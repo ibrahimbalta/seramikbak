@@ -3,8 +3,26 @@ import prisma from '@/lib/prisma';
 import fs from 'fs';
 import path from 'path';
 
-// Helper to save base64 image to public/textures directory
+import { uploadImage } from '@/lib/cloudinary';
+
+// Helper to save base64 image (tries Cloudinary first, falls back to local storage)
 async function saveBase64Image(base64Data, filename) {
+  try {
+    // If Cloudinary credentials are set, upload directly to Cloudinary
+    if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+      console.log('[Products API] Uploading image to Cloudinary:', filename);
+      const publicId = path.basename(filename, path.extname(filename));
+      const uploadResult = await uploadImage(base64Data, {
+        public_id: publicId,
+        folder: 'seramikbak/products'
+      });
+      return uploadResult.secure_url;
+    }
+  } catch (cloudinaryErr) {
+    console.error('[Products API] Cloudinary upload failed, falling back to local storage:', cloudinaryErr);
+  }
+
+  // Fallback to local storage (existing code)
   try {
     const publicDir = path.join(process.cwd(), 'public', 'textures');
     
@@ -20,7 +38,7 @@ async function saveBase64Image(base64Data, filename) {
     fs.writeFileSync(filePath, buffer);
     return `/textures/${filename}`;
   } catch (err) {
-    console.error('[Products API] Failed to save image:', err);
+    console.error('[Products API] Failed to save image locally:', err);
     return null;
   }
 }

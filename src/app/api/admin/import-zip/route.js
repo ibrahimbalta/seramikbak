@@ -4,6 +4,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { uploadImage } from '@/lib/cloudinary';
 
 const execAsync = promisify(exec);
 
@@ -67,16 +68,35 @@ export async function POST(request) {
       });
 
       if (product) {
+        let imageUrl = `/textures/${fileName}`;
+        let textureUrl = `/textures/${fileName}`;
+        const filePath = path.join(texturesDir, fileName);
+
+        // Upload to Cloudinary if config is present
+        if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+          try {
+            logs.push(`[Cloudinary] "${fileName}" buluta yükleniyor...`);
+            const uploadResult = await uploadImage(filePath, {
+              public_id: skuCode.toLowerCase(),
+              folder: 'seramikbak/products'
+            });
+            imageUrl = uploadResult.secure_url;
+            textureUrl = uploadResult.secure_url;
+            logs.push(`[Cloudinary] Yükleme başarılı: ${imageUrl}`);
+          } catch (cloudErr) {
+            logs.push(`[Cloudinary - Hata] Yükleme başarısız (${cloudErr.message}), lokale dönülüyor.`);
+          }
+        }
+
         // Update product image and texture URLs
-        const relativeUrl = `/textures/${fileName}`;
         await prisma.product.update({
           where: { code: skuCode },
           data: {
-            imageUrl: relativeUrl,
-            textureUrl: relativeUrl
+            imageUrl,
+            textureUrl
           }
         });
-        logs.push(`[Eşleşti] "${product.name}" ürünü için görsel atandı: ${fileName} -> SKU: ${skuCode}`);
+        logs.push(`[Eşleşti] "${product.name}" ürünü için görsel atandı: SKU: ${skuCode}`);
         matchedCount++;
       }
     }
