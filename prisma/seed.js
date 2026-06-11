@@ -1,5 +1,19 @@
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const { createClient } = require('@libsql/client');
+const { PrismaLibSQL } = require('@prisma/adapter-libsql');
+
+let prisma;
+
+if (process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN) {
+  const libsql = createClient({
+    url: process.env.TURSO_DATABASE_URL,
+    authToken: process.env.TURSO_AUTH_TOKEN,
+  });
+  const adapter = new PrismaLibSQL(libsql);
+  prisma = new PrismaClient({ adapter });
+} else {
+  prisma = new PrismaClient();
+}
 
 async function main() {
   console.log('Clearing existing database...');
