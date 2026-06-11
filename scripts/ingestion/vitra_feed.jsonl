@@ -1,0 +1,12 @@
+{"name":"Marmori Calacatta","code":"VIT-MAR-CAL","dimensions":"60x120 cm","finish":"Parlak","color":"Beyaz","style":"Mermer","area":"Duvar,Mutfak,Banyo","imageUrl":"/textures/calacatta_gold.jpg"}
+{"name":"Urbancrete Gri","code":"VIT-URB-GRY","dimensions":"60x60 cm","finish":"Mat","color":"Gri","style":"Beton","area":"Yer,Salon,Koridor","imageUrl":"/textures/concrete_light_grey.jpg"}
+{"name":"Retromix Lava","code":"VIT-RET-LAV","dimensions":"15x15 cm","finish":"Mat","color":"Antrasit","style":"Mozaik","area":"Duvar,Banyo","imageUrl":"/textures/borneo_antrasit.jpg"}
+{"name":"Aspenwood Teak","code":"VIT-ASP-TEA","dimensions":"20x120 cm","finish":"Mat","color":"Kahverengi","style":"Ahşap","area":"Yer,Balkon,Salon","imageUrl":"/textures/natural_oak.jpg"}
+{"name":"Ceppostone Gri","code":"VIT-CEP-GRY","dimensions":"60x120 cm","finish":"Lapatto","color":"Gri","style":"Taş","area":"Yer,Koridor,Teras","imageUrl":"/textures/loft_beton.jpg"}
+{"name":"Cementmix Light Grey","code":"VIT-CEM-LGR","dimensions":"80x80 cm","finish":"Mat","color":"Gri","style":"Beton","area":"Yer,Salon","imageUrl":"/textures/concrete_light_grey.jpg"}
+{"name":"Color Code Bej","code":"VIT-COL-BEJ","dimensions":"30x90 cm","finish":"Mat","color":"Bej","style":"Düz Renk","area":"Duvar,Banyo","imageUrl":"/textures/vista_bej.jpg"}
+{"name":"Marmori Nero Marquina","code":"VIT-MAR-NER","dimensions":"60x120 cm","finish":"Parlak","color":"Antrasit","style":"Mermer","area":"Duvar,Yer,Salon","imageUrl":"/textures/borneo_antrasit.jpg"}
+{"name":"Stone Code Sand","code":"VIT-STN-SND","dimensions":"60x120 cm","finish":"Lapatto","color":"Bej","style":"Taş","area":"Yer,Balkon,Havuz Kenarı","imageUrl":"/textures/travertino_classico.jpg"}
+{"name":"Seta Vizon","code":"VIT-SET-VIZ","dimensions":"30x60 cm","finish":"Mat","color":"Bej","style":"Düz Renk","area":"Duvar,Banyo,Mutfak","imageUrl":"/textures/vista_bej.jpg"}
+{"name":"Matrix Beyaz","code":"VIT-MTX-WHT","dimensions":"30x60 cm","finish":"Mat","color":"Beyaz","style":"Beton","area":"Duvar,Mutfak","imageUrl":"/textures/calacatta_gold.jpg"}
+{"name":"Aspenwood Wenge","code":"VIT-ASP-WNG","dimensions":"20x120 cm","finish":"Mat","color":"Antrasit","style":"Ahşap","area":"Yer,Salon","imageUrl":"/textures/borneo_antrasit.jpg"}

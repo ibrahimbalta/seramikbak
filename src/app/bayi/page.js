@@ -1,0 +1,1698 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { 
+  Sparkles, 
+  MapPin, 
+  FileText, 
+  Lock, 
+  User, 
+  LogOut, 
+  CheckCircle, 
+  AlertCircle, 
+  Loader2, 
+  Activity, 
+  TrendingUp, 
+  ArrowLeft,
+  Mail,
+  Phone,
+  Settings,
+  ShieldCheck,
+  Calendar,
+  ExternalLink,
+  Trash2,
+  CreditCard,
+  Crown,
+  Zap,
+  Star,
+  Check,
+  X,
+  BadgeCheck,
+  Clock,
+  Package,
+  ArrowRight,
+  Building2
+} from 'lucide-react';
+import Link from 'next/link';
+
+export default function DealerPortalPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Logged-in Dealer Session State
+  const [dealerInfo, setDealerInfo] = useState(null);
+  
+  // Dashboard Data State
+  const [leads, setLeads] = useState([]);
+  const [stats, setStats] = useState({ totalLeads: 0, pendingLeads: 0, respondedLeads: 0 });
+  const [leadsLoading, setLeadsLoading] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+
+  // Dealer SaaS State
+  const [saasInfo, setSaasInfo] = useState(null);
+  const [stripePlan, setStripePlan] = useState('STANDART');
+  const [stripeLoading, setStripeLoading] = useState(false);
+  const [stripeWebhookResult, setStripeWebhookResult] = useState('');
+
+  // Portal navigation: 'dashboard', 'b2b-projects', 'subscription', 'settings'
+  const [activePortalTab, setActivePortalTab] = useState('dashboard');
+
+  // Profile Form State
+  const [showSettings, setShowSettings] = useState(false);
+  const [profilePhone, setProfilePhone] = useState('');
+  const [profileAddress, setProfileAddress] = useState('');
+  const [profilePassword, setProfilePassword] = useState('');
+  const [profileLat, setProfileLat] = useState('');
+  const [profileLng, setProfileLng] = useState('');
+  const [profileSuccess, setProfileSuccess] = useState('');
+  const [profileError, setProfileError] = useState('');
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  // Restore session from localStorage on mount
+  useEffect(() => {
+    const savedSession = localStorage.getItem('sb_dealer_session');
+    if (savedSession) {
+      try {
+        const session = JSON.parse(savedSession);
+        setDealerInfo(session);
+        setIsLoggedIn(true);
+        // Initialize profile form
+        setProfilePhone(session.phone || '');
+        setProfileAddress(session.address || '');
+        setProfilePassword(session.password || '');
+        setProfileLat(session.lat ? String(session.lat) : '');
+        setProfileLng(session.lng ? String(session.lng) : '');
+      } catch (err) {
+        console.error('Session restore failed:', err);
+      }
+    }
+  }, []);
+
+  // Load leads and projects once logged in
+  useEffect(() => {
+    if (isLoggedIn && dealerInfo) {
+      loadDealerLeads();
+      loadDealerProjects();
+    }
+  }, [isLoggedIn, dealerInfo]);
+
+  const loadDealerLeads = async () => {
+    if (!dealerInfo) return;
+    setLeadsLoading(true);
+    try {
+      const res = await fetch(`/api/dealers/my-leads?dealerId=${dealerInfo.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setLeads(data.leads);
+          setStats(data.stats);
+          setSaasInfo(data.saas);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load leads:', err);
+    } finally {
+      setLeadsLoading(false);
+    }
+  };
+
+  const loadDealerProjects = async () => {
+    if (!dealerInfo) return;
+    setProjectsLoading(true);
+    try {
+      const res = await fetch(`/api/projects/list?dealerId=${dealerInfo.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setProjects(data.projects);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load B2B projects:', err);
+    } finally {
+      setProjectsLoading(false);
+    }
+  };
+
+  const triggerStripeMockWebhook = async () => {
+    if (!dealerInfo) return;
+    setStripeLoading(true);
+    setStripeWebhookResult('');
+    
+    try {
+      const response = await fetch('/api/webhooks/stripe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventType: 'checkout.session.completed',
+          dealerId: dealerInfo.id,
+          plan: stripePlan,
+          durationMonths: 12
+        })
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setStripeWebhookResult(`Stripe Webhook Başarılı! Planınız ${stripePlan} (Yıllık) olarak aktifleştirildi.`);
+        loadDealerLeads();
+        loadDealerProjects();
+      } else {
+        setStripeWebhookResult('Webhook hatası: ' + (result.error || 'Bilinmeyen Hata'));
+      }
+    } catch (err) {
+      setStripeWebhookResult('Bağlantı hatası.');
+      console.error(err);
+    } finally {
+      setStripeLoading(false);
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginError('');
+    setIsLoading(true);
+
+    try {
+      const res = await fetch('/api/dealers/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailOrPhone, password })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setDealerInfo(data.dealer);
+        localStorage.setItem('sb_dealer_session', JSON.stringify(data.dealer));
+        setIsLoggedIn(true);
+
+        // Initialize profile form fields
+        setProfilePhone(data.dealer.phone || '');
+        setProfileAddress(data.dealer.address || '');
+        setProfilePassword(password); // use the successfully typed password
+        setProfileLat(data.dealer.lat ? String(data.dealer.lat) : '');
+        setProfileLng(data.dealer.lng ? String(data.dealer.lng) : '');
+      } else {
+        setLoginError(data.error || 'Giriş başarısız oldu.');
+      }
+    } catch (err) {
+      setLoginError('Sunucu bağlantı hatası.');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('sb_dealer_session');
+    setIsLoggedIn(false);
+    setDealerInfo(null);
+    setLeads([]);
+    setEmailOrPhone('');
+    setPassword('');
+  };
+
+  const handleUpdateLeadStatus = async (leadId, newStatus) => {
+    if (!dealerInfo) return;
+    try {
+      const res = await fetch('/api/dealers/my-leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leadId,
+          dealerId: dealerInfo.id,
+          status: newStatus
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        loadDealerLeads();
+      } else {
+        alert('Durum güncellenemedi: ' + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteLead = async (leadId) => {
+    if (!dealerInfo) return;
+    if (!confirm('Bu teklif talebini silmek istediğinize emin misiniz?')) return;
+    try {
+      const res = await fetch(`/api/dealers/my-leads?leadId=${leadId}&dealerId=${dealerInfo.id}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success) {
+        loadDealerLeads();
+      } else {
+        alert('Talep silinemedi: ' + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    if (!dealerInfo) return;
+    setIsSavingProfile(true);
+    setProfileSuccess('');
+    setProfileError('');
+
+    try {
+      const res = await fetch('/api/admin/dealers', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: dealerInfo.id,
+          phone: profilePhone,
+          address: profileAddress,
+          password: profilePassword,
+          lat: parseFloat(profileLat) || dealerInfo.lat,
+          lng: parseFloat(profileLng) || dealerInfo.lng,
+          status: 'APPROVED' // Keep approved status
+        })
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        setProfileSuccess('Profil bilgileriniz başarıyla güncellendi.');
+        // Update local state and storage session
+        const updatedSession = {
+          ...dealerInfo,
+          phone: profilePhone,
+          address: profileAddress,
+          lat: parseFloat(profileLat) || dealerInfo.lat,
+          lng: parseFloat(profileLng) || dealerInfo.lng
+        };
+        setDealerInfo(updatedSession);
+        localStorage.setItem('sb_dealer_session', JSON.stringify(updatedSession));
+      } else {
+        setProfileError(data.error || 'Profil güncellenemedi.');
+      }
+    } catch (err) {
+      setProfileError('Bağlantı hatası.');
+      console.error(err);
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <main className="login-layout" style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        fontFamily: 'Inter, system-ui, sans-serif'
+      }}>
+        <div className="login-card glass-panel" style={{
+          background: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.4)',
+          borderRadius: '24px',
+          padding: '40px',
+          width: '100%',
+          maxWidth: '440px',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.06)'
+        }}>
+          <div className="login-header" style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <Link href="/" style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              textDecoration: 'none',
+              color: 'var(--text-primary, #111)',
+              marginBottom: '16px',
+              fontSize: '0.85rem',
+              fontWeight: '600'
+            }}>
+              <ArrowLeft size={14} /> Ana Sayfaya Dön
+            </Link>
+            <div className="logo-icon" style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #111 0%, #444 100%)',
+              color: '#d4af37',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: '900',
+              fontSize: '1.4rem',
+              margin: '0 auto 16px auto',
+              boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+            }}>SB</div>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#111', margin: '0 0 6px 0' }}>Yetkili Bayi Portalı</h3>
+            <p style={{ fontSize: '0.85rem', color: '#666', margin: 0 }}>Gelen fiyat tekliflerini ve talepleri yönetin.</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="login-form" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            {loginError && (
+              <div className="error-alert" style={{
+                background: '#fee2e2',
+                color: '#ef4444',
+                border: '1px solid #fca5a5',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                fontSize: '0.8rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <AlertCircle size={16} />
+                <span>{loginError}</span>
+              </div>
+            )}
+
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#333' }}>E-posta Adresi veya Telefon</label>
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type="text" 
+                  value={emailOrPhone} 
+                  onChange={(e) => setEmailOrPhone(e.target.value)} 
+                  required 
+                  placeholder="bayi@seramik.com veya 0216..." 
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px 12px 40px',
+                    borderRadius: '12px',
+                    border: '1px solid #ced4da',
+                    fontSize: '0.9rem',
+                    background: '#fff',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <User size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: '#888' }} />
+              </div>
+            </div>
+
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#333' }}>Şifre</label>
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type="password" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  required 
+                  placeholder="••••••••" 
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px 12px 40px',
+                    borderRadius: '12px',
+                    border: '1px solid #ced4da',
+                    fontSize: '0.9rem',
+                    background: '#fff',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <Lock size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: '#888' }} />
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={isLoading}
+              style={{
+                background: 'linear-gradient(135deg, #111 0%, #333 100%)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '14px',
+                fontWeight: '700',
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginTop: '8px',
+                transition: 'all 0.2s'
+              }}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>Bağlanılıyor...</span>
+                </>
+              ) : (
+                <>
+                  <ShieldCheck size={16} />
+                  <span>Portal Girişi Yap</span>
+                </>
+              )}
+            </button>
+          </form>
+
+          <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.75rem', color: '#888' }}>
+            SeramikBak Yetkili Bayi Ağ Güvenliği Altındadır.
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#f8f9fa',
+      color: '#212529',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      boxSizing: 'border-box'
+    }}>
+      {/* HEADER NAVBAR */}
+      <header style={{
+        background: '#fff',
+        borderBottom: '1px solid #e9ecef',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+      }}>
+        <div style={{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          padding: '14px 24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #111 0%, #333 100%)',
+              color: '#d4af37',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: '900',
+              fontSize: '1.1rem'
+            }}>SB</div>
+            <div>
+              <h1 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {dealerInfo.name} 
+                <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', background: '#e9ecef', color: '#495057', fontWeight: '700' }}>
+                  {dealerInfo.brandName} Bayisi
+                </span>
+                {saasInfo && (
+                  <span style={{ 
+                    fontSize: '0.68rem', 
+                    padding: '2px 8px', 
+                    borderRadius: '10px', 
+                    background: saasInfo.plan === 'PREMIUM' ? 'linear-gradient(135deg, #111 0%, #333 100%)' : '#d4af37', 
+                    color: saasInfo.plan === 'PREMIUM' ? '#d4af37' : '#000', 
+                    fontWeight: '700' 
+                  }}>
+                    {saasInfo.plan} Üyelik
+                  </span>
+                )}
+                {!saasInfo && (
+                  <span style={{ fontSize: '0.68rem', padding: '2px 8px', borderRadius: '10px', background: '#fee2e2', color: '#ef4444', fontWeight: '700' }}>
+                    Aboneliksiz / Süresi Dolmuş
+                  </span>
+                )}
+              </h1>
+              <p style={{ fontSize: '0.7rem', color: '#6c757d', margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <MapPin size={10} /> {dealerInfo.district}, {dealerInfo.city}
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {saasInfo?.expiresAt && (
+              <div style={{ fontSize: '0.75rem', color: '#6c757d', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '4px' }}>
+                <Calendar size={12} />
+                <span>Paket Bitiş: {new Date(saasInfo.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+              </div>
+            )}
+
+            {/* Tab Navigation Buttons */}
+            <div style={{ display: 'flex', gap: '4px', background: '#f1f3f5', borderRadius: '8px', padding: '3px' }}>
+              <button 
+                onClick={() => { setActivePortalTab('dashboard'); setShowSettings(false); }}
+                style={{
+                  background: activePortalTab === 'dashboard' ? '#fff' : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  fontSize: '0.75rem',
+                  fontWeight: activePortalTab === 'dashboard' ? '700' : '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  color: activePortalTab === 'dashboard' ? '#111' : '#6c757d',
+                  boxShadow: activePortalTab === 'dashboard' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <Activity size={13} />
+                <span>Panel</span>
+              </button>
+              <button 
+                onClick={() => { setActivePortalTab('b2b-projects'); setShowSettings(false); }}
+                style={{
+                  background: activePortalTab === 'b2b-projects' ? '#fff' : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  fontSize: '0.75rem',
+                  fontWeight: activePortalTab === 'b2b-projects' ? '700' : '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  color: activePortalTab === 'b2b-projects' ? '#111' : '#6c757d',
+                  boxShadow: activePortalTab === 'b2b-projects' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <Building2 size={13} />
+                <span>Proje Talepleri (B2B)</span>
+              </button>
+              <button 
+                onClick={() => { setActivePortalTab('subscription'); setShowSettings(false); }}
+                style={{
+                  background: activePortalTab === 'subscription' ? '#fff' : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  fontSize: '0.75rem',
+                  fontWeight: activePortalTab === 'subscription' ? '700' : '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  color: activePortalTab === 'subscription' ? '#111' : '#6c757d',
+                  boxShadow: activePortalTab === 'subscription' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <CreditCard size={13} />
+                <span>Abonelik</span>
+              </button>
+              <button 
+                onClick={() => { setActivePortalTab('settings'); setShowSettings(true); }}
+                style={{
+                  background: activePortalTab === 'settings' ? '#fff' : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  fontSize: '0.75rem',
+                  fontWeight: activePortalTab === 'settings' ? '700' : '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  color: activePortalTab === 'settings' ? '#111' : '#6c757d',
+                  boxShadow: activePortalTab === 'settings' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <Settings size={13} />
+                <span>Ayarlar</span>
+              </button>
+            </div>
+
+            <button 
+              onClick={handleLogout} 
+              style={{
+                background: 'transparent',
+                border: '1px solid #fee2e2',
+                borderRadius: '8px',
+                padding: '6px 10px',
+                fontSize: '0.75rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                color: '#dc3545'
+              }}
+            >
+              <LogOut size={13} />
+              <span>Çıkış</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* PORTAL MAIN CONTENT */}
+      <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
+        {activePortalTab === 'b2b-projects' ? (
+          /* B2B PROJECTS TAB */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Building2 size={22} style={{ color: '#d4af37' }} />
+                  B2B Proje & Toplu Seramik İhaleleri
+                </h2>
+                <p style={{ fontSize: '0.82rem', color: '#6c757d', margin: 0 }}>
+                  İnşaat firmaları, mimarlar ve müteahhitler tarafından oluşturulmuş güncel toplu seramik ihtiyaç havuzu.
+                </p>
+              </div>
+              
+              <div style={{
+                background: saasInfo?.plan === 'PREMIUM' ? 'rgba(212, 175, 55, 0.1)' : saasInfo?.plan === 'STANDART' ? '#e9ecef' : '#fee2e2',
+                color: saasInfo?.plan === 'PREMIUM' ? '#d4af37' : saasInfo?.plan === 'STANDART' ? '#495057' : '#dc3545',
+                border: '1px solid ' + (saasInfo?.plan === 'PREMIUM' ? 'rgba(212,175,55,0.2)' : saasInfo?.plan === 'STANDART' ? '#ced4da' : '#fca5a5'),
+                padding: '6px 12px',
+                borderRadius: '20px',
+                fontSize: '0.75rem',
+                fontWeight: '700'
+              }}>
+                Mevcut Planınız: {saasInfo?.plan || 'LITE / YOK'}
+              </div>
+            </div>
+
+            {/* List of project requests */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {projectsLoading ? (
+                <div style={{ textAlign: 'center', padding: '48px', color: '#6c757d' }}>
+                  <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
+                  <span>Proje talepleri yükleniyor...</span>
+                </div>
+              ) : projects.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '48px', color: '#6c757d', background: '#fff', borderRadius: '16px', border: '1px solid #e9ecef' }}>
+                  <span>Şu anda aktif veya onaylanmış bir B2B proje talebi bulunmamaktadır.</span>
+                </div>
+              ) : (
+                projects.map(proj => {
+                  const isLocked = proj.isLocked;
+                  const isMasked = proj.isMasked;
+
+                  return (
+                    <div key={proj.id} style={{
+                      background: '#fff',
+                      border: '1px solid #e9ecef',
+                      borderRadius: '16px',
+                      padding: '24px',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.01)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '16px'
+                    }}>
+                      {/* Top Row: Meta and Badges */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #f1f3f5', paddingBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                            <span style={{
+                              background: '#e0f2fe',
+                              color: '#0284c7',
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontSize: '0.68rem',
+                              fontWeight: '700'
+                            }}>{proj.projectType}</span>
+                            <span style={{ fontSize: '0.72rem', color: '#6c757d' }}>{proj.city} / {proj.district}</span>
+                            <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>•</span>
+                            <span style={{ fontSize: '0.72rem', color: '#6c757d' }}>Aşama: {proj.constructionStep}</span>
+                          </div>
+                          <h4 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#111', margin: '8px 0 0 0' }}>
+                            {proj.projectName}
+                          </h4>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#6c757d' }}>Talep Tarihi</div>
+                          <div style={{ fontSize: '0.8rem', fontWeight: '600' }}>
+                            {new Date(proj.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Main Details Split */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+                        {/* Column 1: Material Requirements */}
+                        <div>
+                          <h5 style={{ fontSize: '0.78rem', fontWeight: '700', textTransform: 'uppercase', color: '#888', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Malzeme Tercihleri</h5>
+                          {isLocked ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', opacity: 0.5 }}>
+                              <div style={{ fontSize: '0.85rem' }}>Ebat: <strong>***</strong></div>
+                              <div style={{ fontSize: '0.85rem' }}>Tarz: <strong>***</strong></div>
+                              <div style={{ fontSize: '0.85rem' }}>Kullanım Alanı: <strong>***</strong></div>
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.85rem' }}>
+                              <div>Ebat: <strong>{proj.ceramicSizes}</strong></div>
+                              <div>Tarz: <strong>{proj.ceramicStyles}</strong></div>
+                              {proj.ceramicFinishes && <div>Yüzey: <strong>{proj.ceramicFinishes}</strong></div>}
+                              {proj.ceramicColors && <div>Renk: <strong>{proj.ceramicColors}</strong></div>}
+                              <div>Alan: <strong>{proj.usageAreas}</strong></div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Column 2: Volume & Timeline */}
+                        <div>
+                          <h5 style={{ fontSize: '0.78rem', fontWeight: '700', textTransform: 'uppercase', color: '#888', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Miktar ve Bütçe</h5>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.85rem' }}>
+                            <div>Toplam Metraj: <strong style={{ color: '#0f172a', fontSize: '1rem' }}>{proj.quantityM2.toLocaleString('tr-TR')} m²</strong></div>
+                            <div>Hedef Bütçe: <strong style={{ color: '#0284c7' }}>{proj.budgetM2}</strong></div>
+                            <div>Teslim Süresi: <strong>{proj.deliveryTimeline}</strong></div>
+                          </div>
+                        </div>
+
+                        {/* Column 3: Contact Info (Protected by SaaS Tier) */}
+                        <div>
+                          <h5 style={{ fontSize: '0.78rem', fontWeight: '700', textTransform: 'uppercase', color: '#888', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Müteahhit / İletişim</h5>
+                          {isLocked ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', opacity: 0.5 }}>
+                              <div style={{ fontSize: '0.82rem' }}>Firma: <strong>***</strong></div>
+                              <div style={{ fontSize: '0.82rem' }}>Yetkili: <strong>***</strong></div>
+                              <div style={{ fontSize: '0.82rem' }}>Telefon: <strong>***</strong></div>
+                            </div>
+                          ) : isMasked ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.82rem' }}>
+                              <div>Firma: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.companyName}</strong></div>
+                              <div>Yetkili: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.contactName}</strong></div>
+                              <div>Telefon: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.contactPhone}</strong></div>
+                              <div style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '700', marginTop: '4px' }}>
+                                ⚠️ İletişim bilgilerini görmek için PREMIUM pakete geçin.
+                              </div>
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.82rem' }}>
+                              <div>Firma: <strong style={{ color: '#111' }}>{proj.companyName}</strong></div>
+                              <div>Yetkili: <strong>{proj.contactName}</strong></div>
+                              <div>Telefon: <a href={`tel:${proj.contactPhone}`} style={{ color: '#0284c7', textDecoration: 'none', fontWeight: '600' }}>{proj.contactPhone}</a></div>
+                              <div>E-posta: <a href={`mailto:${proj.contactEmail}`} style={{ color: '#64748b' }}>{proj.contactEmail}</a></div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Notes Section */}
+                      {!isLocked && proj.notes && (
+                        <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', fontSize: '0.78rem', color: '#475569', fontStyle: 'italic', borderLeft: '3px solid #cbd5e1' }}>
+                          Proje Notu: "{proj.notes}"
+                        </div>
+                      )}
+
+                      {/* Lock Overlays */}
+                      {isLocked && (
+                        <div style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          background: 'rgba(255, 255, 255, 0.9)',
+                          backdropFilter: 'blur(4px)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: '20px',
+                          textAlign: 'center'
+                        }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            background: '#fee2e2',
+                            color: '#dc3545',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginBottom: '12px'
+                          }}>
+                            <Lock size={18} />
+                          </div>
+                          <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#111', margin: '0 0 4px 0' }}>B2B Proje Detayları Kilitli</h4>
+                          <p style={{ fontSize: '0.75rem', color: '#6c757d', margin: '0 0 12px 0', maxWidth: '300px' }}>
+                            Toplu ihale metrajlarını ve malzeme ihtiyaçlarını görmek için bayiliğinizin aboneliğini aktifleştirin.
+                          </p>
+                          <button
+                            onClick={() => setActivePortalTab('subscription')}
+                            style={{
+                              background: '#111',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '8px 16px',
+                              fontSize: '0.75rem',
+                              fontWeight: '700',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Abonelik Paketlerini İncele
+                          </button>
+                        </div>
+                      )}
+
+                      {!isLocked && isMasked && (
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid #f1f3f5', paddingTop: '12px', marginTop: '4px' }}>
+                          <button
+                            onClick={() => setActivePortalTab('subscription')}
+                            style={{
+                              background: 'linear-gradient(135deg, #111 0%, #333 100%)',
+                              color: '#d4af37',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '8px 16px',
+                              fontSize: '0.75rem',
+                              fontWeight: '700',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px'
+                            }}
+                          >
+                            <Crown size={14} style={{ color: '#d4af37' }} />
+                            <span>İletişimi Açmak İçin Premium'a Geç</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        ) : activePortalTab === 'settings' ? (
+          /* SETTINGS TAB */
+          <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+            <div className="glass-panel" style={{
+              background: '#fff',
+              border: '1px solid #e9ecef',
+              borderRadius: '16px',
+              padding: '32px',
+              boxShadow: '0 8px 16px rgba(0,0,0,0.02)'
+            }}>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 6px 0' }}>Bayi Profil Bilgileri Güncelleme</h2>
+              <p style={{ fontSize: '0.8rem', color: '#6c757d', margin: '0 0 24px 0' }}>Aşağıdaki alanları güncelleyerek müşterilere gösterilen şube kartınızı güncel tutun.</p>
+
+              <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {profileSuccess && (
+                  <div style={{
+                    background: '#e6f7ed',
+                    color: '#10b981',
+                    border: '1px solid #a7f3d0',
+                    borderRadius: '8px',
+                    padding: '10px 14px',
+                    fontSize: '0.8rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <CheckCircle size={16} />
+                    <span>{profileSuccess}</span>
+                  </div>
+                )}
+                {profileError && (
+                  <div style={{
+                    background: '#fee2e2',
+                    color: '#ef4444',
+                    border: '1px solid #fca5a5',
+                    borderRadius: '8px',
+                    padding: '10px 14px',
+                    fontSize: '0.8rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <AlertCircle size={16} />
+                    <span>{profileError}</span>
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Şube İletişim Telefonu</label>
+                  <input 
+                    type="text" 
+                    value={profilePhone} 
+                    onChange={(e) => setProfilePhone(e.target.value)} 
+                    required 
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Şube Giriş Şifresi</label>
+                  <input 
+                    type="password" 
+                    value={profilePassword} 
+                    onChange={(e) => setProfilePassword(e.target.value)} 
+                    required 
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Açık Adres</label>
+                  <textarea 
+                    value={profileAddress} 
+                    onChange={(e) => setProfileAddress(e.target.value)} 
+                    required 
+                    rows={3}
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem', fontFamily: 'inherit' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Enlem (Latitude)</label>
+                    <input 
+                      type="text" 
+                      value={profileLat} 
+                      onChange={(e) => setProfileLat(e.target.value)} 
+                      required 
+                      style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
+                    />
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Boylam (Longitude)</label>
+                    <input 
+                      type="text" 
+                      value={profileLng} 
+                      onChange={(e) => setProfileLng(e.target.value)} 
+                      required 
+                      style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
+                    />
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={isSavingProfile}
+                  style={{
+                    background: '#111',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    marginTop: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  {isSavingProfile ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Kaydediliyor...</span>
+                    </>
+                  ) : (
+                    <span>Değişiklikleri Kaydet</span>
+                  )}
+                </button>
+              </form>
+            </div>
+          </div>
+        ) : activePortalTab === 'subscription' ? (
+          /* ===== SUBSCRIPTION TAB ===== */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            {/* Current Subscription Status Banner */}
+            <div style={{
+              background: saasInfo ? 'linear-gradient(135deg, #111 0%, #1a1a2e 50%, #16213e 100%)' : 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+              borderRadius: '20px',
+              padding: '32px 36px',
+              color: saasInfo ? '#fff' : '#991b1b',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              {saasInfo && (
+                <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '200px', height: '200px', background: 'radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%)', borderRadius: '50%' }} />
+              )}
+              <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    {saasInfo ? <Crown size={22} style={{ color: '#d4af37' }} /> : <AlertCircle size={22} />}
+                    <h2 style={{ fontSize: '1.3rem', fontWeight: '800', margin: 0 }}>
+                      {saasInfo ? `${saasInfo.plan} Yıllık Paket` : 'Aktif Aboneliğiniz Bulunmuyor'}
+                    </h2>
+                    {saasInfo && (
+                      <span style={{
+                        background: saasInfo.status === 'ACTIVE' ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)',
+                        color: saasInfo.status === 'ACTIVE' ? '#34d399' : '#fca5a5',
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        fontSize: '0.7rem',
+                        fontWeight: '700'
+                      }}>
+                        {saasInfo.status === 'ACTIVE' ? '● Aktif' : saasInfo.status === 'PAUSED' ? '● Askıda' : '● Süresi Dolmuş'}
+                      </span>
+                    )}
+                  </div>
+                  <p style={{ fontSize: '0.85rem', margin: 0, opacity: 0.8 }}>
+                    {saasInfo 
+                      ? `Paket bitiş tarihi: ${new Date(saasInfo.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}` 
+                      : 'Müşteri bilgilerine tam erişim ve teklif yönetimi için bir paket seçin.'}
+                  </p>
+                </div>
+                {saasInfo && (
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    background: 'rgba(255,255,255,0.08)',
+                    borderRadius: '14px',
+                    padding: '16px 24px',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    <span style={{ fontSize: '0.68rem', fontWeight: '600', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Kalan Süre</span>
+                    <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#d4af37' }}>
+                      {Math.max(0, Math.ceil((new Date(saasInfo.expiresAt) - new Date()) / (1000 * 60 * 60 * 24)))} Gün
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Pricing Cards */}
+            <div>
+              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 6px 0', color: '#111' }}>Yıllık Bayi Abonelik Paketleri</h3>
+                <p style={{ fontSize: '0.85rem', color: '#6c757d', margin: 0 }}>İhtiyacınıza uygun paketi seçin ve müşteri taleplerini yönetin. Tüm paketler yıllık faturalandırılır.</p>
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: '24px',
+                alignItems: 'stretch'
+              }}>
+                {/* LITE Plan */}
+                <div style={{
+                  background: '#fff',
+                  border: saasInfo?.plan === 'LITE' ? '2px solid #d4af37' : '1px solid #e9ecef',
+                  borderRadius: '20px',
+                  padding: '32px 28px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  boxShadow: saasInfo?.plan === 'LITE' ? '0 8px 30px rgba(212,175,55,0.12)' : '0 4px 12px rgba(0,0,0,0.02)',
+                  transition: 'all 0.3s',
+                }}>
+                  {saasInfo?.plan === 'LITE' && (
+                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#d4af37', color: '#000', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <BadgeCheck size={13} /> Mevcut Paketiniz
+                    </div>
+                  )}
+                  <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                    <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px auto' }}>
+                      <Zap size={24} color="#64748b" />
+                    </div>
+                    <h4 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 4px 0', color: '#334155' }}>LITE</h4>
+                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>Küçük bayiler için temel paket</p>
+                  </div>
+                  <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                    <span style={{ fontSize: '2.4rem', fontWeight: '900', color: '#111' }}>₺2.990</span>
+                    <span style={{ fontSize: '0.8rem', color: '#6c757d' }}> / yıl</span>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>Aylık ₺249 karşılığı</div>
+                  </div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 auto 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {[
+                      { text: 'Müşteri adı ve telefon bilgisi', included: true },
+                      { text: 'Aylık 50 müşteri talebi limiti', included: true },
+                      { text: 'Temel talep yönetimi', included: true },
+                      { text: 'E-posta destek', included: true },
+                      { text: 'Öncelikli listeleme', included: false },
+                      { text: 'Anlık bildirimler', included: false },
+                      { text: 'Reklam kampanyaları', included: false },
+                    ].map((f, i) => (
+                      <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: f.included ? '#334155' : '#cbd5e1' }}>
+                        {f.included ? <Check size={15} style={{ color: '#10b981', flexShrink: 0 }} /> : <X size={15} style={{ color: '#e2e8f0', flexShrink: 0 }} />}
+                        <span>{f.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => { setStripePlan('LITE'); triggerStripeMockWebhook(); }}
+                    disabled={stripeLoading || saasInfo?.plan === 'LITE'}
+                    style={{
+                      marginTop: '28px',
+                      background: saasInfo?.plan === 'LITE' ? '#e9ecef' : '#f1f3f5',
+                      color: saasInfo?.plan === 'LITE' ? '#adb5bd' : '#111',
+                      border: '1px solid #dee2e6',
+                      borderRadius: '12px',
+                      padding: '13px',
+                      fontWeight: '700',
+                      fontSize: '0.88rem',
+                      cursor: saasInfo?.plan === 'LITE' ? 'default' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {stripeLoading && stripePlan === 'LITE' ? <Loader2 size={16} className="animate-spin" /> : saasInfo?.plan === 'LITE' ? <CheckCircle size={16} /> : <ArrowRight size={16} />}
+                    <span>{saasInfo?.plan === 'LITE' ? 'Aktif Paketiniz' : 'Lite Paketi Seç'}</span>
+                  </button>
+                </div>
+
+                {/* STANDART Plan - Highlighted */}
+                <div style={{
+                  background: 'linear-gradient(180deg, #fffbeb 0%, #fff 30%)',
+                  border: saasInfo?.plan === 'STANDART' ? '2px solid #d4af37' : '2px solid #f59e0b',
+                  borderRadius: '20px',
+                  padding: '32px 28px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  boxShadow: '0 12px 40px rgba(245,158,11,0.12)',
+                  transform: 'scale(1.02)',
+                  transition: 'all 0.3s'
+                }}>
+                  {saasInfo?.plan === 'STANDART' ? (
+                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#d4af37', color: '#000', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <BadgeCheck size={13} /> Mevcut Paketiniz
+                    </div>
+                  ) : (
+                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', color: '#fff', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Star size={13} /> En Popüler
+                    </div>
+                  )}
+                  <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                    <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px auto' }}>
+                      <Star size={24} color="#fff" />
+                    </div>
+                    <h4 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 4px 0', color: '#92400e' }}>STANDART</h4>
+                    <p style={{ fontSize: '0.75rem', color: '#b45309', margin: 0 }}>Büyüyen bayiler için önerilen paket</p>
+                  </div>
+                  <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                    <span style={{ fontSize: '2.4rem', fontWeight: '900', color: '#111' }}>₺5.990</span>
+                    <span style={{ fontSize: '0.8rem', color: '#6c757d' }}> / yıl</span>
+                    <div style={{ fontSize: '0.72rem', color: '#b45309', marginTop: '2px' }}>Aylık ₺499 karşılığı · %20 tasarruf</div>
+                  </div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 auto 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {[
+                      { text: 'Tam müşteri bilgisi (ad, tel, e-posta)', included: true },
+                      { text: 'Sınırsız müşteri talebi', included: true },
+                      { text: 'Gelişmiş talep yönetimi', included: true },
+                      { text: 'Öncelikli telefon + e-posta destek', included: true },
+                      { text: 'Arama sonuçlarında öncelikli listeleme', included: true },
+                      { text: 'Anlık SMS/E-posta bildirimleri', included: true },
+                      { text: 'Reklam kampanyaları', included: false },
+                    ].map((f, i) => (
+                      <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: f.included ? '#334155' : '#cbd5e1' }}>
+                        {f.included ? <Check size={15} style={{ color: '#f59e0b', flexShrink: 0 }} /> : <X size={15} style={{ color: '#e2e8f0', flexShrink: 0 }} />}
+                        <span>{f.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => { setStripePlan('STANDART'); triggerStripeMockWebhook(); }}
+                    disabled={stripeLoading || saasInfo?.plan === 'STANDART'}
+                    style={{
+                      marginTop: '28px',
+                      background: saasInfo?.plan === 'STANDART' ? '#fef3c7' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                      color: saasInfo?.plan === 'STANDART' ? '#b45309' : '#fff',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '13px',
+                      fontWeight: '700',
+                      fontSize: '0.88rem',
+                      cursor: saasInfo?.plan === 'STANDART' ? 'default' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      boxShadow: saasInfo?.plan === 'STANDART' ? 'none' : '0 4px 12px rgba(245,158,11,0.3)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {stripeLoading && stripePlan === 'STANDART' ? <Loader2 size={16} className="animate-spin" /> : saasInfo?.plan === 'STANDART' ? <CheckCircle size={16} /> : <ArrowRight size={16} />}
+                    <span>{saasInfo?.plan === 'STANDART' ? 'Aktif Paketiniz' : 'Standart Paketi Seç'}</span>
+                  </button>
+                </div>
+
+                {/* PREMIUM Plan */}
+                <div style={{
+                  background: 'linear-gradient(180deg, #f5f3ff 0%, #fff 30%)',
+                  border: saasInfo?.plan === 'PREMIUM' ? '2px solid #d4af37' : '1px solid #e9ecef',
+                  borderRadius: '20px',
+                  padding: '32px 28px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  boxShadow: saasInfo?.plan === 'PREMIUM' ? '0 8px 30px rgba(212,175,55,0.12)' : '0 4px 12px rgba(0,0,0,0.02)',
+                  transition: 'all 0.3s'
+                }}>
+                  {saasInfo?.plan === 'PREMIUM' && (
+                    <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#d4af37', color: '#000', padding: '4px 16px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <BadgeCheck size={13} /> Mevcut Paketiniz
+                    </div>
+                  )}
+                  <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                    <div style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'linear-gradient(135deg, #111 0%, #333 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px auto' }}>
+                      <Crown size={24} color="#d4af37" />
+                    </div>
+                    <h4 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 4px 0', color: '#111' }}>PREMIUM</h4>
+                    <p style={{ fontSize: '0.75rem', color: '#6c757d', margin: 0 }}>Kurumsal bayiler için tam donanım</p>
+                  </div>
+                  <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                    <span style={{ fontSize: '2.4rem', fontWeight: '900', color: '#111' }}>₺11.990</span>
+                    <span style={{ fontSize: '0.8rem', color: '#6c757d' }}> / yıl</span>
+                    <div style={{ fontSize: '0.72rem', color: '#7c3aed', marginTop: '2px' }}>Aylık ₺999 karşılığı · VIP Ayrıcalıklar</div>
+                  </div>
+                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 auto 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {[
+                      { text: 'Tam müşteri bilgisi + adres detayı', included: true },
+                      { text: 'Sınırsız müşteri talebi', included: true },
+                      { text: 'Gelişmiş CRM entegrasyonu', included: true },
+                      { text: '7/24 VIP Destek Hattı', included: true },
+                      { text: 'En üst sırada öncelikli listeleme', included: true },
+                      { text: 'Anlık SMS/E-posta/WhatsApp bildirim', included: true },
+                      { text: 'Sponsorlu reklam kampanyaları', included: true },
+                    ].map((f, i) => (
+                      <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#334155' }}>
+                        <Check size={15} style={{ color: '#7c3aed', flexShrink: 0 }} />
+                        <span>{f.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => { setStripePlan('PREMIUM'); triggerStripeMockWebhook(); }}
+                    disabled={stripeLoading || saasInfo?.plan === 'PREMIUM'}
+                    style={{
+                      marginTop: '28px',
+                      background: saasInfo?.plan === 'PREMIUM' ? '#f3f4f6' : 'linear-gradient(135deg, #111 0%, #333 100%)',
+                      color: saasInfo?.plan === 'PREMIUM' ? '#6b7280' : '#d4af37',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '13px',
+                      fontWeight: '700',
+                      fontSize: '0.88rem',
+                      cursor: saasInfo?.plan === 'PREMIUM' ? 'default' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      boxShadow: saasInfo?.plan === 'PREMIUM' ? 'none' : '0 4px 12px rgba(0,0,0,0.15)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {stripeLoading && stripePlan === 'PREMIUM' ? <Loader2 size={16} className="animate-spin" /> : saasInfo?.plan === 'PREMIUM' ? <CheckCircle size={16} /> : <Crown size={16} />}
+                    <span>{saasInfo?.plan === 'PREMIUM' ? 'Aktif Paketiniz' : 'Premium Paketi Seç'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Stripe Result Banner */}
+            {stripeWebhookResult && (
+              <div style={{
+                background: stripeWebhookResult.includes('Başarılı') ? '#ecfdf5' : '#fef2f2',
+                border: `1px solid ${stripeWebhookResult.includes('Başarılı') ? '#a7f3d0' : '#fecaca'}`,
+                borderRadius: '14px',
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                fontSize: '0.85rem',
+                color: stripeWebhookResult.includes('Başarılı') ? '#065f46' : '#991b1b',
+                fontWeight: '600'
+              }}>
+                {stripeWebhookResult.includes('Başarılı') ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+                <span>{stripeWebhookResult}</span>
+              </div>
+            )}
+
+            {/* Feature Comparison Table */}
+            <div style={{
+              background: '#fff',
+              border: '1px solid #e9ecef',
+              borderRadius: '20px',
+              padding: '32px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
+            }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', color: '#111' }}>Paket Karşılaştırma Tablosu</h3>
+              <p style={{ fontSize: '0.8rem', color: '#6c757d', margin: '0 0 20px 0' }}>Tüm paketlerin detaylı özellik karşılaştırması</p>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #e9ecef', textAlign: 'left' }}>
+                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#6c757d' }}>Özellik</th>
+                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#64748b', textAlign: 'center' }}>LITE</th>
+                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#b45309', textAlign: 'center', background: '#fffbeb' }}>STANDART</th>
+                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#111', textAlign: 'center' }}>PREMIUM</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { feature: 'Yıllık Ücret', lite: '₺2.990', standart: '₺5.990', premium: '₺11.990' },
+                      { feature: 'Müşteri Bilgi Erişimi', lite: 'Ad + Telefon', standart: 'Tam Bilgi', premium: 'Tam + Adres' },
+                      { feature: 'Aylık Talep Limiti', lite: '50', standart: 'Sınırsız', premium: 'Sınırsız' },
+                      { feature: 'Öncelikli Listeleme', lite: false, standart: true, premium: 'VIP Üst Sıra' },
+                      { feature: 'Anlık Bildirimler', lite: false, standart: true, premium: true },
+                      { feature: 'Destek Kanalı', lite: 'E-posta', standart: 'Tel + E-posta', premium: '7/24 VIP' },
+                      { feature: 'Reklam Kampanyaları', lite: false, standart: false, premium: true },
+                      { feature: 'CRM Entegrasyonu', lite: false, standart: false, premium: true },
+                    ].map((row, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid #f1f3f5' }}>
+                        <td style={{ padding: '13px 16px', fontWeight: '600', color: '#374151' }}>{row.feature}</td>
+                        {[row.lite, row.standart, row.premium].map((val, ci) => (
+                          <td key={ci} style={{ padding: '13px 16px', textAlign: 'center', background: ci === 1 ? '#fffbf5' : 'transparent' }}>
+                            {val === true ? <Check size={16} style={{ color: '#10b981', margin: '0 auto' }} /> 
+                              : val === false ? <X size={16} style={{ color: '#e2e8f0', margin: '0 auto' }} /> 
+                              : <span style={{ fontWeight: '600', color: ci === 2 ? '#7c3aed' : '#374151' }}>{val}</span>}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* FAQ Section */}
+            <div style={{
+              background: '#fff',
+              border: '1px solid #e9ecef',
+              borderRadius: '20px',
+              padding: '32px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
+            }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 20px 0', color: '#111' }}>Sık Sorulan Sorular</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {[
+                  { q: 'Abonelik süresi dolunca ne olur?', a: 'Aboneliğiniz sona erdiğinde gelen müşteri talepleri görünmeye devam eder ancak müşteri iletişim bilgileri maskelenir. Yenileme yaparak erişiminizi geri kazanabilirsiniz.' },
+                  { q: 'Paket yükseltme yapabilir miyim?', a: 'Evet, dilediğiniz zaman daha üst bir pakete geçiş yapabilirsiniz. Mevcut sürenize kalan gün sayısı kadar indirim uygulanır.' },
+                  { q: 'Ödeme nasıl yapılır?', a: 'Kredi kartı, banka havalesi/EFT ve sanal POS ile güvenli ödeme yapabilirsiniz. Fatura otomatik olarak e-posta adresinize gönderilir.' },
+                  { q: 'İptal/iade politikası nedir?', a: 'İlk 14 gün içinde koşulsuz iade garantisi sunulmaktadır. 14 gün sonrası için kalan süre üzerinden orantılı iade yapılır.' },
+                ].map((faq, i) => (
+                  <div key={i} style={{ padding: '16px 20px', background: '#f8f9fa', borderRadius: '12px' }}>
+                    <h4 style={{ fontSize: '0.88rem', fontWeight: '700', margin: '0 0 6px 0', color: '#111' }}>{faq.q}</h4>
+                    <p style={{ fontSize: '0.8rem', color: '#6c757d', margin: 0, lineHeight: '1.5' }}>{faq.a}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* ===== DASHBOARD VIEW ===== */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            {/* No Subscription Warning Banner */}
+            {!saasInfo && (
+              <div style={{
+                background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                border: '1px solid #fbbf24',
+                borderRadius: '16px',
+                padding: '20px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '16px',
+                flexWrap: 'wrap'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <AlertCircle size={22} style={{ color: '#92400e', flexShrink: 0 }} />
+                  <div>
+                    <h4 style={{ margin: '0 0 2px 0', fontSize: '0.9rem', fontWeight: '700', color: '#92400e' }}>Aktif Aboneliğiniz Bulunmuyor</h4>
+                    <p style={{ margin: 0, fontSize: '0.78rem', color: '#a16207' }}>Müşteri bilgilerine tam erişim için bir yıllık paket seçin.</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setActivePortalTab('subscription')}
+                  style={{
+                    background: '#111',
+                    color: '#d4af37',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '10px 20px',
+                    fontWeight: '700',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <CreditCard size={15} />
+                  <span>Paketleri İncele</span>
+                </button>
+              </div>
+            )}
+            {/* STATS COUNT GRID */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '20px'
+            }}>
+              <div className="glass-panel" style={{
+                background: '#fff',
+                border: '1px solid #e9ecef',
+                borderRadius: '16px',
+                padding: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '20px'
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: '#f1f3f5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#495057'
+                }}>
+                  <FileText size={22} />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#6c757d', margin: '0 0 4px 0' }}>Toplam Teklif Talebi</h4>
+                  <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#111' }}>{stats.totalLeads} Adet</span>
+                </div>
+              </div>
+
+              <div className="glass-panel" style={{
+                background: '#fff',
+                border: '1px solid #e9ecef',
+                borderRadius: '16px',
+                padding: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '20px'
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: '#fef3c7',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#d97706'
+                }}>
+                  <Activity size={22} className="animate-pulse" />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#6c757d', margin: '0 0 4px 0' }}>Bekleyen Talepler</h4>
+                  <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#d97706' }}>{stats.pendingLeads} Adet</span>
+                </div>
+              </div>
+
+              <div className="glass-panel" style={{
+                background: '#fff',
+                border: '1px solid #e9ecef',
+                borderRadius: '16px',
+                padding: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '20px'
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: '#e6f7ed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#10b981'
+                }}>
+                  <CheckCircle size={22} />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#6c757d', margin: '0 0 4px 0' }}>Cevaplanan Talepler</h4>
+                  <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#10b981' }}>{stats.respondedLeads} Adet</span>
+                </div>
+              </div>
+            </div>
+
+            {/* LEADS LIST PANEL */}
+            <div className="glass-panel" style={{
+              background: '#fff',
+              border: '1px solid #e9ecef',
+              borderRadius: '16px',
+              padding: '28px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 4px 0' }}>Bana Yönlendirilen Müşteri Teklifleri</h3>
+                  <p style={{ fontSize: '0.78rem', color: '#6c757d', margin: 0 }}>Ziyaretçilerin size en yakın konumda olmanız sebebiyle gönderdiği palet/metraj bazlı seramik talepleri.</p>
+                </div>
+                <button 
+                  onClick={loadDealerLeads} 
+                  disabled={leadsLoading} 
+                  style={{
+                    background: '#f8f9fa',
+                    border: '1px solid #dee2e6',
+                    borderRadius: '8px',
+                    padding: '6px 12px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  {leadsLoading ? <Loader2 size={12} className="animate-spin" /> : <TrendingUp size={12} />}
+                  <span>Listeyi Yenile</span>
+                </button>
+              </div>
+
+              {leadsLoading ? (
+                <div style={{ textAlign: 'center', padding: '48px 0', color: '#888' }}>
+                  <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
+                  <span>Talepler yükleniyor...</span>
+                </div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #e9ecef', textAlign: 'left', color: '#495057', fontWeight: '700' }}>
+                        <th style={{ padding: '12px 16px' }}>Müşteri Bilgileri</th>
+                        <th style={{ padding: '12px 16px' }}>Ürün Detayı</th>
+                        <th style={{ padding: '12px 16px' }}>Müşteri Notu</th>
+                        <th style={{ padding: '12px 16px' }}>Tarih</th>
+                        <th style={{ padding: '12px 16px' }}>Durum</th>
+                        <th style={{ padding: '12px 16px' }}>İşlem</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {leads.map(lead => (
+                        <tr key={lead.id} style={{ borderBottom: '1px solid #e9ecef', transition: 'background 0.2s' }}>
+                          <td style={{ padding: '16px' }}>
+                            <strong style={{ display: 'block', color: '#111' }}>{lead.clientName}</strong>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#495057', marginTop: '2px' }}>
+                              <Phone size={10} /> {lead.clientPhone}
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#6c757d', marginTop: '2px' }}>
+                              <Mail size={10} /> {lead.clientEmail}
+                            </div>
+                          </td>
+                          <td style={{ padding: '16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              {lead.product?.imageUrl && (
+                                <img 
+                                  src={lead.product.imageUrl} 
+                                  alt={lead.product.name} 
+                                  style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', border: '1px solid #e9ecef' }} 
+                                />
+                              )}
+                              <div>
+                                <strong style={{ color: '#111' }}>{lead.product?.name}</strong>
+                                <span style={{ display: 'block', fontSize: '0.7rem', color: '#888' }}>SKU: {lead.product?.code}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td style={{ padding: '16px', maxWidth: '240px', color: '#495057', lineHeight: '1.4' }}>
+                            {lead.notes || <span style={{ color: '#adb5bd', fontStyle: 'italic' }}>Not bırakılmadı</span>}
+                          </td>
+                          <td style={{ padding: '16px', color: '#6c757d', fontSize: '0.75rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <Calendar size={12} />
+                              {new Date(lead.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          </td>
+                          <td style={{ padding: '16px' }}>
+                            {lead.status === 'PENDING' && (
+                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: '#fffbeb', color: '#b45309', fontSize: '0.7rem', fontWeight: '700', border: '1px solid #fef3c7' }}>
+                                Bekliyor
+                              </span>
+                            )}
+                            {lead.status === 'RESPONDED' && (
+                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: '#ecfdf5', color: '#047857', fontSize: '0.7rem', fontWeight: '700', border: '1px solid #d1fae5' }}>
+                                Teklif Verildi
+                              </span>
+                            )}
+                            {lead.status === 'COMPLETED' && (
+                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: '#eff6ff', color: '#1d4ed8', fontSize: '0.7rem', fontWeight: '700', border: '1px solid #dbeafe' }}>
+                                Satış Yapıldı
+                              </span>
+                            )}
+                          </td>
+                          <td style={{ padding: '16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <select 
+                                value={lead.status} 
+                                onChange={(e) => handleUpdateLeadStatus(lead.id, e.target.value)}
+                                style={{
+                                  padding: '4px 8px',
+                                  fontSize: '0.75rem',
+                                  borderRadius: '6px',
+                                  border: '1px solid #ced4da',
+                                  background: '#fff',
+                                  cursor: 'pointer',
+                                  outline: 'none'
+                                }}
+                              >
+                                <option value="PENDING">Bekliyor</option>
+                                <option value="RESPONDED">Fiyat İletildi</option>
+                                <option value="COMPLETED">Satış Tamamlandı</option>
+                              </select>
+                              <button 
+                                onClick={() => handleDeleteLead(lead.id)} 
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: '#dc3545',
+                                  cursor: 'pointer',
+                                  padding: '4px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                                title="Müşteri Talebini Sil"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {leads.length === 0 && (
+                        <tr>
+                          <td colSpan="6" style={{ textAlign: 'center', padding: '36px', color: '#888' }}>
+                            Henüz size yönlendirilmiş bir müşteri teklif talebi bulunmamaktadır.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}

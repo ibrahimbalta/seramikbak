@@ -1,0 +1,199 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Brand {
+  id        String        @id @default(uuid())
+  name      String        @unique
+  logoUrl   String?
+  username  String?       @unique
+  password  String        @default("marka123")
+  products  Product[]
+  dealers   Dealer[]
+  campaigns AdCampaign[]
+  analytics AnalyticsLog[]
+  saas      SaaSConfig[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Product {
+  id         String         @id @default(uuid())
+  name       String
+  code       String         @unique
+  brandId    String
+  brand      Brand          @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  width      Int            // in cm, e.g., 60
+  height     Int            // in cm, e.g., 120
+  color      String         // e.g., "Antrasit", "Bej"
+  finish     String         // e.g., "Mat", "Parlak", "Lapatto"
+  style      String         // e.g., "Mermer", "Ahşap", "Beton"
+  area       String         // e.g., "Banyo,Mutfak" (comma-separated string for SQLite compatibility)
+  imageUrl   String         // product thumbnail
+  textureUrl String?        // detailed high-res texture for 3D tiling
+  isPremium  Boolean        @default(false)
+  
+  // Marketplace and home improvement store integration
+  trendyolPrice    Float?
+  trendyolUrl      String?
+  hepsiburadaPrice Float?
+  hepsiburadaUrl   String?
+  n11Price         Float?
+  n11Url           String?
+  koctasPrice      Float?
+  koctasUrl        String?
+  bauhausPrice     Float?
+  bauhausUrl       String?
+
+  leads      Lead[]
+  campaigns  AdCampaign[]
+  analytics  AnalyticsLog[]
+  favorites  Favorite[]
+  
+  // Technical Specifications
+  peiRating        Int?           // Wear resistance rating (1-5)
+  slipResistance   String?        // Slip resistance rating (e.g., "R9", "R10", "R11")
+  frostResistance  Boolean?       // Whether it is frost resistant
+  thickness        Float?         // Thickness in mm (e.g., 9.5)
+  rectified        Boolean?       // Whether it has rectified edges
+
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+model Dealer {
+  id        String   @id @default(uuid())
+  name      String
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  phone     String
+  email     String?
+  password  String   @default("bayi123")
+  status    String   @default("APPROVED") // PENDING_APPROVAL, APPROVED, REJECTED
+  address   String
+  city      String   // e.g., "İstanbul"
+  district  String   // e.g., "Kadıköy"
+  lat       Float
+  lng       Float
+  leads     Lead[]
+  saas      DealerSaaSConfig[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DealerSaaSConfig {
+  id        String   @id @default(uuid())
+  dealerId  String
+  dealer    Dealer   @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  plan      String   // LITE, STANDART, PREMIUM
+  status    String   @default("ACTIVE") // ACTIVE, EXPIRED, PAUSED
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model Lead {
+  id          String   @id @default(uuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  dealerId    String
+  dealer      Dealer   @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  clientName  String
+  clientPhone String
+  clientEmail String
+  notes       String?
+  status      String   @default("PENDING") // PENDING, RESPONDED, COMPLETED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AdCampaign {
+  id          String   @id @default(uuid())
+  brandId     String
+  brand       Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  bidAmount   Float    // CPC (Cost Per Click) in TRY
+  status      String   @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED
+  budget      Float    // Remaining budget in TRY
+  clicks      Int      @default(0)
+  impressions Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AnalyticsLog {
+  id        String   @id @default(uuid())
+  action    String   // SEARCH, VIEW, CLICK, LEAD
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  brandId   String?
+  brand     Brand?   @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  query     String?  // search queries if action is SEARCH
+  city      String?  // user's city
+  createdAt DateTime @default(now())
+}
+
+model SaaSConfig {
+  id        String   @id @default(uuid())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  plan      String   // BASIC, PRO, ENTERPRISE
+  status    String   @default("ACTIVE") // ACTIVE, EXPIRED, PAUSED
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        String     @id @default(uuid())
+  name      String
+  email     String     @unique
+  password  String
+  favorites Favorite[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model ProjectRequest {
+  id               String   @id @default(uuid())
+  companyName      String
+  contactName      String
+  contactPhone     String
+  contactEmail     String
+  projectName      String
+  projectType      String   // Konut, Ofis, Otel, AVM, Hastane, Diğer
+  city             String
+  district         String
+  constructionStep String   // Kaba İnşaat, İnce İşler, Bitmek Üzere, Restorasyon
+  quantityM2       Int      // e.g. 5000
+  ceramicStyles    String   // comma-separated choices: "Mermer,Beton"
+  ceramicSizes     String   // comma-separated choices: "60x120,80x80"
+  ceramicColors    String?  // e.g. "Gri, Antrasit"
+  ceramicFinishes  String?  // e.g. "Mat, Lapatto"
+  usageAreas       String   // comma-separated choices: "Zemin,Islak Hacim"
+  budgetM2         String   // e.g. "Düşük (0-300 TL)", "Orta (300-600 TL)", "Yüksek (600+ TL)"
+  deliveryTimeline String   // e.g. "30 gün içinde", "90 gün içinde"
+  notes            String?
+  status           String   @default("PENDING") // PENDING, APPROVED, COMPLETED, REJECTED
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
