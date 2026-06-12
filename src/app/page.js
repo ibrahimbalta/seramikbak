@@ -9809,6 +9809,73 @@ export default function Home() {
           .catalog-sidebar-panel {
             padding: 16px;
           }
+
+          /* Detail Modal Mobile Overrides */
+          .modal-overlay {
+            padding: 0 !important;
+            align-items: stretch !important;
+            justify-content: stretch !important;
+          }
+          .detail-modal-content-premium {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100% !important;
+            max-height: 100vh !important;
+            border-radius: 0 !important;
+            padding: 16px 16px 24px 16px !important;
+            margin: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+          }
+          .detail-modal-body {
+            flex: 1 !important;
+            max-height: calc(100vh - 80px) !important;
+            overflow-y: auto !important;
+            padding-right: 4px !important;
+            gap: 16px !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: thin !important;
+          }
+          .detail-modal-body::-webkit-scrollbar {
+            display: block !important;
+            width: 6px !important;
+          }
+          .detail-modal-header-title h3 {
+            font-size: 1.15rem !important;
+          }
+          .detail-primary-actions {
+            flex-direction: column !important;
+            gap: 8px !important;
+          }
+          .detail-primary-actions button {
+            width: 100% !important;
+          }
+          .calc-inputs-row {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+          }
+
+          /* Compare Modal Overlay & Content Overrides */
+          .compare-modal-overlay {
+            padding: 0 !important;
+            align-items: stretch !important;
+            justify-content: stretch !important;
+          }
+          .compare-modal-content {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100% !important;
+            max-height: 100vh !important;
+            border-radius: 0 !important;
+            border: none !important;
+          }
+          .compare-modal-header {
+            padding: 16px !important;
+          }
+          .compare-modal-body {
+            padding: 12px !important;
+          }
         }
 
         @media (max-width: 480px) {
@@ -9841,6 +9908,32 @@ export default function Home() {
           }
           .detail-specs-grid {
             grid-template-columns: 1fr !important;
+          }
+          .calc-res-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .modal-dealer-row {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            text-align: center !important;
+            padding: 12px !important;
+          }
+          .m-dealer-info {
+            margin-bottom: 8px !important;
+          }
+          .affiliate-row {
+            flex-direction: column !important;
+            gap: 12px !important;
+            align-items: stretch !important;
+            text-align: center !important;
+            padding: 12px !important;
+          }
+          .aff-store-meta {
+            align-items: center !important;
+          }
+          .aff-price-action {
+            justify-content: space-between !important;
+            width: 100% !important;
           }
         }
       `}</style>
