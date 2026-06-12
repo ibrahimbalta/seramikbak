@@ -341,6 +341,11 @@ function getProductBadge(product, idx) {
 }
 
 export default function Home() {
+  // Page Preloader State
+  const [pageLoading, setPageLoading] = useState(true);
+  const [initialBrandsLoaded, setInitialBrandsLoaded] = useState(false);
+  const [initialProductsLoaded, setInitialProductsLoaded] = useState(false);
+
   // Navigation
   const [activeTab, setActiveTab] = useState('search'); // search, studio, dealers, b2b
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -801,8 +806,23 @@ export default function Home() {
         const premiumOnly = enriched.filter(p => p.isPremium);
         const weekly = premiumOnly.length > 0 ? premiumOnly : enriched.slice(0, 5);
         setWeeklyProducts(weekly);
+        setInitialBrandsLoaded(true);
+      })
+      .catch((err) => {
+        console.error('Failed to load initial search / brands:', err);
+        setInitialBrandsLoaded(true);
       });
   }, []);
+
+  // Sync preloader state
+  useEffect(() => {
+    if (initialBrandsLoaded && initialProductsLoaded) {
+      const timer = setTimeout(() => {
+        setPageLoading(false);
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [initialBrandsLoaded, initialProductsLoaded]);
 
   // Sync locator brand selection when active product or brands list changes
   useEffect(() => {
@@ -877,6 +897,8 @@ export default function Home() {
       }
     } catch (err) {
       console.error('Failed to fetch products:', err);
+    } finally {
+      setInitialProductsLoaded(true);
     }
   };
 
@@ -1712,7 +1734,25 @@ export default function Home() {
   };
 
   return (
-    <main className="main-layout">
+    <>
+      {pageLoading && (
+        <div className="page-loader-overlay">
+          <div className="loader-container">
+            <div className="ceramic-tile-spinner">
+              <div className="tile-face face-front"></div>
+              <div className="tile-face face-back"></div>
+            </div>
+            <h2 className="loader-brand-name">
+              <span>Seramik</span><span className="gold-text">Bak</span>
+            </h2>
+            <p className="loader-status-text">Premium seramik kataloğu yükleniyor...</p>
+            <div className="loader-progress-bar">
+              <div className="loader-progress-line"></div>
+            </div>
+          </div>
+        </div>
+      )}
+      <main className="main-layout">
       {/* Premium Collections Banner */}
       <div className="project-top-banner">
         <div className="banner-left-area">
@@ -9936,7 +9976,102 @@ export default function Home() {
             width: 100% !important;
           }
         }
+          /* Page Loader Screen */
+          .page-loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #0b0f19 0%, #02040a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100000;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+          }
+          .loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+          }
+          .ceramic-tile-spinner {
+            width: 64px;
+            height: 64px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: spin3DTile 2.5s infinite cubic-bezier(0.68, -0.55, 0.27, 1.55);
+          }
+          .tile-face {
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            border: 2px solid var(--accent-gold);
+            box-shadow: 0 0 25px rgba(197, 160, 89, 0.4);
+          }
+          .face-front {
+            background: linear-gradient(135deg, rgba(197, 160, 89, 0.2) 0%, rgba(30, 41, 59, 0.9) 100%);
+            transform: translateZ(2px);
+          }
+          .face-back {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(197, 160, 89, 0.2) 100%);
+            transform: rotateY(180deg) translateZ(2px);
+          }
+          @keyframes spin3DTile {
+            0% { transform: rotateY(0deg) rotateX(0deg); }
+            50% { transform: rotateY(180deg) rotateX(180deg); }
+            100% { transform: rotateY(360deg) rotateX(360deg); }
+          }
+          .loader-brand-name {
+            font-family: var(--font-title);
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+            display: flex;
+            gap: 4px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            margin: 0;
+          }
+          .loader-brand-name .gold-text {
+            color: var(--accent-gold);
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #a27e3c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+          .loader-status-text {
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin: 0;
+            animation: pulseText 1.5s infinite ease-in-out;
+          }
+          @keyframes pulseText {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+          }
+          .loader-progress-bar {
+            width: 160px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+          }
+          .loader-progress-line {
+            width: 60px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+            position: absolute;
+            animation: progressScroll 1.5s infinite linear;
+          }
+          @keyframes progressScroll {
+            0% { left: -60px; }
+            100% { left: 160px; }
+          }
+        }
       `}</style>
     </main>
+    </>
   );
 }
