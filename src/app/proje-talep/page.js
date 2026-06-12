@@ -176,7 +176,7 @@ export default function ProjectDemandPage() {
       alignItems: 'center'
     }}>
       {/* Header Info */}
-      <div style={{ textAlign: 'center', marginBottom: '40px', maxWidth: '640px' }}>
+      <div className="project-header" style={{ textAlign: 'center', marginBottom: '40px', maxWidth: '640px' }}>
         <Link href="/" style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -220,7 +220,7 @@ export default function ProjectDemandPage() {
       </div>
 
       {/* Form Container */}
-      <div className="glass-panel" style={{
+      <div className="glass-panel project-form-container" style={{
         background: 'rgba(15, 23, 42, 0.6)',
         backdropFilter: 'blur(20px)',
         border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -334,7 +334,7 @@ export default function ProjectDemandPage() {
           /* Stepped Form Layout */
           <div>
             {/* Step Indicators */}
-            <div style={{
+            <div className="step-indicators" style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -500,7 +500,7 @@ export default function ProjectDemandPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1' }}>İletişim Telefonu <span style={{ color: '#ef4444' }}>*</span></label>
                     <div style={{ position: 'relative' }}>
@@ -591,7 +591,7 @@ export default function ProjectDemandPage() {
                   <h4 style={{ fontSize: '1.1rem', fontWeight: '700', margin: 0 }}>Proje Detayları</h4>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '16px' }}>
+                <div className="form-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '16px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1' }}>Proje Adı <span style={{ color: '#ef4444' }}>*</span></label>
                     <input 
@@ -637,7 +637,7 @@ export default function ProjectDemandPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1' }}>İl <span style={{ color: '#ef4444' }}>*</span></label>
                     <input 
@@ -683,7 +683,7 @@ export default function ProjectDemandPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1' }}>Metraj İhtiyacı (m²) <span style={{ color: '#ef4444' }}>*</span></label>
                     <div style={{ position: 'relative' }}>
@@ -732,7 +732,7 @@ export default function ProjectDemandPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1' }}>Hedeflenen m² Bütçesi <span style={{ color: '#ef4444' }}>*</span></label>
                     <div style={{ position: 'relative' }}>
@@ -956,7 +956,7 @@ export default function ProjectDemandPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   {/* Renk Tercihi */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1' }}>Renk Tercihleri</label>
@@ -1056,6 +1056,53 @@ export default function ProjectDemandPage() {
           </div>
         )}
       </div>
+
+      {/* RESPONSIVE STYLES */}
+      <style jsx>{`
+        /* ===== TABLET (max-width: 768px) ===== */
+        @media (max-width: 768px) {
+          .project-header {
+            margin-bottom: 24px !important;
+          }
+          .project-header h2 {
+            font-size: 1.4rem !important;
+          }
+          .project-form-container {
+            padding: 20px 16px !important;
+            border-radius: 16px !important;
+          }
+          .step-indicators {
+            margin-bottom: 24px !important;
+          }
+          .step-indicators span {
+            font-size: 0.62rem !important;
+          }
+          .form-grid-2col {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        /* ===== SMALL MOBILE (max-width: 480px) ===== */
+        @media (max-width: 480px) {
+          .project-header h2 {
+            font-size: 1.2rem !important;
+          }
+          .project-header p {
+            font-size: 0.8rem !important;
+          }
+          .project-form-container {
+            padding: 16px 12px !important;
+            border-radius: 12px !important;
+          }
+          .step-indicators span {
+            display: none !important;
+          }
+          .form-grid-2col {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -3067,7 +3067,7 @@ export default function AdminPage() {
           {productSubTab === 'list' ? (
             <div className="admin-card glass-panel w-full">
               {/* Filters Panel */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--border-color)' }}>
+              <div className="admin-filters-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--border-color)' }}>
                 <div className="form-group">
                   <label style={{ fontSize: '0.65rem' }}>Marka Filtresi</label>
                   <select 
@@ -3708,6 +3708,19 @@ export default function AdminPage() {
           .admin-tabs-nav {
             width: 100%;
             overflow-x: auto;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .form-group-row {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+          .admin-card {
+            padding: 16px;
+          }
+          .admin-filters-grid {
+            grid-template-columns: 1fr !important;
           }
         }
 

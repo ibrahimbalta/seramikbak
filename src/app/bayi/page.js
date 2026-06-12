@@ -480,7 +480,7 @@ export default function DealerPortalPage() {
         zIndex: 100,
         boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
       }}>
-        <div style={{
+        <div className="dealer-header-container" style={{
           maxWidth: '1280px',
           margin: '0 auto',
           padding: '14px 24px',
@@ -488,7 +488,7 @@ export default function DealerPortalPage() {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="dealer-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
               width: '36px',
               height: '36px',
@@ -531,7 +531,7 @@ export default function DealerPortalPage() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="dealer-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {saasInfo?.expiresAt && (
               <div style={{ fontSize: '0.75rem', color: '#6c757d', display: 'flex', alignItems: 'center', gap: '4px', marginRight: '4px' }}>
                 <Calendar size={12} />
@@ -540,7 +540,7 @@ export default function DealerPortalPage() {
             )}
 
             {/* Tab Navigation Buttons */}
-            <div style={{ display: 'flex', gap: '4px', background: '#f1f3f5', borderRadius: '8px', padding: '3px' }}>
+            <div className="dealer-tabs-nav" style={{ display: 'flex', gap: '4px', background: '#f1f3f5', borderRadius: '8px', padding: '3px' }}>
               <button 
                 onClick={() => { setActivePortalTab('dashboard'); setShowSettings(false); }}
                 style={{
@@ -651,11 +651,11 @@ export default function DealerPortalPage() {
       </header>
 
       {/* PORTAL MAIN CONTENT */}
-      <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
+      <main className="dealer-main-content" style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
         {activePortalTab === 'b2b-projects' ? (
           /* B2B PROJECTS TAB */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="b2b-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Building2 size={22} style={{ color: '#d4af37' }} />
@@ -737,7 +737,7 @@ export default function DealerPortalPage() {
                       </div>
 
                       {/* Main Details Split */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+                      <div className="dealer-project-details-split" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                         {/* Column 1: Material Requirements */}
                         <div>
                           <h5 style={{ fontSize: '0.78rem', fontWeight: '700', textTransform: 'uppercase', color: '#888', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Malzeme Tercihleri</h5>
@@ -1086,7 +1086,7 @@ export default function DealerPortalPage() {
                 <p style={{ fontSize: '0.85rem', color: '#6c757d', margin: 0 }}>İhtiyacınıza uygun paketi seçin ve müşteri taleplerini yönetin. Tüm paketler yıllık faturalandırılır.</p>
               </div>
 
-              <div style={{
+              <div className="dealer-pricing-grid" style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
                 gap: '24px',
@@ -1447,7 +1447,7 @@ export default function DealerPortalPage() {
               </div>
             )}
             {/* STATS COUNT GRID */}
-            <div style={{
+            <div className="dealer-stats-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
               gap: '20px'
@@ -1693,6 +1693,98 @@ export default function DealerPortalPage() {
           </div>
         )}
       </main>
+
+      {/* RESPONSIVE STYLES */}
+      <style jsx>{`
+        /* ===== TABLET (max-width: 1024px) ===== */
+        @media (max-width: 1024px) {
+          .dealer-header-container {
+            flex-direction: column !important;
+            gap: 12px !important;
+            padding: 12px 16px !important;
+          }
+          .dealer-header-brand {
+            width: 100% !important;
+          }
+          .dealer-header-actions {
+            width: 100% !important;
+            flex-wrap: wrap !important;
+            justify-content: space-between !important;
+            gap: 8px !important;
+          }
+          .dealer-tabs-nav {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            flex: 1 !important;
+            scrollbar-width: none !important;
+          }
+          .dealer-tabs-nav::-webkit-scrollbar {
+            display: none !important;
+          }
+          .dealer-main-content {
+            padding: 20px 16px !important;
+          }
+          .b2b-header-row {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+          }
+        }
+
+        /* ===== MOBILE (max-width: 768px) ===== */
+        @media (max-width: 768px) {
+          .dealer-header-container {
+            padding: 10px 12px !important;
+          }
+          .dealer-header-actions {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+          .dealer-tabs-nav {
+            width: 100% !important;
+            justify-content: space-between !important;
+          }
+          .dealer-tabs-nav button {
+            flex: 1 !important;
+            justify-content: center !important;
+            padding: 8px 6px !important;
+            font-size: 0.7rem !important;
+          }
+          .dealer-tabs-nav button span {
+            display: none !important;
+          }
+          .dealer-main-content {
+            padding: 14px 10px !important;
+          }
+          .login-card {
+            padding: 24px 18px !important;
+            border-radius: 16px !important;
+          }
+          .dealer-project-details-split,
+          .dealer-pricing-grid,
+          .dealer-stats-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+        }
+
+        /* ===== SMALL MOBILE (max-width: 480px) ===== */
+        @media (max-width: 480px) {
+          .dealer-header-brand h1 {
+            font-size: 0.85rem !important;
+          }
+          .dealer-tabs-nav button {
+            padding: 8px 4px !important;
+            min-width: 0 !important;
+          }
+          .dealer-main-content {
+            padding: 10px 8px !important;
+          }
+          .login-card {
+            padding: 20px 14px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -412,7 +412,7 @@ export default function BrandPortalPage() {
         top: 0,
         zIndex: 100
       }}>
-        <div style={{
+        <div className="brand-header-container" style={{
           maxWidth: '1280px',
           margin: '0 auto',
           padding: '14px 24px',
@@ -420,7 +420,7 @@ export default function BrandPortalPage() {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="brand-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
               width: '36px',
               height: '36px',
@@ -453,7 +453,7 @@ export default function BrandPortalPage() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="brand-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {b2bStats?.saas?.expiresAt && (
               <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <Calendar size={12} />
@@ -462,7 +462,7 @@ export default function BrandPortalPage() {
             )}
 
             {/* Tab Navigation Buttons */}
-            <div style={{ display: 'flex', gap: '4px', background: '#f1f3f5', borderRadius: '8px', padding: '3px', marginRight: '4px' }}>
+            <div className="brand-tabs-nav" style={{ display: 'flex', gap: '4px', background: '#f1f3f5', borderRadius: '8px', padding: '3px', marginRight: '4px' }}>
               <button 
                 onClick={() => setActivePortalTab('dashboard')}
                 style={{
@@ -531,7 +531,7 @@ export default function BrandPortalPage() {
       </header>
 
       {/* PORTAL MAIN CONTENT */}
-      <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
+      <main className="brand-main-content" style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
         {activePortalTab === 'b2b-projects' ? (
           /* B2B PROJECTS TAB */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -619,7 +619,7 @@ export default function BrandPortalPage() {
                       </div>
 
                       {/* Main Details */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+                      <div className="brand-project-details-split" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                         {/* Column 1: Material */}
                         <div>
                           <h5 style={{ fontSize: '0.78rem', fontWeight: '700', textTransform: 'uppercase', color: '#888', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Malzeme Tercihleri</h5>
@@ -737,7 +737,7 @@ export default function BrandPortalPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             
             {/* METRICS SUMMARY */}
-            <div style={{
+            <div className="brand-stats-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
               gap: '20px'
@@ -770,7 +770,7 @@ export default function BrandPortalPage() {
             </div>
 
             {/* CAMPAIGNS & RECENT LEADS SPLIT */}
-            <div style={{
+            <div className="brand-campaign-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
               gap: '24px'
@@ -823,7 +823,7 @@ export default function BrandPortalPage() {
                     <div style={{ background: '#fee2e2', color: '#ef4444', padding: '8px 12px', borderRadius: '6px', fontSize: '0.75rem' }}>{campaignErrorMsg}</div>
                   )}
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                  <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Hedef Ürün</label>
                       <select 
@@ -924,7 +924,7 @@ export default function BrandPortalPage() {
             </div>
 
             {/* MARKET TRENDS & STRIPE BILLING */}
-            <div style={{
+            <div className="brand-trends-billing-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
               gap: '24px'
@@ -934,7 +934,7 @@ export default function BrandPortalPage() {
                 <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0' }}>B2B Pazar Trendleri (Tüketici Raporları)</h3>
                 <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Kullanıcıların arama ve yoğunluk verilerine göre en popüler karolar ve lokasyonlar (PRO/Enterprise Özelliği).</p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div className="brand-trends-tables-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                   <div>
                     <h5 style={{ fontSize: '0.8rem', fontWeight: '700', marginBottom: '8px', color: '#0f172a' }}>En Sık Aranan Kelimeler</h5>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
@@ -1074,6 +1074,99 @@ export default function BrandPortalPage() {
           </div>
         ) : null}
       </main>
+
+      {/* RESPONSIVE STYLES */}
+      <style jsx>{`
+        /* ===== TABLET (max-width: 1024px) ===== */
+        @media (max-width: 1024px) {
+          .brand-header-container {
+            flex-direction: column !important;
+            gap: 12px !important;
+            padding: 12px 16px !important;
+          }
+          .brand-header-brand {
+            width: 100% !important;
+          }
+          .brand-header-actions {
+            width: 100% !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            gap: 8px !important;
+          }
+          .brand-tabs-nav {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+          }
+          .brand-tabs-nav::-webkit-scrollbar {
+            display: none !important;
+          }
+          .brand-main-content {
+            padding: 20px 16px !important;
+          }
+          .brand-campaign-grid,
+          .brand-trends-billing-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        /* ===== MOBILE (max-width: 768px) ===== */
+        @media (max-width: 768px) {
+          .brand-header-container {
+            padding: 10px 12px !important;
+          }
+          .brand-header-actions {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+          .brand-tabs-nav {
+            width: 100% !important;
+            justify-content: space-between !important;
+          }
+          .brand-tabs-nav button {
+            flex: 1 !important;
+            justify-content: center !important;
+            padding: 8px 6px !important;
+          }
+          .brand-tabs-nav button span {
+            display: none !important;
+          }
+          .brand-main-content {
+            padding: 14px 10px !important;
+          }
+          .brand-campaign-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .login-card {
+            padding: 24px 18px !important;
+            border-radius: 16px !important;
+          }
+          .brand-project-details-split,
+          .brand-stats-grid,
+          .campaign-inputs-grid,
+          .brand-trends-billing-grid,
+          .brand-trends-tables-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+        }
+
+        /* ===== SMALL MOBILE (max-width: 480px) ===== */
+        @media (max-width: 480px) {
+          .brand-header-brand h1 {
+            font-size: 0.85rem !important;
+          }
+          .brand-tabs-nav button {
+            padding: 8px 4px !important;
+          }
+          .brand-main-content {
+            padding: 10px 8px !important;
+          }
+          .login-card {
+            padding: 20px 14px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

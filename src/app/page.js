@@ -343,6 +343,7 @@ function getProductBadge(product, idx) {
 export default function Home() {
   // Navigation
   const [activeTab, setActiveTab] = useState('search'); // search, studio, dealers, b2b
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   // Database State
   const [products, setProducts] = useState([]);
@@ -1842,80 +1843,153 @@ export default function Home() {
 
         {/* Right Buttons */}
         <div className="header-right-buttons">
-          <button 
-            onClick={() => setIsKioskMode(!isKioskMode)} 
-            className={`header-btn kiosk-btn ${isKioskMode ? 'active' : ''}`}
-            title="Bayi Teşhir Modu (Kiosk)"
-          >
-            <span>{isKioskMode ? 'Kiosk Kapat' : 'Teşhir Kiosk'}</span>
-          </button>
-          {!isKioskMode && (
-            <>
-              <Link href="/proje-talep" className="b2b-header-btn">
-                <Building2 size={14} />
-                <span>Proje Talebi</span>
-                <span className="b2b-badge">B2B</span>
-              </Link>
-              <button onClick={() => setShowDealerSignup(true)} className="header-btn highlight">
-                <MapPin size={14} />
-                <span>Bayimiz Olun</span>
-              </button>
-              <Link href="/bayi" className="header-btn portal-btn" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <UserIcon size={14} />
-                <span>Bayi Girişi</span>
-              </Link>
-              <Link href="/marka" className="header-btn portal-btn" style={{ textDecoration: 'none', color: 'inherit' }}>
-                <TrendingUp size={14} />
-                <span>Marka Girişi</span>
-              </Link>
-              <button className="header-btn favorites-btn" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { setShowAuthModal(true); } }}>
-                <HeartIcon size={16} />
-                <span>Favorilerim</span>
-                {userFavorites.length > 0 && <span className="fav-count-badge">{userFavorites.length}</span>}
-              </button>
-              {currentUser ? (
-                <div className="user-menu-wrapper">
-                  <button className="header-btn account-btn logged-in" onClick={() => setShowUserMenu(!showUserMenu)}>
-                    <div className="user-avatar-mini">{currentUser.name.charAt(0).toUpperCase()}</div>
-                    <span>{currentUser.name.split(' ')[0]}</span>
-                    <ChevronDown size={12} />
-                  </button>
-                  {showUserMenu && (
-                    <div className="user-dropdown-menu glass-panel">
-                      <div className="user-dropdown-header">
-                        <div className="user-dropdown-avatar">{currentUser.name.charAt(0).toUpperCase()}</div>
-                        <div>
-                          <div className="user-dropdown-name">{currentUser.name}</div>
-                          <div className="user-dropdown-email">{currentUser.email}</div>
-                        </div>
-                      </div>
-                      <div className="user-dropdown-divider" />
-                      <button className="user-dropdown-item" onClick={() => { setShowFavoritesPanel(true); setShowUserMenu(false); }}>
-                        <HeartIcon size={14} /> Favorilerim ({userFavorites.length})
-                      </button>
-                      <button className="user-dropdown-item" onClick={() => { setShowUserMenu(false); }}>
-                        <Settings size={14} /> Hesap Ayarları
-                      </button>
-                      <div className="user-dropdown-divider" />
-                      <button className="user-dropdown-item logout-item" onClick={handleLogout}>
-                        <ArrowRight size={14} /> Çıkış Yap
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button className="header-btn account-btn" onClick={() => setShowAuthModal(true)}>
-                  <UserIcon size={16} />
-                  <span>Giriş Yap</span>
+          <div className="desktop-header-actions">
+            <button 
+              onClick={() => setIsKioskMode(!isKioskMode)} 
+              className={`header-btn kiosk-btn ${isKioskMode ? 'active' : ''}`}
+              title="Bayi Teşhir Modu (Kiosk)"
+            >
+              <span>{isKioskMode ? 'Kiosk Kapat' : 'Teşhir Kiosk'}</span>
+            </button>
+            {!isKioskMode && (
+              <>
+                <Link href="/proje-talep" className="b2b-header-btn">
+                  <Building2 size={14} />
+                  <span>Proje Talebi</span>
+                  <span className="b2b-badge">B2B</span>
+                </Link>
+                <button onClick={() => setShowDealerSignup(true)} className="header-btn highlight">
+                  <MapPin size={14} />
+                  <span>Bayimiz Olun</span>
                 </button>
-              )}
-            </>
-          )}
-          <button className="hamburger-menu-btn">
+                <Link href="/bayi" className="header-btn portal-btn" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <UserIcon size={14} />
+                  <span>Bayi Girişi</span>
+                </Link>
+                <Link href="/marka" className="header-btn portal-btn" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <TrendingUp size={14} />
+                  <span>Marka Girişi</span>
+                </Link>
+                <button className="header-btn favorites-btn" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { setShowAuthModal(true); } }}>
+                  <HeartIcon size={16} />
+                  <span>Favorilerim</span>
+                  {userFavorites.length > 0 && <span className="fav-count-badge">{userFavorites.length}</span>}
+                </button>
+                {currentUser ? (
+                  <div className="user-menu-wrapper">
+                    <button className="header-btn account-btn logged-in" onClick={() => setShowUserMenu(!showUserMenu)}>
+                      <div className="user-avatar-mini">{currentUser.name.charAt(0).toUpperCase()}</div>
+                      <span>{currentUser.name.split(' ')[0]}</span>
+                      <ChevronDown size={12} />
+                    </button>
+                    {showUserMenu && (
+                      <div className="user-dropdown-menu glass-panel">
+                        <div className="user-dropdown-header">
+                          <div className="user-dropdown-avatar">{currentUser.name.charAt(0).toUpperCase()}</div>
+                          <div>
+                            <div className="user-dropdown-name">{currentUser.name}</div>
+                            <div className="user-dropdown-email">{currentUser.email}</div>
+                          </div>
+                        </div>
+                        <div className="user-dropdown-divider" />
+                        <button className="user-dropdown-item" onClick={() => { setShowFavoritesPanel(true); setShowUserMenu(false); }}>
+                          <HeartIcon size={14} /> Favorilerim ({userFavorites.length})
+                        </button>
+                        <button className="user-dropdown-item" onClick={() => { setShowUserMenu(false); }}>
+                          <Settings size={14} /> Hesap Ayarları
+                        </button>
+                        <div className="user-dropdown-divider" />
+                        <button className="user-dropdown-item logout-item" onClick={handleLogout}>
+                          <ArrowRight size={14} /> Çıkış Yap
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <button className="header-btn account-btn" onClick={() => setShowAuthModal(true)}>
+                    <UserIcon size={16} />
+                    <span>Giriş Yap</span>
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+          <button className="hamburger-menu-btn" onClick={() => setShowMobileMenu(!showMobileMenu)}>
             <MenuIcon size={20} />
           </button>
         </div>
       </header>
+
+      {/* Mobile Navigation Drawer */}
+      {showMobileMenu && (
+        <div className="mobile-menu-overlay" onClick={() => setShowMobileMenu(false)}>
+          <div className="mobile-menu-drawer glass-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-menu-header">
+              <span className="mobile-menu-title">Menü</span>
+              <button className="mobile-menu-close" onClick={() => setShowMobileMenu(false)}>✕</button>
+            </div>
+            <div className="mobile-menu-nav">
+              <button 
+                className={`mobile-nav-link ${activeTab === 'search' ? 'active' : ''}`} 
+                onClick={() => { setActiveTab('search'); setShowMobileMenu(false); }}
+              >
+                Arama Motoru
+              </button>
+              <button 
+                className={`mobile-nav-link ${activeTab === 'studio' ? 'active' : ''}`} 
+                onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); }}
+              >
+                3D Sanal Stüdyo
+              </button>
+              <button 
+                className={`mobile-nav-link ${activeTab === 'dealers' ? 'active' : ''}`} 
+                onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); }}
+              >
+                Bayi Bulucu
+              </button>
+              
+              <div className="mobile-menu-divider" />
+              
+              <Link href="/proje-talep" className="mobile-nav-link b2b-link" onClick={() => setShowMobileMenu(false)}>
+                <span>Proje Talebi (B2B)</span>
+              </Link>
+              <button className="mobile-nav-link highlight-link" onClick={() => { setShowDealerSignup(true); setShowMobileMenu(false); }}>
+                Bayimiz Olun
+              </button>
+              <Link href="/bayi" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
+                Bayi Girişi
+              </Link>
+              <Link href="/marka" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
+                Marka Girişi
+              </Link>
+              
+              <div className="mobile-menu-divider" />
+              
+              <button 
+                className="mobile-nav-link fav-link" 
+                onClick={() => { if(currentUser) { setShowFavoritesPanel(true); } else { setShowAuthModal(true); } setShowMobileMenu(false); }}
+              >
+                <span>Favorilerim ({userFavorites.length})</span>
+              </button>
+              
+              {currentUser ? (
+                <>
+                  <div className="mobile-user-info">
+                    Giriş yapan: <strong>{currentUser.name}</strong>
+                  </div>
+                  <button className="mobile-nav-link logout-link" onClick={() => { handleLogout(); setShowMobileMenu(false); }}>
+                    Çıkış Yap
+                  </button>
+                </>
+              ) : (
+                <button className="mobile-nav-link login-link" onClick={() => { setShowAuthModal(true); setShowMobileMenu(false); }}>
+                  Giriş Yap
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="content-container">
@@ -3274,7 +3348,7 @@ export default function Home() {
                       )}
                     </div>
                   )}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '6px' }}>
+                  <div className="ai-actions-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '6px' }}>
                     {/* Yükleme Kartı */}
                     <div className="ai-uploader-card glass-panel" style={{ position: 'relative', overflow: 'hidden', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '6px', cursor: 'pointer', minHeight: '110px', justifyContent: 'center' }}>
                       <UploadCloud size={20} style={{ color: 'var(--accent-gold)' }} />
@@ -5345,6 +5419,12 @@ export default function Home() {
           gap: 8px;
         }
 
+        .desktop-header-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
         :global(.header-btn) {
           display: flex;
           align-items: center;
@@ -5561,7 +5641,7 @@ export default function Home() {
           color: var(--text-primary);
           cursor: pointer;
           padding: 6px;
-          display: flex;
+          display: none;
           align-items: center;
           justify-content: center;
           transition: transform 0.2s ease;
@@ -5569,6 +5649,135 @@ export default function Home() {
 
         .hamburger-menu-btn:hover {
           transform: scale(1.05);
+        }
+
+        /* Mobile Menu Drawer Styles */
+        .mobile-menu-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(4px);
+          z-index: 11000;
+          display: flex;
+          justify-content: flex-end;
+          animation: fadeIn 0.2s ease forwards;
+        }
+
+        .mobile-menu-drawer {
+          width: 300px;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.95);
+          display: flex;
+          flex-direction: column;
+          padding: 24px;
+          box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+          animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-menu-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+          border-bottom: 1px solid var(--border-color);
+          padding-bottom: 12px;
+        }
+
+        .mobile-menu-title {
+          font-family: var(--font-title);
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--text-primary);
+        }
+
+        .mobile-menu-close {
+          background: transparent;
+          border: none;
+          font-size: 1.2rem;
+          cursor: pointer;
+          color: var(--text-secondary);
+        }
+
+        .mobile-menu-nav {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        :global(.mobile-nav-link) {
+          display: flex;
+          align-items: center;
+          padding: 12px 16px;
+          border-radius: var(--border-radius-sm);
+          font-family: var(--font-title);
+          font-weight: 600;
+          font-size: 0.95rem;
+          color: var(--text-secondary);
+          background: transparent;
+          border: none;
+          text-align: left;
+          cursor: pointer;
+          text-decoration: none !important;
+          transition: all 0.2s ease;
+        }
+
+        :global(.mobile-nav-link:hover) {
+          background: rgba(0, 0, 0, 0.03);
+          color: var(--text-primary);
+        }
+
+        :global(.mobile-nav-link.active) {
+          background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
+          color: #ffffff !important;
+          box-shadow: 0 4px 10px rgba(179, 142, 71, 0.2);
+        }
+
+        :global(.mobile-nav-link.b2b-link) {
+          color: var(--accent-blue-hover) !important;
+          background: rgba(37, 99, 235, 0.05);
+        }
+
+        :global(.mobile-nav-link.highlight-link) {
+          color: var(--accent-gold) !important;
+          background: rgba(179, 142, 71, 0.08);
+          border: 1px solid var(--border-gold);
+        }
+
+        .mobile-menu-divider {
+          height: 1px;
+          background: var(--border-color);
+          margin: 8px 0;
+        }
+
+        .mobile-user-info {
+          font-size: 0.8rem;
+          color: var(--text-secondary);
+          padding: 6px 16px;
+        }
+
+        :global(.mobile-nav-link.logout-link) {
+          color: #ef4444 !important;
+          background: rgba(239, 68, 68, 0.05);
+        }
+
+        @keyframes slideInRight {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }
+
+        @media (max-width: 960px) {
+          .header-nav {
+            display: none !important;
+          }
+          .desktop-header-actions {
+            display: none !important;
+          }
+          .hamburger-menu-btn {
+            display: flex !important;
+          }
         }
 
         .content-container {
@@ -9530,6 +9739,109 @@ export default function Home() {
 
         .buy-arrow {
           font-size: 0.6rem;
+        }
+
+        /* MOBILE RESPONSIVENESS OVERRIDES */
+        @media (max-width: 768px) {
+          .ai-actions-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+          .detail-specs-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px !important;
+          }
+          .main-header {
+            padding: 10px 16px;
+            border-radius: var(--border-radius-md);
+          }
+          .logo-text {
+            font-size: 1.2rem;
+          }
+          .project-top-banner {
+            flex-direction: column;
+            align-items: stretch;
+            text-align: center;
+          }
+          .banner-left-area {
+            background: #0b0f19;
+            justify-content: center;
+            padding: 12px;
+          }
+          .banner-marquee-wrapper {
+            padding: 10px 0;
+          }
+          .showroom-hero-banner {
+            padding: 24px 20px;
+            min-height: 360px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+          }
+          .showroom-hero-banner h2 {
+            font-size: 1.8rem;
+            min-height: auto;
+          }
+          .hero-banner-subtitle {
+            font-size: 0.85rem;
+            margin-top: 8px;
+          }
+          .main-layout {
+            padding: 12px;
+            gap: 16px;
+          }
+          .search-bar-container-new {
+            flex-direction: column;
+            padding: 12px;
+            gap: 10px;
+          }
+          .search-bar-new {
+            width: 100% !important;
+          }
+          .search-btn-new {
+            width: 100%;
+            justify-content: center;
+          }
+          .filter-chips-row {
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+          .catalog-sidebar-panel {
+            padding: 16px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .products-grid-new {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+          }
+          .product-card-new {
+            border-radius: 8px;
+          }
+          .product-card-new h3 {
+            font-size: 0.85rem !important;
+          }
+          .product-card-new .brand-badge {
+            font-size: 0.6rem !important;
+          }
+          .product-card-new .price-tag {
+            font-size: 0.85rem !important;
+          }
+          .swapper-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px !important;
+          }
+          .brand-button-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px !important;
+          }
+          .auth-modal {
+            padding: 20px 16px;
+          }
+          .detail-specs-grid {
+            grid-template-columns: 1fr !important;
+          }
         }
       `}</style>
     </main>
