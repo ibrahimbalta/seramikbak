@@ -1734,7 +1734,7 @@ export default function Home() {
   };
 
   return (
-    <>
+    <main className="main-layout">
       {pageLoading && (
         <div className="page-loader-overlay">
           <div className="loader-container">
@@ -1752,7 +1752,6 @@ export default function Home() {
           </div>
         </div>
       )}
-      <main className="main-layout">
       {/* Premium Collections Banner */}
       <div className="project-top-banner">
         <div className="banner-left-area">
@@ -10072,6 +10071,5 @@ export default function Home() {
         }
       `}</style>
     </main>
-    </>
   );
 }
