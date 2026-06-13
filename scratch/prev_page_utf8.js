@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -53,15 +53,15 @@ const MapComponent = dynamic(() => import('@/components/MapComponent'), { ssr: f
 // ----------------------------------------------------------------------
 function TileVisualPreview({ style, color, finish, width, height, imageUrl }) {
   const [imageError, setImageError] = useState(false);
-  const isDark = color.toLowerCase().includes('antrasit') || color.toLowerCase().includes('siyah') || color.toLowerCase().includes('füme');
+  const isDark = color.toLowerCase().includes('antrasit') || color.toLowerCase().includes('siyah') || color.toLowerCase().includes('f├╝me');
   const isBeige = color.toLowerCase().includes('bej') || color.toLowerCase().includes('krem');
-  const isBrown = color.toLowerCase().includes('kahve') || color.toLowerCase().includes('ahşap');
+  const isBrown = color.toLowerCase().includes('kahve') || color.toLowerCase().includes('ah┼şap');
   
   // Base background color determination
   let bgColor = '#e5e7eb'; // Default light grey
   if (style === 'Mermer') {
     bgColor = isDark ? '#1f242e' : '#f4f5f8';
-  } else if (style === 'Ahşap') {
+  } else if (style === 'Ah┼şap') {
     bgColor = '#8a5a36'; // Wood brown
   } else if (style === 'Beton') {
     bgColor = isBeige ? '#e3d6c3' : '#a0a4ab'; // Beige/Grey concrete
@@ -163,7 +163,7 @@ function TileVisualPreview({ style, color, finish, width, height, imageUrl }) {
       )}
 
       {/* 2. WOOD PLANK SEAMS */}
-      {style === 'Ahşap' && (
+      {style === 'Ah┼şap' && (
         <div className="tile-wood-grain">
           <div className="wood-seam" style={{ left: '25%' }} />
           <div className="wood-seam" style={{ left: '50%' }} />
@@ -302,9 +302,9 @@ function enrichProductData(p) {
   const basePrice = p.width * p.height * 0.08 + (p.finish === 'Parlak' ? 120 : 0) + (p.style === 'Mermer' ? 150 : 80);
   
   const dealerOffers = [
-    { dealerName: 'Kadıköy Bayi', price: Math.round(basePrice * 0.95), stock: 'Stokta Var' },
-    { dealerName: 'Beşiktaş Showroom', price: Math.round(basePrice), stock: 'Stokta Var' },
-    { dealerName: 'Şişli Concept Store', price: Math.round(basePrice * 1.05), stock: 'Sınırlı Stok' }
+    { dealerName: 'Kad─▒k├Ây Bayi', price: Math.round(basePrice * 0.95), stock: 'Stokta Var' },
+    { dealerName: 'Be┼şikta┼ş Showroom', price: Math.round(basePrice), stock: 'Stokta Var' },
+    { dealerName: '┼Şi┼şli Concept Store', price: Math.round(basePrice * 1.05), stock: 'S─▒n─▒rl─▒ Stok' }
   ];
 
   const sortedOffers = [...dealerOffers].sort((a, b) => a.price - b.price);
@@ -335,9 +335,9 @@ function enrichProductData(p) {
 function getProductBadge(product, idx) {
   if (product.isPremium) return { text: "Premium", className: "gold" };
   const val = product.name.charCodeAt(0) + product.name.charCodeAt(product.name.length - 1) + idx;
-  if (val % 3 === 0) return { text: "Çok Satan", className: "red" };
-  if (val % 3 === 1) return { text: "Haftanın Trendi", className: "orange" };
-  return { text: "Mimarın Seçimi", className: "blue" };
+  if (val % 3 === 0) return { text: "├çok Satan", className: "red" };
+  if (val % 3 === 1) return { text: "Haftan─▒n Trendi", className: "orange" };
+  return { text: "Mimar─▒n Se├ğimi", className: "blue" };
 }
 
 export default function Home() {
@@ -345,28 +345,6 @@ export default function Home() {
   const [pageLoading, setPageLoading] = useState(true);
   const [initialBrandsLoaded, setInitialBrandsLoaded] = useState(false);
   const [initialProductsLoaded, setInitialProductsLoaded] = useState(false);
-
-  // Accordion Expand/Collapse States for Filters
-  const [expandedSections, setExpandedSections] = useState({
-    categories: true,
-    collection: true,
-    texture: true,
-    ebat: true,
-    productType: true,
-    productFeature: true,
-    spaceType: true
-  });
-
-  const toggleSection = (sec) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [sec]: !prev[sec]
-    }));
-  };
-
-  // Additional Filter States
-  const [selectedRectified, setSelectedRectified] = useState(''); // '', 'true', 'false'
-  const [selectedFrost, setSelectedFrost] = useState(''); // '', 'true', 'false'
 
   // Navigation
   const [activeTab, setActiveTab] = useState('search'); // search, studio, dealers, b2b
@@ -394,7 +372,7 @@ export default function Home() {
         return prev.filter(p => p.id !== product.id);
       } else {
         if (prev.length >= 4) {
-          alert('En fazla 4 ürünü aynı anda karşılaştırabilirsiniz.');
+          alert('En fazla 4 ├╝r├╝n├╝ ayn─▒ anda kar┼ş─▒la┼şt─▒rabilirsiniz.');
           return prev;
         }
         return [...prev, product];
@@ -404,25 +382,25 @@ export default function Home() {
 
   const heroSlides = [
     {
-      title: "Türkiye'nin Seramik Arama Motoru",
-      subtitle: "100+ seçkin marka ve 25.000+ seramik ürününü saniyeler içinde karşılaştırın, en ucuz pazar yeri fiyatlarını ve yetkili bayileri bulun.",
+      title: "T├╝rkiye'nin Seramik Arama Motoru",
+      subtitle: "100+ se├ğkin marka ve 25.000+ seramik ├╝r├╝n├╝n├╝ saniyeler i├ğinde kar┼ş─▒la┼şt─▒r─▒n, en ucuz pazar yeri fiyatlar─▒n─▒ ve yetkili bayileri bulun.",
       bg: "/hero/luxury_bathroom.png",
-      tag: "TÜRKİYE'NİN EN KAPSAMLI SERAMİK DİZİNİ",
-      highlight: "Fiyatları Karşılaştırın"
+      tag: "T├£RK─░YE'N─░N EN KAPSAMLI SERAM─░K D─░Z─░N─░",
+      highlight: "Fiyatlar─▒ Kar┼ş─▒la┼şt─▒r─▒n"
     },
     {
-      title: "Seramikleri Evinizde Canlı Deneyin",
-      subtitle: "Seçtiğiniz fayans veya karoyu interaktif 3D Sanal Stüdyo'da döşeyin; derz genişliğini, rengini, döşeme desenini ve oda ışıklarını özelleştirin.",
+      title: "Seramikleri Evinizde Canl─▒ Deneyin",
+      subtitle: "Se├ğti─şiniz fayans veya karoyu interaktif 3D Sanal St├╝dyo'da d├Â┼şeyin; derz geni┼şli─şini, rengini, d├Â┼şeme desenini ve oda ─▒┼ş─▒klar─▒n─▒ ├Âzelle┼ştirin.",
       bg: "/hero/scandinavian_kitchen.png",
-      tag: "3D DİJİTAL ODA SİMÜLASYONU",
-      highlight: "3D Sanal Stüdyo Modu"
+      tag: "3D D─░J─░TAL ODA S─░M├£LASYONU",
+      highlight: "3D Sanal St├╝dyo Modu"
     },
     {
-      title: "Kendi Odanızı AI ile Tasarlayın",
-      subtitle: "Banyonuzun veya mutfağınızın fotoğrafını yükleyin; Google Gemini yapay zekası zemin/duvar sınırlarını maskeleyip seçtiğiniz seramikleri giydirsin.",
+      title: "Kendi Odan─▒z─▒ AI ile Tasarlay─▒n",
+      subtitle: "Banyonuzun veya mutfa─ş─▒n─▒z─▒n foto─şraf─▒n─▒ y├╝kleyin; Google Gemini yapay zekas─▒ zemin/duvar s─▒n─▒rlar─▒n─▒ maskeleyip se├ğti─şiniz seramikleri giydirsin.",
       bg: "/hero/modern_living.png",
-      tag: "YAPAY ZEKA FOTOĞRAF GİYDİRME",
-      highlight: "AI Tasarım Asistanı"
+      tag: "YAPAY ZEKA FOTO─ŞRAF G─░YD─░RME",
+      highlight: "AI Tasar─▒m Asistan─▒"
     }
   ];
 
@@ -550,7 +528,7 @@ export default function Home() {
     setDragIndex(null);
   };
 
-  // Bayi Teşhir Kiosk Modu State
+  // Bayi Te┼şhir Kiosk Modu State
   const [isKioskMode, setIsKioskMode] = useState(false);
   
   // Search & Filters State
@@ -580,7 +558,7 @@ export default function Home() {
   const [studioTimeOfDay, setStudioTimeOfDay] = useState('day'); // day or night
 
   // Geolocation & Dealer Locator State
-  const [userLocationName, setUserLocationName] = useState('Kadıköy Merkez');
+  const [userLocationName, setUserLocationName] = useState('Kad─▒k├Ây Merkez');
   const [userCoords, setUserCoords] = useState({ lat: 40.9901, lng: 29.0278 }); // Kadikoy by default
   const [nearestDealers, setNearestDealers] = useState([]);
   const [activeDealerOnMap, setActiveDealerOnMap] = useState(null);
@@ -608,7 +586,7 @@ export default function Home() {
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupAddress, setSignupAddress] = useState('');
-  const [signupCity, setSignupCity] = useState('İstanbul');
+  const [signupCity, setSignupCity] = useState('─░stanbul');
   const [signupDistrict, setSignupDistrict] = useState('');
   const [signupLat, setSignupLat] = useState('40.9901');
   const [signupLng, setSignupLng] = useState('29.0278');
@@ -656,7 +634,7 @@ export default function Home() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setSignupSuccess('Başvurunuz başarıyla alındı! Sistem yöneticisi onayından sonra aktifleşecektir.');
+        setSignupSuccess('Ba┼şvurunuz ba┼şar─▒yla al─▒nd─▒! Sistem y├Âneticisi onay─▒ndan sonra aktifle┼şecektir.');
         setSignupName('');
         setSignupPhone('');
         setSignupEmail('');
@@ -664,11 +642,11 @@ export default function Home() {
         setSignupAddress('');
         setSignupDistrict('');
       } else {
-        setSignupError(data.error || 'Başvuru sırasında hata oluştu.');
+        setSignupError(data.error || 'Ba┼şvuru s─▒ras─▒nda hata olu┼ştu.');
       }
     } catch (err) {
       console.error(err);
-      setSignupError('Sunucu bağlantı hatası.');
+      setSignupError('Sunucu ba─şlant─▒ hatas─▒.');
     } finally {
       setIsSubmittingSignup(false);
     }
@@ -721,10 +699,10 @@ export default function Home() {
         setAuthPassword('');
         setAuthSuccess('');
       } else {
-        setAuthError(data.error || 'Giriş başarısız.');
+        setAuthError(data.error || 'Giri┼ş ba┼şar─▒s─▒z.');
       }
     } catch (err) {
-      setAuthError('Sunucu bağlantı hatası.');
+      setAuthError('Sunucu ba─şlant─▒ hatas─▒.');
     } finally {
       setAuthLoading(false);
     }
@@ -742,15 +720,15 @@ export default function Home() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setAuthSuccess('Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+        setAuthSuccess('Kay─▒t ba┼şar─▒l─▒! ┼Şimdi giri┼ş yapabilirsiniz.');
         setAuthTab('login');
         setAuthName('');
         setAuthPassword('');
       } else {
-        setAuthError(data.error || 'Kayıt başarısız.');
+        setAuthError(data.error || 'Kay─▒t ba┼şar─▒s─▒z.');
       }
     } catch (err) {
-      setAuthError('Sunucu bağlantı hatası.');
+      setAuthError('Sunucu ba─şlant─▒ hatas─▒.');
     } finally {
       setAuthLoading(false);
     }
@@ -898,8 +876,6 @@ export default function Home() {
         if (selectedStyle) params.append('style', selectedStyle);
         if (selectedArea) params.append('area', selectedArea);
         if (selectedSize) params.append('size', selectedSize);
-        if (selectedRectified) params.append('rectified', selectedRectified);
-        if (selectedFrost) params.append('frost', selectedFrost);
         url += params.toString();
       }
       const res = await fetch(url);
@@ -928,7 +904,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchProducts();
-  }, [sortBy, searchQuery, selectedBrand, selectedColor, selectedFinish, selectedStyle, selectedArea, selectedSize, selectedRectified, selectedFrost]);
+  }, [sortBy, searchQuery, selectedBrand, selectedColor, selectedFinish, selectedStyle, selectedArea, selectedSize]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -994,7 +970,7 @@ export default function Home() {
           console.warn(data.warning);
         }
       } else {
-        throw new Error('Görsel arama API hatası');
+        throw new Error('G├Ârsel arama API hatas─▒');
       }
     } catch (err) {
       console.error('Visual Search Error:', err);
@@ -1018,7 +994,7 @@ export default function Home() {
 
   const detectUserLocation = () => {
     if (typeof window === 'undefined' || !navigator.geolocation) {
-      setLocationError('Tarayıcınız konum servislerini desteklemiyor.');
+      setLocationError('Taray─▒c─▒n─▒z konum servislerini desteklemiyor.');
       return;
     }
 
@@ -1038,16 +1014,16 @@ export default function Home() {
       },
       (error) => {
         console.warn("Geolocation error:", error);
-        let errorMsg = 'Konum alınamadı.';
+        let errorMsg = 'Konum al─▒namad─▒.';
         if (error.code === 1) errorMsg = 'Konum izni reddedildi.';
-        else if (error.code === 2) errorMsg = 'Konum bilgisi mevcut değil.';
-        else if (error.code === 3) errorMsg = 'Konum isteği zaman aşımına uğradı.';
+        else if (error.code === 2) errorMsg = 'Konum bilgisi mevcut de─şil.';
+        else if (error.code === 3) errorMsg = 'Konum iste─şi zaman a┼ş─▒m─▒na u─şrad─▒.';
         setLocationError(errorMsg);
         setIsLocating(false);
         
-        // Fallback: Kadıköy by default if not set yet
+        // Fallback: Kad─▒k├Ây by default if not set yet
         setUserCoords({ lat: 40.9901, lng: 29.0278 });
-        setUserLocationName('Kadıköy Merkez (Varsayılan)');
+        setUserLocationName('Kad─▒k├Ây Merkez (Varsay─▒lan)');
       },
       { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
     );
@@ -1080,7 +1056,7 @@ export default function Home() {
       });
       const data = await res.json();
       if (data.success) {
-        setLeadSuccessMsg('Teklif talebiniz yetkili bayiye iletilmiştir.');
+        setLeadSuccessMsg('Teklif talebiniz yetkili bayiye iletilmi┼ştir.');
         setLeadName('');
         setLeadPhone('');
         setLeadEmail('');
@@ -1194,7 +1170,7 @@ export default function Home() {
       suggestedGroutColor = 'Beyaz';
     } else if (tileColorLower.includes('bej')) {
       suggestedGroutColor = 'Bej';
-    } else if (tileColorLower.includes('kahve') || tileColorLower.includes('ahşap')) {
+    } else if (tileColorLower.includes('kahve') || tileColorLower.includes('ah┼şap')) {
       suggestedGroutColor = 'Kahverengi';
     } else if (tileColorLower.includes('antrasit') || tileColorLower.includes('siyah')) {
       suggestedGroutColor = 'Antrasit';
@@ -1231,7 +1207,7 @@ export default function Home() {
       const link = document.createElement('a');
       link.href = '#';
       link.setAttribute('download', `${prod.code}_3D_Textures_CAD.zip`);
-      alert(`[CAD Portal] ${prod.brand?.name} - ${prod.name} (.ZIP) Seamless texture paketi, CAD blokları ve Revit BIM dosyası başarıyla bilgisayarınıza indirildi.`);
+      alert(`[CAD Portal] ${prod.brand?.name} - ${prod.name} (.ZIP) Seamless texture paketi, CAD bloklar─▒ ve Revit BIM dosyas─▒ ba┼şar─▒yla bilgisayar─▒n─▒za indirildi.`);
       
       setTimeout(() => setCadDownloadSuccess(false), 3000);
     }, 1500);
@@ -1432,19 +1408,19 @@ export default function Home() {
   // Generate a complete luxury bathroom design from scratch based on the selected ceramic
   const generateAIBathroomImage = async () => {
     if (!activeProduct) {
-      alert('Lütfen banyo tasarlamak için bir seramik modeli seçin.');
+      alert('L├╝tfen banyo tasarlamak i├ğin bir seramik modeli se├ğin.');
       return;
     }
 
     setIsProcessingRoomImage(true);
     setProcessedRoomImage(null);
-    setRoomProcessingStep('Yapay zeka banyo konsepti tasarlıyor...');
+    setRoomProcessingStep('Yapay zeka banyo konsepti tasarl─▒yor...');
 
     const logSteps = [
-      { delay: 1200, label: 'Lüks oda mimarisi tasarlanıyor...' },
-      { delay: 2600, label: `Seçili seramik dokusu (${activeProduct.name}) tüm duvar ve zemine döşeniyor...` },
-      { delay: 4000, label: 'Banyo elemanları (küvet, lavabo, batarya) yerleştiriliyor...' },
-      { delay: 5400, label: 'Işık yansımaları ve fotorealistik gölgeler hesaplanıyor...' }
+      { delay: 1200, label: 'L├╝ks oda mimarisi tasarlan─▒yor...' },
+      { delay: 2600, label: `Se├ğili seramik dokusu (${activeProduct.name}) t├╝m duvar ve zemine d├Â┼şeniyor...` },
+      { delay: 4000, label: 'Banyo elemanlar─▒ (k├╝vet, lavabo, batarya) yerle┼ştiriliyor...' },
+      { delay: 5400, label: 'I┼ş─▒k yans─▒malar─▒ ve fotorealistik g├Âlgeler hesaplan─▒yor...' }
     ];
 
     logSteps.forEach((s) => {
@@ -1477,7 +1453,7 @@ export default function Home() {
 
       const data = await response.json();
       if (!data.success || !data.image) {
-        throw new Error(data.error || 'Görsel üretilemedi.');
+        throw new Error(data.error || 'G├Ârsel ├╝retilemedi.');
       }
 
       const imageUrl = data.image;
@@ -1493,12 +1469,12 @@ export default function Home() {
       };
       img.onerror = () => {
         setIsProcessingRoomImage(false);
-        alert('Tasarım görseli üretilirken bir hata oluştu. Lütfen tekrar deneyin.');
+        alert('Tasar─▒m g├Ârseli ├╝retilirken bir hata olu┼ştu. L├╝tfen tekrar deneyin.');
       };
     } catch (err) {
       console.error('AI Room generation failed:', err);
       setIsProcessingRoomImage(false);
-      alert('Tasarım görseli üretilirken bir hata oluştu. Lütfen tekrar deneyin.');
+      alert('Tasar─▒m g├Ârseli ├╝retilirken bir hata olu┼ştu. L├╝tfen tekrar deneyin.');
     }
   };
 
@@ -1508,13 +1484,13 @@ export default function Home() {
 
     setIsProcessingRoomImage(true);
     setProcessedRoomImage(null);
-    setRoomProcessingStep(targetVal === 'floor' ? 'Zemin analizi yapılıyor...' : 'Duvar analizi yapılıyor...');
+    setRoomProcessingStep(targetVal === 'floor' ? 'Zemin analizi yap─▒l─▒yor...' : 'Duvar analizi yap─▒l─▒yor...');
 
     const logSteps = [
-      { delay: 1000, label: 'Zemin ve duvar sınırları analiz ediliyor...' },
-      { delay: 2200, label: 'Perspektif ve gölgeleme açıları hesaplanıyor...' },
-      { delay: 3500, label: `Seçili seramik (${activeProduct.name}) alana kaplanıyor...` },
-      { delay: 4800, label: 'Işık yansımaları ve pürüzsüzlük (specular maps) ekleniyor...' }
+      { delay: 1000, label: 'Zemin ve duvar s─▒n─▒rlar─▒ analiz ediliyor...' },
+      { delay: 2200, label: 'Perspektif ve g├Âlgeleme a├ğ─▒lar─▒ hesaplan─▒yor...' },
+      { delay: 3500, label: `Se├ğili seramik (${activeProduct.name}) alana kaplan─▒yor...` },
+      { delay: 4800, label: 'I┼ş─▒k yans─▒malar─▒ ve p├╝r├╝zs├╝zl├╝k (specular maps) ekleniyor...' }
     ];
 
     logSteps.forEach((s) => {
@@ -1564,12 +1540,12 @@ export default function Home() {
           };
         }
       } else {
-        throw new Error(data.error || 'AI segmentasyonu başarısız.');
+        throw new Error(data.error || 'AI segmentasyonu ba┼şar─▒s─▒z.');
       }
     } catch (err) {
       console.error('AI Room visualization failed:', err);
       setIsProcessingRoomImage(false);
-      alert('Yapay zeka görsel giydirme işlemi sırasında bir hata oluştu.');
+      alert('Yapay zeka g├Ârsel giydirme i┼şlemi s─▒ras─▒nda bir hata olu┼ştu.');
     }
   };
 
@@ -1604,7 +1580,7 @@ export default function Home() {
     if (!file) return;
 
     if (!activeProduct) {
-      alert('Lütfen odanıza giydirmek istediğiniz seramik modelini katalogdan seçin.');
+      alert('L├╝tfen odan─▒za giydirmek istedi─şiniz seramik modelini katalogdan se├ğin.');
       return;
     }
 
@@ -1613,13 +1589,13 @@ export default function Home() {
     setIsProcessingRoomImage(true);
     setProcessedRoomImage(null);
     setShowPointEditor(false);
-    setRoomProcessingStep('AI Modeli Yükleniyor... (Segmentasyon)');
+    setRoomProcessingStep('AI Modeli Y├╝kleniyor... (Segmentasyon)');
 
     const logSteps = [
-      { delay: 1000, label: 'Zemin ve duvar sınırları analiz ediliyor...' },
-      { delay: 2200, label: 'Perspektif ve gölgeleme açıları hesaplanıyor...' },
-      { delay: 3500, label: `Seçili seramik (${activeProduct.name}) alana kaplanıyor...` },
-      { delay: 4800, label: 'Işık yansımaları ve pürüzsüzlük (specular maps) ekleniyor...' }
+      { delay: 1000, label: 'Zemin ve duvar s─▒n─▒rlar─▒ analiz ediliyor...' },
+      { delay: 2200, label: 'Perspektif ve g├Âlgeleme a├ğ─▒lar─▒ hesaplan─▒yor...' },
+      { delay: 3500, label: `Se├ğili seramik (${activeProduct.name}) alana kaplan─▒yor...` },
+      { delay: 4800, label: 'I┼ş─▒k yans─▒malar─▒ ve p├╝r├╝zs├╝zl├╝k (specular maps) ekleniyor...' }
     ];
 
     logSteps.forEach((s) => {
@@ -1678,17 +1654,17 @@ export default function Home() {
             };
           };
         } else {
-          throw new Error(data.error || 'AI segmentasyonu başarısız.');
+          throw new Error(data.error || 'AI segmentasyonu ba┼şar─▒s─▒z.');
         }
       } catch (err) {
         console.error('AI Room visualization failed:', err);
         setIsProcessingRoomImage(false);
-        alert('Yapay zeka görsel giydirme işlemi sırasında bir hata oluştu.');
+        alert('Yapay zeka g├Ârsel giydirme i┼şlemi s─▒ras─▒nda bir hata olu┼ştu.');
       }
     };
     reader.onerror = () => {
       setIsProcessingRoomImage(false);
-      alert('Dosya okunamadı.');
+      alert('Dosya okunamad─▒.');
     };
     reader.readAsDataURL(file);
   };
@@ -1723,7 +1699,7 @@ export default function Home() {
       });
       const data = await res.json();
       if (data.success) {
-        setCampaignSuccessMsg('Reklam kampanyası başarıyla güncellendi.');
+        setCampaignSuccessMsg('Reklam kampanyas─▒ ba┼şar─▒yla g├╝ncellendi.');
         fetchB2bStats(b2bBrandId);
         fetchProducts();
       }
@@ -1748,7 +1724,7 @@ export default function Home() {
       });
       const data = await res.json();
       if (data.success) {
-        setStripeWebhookResult(`[Stripe] Plan: ${stripePlan} lisansı aktifleşti.`);
+        setStripeWebhookResult(`[Stripe] Plan: ${stripePlan} lisans─▒ aktifle┼şti.`);
         fetchB2bStats(b2bBrandId);
       }
     } catch (err) {
@@ -1769,7 +1745,7 @@ export default function Home() {
             <h2 className="loader-brand-name">
               <span>Seramik</span><span className="gold-text">Bak</span>
             </h2>
-            <p className="loader-status-text">Premium seramik kataloğu yükleniyor...</p>
+            <p className="loader-status-text">Premium seramik katalo─şu y├╝kleniyor...</p>
             <div className="loader-progress-bar">
               <div className="loader-progress-line"></div>
             </div>
@@ -1786,7 +1762,7 @@ export default function Home() {
         <div className="banner-left-area">
           <div className="banner-badge">
             <Sparkles size={13} className="spin-icon-slow" />
-            <span>YENİ KOLEKSİYONLAR</span>
+            <span>YEN─░ KOLEKS─░YONLAR</span>
           </div>
         </div>
         <div className="banner-marquee-wrapper">
@@ -1807,9 +1783,9 @@ export default function Home() {
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('KUT-CAL-GLD')}>
-              <img src="/hero/scandinavian_kitchen.png" alt="Kütahya Calacatta" className="banner-img" />
+              <img src="/hero/scandinavian_kitchen.png" alt="K├╝tahya Calacatta" className="banner-img" />
               <div className="banner-item-info">
-                <span className="banner-brand-name">Kütahya</span>
+                <span className="banner-brand-name">K├╝tahya</span>
                 <span className="banner-product-name">Calacatta Gold</span>
               </div>
             </div>
@@ -1850,9 +1826,9 @@ export default function Home() {
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('KUT-CAL-GLD')}>
-              <img src="/hero/scandinavian_kitchen.png" alt="Kütahya Calacatta" className="banner-img" />
+              <img src="/hero/scandinavian_kitchen.png" alt="K├╝tahya Calacatta" className="banner-img" />
               <div className="banner-item-info">
-                <span className="banner-brand-name">Kütahya</span>
+                <span className="banner-brand-name">K├╝tahya</span>
                 <span className="banner-product-name">Calacatta Gold</span>
               </div>
             </div>
@@ -1892,7 +1868,7 @@ export default function Home() {
         <nav className="header-nav">
           {isKioskMode ? (
             <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--accent-gold)', letterSpacing: '0.05em' }}>
-              ✦ SERAMİKBAK BAYİ TEŞHİR KİOSK EKRANI ✦
+              Ô£Ğ SERAM─░KBAK BAY─░ TE┼ŞH─░R K─░OSK EKRANI Ô£Ğ
             </span>
           ) : (
             <>
@@ -1900,7 +1876,7 @@ export default function Home() {
                 <span>Arama Motoru</span>
               </button>
               <button className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); }}>
-                <span>3D Sanal Stüdyo</span>
+                <span>3D Sanal St├╝dyo</span>
               </button>
               <button className={`nav-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); }}>
                 <span>Bayi Bulucu</span>
@@ -1915,9 +1891,9 @@ export default function Home() {
             <button 
               onClick={() => setIsKioskMode(!isKioskMode)} 
               className={`header-btn kiosk-btn ${isKioskMode ? 'active' : ''}`}
-              title="Bayi Teşhir Modu (Kiosk)"
+              title="Bayi Te┼şhir Modu (Kiosk)"
             >
-              <span>{isKioskMode ? 'Kiosk Kapat' : 'Teşhir Kiosk'}</span>
+              <span>{isKioskMode ? 'Kiosk Kapat' : 'Te┼şhir Kiosk'}</span>
             </button>
             {!isKioskMode && (
               <>
@@ -1932,11 +1908,11 @@ export default function Home() {
                 </button>
                 <Link href="/bayi" className="header-btn portal-btn" style={{ textDecoration: 'none', color: 'inherit' }}>
                   <UserIcon size={14} />
-                  <span>Bayi Girişi</span>
+                  <span>Bayi Giri┼şi</span>
                 </Link>
                 <Link href="/marka" className="header-btn portal-btn" style={{ textDecoration: 'none', color: 'inherit' }}>
                   <TrendingUp size={14} />
-                  <span>Marka Girişi</span>
+                  <span>Marka Giri┼şi</span>
                 </Link>
                 <button className="header-btn favorites-btn" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { setShowAuthModal(true); } }}>
                   <HeartIcon size={16} />
@@ -1964,11 +1940,11 @@ export default function Home() {
                           <HeartIcon size={14} /> Favorilerim ({userFavorites.length})
                         </button>
                         <button className="user-dropdown-item" onClick={() => { setShowUserMenu(false); }}>
-                          <Settings size={14} /> Hesap Ayarları
+                          <Settings size={14} /> Hesap Ayarlar─▒
                         </button>
                         <div className="user-dropdown-divider" />
                         <button className="user-dropdown-item logout-item" onClick={handleLogout}>
-                          <ArrowRight size={14} /> Çıkış Yap
+                          <ArrowRight size={14} /> ├ç─▒k─▒┼ş Yap
                         </button>
                       </div>
                     )}
@@ -1976,7 +1952,7 @@ export default function Home() {
                 ) : (
                   <button className="header-btn account-btn" onClick={() => setShowAuthModal(true)}>
                     <UserIcon size={16} />
-                    <span>Giriş Yap</span>
+                    <span>Giri┼ş Yap</span>
                   </button>
                 )}
               </>
@@ -1993,8 +1969,8 @@ export default function Home() {
         <div className="mobile-menu-overlay" onClick={() => setShowMobileMenu(false)}>
           <div className="mobile-menu-drawer glass-panel" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-menu-header">
-              <span className="mobile-menu-title">Menü</span>
-              <button className="mobile-menu-close" onClick={() => setShowMobileMenu(false)}>✕</button>
+              <span className="mobile-menu-title">Men├╝</span>
+              <button className="mobile-menu-close" onClick={() => setShowMobileMenu(false)}>Ô£ò</button>
             </div>
             <div className="mobile-menu-nav">
               <button 
@@ -2007,7 +1983,7 @@ export default function Home() {
                 className={`mobile-nav-link ${activeTab === 'studio' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); }}
               >
-                3D Sanal Stüdyo
+                3D Sanal St├╝dyo
               </button>
               <button 
                 className={`mobile-nav-link ${activeTab === 'dealers' ? 'active' : ''}`} 
@@ -2025,10 +2001,10 @@ export default function Home() {
                 Bayimiz Olun
               </button>
               <Link href="/bayi" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
-                Bayi Girişi
+                Bayi Giri┼şi
               </Link>
               <Link href="/marka" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
-                Marka Girişi
+                Marka Giri┼şi
               </Link>
               
               <div className="mobile-menu-divider" />
@@ -2043,15 +2019,15 @@ export default function Home() {
               {currentUser ? (
                 <>
                   <div className="mobile-user-info">
-                    Giriş yapan: <strong>{currentUser.name}</strong>
+                    Giri┼ş yapan: <strong>{currentUser.name}</strong>
                   </div>
                   <button className="mobile-nav-link logout-link" onClick={() => { handleLogout(); setShowMobileMenu(false); }}>
-                    Çıkış Yap
+                    ├ç─▒k─▒┼ş Yap
                   </button>
                 </>
               ) : (
                 <button className="mobile-nav-link login-link" onClick={() => { setShowAuthModal(true); setShowMobileMenu(false); }}>
-                  Giriş Yap
+                  Giri┼ş Yap
                 </button>
               )}
             </div>
@@ -2087,7 +2063,7 @@ export default function Home() {
                     <SearchIcon size={20} className="search-bar-icon-left" />
                     <input 
                       type="text" 
-                      placeholder="Marka, ürün adı, kod, renk, ebat, yüzey, koleksiyon..." 
+                      placeholder="Marka, ├╝r├╝n ad─▒, kod, renk, ebat, y├╝zey, koleksiyon..." 
                       value={searchQuery}
                       onChange={handleSearchChange}
                       onFocus={() => { if (searchQuery.trim().length > 1) setShowSuggestions(true); }}
@@ -2095,8 +2071,8 @@ export default function Home() {
                       className="wide-search-input"
                     />
                     
-                    {/* Inline Image Upload (Görsel Arama) */}
-                    <div className="search-camera-trigger" title="Görsel ile Arama Yap (CLIP)">
+                    {/* Inline Image Upload (G├Ârsel Arama) */}
+                    <div className="search-camera-trigger" title="G├Ârsel ile Arama Yap (CLIP)">
                       <ImageIcon size={20} className="camera-trigger-icon" />
                       <input 
                         type="file" 
@@ -2152,9 +2128,9 @@ export default function Home() {
                           />
                           <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                             <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
-                            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{p.brand?.name} • {p.code} • {p.width}x{p.height} cm</span>
+                            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{p.brand?.name} ÔÇó {p.code} ÔÇó {p.width}x{p.height} cm</span>
                           </div>
-                          <span style={{ color: 'var(--accent-gold)', fontSize: '0.9rem' }}>↗</span>
+                          <span style={{ color: 'var(--accent-gold)', fontSize: '0.9rem' }}>Ôåù</span>
                         </div>
                       ))}
                     </div>
@@ -2163,10 +2139,10 @@ export default function Home() {
 
                 {/* Popular Searches */}
                 <div className="hero-popular-tags">
-                  <span className="pop-tags-label">Popüler Aramalar:</span>
+                  <span className="pop-tags-label">Pop├╝ler Aramalar:</span>
                   <button onClick={() => handleTagClick('Mermer', 'style', 'Mermer')} className="pop-tag-capsule">60x120 Mermer</button>
                   <button onClick={() => handleTagClick('Calacatta Gold', 'style', 'Mermer')} className="pop-tag-capsule">Calacatta Gold</button>
-                  <button onClick={() => handleTagClick('Ahşap', 'style', 'Ahşap')} className="pop-tag-capsule">Mat Ahşap</button>
+                  <button onClick={() => handleTagClick('Ah┼şap', 'style', 'Ah┼şap')} className="pop-tag-capsule">Mat Ah┼şap</button>
                   <button onClick={() => handleTagClick('Beton', 'style', 'Beton')} className="pop-tag-capsule">Gri Beton</button>
                   <button onClick={() => handleTagClick('Traverten', 'style', 'Beton')} className="pop-tag-capsule">Traverten</button>
                   <button onClick={() => handleTagClick('Beyaz', 'style', 'Mermer')} className="pop-tag-capsule">Parlak Beyaz</button>
@@ -2176,7 +2152,7 @@ export default function Home() {
                 <div className="hero-feature-stats-row">
                   <div className="feature-stat-capsule">
                     <Layers2 size={16} />
-                    <span>25.000+ Seramik Ürün</span>
+                    <span>25.000+ Seramik ├£r├╝n</span>
                   </div>
                   <div className="feature-stat-capsule">
                     <Activity size={16} />
@@ -2184,7 +2160,7 @@ export default function Home() {
                   </div>
                   <div className="feature-stat-capsule">
                     <ImageIcon size={16} />
-                    <span>Görsel Arama ile Keşfet</span>
+                    <span>G├Ârsel Arama ile Ke┼şfet</span>
                   </div>
                   <div className="feature-stat-capsule">
                     <Sparkles size={16} />
@@ -2266,7 +2242,7 @@ export default function Home() {
                   <div className="category-circle-icon-wrapper flat-bg-gold">
                     <Layers2 size={18} />
                   </div>
-                  <span>Tümü</span>
+                  <span>T├╝m├╝</span>
                 </button>
 
                 <button 
@@ -2286,11 +2262,11 @@ export default function Home() {
                 </button>
 
                 <button 
-                  onClick={() => { setSelectedStyle('Ahşap'); fetchProducts('style=Ahşap'); }} 
-                  className={`category-circle-btn ${selectedStyle === 'Ahşap' ? 'active' : ''}`}
+                  onClick={() => { setSelectedStyle('Ah┼şap'); fetchProducts('style=Ah┼şap'); }} 
+                  className={`category-circle-btn ${selectedStyle === 'Ah┼şap' ? 'active' : ''}`}
                 >
                   <div className="category-circle-icon-wrapper wood-pattern-bg" />
-                  <span>Ahşap</span>
+                  <span>Ah┼şap</span>
                 </button>
 
                 <button 
@@ -2298,7 +2274,7 @@ export default function Home() {
                   className="category-circle-btn"
                 >
                   <div className="category-circle-icon-wrapper stone-pattern-bg" />
-                  <span>Taş</span>
+                  <span>Ta┼ş</span>
                 </button>
 
                 <button 
@@ -2321,7 +2297,7 @@ export default function Home() {
 
                 <button className="category-circle-btn" onClick={() => { setSelectedColor('Gri'); fetchProducts('color=Gri'); }}>
                   <div className="category-circle-icon-wrapper flat-grey-bg" />
-                  <span>Düz Renk</span>
+                  <span>D├╝z Renk</span>
                 </button>
 
                 <button className="category-circle-btn" onClick={() => setActiveTab('studio')}>
@@ -2330,11 +2306,11 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* 3D Sanal Stüdyo Promo Banner Card */}
+              {/* 3D Sanal St├╝dyo Promo Banner Card */}
               <div className="studio-promo-card-banner glass-panel" onClick={() => setActiveTab('studio')} style={{ cursor: 'pointer' }}>
                 <div className="promo-text-column">
-                  <h5>3D Sanal Stüdyo</h5>
-                  <p>Seramiklerinizi mekanınızda görselleştirin</p>
+                  <h5>3D Sanal St├╝dyo</h5>
+                  <p>Seramiklerinizi mekan─▒n─▒zda g├Ârselle┼ştirin</p>
                   <button className="promo-action-btn-gold">Hemen Deneyin</button>
                 </div>
                 <div className="promo-image-column">
@@ -2348,35 +2324,35 @@ export default function Home() {
               <div className="brand-marquee-container">
                 <div className="brand-marquee-track">
                   {/* First set of brands */}
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>NG KÜTAHYA SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)', letterSpacing: '0.1em' }}>BIEN SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>EGE SERAMİK</div>
+                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>NG K├£TAHYA SERAM─░K</div>
+                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)', letterSpacing: '0.1em' }}>BIEN SERAM─░K</div>
+                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>EGE SERAM─░K</div>
                   <div className="brand-marquee-item" style={{ fontWeight: '900', fontStyle: 'italic' }}>VitrA</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em', color: '#0f172a' }}>GÜRAL SERAMİK</div>
+                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em', color: '#0f172a' }}>G├£RAL SERAM─░K</div>
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.08em', fontWeight: '800' }}>QUA GRANITE</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)' }}>YURTBAY SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>ÇANAKKALE SERAMİK</div>
+                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)' }}>YURTBAY SERAM─░K</div>
+                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>├çANAKKALE SERAM─░K</div>
                   <div className="brand-marquee-item" style={{ fontWeight: '800', letterSpacing: '0.12em' }}>KALEBODUR</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--text-muted)' }}>TERMAL SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>UŞAK SERAMİK</div>
+                  <div className="brand-marquee-item" style={{ color: 'var(--text-muted)' }}>TERMAL SERAM─░K</div>
+                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>U┼ŞAK SERAM─░K</div>
 
                   {/* Duplicate set for infinite loop */}
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>NG KÜTAHYA SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)', letterSpacing: '0.1em' }}>BIEN SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>EGE SERAMİK</div>
+                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>NG K├£TAHYA SERAM─░K</div>
+                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)', letterSpacing: '0.1em' }}>BIEN SERAM─░K</div>
+                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>EGE SERAM─░K</div>
                   <div className="brand-marquee-item" style={{ fontWeight: '900', fontStyle: 'italic' }}>VitrA</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em', color: '#0f172a' }}>GÜRAL SERAMİK</div>
+                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em', color: '#0f172a' }}>G├£RAL SERAM─░K</div>
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.08em', fontWeight: '800' }}>QUA GRANITE</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)' }}>YURTBAY SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>ÇANAKKALE SERAMİK</div>
+                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)' }}>YURTBAY SERAM─░K</div>
+                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>├çANAKKALE SERAM─░K</div>
                   <div className="brand-marquee-item" style={{ fontWeight: '800', letterSpacing: '0.12em' }}>KALEBODUR</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--text-muted)' }}>TERMAL SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>UŞAK SERAMİK</div>
+                  <div className="brand-marquee-item" style={{ color: 'var(--text-muted)' }}>TERMAL SERAM─░K</div>
+                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>U┼ŞAK SERAM─░K</div>
                 </div>
               </div>
             </div>
 
-            {/* Haftanın Ürünleri Section */}
+            {/* Haftan─▒n ├£r├╝nleri Section */}
             {weeklyProducts.length > 0 && (
               <div className="weekly-products-section glass-panel" style={{ 
                 display: 'flex', 
@@ -2407,10 +2383,10 @@ export default function Home() {
                     </div>
                     <div>
                       <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        Haftanın En Popüler Ürünleri
+                        Haftan─▒n En Pop├╝ler ├£r├╝nleri
                       </h3>
                       <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                        En çok tercih edilen ve öne çıkan popüler seramik modellerini keşfedin.
+                        En ├ğok tercih edilen ve ├Âne ├ğ─▒kan pop├╝ler seramik modellerini ke┼şfedin.
                       </p>
                     </div>
                   </div>
@@ -2423,7 +2399,7 @@ export default function Home() {
                     borderRadius: '12px', 
                     fontWeight: '700', 
                     letterSpacing: '0.05em' 
-                  }}>ÖNE ÇIKANLAR</span>
+                  }}>├ûNE ├çIKANLAR</span>
                 </div>
 
                 <div className="weekly-products-scroll-container" style={{ 
@@ -2469,7 +2445,7 @@ export default function Home() {
                             fontWeight: '800', 
                             color: 'var(--accent-gold)'
                           }}>
-                            ₺{price.toLocaleString('tr-TR')},00
+                            Ôé║{price.toLocaleString('tr-TR')},00
                           </span>
                         </div>
 
@@ -2528,7 +2504,7 @@ export default function Home() {
                           </h4>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
-                              {p.width}x{p.height} cm • {p.finish}
+                              {p.width}x{p.height} cm ÔÇó {p.finish}
                             </span>
                             <span style={{ 
                               fontSize: '0.65rem', 
@@ -2553,8 +2529,8 @@ export default function Home() {
             <div className="shop-the-look-section" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
               <div className="stl-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                  <h3 className="stl-title" style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-primary)' }}>Tarzı Satın Al (Shop the Look)</h3>
-                  <p className="stl-subtitle" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>Profesyonel iç mimarlar tarafından tasarlanmış hazır banyo, mutfak ve salon konseptlerini inceleyin.</p>
+                  <h3 className="stl-title" style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-primary)' }}>Tarz─▒ Sat─▒n Al (Shop the Look)</h3>
+                  <p className="stl-subtitle" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>Profesyonel i├ğ mimarlar taraf─▒ndan tasarlanm─▒┼ş haz─▒r banyo, mutfak ve salon konseptlerini inceleyin.</p>
                 </div>
                 <span className="stl-badge" style={{ fontSize: '0.65rem', background: 'rgba(197,160,89,0.1)', border: '1px solid var(--border-gold)', color: 'var(--accent-gold)', padding: '4px 10px', borderRadius: '12px', fontWeight: '700', letterSpacing: '0.05em' }}>KONSEPT TASARIMLAR</span>
               </div>
@@ -2563,23 +2539,23 @@ export default function Home() {
                 {/* Concept 1: Luxury Marble Bathroom */}
                 <div className="stl-card glass-panel" style={{ display: 'flex', flexDirection: 'column', borderRadius: 'var(--border-radius-md)', overflow: 'hidden', background: '#ffffff' }}>
                   <div className="stl-image-container" style={{ height: '180px', position: 'relative', overflow: 'hidden' }}>
-                    <img src="/hero/luxury_bathroom.png" alt="Lüks Mermer Banyo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    <div className="stl-tag" style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(0,0,0,0.7)', color: '#ffffff', fontSize: '0.6rem', padding: '3px 8px', borderRadius: '4px', fontWeight: '700' }}>LÜKS BANYO</div>
+                    <img src="/hero/luxury_bathroom.png" alt="L├╝ks Mermer Banyo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div className="stl-tag" style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(0,0,0,0.7)', color: '#ffffff', fontSize: '0.6rem', padding: '3px 8px', borderRadius: '4px', fontWeight: '700' }}>L├£KS BANYO</div>
                   </div>
                   <div className="stl-body" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', flexGrow: 1 }}>
                     <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: 'var(--text-primary)' }}>Mermer Zarafeti Banyo</h4>
-                    <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>Beyaz Calacatta mermer dokusunun pirinç ve gold detaylarla lüks uyumu.</p>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>Beyaz Calacatta mermer dokusunun pirin├ğ ve gold detaylarla l├╝ks uyumu.</p>
                     <div className="stl-materials-list" style={{ marginTop: '8px' }}>
-                      <span className="mat-item-title" style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Kullanılan Seramikler:</span>
+                      <span className="mat-item-title" style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Kullan─▒lan Seramikler:</span>
                       <div className="mat-items" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         {products.filter(p => p.style === 'Mermer').slice(0, 2).map(p => (
                           <div key={p.id} className="mat-row" onClick={() => handleProductCardClick(p)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
                             <img src={p.imageUrl || '/textures/calacatta_gold.jpg'} alt={p.name} style={{ width: '28px', height: '28px', objectFit: 'cover', borderRadius: '4px' }} />
                             <div className="mat-info" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                               <span className="mat-name" style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
-                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm • {p.finish}</span>
+                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm ÔÇó {p.finish}</span>
                             </div>
-                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>↗</span>
+                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>Ôåù</span>
                           </div>
                         ))}
                       </div>
@@ -2590,34 +2566,34 @@ export default function Home() {
                 {/* Concept 2: Scandinavian Oak Kitchen */}
                 <div className="stl-card glass-panel" style={{ display: 'flex', flexDirection: 'column', borderRadius: 'var(--border-radius-md)', overflow: 'hidden', background: '#ffffff' }}>
                   <div className="stl-image-container" style={{ height: '180px', position: 'relative', overflow: 'hidden' }}>
-                    <img src="/hero/scandinavian_kitchen.png" alt="İskandinav Mutfak" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src="/hero/scandinavian_kitchen.png" alt="─░skandinav Mutfak" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     <div className="stl-tag" style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(0,0,0,0.7)', color: '#ffffff', fontSize: '0.6rem', padding: '3px 8px', borderRadius: '4px', fontWeight: '700' }}>SICAK MUTFAK</div>
                   </div>
                   <div className="stl-body" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', flexGrow: 1 }}>
-                    <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: 'var(--text-primary)' }}>Doğal İskandinav Mutfak</h4>
-                    <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>Sıcak meşe ahşap panellerin beyaz tezgah seramikleriyle ferah kombinasyonu.</p>
+                    <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: 'var(--text-primary)' }}>Do─şal ─░skandinav Mutfak</h4>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>S─▒cak me┼şe ah┼şap panellerin beyaz tezgah seramikleriyle ferah kombinasyonu.</p>
                     <div className="stl-materials-list" style={{ marginTop: '8px' }}>
-                      <span className="mat-item-title" style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Kullanılan Seramikler:</span>
+                      <span className="mat-item-title" style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Kullan─▒lan Seramikler:</span>
                       <div className="mat-items" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        {products.filter(p => p.style === 'Ahşap' || p.name.toLowerCase().includes('ahşap')).slice(0, 2).map(p => (
+                        {products.filter(p => p.style === 'Ah┼şap' || p.name.toLowerCase().includes('ah┼şap')).slice(0, 2).map(p => (
                           <div key={p.id} className="mat-row" onClick={() => handleProductCardClick(p)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
                             <img src={p.imageUrl || '/textures/teak_ahsap.jpg'} alt={p.name} style={{ width: '28px', height: '28px', objectFit: 'cover', borderRadius: '4px' }} />
                             <div className="mat-info" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                               <span className="mat-name" style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
-                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm • {p.finish}</span>
+                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm ÔÇó {p.finish}</span>
                             </div>
-                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>↗</span>
+                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>Ôåù</span>
                           </div>
                         ))}
-                        {products.filter(p => p.style === 'Ahşap' || p.name.toLowerCase().includes('ahşap')).length === 0 && 
+                        {products.filter(p => p.style === 'Ah┼şap' || p.name.toLowerCase().includes('ah┼şap')).length === 0 && 
                           products.slice(0, 2).map(p => (
                           <div key={p.id} className="mat-row" onClick={() => handleProductCardClick(p)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
                             <img src={p.imageUrl || '/textures/calacatta_gold.jpg'} alt={p.name} style={{ width: '28px', height: '28px', objectFit: 'cover', borderRadius: '4px' }} />
                             <div className="mat-info" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                               <span className="mat-name" style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
-                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm • {p.finish}</span>
+                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm ÔÇó {p.finish}</span>
                             </div>
-                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>↗</span>
+                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>Ôåù</span>
                           </div>
                         ))
                         }
@@ -2630,22 +2606,22 @@ export default function Home() {
                 <div className="stl-card glass-panel" style={{ display: 'flex', flexDirection: 'column', borderRadius: 'var(--border-radius-md)', overflow: 'hidden', background: '#ffffff' }}>
                   <div className="stl-image-container" style={{ height: '180px', position: 'relative', overflow: 'hidden' }}>
                     <img src="/hero/modern_living.png" alt="Modern Salon" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    <div className="stl-tag" style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(0,0,0,0.7)', color: '#ffffff', fontSize: '0.6rem', padding: '3px 8px', borderRadius: '4px', fontWeight: '700' }}>ENDÜSTRİYEL SALON</div>
+                    <div className="stl-tag" style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(0,0,0,0.7)', color: '#ffffff', fontSize: '0.6rem', padding: '3px 8px', borderRadius: '4px', fontWeight: '700' }}>END├£STR─░YEL SALON</div>
                   </div>
                   <div className="stl-body" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', flexGrow: 1 }}>
-                    <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: 'var(--text-primary)' }}>Endüstriyel Beton Salon</h4>
-                    <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>Polisajlı gri beton karolar ile minimalist ve modern salon döşemesi.</p>
+                    <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: 'var(--text-primary)' }}>End├╝striyel Beton Salon</h4>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>Polisajl─▒ gri beton karolar ile minimalist ve modern salon d├Â┼şemesi.</p>
                     <div className="stl-materials-list" style={{ marginTop: '8px' }}>
-                      <span className="mat-item-title" style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Kullanılan Seramikler:</span>
+                      <span className="mat-item-title" style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Kullan─▒lan Seramikler:</span>
                       <div className="mat-items" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         {products.filter(p => p.style === 'Beton' || p.name.toLowerCase().includes('beton')).slice(0, 2).map(p => (
                           <div key={p.id} className="mat-row" onClick={() => handleProductCardClick(p)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
                             <img src={p.imageUrl || '/textures/loft_beton.jpg'} alt={p.name} style={{ width: '28px', height: '28px', objectFit: 'cover', borderRadius: '4px' }} />
                             <div className="mat-info" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                               <span className="mat-name" style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
-                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm • {p.finish}</span>
+                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm ÔÇó {p.finish}</span>
                             </div>
-                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>↗</span>
+                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>Ôåù</span>
                           </div>
                         ))}
                       </div>
@@ -2659,341 +2635,325 @@ export default function Home() {
             <div className="main-search-and-results-layout">
               {/* Left Sidebar Filter Section */}
               <aside className="filters-sidebar-new glass-panel" style={{ position: 'relative' }}>
-                <div className="filter-header-row">
-                  <h3 className="filter-title-main" style={{ fontSize: '1.2rem', fontWeight: '750', color: '#0f172a', margin: 0, border: 'none', padding: 0 }}>Filtreler</h3>
-                  <button onClick={() => {
-                    setSelectedBrand('');
-                    setSelectedColor('');
-                    setSelectedFinish('');
-                    setSelectedStyle('');
-                    setSelectedArea('');
-                    setSelectedSize('');
-                    setSelectedRectified('');
-                    setSelectedFrost('');
-                    setSearchQuery('');
-                    setUploadedImagePreview(null);
-                    setVisualSearchMatches(null);
-                    fetchProducts('clear=true');
-                  }} className="clear-all-filters-btn">
-                    Tümünü Temizle
-                  </button>
-                </div>
+                <h3 className="filter-title-main">Filtreleme</h3>
 
-                {/* 1. KATEGORİLER */}
-                <div className="accordion-section">
-                  <div className="accordion-header" onClick={() => toggleSection('categories')}>
-                    <span className="accordion-title">Kategoriler</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.categories ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-                  </div>
-                  {expandedSections.categories && (
-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {['Mermer', 'Ahşap', 'Beton', 'Taş'].map(styleVal => (
-                        <label key={styleVal} className="checkbox-label-wrapper">
-                          <input 
-                            type="checkbox" 
-                            checked={selectedStyle === styleVal} 
-                            onChange={() => setSelectedStyle(selectedStyle === styleVal ? '' : styleVal)}
-                          />
-                          <span className="checkbox-custom-box" />
-                          <span className="checkbox-text-label">{styleVal}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* 2. KOLEKSİYON */}
-                <div className="accordion-section">
-                  <div className="accordion-header" onClick={() => toggleSection('collection')}>
-                    <span className="accordion-title">Koleksiyon</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.collection ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-                  </div>
-                  {expandedSections.collection && (
-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
-                      {brands.map(brand => (
-                        <label key={brand.id} className="checkbox-label-wrapper">
-                          <input 
-                            type="checkbox" 
-                            checked={selectedBrand === brand.id} 
-                            onChange={() => setSelectedBrand(selectedBrand === brand.id ? '' : brand.id)}
-                          />
-                          <span className="checkbox-custom-box" />
-                          <span className="checkbox-text-label">{brand.name}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* 3. DOKU */}
-                <div className="accordion-section">
-                  <div className="accordion-header" onClick={() => toggleSection('texture')}>
-                    <span className="accordion-title">Doku</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.texture ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-                  </div>
-                  {expandedSections.texture && (
-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {['Beyaz', 'Bej', 'Gri', 'Antrasit', 'Kahverengi'].map(colorVal => (
-                        <label key={colorVal} className="checkbox-label-wrapper">
-                          <input 
-                            type="checkbox" 
-                            checked={selectedColor === colorVal} 
-                            onChange={() => setSelectedColor(selectedColor === colorVal ? '' : colorVal)}
-                          />
-                          <span className="checkbox-custom-box" />
-                          <span className="checkbox-text-label">{colorVal}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* 4. EBAT */}
-                <div className="accordion-section">
-                  <div className="accordion-header" onClick={() => toggleSection('ebat')}>
-                    <span className="accordion-title">Ebat</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.ebat ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-                  </div>
-                  {expandedSections.ebat && (
-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div className="scrollable-ebat-list">
-                        {[
-                          '120x240', '120x120', '60x120', '20x120', '80x80', 
-                          '60x60', '30x60', '31,5x61,5', '42x42', '60x90', 
-                          '61x61', '80x160', '30x85', '33x66', '21x122', 
-                          '15x60', '240x240', '360x240', '100x100', '40x120', 
-                          '30x120', '30x90', '30x40', '20x40', '19,7x19,7'
-                        ].map(sizeVal => {
-                          const parts = sizeVal.replace(',', '.').split('x');
-                          const wCm = parseFloat(parts[0]) || 0;
-                          const hCm = parseFloat(parts[1]) || 0;
-                          const scale = 80 / 175;
-                          const wPx = Math.max(4, Math.round(wCm * scale));
-                          const hPx = Math.max(4, Math.round(hCm * scale));
-
-                          return (
-                            <label key={sizeVal} className="checkbox-label-wrapper" style={{ position: 'relative' }}>
-                              <input 
-                                type="checkbox" 
-                                checked={selectedSize === sizeVal} 
-                                onChange={() => setSelectedSize(selectedSize === sizeVal ? '' : sizeVal)}
-                              />
-                              <span className="checkbox-custom-box" />
-                              <span className="checkbox-text-label">{sizeVal}</span>
-                              
-                              <div className="size-guide-tooltip">
-                                <span className="tooltip-title">Boyut Kıyaslama</span>
-                                <div className="size-guide-viz">
-                                  <div className="viz-human">
-                                    <div className="viz-human-head"></div>
-                                    <div className="viz-human-body"></div>
-                                    <span className="viz-lbl">İnsan (175 cm)</span>
-                                  </div>
-                                  <div className="viz-tile" style={{ width: `${wPx}px`, height: `${hPx}px`, background: 'var(--accent-gold)', border: '1px solid rgba(255,255,255,0.3)' }}>
-                                    <span className="viz-lbl">{sizeVal} cm</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </label>
-                          );
-                        })}
+                {/* EBAT Checkboxes */}
+                <div className="filter-group-new">
+                  <h4 className="filter-group-title">EBAT</h4>
+                  <div className="checkboxes-list-new" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedSize === '30x60'} 
+                        onChange={() => setSelectedSize(selectedSize === '30x60' ? '' : '30x60')}
+                      />
+                      <span className="checkbox-custom-box" />
+                      <span className="checkbox-text-label">30x60</span>
+                      
+                      <div className="size-guide-tooltip">
+                        <span className="tooltip-title">Boyut K─▒yaslama</span>
+                        <div className="size-guide-viz">
+                          <div className="viz-human">
+                            <div className="viz-human-head"></div>
+                            <div className="viz-human-body"></div>
+                            <span className="viz-lbl">─░nsan (175 cm)</span>
+                          </div>
+                          <div className="viz-tile size-30x60" style={{ width: '14px', height: '27px', background: '#cbd5e1', border: '1px solid #94a3b8' }}>
+                            <span className="viz-lbl">30x60 cm</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    </label>
+
+                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedSize === '60x60'} 
+                        onChange={() => setSelectedSize(selectedSize === '60x60' ? '' : '60x60')}
+                      />
+                      <span className="checkbox-custom-box" />
+                      <span className="checkbox-text-label">60x60</span>
+
+                      <div className="size-guide-tooltip">
+                        <span className="tooltip-title">Boyut K─▒yaslama</span>
+                        <div className="size-guide-viz">
+                          <div className="viz-human">
+                            <div className="viz-human-head"></div>
+                            <div className="viz-human-body"></div>
+                            <span className="viz-lbl">─░nsan (175 cm)</span>
+                          </div>
+                          <div className="viz-tile size-60x60">
+                            <span className="viz-lbl">60x60 cm</span>
+                          </div>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedSize === '60x120'} 
+                        onChange={() => setSelectedSize(selectedSize === '60x120' ? '' : '60x120')}
+                      />
+                      <span className="checkbox-custom-box" />
+                      <span className="checkbox-text-label">60x120</span>
+
+                      <div className="size-guide-tooltip">
+                        <span className="tooltip-title">Boyut K─▒yaslama</span>
+                        <div className="size-guide-viz">
+                          <div className="viz-human">
+                            <div className="viz-human-head"></div>
+                            <div className="viz-human-body"></div>
+                            <span className="viz-lbl">─░nsan (175 cm)</span>
+                          </div>
+                          <div className="viz-tile size-60x120">
+                            <span className="viz-lbl">60x120 cm</span>
+                          </div>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedSize === '80x80'} 
+                        onChange={() => setSelectedSize(selectedSize === '80x80' ? '' : '80x80')}
+                      />
+                      <span className="checkbox-custom-box" />
+                      <span className="checkbox-text-label">80x80</span>
+
+                      <div className="size-guide-tooltip">
+                        <span className="tooltip-title">Boyut K─▒yaslama</span>
+                        <div className="size-guide-viz">
+                          <div className="viz-human">
+                            <div className="viz-human-head"></div>
+                            <div className="viz-human-body"></div>
+                            <span className="viz-lbl">─░nsan (175 cm)</span>
+                          </div>
+                          <div className="viz-tile size-80x80">
+                            <span className="viz-lbl">80x80 cm</span>
+                          </div>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedSize === '120x120'} 
+                        onChange={() => setSelectedSize(selectedSize === '120x120' ? '' : '120x120')}
+                      />
+                      <span className="checkbox-custom-box" />
+                      <span className="checkbox-text-label">120x120</span>
+
+                      <div className="size-guide-tooltip">
+                        <span className="tooltip-title">Boyut K─▒yaslama</span>
+                        <div className="size-guide-viz">
+                          <div className="viz-human">
+                            <div className="viz-human-head"></div>
+                            <div className="viz-human-body"></div>
+                            <span className="viz-lbl">─░nsan (175 cm)</span>
+                          </div>
+                          <div className="viz-tile size-120x120">
+                            <span className="viz-lbl">120x120 cm</span>
+                          </div>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                  <button onClick={() => setSelectedSize('')} className="show-all-filter-link" style={{ marginTop: '8px' }}>T├╝m├╝n├╝ G├Âster</button>
                 </div>
 
-                {/* 5. ÜRÜN TİPİ */}
-                <div className="accordion-section">
-                  <div className="accordion-header" onClick={() => toggleSection('productType')}>
-                    <span className="accordion-title">Ürün Tipi</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.productType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                {/* RENK Swatches */}
+                <div className="filter-group-new">
+                  <h4 className="filter-group-title">RENK</h4>
+                  <div className="color-swatches-grid-new">
+                    <button 
+                      onClick={() => setSelectedColor('Beyaz')}
+                      className={`color-swatch-circle-btn ${selectedColor === 'Beyaz' ? 'active' : ''}`}
+                      style={{ backgroundColor: '#ffffff', border: '1px solid #ddd' }}
+                      title="Beyaz"
+                    />
+                    <button 
+                      onClick={() => setSelectedColor('Bej')}
+                      className={`color-swatch-circle-btn ${selectedColor === 'Bej' ? 'active' : ''}`}
+                      style={{ backgroundColor: '#e3d6c3' }}
+                      title="Bej"
+                    />
+                    <button 
+                      onClick={() => setSelectedColor('Gri')}
+                      className={`color-swatch-circle-btn ${selectedColor === 'Gri' ? 'active' : ''}`}
+                      style={{ backgroundColor: '#a0a4ab' }}
+                      title="Gri"
+                    />
+                    <button 
+                      onClick={() => setSelectedColor('Antrasit')}
+                      className={`color-swatch-circle-btn ${selectedColor === 'Antrasit' ? 'active' : ''}`}
+                      style={{ backgroundColor: '#374151' }}
+                      title="Antrasit"
+                    />
+                    <button 
+                      onClick={() => setSelectedColor('Kahverengi')}
+                      className={`color-swatch-circle-btn ${selectedColor === 'Kahverengi' ? 'active' : ''}`}
+                      style={{ backgroundColor: '#8a5a36' }}
+                      title="Kahverengi"
+                    />
+                    <button 
+                      onClick={() => setSelectedColor('')}
+                      className={`color-swatch-all-btn ${selectedColor === '' ? 'active' : ''}`}
+                    >
+                      T├╝m├╝
+                    </button>
                   </div>
-                  {expandedSections.productType && (
-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {['Mat', 'Parlak', 'Lapatto'].map(finishVal => (
-                        <label key={finishVal} className="checkbox-label-wrapper">
-                          <input 
-                            type="checkbox" 
-                            checked={selectedFinish === finishVal} 
-                            onChange={() => setSelectedFinish(selectedFinish === finishVal ? '' : finishVal)}
-                          />
-                          <span className="checkbox-custom-box" />
-                          <span className="checkbox-text-label">{finishVal === 'Parlak' ? 'Parlak (Camsı)' : finishVal === 'Lapatto' ? 'Lapatto (Yarı Parlak)' : finishVal}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
-                {/* 6. ÜRÜN ÖZELLİK */}
-                <div className="accordion-section">
-                  <div className="accordion-header" onClick={() => toggleSection('productFeature')}>
-                    <span className="accordion-title">Ürün Özellik</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.productFeature ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-                  </div>
-                  {expandedSections.productFeature && (
-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <label className="checkbox-label-wrapper">
-                        <input 
-                          type="checkbox" 
-                          checked={selectedRectified === 'true'} 
-                          onChange={() => setSelectedRectified(selectedRectified === 'true' ? '' : 'true')}
-                        />
-                        <span className="checkbox-custom-box" />
-                        <span className="checkbox-text-label">Rektifiyeli</span>
-                      </label>
-                      <label className="checkbox-label-wrapper">
-                        <input 
-                          type="checkbox" 
-                          checked={selectedFrost === 'true'} 
-                          onChange={() => setSelectedFrost(selectedFrost === 'true' ? '' : 'true')}
-                        />
-                        <span className="checkbox-custom-box" />
-                        <span className="checkbox-text-label">Dona Dayanıklı</span>
-                      </label>
-                    </div>
-                  )}
+                {/* Brand and Surface selects */}
+                <div className="filter-group-new select-group">
+                  <h4 className="filter-group-title">Marka</h4>
+                  <select className="simple-filter-select" value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)}>
+                    <option value="">T├╝m Markalar</option>
+                    {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
                 </div>
-
-                {/* 7. MEKAN TİPİ */}
-                <div className="accordion-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>
-                  <div className="accordion-header" onClick={() => toggleSection('spaceType')}>
-                    <span className="accordion-title">Mekan Tipi</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.spaceType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-                  </div>
-                  {expandedSections.spaceType && (
-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {['Banyo', 'Mutfak', 'Salon', 'Balkon', 'Koridor', 'Teras'].map(areaVal => (
-                        <label key={areaVal} className="checkbox-label-wrapper">
-                          <input 
-                            type="checkbox" 
-                            checked={selectedArea === areaVal} 
-                            onChange={() => setSelectedArea(selectedArea === areaVal ? '' : areaVal)}
-                          />
-                          <span className="checkbox-custom-box" />
-                          <span className="checkbox-text-label">{areaVal}</span>
-                        </label>
-                      ))}
-                    </div>
-                  )}
+                
+                <div className="filter-group-new select-group">
+                  <h4 className="filter-group-title">Y├╝zey</h4>
+                  <select className="simple-filter-select" value={selectedFinish} onChange={(e) => setSelectedFinish(e.target.value)}>
+                    <option value="">T├╝m Y├╝zeyler</option>
+                    <option value="Mat">Mat</option>
+                    <option value="Parlak">Parlak (Cams─▒)</option>
+                    <option value="Lapatto">Lapatto (Yar─▒ Parlak)</option>
+                  </select>
                 </div>
               </aside>
 
               {/* Right Side Content Results area */}
               <div className="results-container-new">
-                <div className="results-header-row-new" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', marginBottom: '20px' }}>
+                <div className="results-header-row-new">
                   <div className="results-header-text-new">
                     {uploadedImagePreview ? (
-                      <h3>Görsel Arama Sonuçları <span className="results-new-badge gold">AI Eşleşme</span></h3>
+                      <>
+                        <h3>G├Ârsel Arama Sonu├ğlar─▒ <span className="results-new-badge gold">AI E┼şle┼şme</span></h3>
+                        <p>Y├╝kledi─şiniz g├Ârselle benzer doku ve renkteki ├╝r├╝nler listeleniyor.</p>
+                      </>
                     ) : (
-                      <h3>Katalog Sonuçları</h3>
+                      <>
+                        <h3>Yeni Eklenen ├£r├╝nler <span className="results-new-badge">Yeni</span></h3>
+                        <p>En yeni seramik koleksiyonlar─▒n─▒ ke┼şfedin.</p>
+                      </>
                     )}
                   </div>
-                  <div className="results-header-actions-new" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>
-                      Sonuç: <strong style={{ color: '#0f172a' }}>{products.length}</strong>
+                  <div className="results-header-actions-new">
+                    <button onClick={() => { 
+                      setSelectedBrand(''); 
+                      setSelectedColor(''); 
+                      setSelectedFinish(''); 
+                      setSelectedStyle(''); 
+                      setSelectedArea(''); 
+                      setSelectedSize(''); 
+                      setSearchQuery(''); 
+                      setUploadedImagePreview(null);
+                      setVisualSearchMatches(null);
+                      fetchProducts('clear=true'); 
+                    }} className="view-all-results-link">Temizle / T├╝m├╝n├╝ G├Âr</button>
+                    <div className="results-slider-arrows-new">
+                      <button className="slider-arrow-btn-new">ÔØ«</button>
+                      <button className="slider-arrow-btn-new">ÔØ»</button>
                     </div>
                   </div>
                 </div>
 
                 {/* Main Grid */}
                 <div className="products-grid-new">
-                  {!initialProductsLoaded ? (
-                    <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', gap: '12px' }}>
-                      <Loader2 className="animate-spin" size={32} style={{ color: 'var(--accent-gold)' }} />
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Ürünler yükleniyor...</span>
-                    </div>
-                  ) : (
-                    products.map((product, idx) => {
-                      const hasAd = product.campaigns && product.campaigns.length > 0;
-                      return (
-                        <div 
-                          key={product.id}
-                          onClick={() => handleProductCardClick(product)}
-                          className={`product-card-new glass-panel ${activeProduct?.id === product.id ? 'active' : ''} ${hasAd ? 'sponsored-card-new' : ''}`}
-                        >
-                          {/* Thumbnail Texture Container */}
-                          <div className="card-texture-container-new">
-                            <TileVisualPreview 
-                              style={product.style} 
-                              color={product.color} 
-                              finish={product.finish}
-                              width={product.width}
-                              height={product.height}
-                              imageUrl={product.imageUrl}
-                            />
-                            
-                            {/* Compare button overlay */}
-                            <button 
-                              className={`card-compare-btn-overlay ${comparedProducts.some(p => p.id === product.id) ? 'active' : ''}`} 
-                              onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
-                              title="Karşılaştır"
-                            >
-                              <span className="compare-icon-indicator">
-                                {comparedProducts.some(p => p.id === product.id) ? '✓' : '+'}
-                              </span>
-                              <span>{comparedProducts.some(p => p.id === product.id) ? 'Seçildi' : 'Karşılaştır'}</span>
-                            </button>
-                            
-                            {/* Heart icon button overlay */}
-                            <button 
-                              className="card-favorites-heart-btn" 
-                              onClick={(e) => { e.stopPropagation(); handleToggleFavorite(product.id); }}
-                              title="Favorilerime Ekle"
-                            >
-                              <HeartIcon size={16} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
-                            </button>
+                  {products.map((product, idx) => {
+                    const hasAd = product.campaigns && product.campaigns.length > 0;
+                    return (
+                      <div 
+                        key={product.id}
+                        onClick={() => handleProductCardClick(product)}
+                        className={`product-card-new glass-panel ${activeProduct?.id === product.id ? 'active' : ''} ${hasAd ? 'sponsored-card-new' : ''}`}
+                      >
+                        {/* Thumbnail Texture Container */}
+                        <div className="card-texture-container-new">
+                          <TileVisualPreview 
+                            style={product.style} 
+                            color={product.color} 
+                            finish={product.finish}
+                            width={product.width}
+                            height={product.height}
+                            imageUrl={product.imageUrl}
+                          />
+                          
+                          {/* Compare button overlay */}
+                          <button 
+                            className={`card-compare-btn-overlay ${comparedProducts.some(p => p.id === product.id) ? 'active' : ''}`} 
+                            onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
+                            title="Kar┼ş─▒la┼şt─▒r"
+                          >
+                            <span className="compare-icon-indicator">
+                              {comparedProducts.some(p => p.id === product.id) ? 'Ô£ô' : '+'}
+                            </span>
+                            <span>{comparedProducts.some(p => p.id === product.id) ? 'Se├ğildi' : 'Kar┼ş─▒la┼şt─▒r'}</span>
+                          </button>
+                          
+                          {/* Heart icon button overlay */}
+                          <button 
+                            className="card-favorites-heart-btn" 
+                            onClick={(e) => { e.stopPropagation(); alert(`${product.name} favorilerinize eklendi!`); }}
+                            title="Favorilerime Ekle"
+                          >
+                            <HeartIcon size={16} />
+                          </button>
 
-                            {/* Hover action layout */}
-                            <div className="card-quick-actions-row">
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
-                                className="btn-primary card-action-btn-new"
-                              >
-                                3D Dene
-                              </button>
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}
-                                className="btn-secondary card-action-btn-new"
-                              >
-                                Bayi Bul
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Card Meta Content */}
-                          <div className="card-text-details-new">
-                            <div className="card-badges-row-new">
-                              {(() => {
-                                const badge = getProductBadge(product, idx);
-                                return (
-                                  <span className={`card-badge-tag-new ${badge.className}`}>
-                                    {badge.text}
-                                  </span>
-                                );
-                              })()}
-                              <span className="card-badge-tag-new grey">{product.finish}</span>
-                              {product.similarityScore !== undefined && product.similarityScore > 0 && (
-                                <span className="card-badge-tag-new gold animate-pulse">
-                                  %{product.similarityScore} Eşleşme
-                                </span>
-                              )}
-                            </div>
-                            
-                            <h4 className="card-title-new">{product.name}</h4>
-                            <p className="card-specs-new">{product.width}x{product.height} cm</p>
-                            <p className="card-brand-new">{product.brand?.name}</p>
+                          {/* Hover action layout */}
+                          <div className="card-quick-actions-row">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
+                              className="btn-primary card-action-btn-new"
+                            >
+                              3D Dene
+                            </button>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}
+                              className="btn-secondary card-action-btn-new"
+                            >
+                              Bayi Bul
+                            </button>
                           </div>
                         </div>
-                      );
-                    })
-                  )}
 
-                  {initialProductsLoaded && products.length === 0 && (
+                        {/* Card Meta Content */}
+                        <div className="card-text-details-new">
+                          <div className="card-badges-row-new">
+                            {(() => {
+                              const badge = getProductBadge(product, idx);
+                              return (
+                                <span className={`card-badge-tag-new ${badge.className}`}>
+                                  {badge.text}
+                                </span>
+                              );
+                            })()}
+                            <span className="card-badge-tag-new grey">{product.finish}</span>
+                            {product.similarityScore !== undefined && product.similarityScore > 0 && (
+                              <span className="card-badge-tag-new gold animate-pulse">
+                                %{product.similarityScore} E┼şle┼şme
+                              </span>
+                            )}
+                          </div>
+                          
+                          <h4 className="card-title-new">{product.name}</h4>
+                          <p className="card-specs-new">{product.width}x{product.height} cm</p>
+                          <p className="card-brand-new">{product.brand?.name}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {products.length === 0 && (
                     <div className="empty-results glass-panel w-full" style={{ gridColumn: '1/-1' }}>
                       <HelpCircle size={40} className="empty-icon" />
-                      <h4>Aradığınız model bulunamadı</h4>
-                      <p>Farklı bir arama yapmayı veya filtreleri temizlemeyi deneyebilirsiniz.</p>
+                      <h4>Arad─▒─ş─▒n─▒z model bulunamad─▒</h4>
+                      <p>Farkl─▒ bir arama yapmay─▒ veya filtreleri temizlemeyi deneyebilirsiniz.</p>
                     </div>
                   )}
                 </div>
@@ -3007,29 +2967,29 @@ export default function Home() {
           <div className="studio-portal animate-fade-in">
             <div className="studio-layout">
               <div className="studio-control-panel glass-panel">
-                <h3>3D Sanal Stüdyo</h3>
-                <p className="desc">Seçili seramiği banyo/mutfak sahnesine giydirerek specula (parlaklık) ve döşeme etkisini inceleyin.</p>
+                <h3>3D Sanal St├╝dyo</h3>
+                <p className="desc">Se├ğili serami─şi banyo/mutfak sahnesine giydirerek specula (parlakl─▒k) ve d├Â┼şeme etkisini inceleyin.</p>
 
                 {activeProduct ? (
                   <div className="active-tile-summary glass-panel-gold">
                     <span className="brand-label">{activeProduct.brand?.name}</span>
                     <h4>{activeProduct.name}</h4>
-                    <p className="code">Ürün Kodu: {activeProduct.code}</p>
+                    <p className="code">├£r├╝n Kodu: {activeProduct.code}</p>
                     <div className="summary-specs">
                       <div><span>Boyut:</span> <strong>{activeProduct.width}x{activeProduct.height} cm</strong></div>
-                      <div><span>Bitiş:</span> <strong>{activeProduct.finish}</strong></div>
+                      <div><span>Biti┼ş:</span> <strong>{activeProduct.finish}</strong></div>
                       <div><span>Tip:</span> <strong>{activeProduct.style}</strong></div>
-                      <div><span>En Düşük Fiyat:</span> <strong style={{ color: 'var(--accent-gold)' }}>{activeProduct.cheapestOffer?.price || '804'} TL/m²</strong></div>
+                      <div><span>En D├╝┼ş├╝k Fiyat:</span> <strong style={{ color: 'var(--accent-gold)' }}>{activeProduct.cheapestOffer?.price || '804'} TL/m┬▓</strong></div>
                     </div>
                   </div>
                 ) : (
                   <div className="studio-no-product glass-panel">
-                    <p>Lütfen seramik giydirmek için bir ürün seçin.</p>
+                    <p>L├╝tfen seramik giydirmek i├ğin bir ├╝r├╝n se├ğin.</p>
                   </div>
                 )}
 
                 <div className="control-group">
-                  <label>Seramik Giydirme Alanı</label>
+                  <label>Seramik Giydirme Alan─▒</label>
                   <div className="segmented-control">
                     <button 
                       className={studioTarget === 'floor' ? 'active' : ''} 
@@ -3040,7 +3000,7 @@ export default function Home() {
                         }
                       }}
                     >
-                      Zemin Döşeme
+                      Zemin D├Â┼şeme
                     </button>
                     <button 
                       className={studioTarget === 'walls' ? 'active' : ''} 
@@ -3057,7 +3017,7 @@ export default function Home() {
                 </div>
 
                 <div className="control-group" style={{ marginTop: '14px', marginBottom: '14px' }}>
-                  <label>Simülasyon Sahnesi</label>
+                  <label>Sim├╝lasyon Sahnesi</label>
                   <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '8px' }}>
                     <button 
                       className={studioRoomType === 'bathroom' ? 'active' : ''} 
@@ -3100,45 +3060,45 @@ export default function Home() {
                 {/* 3D CUSTOMIZER SETTINGS TOOLBOX */}
                 <div className="studio-settings-toolbox" style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
                   
-                  {/* SECTION 1: DÖŞEME AYARLARI */}
+                  {/* SECTION 1: D├û┼ŞEME AYARLARI */}
                   <div className="studio-toolbox-section">
-                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Döşeme Ayarları</span>
+                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>D├Â┼şeme Ayarlar─▒</span>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Döşeme Deseni</span>
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>D├Â┼şeme Deseni</span>
                         <div className="segmented-control" style={{ padding: '2px' }}>
                           <button 
                             className={studioLayPattern === 'flat' ? 'active' : ''} 
                             onClick={() => setStudioLayPattern('flat')}
                             style={{ fontSize: '0.65rem', padding: '4px' }}
                           >
-                            Düz
+                            D├╝z
                           </button>
                           <button 
                             className={studioLayPattern === 'diagonal' ? 'active' : ''} 
                             onClick={() => setStudioLayPattern('diagonal')}
                             style={{ fontSize: '0.65rem', padding: '4px' }}
                           >
-                            Çapraz
+                            ├çapraz
                           </button>
                         </div>
                       </div>
                       <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Karo Yönü</span>
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Karo Y├Ân├╝</span>
                         <div className="segmented-control" style={{ padding: '2px' }}>
                           <button 
                             className={studioTileRotation === 0 ? 'active' : ''} 
                             onClick={() => setStudioTileRotation(0)}
                             style={{ fontSize: '0.65rem', padding: '4px' }}
                           >
-                            0°
+                            0┬░
                           </button>
                           <button 
                             className={studioTileRotation === 90 ? 'active' : ''} 
                             onClick={() => setStudioTileRotation(90)}
                             style={{ fontSize: '0.65rem', padding: '4px' }}
                           >
-                            90°
+                            90┬░
                           </button>
                         </div>
                       </div>
@@ -3147,10 +3107,10 @@ export default function Home() {
 
                   {/* SECTION 2: DERZ AYARLARI */}
                   <div className="studio-toolbox-section" style={{ borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '10px' }}>
-                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Derz Dolgu Ayarları</span>
+                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Derz Dolgu Ayarlar─▒</span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <div>
-                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Derz Kalınlığı</span>
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Derz Kal─▒nl─▒─ş─▒</span>
                         <div className="segmented-control" style={{ padding: '2px' }}>
                           {['1', '2', '3', '5'].map(w => (
                             <button 
@@ -3191,27 +3151,27 @@ export default function Home() {
                             />
                           ))}
                           <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginLeft: '4px' }}>
-                            {['#ffffff', '#888888', '#2b2d35', '#d9ccb9', '#664422'].find(x => x === studioGroutColor) ? '' : 'Özel'}
+                            {['#ffffff', '#888888', '#2b2d35', '#d9ccb9', '#664422'].find(x => x === studioGroutColor) ? '' : '├ûzel'}
                           </span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* SECTION 3: AYDINLATMA & GÜNÜN SAATİ */}
+                  {/* SECTION 3: AYDINLATMA & G├£N├£N SAAT─░ */}
                   <div className="studio-toolbox-section" style={{ borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '10px' }}>
-                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Işıklandırma & Ortam</span>
+                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>I┼ş─▒kland─▒rma & Ortam</span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         <div style={{ flex: 1.2 }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Günün Saati</span>
+                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>G├╝n├╝n Saati</span>
                           <div className="segmented-control" style={{ padding: '2px' }}>
                             <button 
                               className={studioTimeOfDay === 'day' ? 'active' : ''} 
                               onClick={() => setStudioTimeOfDay('day')}
                               style={{ fontSize: '0.65rem', padding: '4px' }}
                             >
-                              Gündüz
+                              G├╝nd├╝z
                             </button>
                             <button 
                               className={studioTimeOfDay === 'night' ? 'active' : ''} 
@@ -3223,29 +3183,29 @@ export default function Home() {
                           </div>
                         </div>
                         <div style={{ flex: 0.8 }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Işık Rengi</span>
+                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>I┼ş─▒k Rengi</span>
                           <div className="segmented-control" style={{ padding: '2px' }}>
                             <button 
                               className={studioLightTemp === 'warm' ? 'active' : ''} 
                               onClick={() => setStudioLightTemp('warm')}
                               style={{ fontSize: '0.65rem', padding: '4px' }}
-                              title="Sarı Işık"
+                              title="Sar─▒ I┼ş─▒k"
                             >
-                              Sarı
+                              Sar─▒
                             </button>
                             <button 
                               className={studioLightTemp === 'neutral' ? 'active' : ''} 
                               onClick={() => setStudioLightTemp('neutral')}
                               style={{ fontSize: '0.65rem', padding: '4px' }}
-                              title="Doğal Işık"
+                              title="Do─şal I┼ş─▒k"
                             >
-                              Doğal
+                              Do─şal
                             </button>
                             <button 
                               className={studioLightTemp === 'cool' ? 'active' : ''} 
                               onClick={() => setStudioLightTemp('cool')}
                               style={{ fontSize: '0.65rem', padding: '4px' }}
-                              title="Beyaz Işık"
+                              title="Beyaz I┼ş─▒k"
                             >
                               Beyaz
                             </button>
@@ -3255,7 +3215,7 @@ export default function Home() {
 
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>Aydınlık Şiddeti</span>
+                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)' }}>Ayd─▒nl─▒k ┼Şiddeti</span>
                           <span style={{ fontSize: '0.65rem', color: 'var(--accent-gold)', fontWeight: '600' }}>%{Math.round(studioLightIntensity * 100)}</span>
                         </div>
                         <input 
@@ -3280,10 +3240,10 @@ export default function Home() {
 
                 </div>
 
-                {/* AI ROOM FOTOĞRAF YÜKLEYİCİ */}
+                {/* AI ROOM FOTO─ŞRAF Y├£KLEY─░C─░ */}
                 <div className="control-group ai-room-uploader-group">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <label style={{ margin: 0 }}>Yapay Zeka ile Kendi Odanı Tasarla</label>
+                    <label style={{ margin: 0 }}>Yapay Zeka ile Kendi Odan─▒ Tasarla</label>
                     <button 
                       type="button" 
                       onClick={() => setShowApiKeyInput(!showApiKeyInput)}
@@ -3300,13 +3260,13 @@ export default function Home() {
                         gap: '4px'
                       }}
                     >
-                      <span>🔑 {aiProvider === 'grok' ? (grokApiKey ? 'Grok Aktif' : 'Grok API Key Tanımla') : (geminiApiKey ? 'Gemini Aktif' : 'Gemini API Key Tanımla')}</span>
+                      <span>­şöæ {aiProvider === 'grok' ? (grokApiKey ? 'Grok Aktif' : 'Grok API Key Tan─▒mla') : (geminiApiKey ? 'Gemini Aktif' : 'Gemini API Key Tan─▒mla')}</span>
                     </button>
                   </div>
 
                   {showApiKeyInput && (
                     <div className="glass-panel" style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '10px', background: '#f8f9fc', border: '1px solid var(--border-color)', borderRadius: '6px' }}>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--text-primary)', fontWeight: '700' }}>Yapay Zeka Seçenekleri</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-primary)', fontWeight: '700' }}>Yapay Zeka Se├ğenekleri</span>
                       
                       <div style={{ display: 'flex', gap: '4px', backgroundColor: '#cbd5e1', padding: '2px', borderRadius: '4px' }}>
                         <button
@@ -3349,7 +3309,7 @@ export default function Home() {
 
                       {aiProvider === 'grok' ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '600' }}>xAI Grok API Anahtarı</span>
+                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '600' }}>xAI Grok API Anahtar─▒</span>
                           <div style={{ display: 'flex', gap: '6px' }}>
                             <input 
                               type="password" 
@@ -3385,12 +3345,12 @@ export default function Home() {
                             </button>
                           </div>
                           <a href="https://console.x.ai/" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.6rem', color: 'var(--accent-gold)', textDecoration: 'underline' }}>
-                            Grok API Anahtarı Almak İçin Tıklayın
+                            Grok API Anahtar─▒ Almak ─░├ğin T─▒klay─▒n
                           </a>
                         </div>
                       ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Google Gemini API Anahtarı</span>
+                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Google Gemini API Anahtar─▒</span>
                           <div style={{ display: 'flex', gap: '6px' }}>
                             <input 
                               type="password" 
@@ -3426,19 +3386,19 @@ export default function Home() {
                             </button>
                           </div>
                           <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.6rem', color: 'var(--accent-gold)', textDecoration: 'underline' }}>
-                            Ücretsiz Gemini API Anahtarı Almak İçin Tıklayın
+                            ├£cretsiz Gemini API Anahtar─▒ Almak ─░├ğin T─▒klay─▒n
                           </a>
                         </div>
                       )}
                     </div>
                   )}
                   <div className="ai-actions-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '6px' }}>
-                    {/* Yükleme Kartı */}
+                    {/* Y├╝kleme Kart─▒ */}
                     <div className="ai-uploader-card glass-panel" style={{ position: 'relative', overflow: 'hidden', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '6px', cursor: 'pointer', minHeight: '110px', justifyContent: 'center' }}>
                       <UploadCloud size={20} style={{ color: 'var(--accent-gold)' }} />
                       <div className="uploader-text">
-                        <h5 style={{ fontSize: '0.72rem', fontWeight: '700', margin: '0 0 2px 0' }}>Kendi Odanı Tasarla</h5>
-                        <p style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.2 }}>Oda fotoğrafı yükle ve üzerine kapla</p>
+                        <h5 style={{ fontSize: '0.72rem', fontWeight: '700', margin: '0 0 2px 0' }}>Kendi Odan─▒ Tasarla</h5>
+                        <p style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.2 }}>Oda foto─şraf─▒ y├╝kle ve ├╝zerine kapla</p>
                       </div>
                       <input 
                         type="file" 
@@ -3449,7 +3409,7 @@ export default function Home() {
                       />
                     </div>
 
-                    {/* Sıfırdan Tasarlama Kartı */}
+                    {/* S─▒f─▒rdan Tasarlama Kart─▒ */}
                     <div 
                       onClick={generateAIBathroomImage}
                       className="ai-uploader-card glass-panel-gold" 
@@ -3471,14 +3431,14 @@ export default function Home() {
                       <Sparkles size={20} style={{ color: 'var(--accent-gold)' }} />
                       <div className="uploader-text">
                         <h5 style={{ fontSize: '0.72rem', fontWeight: '700', margin: '0 0 2px 0', color: 'var(--accent-gold)' }}>Yapay Zeka Tasarla</h5>
-                        <p style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.2 }}>Seçili seramik ile sıfırdan banyo üret</p>
+                        <p style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.2 }}>Se├ğili seramik ile s─▒f─▒rdan banyo ├╝ret</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="studio-physics-details">
-                  <h4>Malzeme Fizik Özellikleri</h4>
+                  <h4>Malzeme Fizik ├ûzellikleri</h4>
                   <div className="phys-row"><span>Clearcoat:</span><strong>{activeProduct?.finish === 'Parlak' ? '1.0' : activeProduct?.finish === 'Lapatto' ? '0.4' : '0.0'}</strong></div>
                   <div className="phys-row"><span>Roughness:</span><strong>{activeProduct?.finish === 'Parlak' ? '0.08' : activeProduct?.finish === 'Lapatto' ? '0.35' : '0.85'}</strong></div>
                   <div className="phys-row"><span>Karo Tekrarlama Adedi:</span><strong>{activeProduct ? `${Math.round(3.6 / (activeProduct.width/100))}x${Math.round(3.6 / (activeProduct.height/100))}` : '-'}</strong></div>
@@ -3487,10 +3447,10 @@ export default function Home() {
                 <div className="ar-activation-box glass-panel">
                   <Sparkles size={18} className="ar-icon" />
                   <div>
-                    <h5>Artırılmış Gerçeklik (AR) Modu</h5>
-                    <p>Kameranızı kullanarak yerdeki gerçek zemine karo döşeyin.</p>
+                    <h5>Art─▒r─▒lm─▒┼ş Ger├ğeklik (AR) Modu</h5>
+                    <p>Kameran─▒z─▒ kullanarak yerdeki ger├ğek zemine karo d├Â┼şeyin.</p>
                   </div>
-                  <button onClick={() => alert('WebXR AR başlatılıyor... Kamera izinleri istenecek.')} className="btn-primary ar-btn">AR Kamerasını Aç</button>
+                  <button onClick={() => alert('WebXR AR ba┼şlat─▒l─▒yor... Kamera izinleri istenecek.')} className="btn-primary ar-btn">AR Kameras─▒n─▒ A├ğ</button>
                 </div>
               </div>
 
@@ -3507,7 +3467,7 @@ export default function Home() {
                     <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%', maxHeight: '100%' }}>
                       <img 
                         src={processedRoomImage} 
-                        alt="AI Kaplanmış Oda" 
+                        alt="AI Kaplanm─▒┼ş Oda" 
                         className="ai-room-img" 
                         style={{ display: 'block', maxWidth: '100%', maxHeight: '480px', width: 'auto', height: 'auto', borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }} 
                       />
@@ -3576,7 +3536,7 @@ export default function Home() {
 
                     <div className="ai-watermark-badge" style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 10 }}>
                       <Sparkles size={14} />
-                      <span>{isAiGeneratedRoom ? 'AI BANYO KONSEPTİ (JENERATİF)' : 'AI KAPLANMIŞ ODA (SİMÜLASYON)'}</span>
+                      <span>{isAiGeneratedRoom ? 'AI BANYO KONSEPT─░ (JENERAT─░F)' : 'AI KAPLANMI┼Ş ODA (S─░M├£LASYON)'}</span>
                     </div>
 
                     {isAiGeneratedRoom ? (
@@ -3601,7 +3561,7 @@ export default function Home() {
                         }}
                       >
                         <Sparkles size={12} />
-                        <span>Başka Konsept Tasarla</span>
+                        <span>Ba┼şka Konsept Tasarla</span>
                       </button>
                     ) : (
                       <button 
@@ -3623,7 +3583,7 @@ export default function Home() {
                           border: showPointEditor ? 'none' : '1px solid var(--border-color)'
                         }}
                       >
-                        <span>✏️ {showPointEditor ? 'Ayarları Kaydet' : 'Köşeleri Elle Düzenle'}</span>
+                        <span>Ô£Å´©Å {showPointEditor ? 'Ayarlar─▒ Kaydet' : 'K├Â┼şeleri Elle D├╝zenle'}</span>
                       </button>
                     )}
 
@@ -3636,7 +3596,7 @@ export default function Home() {
                       className="btn-secondary remove-ai-room-btn" 
                       style={{ zIndex: 20 }}
                     >
-                      3D Stüdyo Moduna Geri Dön
+                      3D St├╝dyo Moduna Geri D├Ân
                     </button>
                   </div>
                 ) : activeProduct ? (
@@ -3655,14 +3615,14 @@ export default function Home() {
                 ) : (
                   <div className="canvas-placeholder">
                     <Layers size={48} />
-                    <p>3D model yüklemek için bir karo seçin.</p>
+                    <p>3D model y├╝klemek i├ğin bir karo se├ğin.</p>
                   </div>
                 )}
               </div>
             </div>
 
             <div className="quick-swapper-drawer glass-panel">
-              <h4>Hızlı Seramik Seçimi</h4>
+              <h4>H─▒zl─▒ Seramik Se├ğimi</h4>
               <div className="swapper-grid">
                 {products.slice(0, 6).map((prod) => (
                   <div 
@@ -3674,7 +3634,7 @@ export default function Home() {
                     <TileVisualPreview style={prod.style} color={prod.color} finish={prod.finish} width={prod.width} height={prod.height} imageUrl={prod.imageUrl} />
                     <div className="swapper-label">
                       <span>{prod.name}</span>
-                      <small>{prod.brand?.name} • {prod.width}x{prod.height}</small>
+                      <small>{prod.brand?.name} ÔÇó {prod.width}x{prod.height}</small>
                     </div>
                   </div>
                 ))}
@@ -3700,19 +3660,19 @@ export default function Home() {
                 <div className="dealers-control-panel glass-panel">
                   <div className="panel-title-row">
                     <MapPin size={20} className="pin-title-icon" />
-                    <h3>En Yakın Bayiler</h3>
+                    <h3>En Yak─▒n Bayiler</h3>
                   </div>
-                  <p className="desc">Seçili seramik markasının size en yakın olan yetkili bayilerini inceleyin, mesafe hesaplayıp teklif talep edin.</p>
+                  <p className="desc">Se├ğili seramik markas─▒n─▒n size en yak─▒n olan yetkili bayilerini inceleyin, mesafe hesaplay─▒p teklif talep edin.</p>
 
                   {/* ACTIVE BRAND/PRODUCT SECTOR */}
                   {activeProduct ? (
                     <div className="active-product-badge">
-                      <span>Arama Yapılan Ürün:</span>
+                      <span>Arama Yap─▒lan ├£r├╝n:</span>
                       <strong>{activeProduct.brand?.name} - {activeProduct.name}</strong>
                     </div>
                   ) : (
                     <div className="active-product-badge warning">
-                      <span>Aktif seramik seçilmedi. Aşağıdan marka seçerek de bayileri listeleyebilirsiniz.</span>
+                      <span>Aktif seramik se├ğilmedi. A┼şa─ş─▒dan marka se├ğerek de bayileri listeleyebilirsiniz.</span>
                     </div>
                   )}
 
@@ -3723,19 +3683,19 @@ export default function Home() {
                       {isLocating ? (
                         <span className="status-badge pulse-loading">
                           <Loader2 size={12} className="animate-spin" />
-                          Algılanıyor...
+                          Alg─▒lan─▒yor...
                         </span>
                       ) : locationError ? (
                         <span className="status-badge error">
-                          ⚠️ {locationError}
+                          ÔÜá´©Å {locationError}
                         </span>
                       ) : userLocationName === 'Cihaz Konumunuz (GPS)' ? (
                         <span className="status-badge success">
-                          ● Otomatik GPS Aktif
+                          ÔùÅ Otomatik GPS Aktif
                         </span>
                       ) : (
                         <span className="status-badge warning">
-                          ● Manuel Konum Seçili
+                          ÔùÅ Manuel Konum Se├ğili
                         </span>
                       )}
                     </div>
@@ -3747,7 +3707,7 @@ export default function Home() {
                       <button 
                         onClick={detectUserLocation} 
                         className="btn-detect-loc"
-                        title="Konumumu Yeniden Algıla"
+                        title="Konumumu Yeniden Alg─▒la"
                         disabled={isLocating}
                       >
                         <Navigation size={14} className={isLocating ? "animate-pulse" : ""} />
@@ -3769,42 +3729,42 @@ export default function Home() {
                           }}
                           className="locator-select"
                         >
-                          <option value="">Marka Seçin...</option>
+                          <option value="">Marka Se├ğin...</option>
                           {brands.map(brand => (
                             <option key={brand.id} value={brand.id}>{brand.name}</option>
                           ))}
                         </select>
                       </div>
                       <div className="locator-filter-group">
-                        <label>Mesafe Sınırı</label>
+                        <label>Mesafe S─▒n─▒r─▒</label>
                         <select
                           value={locatorMaxDistance}
                           onChange={(e) => setLocatorMaxDistance(Number(e.target.value))}
                           className="locator-select"
                         >
-                          <option value={5}>5 km Yakınındakiler</option>
-                          <option value={15}>15 km Yakınındakiler</option>
-                          <option value={30}>30 km Yakınındakiler</option>
-                          <option value={50}>50 km Yakınındakiler</option>
-                          <option value={999}>Tüm Mesafe</option>
+                          <option value={5}>5 km Yak─▒n─▒ndakiler</option>
+                          <option value={15}>15 km Yak─▒n─▒ndakiler</option>
+                          <option value={30}>30 km Yak─▒n─▒ndakiler</option>
+                          <option value={50}>50 km Yak─▒n─▒ndakiler</option>
+                          <option value={999}>T├╝m Mesafe</option>
                         </select>
                       </div>
                     </div>
 
                     {/* SEARCH INPUT */}
                     <div className="locator-search-group">
-                      <label>İl/İlçe veya Bayi Arama</label>
+                      <label>─░l/─░l├ğe veya Bayi Arama</label>
                       <div className="locator-search-wrapper">
                         <SearchIcon size={14} className="locator-search-icon" />
                         <input 
                           type="text" 
-                          placeholder="Bayi adı, il veya ilçe yazın..." 
+                          placeholder="Bayi ad─▒, il veya il├ğe yaz─▒n..." 
                           value={dealerSearchQuery}
                           onChange={(e) => setDealerSearchQuery(e.target.value)}
                           className="locator-search-input"
                         />
                         {dealerSearchQuery && (
-                          <button onClick={() => setDealerSearchQuery('')} className="locator-search-clear">✕</button>
+                          <button onClick={() => setDealerSearchQuery('')} className="locator-search-clear">Ô£ò</button>
                         )}
                       </div>
                     </div>
@@ -3812,11 +3772,11 @@ export default function Home() {
 
                   {/* SIMULATED PRESETS FOR QUICK TEST */}
                   <div className="control-group mini-presets">
-                    <label>Hızlı Konum Değiştir (GPS Simülatörü)</label>
+                    <label>H─▒zl─▒ Konum De─şi┼ştir (GPS Sim├╝lat├Âr├╝)</label>
                     <div className="location-buttons-row">
-                      <button className={`loc-btn-mini ${userLocationName === 'Kadıköy Merkez' ? 'active' : ''}`} onClick={() => handleLocationChange('Kadıköy Merkez', 40.9901, 29.0278)}>Kadıköy</button>
-                      <button className={`loc-btn-mini ${userLocationName === 'Beşiktaş Showroom' ? 'active' : ''}`} onClick={() => handleLocationChange('Beşiktaş Showroom', 41.0428, 29.0075)}>Beşiktaş</button>
-                      <button className={`loc-btn-mini ${userLocationName === 'Ataşehir Merkez' ? 'active' : ''}`} onClick={() => handleLocationChange('Ataşehir Merkez', 40.9950, 29.1170)}>Ataşehir</button>
+                      <button className={`loc-btn-mini ${userLocationName === 'Kad─▒k├Ây Merkez' ? 'active' : ''}`} onClick={() => handleLocationChange('Kad─▒k├Ây Merkez', 40.9901, 29.0278)}>Kad─▒k├Ây</button>
+                      <button className={`loc-btn-mini ${userLocationName === 'Be┼şikta┼ş Showroom' ? 'active' : ''}`} onClick={() => handleLocationChange('Be┼şikta┼ş Showroom', 41.0428, 29.0075)}>Be┼şikta┼ş</button>
+                      <button className={`loc-btn-mini ${userLocationName === 'Ata┼şehir Merkez' ? 'active' : ''}`} onClick={() => handleLocationChange('Ata┼şehir Merkez', 40.9950, 29.1170)}>Ata┼şehir</button>
                     </div>
                   </div>
 
@@ -3837,13 +3797,13 @@ export default function Home() {
                           >
                             <div className="dealer-card-header-meta">
                               <span className="dealer-brand-label">{dealer.brand?.name} Yetkili Bayi</span>
-                              <div className="dealer-badge-new">#{idx + 1} En Yakın</div>
+                              <div className="dealer-badge-new">#{idx + 1} En Yak─▒n</div>
                             </div>
                             <div className="dealer-header">
                               <h5>{dealer.name}</h5>
                               <strong className="distance-tag">{dealer.distanceKm} km</strong>
                             </div>
-                            <p className="address">{dealer.address} • {dealer.district}, {dealer.city}</p>
+                            <p className="address">{dealer.address} ÔÇó {dealer.district}, {dealer.city}</p>
                             
                             {/* Open/Closed Badge */}
                             {(() => {
@@ -3852,7 +3812,7 @@ export default function Home() {
                               return (
                                 <div className={`dealer-status-hours ${isOpen ? 'open' : 'closed'}`}>
                                   <span className="status-dot" />
-                                  <span>{isOpen ? 'Açık' : 'Kapalı'} • {isOpen ? 'Kapanış 19:00' : 'Açılış 09:00'}</span>
+                                  <span>{isOpen ? 'A├ğ─▒k' : 'Kapal─▒'} ÔÇó {isOpen ? 'Kapan─▒┼ş 19:00' : 'A├ğ─▒l─▒┼ş 09:00'}</span>
                                 </div>
                               );
                             })()}
@@ -3880,7 +3840,7 @@ export default function Home() {
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
                                   className="quick-action-link whatsapp"
-                                  title="WhatsApp ile İletişim Kur"
+                                  title="WhatsApp ile ─░leti┼şim Kur"
                                 >
                                   <MessageSquare size={12} />
                                   <span>WhatsApp</span>
@@ -3905,8 +3865,8 @@ export default function Home() {
                     ) : (
                       <div className="no-dealers-found">
                         <MapPin size={24} className="no-dealers-icon" />
-                        <p>Kriterlere uygun yetkili bayi bulunamadı.</p>
-                        <span>Mesafe sınırını artırabilir veya arama kelimesini temizleyebilirsiniz.</span>
+                        <p>Kriterlere uygun yetkili bayi bulunamad─▒.</p>
+                        <span>Mesafe s─▒n─▒r─▒n─▒ art─▒rabilir veya arama kelimesini temizleyebilirsiniz.</span>
                       </div>
                     )}
                   </div>
@@ -3931,8 +3891,8 @@ export default function Home() {
               <div className="selector-meta">
                 <Settings size={20} className="b2b-meta-icon" />
                 <div>
-                  <h3>B2B Marka Raporlama & Yönetim Paneli</h3>
-                  <p className="desc">Markaların panelini simüle etmek için yukarıdan marka değiştirin.</p>
+                  <h3>B2B Marka Raporlama & Y├Ânetim Paneli</h3>
+                  <p className="desc">Markalar─▒n panelini sim├╝le etmek i├ğin yukar─▒dan marka de─şi┼ştirin.</p>
                 </div>
               </div>
               <div className="brand-button-grid">
@@ -3960,25 +3920,25 @@ export default function Home() {
                   <div className="b2b-stat-card glass-panel">
                     <div className="stat-header"><span>SaaS Abonelik</span><CreditCard size={18} className="stat-icon gold" /></div>
                     <div className="stat-value text-gold">{b2bStats.saas.plan}</div>
-                    <p className="stat-footer">Bitiş: {new Date(b2bStats.saas.expiresAt).toLocaleDateString('tr-TR')}</p>
+                    <p className="stat-footer">Biti┼ş: {new Date(b2bStats.saas.expiresAt).toLocaleDateString('tr-TR')}</p>
                   </div>
 
                   <div className="b2b-stat-card glass-panel">
-                    <div className="stat-header"><span>Gösterim</span><Eye size={18} className="stat-icon" /></div>
+                    <div className="stat-header"><span>G├Âsterim</span><Eye size={18} className="stat-icon" /></div>
                     <div className="stat-value">{b2bStats.summary.totalViews}</div>
-                    <p className="stat-footer">Arama Sonuçları Gösterimleri</p>
+                    <p className="stat-footer">Arama Sonu├ğlar─▒ G├Âsterimleri</p>
                   </div>
 
                   <div className="b2b-stat-card glass-panel">
-                    <div className="stat-header"><span>Tıklanma Oranı (CTR)</span><TrendingUp size={18} className="stat-icon green" /></div>
+                    <div className="stat-header"><span>T─▒klanma Oran─▒ (CTR)</span><TrendingUp size={18} className="stat-icon green" /></div>
                     <div className="stat-value text-green">%{b2bStats.summary.ctr}</div>
-                    <p className="stat-footer">Tıklama/Gösterim Oranı</p>
+                    <p className="stat-footer">T─▒klama/G├Âsterim Oran─▒</p>
                   </div>
 
                   <div className="b2b-stat-card glass-panel">
                     <div className="stat-header"><span>Teklif Talepleri</span><FileText size={18} className="stat-icon blue" /></div>
                     <div className="stat-value text-blue">{b2bStats.summary.totalLeads}</div>
-                    <p className="stat-footer">Bayilere İletilen Teklifler</p>
+                    <p className="stat-footer">Bayilere ─░letilen Teklifler</p>
                   </div>
                 </div>
 
@@ -3986,7 +3946,7 @@ export default function Home() {
                   
                   {/* Timeline Chart */}
                   <div className="b2b-chart-panel glass-panel">
-                    <h4>Tıklama ve Gösterim Dağılımı</h4>
+                    <h4>T─▒klama ve G├Âsterim Da─ş─▒l─▒m─▒</h4>
                     <div className="svg-chart-container">
                       <svg viewBox="0 0 500 200" className="svg-chart">
                         <line x1="40" y1="20" x2="480" y2="20" stroke="var(--border-color)" strokeDasharray="3,3" />
@@ -4030,19 +3990,19 @@ export default function Home() {
                       </svg>
                       
                       <div className="chart-legend">
-                        <div className="legend-item"><span className="legend-dot blue" /><span>Gösterim</span></div>
-                        <div className="legend-item"><span className="legend-dot gold" /><span>Tıklama</span></div>
+                        <div className="legend-item"><span className="legend-dot blue" /><span>G├Âsterim</span></div>
+                        <div className="legend-item"><span className="legend-dot gold" /><span>T─▒klama</span></div>
                       </div>
                     </div>
                   </div>
 
                   {/* Campaign Bidding Manager */}
                   <div className="b2b-campaign-panel glass-panel">
-                    <h4>Premium Reklam Yönetimi</h4>
-                    <p className="panel-desc">Arama sonuçlarında en üst sırada yer almak için sponsorlu reklam bütçesi tanımlayın.</p>
+                    <h4>Premium Reklam Y├Ânetimi</h4>
+                    <p className="panel-desc">Arama sonu├ğlar─▒nda en ├╝st s─▒rada yer almak i├ğin sponsorlu reklam b├╝t├ğesi tan─▒mlay─▒n.</p>
 
                     <div className="active-campaigns-list">
-                      <h5>Mevcut Reklam Kampanyaları</h5>
+                      <h5>Mevcut Reklam Kampanyalar─▒</h5>
                       {b2bStats.campaigns.map((camp) => (
                         <div key={camp.id} className="campaign-row">
                           <div className="camp-meta">
@@ -4050,9 +4010,9 @@ export default function Home() {
                             <span>SKU: {camp.product?.code}</span>
                           </div>
                           <div className="camp-data">
-                            <div>Tık: <strong>{camp.clicks}</strong></div>
-                            <div>Tık Başı: <strong>{camp.bidAmount} TL</strong></div>
-                            <div className="budget-capsule">Bütçe: <strong>{camp.budget.toFixed(2)} TL</strong></div>
+                            <div>T─▒k: <strong>{camp.clicks}</strong></div>
+                            <div>T─▒k Ba┼ş─▒: <strong>{camp.bidAmount} TL</strong></div>
+                            <div className="budget-capsule">B├╝t├ğe: <strong>{camp.budget.toFixed(2)} TL</strong></div>
                           </div>
                         </div>
                       ))}
@@ -4064,16 +4024,16 @@ export default function Home() {
                       
                       <div className="form-fields-grid">
                         <div className="form-group-inline">
-                          <label>Hedef Ürün</label>
+                          <label>Hedef ├£r├╝n</label>
                           <select value={campaignProduct} onChange={(e) => setCampaignProduct(e.target.value)} required>
-                            <option value="">Seçin...</option>
+                            <option value="">Se├ğin...</option>
                             {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                           </select>
                         </div>
                         <div className="form-group-inline"><label>Teklif (TL)</label><input type="number" step="0.1" value={campaignBid} onChange={(e) => setCampaignBid(e.target.value)} required /></div>
-                        <div className="form-group-inline"><label>Bütçe (TL)</label><input type="number" value={campaignBudget} onChange={(e) => setCampaignBudget(e.target.value)} required /></div>
+                        <div className="form-group-inline"><label>B├╝t├ğe (TL)</label><input type="number" value={campaignBudget} onChange={(e) => setCampaignBudget(e.target.value)} required /></div>
                       </div>
-                      <button type="submit" className="btn-primary w-full-btn">Reklamı Başlat</button>
+                      <button type="submit" className="btn-primary w-full-btn">Reklam─▒ Ba┼şlat</button>
                     </form>
                   </div>
                 </div>
@@ -4083,7 +4043,7 @@ export default function Home() {
                     <h4>Pazar Trendleri</h4>
                     <div className="intel-grid">
                       <div className="intel-block">
-                        <h5>En Sık Aranan Kelimeler</h5>
+                        <h5>En S─▒k Aranan Kelimeler</h5>
                         <table className="intel-table">
                           <thead><tr><th>Arama</th><th>Adet</th></tr></thead>
                           <tbody>
@@ -4094,9 +4054,9 @@ export default function Home() {
                         </table>
                       </div>
                       <div className="intel-block">
-                        <h5>Arama Yoğunluğu Olan İller</h5>
+                        <h5>Arama Yo─şunlu─şu Olan ─░ller</h5>
                         <table className="intel-table">
-                          <thead><tr><th>İl</th><th>Tıklama</th></tr></thead>
+                          <thead><tr><th>─░l</th><th>T─▒klama</th></tr></thead>
                           <tbody>
                             {b2bStats.topCities.map((item, idx) => (
                               <tr key={idx}><td>{item.city}</td><td><strong>{item.count}</strong></td></tr>
@@ -4111,14 +4071,14 @@ export default function Home() {
                     <h4>SaaS Abonelik ve Stripe Webhook Sandbox</h4>
                     <div className="billing-test-box glass-panel">
                       <div className="plan-picker-row">
-                        <span>Abonelik Katmanı:</span>
+                        <span>Abonelik Katman─▒:</span>
                         <div className="segmented-control mini">
                           <button className={stripePlan === 'PRO' ? 'active' : ''} onClick={() => setStripePlan('PRO')}>PRO</button>
                           <button className={stripePlan === 'ENTERPRISE' ? 'active' : ''} onClick={() => setStripePlan('ENTERPRISE')}>ENTERPRISE</button>
                         </div>
                       </div>
                       <button onClick={triggerStripeMockWebhook} className="btn-secondary w-full-btn" disabled={stripeLoading} style={{ borderColor: 'var(--accent-gold)', color: 'var(--accent-gold)' }}>
-                        {stripeLoading ? 'Simüle Ediliyor...' : `Stripe Webhook Gönder (${stripePlan})`}
+                        {stripeLoading ? 'Sim├╝le Ediliyor...' : `Stripe Webhook G├Ânder (${stripePlan})`}
                       </button>
                       {stripeWebhookResult && (
                         <div className="webhook-result-badge"><CheckCircle size={14} style={{ color: 'var(--accent-green)' }} /><span>{stripeWebhookResult}</span></div>
@@ -4131,19 +4091,19 @@ export default function Home() {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px', background: 'rgba(0,0,0,0.01)', borderRadius: '4px' }}>
                           <span>1. SaaS Abonelikleri:</span>
-                          <strong style={{ color: 'var(--accent-gold)' }}>Aylık Sabit SaaS Ücreti</strong>
+                          <strong style={{ color: 'var(--accent-gold)' }}>Ayl─▒k Sabit SaaS ├£creti</strong>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px', background: 'rgba(0,0,0,0.01)', borderRadius: '4px' }}>
-                          <span>2. Yönlendirilen Müşteri (Lead):</span>
-                          <strong style={{ color: 'var(--accent-blue-hover)' }}>Bayi Başı 25 TL / Teklif</strong>
+                          <span>2. Y├Ânlendirilen M├╝┼şteri (Lead):</span>
+                          <strong style={{ color: 'var(--accent-blue-hover)' }}>Bayi Ba┼ş─▒ 25 TL / Teklif</strong>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px', background: 'rgba(0,0,0,0.01)', borderRadius: '4px' }}>
-                          <span>3. Yapı Market / Trendyol Affiliate:</span>
-                          <strong style={{ color: 'var(--accent-green)' }}>%2-%5 Satış Komisyonu</strong>
+                          <span>3. Yap─▒ Market / Trendyol Affiliate:</span>
+                          <strong style={{ color: 'var(--accent-green)' }}>%2-%5 Sat─▒┼ş Komisyonu</strong>
                         </div>
                       </div>
                       <p style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '8px', lineHeight: '1.3' }}>
-                        *SeramikBak stok ve lojistik riski almaz. Müşteriyi online pazaryerlerine veya en yakın fiziksel bayiye yönlendirerek pasif komisyon ve abonelik geliri üretir.
+                        *SeramikBak stok ve lojistik riski almaz. M├╝┼şteriyi online pazaryerlerine veya en yak─▒n fiziksel bayiye y├Ânlendirerek pasif komisyon ve abonelik geliri ├╝retir.
                       </p>
                     </div>
                   </div>
@@ -4162,10 +4122,10 @@ export default function Home() {
           <div className="modal-content glass-panel" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', width: '100%', padding: '28px' }}>
             <div className="modal-header" style={{ marginBottom: '16px' }}>
               <div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0 }}>Bayi Kayıt Başvurusu</h3>
-                <small className="code-text" style={{ color: 'var(--accent-gold)', fontWeight: '700' }}>SeramikBak Yetkili Bayi Ağı</small>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0 }}>Bayi Kay─▒t Ba┼şvurusu</h3>
+                <small className="code-text" style={{ color: 'var(--accent-gold)', fontWeight: '700' }}>SeramikBak Yetkili Bayi A─ş─▒</small>
               </div>
-              <button onClick={() => setShowDealerSignup(false)} className="close-modal-btn">✕</button>
+              <button onClick={() => setShowDealerSignup(false)} className="close-modal-btn">Ô£ò</button>
             </div>
 
             <form onSubmit={handleDealerSignupSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -4185,13 +4145,13 @@ export default function Home() {
 
               <div style={{ display: 'flex', gap: '10px' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Bayi Adı / Şube</label>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Bayi Ad─▒ / ┼Şube</label>
                   <input 
                     type="text" 
                     value={signupName} 
                     onChange={(e) => setSignupName(e.target.value)} 
                     required 
-                    placeholder="Örn: VitrA Kadıköy Şubesi"
+                    placeholder="├ûrn: VitrA Kad─▒k├Ây ┼Şubesi"
                     style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
                   />
                 </div>
@@ -4203,7 +4163,7 @@ export default function Home() {
                     required
                     style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
                   >
-                    <option value="">Seçiniz...</option>
+                    <option value="">Se├ğiniz...</option>
                     {brands.map(b => (
                       <option key={b.id} value={b.id}>{b.name}</option>
                     ))}
@@ -4224,13 +4184,13 @@ export default function Home() {
                   />
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Şifre</label>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>┼Şifre</label>
                   <input 
                     type="password" 
                     value={signupPassword} 
                     onChange={(e) => setSignupPassword(e.target.value)} 
                     required 
-                    placeholder="••••••••"
+                    placeholder="ÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇó"
                     style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
                   />
                 </div>
@@ -4238,7 +4198,7 @@ export default function Home() {
 
               <div style={{ display: 'flex', gap: '10px' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>İletişim Telefonu</label>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>─░leti┼şim Telefonu</label>
                   <input 
                     type="tel" 
                     value={signupPhone} 
@@ -4249,14 +4209,14 @@ export default function Home() {
                   />
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>İlçe / Şehir</label>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>─░l├ğe / ┼Şehir</label>
                   <div style={{ display: 'flex', gap: '6px' }}>
                     <input 
                       type="text" 
                       value={signupDistrict} 
                       onChange={(e) => setSignupDistrict(e.target.value)} 
                       required 
-                      placeholder="Kadıköy"
+                      placeholder="Kad─▒k├Ây"
                       style={{ flex: 1, padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem', width: '100%', minWidth: 0 }}
                     />
                     <input 
@@ -4271,12 +4231,12 @@ export default function Home() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Şube Adresi</label>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>┼Şube Adresi</label>
                 <textarea 
                   value={signupAddress} 
                   onChange={(e) => setSignupAddress(e.target.value)} 
                   required 
-                  placeholder="Göztepe Mah. Bağdat Cad. No:120 Kadıköy"
+                  placeholder="G├Âztepe Mah. Ba─şdat Cad. No:120 Kad─▒k├Ây"
                   rows={2}
                   style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem', fontFamily: 'inherit' }}
                 />
@@ -4330,7 +4290,7 @@ export default function Home() {
                     <span>Kaydediliyor...</span>
                   </>
                 ) : (
-                  <span>Başvuruyu Tamamla</span>
+                  <span>Ba┼şvuruyu Tamamla</span>
                 )}
               </button>
             </form>
@@ -4346,9 +4306,9 @@ export default function Home() {
               <div className="detail-modal-header-title">
                 <span className="brand-badge-detail">{detailProduct.brand?.name}</span>
                 <h3 style={{ marginTop: '4px' }}>{detailProduct.name}</h3>
-                <small className="code-text">Ürün Kodu: {detailProduct.code}</small>
+                <small className="code-text">├£r├╝n Kodu: {detailProduct.code}</small>
               </div>
-              <button onClick={() => setShowDetailModal(false)} className="close-modal-btn">✕</button>
+              <button onClick={() => setShowDetailModal(false)} className="close-modal-btn">Ô£ò</button>
             </div>
 
             <div className="detail-modal-body">
@@ -4371,7 +4331,7 @@ export default function Home() {
                     <span className="spec-val">{detailProduct.width}x{detailProduct.height} cm</span>
                   </div>
                   <div className="spec-item-box">
-                    <span className="spec-lbl">Yüzey Tipi</span>
+                    <span className="spec-lbl">Y├╝zey Tipi</span>
                     <span className="spec-val">{detailProduct.finish}</span>
                   </div>
                   <div className="spec-item-box">
@@ -4379,21 +4339,21 @@ export default function Home() {
                     <span className="spec-val">{detailProduct.style}</span>
                   </div>
                   <div className="spec-item-box">
-                    <span className="spec-lbl">Kullanım Alanı</span>
+                    <span className="spec-lbl">Kullan─▒m Alan─▒</span>
                     <span className="spec-val" title={detailProduct.area}>
                       {detailProduct.area ? detailProduct.area.split(',').slice(0, 2).join(', ') : 'Zemin/Duvar'}
                     </span>
                   </div>
                   <div className="spec-item-box">
-                    <span className="spec-lbl">Aşınma (PEI)</span>
+                    <span className="spec-lbl">A┼ş─▒nma (PEI)</span>
                     <span className="spec-val">{detailProduct.peiRating ? `PEI ${detailProduct.peiRating}` : 'N/A'}</span>
                   </div>
                   <div className="spec-item-box">
-                    <span className="spec-lbl">Kaymazlık</span>
+                    <span className="spec-lbl">Kaymazl─▒k</span>
                     <span className="spec-val">{detailProduct.slipResistance || 'N/A'}</span>
                   </div>
                   <div className="spec-item-box">
-                    <span className="spec-lbl">Kalınlık</span>
+                    <span className="spec-lbl">Kal─▒nl─▒k</span>
                     <span className="spec-val">{detailProduct.thickness ? `${detailProduct.thickness} mm` : 'N/A'}</span>
                   </div>
                   <div className="spec-item-box">
@@ -4401,8 +4361,8 @@ export default function Home() {
                     <span className="spec-val">{detailProduct.rectified !== null ? (detailProduct.rectified ? 'Rektifiyeli' : 'Rektifiyesiz') : 'N/A'}</span>
                   </div>
                   <div className="spec-item-box">
-                    <span className="spec-lbl">Dona Dayanım</span>
-                    <span className="spec-val">{detailProduct.frostResistance !== null ? (detailProduct.frostResistance ? 'Evet' : 'Hayır') : 'N/A'}</span>
+                    <span className="spec-lbl">Dona Dayan─▒m</span>
+                    <span className="spec-val">{detailProduct.frostResistance !== null ? (detailProduct.frostResistance ? 'Evet' : 'Hay─▒r') : 'N/A'}</span>
                   </div>
                 </div>
 
@@ -4415,7 +4375,7 @@ export default function Home() {
                     className="btn-primary w-full-btn flex-center-btn detail-action-btn"
                   >
                     <Sparkles size={16} />
-                    <span>3D Sanal Stüdyoda Dene</span>
+                    <span>3D Sanal St├╝dyoda Dene</span>
                   </button>
                   <button 
                     onClick={() => {
@@ -4425,13 +4385,13 @@ export default function Home() {
                     className="btn-secondary w-full-btn flex-center-btn detail-action-btn"
                   >
                     <Map size={16} />
-                    <span>Haritada Bayileri Gör</span>
+                    <span>Haritada Bayileri G├Âr</span>
                   </button>
                 </div>
 
-                {/* MİMAR VE TASARIMCILAR İÇİN DOKU PORTALI */}
+                {/* M─░MAR VE TASARIMCILAR ─░├ç─░N DOKU PORTALI */}
                 <div className="architect-download-box">
-                  <span className="architect-lbl">MİMARLAR & TASARIMCILAR İÇİN</span>
+                  <span className="architect-lbl">M─░MARLAR & TASARIMCILAR ─░├ç─░N</span>
                   <button 
                     onClick={() => handleDownloadCAD(detailProduct)}
                     className="btn-architect-download w-full-btn flex-center-btn"
@@ -4445,36 +4405,36 @@ export default function Home() {
                     ) : (
                       <>
                         <UploadCloud size={16} style={{ transform: 'rotate(180deg)' }} />
-                        <span>3D Doku & CAD Nesnelerini İndir (.ZIP)</span>
+                        <span>3D Doku & CAD Nesnelerini ─░ndir (.ZIP)</span>
                       </>
                     )}
                   </button>
                   <small className="architect-desc">
-                    İçerik: High-res dikişsiz doku (Diffuse, Normal, Roughness), AutoCAD dwg bloğu, Revit BIM nesnesi (.rfa).
+                    ─░├ğerik: High-res diki┼şsiz doku (Diffuse, Normal, Roughness), AutoCAD dwg blo─şu, Revit BIM nesnesi (.rfa).
                   </small>
                 </div>
 
-                {/* GÜVENİLİRLİK VE SOSYAL KANIT ROZETLERİ */}
+                {/* G├£VEN─░L─░RL─░K VE SOSYAL KANIT ROZETLER─░ */}
                 <div className="detail-trust-badges-box">
                   <div className="trust-badge-item">
                     <CheckCircle size={14} className="trust-icon" />
                     <div>
-                      <strong>En İyi Fiyat Garantisi</strong>
-                      <span>Bayi ve pazaryerleri arasında en avantajlı fiyatlar</span>
+                      <strong>En ─░yi Fiyat Garantisi</strong>
+                      <span>Bayi ve pazaryerleri aras─▒nda en avantajl─▒ fiyatlar</span>
                     </div>
                   </div>
                   <div className="trust-badge-item">
                     <Activity size={14} className="trust-icon" />
                     <div>
-                      <strong>Sigortalı Nakliye Sevk</strong>
-                      <span>Kırılma garantili lojistik ve hızlı teslimat</span>
+                      <strong>Sigortal─▒ Nakliye Sevk</strong>
+                      <span>K─▒r─▒lma garantili lojistik ve h─▒zl─▒ teslimat</span>
                     </div>
                   </div>
                   <div className="trust-badge-item">
                     <MapPin size={14} className="trust-icon" />
                     <div>
                       <strong>100% Orijinal Yetkili Bayi</strong>
-                      <span>Doğrudan üretici garantili faturalı ürünler</span>
+                      <span>Do─şrudan ├╝retici garantili fatural─▒ ├╝r├╝nler</span>
                     </div>
                   </div>
                 </div>
@@ -4486,13 +4446,13 @@ export default function Home() {
                 <div className="channel-box calculator-box">
                   <h4 className="channel-title">
                     <SlidersHorizontal size={16} style={{ color: 'var(--accent-gold)' }} />
-                    <span>Akıllı Metraj & Malzeme Hesaplayıcı</span>
+                    <span>Ak─▒ll─▒ Metraj & Malzeme Hesaplay─▒c─▒</span>
                   </h4>
-                  <p className="channel-desc">Kaplayacağınız alanın genişlik ve uzunluğunu girin; gerekli paket adetini, yapıştırıcıyı, derz dolgusunu ve lojistik ağırlığını hesaplayalım.</p>
+                  <p className="channel-desc">Kaplayaca─ş─▒n─▒z alan─▒n geni┼şlik ve uzunlu─şunu girin; gerekli paket adetini, yap─▒┼şt─▒r─▒c─▒y─▒, derz dolgusunu ve lojistik a─ş─▒rl─▒─ş─▒n─▒ hesaplayal─▒m.</p>
                   
                   <div className="calc-inputs-row">
                     <div className="calc-input-group">
-                      <label>Genişlik (m)</label>
+                      <label>Geni┼şlik (m)</label>
                       <input 
                         type="number" 
                         step="0.1" 
@@ -4514,7 +4474,7 @@ export default function Home() {
                       />
                     </div>
                     <div className="calc-input-group">
-                      <label>Döşeme Şekli</label>
+                      <label>D├Â┼şeme ┼Şekli</label>
                       <select 
                         value={calcLayout} 
                         onChange={(e) => {
@@ -4523,8 +4483,8 @@ export default function Home() {
                         }}
                         className="calc-select"
                       >
-                        <option value="flat">Düz Döşeme</option>
-                        <option value="diagonal">Çapraz Döşeme</option>
+                        <option value="flat">D├╝z D├Â┼şeme</option>
+                        <option value="diagonal">├çapraz D├Â┼şeme</option>
                       </select>
                     </div>
                   </div>
@@ -4534,11 +4494,11 @@ export default function Home() {
                       <div className="calc-res-grid">
                         <div className="calc-res-item">
                           <span>Net Alan:</span>
-                          <strong>{calcResults.rawArea} m²</strong>
+                          <strong>{calcResults.rawArea} m┬▓</strong>
                         </div>
                         <div className="calc-res-item">
                           <span>Zayiat Dahil:</span>
-                          <strong>{calcResults.totalAreaNeeded} m² ({calcWastage === '15' ? '%15' : '%10'} Zayiat)</strong>
+                          <strong>{calcResults.totalAreaNeeded} m┬▓ ({calcWastage === '15' ? '%15' : '%10'} Zayiat)</strong>
                         </div>
                         <div className="calc-res-item">
                           <span>Gerekli Kutu:</span>
@@ -4549,7 +4509,7 @@ export default function Home() {
                           <strong>{calcResults.totalTilesNeeded} Adet</strong>
                         </div>
                         <div className="calc-res-item">
-                          <span>Kalekim Yapıştırıcı:</span>
+                          <span>Kalekim Yap─▒┼şt─▒r─▒c─▒:</span>
                           <strong>{calcResults.adhesiveKg} kg ({calcResults.adhesiveBags} Torba)</strong>
                         </div>
                         <div className="calc-res-item">
@@ -4560,9 +4520,9 @@ export default function Home() {
                       
                       {/* DYNAMICS: HEAVY FREIGHT PALLET LOGISTICS ESTIMATION */}
                       <div className="pallet-logistics-box">
-                        <span className="logistics-lbl">🚚 Kargo & Ağır Yük Lojistiği (Borusan Entegrasyonu)</span>
+                        <span className="logistics-lbl">­şÜÜ Kargo & A─ş─▒r Y├╝k Lojisti─şi (Borusan Entegrasyonu)</span>
                         <div className="logistics-row">
-                          <span>Toplam Ağırlık:</span>
+                          <span>Toplam A─ş─▒rl─▒k:</span>
                           <strong>{Math.round(parseFloat(calcResults.actualAreaPurchased) * 18)} kg ({Math.ceil(Math.round(parseFloat(calcResults.actualAreaPurchased) * 18) / 1000)} Palet)</strong>
                         </div>
                         <div className="logistics-row highlight-price">
@@ -4582,12 +4542,12 @@ export default function Home() {
                     <MapPin size={16} style={{ color: 'var(--accent-blue)' }} />
                     <span>Resmi Yetkili Bayiler (Teklif Al)</span>
                   </h4>
-                  <p className="channel-desc">En yakın bayiden palet bazında teklif isteyin veya Showroom&apos;da inceleyin.</p>
+                  <p className="channel-desc">En yak─▒n bayiden palet baz─▒nda teklif isteyin veya Showroom&apos;da inceleyin.</p>
                   
                   {detailDealersLoading ? (
                     <div className="channel-loading">
                       <Loader2 size={16} className="animate-spin" style={{ color: 'var(--accent-blue)' }} />
-                      <span>Yakındaki bayiler aranıyor...</span>
+                      <span>Yak─▒ndaki bayiler aran─▒yor...</span>
                     </div>
                   ) : detailDealers.length > 0 ? (
                     <div className="modal-dealers-list">
@@ -4595,7 +4555,7 @@ export default function Home() {
                         <div key={dealer.id} className="modal-dealer-row">
                           <div className="m-dealer-info">
                             <h5>{dealer.name}</h5>
-                            <p className="m-dealer-meta">{dealer.district}, {dealer.city} • <strong>{dealer.distanceKm} km</strong></p>
+                            <p className="m-dealer-meta">{dealer.district}, {dealer.city} ÔÇó <strong>{dealer.distanceKm} km</strong></p>
                           </div>
                           <button 
                             onClick={() => {
@@ -4604,19 +4564,19 @@ export default function Home() {
                               setLeadName('');
                               setLeadPhone('');
                               setLeadEmail('');
-                              setLeadNotes(`Bana 50 metrekare bu ${detailProduct.name} ürününden lazım, fiyat teklifi gönderin.`);
+                              setLeadNotes(`Bana 50 metrekare bu ${detailProduct.name} ├╝r├╝n├╝nden laz─▒m, fiyat teklifi g├Ânderin.`);
                               setLeadSuccessMsg('');
                               setShowLeadModal(true);
                             }}
                             className="btn-primary btn-sm quote-btn"
                           >
-                            Teklif İste
+                            Teklif ─░ste
                           </button>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="no-channel-data">Bu marka için yakınlarda yetkili bayi bulunamadı.</p>
+                    <p className="no-channel-data">Bu marka i├ğin yak─▒nlarda yetkili bayi bulunamad─▒.</p>
                   )}
                 </div>
 
@@ -4624,19 +4584,19 @@ export default function Home() {
                 <div className="channel-box">
                   <h4 className="channel-title">
                     <CreditCard size={16} style={{ color: 'var(--accent-gold)' }} />
-                    <span>Online Pazaryeri Mağazaları</span>
+                    <span>Online Pazaryeri Ma─şazalar─▒</span>
                   </h4>
-                  <p className="channel-desc">Distribütör satıcılarından kapıya teslim palet siparişi verebilirsiniz.</p>
+                  <p className="channel-desc">Distrib├╝t├Âr sat─▒c─▒lar─▒ndan kap─▒ya teslim palet sipari┼şi verebilirsiniz.</p>
                   
                   <div className="affiliate-prices-list">
                     {/* Trendyol (Cheapest) */}
                     <div className="affiliate-row cheapest-row">
                       <div className="aff-store-meta">
-                        <span className="cheapest-badge">EN UCUZ SEÇENEK</span>
+                        <span className="cheapest-badge">EN UCUZ SE├çENEK</span>
                         <span className="store-name font-bold">Trendyol Pazaryeri</span>
                       </div>
                       <div className="aff-price-action">
-                        <span className="aff-price">{detailProduct.trendyolPrice} TL/m²</span>
+                        <span className="aff-price">{detailProduct.trendyolPrice} TL/m┬▓</span>
                         <a 
                           href={detailProduct.trendyolUrl} 
                           target="_blank" 
@@ -4644,7 +4604,7 @@ export default function Home() {
                           onClick={() => logInteraction('CLICK', detailProduct.id, detailProduct.brandId)}
                           className="aff-btn"
                         >
-                          Satın Al ↗
+                          Sat─▒n Al Ôåù
                         </a>
                       </div>
                     </div>
@@ -4652,10 +4612,10 @@ export default function Home() {
                     {/* Hepsiburada */}
                     <div className="affiliate-row">
                       <div className="aff-store-meta">
-                        <span className="store-name">Hepsiburada Satıcıları</span>
+                        <span className="store-name">Hepsiburada Sat─▒c─▒lar─▒</span>
                       </div>
                       <div className="aff-price-action">
-                        <span className="aff-price">{detailProduct.hepsiPrice} TL/m²</span>
+                        <span className="aff-price">{detailProduct.hepsiPrice} TL/m┬▓</span>
                         <a 
                           href={detailProduct.hepsiburadaUrl} 
                           target="_blank" 
@@ -4663,7 +4623,7 @@ export default function Home() {
                           onClick={() => logInteraction('CLICK', detailProduct.id, detailProduct.brandId)}
                           className="aff-btn-secondary"
                         >
-                          İncele ↗
+                          ─░ncele Ôåù
                         </a>
                       </div>
                     </div>
@@ -4671,10 +4631,10 @@ export default function Home() {
                     {/* n11 */}
                     <div className="affiliate-row">
                       <div className="aff-store-meta">
-                        <span className="store-name">n11 Distribütörleri</span>
+                        <span className="store-name">n11 Distrib├╝t├Ârleri</span>
                       </div>
                       <div className="aff-price-action">
-                        <span className="aff-price">{detailProduct.n11Price} TL/m²</span>
+                        <span className="aff-price">{detailProduct.n11Price} TL/m┬▓</span>
                         <a 
                           href={detailProduct.n11Url} 
                           target="_blank" 
@@ -4682,29 +4642,29 @@ export default function Home() {
                           onClick={() => logInteraction('CLICK', detailProduct.id, detailProduct.brandId)}
                           className="aff-btn-secondary"
                         >
-                          İncele ↗
+                          ─░ncele Ôåù
                         </a>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* 3. Dev Yapı Marketler */}
+                {/* 3. Dev Yap─▒ Marketler */}
                 <div className="channel-box">
                   <h4 className="channel-title">
                     <Layers size={16} style={{ color: 'var(--accent-orange)' }} />
-                    <span>Dev Yapı Marketler</span>
+                    <span>Dev Yap─▒ Marketler</span>
                   </h4>
-                  <p className="channel-desc">Türkiye genelinde mağazalarda hazır stoklu standart seriler.</p>
+                  <p className="channel-desc">T├╝rkiye genelinde ma─şazalarda haz─▒r stoklu standart seriler.</p>
                   
                   <div className="affiliate-prices-list">
-                    {/* Koçtaş */}
+                    {/* Ko├ğta┼ş */}
                     <div className="affiliate-row">
                       <div className="aff-store-meta">
-                        <span className="store-name">Koçtaş Mağazaları</span>
+                        <span className="store-name">Ko├ğta┼ş Ma─şazalar─▒</span>
                       </div>
                       <div className="aff-price-action">
-                        <span className="aff-price">{detailProduct.koctasPrice} TL/m²</span>
+                        <span className="aff-price">{detailProduct.koctasPrice} TL/m┬▓</span>
                         <a 
                           href={detailProduct.koctasUrl} 
                           target="_blank" 
@@ -4712,7 +4672,7 @@ export default function Home() {
                           onClick={() => logInteraction('CLICK', detailProduct.id, detailProduct.brandId)}
                           className="aff-btn-secondary"
                         >
-                          Satın Al ↗
+                          Sat─▒n Al Ôåù
                         </a>
                       </div>
                     </div>
@@ -4720,10 +4680,10 @@ export default function Home() {
                     {/* Bauhaus */}
                     <div className="affiliate-row">
                       <div className="aff-store-meta">
-                        <span className="store-name">Bauhaus Yapı Market</span>
+                        <span className="store-name">Bauhaus Yap─▒ Market</span>
                       </div>
                       <div className="aff-price-action">
-                        <span className="aff-price">{detailProduct.bauhausPrice} TL/m²</span>
+                        <span className="aff-price">{detailProduct.bauhausPrice} TL/m┬▓</span>
                         <a 
                           href={detailProduct.bauhausUrl} 
                           target="_blank" 
@@ -4731,7 +4691,7 @@ export default function Home() {
                           onClick={() => logInteraction('CLICK', detailProduct.id, detailProduct.brandId)}
                           className="aff-btn-secondary"
                         >
-                          İncele ↗
+                          ─░ncele Ôåù
                         </a>
                       </div>
                     </div>
@@ -4749,7 +4709,7 @@ export default function Home() {
           <div className="modal-content glass-panel-gold">
             <div className="modal-header">
               <h3>Bayiden Fiyat Teklifi Al</h3>
-              <button onClick={() => { setShowLeadModal(false); setLeadSuccessMsg(''); }} className="close-modal-btn">✕</button>
+              <button onClick={() => { setShowLeadModal(false); setLeadSuccessMsg(''); }} className="close-modal-btn">Ô£ò</button>
             </div>
             
             {leadSuccessMsg ? (
@@ -4766,17 +4726,17 @@ export default function Home() {
                   </div>
                   <div>
                     <strong>{leadProduct.brand?.name} - {leadProduct.name}</strong>
-                    <p>{leadProduct.width}x{leadProduct.height} cm • {leadProduct.finish}</p>
+                    <p>{leadProduct.width}x{leadProduct.height} cm ÔÇó {leadProduct.finish}</p>
                     <p style={{ fontSize: '0.75rem', color: 'var(--accent-blue)', marginTop: '4px' }}>Bayi: {leadDealer.name}</p>
                   </div>
                 </div>
-                <div className="form-group"><label>Adınız Soyadınız</label><input type="text" className="form-input" value={leadName} onChange={(e) => setLeadName(e.target.value)} required placeholder="Ahmet Yılmaz" /></div>
+                <div className="form-group"><label>Ad─▒n─▒z Soyad─▒n─▒z</label><input type="text" className="form-input" value={leadName} onChange={(e) => setLeadName(e.target.value)} required placeholder="Ahmet Y─▒lmaz" /></div>
                 <div className="form-group-row">
                   <div className="form-group"><label>Telefon</label><input type="tel" className="form-input" value={leadPhone} onChange={(e) => setLeadPhone(e.target.value)} required placeholder="0555 123 4567" /></div>
                   <div className="form-group"><label>E-Posta</label><input type="email" className="form-input" value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} required placeholder="ahmet@mail.com" /></div>
                 </div>
-                <div className="form-group"><label>Notlar</label><textarea className="form-input form-textarea" value={leadNotes} onChange={(e) => setLeadNotes(e.target.value)} placeholder="Miktar ve nakliye detaylarını ekleyebilirsiniz..." rows={2} /></div>
-                <button type="submit" className="btn-primary w-full-btn" style={{ marginTop: '10px' }}>Teklifi Gönder</button>
+                <div className="form-group"><label>Notlar</label><textarea className="form-input form-textarea" value={leadNotes} onChange={(e) => setLeadNotes(e.target.value)} placeholder="Miktar ve nakliye detaylar─▒n─▒ ekleyebilirsiniz..." rows={2} /></div>
+                <button type="submit" className="btn-primary w-full-btn" style={{ marginTop: '10px' }}>Teklifi G├Ânder</button>
               </form>
             )}
           </div>
@@ -4787,22 +4747,22 @@ export default function Home() {
       {showAuthModal && (
         <div className="auth-modal-overlay" onClick={(e) => { if(e.target === e.currentTarget) setShowAuthModal(false); }}>
           <div className="auth-modal glass-panel">
-            <button className="auth-modal-close" onClick={() => { setShowAuthModal(false); setAuthError(''); setAuthSuccess(''); }}>✕</button>
+            <button className="auth-modal-close" onClick={() => { setShowAuthModal(false); setAuthError(''); setAuthSuccess(''); }}>Ô£ò</button>
             
             <div className="auth-modal-header">
               <div className="auth-logo-area">
                 <div className="auth-logo-icon">SB</div>
                 <span className="auth-logo-text">SeramikBak</span>
               </div>
-              <p className="auth-subtitle">Türkiye&apos;nin en kapsamlı seramik platformuna katılın</p>
+              <p className="auth-subtitle">T├╝rkiye&apos;nin en kapsaml─▒ seramik platformuna kat─▒l─▒n</p>
             </div>
 
             <div className="auth-tabs">
               <button className={`auth-tab ${authTab === 'login' ? 'active' : ''}`} onClick={() => { setAuthTab('login'); setAuthError(''); }}>
-                Giriş Yap
+                Giri┼ş Yap
               </button>
               <button className={`auth-tab ${authTab === 'register' ? 'active' : ''}`} onClick={() => { setAuthTab('register'); setAuthError(''); }}>
-                Üye Ol
+                ├£ye Ol
               </button>
             </div>
 
@@ -4819,14 +4779,14 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="auth-field">
-                  <label>Şifre</label>
+                  <label>┼Şifre</label>
                   <div className="auth-input-wrapper">
                     <Settings size={16} />
-                    <input type="password" placeholder="••••••••" value={authPassword} onChange={e => setAuthPassword(e.target.value)} required />
+                    <input type="password" placeholder="ÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇó" value={authPassword} onChange={e => setAuthPassword(e.target.value)} required />
                   </div>
                 </div>
                 <button type="submit" className="auth-submit-btn" disabled={authLoading}>
-                  {authLoading ? <><Loader2 size={16} className="spin-icon" /> Giriş yapılıyor...</> : 'Giriş Yap'}
+                  {authLoading ? <><Loader2 size={16} className="spin-icon" /> Giri┼ş yap─▒l─▒yor...</> : 'Giri┼ş Yap'}
                 </button>
               </form>
             ) : (
@@ -4835,7 +4795,7 @@ export default function Home() {
                   <label>Ad Soyad</label>
                   <div className="auth-input-wrapper">
                     <UserIcon size={16} />
-                    <input type="text" placeholder="Adınız Soyadınız" value={authName} onChange={e => setAuthName(e.target.value)} required />
+                    <input type="text" placeholder="Ad─▒n─▒z Soyad─▒n─▒z" value={authName} onChange={e => setAuthName(e.target.value)} required />
                   </div>
                 </div>
                 <div className="auth-field">
@@ -4846,28 +4806,28 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="auth-field">
-                  <label>Şifre</label>
+                  <label>┼Şifre</label>
                   <div className="auth-input-wrapper">
                     <Settings size={16} />
                     <input type="password" placeholder="En az 6 karakter" value={authPassword} onChange={e => setAuthPassword(e.target.value)} required minLength={6} />
                   </div>
                 </div>
                 <button type="submit" className="auth-submit-btn" disabled={authLoading}>
-                  {authLoading ? <><Loader2 size={16} className="spin-icon" /> Kayıt yapılıyor...</> : 'Üye Ol'}
+                  {authLoading ? <><Loader2 size={16} className="spin-icon" /> Kay─▒t yap─▒l─▒yor...</> : '├£ye Ol'}
                 </button>
               </form>
             )}
 
             <div className="auth-benefits">
-              <div className="auth-benefit-item"><CheckCircle size={14} /> Fiyat karşılaştırma ve favori kaydetme</div>
-              <div className="auth-benefit-item"><CheckCircle size={14} /> Fiyat düşüş bildirimleri alma</div>
-              <div className="auth-benefit-item"><CheckCircle size={14} /> Bayilerden özel teklif talep etme</div>
-              <div className="auth-benefit-item"><CheckCircle size={14} /> 3D oda tasarımlarınızı kaydetme</div>
+              <div className="auth-benefit-item"><CheckCircle size={14} /> Fiyat kar┼ş─▒la┼şt─▒rma ve favori kaydetme</div>
+              <div className="auth-benefit-item"><CheckCircle size={14} /> Fiyat d├╝┼ş├╝┼ş bildirimleri alma</div>
+              <div className="auth-benefit-item"><CheckCircle size={14} /> Bayilerden ├Âzel teklif talep etme</div>
+              <div className="auth-benefit-item"><CheckCircle size={14} /> 3D oda tasar─▒mlar─▒n─▒z─▒ kaydetme</div>
             </div>
 
             <div className="auth-member-count">
               <Sparkles size={14} className="badge-icon-gold" />
-              <span><strong>2.847</strong> kullanıcı şimdiden SeramikBak&apos;a üye oldu</span>
+              <span><strong>2.847</strong> kullan─▒c─▒ ┼şimdiden SeramikBak&apos;a ├╝ye oldu</span>
             </div>
           </div>
         </div>
@@ -4879,13 +4839,13 @@ export default function Home() {
           <div className="favorites-panel glass-panel">
             <div className="favorites-panel-header">
               <h3><HeartIcon size={18} /> Favorilerim</h3>
-              <button onClick={() => setShowFavoritesPanel(false)}>✕</button>
+              <button onClick={() => setShowFavoritesPanel(false)}>Ô£ò</button>
             </div>
             {userFavorites.length === 0 ? (
               <div className="favorites-empty">
                 <HeartIcon size={40} />
-                <p>Henüz favori ürününüz yok.</p>
-                <span>Beğendiğiniz ürünlerin kalp ikonuna tıklayarak favorilerinize ekleyebilirsiniz.</span>
+                <p>Hen├╝z favori ├╝r├╝n├╝n├╝z yok.</p>
+                <span>Be─şendi─şiniz ├╝r├╝nlerin kalp ikonuna t─▒klayarak favorilerinize ekleyebilirsiniz.</span>
               </div>
             ) : (
               <div className="favorites-list">
@@ -4901,7 +4861,7 @@ export default function Home() {
                       )}
                     </div>
                     <div className="favorite-item-info">
-                      <div className="favorite-item-name">{fav.product?.name || 'Ürün'}</div>
+                      <div className="favorite-item-name">{fav.product?.name || '├£r├╝n'}</div>
                       <div className="favorite-item-brand">{fav.product?.brand?.name || ''}</div>
                     </div>
                     <button className="favorite-remove-btn" onClick={(e) => { e.stopPropagation(); handleToggleFavorite(fav.productId); }}>
@@ -4926,13 +4886,13 @@ export default function Home() {
               <span className="logo-text">SeramikBak</span>
             </div>
             <p className="footer-tagline">
-              Türkiye'nin ilk ve lider seramik arama motoru. 100+ markayı karşılaştırın, 3D sanal stüdyoda odanızı tasarlayın ve en yakın yetkili bayiden anında teklif alın.
+              T├╝rkiye'nin ilk ve lider seramik arama motoru. 100+ markay─▒ kar┼ş─▒la┼şt─▒r─▒n, 3D sanal st├╝dyoda odan─▒z─▒ tasarlay─▒n ve en yak─▒n yetkili bayiden an─▒nda teklif al─▒n.
             </p>
             <div className="footer-socials">
               <a href="#" className="social-icon-btn" title="Web Sitesi" onClick={(e) => e.preventDefault()}><Globe size={16} /></a>
-              <a href="mailto:destek@seramikbak.com" className="social-icon-btn" title="E-Posta Gönder"><Mail size={16} /></a>
-              <a href="tel:08501234567" className="social-icon-btn" title="Müşteri Hizmetleri Ara"><Phone size={16} /></a>
-              <a href="https://wa.me/908501234567" target="_blank" rel="noopener noreferrer" className="social-icon-btn" title="WhatsApp Destek Hattı"><MessageSquare size={16} /></a>
+              <a href="mailto:destek@seramikbak.com" className="social-icon-btn" title="E-Posta G├Ânder"><Mail size={16} /></a>
+              <a href="tel:08501234567" className="social-icon-btn" title="M├╝┼şteri Hizmetleri Ara"><Phone size={16} /></a>
+              <a href="https://wa.me/908501234567" target="_blank" rel="noopener noreferrer" className="social-icon-btn" title="WhatsApp Destek Hatt─▒"><MessageSquare size={16} /></a>
             </div>
           </div>
 
@@ -4940,18 +4900,18 @@ export default function Home() {
           <div className="footer-col">
             <h4>Seramik Kategorileri</h4>
             <ul>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Mermer Görünümlü', 'style', 'Mermer'); }}>Mermer Görünümlü Karolar</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Beton Görünümlü', 'style', 'Beton'); }}>Beton Görünümlü Seramikler</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Ahşap Dokulu', 'style', 'Ahşap'); }}>Ahşap Görünümlü Seramikler</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('60x120', 'size', '60x120'); }}>60x120 Geniş Ebatlı Porselen</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Parlak', 'finish', 'Parlak'); }}>Parlak Cilalı Koleksiyonlar</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Mermer G├Âr├╝n├╝ml├╝', 'style', 'Mermer'); }}>Mermer G├Âr├╝n├╝ml├╝ Karolar</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Beton G├Âr├╝n├╝ml├╝', 'style', 'Beton'); }}>Beton G├Âr├╝n├╝ml├╝ Seramikler</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Ah┼şap Dokulu', 'style', 'Ah┼şap'); }}>Ah┼şap G├Âr├╝n├╝ml├╝ Seramikler</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('60x120', 'size', '60x120'); }}>60x120 Geni┼ş Ebatl─▒ Porselen</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Parlak', 'finish', 'Parlak'); }}>Parlak Cilal─▒ Koleksiyonlar</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); handleTagClick('Mat', 'finish', 'Mat'); }}>Mat & R10 Kaymaz Karolar</a></li>
             </ul>
           </div>
 
-          {/* Column 3: Popüler Seramik Markaları */}
+          {/* Column 3: Pop├╝ler Seramik Markalar─▒ */}
           <div className="footer-col">
-            <h4>Popüler Markalar</h4>
+            <h4>Pop├╝ler Markalar</h4>
             <ul>
               {brands.slice(0, 6).map(brand => (
                 <li key={brand.id}>
@@ -4962,26 +4922,26 @@ export default function Home() {
               ))}
               {brands.length === 0 && (
                 <>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>NG Kütahya Seramik</a></li>
+                  <li><a href="#" onClick={(e) => e.preventDefault()}>NG K├╝tahya Seramik</a></li>
                   <li><a href="#" onClick={(e) => e.preventDefault()}>Vitra Seramik</a></li>
                   <li><a href="#" onClick={(e) => e.preventDefault()}>Bien Seramik</a></li>
-                  <li><a href="#" onClick={(e) => e.preventDefault()}>Çanakkale Seramik</a></li>
+                  <li><a href="#" onClick={(e) => e.preventDefault()}>├çanakkale Seramik</a></li>
                   <li><a href="#" onClick={(e) => e.preventDefault()}>Ege Seramik</a></li>
                 </>
               )}
             </ul>
           </div>
 
-          {/* Column 4: Hızlı Erişim */}
+          {/* Column 4: H─▒zl─▒ Eri┼şim */}
           <div className="footer-col">
             <h4>Kurumsal & Portallar</h4>
             <ul>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('search'); }}>Arama Motoru</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('studio'); }}>3D Sanal Stüdyo</a></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('studio'); }}>3D Sanal St├╝dyo</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('dealers'); }}>Bayi Bulucu</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); setShowDealerSignup(true); }}>Bayimiz Olun (B2B Başvuru)</a></li>
-              <li><Link href="/bayi">Bayi Giriş Portalı</Link></li>
-              <li><Link href="/marka">B2B Marka Portalı</Link></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setShowDealerSignup(true); }}>Bayimiz Olun (B2B Ba┼şvuru)</a></li>
+              <li><Link href="/bayi">Bayi Giri┼ş Portal─▒</Link></li>
+              <li><Link href="/marka">B2B Marka Portal─▒</Link></li>
             </ul>
           </div>
 
@@ -4990,10 +4950,10 @@ export default function Home() {
         {/* Footer Bottom Bar */}
         <div className="footer-bottom">
           <div className="footer-bottom-left">
-            <p>© 2026 SeramikBak. Tüm hakları saklıdır. Türkiye'nin Seramik Arama Motoru.</p>
+            <p>┬® 2026 SeramikBak. T├╝m haklar─▒ sakl─▒d─▒r. T├╝rkiye'nin Seramik Arama Motoru.</p>
           </div>
           <div className="footer-bottom-right">
-            <span className="footer-security-tag">🔒 256-Bit SSL Güvenli Bağlantı</span>
+            <span className="footer-security-tag">­şöÆ 256-Bit SSL G├╝venli Ba─şlant─▒</span>
           </div>
         </div>
       </footer>
@@ -5003,8 +4963,8 @@ export default function Home() {
         <div className="sticky-compare-bar">
           <div className="compare-bar-container">
             <div className="compare-bar-info">
-              <h4>Ürün Karşılaştırma</h4>
-              <p>{comparedProducts.length}/4 ürün seçildi</p>
+              <h4>├£r├╝n Kar┼ş─▒la┼şt─▒rma</h4>
+              <p>{comparedProducts.length}/4 ├╝r├╝n se├ğildi</p>
             </div>
             
             <div className="compare-bar-items">
@@ -5015,9 +4975,9 @@ export default function Home() {
                     <button 
                       className="compare-bar-item-remove"
                       onClick={() => toggleCompareProduct(p)}
-                      title="Çıkar"
+                      title="├ç─▒kar"
                     >
-                      ✕
+                      Ô£ò
                     </button>
                   </div>
                   <span className="compare-bar-item-name">{p.name}</span>
@@ -5030,7 +4990,7 @@ export default function Home() {
                   <div className="compare-bar-item-thumb">
                     <span className="empty-slot-plus">+</span>
                   </div>
-                  <span className="compare-bar-item-name">Boş Yuva</span>
+                  <span className="compare-bar-item-name">Bo┼ş Yuva</span>
                 </div>
               ))}
             </div>
@@ -5040,14 +5000,14 @@ export default function Home() {
                 className="btn-compare-clear"
                 onClick={() => setComparedProducts([])}
               >
-                Tümünü Temizle
+                T├╝m├╝n├╝ Temizle
               </button>
               <button 
                 className="btn-compare-submit"
                 onClick={() => setShowComparisonModal(true)}
                 disabled={comparedProducts.length < 2}
               >
-                {comparedProducts.length < 2 ? 'En Az 2 Ürün Seçin' : 'Karşılaştır'}
+                {comparedProducts.length < 2 ? 'En Az 2 ├£r├╝n Se├ğin' : 'Kar┼ş─▒la┼şt─▒r'}
               </button>
             </div>
           </div>
@@ -5060,10 +5020,10 @@ export default function Home() {
           <div className="compare-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="compare-modal-header">
               <div>
-                <h2>Teknik Detay Karşılaştırma Sihirbazı</h2>
-                <p>Seçtiğiniz seramik modellerinin tüm teknik detay ve pazar fiyatlarının yan yana analizi</p>
+                <h2>Teknik Detay Kar┼ş─▒la┼şt─▒rma Sihirbaz─▒</h2>
+                <p>Se├ğti─şiniz seramik modellerinin t├╝m teknik detay ve pazar fiyatlar─▒n─▒n yan yana analizi</p>
               </div>
-              <button className="compare-modal-close" onClick={() => setShowComparisonModal(false)}>✕</button>
+              <button className="compare-modal-close" onClick={() => setShowComparisonModal(false)}>Ô£ò</button>
             </div>
 
             <div className="compare-modal-body">
@@ -5071,16 +5031,16 @@ export default function Home() {
                 <table className="compare-table">
                   <thead>
                     <tr>
-                      <th className="feature-col">Özellikler</th>
+                      <th className="feature-col">├ûzellikler</th>
                       {comparedProducts.map(p => (
                         <th key={p.id} className="product-col">
                           <div className="compare-product-header">
                             <button 
                               className="compare-product-remove" 
                               onClick={() => toggleCompareProduct(p)}
-                              title="Bu Ürünü Kaldır"
+                              title="Bu ├£r├╝n├╝ Kald─▒r"
                             >
-                              ✕ Kaldır
+                              Ô£ò Kald─▒r
                             </button>
                             <div className="compare-product-img">
                               <img src={p.imageUrl} alt={p.name} />
@@ -5096,59 +5056,59 @@ export default function Home() {
                   <tbody>
                     {/* Fiyatlar */}
                     <tr className="section-row">
-                      <td colSpan={comparedProducts.length + 1}>Pazar Yeri ve En Düşük Bayi Fiyatları</td>
+                      <td colSpan={comparedProducts.length + 1}>Pazar Yeri ve En D├╝┼ş├╝k Bayi Fiyatlar─▒</td>
                     </tr>
                     <tr>
-                      <td className="feature-name">En Düşük Bayi Fiyatı</td>
+                      <td className="feature-name">En D├╝┼ş├╝k Bayi Fiyat─▒</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value highlight-gold">
-                          {p.cheapestOffer?.price ? `${p.cheapestOffer.price} TL/m²` : 'Bilinmiyor'}
+                          {p.cheapestOffer?.price ? `${p.cheapestOffer.price} TL/m┬▓` : 'Bilinmiyor'}
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td className="feature-name">Trendyol Fiyatı</td>
+                      <td className="feature-name">Trendyol Fiyat─▒</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value">
                           {p.trendyolPrice ? (
                             <a href={p.trendyolUrl} target="_blank" rel="noopener noreferrer" className="marketplace-link trendyol">
-                              {p.trendyolPrice} TL <span className="buy-arrow">↗</span>
+                              {p.trendyolPrice} TL <span className="buy-arrow">Ôåù</span>
                             </a>
-                          ) : 'Satışta Değil'}
+                          ) : 'Sat─▒┼şta De─şil'}
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td className="feature-name">Hepsiburada Fiyatı</td>
+                      <td className="feature-name">Hepsiburada Fiyat─▒</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value">
                           {p.hepsiPrice ? (
                             <a href={p.hepsiburadaUrl} target="_blank" rel="noopener noreferrer" className="marketplace-link hepsiburada">
-                              {p.hepsiPrice} TL <span className="buy-arrow">↗</span>
+                              {p.hepsiPrice} TL <span className="buy-arrow">Ôåù</span>
                             </a>
-                          ) : 'Satışta Değil'}
+                          ) : 'Sat─▒┼şta De─şil'}
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td className="feature-name">Koçtaş Fiyatı</td>
+                      <td className="feature-name">Ko├ğta┼ş Fiyat─▒</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value">
                           {p.koctasPrice ? (
                             <a href={p.koctasUrl} target="_blank" rel="noopener noreferrer" className="marketplace-link koctas">
-                              {p.koctasPrice} TL <span className="buy-arrow">↗</span>
+                              {p.koctasPrice} TL <span className="buy-arrow">Ôåù</span>
                             </a>
-                          ) : 'Satışta Değil'}
+                          ) : 'Sat─▒┼şta De─şil'}
                         </td>
                       ))}
                     </tr>
 
-                    {/* Boyut ve Görünüm */}
+                    {/* Boyut ve G├Âr├╝n├╝m */}
                     <tr className="section-row">
-                      <td colSpan={comparedProducts.length + 1}>Boyut ve Görünüm Detayları</td>
+                      <td colSpan={comparedProducts.length + 1}>Boyut ve G├Âr├╝n├╝m Detaylar─▒</td>
                     </tr>
                     <tr>
-                      <td className="feature-name">Ebat (Genişlik x Yükseklik)</td>
+                      <td className="feature-name">Ebat (Geni┼şlik x Y├╝kseklik)</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value">{p.width}x{p.height} cm</td>
                       ))}
@@ -5163,71 +5123,71 @@ export default function Home() {
                       ))}
                     </tr>
                     <tr>
-                      <td className="feature-name">Bitiş / Yüzey</td>
+                      <td className="feature-name">Biti┼ş / Y├╝zey</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value">{p.finish}</td>
                       ))}
                     </tr>
                     <tr>
-                      <td className="feature-name">Stil / Tasarım</td>
+                      <td className="feature-name">Stil / Tasar─▒m</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value">{p.style}</td>
                       ))}
                     </tr>
 
-                    {/* Teknik Özellikler */}
+                    {/* Teknik ├ûzellikler */}
                     <tr className="section-row">
-                      <td colSpan={comparedProducts.length + 1}>Teknik Dayanıklılık Değerleri</td>
+                      <td colSpan={comparedProducts.length + 1}>Teknik Dayan─▒kl─▒l─▒k De─şerleri</td>
                     </tr>
                     <tr>
-                      <td className="feature-name">Aşınma Dayanımı (PEI Sınıfı)</td>
+                      <td className="feature-name">A┼ş─▒nma Dayan─▒m─▒ (PEI S─▒n─▒f─▒)</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value">
                           {p.peiRating ? (
                             <span className={`tech-badge pei-class-${p.peiRating}`}>
-                              PEI {p.peiRating} ({p.peiRating >= 4 ? 'Yoğun Trafik' : 'Orta Trafik'})
+                              PEI {p.peiRating} ({p.peiRating >= 4 ? 'Yo─şun Trafik' : 'Orta Trafik'})
                             </span>
                           ) : (
-                            <span className="text-muted">Belirtilmemiş</span>
+                            <span className="text-muted">Belirtilmemi┼ş</span>
                           )}
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td className="feature-name">Kaymazlık Sınıfı (R Değeri)</td>
+                      <td className="feature-name">Kaymazl─▒k S─▒n─▒f─▒ (R De─şeri)</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value">
                           {p.slipResistance ? (
                             <span className={`tech-badge slip-class-${p.slipResistance}`}>
-                              {p.slipResistance} ({p.slipResistance === 'R11' ? 'Islak Alan/Dış Mekan' : p.slipResistance === 'R10' ? 'Mutfak/Banyo Yer' : 'İç Mekan Duvar/Yer'})
+                              {p.slipResistance} ({p.slipResistance === 'R11' ? 'Islak Alan/D─▒┼ş Mekan' : p.slipResistance === 'R10' ? 'Mutfak/Banyo Yer' : '─░├ğ Mekan Duvar/Yer'})
                             </span>
                           ) : (
-                            <span className="text-muted">Belirtilmemiş</span>
+                            <span className="text-muted">Belirtilmemi┼ş</span>
                           )}
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td className="feature-name">Dona Dayanıklılık</td>
+                      <td className="feature-name">Dona Dayan─▒kl─▒l─▒k</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value">
                           {p.frostResistance !== null ? (
                             p.frostResistance ? (
-                              <span className="tech-badge success">✓ Dona Dayanıklı (Dış Mekan Uygun)</span>
+                              <span className="tech-badge success">Ô£ô Dona Dayan─▒kl─▒ (D─▒┼ş Mekan Uygun)</span>
                             ) : (
-                              <span className="tech-badge danger">✗ Dona Dayanıklı Değil (Sadece İç Mekan)</span>
+                              <span className="tech-badge danger">Ô£ù Dona Dayan─▒kl─▒ De─şil (Sadece ─░├ğ Mekan)</span>
                             )
                           ) : (
-                            <span className="text-muted">Belirtilmemiş</span>
+                            <span className="text-muted">Belirtilmemi┼ş</span>
                           )}
                         </td>
                       ))}
                     </tr>
                     <tr>
-                      <td className="feature-name">Kalınlık</td>
+                      <td className="feature-name">Kal─▒nl─▒k</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value">
-                          {p.thickness ? `${p.thickness} mm` : <span className="text-muted">Belirtilmemiş</span>}
+                          {p.thickness ? `${p.thickness} mm` : <span className="text-muted">Belirtilmemi┼ş</span>}
                         </td>
                       ))}
                     </tr>
@@ -5237,12 +5197,12 @@ export default function Home() {
                         <td key={p.id} className="feature-value">
                           {p.rectified !== null ? (
                             p.rectified ? (
-                              <span className="tech-badge info">✓ Rektifiyeli (Sıfır Derz Uyumlu)</span>
+                              <span className="tech-badge info">Ô£ô Rektifiyeli (S─▒f─▒r Derz Uyumlu)</span>
                             ) : (
-                              <span className="tech-badge warning">✗ Rektifiyesiz (Derzli Döşeme)</span>
+                              <span className="tech-badge warning">Ô£ù Rektifiyesiz (Derzli D├Â┼şeme)</span>
                             )
                           ) : (
-                            <span className="text-muted">Belirtilmemiş</span>
+                            <span className="text-muted">Belirtilmemi┼ş</span>
                           )}
                         </td>
                       ))}
@@ -10019,69 +9979,6 @@ export default function Home() {
             justify-content: space-between !important;
             width: 100% !important;
           }
-        }
-
-        .accordion-section {
-          border-bottom: 1px solid var(--border-color);
-          padding-bottom: 16px;
-          margin-bottom: 16px;
-        }
-        .accordion-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          cursor: pointer;
-          user-select: none;
-          padding: 4px 0;
-        }
-        .accordion-title {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: var(--text-primary);
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-        .clear-all-filters-btn {
-          background: none;
-          border: none;
-          color: #64748b;
-          font-size: 0.8rem;
-          cursor: pointer;
-          text-decoration: underline;
-          transition: color 0.2s;
-        }
-        .clear-all-filters-btn:hover {
-          color: var(--accent-gold);
-        }
-        .scrollable-ebat-list {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          max-height: 240px;
-          overflow-y: auto;
-          padding-right: 4px;
-        }
-        .scrollable-ebat-list::-webkit-scrollbar {
-          width: 4px;
-        }
-        .scrollable-ebat-list::-webkit-scrollbar-track {
-          background: #f1f5f9;
-          border-radius: 2px;
-        }
-        .scrollable-ebat-list::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 2px;
-        }
-        .scrollable-ebat-list::-webkit-scrollbar-thumb:hover {
-          background: var(--accent-gold);
-        }
-        .filter-header-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          border-bottom: 1px solid var(--border-color);
-          padding-bottom: 16px;
-          margin-bottom: 16px;
         }
       `}</style>
     </main>

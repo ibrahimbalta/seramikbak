@@ -1,0 +1,743 @@
+﻿diff --git a/src/app/page.js b/src/app/page.js
+index 515859c..009ad51 100644
+--- a/src/app/page.js
++++ b/src/app/page.js
+@@ -342,7 +342,7 @@ function getProductBadge(product, idx) {
+ 
+ export default function Home() {
+   // Page Preloader State
+-  const [pageLoading, setPageLoading] = useState(true);
++  const [pageLoading, setPageLoading] = useState(false);
+   const [initialBrandsLoaded, setInitialBrandsLoaded] = useState(false);
+   const [initialProductsLoaded, setInitialProductsLoaded] = useState(false);
+ 
+@@ -876,6 +876,8 @@ export default function Home() {
+         if (selectedStyle) params.append('style', selectedStyle);
+         if (selectedArea) params.append('area', selectedArea);
+         if (selectedSize) params.append('size', selectedSize);
++        if (selectedRectified) params.append('rectified', selectedRectified);
++        if (selectedFrost) params.append('frost', selectedFrost);
+         url += params.toString();
+       }
+       const res = await fetch(url);
+@@ -904,7 +906,7 @@ export default function Home() {
+ 
+   useEffect(() => {
+     fetchProducts();
+-  }, [sortBy, searchQuery, selectedBrand, selectedColor, selectedFinish, selectedStyle, selectedArea, selectedSize]);
++  }, [sortBy, searchQuery, selectedBrand, selectedColor, selectedFinish, selectedStyle, selectedArea, selectedSize, selectedRectified, selectedFrost]);
+ 
+   const handleSearchSubmit = (e) => {
+     e.preventDefault();
+@@ -1733,27 +1735,7 @@ export default function Home() {
+     setStripeLoading(false);
+   };
+ 
+-  if (pageLoading) {
+-    return (
+-      <main className="main-layout" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at center, #0b0f19 0%, #02040a 100%)' }}>
+-        <div className="page-loader-overlay">
+-          <div className="loader-container">
+-            <div className="ceramic-tile-spinner">
+-              <div className="tile-face face-front"></div>
+-              <div className="tile-face face-back"></div>
+-            </div>
+-            <h2 className="loader-brand-name">
+-              <span>Seramik</span><span className="gold-text">Bak</span>
+-            </h2>
+-            <p className="loader-status-text">Premium seramik katalo─şu y├╝kleniyor...</p>
+-            <div className="loader-progress-bar">
+-              <div className="loader-progress-line"></div>
+-            </div>
+-          </div>
+-        </div>
+-      </main>
+-    );
+-  }
++  // Preloader removed to show main catalog instantly
+ 
+   return (
+     <main className="main-layout">
+@@ -2635,321 +2617,337 @@ export default function Home() {
+             <div className="main-search-and-results-layout">
+               {/* Left Sidebar Filter Section */}
+               <aside className="filters-sidebar-new glass-panel" style={{ position: 'relative' }}>
+-                <h3 className="filter-title-main">Filtreleme</h3>
++                <div className="filter-header-row">
++                  <h3 className="filter-title-main" style={{ fontSize: '1.2rem', fontWeight: '750', color: '#0f172a', margin: 0, border: 'none', padding: 0 }}>Filtreler</h3>
++                  <button onClick={() => {
++                    setSelectedBrand('');
++                    setSelectedColor('');
++                    setSelectedFinish('');
++                    setSelectedStyle('');
++                    setSelectedArea('');
++                    setSelectedSize('');
++                    setSelectedRectified('');
++                    setSelectedFrost('');
++                    setSearchQuery('');
++                    setUploadedImagePreview(null);
++                    setVisualSearchMatches(null);
++                    fetchProducts('clear=true');
++                  }} className="clear-all-filters-btn">
++                    T├╝m├╝n├╝ Temizle
++                  </button>
++                </div>
+ 
+-                {/* EBAT Checkboxes */}
+-                <div className="filter-group-new">
+-                  <h4 className="filter-group-title">EBAT</h4>
+-                  <div className="checkboxes-list-new" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+-                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+-                      <input 
+-                        type="checkbox" 
+-                        checked={selectedSize === '30x60'} 
+-                        onChange={() => setSelectedSize(selectedSize === '30x60' ? '' : '30x60')}
+-                      />
+-                      <span className="checkbox-custom-box" />
+-                      <span className="checkbox-text-label">30x60</span>
+-                      
+-                      <div className="size-guide-tooltip">
+-                        <span className="tooltip-title">Boyut K─▒yaslama</span>
+-                        <div className="size-guide-viz">
+-                          <div className="viz-human">
+-                            <div className="viz-human-head"></div>
+-                            <div className="viz-human-body"></div>
+-                            <span className="viz-lbl">─░nsan (175 cm)</span>
+-                          </div>
+-                          <div className="viz-tile size-30x60" style={{ width: '14px', height: '27px', background: '#cbd5e1', border: '1px solid #94a3b8' }}>
+-                            <span className="viz-lbl">30x60 cm</span>
+-                          </div>
+-                        </div>
+-                      </div>
+-                    </label>
++                {/* 1. KATEGOR─░LER */}
++                <div className="accordion-section">
++                  <div className="accordion-header" onClick={() => toggleSection('categories')}>
++                    <span className="accordion-title">Kategoriler</span>
++                    <ChevronDown size={16} style={{ transform: expandedSections.categories ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
++                  </div>
++                  {expandedSections.categories && (
++                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
++                      {['Mermer', 'Ah┼şap', 'Beton', 'Ta┼ş'].map(styleVal => (
++                        <label key={styleVal} className="checkbox-label-wrapper">
++                          <input 
++                            type="checkbox" 
++                            checked={selectedStyle === styleVal} 
++                            onChange={() => setSelectedStyle(selectedStyle === styleVal ? '' : styleVal)}
++                          />
++                          <span className="checkbox-custom-box" />
++                          <span className="checkbox-text-label">{styleVal}</span>
++                        </label>
++                      ))}
++                    </div>
++                  )}
++                </div>
+ 
+-                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+-                      <input 
+-                        type="checkbox" 
+-                        checked={selectedSize === '60x60'} 
+-                        onChange={() => setSelectedSize(selectedSize === '60x60' ? '' : '60x60')}
+-                      />
+-                      <span className="checkbox-custom-box" />
+-                      <span className="checkbox-text-label">60x60</span>
+-
+-                      <div className="size-guide-tooltip">
+-                        <span className="tooltip-title">Boyut K─▒yaslama</span>
+-                        <div className="size-guide-viz">
+-                          <div className="viz-human">
+-                            <div className="viz-human-head"></div>
+-                            <div className="viz-human-body"></div>
+-                            <span className="viz-lbl">─░nsan (175 cm)</span>
+-                          </div>
+-                          <div className="viz-tile size-60x60">
+-                            <span className="viz-lbl">60x60 cm</span>
+-                          </div>
+-                        </div>
+-                      </div>
+-                    </label>
++                {/* 2. KOLEKS─░YON */}
++                <div className="accordion-section">
++                  <div className="accordion-header" onClick={() => toggleSection('collection')}>
++                    <span className="accordion-title">Koleksiyon</span>
++                    <ChevronDown size={16} style={{ transform: expandedSections.collection ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
++                  </div>
++                  {expandedSections.collection && (
++                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
++                      {brands.map(brand => (
++                        <label key={brand.id} className="checkbox-label-wrapper">
++                          <input 
++                            type="checkbox" 
++                            checked={selectedBrand === brand.id} 
++                            onChange={() => setSelectedBrand(selectedBrand === brand.id ? '' : brand.id)}
++                          />
++                          <span className="checkbox-custom-box" />
++                          <span className="checkbox-text-label">{brand.name}</span>
++                        </label>
++                      ))}
++                    </div>
++                  )}
++                </div>
+ 
+-                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+-                      <input 
+-                        type="checkbox" 
+-                        checked={selectedSize === '60x120'} 
+-                        onChange={() => setSelectedSize(selectedSize === '60x120' ? '' : '60x120')}
+-                      />
+-                      <span className="checkbox-custom-box" />
+-                      <span className="checkbox-text-label">60x120</span>
+-
+-                      <div className="size-guide-tooltip">
+-                        <span className="tooltip-title">Boyut K─▒yaslama</span>
+-                        <div className="size-guide-viz">
+-                          <div className="viz-human">
+-                            <div className="viz-human-head"></div>
+-                            <div className="viz-human-body"></div>
+-                            <span className="viz-lbl">─░nsan (175 cm)</span>
+-                          </div>
+-                          <div className="viz-tile size-60x120">
+-                            <span className="viz-lbl">60x120 cm</span>
+-                          </div>
+-                        </div>
+-                      </div>
+-                    </label>
++                {/* 3. DOKU */}
++                <div className="accordion-section">
++                  <div className="accordion-header" onClick={() => toggleSection('texture')}>
++                    <span className="accordion-title">Doku</span>
++                    <ChevronDown size={16} style={{ transform: expandedSections.texture ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
++                  </div>
++                  {expandedSections.texture && (
++                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
++                      {['Beyaz', 'Bej', 'Gri', 'Antrasit', 'Kahverengi'].map(colorVal => (
++                        <label key={colorVal} className="checkbox-label-wrapper">
++                          <input 
++                            type="checkbox" 
++                            checked={selectedColor === colorVal} 
++                            onChange={() => setSelectedColor(selectedColor === colorVal ? '' : colorVal)}
++                          />
++                          <span className="checkbox-custom-box" />
++                          <span className="checkbox-text-label">{colorVal}</span>
++                        </label>
++                      ))}
++                    </div>
++                  )}
++                </div>
+ 
+-                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+-                      <input 
+-                        type="checkbox" 
+-                        checked={selectedSize === '80x80'} 
+-                        onChange={() => setSelectedSize(selectedSize === '80x80' ? '' : '80x80')}
+-                      />
+-                      <span className="checkbox-custom-box" />
+-                      <span className="checkbox-text-label">80x80</span>
+-
+-                      <div className="size-guide-tooltip">
+-                        <span className="tooltip-title">Boyut K─▒yaslama</span>
+-                        <div className="size-guide-viz">
+-                          <div className="viz-human">
+-                            <div className="viz-human-head"></div>
+-                            <div className="viz-human-body"></div>
+-                            <span className="viz-lbl">─░nsan (175 cm)</span>
+-                          </div>
+-                          <div className="viz-tile size-80x80">
+-                            <span className="viz-lbl">80x80 cm</span>
+-                          </div>
+-                        </div>
+-                      </div>
+-                    </label>
++                {/* 4. EBAT */}
++                <div className="accordion-section">
++                  <div className="accordion-header" onClick={() => toggleSection('ebat')}>
++                    <span className="accordion-title">Ebat</span>
++                    <ChevronDown size={16} style={{ transform: expandedSections.ebat ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
++                  </div>
++                  {expandedSections.ebat && (
++                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
++                      <div className="scrollable-ebat-list">
++                        {[
++                          '120x240', '120x120', '60x120', '20x120', '80x80', 
++                          '60x60', '30x60', '31,5x61,5', '42x42', '60x90', 
++                          '61x61', '80x160', '30x85', '33x66', '21x122', 
++                          '15x60', '240x240', '360x240', '100x100', '40x120', 
++                          '30x120', '30x90', '30x40', '20x40', '19,7x19,7'
++                        ].map(sizeVal => {
++                          const parts = sizeVal.replace(',', '.').split('x');
++                          const wCm = parseFloat(parts[0]) || 0;
++                          const hCm = parseFloat(parts[1]) || 0;
++                          const scale = 80 / 175;
++                          const wPx = Math.max(4, Math.round(wCm * scale));
++                          const hPx = Math.max(4, Math.round(hCm * scale));
+ 
+-                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+-                      <input 
+-                        type="checkbox" 
+-                        checked={selectedSize === '120x120'} 
+-                        onChange={() => setSelectedSize(selectedSize === '120x120' ? '' : '120x120')}
+-                      />
+-                      <span className="checkbox-custom-box" />
+-                      <span className="checkbox-text-label">120x120</span>
+-
+-                      <div className="size-guide-tooltip">
+-                        <span className="tooltip-title">Boyut K─▒yaslama</span>
+-                        <div className="size-guide-viz">
+-                          <div className="viz-human">
+-                            <div className="viz-human-head"></div>
+-                            <div className="viz-human-body"></div>
+-                            <span className="viz-lbl">─░nsan (175 cm)</span>
+-                          </div>
+-                          <div className="viz-tile size-120x120">
+-                            <span className="viz-lbl">120x120 cm</span>
+-                          </div>
+-                        </div>
++                          return (
++                            <label key={sizeVal} className="checkbox-label-wrapper" style={{ position: 'relative' }}>
++                              <input 
++                                type="checkbox" 
++                                checked={selectedSize === sizeVal} 
++                                onChange={() => setSelectedSize(selectedSize === sizeVal ? '' : sizeVal)}
++                              />
++                              <span className="checkbox-custom-box" />
++                              <span className="checkbox-text-label">{sizeVal}</span>
++                              
++                              <div className="size-guide-tooltip">
++                                <span className="tooltip-title">Boyut K─▒yaslama</span>
++                                <div className="size-guide-viz">
++                                  <div className="viz-human">
++                                    <div className="viz-human-head"></div>
++                                    <div className="viz-human-body"></div>
++                                    <span className="viz-lbl">─░nsan (175 cm)</span>
++                                  </div>
++                                  <div className="viz-tile" style={{ width: `${wPx}px`, height: `${hPx}px`, background: 'var(--accent-gold)', border: '1px solid rgba(255,255,255,0.3)' }}>
++                                    <span className="viz-lbl">{sizeVal} cm</span>
++                                  </div>
++                                </div>
++                              </div>
++                            </label>
++                          );
++                        })}
+                       </div>
+-                    </label>
+-                  </div>
+-                  <button onClick={() => setSelectedSize('')} className="show-all-filter-link" style={{ marginTop: '8px' }}>T├╝m├╝n├╝ G├Âster</button>
++                    </div>
++                  )}
+                 </div>
+ 
+-                {/* RENK Swatches */}
+-                <div className="filter-group-new">
+-                  <h4 className="filter-group-title">RENK</h4>
+-                  <div className="color-swatches-grid-new">
+-                    <button 
+-                      onClick={() => setSelectedColor('Beyaz')}
+-                      className={`color-swatch-circle-btn ${selectedColor === 'Beyaz' ? 'active' : ''}`}
+-                      style={{ backgroundColor: '#ffffff', border: '1px solid #ddd' }}
+-                      title="Beyaz"
+-                    />
+-                    <button 
+-                      onClick={() => setSelectedColor('Bej')}
+-                      className={`color-swatch-circle-btn ${selectedColor === 'Bej' ? 'active' : ''}`}
+-                      style={{ backgroundColor: '#e3d6c3' }}
+-                      title="Bej"
+-                    />
+-                    <button 
+-                      onClick={() => setSelectedColor('Gri')}
+-                      className={`color-swatch-circle-btn ${selectedColor === 'Gri' ? 'active' : ''}`}
+-                      style={{ backgroundColor: '#a0a4ab' }}
+-                      title="Gri"
+-                    />
+-                    <button 
+-                      onClick={() => setSelectedColor('Antrasit')}
+-                      className={`color-swatch-circle-btn ${selectedColor === 'Antrasit' ? 'active' : ''}`}
+-                      style={{ backgroundColor: '#374151' }}
+-                      title="Antrasit"
+-                    />
+-                    <button 
+-                      onClick={() => setSelectedColor('Kahverengi')}
+-                      className={`color-swatch-circle-btn ${selectedColor === 'Kahverengi' ? 'active' : ''}`}
+-                      style={{ backgroundColor: '#8a5a36' }}
+-                      title="Kahverengi"
+-                    />
+-                    <button 
+-                      onClick={() => setSelectedColor('')}
+-                      className={`color-swatch-all-btn ${selectedColor === '' ? 'active' : ''}`}
+-                    >
+-                      T├╝m├╝
+-                    </button>
++                {/* 5. ├£R├£N T─░P─░ */}
++                <div className="accordion-section">
++                  <div className="accordion-header" onClick={() => toggleSection('productType')}>
++                    <span className="accordion-title">├£r├╝n Tipi</span>
++                    <ChevronDown size={16} style={{ transform: expandedSections.productType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                   </div>
++                  {expandedSections.productType && (
++                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
++                      {['Mat', 'Parlak', 'Lapatto'].map(finishVal => (
++                        <label key={finishVal} className="checkbox-label-wrapper">
++                          <input 
++                            type="checkbox" 
++                            checked={selectedFinish === finishVal} 
++                            onChange={() => setSelectedFinish(selectedFinish === finishVal ? '' : finishVal)}
++                          />
++                          <span className="checkbox-custom-box" />
++                          <span className="checkbox-text-label">{finishVal === 'Parlak' ? 'Parlak (Cams─▒)' : finishVal === 'Lapatto' ? 'Lapatto (Yar─▒ Parlak)' : finishVal}</span>
++                        </label>
++                      ))}
++                    </div>
++                  )}
+                 </div>
+ 
+-                {/* Brand and Surface selects */}
+-                <div className="filter-group-new select-group">
+-                  <h4 className="filter-group-title">Marka</h4>
+-                  <select className="simple-filter-select" value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)}>
+-                    <option value="">T├╝m Markalar</option>
+-                    {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+-                  </select>
++                {/* 6. ├£R├£N ├ûZELL─░K */}
++                <div className="accordion-section">
++                  <div className="accordion-header" onClick={() => toggleSection('productFeature')}>
++                    <span className="accordion-title">├£r├╝n ├ûzellik</span>
++                    <ChevronDown size={16} style={{ transform: expandedSections.productFeature ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
++                  </div>
++                  {expandedSections.productFeature && (
++                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
++                      <label className="checkbox-label-wrapper">
++                        <input 
++                          type="checkbox" 
++                          checked={selectedRectified === 'true'} 
++                          onChange={() => setSelectedRectified(selectedRectified === 'true' ? '' : 'true')}
++                        />
++                        <span className="checkbox-custom-box" />
++                        <span className="checkbox-text-label">Rektifiyeli</span>
++                      </label>
++                      <label className="checkbox-label-wrapper">
++                        <input 
++                          type="checkbox" 
++                          checked={selectedFrost === 'true'} 
++                          onChange={() => setSelectedFrost(selectedFrost === 'true' ? '' : 'true')}
++                        />
++                        <span className="checkbox-custom-box" />
++                        <span className="checkbox-text-label">Dona Dayan─▒kl─▒</span>
++                      </label>
++                    </div>
++                  )}
+                 </div>
+-                
+-                <div className="filter-group-new select-group">
+-                  <h4 className="filter-group-title">Y├╝zey</h4>
+-                  <select className="simple-filter-select" value={selectedFinish} onChange={(e) => setSelectedFinish(e.target.value)}>
+-                    <option value="">T├╝m Y├╝zeyler</option>
+-                    <option value="Mat">Mat</option>
+-                    <option value="Parlak">Parlak (Cams─▒)</option>
+-                    <option value="Lapatto">Lapatto (Yar─▒ Parlak)</option>
+-                  </select>
++
++                {/* 7. MEKAN T─░P─░ */}
++                <div className="accordion-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>
++                  <div className="accordion-header" onClick={() => toggleSection('spaceType')}>
++                    <span className="accordion-title">Mekan Tipi</span>
++                    <ChevronDown size={16} style={{ transform: expandedSections.spaceType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
++                  </div>
++                  {expandedSections.spaceType && (
++                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
++                      {['Banyo', 'Mutfak', 'Salon', 'Balkon', 'Koridor', 'Teras'].map(areaVal => (
++                        <label key={areaVal} className="checkbox-label-wrapper">
++                          <input 
++                            type="checkbox" 
++                            checked={selectedArea === areaVal} 
++                            onChange={() => setSelectedArea(selectedArea === areaVal ? '' : areaVal)}
++                          />
++                          <span className="checkbox-custom-box" />
++                          <span className="checkbox-text-label">{areaVal}</span>
++                        </label>
++                      ))}
++                    </div>
++                  )}
+                 </div>
+               </aside>
+ 
+               {/* Right Side Content Results area */}
+               <div className="results-container-new">
+-                <div className="results-header-row-new">
++                <div className="results-header-row-new" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', marginBottom: '20px' }}>
+                   <div className="results-header-text-new">
+                     {uploadedImagePreview ? (
+-                      <>
+-                        <h3>G├Ârsel Arama Sonu├ğlar─▒ <span className="results-new-badge gold">AI E┼şle┼şme</span></h3>
+-                        <p>Y├╝kledi─şiniz g├Ârselle benzer doku ve renkteki ├╝r├╝nler listeleniyor.</p>
+-                      </>
++                      <h3>G├Ârsel Arama Sonu├ğlar─▒ <span className="results-new-badge gold">AI E┼şle┼şme</span></h3>
+                     ) : (
+-                      <>
+-                        <h3>Yeni Eklenen ├£r├╝nler <span className="results-new-badge">Yeni</span></h3>
+-                        <p>En yeni seramik koleksiyonlar─▒n─▒ ke┼şfedin.</p>
+-                      </>
++                      <h3>Katalog Sonu├ğlar─▒</h3>
+                     )}
+                   </div>
+-                  <div className="results-header-actions-new">
+-                    <button onClick={() => { 
+-                      setSelectedBrand(''); 
+-                      setSelectedColor(''); 
+-                      setSelectedFinish(''); 
+-                      setSelectedStyle(''); 
+-                      setSelectedArea(''); 
+-                      setSelectedSize(''); 
+-                      setSearchQuery(''); 
+-                      setUploadedImagePreview(null);
+-                      setVisualSearchMatches(null);
+-                      fetchProducts('clear=true'); 
+-                    }} className="view-all-results-link">Temizle / T├╝m├╝n├╝ G├Âr</button>
+-                    <div className="results-slider-arrows-new">
+-                      <button className="slider-arrow-btn-new">ÔØ«</button>
+-                      <button className="slider-arrow-btn-new">ÔØ»</button>
++                  <div className="results-header-actions-new" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
++                    <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>
++                      Sonu├ğ: <strong style={{ color: '#0f172a' }}>{products.length}</strong>
+                     </div>
+                   </div>
+                 </div>
+ 
+                 {/* Main Grid */}
+                 <div className="products-grid-new">
+-                  {products.map((product, idx) => {
+-                    const hasAd = product.campaigns && product.campaigns.length > 0;
+-                    return (
+-                      <div 
+-                        key={product.id}
+-                        onClick={() => handleProductCardClick(product)}
+-                        className={`product-card-new glass-panel ${activeProduct?.id === product.id ? 'active' : ''} ${hasAd ? 'sponsored-card-new' : ''}`}
+-                      >
+-                        {/* Thumbnail Texture Container */}
+-                        <div className="card-texture-container-new">
+-                          <TileVisualPreview 
+-                            style={product.style} 
+-                            color={product.color} 
+-                            finish={product.finish}
+-                            width={product.width}
+-                            height={product.height}
+-                            imageUrl={product.imageUrl}
+-                          />
+-                          
+-                          {/* Compare button overlay */}
+-                          <button 
+-                            className={`card-compare-btn-overlay ${comparedProducts.some(p => p.id === product.id) ? 'active' : ''}`} 
+-                            onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
+-                            title="Kar┼ş─▒la┼şt─▒r"
+-                          >
+-                            <span className="compare-icon-indicator">
+-                              {comparedProducts.some(p => p.id === product.id) ? 'Ô£ô' : '+'}
+-                            </span>
+-                            <span>{comparedProducts.some(p => p.id === product.id) ? 'Se├ğildi' : 'Kar┼ş─▒la┼şt─▒r'}</span>
+-                          </button>
+-                          
+-                          {/* Heart icon button overlay */}
+-                          <button 
+-                            className="card-favorites-heart-btn" 
+-                            onClick={(e) => { e.stopPropagation(); alert(`${product.name} favorilerinize eklendi!`); }}
+-                            title="Favorilerime Ekle"
+-                          >
+-                            <HeartIcon size={16} />
+-                          </button>
+-
+-                          {/* Hover action layout */}
+-                          <div className="card-quick-actions-row">
++                  {!initialProductsLoaded ? (
++                    <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', gap: '12px' }}>
++                      <Loader2 className="animate-spin" size={32} style={{ color: 'var(--accent-gold)' }} />
++                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>├£r├╝nler y├╝kleniyor...</span>
++                    </div>
++                  ) : (
++                    products.map((product, idx) => {
++                      const hasAd = product.campaigns && product.campaigns.length > 0;
++                      return (
++                        <div 
++                          key={product.id}
++                          onClick={() => handleProductCardClick(product)}
++                          className={`product-card-new glass-panel ${activeProduct?.id === product.id ? 'active' : ''} ${hasAd ? 'sponsored-card-new' : ''}`}
++                        >
++                          {/* Thumbnail Texture Container */}
++                          <div className="card-texture-container-new">
++                            <TileVisualPreview 
++                              style={product.style} 
++                              color={product.color} 
++                              finish={product.finish}
++                              width={product.width}
++                              height={product.height}
++                              imageUrl={product.imageUrl}
++                            />
++                            
++                            {/* Compare button overlay */}
+                             <button 
+-                              onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
+-                              className="btn-primary card-action-btn-new"
++                              className={`card-compare-btn-overlay ${comparedProducts.some(p => p.id === product.id) ? 'active' : ''}`} 
++                              onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
++                              title="Kar┼ş─▒la┼şt─▒r"
+                             >
+-                              3D Dene
++                              <span className="compare-icon-indicator">
++                                {comparedProducts.some(p => p.id === product.id) ? 'Ô£ô' : '+'}
++                              </span>
++                              <span>{comparedProducts.some(p => p.id === product.id) ? 'Se├ğildi' : 'Kar┼ş─▒la┼şt─▒r'}</span>
+                             </button>
++                            
++                            {/* Heart icon button overlay */}
+                             <button 
+-                              onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}
+-                              className="btn-secondary card-action-btn-new"
++                              className="card-favorites-heart-btn" 
++                              onClick={(e) => { e.stopPropagation(); handleToggleFavorite(product.id); }}
++                              title="Favorilerime Ekle"
+                             >
+-                              Bayi Bul
++                              <HeartIcon size={16} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
+                             </button>
++
++                            {/* Hover action layout */}
++                            <div className="card-quick-actions-row">
++                              <button 
++                                onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
++                                className="btn-primary card-action-btn-new"
++                              >
++                                3D Dene
++                              </button>
++                              <button 
++                                onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}
++                                className="btn-secondary card-action-btn-new"
++                              >
++                                Bayi Bul
++                              </button>
++                            </div>
+                           </div>
+-                        </div>
+ 
+-                        {/* Card Meta Content */}
+-                        <div className="card-text-details-new">
+-                          <div className="card-badges-row-new">
+-                            {(() => {
+-                              const badge = getProductBadge(product, idx);
+-                              return (
+-                                <span className={`card-badge-tag-new ${badge.className}`}>
+-                                  {badge.text}
++                          {/* Card Meta Content */}
++                          <div className="card-text-details-new">
++                            <div className="card-badges-row-new">
++                              {(() => {
++                                const badge = getProductBadge(product, idx);
++                                return (
++                                  <span className={`card-badge-tag-new ${badge.className}`}>
++                                    {badge.text}
++                                  </span>
++                                );
++                              })()}
++                              <span className="card-badge-tag-new grey">{product.finish}</span>
++                              {product.similarityScore !== undefined && product.similarityScore > 0 && (
++                                <span className="card-badge-tag-new gold animate-pulse">
++                                  %{product.similarityScore} E┼şle┼şme
+                                 </span>
+-                              );
+-                            })()}
+-                            <span className="card-badge-tag-new grey">{product.finish}</span>
+-                            {product.similarityScore !== undefined && product.similarityScore > 0 && (
+-                              <span className="card-badge-tag-new gold animate-pulse">
+-                                %{product.similarityScore} E┼şle┼şme
+-                              </span>
+-                            )}
++                              )}
++                            </div>
++                            
++                            <h4 className="card-title-new">{product.name}</h4>
++                            <p className="card-specs-new">{product.width}x{product.height} cm</p>
++                            <p className="card-brand-new">{product.brand?.name}</p>
+                           </div>
+-                          
+-                          <h4 className="card-title-new">{product.name}</h4>
+-                          <p className="card-specs-new">{product.width}x{product.height} cm</p>
+-                          <p className="card-brand-new">{product.brand?.name}</p>
+                         </div>
+-                      </div>
+-                    );
+-                  })}
++                      );
++                    })
++                  )}
+ 
+-                  {products.length === 0 && (
++                  {initialProductsLoaded && products.length === 0 && (
+                     <div className="empty-results glass-panel w-full" style={{ gridColumn: '1/-1' }}>
+                       <HelpCircle size={40} className="empty-icon" />
+                       <h4>Arad─▒─ş─▒n─▒z model bulunamad─▒</h4>
+@@ -9980,6 +9978,69 @@ export default function Home() {
+             width: 100% !important;
+           }
+         }
++
++        .accordion-section {
++          border-bottom: 1px solid var(--border-color);
++          padding-bottom: 16px;
++          margin-bottom: 16px;
++        }
++        .accordion-header {
++          display: flex;
++          justify-content: space-between;
++          align-items: center;
++          cursor: pointer;
++          user-select: none;
++          padding: 4px 0;
++        }
++        .accordion-title {
++          font-size: 0.85rem;
++          font-weight: 600;
++          color: var(--text-primary);
++          text-transform: uppercase;
++          letter-spacing: 0.05em;
++        }
++        .clear-all-filters-btn {
++          background: none;
++          border: none;
++          color: #64748b;
++          font-size: 0.8rem;
++          cursor: pointer;
++          text-decoration: underline;
++          transition: color 0.2s;
++        }
++        .clear-all-filters-btn:hover {
++          color: var(--accent-gold);
++        }
++        .scrollable-ebat-list {
++          display: flex;
++          flex-direction: column;
++          gap: 8px;
++          max-height: 240px;
++          overflow-y: auto;
++          padding-right: 4px;
++        }
++        .scrollable-ebat-list::-webkit-scrollbar {
++          width: 4px;
++        }
++        .scrollable-ebat-list::-webkit-scrollbar-track {
++          background: #f1f5f9;
++          border-radius: 2px;
++        }
++        .scrollable-ebat-list::-webkit-scrollbar-thumb {
++          background: #cbd5e1;
++          border-radius: 2px;
++        }
++        .scrollable-ebat-list::-webkit-scrollbar-thumb:hover {
++          background: var(--accent-gold);
++        }
++        .filter-header-row {
++          display: flex;
++          justify-content: space-between;
++          align-items: center;
++          border-bottom: 1px solid var(--border-color);
++          padding-bottom: 16px;
++          margin-bottom: 16px;
++        }
+       `}</style>
+     </main>
+   );

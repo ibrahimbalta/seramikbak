@@ -1,0 +1,1528 @@
+﻿diff --git a/src/app/page.js b/src/app/page.js
+index 22e7045..515859c 100644
+--- a/src/app/page.js
++++ b/src/app/page.js
+@@ -342,32 +342,10 @@ function getProductBadge(product, idx) {
+ 
+ export default function Home() {
+   // Page Preloader State
+-  const [pageLoading, setPageLoading] = useState(false);
++  const [pageLoading, setPageLoading] = useState(true);
+   const [initialBrandsLoaded, setInitialBrandsLoaded] = useState(false);
+   const [initialProductsLoaded, setInitialProductsLoaded] = useState(false);
+ 
+-  // Accordion Expand/Collapse States for Filters
+-  const [expandedSections, setExpandedSections] = useState({
+-    categories: true,
+-    collection: true,
+-    texture: true,
+-    ebat: true,
+-    productType: true,
+-    productFeature: true,
+-    spaceType: true
+-  });
+-
+-  const toggleSection = (sec) => {
+-    setExpandedSections(prev => ({
+-      ...prev,
+-      [sec]: !prev[sec]
+-    }));
+-  };
+-
+-  // Additional Filter States
+-  const [selectedRectified, setSelectedRectified] = useState(''); // '', 'true', 'false'
+-  const [selectedFrost, setSelectedFrost] = useState(''); // '', 'true', 'false'
+-
+   // Navigation
+   const [activeTab, setActiveTab] = useState('search'); // search, studio, dealers, b2b
+   const [showMobileMenu, setShowMobileMenu] = useState(false);
+@@ -898,8 +876,6 @@ export default function Home() {
+         if (selectedStyle) params.append('style', selectedStyle);
+         if (selectedArea) params.append('area', selectedArea);
+         if (selectedSize) params.append('size', selectedSize);
+-        if (selectedRectified) params.append('rectified', selectedRectified);
+-        if (selectedFrost) params.append('frost', selectedFrost);
+         url += params.toString();
+       }
+       const res = await fetch(url);
+@@ -928,7 +904,7 @@ export default function Home() {
+ 
+   useEffect(() => {
+     fetchProducts();
+-  }, [sortBy, searchQuery, selectedBrand, selectedColor, selectedFinish, selectedStyle, selectedArea, selectedSize, selectedRectified, selectedFrost]);
++  }, [sortBy, searchQuery, selectedBrand, selectedColor, selectedFinish, selectedStyle, selectedArea, selectedSize]);
+ 
+   const handleSearchSubmit = (e) => {
+     e.preventDefault();
+@@ -1757,10 +1733,130 @@ export default function Home() {
+     setStripeLoading(false);
+   };
+ 
+-  // Preloader removed to show main catalog instantly
++  if (pageLoading) {
++    return (
++      <main className="main-layout" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at center, #0b0f19 0%, #02040a 100%)' }}>
++        <div className="page-loader-overlay">
++          <div className="loader-container">
++            <div className="ceramic-tile-spinner">
++              <div className="tile-face face-front"></div>
++              <div className="tile-face face-back"></div>
++            </div>
++            <h2 className="loader-brand-name">
++              <span>Seramik</span><span className="gold-text">Bak</span>
++            </h2>
++            <p className="loader-status-text">Premium seramik katalo─şu y├╝kleniyor...</p>
++            <div className="loader-progress-bar">
++              <div className="loader-progress-line"></div>
++            </div>
++          </div>
++        </div>
++      </main>
++    );
++  }
+ 
+   return (
+     <main className="main-layout">
++      {/* Premium Collections Banner */}
++      <div className="project-top-banner">
++        <div className="banner-left-area">
++          <div className="banner-badge">
++            <Sparkles size={13} className="spin-icon-slow" />
++            <span>YEN─░ KOLEKS─░YONLAR</span>
++          </div>
++        </div>
++        <div className="banner-marquee-wrapper">
++          <div className="banner-marquee-track">
++            {/* First set */}
++            <div className="banner-item" onClick={() => openProductByCode('VIT-CON-GRY')}>
++              <img src="/hero/luxury_bathroom.png" alt="VitrA Concrete" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">VitrA</span>
++                <span className="banner-product-name">Concrete Light Grey</span>
++              </div>
++            </div>
++            <div className="banner-item" onClick={() => openProductByCode('BIEN-NAT-OAK')}>
++              <img src="/hero/modern_living.png" alt="Bien Natural Oak" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">Bien</span>
++                <span className="banner-product-name">Natural Oak</span>
++              </div>
++            </div>
++            <div className="banner-item" onClick={() => openProductByCode('KUT-CAL-GLD')}>
++              <img src="/hero/scandinavian_kitchen.png" alt="K├╝tahya Calacatta" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">K├╝tahya</span>
++                <span className="banner-product-name">Calacatta Gold</span>
++              </div>
++            </div>
++            <div className="banner-item" onClick={() => openProductByCode('EGE-TRA-CLA')}>
++              <img src="/hero/hero_ceramics.jpg" alt="Ege Travertino" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">Ege Seramik</span>
++                <span className="banner-product-name">Travertino Classico</span>
++              </div>
++            </div>
++            <div className="banner-item" onClick={() => openProductByCode('KALE-ROY-GRY')}>
++              <img src="/hero/luxury_bathroom.png" alt="Kalebodur Royal" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">Kalebodur</span>
++                <span className="banner-product-name">Royal Grey</span>
++              </div>
++            </div>
++            <div className="banner-item" onClick={() => openProductByCode('BIEN-BOR-ANT')}>
++              <img src="/hero/modern_living.png" alt="Bien Borneo" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">Bien</span>
++                <span className="banner-product-name">Borneo Antrasit</span>
++              </div>
++            </div>
++            {/* Duplicate set for seamless loop */}
++            <div className="banner-item" onClick={() => openProductByCode('VIT-CON-GRY')}>
++              <img src="/hero/luxury_bathroom.png" alt="VitrA Concrete" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">VitrA</span>
++                <span className="banner-product-name">Concrete Light Grey</span>
++              </div>
++            </div>
++            <div className="banner-item" onClick={() => openProductByCode('BIEN-NAT-OAK')}>
++              <img src="/hero/modern_living.png" alt="Bien Natural Oak" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">Bien</span>
++                <span className="banner-product-name">Natural Oak</span>
++              </div>
++            </div>
++            <div className="banner-item" onClick={() => openProductByCode('KUT-CAL-GLD')}>
++              <img src="/hero/scandinavian_kitchen.png" alt="K├╝tahya Calacatta" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">K├╝tahya</span>
++                <span className="banner-product-name">Calacatta Gold</span>
++              </div>
++            </div>
++            <div className="banner-item" onClick={() => openProductByCode('EGE-TRA-CLA')}>
++              <img src="/hero/hero_ceramics.jpg" alt="Ege Travertino" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">Ege Seramik</span>
++                <span className="banner-product-name">Travertino Classico</span>
++              </div>
++            </div>
++            <div className="banner-item" onClick={() => openProductByCode('KALE-ROY-GRY')}>
++              <img src="/hero/luxury_bathroom.png" alt="Kalebodur Royal" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">Kalebodur</span>
++                <span className="banner-product-name">Royal Grey</span>
++              </div>
++            </div>
++            <div className="banner-item" onClick={() => openProductByCode('BIEN-BOR-ANT')}>
++              <img src="/hero/modern_living.png" alt="Bien Borneo" className="banner-img" />
++              <div className="banner-item-info">
++                <span className="banner-brand-name">Bien</span>
++                <span className="banner-product-name">Borneo Antrasit</span>
++              </div>
++            </div>
++          </div>
++        </div>
++      </div>
++
+       {/* Top Header Navigation */}
+       <header className="main-header glass-panel">
+         <div className="header-brand" onClick={() => setActiveTab('search')} style={{ cursor: 'pointer' }}>
+@@ -1945,424 +2041,915 @@ export default function Home() {
+         {/* TAB 1: SMART SEARCH & CATALOG */}
+         {activeTab === 'search' && (
+           <div className="search-portal animate-fade-in">
+-            {/* Elegant Minimalist Search Bar at the Top */}
+-            <div className="catalog-search-bar-row" style={{ marginBottom: '24px' }}>
+-              <form onSubmit={handleSearchSubmit} className="catalog-search-form" style={{ position: 'relative', width: '100%' }}>
+-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', background: '#ffffff', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '6px 12px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', transition: 'all 0.2s' }} className="catalog-search-input-wrapper">
+-                  <SearchIcon size={18} style={{ color: 'var(--text-secondary)' }} />
+-                  <input 
+-                    type="text" 
+-                    placeholder="Marka, ├╝r├╝n ad─▒, kod, renk, ebat, y├╝zey, koleksiyon ara..." 
+-                    value={searchQuery}
+-                    onChange={handleSearchChange}
+-                    onFocus={() => { if (searchQuery.trim().length > 1) setShowSuggestions(true); }}
+-                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+-                    style={{ flexGrow: 1, border: 'none', outline: 'none', fontSize: '0.85rem', color: 'var(--text-primary)', padding: '6px 0' }}
+-                  />
+-                  
+-                  {/* Visual Search upload button inside search bar */}
+-                  <div className="search-camera-trigger" title="G├Ârsel ile Arama Yap" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', position: 'relative' }}>
+-                    <ImageIcon size={18} style={{ color: 'var(--text-secondary)', transition: 'color 0.2s' }} />
++            
++            {/* Wide Centered Hero Section with Showroom Image Background */}
++            <div className="showroom-hero-banner glass-panel" style={{ backgroundImage: `url(${heroSlides[heroSlideIndex].bg})`, transition: 'background-image 0.8s ease' }}>
++              <div className="hero-dark-overlay" />
++              <div className="hero-banner-content">
++                <div className="hero-badge-capsule">
++                  <Sparkles size={12} className="badge-icon-gold" />
++                  <span>{heroSlides[heroSlideIndex].tag}</span>
++                </div>
++                
++                <h2 style={{ minHeight: '84px' }}>{heroSlides[heroSlideIndex].title} <br /><span className="highlight-text">{heroSlides[heroSlideIndex].highlight}</span></h2>
++                
++                <p className="hero-banner-subtitle">
++                  {heroSlides[heroSlideIndex].subtitle}
++                </p>
++
++                {/* Wide Centered Search Bar */}
++                <form onSubmit={handleSearchSubmit} className="wide-search-bar-form" style={{ position: 'relative' }}>
++                  <div className="search-bar-inner-container">
++                    <SearchIcon size={20} className="search-bar-icon-left" />
+                     <input 
+-                      type="file" 
+-                      accept="image/*" 
+-                      onChange={handleVisualSearch} 
+-                      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
++                      type="text" 
++                      placeholder="Marka, ├╝r├╝n ad─▒, kod, renk, ebat, y├╝zey, koleksiyon..." 
++                      value={searchQuery}
++                      onChange={handleSearchChange}
++                      onFocus={() => { if (searchQuery.trim().length > 1) setShowSuggestions(true); }}
++                      onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
++                      className="wide-search-input"
+                     />
++                    
++                    {/* Inline Image Upload (G├Ârsel Arama) */}
++                    <div className="search-camera-trigger" title="G├Ârsel ile Arama Yap (CLIP)">
++                      <ImageIcon size={20} className="camera-trigger-icon" />
++                      <input 
++                        type="file" 
++                        accept="image/*" 
++                        onChange={handleVisualSearch} 
++                        className="invisible-file-upload-input"
++                      />
++                    </div>
++                    
++                    <button type="submit" className="wide-search-submit-btn">Ara</button>
+                   </div>
+-                  
+-                  <button type="submit" style={{ background: 'var(--accent-gold)', color: '#ffffff', border: 'none', borderRadius: '8px', padding: '6px 16px', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', transition: 'background 0.2s' }}>
+-                    Ara
+-                  </button>
++
++                  {/* Instant Search Suggestions Dropdown */}
++                  {showSuggestions && searchSuggestions.length > 0 && (
++                    <div className="search-suggestions-dropdown glass-panel" style={{
++                      position: 'absolute',
++                      top: '100%',
++                      left: '0',
++                      right: '0',
++                      background: '#ffffff',
++                      border: '1px solid var(--border-color)',
++                      borderRadius: '16px',
++                      marginTop: '8px',
++                      boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
++                      zIndex: '99',
++                      maxHeight: '320px',
++                      overflowY: 'auto',
++                      padding: '8px 0'
++                    }}>
++                      {searchSuggestions.map(p => (
++                        <div 
++                          key={p.id} 
++                          className="suggestion-item"
++                          onClick={() => {
++                            setSearchQuery(p.name);
++                            setShowSuggestions(false);
++                            handleProductCardClick(p);
++                          }}
++                          style={{
++                            display: 'flex',
++                            alignItems: 'center',
++                            gap: '12px',
++                            padding: '10px 16px',
++                            cursor: 'pointer',
++                            transition: 'background 0.2s ease',
++                            borderBottom: '1px solid #f1f3f7'
++                          }}
++                        >
++                          <img 
++                            src={p.imageUrl || '/textures/calacatta_gold.jpg'} 
++                            alt={p.name} 
++                            style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border-color)' }}
++                          />
++                          <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
++                            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
++                            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{p.brand?.name} ÔÇó {p.code} ÔÇó {p.width}x{p.height} cm</span>
++                          </div>
++                          <span style={{ color: 'var(--accent-gold)', fontSize: '0.9rem' }}>Ôåù</span>
++                        </div>
++                      ))}
++                    </div>
++                  )}
++                </form>
++
++                {/* Popular Searches */}
++                <div className="hero-popular-tags">
++                  <span className="pop-tags-label">Pop├╝ler Aramalar:</span>
++                  <button onClick={() => handleTagClick('Mermer', 'style', 'Mermer')} className="pop-tag-capsule">60x120 Mermer</button>
++                  <button onClick={() => handleTagClick('Calacatta Gold', 'style', 'Mermer')} className="pop-tag-capsule">Calacatta Gold</button>
++                  <button onClick={() => handleTagClick('Ah┼şap', 'style', 'Ah┼şap')} className="pop-tag-capsule">Mat Ah┼şap</button>
++                  <button onClick={() => handleTagClick('Beton', 'style', 'Beton')} className="pop-tag-capsule">Gri Beton</button>
++                  <button onClick={() => handleTagClick('Traverten', 'style', 'Beton')} className="pop-tag-capsule">Traverten</button>
++                  <button onClick={() => handleTagClick('Beyaz', 'style', 'Mermer')} className="pop-tag-capsule">Parlak Beyaz</button>
++                </div>
++
++                {/* Feature Columns Row */}
++                <div className="hero-feature-stats-row">
++                  <div className="feature-stat-capsule">
++                    <Layers2 size={16} />
++                    <span>25.000+ Seramik ├£r├╝n</span>
++                  </div>
++                  <div className="feature-stat-capsule">
++                    <Activity size={16} />
++                    <span>150+ Marka</span>
++                  </div>
++                  <div className="feature-stat-capsule">
++                    <ImageIcon size={16} />
++                    <span>G├Ârsel Arama ile Ke┼şfet</span>
++                  </div>
++                  <div className="feature-stat-capsule">
++                    <Sparkles size={16} />
++                    <span>3D Sanal Deneyim</span>
++                  </div>
++                </div>
++              </div>
++
++              {/* Display Stand with Upright 3D Slabs */}
++              <div className="hero-display-stand-container">
++                <div className="display-stand-platform">
++                  {/* Slab 1 (Left - Active or Calacatta Gold) */}
++                  <div className="display-slab-wrapper left-slab">
++                    <div className="slab-visual-container">
++                      <TileVisualPreview 
++                        style={activeProduct?.style || "Mermer"} 
++                        color={activeProduct?.color || "Beyaz"} 
++                        finish={activeProduct?.finish || "Mat"} 
++                        width={activeProduct?.width || 60} 
++                        height={activeProduct?.height || 120} 
++                        imageUrl={activeProduct?.imageUrl || "/textures/calacatta_gold.jpg"} 
++                      />
++                      <div className="slab-badge-overlay">
++                        <span className="slab-badge-title">{activeProduct?.name || "Calacatta Gold"}</span>
++                        <span className="slab-badge-specs">{activeProduct?.width || 60}x{activeProduct?.height || 120} cm</span>
++                      </div>
++                    </div>
++                  </div>
++
++                  {/* Slab 2 (Right - Featured or Borneo Antrasit) */}
++                  <div className="display-slab-wrapper right-slab">
++                    <div className="slab-visual-container">
++                      <TileVisualPreview style="Mermer" color="Antrasit" finish="Mat" width={60} height={120} imageUrl="/textures/borneo_antrasit.jpg" />
++                      <div className="slab-badge-overlay">
++                        <span className="slab-badge-title">Borneo Antrasit</span>
++                        <span className="slab-badge-specs">60x120 cm</span>
++                      </div>
++                    </div>
++                  </div>
++                </div>
++              </div>
++
++              {/* Slider Dots */}
++              <div style={{
++                position: 'absolute',
++                bottom: '16px',
++                left: '50%',
++                transform: 'translateX(-50%)',
++                display: 'flex',
++                gap: '8px',
++                zIndex: '3'
++              }}>
++                {heroSlides.map((_, idx) => (
++                  <button
++                    key={idx}
++                    onClick={() => setHeroSlideIndex(idx)}
++                    style={{
++                      width: '8px',
++                      height: '8px',
++                      borderRadius: '50%',
++                      border: 'none',
++                      background: heroSlideIndex === idx ? 'var(--accent-gold)' : 'rgba(255,255,255,0.4)',
++                      cursor: 'pointer',
++                      transition: 'all 0.3s ease'
++                    }}
++                  />
++                ))}
++              </div>
++            </div>
++
++            {/* Categories & 3D Showcase Section */}
++            <div className="categories-showcase-container">
++              {/* Circular Categories List */}
++              <div className="circular-categories-row">
++                <button 
++                  onClick={() => { setSelectedStyle(''); setSelectedColor(''); setSelectedSize(''); fetchProducts(); }} 
++                  className={`category-circle-btn ${selectedStyle === '' && selectedColor === '' && selectedSize === '' ? 'active' : ''}`}
++                >
++                  <div className="category-circle-icon-wrapper flat-bg-gold">
++                    <Layers2 size={18} />
++                  </div>
++                  <span>T├╝m├╝</span>
++                </button>
++
++                <button 
++                  onClick={() => { setSelectedStyle('Mermer'); fetchProducts('style=Mermer'); }} 
++                  className={`category-circle-btn ${selectedStyle === 'Mermer' ? 'active' : ''}`}
++                >
++                  <div className="category-circle-icon-wrapper marble-pattern-bg" />
++                  <span>Mermer</span>
++                </button>
++
++                <button 
++                  onClick={() => { setSelectedStyle('Beton'); fetchProducts('style=Beton'); }} 
++                  className={`category-circle-btn ${selectedStyle === 'Beton' ? 'active' : ''}`}
++                >
++                  <div className="category-circle-icon-wrapper concrete-pattern-bg" />
++                  <span>Beton</span>
++                </button>
++
++                <button 
++                  onClick={() => { setSelectedStyle('Ah┼şap'); fetchProducts('style=Ah┼şap'); }} 
++                  className={`category-circle-btn ${selectedStyle === 'Ah┼şap' ? 'active' : ''}`}
++                >
++                  <div className="category-circle-icon-wrapper wood-pattern-bg" />
++                  <span>Ah┼şap</span>
++                </button>
++
++                <button 
++                  onClick={() => { setSelectedStyle('Beton'); fetchProducts('style=Beton'); }} 
++                  className="category-circle-btn"
++                >
++                  <div className="category-circle-icon-wrapper stone-pattern-bg" />
++                  <span>Ta┼ş</span>
++                </button>
++
++                <button 
++                  onClick={() => { setSelectedColor('Bej'); fetchProducts('color=Bej'); }} 
++                  className="category-circle-btn"
++                >
++                  <div className="category-circle-icon-wrapper travert-pattern-bg" />
++                  <span>Traverten</span>
++                </button>
++
++                <button className="category-circle-btn" onClick={() => alert('Mozaik seriler listeleniyor...')}>
++                  <div className="category-circle-icon-wrapper mosaic-pattern-bg" />
++                  <span>Mozaik</span>
++                </button>
++
++                <button className="category-circle-btn" onClick={() => alert('Dekoratif seriler listeleniyor...')}>
++                  <div className="category-circle-icon-wrapper decor-pattern-bg" />
++                  <span>Dekor</span>
++                </button>
++
++                <button className="category-circle-btn" onClick={() => { setSelectedColor('Gri'); fetchProducts('color=Gri'); }}>
++                  <div className="category-circle-icon-wrapper flat-grey-bg" />
++                  <span>D├╝z Renk</span>
++                </button>
++
++                <button className="category-circle-btn" onClick={() => setActiveTab('studio')}>
++                  <div className="category-circle-icon-wrapper wireframe-bg" />
++                  <span>3D Seriler</span>
++                </button>
++              </div>
++
++              {/* 3D Sanal St├╝dyo Promo Banner Card */}
++              <div className="studio-promo-card-banner glass-panel" onClick={() => setActiveTab('studio')} style={{ cursor: 'pointer' }}>
++                <div className="promo-text-column">
++                  <h5>3D Sanal St├╝dyo</h5>
++                  <p>Seramiklerinizi mekan─▒n─▒zda g├Ârselle┼ştirin</p>
++                  <button className="promo-action-btn-gold">Hemen Deneyin</button>
++                </div>
++                <div className="promo-image-column">
++                  <img src="/hero/hero_ceramics.jpg" alt="3D Studio Preview" />
++                </div>
++              </div>
++            </div>
++
++            {/* Brand Logos Infinite Marquee */}
++            <div className="brand-marquee-section">
++              <div className="brand-marquee-container">
++                <div className="brand-marquee-track">
++                  {/* First set of brands */}
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>NG K├£TAHYA SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)', letterSpacing: '0.1em' }}>BIEN SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>EGE SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ fontWeight: '900', fontStyle: 'italic' }}>VitrA</div>
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em', color: '#0f172a' }}>G├£RAL SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.08em', fontWeight: '800' }}>QUA GRANITE</div>
++                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)' }}>YURTBAY SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>├çANAKKALE SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ fontWeight: '800', letterSpacing: '0.12em' }}>KALEBODUR</div>
++                  <div className="brand-marquee-item" style={{ color: 'var(--text-muted)' }}>TERMAL SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>U┼ŞAK SERAM─░K</div>
++
++                  {/* Duplicate set for infinite loop */}
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>NG K├£TAHYA SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)', letterSpacing: '0.1em' }}>BIEN SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>EGE SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ fontWeight: '900', fontStyle: 'italic' }}>VitrA</div>
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em', color: '#0f172a' }}>G├£RAL SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.08em', fontWeight: '800' }}>QUA GRANITE</div>
++                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)' }}>YURTBAY SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>├çANAKKALE SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ fontWeight: '800', letterSpacing: '0.12em' }}>KALEBODUR</div>
++                  <div className="brand-marquee-item" style={{ color: 'var(--text-muted)' }}>TERMAL SERAM─░K</div>
++                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>U┼ŞAK SERAM─░K</div>
+                 </div>
++              </div>
++            </div>
+ 
+-                {/* Instant Search Suggestions Dropdown */}
+-                {showSuggestions && searchSuggestions.length > 0 && (
+-                  <div className="search-suggestions-dropdown glass-panel" style={{
+-                    position: 'absolute',
+-                    top: '100%',
+-                    left: '0',
+-                    right: '0',
+-                    background: '#ffffff',
+-                    border: '1px solid var(--border-color)',
+-                    borderRadius: '12px',
+-                    marginTop: '8px',
+-                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+-                    zIndex: '99',
+-                    maxHeight: '320px',
+-                    overflowY: 'auto',
+-                    padding: '8px 0'
+-                  }}>
+-                    {searchSuggestions.map(p => (
++            {/* Haftan─▒n ├£r├╝nleri Section */}
++            {weeklyProducts.length > 0 && (
++              <div className="weekly-products-section glass-panel" style={{ 
++                display: 'flex', 
++                flexDirection: 'column', 
++                gap: '16px', 
++                marginBottom: '32px',
++                padding: '24px',
++                background: '#ffffff'
++              }}>
++                <div className="weekly-products-header" style={{ 
++                  display: 'flex', 
++                  justifyContent: 'space-between', 
++                  alignItems: 'center', 
++                  borderBottom: '1px solid var(--border-color)', 
++                  paddingBottom: '16px' 
++                }}>
++                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
++                    <div style={{ 
++                      background: 'rgba(179, 142, 71, 0.1)', 
++                      color: 'var(--accent-gold)', 
++                      padding: '8px', 
++                      borderRadius: '50%', 
++                      display: 'flex', 
++                      alignItems: 'center', 
++                      justifyContent: 'center' 
++                    }}>
++                      <Flame size={20} fill="var(--accent-gold)" />
++                    </div>
++                    <div>
++                      <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
++                        Haftan─▒n En Pop├╝ler ├£r├╝nleri
++                      </h3>
++                      <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
++                        En ├ğok tercih edilen ve ├Âne ├ğ─▒kan pop├╝ler seramik modellerini ke┼şfedin.
++                      </p>
++                    </div>
++                  </div>
++                  <span className="weekly-badge" style={{ 
++                    fontSize: '0.62rem', 
++                    background: 'rgba(179,142,71,0.1)', 
++                    border: '1px solid var(--border-gold)', 
++                    color: 'var(--accent-gold)', 
++                    padding: '4px 10px', 
++                    borderRadius: '12px', 
++                    fontWeight: '700', 
++                    letterSpacing: '0.05em' 
++                  }}>├ûNE ├çIKANLAR</span>
++                </div>
++
++                <div className="weekly-products-scroll-container" style={{ 
++                  display: 'flex', 
++                  gap: '20px', 
++                  overflowX: 'auto', 
++                  padding: '4px 4px 12px 4px'
++                }}>
++                  {weeklyProducts.map((p) => {
++                    const price = p.cheapestOffer?.price || 480;
++                    const brandShort = p.brand?.name ? p.brand.name.split(' ')[0] : 'Seramik';
++                    return (
+                       <div 
+                         key={p.id} 
+-                        className="suggestion-item"
+-                        onClick={() => {
+-                          setSearchQuery(p.name);
+-                          setShowSuggestions(false);
+-                          handleProductCardClick(p);
+-                        }}
++                        className="weekly-product-card glass-panel" 
+                         style={{
++                          minWidth: '230px',
++                          width: '230px',
++                          borderRadius: 'var(--border-radius-md)',
++                          overflow: 'hidden',
++                          background: '#ffffff',
+                           display: 'flex',
+-                          alignItems: 'center',
+-                          gap: '12px',
+-                          padding: '10px 16px',
+-                          cursor: 'pointer',
+-                          transition: 'background 0.2s ease',
+-                          borderBottom: '1px solid #f1f3f7'
+-                        }}
++                          flexDirection: 'column',
++                          padding: '12px',
++                          gap: '10px',
++                          cursor: 'pointer'
++                        }} 
++                        onClick={() => handleProductCardClick(p)}
+                       >
+-                        <img 
+-                          src={p.imageUrl || '/textures/calacatta_gold.jpg'} 
+-                          alt={p.name} 
+-                          style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--border-color)' }}
+-                        />
+-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+-                          <span style={{ fontSize: '0.8rem', fontWeight: '650', color: 'var(--text-primary)' }}>{p.name}</span>
+-                          <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{p.brand?.name || 'Seramik'} ÔÇó {p.width}x{p.height} cm</span>
++                        {/* Top Row: Brand name & Price */}
++                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
++                          <span style={{ 
++                            fontSize: '0.65rem', 
++                            fontWeight: '700', 
++                            color: 'var(--text-secondary)',
++                            textTransform: 'uppercase',
++                            letterSpacing: '0.05em'
++                          }}>
++                            {brandShort}
++                          </span>
++                          <span style={{ 
++                            fontSize: '0.78rem', 
++                            fontWeight: '800', 
++                            color: 'var(--accent-gold)'
++                          }}>
++                            Ôé║{price.toLocaleString('tr-TR')},00
++                          </span>
++                        </div>
++
++                        {/* Product Image */}
++                        <div style={{
++                          height: '130px',
++                          background: '#f8fafc',
++                          borderRadius: 'var(--border-radius-sm)',
++                          overflow: 'hidden',
++                          display: 'flex',
++                          alignItems: 'center',
++                          justifyContent: 'center',
++                          position: 'relative'
++                        }}>
++                          <img 
++                            src={p.imageUrl || '/textures/calacatta_gold.jpg'} 
++                            alt={p.name} 
++                            style={{
++                              width: '100%',
++                              height: '100%',
++                              objectFit: 'cover',
++                              transition: 'transform 0.3s ease'
++                            }}
++                            className="weekly-card-image"
++                          />
++                          {p.isPremium && (
++                            <span style={{
++                              position: 'absolute',
++                              top: '8px',
++                              right: '8px',
++                              background: 'var(--accent-gold)',
++                              color: '#ffffff',
++                              fontSize: '0.55rem',
++                              fontWeight: '700',
++                              padding: '2px 6px',
++                              borderRadius: '4px',
++                              boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
++                            }}>
++                              PREMIUM
++                            </span>
++                          )}
++                        </div>
++
++                        {/* Info & Metadata */}
++                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
++                          <h4 style={{ 
++                            fontSize: '0.85rem', 
++                            fontWeight: '700', 
++                            color: 'var(--text-primary)', 
++                            margin: 0,
++                            whiteSpace: 'nowrap',
++                            overflow: 'hidden',
++                            textOverflow: 'ellipsis'
++                          }}>
++                            {p.name}
++                          </h4>
++                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
++                            <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
++                              {p.width}x{p.height} cm ÔÇó {p.finish}
++                            </span>
++                            <span style={{ 
++                              fontSize: '0.65rem', 
++                              color: 'var(--text-muted)',
++                              fontWeight: '600',
++                              background: '#f1f5f9',
++                              padding: '1px 6px',
++                              borderRadius: '4px'
++                            }}>
++                              {p.style}
++                            </span>
++                          </div>
+                         </div>
+                       </div>
+-                    ))}
+-                  </div>
+-                )}
+-              </form>
+-            </div>
++                    );
++                  })}
++                </div>
++              </div>
++            )}
+ 
+-            {/* Main Layout: Left Sidebar + Results Grid */}
+-            <div className="main-search-and-results-layout">
+-              {/* Left Sidebar Filter Section */}
+-              <aside className="filters-sidebar-new glass-panel" style={{ position: 'relative' }}>
+-                <div className="filter-header-row">
+-                  <h3 className="filter-title-main" style={{ fontSize: '1.2rem', fontWeight: '750', color: '#0f172a', margin: 0, border: 'none', padding: 0 }}>Filtreler</h3>
+-                  <button onClick={() => {
+-                    setSelectedBrand('');
+-                    setSelectedColor('');
+-                    setSelectedFinish('');
+-                    setSelectedStyle('');
+-                    setSelectedArea('');
+-                    setSelectedSize('');
+-                    setSelectedRectified('');
+-                    setSelectedFrost('');
+-                    setSearchQuery('');
+-                    setUploadedImagePreview(null);
+-                    setVisualSearchMatches(null);
+-                    fetchProducts('clear=true');
+-                  }} className="clear-all-filters-btn">
+-                    T├╝m├╝n├╝ Temizle
+-                  </button>
++            {/* Shop the Look - Konsept Odalar */}
++            <div className="shop-the-look-section" style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
++              <div className="stl-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', flexWrap: 'wrap', gap: '12px' }}>
++                <div>
++                  <h3 className="stl-title" style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-primary)' }}>Tarz─▒ Sat─▒n Al (Shop the Look)</h3>
++                  <p className="stl-subtitle" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>Profesyonel i├ğ mimarlar taraf─▒ndan tasarlanm─▒┼ş haz─▒r banyo, mutfak ve salon konseptlerini inceleyin.</p>
+                 </div>
++                <span className="stl-badge" style={{ fontSize: '0.65rem', background: 'rgba(197,160,89,0.1)', border: '1px solid var(--border-gold)', color: 'var(--accent-gold)', padding: '4px 10px', borderRadius: '12px', fontWeight: '700', letterSpacing: '0.05em' }}>KONSEPT TASARIMLAR</span>
++              </div>
+ 
+-                {/* 1. KATEGOR─░LER */}
+-                <div className="accordion-section">
+-                  <div className="accordion-header" onClick={() => toggleSection('categories')}>
+-                    <span className="accordion-title">Kategoriler</span>
+-                    <ChevronDown size={16} style={{ transform: expandedSections.categories ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
++              <div className="stl-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
++                {/* Concept 1: Luxury Marble Bathroom */}
++                <div className="stl-card glass-panel" style={{ display: 'flex', flexDirection: 'column', borderRadius: 'var(--border-radius-md)', overflow: 'hidden', background: '#ffffff' }}>
++                  <div className="stl-image-container" style={{ height: '180px', position: 'relative', overflow: 'hidden' }}>
++                    <img src="/hero/luxury_bathroom.png" alt="L├╝ks Mermer Banyo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
++                    <div className="stl-tag" style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(0,0,0,0.7)', color: '#ffffff', fontSize: '0.6rem', padding: '3px 8px', borderRadius: '4px', fontWeight: '700' }}>L├£KS BANYO</div>
+                   </div>
+-                  {expandedSections.categories && (
+-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+-                      {['Mermer', 'Ah┼şap', 'Beton', 'Ta┼ş'].map(styleVal => (
+-                        <label key={styleVal} className="checkbox-label-wrapper">
+-                          <input 
+-                            type="checkbox" 
+-                            checked={selectedStyle === styleVal} 
+-                            onChange={() => setSelectedStyle(selectedStyle === styleVal ? '' : styleVal)}
+-                          />
+-                          <span className="checkbox-custom-box" />
+-                          <span className="checkbox-text-label">{styleVal}</span>
+-                        </label>
+-                      ))}
++                  <div className="stl-body" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', flexGrow: 1 }}>
++                    <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: 'var(--text-primary)' }}>Mermer Zarafeti Banyo</h4>
++                    <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>Beyaz Calacatta mermer dokusunun pirin├ğ ve gold detaylarla l├╝ks uyumu.</p>
++                    <div className="stl-materials-list" style={{ marginTop: '8px' }}>
++                      <span className="mat-item-title" style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Kullan─▒lan Seramikler:</span>
++                      <div className="mat-items" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
++                        {products.filter(p => p.style === 'Mermer').slice(0, 2).map(p => (
++                          <div key={p.id} className="mat-row" onClick={() => handleProductCardClick(p)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
++                            <img src={p.imageUrl || '/textures/calacatta_gold.jpg'} alt={p.name} style={{ width: '28px', height: '28px', objectFit: 'cover', borderRadius: '4px' }} />
++                            <div className="mat-info" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
++                              <span className="mat-name" style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
++                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm ÔÇó {p.finish}</span>
++                            </div>
++                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>Ôåù</span>
++                          </div>
++                        ))}
++                      </div>
+                     </div>
+-                  )}
++                  </div>
+                 </div>
+ 
+-                {/* 2. KOLEKS─░YON */}
+-                <div className="accordion-section">
+-                  <div className="accordion-header" onClick={() => toggleSection('collection')}>
+-                    <span className="accordion-title">Koleksiyon</span>
+-                    <ChevronDown size={16} style={{ transform: expandedSections.collection ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
++                {/* Concept 2: Scandinavian Oak Kitchen */}
++                <div className="stl-card glass-panel" style={{ display: 'flex', flexDirection: 'column', borderRadius: 'var(--border-radius-md)', overflow: 'hidden', background: '#ffffff' }}>
++                  <div className="stl-image-container" style={{ height: '180px', position: 'relative', overflow: 'hidden' }}>
++                    <img src="/hero/scandinavian_kitchen.png" alt="─░skandinav Mutfak" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
++                    <div className="stl-tag" style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(0,0,0,0.7)', color: '#ffffff', fontSize: '0.6rem', padding: '3px 8px', borderRadius: '4px', fontWeight: '700' }}>SICAK MUTFAK</div>
+                   </div>
+-                  {expandedSections.collection && (
+-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }}>
+-                      {brands.map(brand => (
+-                        <label key={brand.id} className="checkbox-label-wrapper">
+-                          <input 
+-                            type="checkbox" 
+-                            checked={selectedBrand === brand.id} 
+-                            onChange={() => setSelectedBrand(selectedBrand === brand.id ? '' : brand.id)}
+-                          />
+-                          <span className="checkbox-custom-box" />
+-                          <span className="checkbox-text-label">{brand.name}</span>
+-                        </label>
+-                      ))}
++                  <div className="stl-body" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', flexGrow: 1 }}>
++                    <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: 'var(--text-primary)' }}>Do─şal ─░skandinav Mutfak</h4>
++                    <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>S─▒cak me┼şe ah┼şap panellerin beyaz tezgah seramikleriyle ferah kombinasyonu.</p>
++                    <div className="stl-materials-list" style={{ marginTop: '8px' }}>
++                      <span className="mat-item-title" style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Kullan─▒lan Seramikler:</span>
++                      <div className="mat-items" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
++                        {products.filter(p => p.style === 'Ah┼şap' || p.name.toLowerCase().includes('ah┼şap')).slice(0, 2).map(p => (
++                          <div key={p.id} className="mat-row" onClick={() => handleProductCardClick(p)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
++                            <img src={p.imageUrl || '/textures/teak_ahsap.jpg'} alt={p.name} style={{ width: '28px', height: '28px', objectFit: 'cover', borderRadius: '4px' }} />
++                            <div className="mat-info" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
++                              <span className="mat-name" style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
++                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm ÔÇó {p.finish}</span>
++                            </div>
++                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>Ôåù</span>
++                          </div>
++                        ))}
++                        {products.filter(p => p.style === 'Ah┼şap' || p.name.toLowerCase().includes('ah┼şap')).length === 0 && 
++                          products.slice(0, 2).map(p => (
++                          <div key={p.id} className="mat-row" onClick={() => handleProductCardClick(p)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
++                            <img src={p.imageUrl || '/textures/calacatta_gold.jpg'} alt={p.name} style={{ width: '28px', height: '28px', objectFit: 'cover', borderRadius: '4px' }} />
++                            <div className="mat-info" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
++                              <span className="mat-name" style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
++                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm ÔÇó {p.finish}</span>
++                            </div>
++                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>Ôåù</span>
++                          </div>
++                        ))
++                        }
++                      </div>
+                     </div>
+-                  )}
++                  </div>
+                 </div>
+ 
+-                {/* 3. DOKU */}
+-                <div className="accordion-section">
+-                  <div className="accordion-header" onClick={() => toggleSection('texture')}>
+-                    <span className="accordion-title">Doku</span>
+-                    <ChevronDown size={16} style={{ transform: expandedSections.texture ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
++                {/* Concept 3: Modern Concrete Living Room */}
++                <div className="stl-card glass-panel" style={{ display: 'flex', flexDirection: 'column', borderRadius: 'var(--border-radius-md)', overflow: 'hidden', background: '#ffffff' }}>
++                  <div className="stl-image-container" style={{ height: '180px', position: 'relative', overflow: 'hidden' }}>
++                    <img src="/hero/modern_living.png" alt="Modern Salon" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
++                    <div className="stl-tag" style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(0,0,0,0.7)', color: '#ffffff', fontSize: '0.6rem', padding: '3px 8px', borderRadius: '4px', fontWeight: '700' }}>END├£STR─░YEL SALON</div>
+                   </div>
+-                  {expandedSections.texture && (
+-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+-                      {['Beyaz', 'Bej', 'Gri', 'Antrasit', 'Kahverengi'].map(colorVal => (
+-                        <label key={colorVal} className="checkbox-label-wrapper">
+-                          <input 
+-                            type="checkbox" 
+-                            checked={selectedColor === colorVal} 
+-                            onChange={() => setSelectedColor(selectedColor === colorVal ? '' : colorVal)}
+-                          />
+-                          <span className="checkbox-custom-box" />
+-                          <span className="checkbox-text-label">{colorVal}</span>
+-                        </label>
+-                      ))}
++                  <div className="stl-body" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', flexGrow: 1 }}>
++                    <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: 'var(--text-primary)' }}>End├╝striyel Beton Salon</h4>
++                    <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>Polisajl─▒ gri beton karolar ile minimalist ve modern salon d├Â┼şemesi.</p>
++                    <div className="stl-materials-list" style={{ marginTop: '8px' }}>
++                      <span className="mat-item-title" style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>Kullan─▒lan Seramikler:</span>
++                      <div className="mat-items" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
++                        {products.filter(p => p.style === 'Beton' || p.name.toLowerCase().includes('beton')).slice(0, 2).map(p => (
++                          <div key={p.id} className="mat-row" onClick={() => handleProductCardClick(p)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
++                            <img src={p.imageUrl || '/textures/loft_beton.jpg'} alt={p.name} style={{ width: '28px', height: '28px', objectFit: 'cover', borderRadius: '4px' }} />
++                            <div className="mat-info" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
++                              <span className="mat-name" style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-primary)' }}>{p.name}</span>
++                              <span className="mat-spec" style={{ fontSize: '0.6rem', color: 'var(--text-muted)' }}>{p.width}x{p.height} cm ÔÇó {p.finish}</span>
++                            </div>
++                            <span className="mat-price-arrow" style={{ color: 'var(--accent-gold)', fontSize: '0.75rem' }}>Ôåù</span>
++                          </div>
++                        ))}
++                      </div>
+                     </div>
+-                  )}
++                  </div>
+                 </div>
++              </div>
++            </div>
+ 
+-                {/* 4. EBAT */}
+-                <div className="accordion-section">
+-                  <div className="accordion-header" onClick={() => toggleSection('ebat')}>
+-                    <span className="accordion-title">Ebat</span>
+-                    <ChevronDown size={16} style={{ transform: expandedSections.ebat ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+-                  </div>
+-                  {expandedSections.ebat && (
+-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+-                      <div className="scrollable-ebat-list">
+-                        {[
+-                          '120x240', '120x120', '60x120', '20x120', '80x80', 
+-                          '60x60', '30x60', '31,5x61,5', '42x42', '60x90', 
+-                          '61x61', '80x160', '30x85', '33x66', '21x122', 
+-                          '15x60', '240x240', '360x240', '100x100', '40x120', 
+-                          '30x120', '30x90', '30x40', '20x40', '19,7x19,7'
+-                        ].map(sizeVal => {
+-                          const parts = sizeVal.replace(',', '.').split('x');
+-                          const wCm = parseFloat(parts[0]) || 0;
+-                          const hCm = parseFloat(parts[1]) || 0;
+-                          const scale = 80 / 175;
+-                          const wPx = Math.max(4, Math.round(wCm * scale));
+-                          const hPx = Math.max(4, Math.round(hCm * scale));
++            {/* Main Layout: Left Sidebar + Results Grid */}
++            <div className="main-search-and-results-layout">
++              {/* Left Sidebar Filter Section */}
++              <aside className="filters-sidebar-new glass-panel" style={{ position: 'relative' }}>
++                <h3 className="filter-title-main">Filtreleme</h3>
+ 
+-                          return (
+-                            <label key={sizeVal} className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+-                              <input 
+-                                type="checkbox" 
+-                                checked={selectedSize === sizeVal} 
+-                                onChange={() => setSelectedSize(selectedSize === sizeVal ? '' : sizeVal)}
+-                              />
+-                              <span className="checkbox-custom-box" />
+-                              <span className="checkbox-text-label">{sizeVal}</span>
+-                              
+-                              <div className="size-guide-tooltip">
+-                                <span className="tooltip-title">Boyut K─▒yaslama</span>
+-                                <div className="size-guide-viz">
+-                                  <div className="viz-human">
+-                                    <div className="viz-human-head"></div>
+-                                    <div className="viz-human-body"></div>
+-                                    <span className="viz-lbl">─░nsan (175 cm)</span>
+-                                  </div>
+-                                  <div className="viz-tile" style={{ width: `${wPx}px`, height: `${hPx}px`, background: 'var(--accent-gold)', border: '1px solid rgba(255,255,255,0.3)' }}>
+-                                    <span className="viz-lbl">{sizeVal} cm</span>
+-                                  </div>
+-                                </div>
+-                              </div>
+-                            </label>
+-                          );
+-                        })}
++                {/* EBAT Checkboxes */}
++                <div className="filter-group-new">
++                  <h4 className="filter-group-title">EBAT</h4>
++                  <div className="checkboxes-list-new" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
++                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
++                      <input 
++                        type="checkbox" 
++                        checked={selectedSize === '30x60'} 
++                        onChange={() => setSelectedSize(selectedSize === '30x60' ? '' : '30x60')}
++                      />
++                      <span className="checkbox-custom-box" />
++                      <span className="checkbox-text-label">30x60</span>
++                      
++                      <div className="size-guide-tooltip">
++                        <span className="tooltip-title">Boyut K─▒yaslama</span>
++                        <div className="size-guide-viz">
++                          <div className="viz-human">
++                            <div className="viz-human-head"></div>
++                            <div className="viz-human-body"></div>
++                            <span className="viz-lbl">─░nsan (175 cm)</span>
++                          </div>
++                          <div className="viz-tile size-30x60" style={{ width: '14px', height: '27px', background: '#cbd5e1', border: '1px solid #94a3b8' }}>
++                            <span className="viz-lbl">30x60 cm</span>
++                          </div>
++                        </div>
+                       </div>
+-                    </div>
+-                  )}
+-                </div>
++                    </label>
++
++                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
++                      <input 
++                        type="checkbox" 
++                        checked={selectedSize === '60x60'} 
++                        onChange={() => setSelectedSize(selectedSize === '60x60' ? '' : '60x60')}
++                      />
++                      <span className="checkbox-custom-box" />
++                      <span className="checkbox-text-label">60x60</span>
++
++                      <div className="size-guide-tooltip">
++                        <span className="tooltip-title">Boyut K─▒yaslama</span>
++                        <div className="size-guide-viz">
++                          <div className="viz-human">
++                            <div className="viz-human-head"></div>
++                            <div className="viz-human-body"></div>
++                            <span className="viz-lbl">─░nsan (175 cm)</span>
++                          </div>
++                          <div className="viz-tile size-60x60">
++                            <span className="viz-lbl">60x60 cm</span>
++                          </div>
++                        </div>
++                      </div>
++                    </label>
++
++                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
++                      <input 
++                        type="checkbox" 
++                        checked={selectedSize === '60x120'} 
++                        onChange={() => setSelectedSize(selectedSize === '60x120' ? '' : '60x120')}
++                      />
++                      <span className="checkbox-custom-box" />
++                      <span className="checkbox-text-label">60x120</span>
++
++                      <div className="size-guide-tooltip">
++                        <span className="tooltip-title">Boyut K─▒yaslama</span>
++                        <div className="size-guide-viz">
++                          <div className="viz-human">
++                            <div className="viz-human-head"></div>
++                            <div className="viz-human-body"></div>
++                            <span className="viz-lbl">─░nsan (175 cm)</span>
++                          </div>
++                          <div className="viz-tile size-60x120">
++                            <span className="viz-lbl">60x120 cm</span>
++                          </div>
++                        </div>
++                      </div>
++                    </label>
++
++                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
++                      <input 
++                        type="checkbox" 
++                        checked={selectedSize === '80x80'} 
++                        onChange={() => setSelectedSize(selectedSize === '80x80' ? '' : '80x80')}
++                      />
++                      <span className="checkbox-custom-box" />
++                      <span className="checkbox-text-label">80x80</span>
++
++                      <div className="size-guide-tooltip">
++                        <span className="tooltip-title">Boyut K─▒yaslama</span>
++                        <div className="size-guide-viz">
++                          <div className="viz-human">
++                            <div className="viz-human-head"></div>
++                            <div className="viz-human-body"></div>
++                            <span className="viz-lbl">─░nsan (175 cm)</span>
++                          </div>
++                          <div className="viz-tile size-80x80">
++                            <span className="viz-lbl">80x80 cm</span>
++                          </div>
++                        </div>
++                      </div>
++                    </label>
+ 
+-                {/* 5. ├£R├£N T─░P─░ */}
+-                <div className="accordion-section">
+-                  <div className="accordion-header" onClick={() => toggleSection('productType')}>
+-                    <span className="accordion-title">├£r├╝n Tipi</span>
+-                    <ChevronDown size={16} style={{ transform: expandedSections.productType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
++                    <label className="checkbox-label-wrapper" style={{ position: 'relative' }}>
++                      <input 
++                        type="checkbox" 
++                        checked={selectedSize === '120x120'} 
++                        onChange={() => setSelectedSize(selectedSize === '120x120' ? '' : '120x120')}
++                      />
++                      <span className="checkbox-custom-box" />
++                      <span className="checkbox-text-label">120x120</span>
++
++                      <div className="size-guide-tooltip">
++                        <span className="tooltip-title">Boyut K─▒yaslama</span>
++                        <div className="size-guide-viz">
++                          <div className="viz-human">
++                            <div className="viz-human-head"></div>
++                            <div className="viz-human-body"></div>
++                            <span className="viz-lbl">─░nsan (175 cm)</span>
++                          </div>
++                          <div className="viz-tile size-120x120">
++                            <span className="viz-lbl">120x120 cm</span>
++                          </div>
++                        </div>
++                      </div>
++                    </label>
+                   </div>
+-                  {expandedSections.productType && (
+-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+-                      {['Mat', 'Parlak', 'Lapatto'].map(finishVal => (
+-                        <label key={finishVal} className="checkbox-label-wrapper">
+-                          <input 
+-                            type="checkbox" 
+-                            checked={selectedFinish === finishVal} 
+-                            onChange={() => setSelectedFinish(selectedFinish === finishVal ? '' : finishVal)}
+-                          />
+-                          <span className="checkbox-custom-box" />
+-                          <span className="checkbox-text-label">{finishVal === 'Parlak' ? 'Parlak (Cams─▒)' : finishVal === 'Lapatto' ? 'Lapatto (Yar─▒ Parlak)' : finishVal}</span>
+-                        </label>
+-                      ))}
+-                    </div>
+-                  )}
++                  <button onClick={() => setSelectedSize('')} className="show-all-filter-link" style={{ marginTop: '8px' }}>T├╝m├╝n├╝ G├Âster</button>
+                 </div>
+ 
+-                {/* 6. ├£R├£N ├ûZELL─░K */}
+-                <div className="accordion-section">
+-                  <div className="accordion-header" onClick={() => toggleSection('productFeature')}>
+-                    <span className="accordion-title">├£r├╝n ├ûzellik</span>
+-                    <ChevronDown size={16} style={{ transform: expandedSections.productFeature ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
++                {/* RENK Swatches */}
++                <div className="filter-group-new">
++                  <h4 className="filter-group-title">RENK</h4>
++                  <div className="color-swatches-grid-new">
++                    <button 
++                      onClick={() => setSelectedColor('Beyaz')}
++                      className={`color-swatch-circle-btn ${selectedColor === 'Beyaz' ? 'active' : ''}`}
++                      style={{ backgroundColor: '#ffffff', border: '1px solid #ddd' }}
++                      title="Beyaz"
++                    />
++                    <button 
++                      onClick={() => setSelectedColor('Bej')}
++                      className={`color-swatch-circle-btn ${selectedColor === 'Bej' ? 'active' : ''}`}
++                      style={{ backgroundColor: '#e3d6c3' }}
++                      title="Bej"
++                    />
++                    <button 
++                      onClick={() => setSelectedColor('Gri')}
++                      className={`color-swatch-circle-btn ${selectedColor === 'Gri' ? 'active' : ''}`}
++                      style={{ backgroundColor: '#a0a4ab' }}
++                      title="Gri"
++                    />
++                    <button 
++                      onClick={() => setSelectedColor('Antrasit')}
++                      className={`color-swatch-circle-btn ${selectedColor === 'Antrasit' ? 'active' : ''}`}
++                      style={{ backgroundColor: '#374151' }}
++                      title="Antrasit"
++                    />
++                    <button 
++                      onClick={() => setSelectedColor('Kahverengi')}
++                      className={`color-swatch-circle-btn ${selectedColor === 'Kahverengi' ? 'active' : ''}`}
++                      style={{ backgroundColor: '#8a5a36' }}
++                      title="Kahverengi"
++                    />
++                    <button 
++                      onClick={() => setSelectedColor('')}
++                      className={`color-swatch-all-btn ${selectedColor === '' ? 'active' : ''}`}
++                    >
++                      T├╝m├╝
++                    </button>
+                   </div>
+-                  {expandedSections.productFeature && (
+-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+-                      <label className="checkbox-label-wrapper">
+-                        <input 
+-                          type="checkbox" 
+-                          checked={selectedRectified === 'true'} 
+-                          onChange={() => setSelectedRectified(selectedRectified === 'true' ? '' : 'true')}
+-                        />
+-                        <span className="checkbox-custom-box" />
+-                        <span className="checkbox-text-label">Rektifiyeli</span>
+-                      </label>
+-                      <label className="checkbox-label-wrapper">
+-                        <input 
+-                          type="checkbox" 
+-                          checked={selectedFrost === 'true'} 
+-                          onChange={() => setSelectedFrost(selectedFrost === 'true' ? '' : 'true')}
+-                        />
+-                        <span className="checkbox-custom-box" />
+-                        <span className="checkbox-text-label">Dona Dayan─▒kl─▒</span>
+-                      </label>
+-                    </div>
+-                  )}
+                 </div>
+ 
+-                {/* 7. MEKAN T─░P─░ */}
+-                <div className="accordion-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>
+-                  <div className="accordion-header" onClick={() => toggleSection('spaceType')}>
+-                    <span className="accordion-title">Mekan Tipi</span>
+-                    <ChevronDown size={16} style={{ transform: expandedSections.spaceType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+-                  </div>
+-                  {expandedSections.spaceType && (
+-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+-                      {['Banyo', 'Mutfak', 'Salon', 'Balkon', 'Koridor', 'Teras'].map(areaVal => (
+-                        <label key={areaVal} className="checkbox-label-wrapper">
+-                          <input 
+-                            type="checkbox" 
+-                            checked={selectedArea === areaVal} 
+-                            onChange={() => setSelectedArea(selectedArea === areaVal ? '' : areaVal)}
+-                          />
+-                          <span className="checkbox-custom-box" />
+-                          <span className="checkbox-text-label">{areaVal}</span>
+-                        </label>
+-                      ))}
+-                    </div>
+-                  )}
++                {/* Brand and Surface selects */}
++                <div className="filter-group-new select-group">
++                  <h4 className="filter-group-title">Marka</h4>
++                  <select className="simple-filter-select" value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)}>
++                    <option value="">T├╝m Markalar</option>
++                    {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
++                  </select>
++                </div>
++                
++                <div className="filter-group-new select-group">
++                  <h4 className="filter-group-title">Y├╝zey</h4>
++                  <select className="simple-filter-select" value={selectedFinish} onChange={(e) => setSelectedFinish(e.target.value)}>
++                    <option value="">T├╝m Y├╝zeyler</option>
++                    <option value="Mat">Mat</option>
++                    <option value="Parlak">Parlak (Cams─▒)</option>
++                    <option value="Lapatto">Lapatto (Yar─▒ Parlak)</option>
++                  </select>
+                 </div>
+               </aside>
+ 
+               {/* Right Side Content Results area */}
+               <div className="results-container-new">
+-                <div className="results-header-row-new" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', marginBottom: '20px' }}>
++                <div className="results-header-row-new">
+                   <div className="results-header-text-new">
+                     {uploadedImagePreview ? (
+-                      <h3>G├Ârsel Arama Sonu├ğlar─▒ <span className="results-new-badge gold">AI E┼şle┼şme</span></h3>
++                      <>
++                        <h3>G├Ârsel Arama Sonu├ğlar─▒ <span className="results-new-badge gold">AI E┼şle┼şme</span></h3>
++                        <p>Y├╝kledi─şiniz g├Ârselle benzer doku ve renkteki ├╝r├╝nler listeleniyor.</p>
++                      </>
+                     ) : (
+-                      <h3>Katalog Sonu├ğlar─▒</h3>
++                      <>
++                        <h3>Yeni Eklenen ├£r├╝nler <span className="results-new-badge">Yeni</span></h3>
++                        <p>En yeni seramik koleksiyonlar─▒n─▒ ke┼şfedin.</p>
++                      </>
+                     )}
+                   </div>
+-                  <div className="results-header-actions-new" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+-                    <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>
+-                      Sonu├ğ: <strong style={{ color: '#0f172a' }}>{products.length}</strong>
++                  <div className="results-header-actions-new">
++                    <button onClick={() => { 
++                      setSelectedBrand(''); 
++                      setSelectedColor(''); 
++                      setSelectedFinish(''); 
++                      setSelectedStyle(''); 
++                      setSelectedArea(''); 
++                      setSelectedSize(''); 
++                      setSearchQuery(''); 
++                      setUploadedImagePreview(null);
++                      setVisualSearchMatches(null);
++                      fetchProducts('clear=true'); 
++                    }} className="view-all-results-link">Temizle / T├╝m├╝n├╝ G├Âr</button>
++                    <div className="results-slider-arrows-new">
++                      <button className="slider-arrow-btn-new">ÔØ«</button>
++                      <button className="slider-arrow-btn-new">ÔØ»</button>
+                     </div>
+                   </div>
+                 </div>
+ 
+                 {/* Main Grid */}
+                 <div className="products-grid-new">
+-                  {!initialProductsLoaded ? (
+-                    <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', gap: '12px' }}>
+-                      <Loader2 className="animate-spin" size={32} style={{ color: 'var(--accent-gold)' }} />
+-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>├£r├╝nler y├╝kleniyor...</span>
+-                    </div>
+-                  ) : (
+-                    products.map((product, idx) => {
+-                      const hasAd = product.campaigns && product.campaigns.length > 0;
+-                      return (
+-                        <div 
+-                          key={product.id}
+-                          onClick={() => handleProductCardClick(product)}
+-                          className={`product-card-new glass-panel ${activeProduct?.id === product.id ? 'active' : ''} ${hasAd ? 'sponsored-card-new' : ''}`}
+-                        >
+-                          {/* Thumbnail Texture Container */}
+-                          <div className="card-texture-container-new">
+-                            <TileVisualPreview 
+-                              style={product.style} 
+-                              color={product.color} 
+-                              finish={product.finish}
+-                              width={product.width}
+-                              height={product.height}
+-                              imageUrl={product.imageUrl}
+-                            />
+-                            
+-                            {/* Compare button overlay */}
++                  {products.map((product, idx) => {
++                    const hasAd = product.campaigns && product.campaigns.length > 0;
++                    return (
++                      <div 
++                        key={product.id}
++                        onClick={() => handleProductCardClick(product)}
++                        className={`product-card-new glass-panel ${activeProduct?.id === product.id ? 'active' : ''} ${hasAd ? 'sponsored-card-new' : ''}`}
++                      >
++                        {/* Thumbnail Texture Container */}
++                        <div className="card-texture-container-new">
++                          <TileVisualPreview 
++                            style={product.style} 
++                            color={product.color} 
++                            finish={product.finish}
++                            width={product.width}
++                            height={product.height}
++                            imageUrl={product.imageUrl}
++                          />
++                          
++                          {/* Compare button overlay */}
++                          <button 
++                            className={`card-compare-btn-overlay ${comparedProducts.some(p => p.id === product.id) ? 'active' : ''}`} 
++                            onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
++                            title="Kar┼ş─▒la┼şt─▒r"
++                          >
++                            <span className="compare-icon-indicator">
++                              {comparedProducts.some(p => p.id === product.id) ? 'Ô£ô' : '+'}
++                            </span>
++                            <span>{comparedProducts.some(p => p.id === product.id) ? 'Se├ğildi' : 'Kar┼ş─▒la┼şt─▒r'}</span>
++                          </button>
++                          
++                          {/* Heart icon button overlay */}
++                          <button 
++                            className="card-favorites-heart-btn" 
++                            onClick={(e) => { e.stopPropagation(); alert(`${product.name} favorilerinize eklendi!`); }}
++                            title="Favorilerime Ekle"
++                          >
++                            <HeartIcon size={16} />
++                          </button>
++
++                          {/* Hover action layout */}
++                          <div className="card-quick-actions-row">
+                             <button 
+-                              className={`card-compare-btn-overlay ${comparedProducts.some(p => p.id === product.id) ? 'active' : ''}`} 
+-                              onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
+-                              title="Kar┼ş─▒la┼şt─▒r"
++                              onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
++                              className="btn-primary card-action-btn-new"
+                             >
+-                              <span className="compare-icon-indicator">
+-                                {comparedProducts.some(p => p.id === product.id) ? 'Ô£ô' : '+'}
+-                              </span>
+-                              <span>{comparedProducts.some(p => p.id === product.id) ? 'Se├ğildi' : 'Kar┼ş─▒la┼şt─▒r'}</span>
++                              3D Dene
+                             </button>
+-                            
+-                            {/* Heart icon button overlay */}
+                             <button 
+-                              className="card-favorites-heart-btn" 
+-                              onClick={(e) => { e.stopPropagation(); handleToggleFavorite(product.id); }}
+-                              title="Favorilerime Ekle"
++                              onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}
++                              className="btn-secondary card-action-btn-new"
+                             >
+-                              <HeartIcon size={16} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
++                              Bayi Bul
+                             </button>
+-
+-                            {/* Hover action layout */}
+-                            <div className="card-quick-actions-row">
+-                              <button 
+-                                onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
+-                                className="btn-primary card-action-btn-new"
+-                              >
+-                                3D Dene
+-                              </button>
+-                              <button 
+-                                onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}
+-                                className="btn-secondary card-action-btn-new"
+-                              >
+-                                Bayi Bul
+-                              </button>
+-                            </div>
+                           </div>
++                        </div>
+ 
+-                          {/* Card Meta Content */}
+-                          <div className="card-text-details-new">
+-                            <div className="card-badges-row-new">
+-                              {(() => {
+-                                const badge = getProductBadge(product, idx);
+-                                return (
+-                                  <span className={`card-badge-tag-new ${badge.className}`}>
+-                                    {badge.text}
+-                                  </span>
+-                                );
+-                              })()}
+-                              <span className="card-badge-tag-new grey">{product.finish}</span>
+-                              {product.similarityScore !== undefined && product.similarityScore > 0 && (
+-                                <span className="card-badge-tag-new gold animate-pulse">
+-                                  %{product.similarityScore} E┼şle┼şme
++                        {/* Card Meta Content */}
++                        <div className="card-text-details-new">
++                          <div className="card-badges-row-new">
++                            {(() => {
++                              const badge = getProductBadge(product, idx);
++                              return (
++                                <span className={`card-badge-tag-new ${badge.className}`}>
++                                  {badge.text}
+                                 </span>
+-                              )}
+-                            </div>
+-                            
+-                            <h4 className="card-title-new">{product.name}</h4>
+-                            <p className="card-specs-new">{product.width}x{product.height} cm</p>
+-                            <p className="card-brand-new">{product.brand?.name}</p>
++                              );
++                            })()}
++                            <span className="card-badge-tag-new grey">{product.finish}</span>
++                            {product.similarityScore !== undefined && product.similarityScore > 0 && (
++                              <span className="card-badge-tag-new gold animate-pulse">
++                                %{product.similarityScore} E┼şle┼şme
++                              </span>
++                            )}
+                           </div>
++                          
++                          <h4 className="card-title-new">{product.name}</h4>
++                          <p className="card-specs-new">{product.width}x{product.height} cm</p>
++                          <p className="card-brand-new">{product.brand?.name}</p>
+                         </div>
+-                      );
+-                    })
+-                  )}
++                      </div>
++                    );
++                  })}
+ 
+-                  {initialProductsLoaded && products.length === 0 && (
++                  {products.length === 0 && (
+                     <div className="empty-results glass-panel w-full" style={{ gridColumn: '1/-1' }}>
+                       <HelpCircle size={40} className="empty-icon" />
+                       <h4>Arad─▒─ş─▒n─▒z model bulunamad─▒</h4>
+@@ -9393,69 +9980,6 @@ export default function Home() {
+             width: 100% !important;
+           }
+         }
+-
+-        .accordion-section {
+-          border-bottom: 1px solid var(--border-color);
+-          padding-bottom: 16px;
+-          margin-bottom: 16px;
+-        }
+-        .accordion-header {
+-          display: flex;
+-          justify-content: space-between;
+-          align-items: center;
+-          cursor: pointer;
+-          user-select: none;
+-          padding: 4px 0;
+-        }
+-        .accordion-title {
+-          font-size: 0.85rem;
+-          font-weight: 600;
+-          color: var(--text-primary);
+-          text-transform: uppercase;
+-          letter-spacing: 0.05em;
+-        }
+-        .clear-all-filters-btn {
+-          background: none;
+-          border: none;
+-          color: #64748b;
+-          font-size: 0.8rem;
+-          cursor: pointer;
+-          text-decoration: underline;
+-          transition: color 0.2s;
+-        }
+-        .clear-all-filters-btn:hover {
+-          color: var(--accent-gold);
+-        }
+-        .scrollable-ebat-list {
+-          display: flex;
+-          flex-direction: column;
+-          gap: 8px;
+-          max-height: 240px;
+-          overflow-y: auto;
+-          padding-right: 4px;
+-        }
+-        .scrollable-ebat-list::-webkit-scrollbar {
+-          width: 4px;
+-        }
+-        .scrollable-ebat-list::-webkit-scrollbar-track {
+-          background: #f1f5f9;
+-          border-radius: 2px;
+-        }
+-        .scrollable-ebat-list::-webkit-scrollbar-thumb {
+-          background: #cbd5e1;
+-          border-radius: 2px;
+-        }
+-        .scrollable-ebat-list::-webkit-scrollbar-thumb:hover {
+-          background: var(--accent-gold);
+-        }
+-        .filter-header-row {
+-          display: flex;
+-          justify-content: space-between;
+-          align-items: center;
+-          border-bottom: 1px solid var(--border-color);
+-          padding-bottom: 16px;
+-          margin-bottom: 16px;
+-        }
+       `}</style>
+     </main>
+   );
