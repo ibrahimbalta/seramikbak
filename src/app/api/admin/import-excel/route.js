@@ -57,8 +57,8 @@ export async function POST(request) {
         continue;
       }
 
-      const width = parseInt(cols[2], 10) || 60;
-      const height = parseInt(cols[3], 10) || 60;
+      const width = parseFloat(cols[2]?.replace(',', '.')) || 60;
+      const height = parseFloat(cols[3]?.replace(',', '.')) || 60;
       const color = cols[4]?.trim() || 'Beyaz';
       const finish = cols[5]?.trim() || 'Mat';
       const style = cols[6]?.trim() || defaultStyle || 'Mermer';

@@ -48,8 +48,8 @@ function parseJsonFeed(jsonText) {
       return {
         name,
         code,
-        width: parseInt(widthVal, 10) || 60,
-        height: parseInt(heightVal, 10) || 60,
+        width: parseFloat(widthVal?.replace(',', '.')) || 60,
+        height: parseFloat(heightVal?.replace(',', '.')) || 60,
         color: color || 'Gri',
         finish: finish || 'Mat',
         style: style || '',
@@ -104,8 +104,8 @@ function parseXmlFeed(xmlText) {
       products.push({
         name,
         code,
-        width: parseInt(widthVal, 10) || 60,
-        height: parseInt(heightVal, 10) || 60,
+        width: parseFloat(widthVal?.replace(',', '.')) || 60,
+        height: parseFloat(heightVal?.replace(',', '.')) || 60,
         color: color || 'Gri',
         finish: finish || 'Mat',
         style: style || '',
@@ -152,8 +152,8 @@ function parseXmlFeed(xmlText) {
             products.push({
               name,
               code,
-              width: parseInt(widthVal, 10) || 60,
-              height: parseInt(heightVal, 10) || 60,
+              width: parseFloat(widthVal?.replace(',', '.')) || 60,
+              height: parseFloat(heightVal?.replace(',', '.')) || 60,
               color: color || 'Gri',
               finish: finish || 'Mat',
               style: style || '',

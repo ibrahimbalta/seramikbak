@@ -13,6 +13,8 @@ export async function GET(request) {
     const area = searchParams.get('area');
     const brandId = searchParams.get('brandId');
     const size = searchParams.get('size'); // format: '60x120', '60x60', '20x120'
+    const rectified = searchParams.get('rectified');
+    const frost = searchParams.get('frost');
 
     // Construct Prisma where filters
     const where = {};
@@ -33,6 +35,14 @@ export async function GET(request) {
       where.style = style;
     }
 
+    if (rectified) {
+      where.rectified = rectified === 'true';
+    }
+
+    if (frost) {
+      where.frostResistance = frost === 'true';
+    }
+
     if (area) {
       // Since area is stored as "Banyo,Mutfak", we perform a contains search
       where.area = {
@@ -41,10 +51,10 @@ export async function GET(request) {
     }
 
     if (size) {
-      const parts = size.split('x');
+      const parts = size.toLowerCase().split('x');
       if (parts.length === 2) {
-        const width = parseInt(parts[0], 10);
-        const height = parseInt(parts[1], 10);
+        const width = parseFloat(parts[0].replace(',', '.'));
+        const height = parseFloat(parts[1].replace(',', '.'));
         if (!isNaN(width) && !isNaN(height)) {
           where.OR = [
             { width: width, height: height },

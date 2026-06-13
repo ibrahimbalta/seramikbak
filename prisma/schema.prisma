@@ -29,8 +29,8 @@ model Product {
   code       String         @unique
   brandId    String
   brand      Brand          @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  width      Int            // in cm, e.g., 60
-  height     Int            // in cm, e.g., 120
+  width      Float          // in cm, e.g., 60
+  height     Float          // in cm, e.g., 120
   color      String         // e.g., "Antrasit", "Bej"
   finish     String         // e.g., "Mat", "Parlak", "Lapatto"
   style      String         // e.g., "Mermer", "Ahşap", "Beton"
