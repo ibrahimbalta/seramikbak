@@ -10131,6 +10131,45 @@ export default function Home() {
             justify-content: space-between !important;
             width: 100% !important;
           }
+
+          /* Showroom Hero Banner & Search Form Mobile Fixes */
+          .showroom-hero-banner {
+            padding: 20px 15px !important;
+            min-height: auto !important;
+          }
+          .showroom-hero-banner h2 {
+            font-size: 1.35rem !important;
+            line-height: 1.35 !important;
+          }
+          .hero-banner-subtitle {
+            font-size: 0.78rem !important;
+            line-height: 1.45 !important;
+          }
+          .hero-badge-capsule {
+            padding: 4px 10px !important;
+            font-size: 0.6rem !important;
+          }
+          .search-bar-inner-container {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            border-radius: var(--border-radius-md) !important;
+            padding: 10px !important;
+            gap: 8px !important;
+          }
+          .search-bar-icon-left {
+            display: none !important;
+          }
+          .wide-search-input {
+            width: 100% !important;
+            padding: 4px 0 !important;
+            text-align: center !important;
+          }
+          .wide-search-submit-btn {
+            width: 100% !important;
+            border-radius: var(--border-radius-sm) !important;
+            padding: 10px !important;
+            text-align: center !important;
+          }
         }
 
         .accordion-section {
