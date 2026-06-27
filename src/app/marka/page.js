@@ -113,12 +113,10 @@ export default function BrandPortalPage() {
 
   const fetchBrandProducts = async (brandId) => {
     try {
-      const res = await fetch('/api/search');
+      const res = await fetch(`/api/search?brandId=${brandId}&limit=all`);
       if (res.ok) {
         const data = await res.json();
-        // Filter products belonging to this brand
-        const filtered = data.filter(p => p.brandId === brandId);
-        setBrandProducts(filtered);
+        setBrandProducts(data);
       }
     } catch (err) {
       console.error('Failed to fetch brand products:', err);

@@ -75,6 +75,7 @@ function TileVisualPreview({ style, color, finish, width, height, imageUrl }) {
           src={imageUrl} 
           alt={`${color} ${style} Seramik`} 
           onError={() => setImageError(true)} 
+          loading="lazy"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
         {finish === 'Parlak' && <div className="tile-gloss-reflection" />}
@@ -374,6 +375,9 @@ export default function Home() {
 
   // Database State
   const [products, setProducts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [fetchingMore, setFetchingMore] = useState(false);
   const [brands, setBrands] = useState([]);
   const [weeklyProducts, setWeeklyProducts] = useState([]);
   const [activeProduct, setActiveProduct] = useState(null);
@@ -805,39 +809,37 @@ export default function Home() {
   const [stripeWebhookResult, setStripeWebhookResult] = useState('');
   const [stripeLoading, setStripeLoading] = useState(false);
 
-  // Fetch initial products & brands
+  // Fetch initial brands & weekly products
   useEffect(() => {
-    fetch('/api/search') // Empty search returns all
+    // Fetch brands list (fast, ~14 records)
+    fetch('/api/brands')
       .then(res => res.json())
       .then(data => {
         if (!Array.isArray(data)) {
-          console.error('Failed to load initial search / brands (expected array):', data);
+          console.error('Failed to load initial brands (expected array):', data);
           setInitialBrandsLoaded(true);
           return;
         }
-        const uniqueBrands = [];
-        const seen = new Set();
-        data.forEach(p => {
-          if (p.brand && !seen.has(p.brand.id)) {
-            seen.add(p.brand.id);
-            uniqueBrands.push(p.brand);
-          }
-        });
-        setBrands(uniqueBrands);
-        if (uniqueBrands.length > 0) {
-          setB2bBrandId(uniqueBrands[0].id);
+        setBrands(data);
+        if (data.length > 0) {
+          setB2bBrandId(data[0].id);
         }
-
-        // Set weekly featured products
-        const enriched = data.map(enrichProductData);
-        const premiumOnly = enriched.filter(p => p.isPremium);
-        const weekly = premiumOnly.length > 0 ? premiumOnly : enriched.slice(0, 5);
-        setWeeklyProducts(weekly);
         setInitialBrandsLoaded(true);
       })
       .catch((err) => {
-        console.error('Failed to load initial search / brands:', err);
+        console.error('Failed to load initial brands:', err);
         setInitialBrandsLoaded(true);
+      });
+
+    // Fetch weekly premium products (fast, ~12 records)
+    fetch('/api/search?isPremium=true&limit=12')
+      .then(res => res.json())
+      .then(data => {
+        const enriched = Array.isArray(data) ? data.map(enrichProductData) : [];
+        setWeeklyProducts(enriched);
+      })
+      .catch((err) => {
+        console.error('Failed to load weekly products:', err);
       });
   }, []);
 
@@ -888,12 +890,21 @@ export default function Home() {
     }
   }, [isKioskMode]);
 
-  // General products fetch with filters
-  async function fetchProducts(customParams = '') {
+  // General products fetch with filters (with pagination support)
+  async function fetchProducts(customParams = '', targetPage = 1, append = false) {
+    if (append) {
+      setFetchingMore(true);
+    } else {
+      setInitialProductsLoaded(false);
+    }
     try {
+      const limit = 24;
       let url = `/api/search?`;
       if (customParams) {
         url += customParams;
+        if (!url.includes('page=')) {
+          url += `&page=${targetPage}&limit=${limit}`;
+        }
       } else {
         const params = new URLSearchParams();
         if (searchQuery) params.append('q', searchQuery);
@@ -905,6 +916,8 @@ export default function Home() {
         if (selectedSize) params.append('size', selectedSize);
         if (selectedRectified) params.append('rectified', selectedRectified);
         if (selectedFrost) params.append('frost', selectedFrost);
+        params.append('page', String(targetPage));
+        params.append('limit', String(limit));
         url += params.toString();
       }
       const res = await fetch(url);
@@ -920,26 +933,47 @@ export default function Home() {
         sortedData.sort((a, b) => b.cheapestOffer.price - a.cheapestOffer.price);
       }
 
-      setProducts(sortedData);
-      if (sortedData.length > 0 && !activeProduct) {
-        setActiveProduct(sortedData[0]);
+      if (append) {
+        setProducts(prev => [...prev, ...sortedData]);
+      } else {
+        setProducts(sortedData);
+        if (sortedData.length > 0) {
+          // Keep activeProduct if it exists in the new list, or set it to the first one
+          setActiveProduct(sortedData[0]);
+        }
+      }
+
+      if (sortedData.length < limit) {
+        setHasMore(false);
+      } else {
+        setHasMore(true);
       }
     } catch (err) {
       console.error('Failed to fetch products:', err);
     } finally {
       setInitialProductsLoaded(true);
+      setFetchingMore(false);
     }
   };
 
   useEffect(() => {
-    fetchProducts();
+    setPage(1);
+    fetchProducts('', 1, false);
   }, [sortBy, searchQuery, selectedBrand, selectedColor, selectedFinish, selectedStyle, selectedArea, selectedSize, selectedRectified, selectedFrost]);
+
+  const handleLoadMore = () => {
+    if (fetchingMore || !hasMore) return;
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProducts('', nextPage, true);
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setUploadedImagePreview(null);
     setVisualSearchMatches(null);
-    fetchProducts();
+    setPage(1);
+    fetchProducts('', 1, false);
   };
 
   const handleTagClick = (tagQuery, filterType = '', filterVal = '') => {
@@ -947,19 +981,13 @@ export default function Home() {
     setUploadedImagePreview(null);
     setVisualSearchMatches(null);
     
-    let customParams = `q=${encodeURIComponent(tagQuery)}`;
     if (filterType === 'style') {
       setSelectedStyle(filterVal);
-      customParams += `&style=${filterVal}`;
     } else if (filterType === 'finish') {
       setSelectedFinish(filterVal);
-      customParams += `&finish=${filterVal}`;
     } else if (filterType === 'size') {
       setSelectedSize(filterVal);
-      customParams += `&size=${filterVal}`;
     }
-    
-    fetchProducts(customParams);
   };
 
   const handleVisualSearch = async (e) => {
@@ -986,6 +1014,7 @@ export default function Home() {
           // Enrich products returned from API
           const enriched = data.products.map(enrichProductData);
           setProducts(enriched);
+          setHasMore(false);
           
           // Set visual search match metadata for UI indicators
           const matches = data.products.map(p => ({
@@ -2496,6 +2525,7 @@ export default function Home() {
                           <img 
                             src={p.imageUrl || '/textures/calacatta_gold.jpg'} 
                             alt={p.name} 
+                            loading="lazy"
                             style={{
                               width: '100%',
                               height: '100%',
@@ -3006,6 +3036,27 @@ export default function Home() {
                     </div>
                   )}
                 </div>
+
+                {/* Pagination Controls */}
+                {initialProductsLoaded && hasMore && products.length > 0 && (
+                  <div className="pagination-wrapper-new" style={{ display: 'flex', justifyContent: 'center', margin: '30px 0 10px 0' }}>
+                    <button 
+                      onClick={handleLoadMore} 
+                      className="btn-secondary" 
+                      disabled={fetchingMore}
+                      style={{ padding: '12px 35px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', minWidth: '200px', justifyContent: 'center', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}
+                    >
+                      {fetchingMore ? (
+                        <>
+                          <Loader2 className="animate-spin" size={16} />
+                          Yükleniyor...
+                        </>
+                      ) : (
+                        'Daha Fazla Ürün Göster'
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

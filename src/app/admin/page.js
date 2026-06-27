@@ -175,25 +175,17 @@ export default function AdminPage() {
   // Fetch initial datasets
   const loadBrands = async () => {
     try {
-      const res = await fetch('/api/search');
+      const res = await fetch('/api/brands');
       const data = await res.json();
-      const uniqueBrands = [];
-      const seen = new Set();
-      data.forEach(p => {
-        if (p.brand && !seen.has(p.brand.id)) {
-          seen.add(p.brand.id);
-          uniqueBrands.push(p.brand);
-        }
-      });
-      setBrands(uniqueBrands);
-      if (uniqueBrands.length > 0) {
-        setSelectedBrand(uniqueBrands[0].id);
-        setNewDealerBrandId(uniqueBrands[0].id);
-        setSaasBrandId(uniqueBrands[0].id);
-        setExcelBrandId(uniqueBrands[0].id);
-        setPdfBrandId(uniqueBrands[0].id);
-        setManualBrandId(uniqueBrands[0].id);
-        setFeedBrandId(uniqueBrands[0].id);
+      setBrands(data);
+      if (data.length > 0) {
+        setSelectedBrand(data[0].id);
+        setNewDealerBrandId(data[0].id);
+        setSaasBrandId(data[0].id);
+        setExcelBrandId(data[0].id);
+        setPdfBrandId(data[0].id);
+        setManualBrandId(data[0].id);
+        setFeedBrandId(data[0].id);
       }
     } catch (err) {
       console.error('Failed to load brands:', err);

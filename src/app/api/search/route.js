@@ -15,6 +15,24 @@ export async function GET(request) {
     const size = searchParams.get('size'); // format: '60x120', '60x60', '20x120'
     const rectified = searchParams.get('rectified');
     const frost = searchParams.get('frost');
+    const isPremium = searchParams.get('isPremium');
+
+    // Pagination parameters
+    const limitParam = searchParams.get('limit');
+    const pageParam = searchParams.get('page');
+    let skip = undefined;
+    let take = undefined;
+
+    if (limitParam !== 'all') {
+      const limit = parseInt(limitParam || '24', 10);
+      const page = parseInt(pageParam || '1', 10);
+      if (!isNaN(limit) && limit > 0) {
+        take = limit;
+        if (!isNaN(page) && page > 0) {
+          skip = (page - 1) * limit;
+        }
+      }
+    }
 
     // Construct Prisma where filters
     const where = {};
@@ -41,6 +59,10 @@ export async function GET(request) {
 
     if (frost) {
       where.frostResistance = frost === 'true';
+    }
+
+    if (isPremium) {
+      where.isPremium = isPremium === 'true';
     }
 
     if (area) {
@@ -85,6 +107,12 @@ export async function GET(request) {
     // Query products
     const products = await prisma.product.findMany({
       where,
+      skip,
+      take,
+      orderBy: [
+        { isPremium: 'desc' },
+        { createdAt: 'desc' }
+      ],
       include: {
         brand: {
           select: {
