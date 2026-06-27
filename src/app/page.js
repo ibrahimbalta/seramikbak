@@ -1858,11 +1858,11 @@ export default function Home() {
                 <span className="banner-product-name">Travertino Classico</span>
               </div>
             </div>
-            <div className="banner-item" onClick={() => openProductByCode('KALE-ROY-GRY')}>
-              <img src="/hero/luxury_bathroom.png" alt="Kalebodur Royal" className="banner-img" />
+            <div className="banner-item" onClick={() => openProductByCode('HITIT-NEXOS-ANTRASIT-LAPPATO-60X120')}>
+              <img src="/hero/luxury_bathroom.png" alt="Hitit Nexos" className="banner-img" />
               <div className="banner-item-info">
-                <span className="banner-brand-name">Kalebodur</span>
-                <span className="banner-product-name">Royal Grey</span>
+                <span className="banner-brand-name">Hitit Seramik</span>
+                <span className="banner-product-name">Nexos Antrasit Lappato</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('BIEN-BOR-ANT')}>
@@ -1901,11 +1901,11 @@ export default function Home() {
                 <span className="banner-product-name">Travertino Classico</span>
               </div>
             </div>
-            <div className="banner-item" onClick={() => openProductByCode('KALE-ROY-GRY')}>
-              <img src="/hero/luxury_bathroom.png" alt="Kalebodur Royal" className="banner-img" />
+            <div className="banner-item" onClick={() => openProductByCode('HITIT-NEXOS-ANTRASIT-LAPPATO-60X120')}>
+              <img src="/hero/luxury_bathroom.png" alt="Hitit Nexos" className="banner-img" />
               <div className="banner-item-info">
-                <span className="banner-brand-name">Kalebodur</span>
-                <span className="banner-product-name">Royal Grey</span>
+                <span className="banner-brand-name">Hitit Seramik</span>
+                <span className="banner-product-name">Nexos Antrasit Lappato</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('BIEN-BOR-ANT')}>
@@ -2394,7 +2394,7 @@ export default function Home() {
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.08em', fontWeight: '800' }}>QUA GRANITE</div>
                   <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)' }}>YURTBAY SERAMİK</div>
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>ÇANAKKALE SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ fontWeight: '800', letterSpacing: '0.12em' }}>KALEBODUR</div>
+                  <div className="brand-marquee-item" style={{ fontWeight: '800', letterSpacing: '0.12em' }}>HİTİT SERAMİK</div>
                   <div className="brand-marquee-item" style={{ color: 'var(--text-muted)' }}>TERMAL SERAMİK</div>
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>UŞAK SERAMİK</div>
 
@@ -2407,7 +2407,7 @@ export default function Home() {
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.08em', fontWeight: '800' }}>QUA GRANITE</div>
                   <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)' }}>YURTBAY SERAMİK</div>
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>ÇANAKKALE SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ fontWeight: '800', letterSpacing: '0.12em' }}>KALEBODUR</div>
+                  <div className="brand-marquee-item" style={{ fontWeight: '800', letterSpacing: '0.12em' }}>HİTİT SERAMİK</div>
                   <div className="brand-marquee-item" style={{ color: 'var(--text-muted)' }}>TERMAL SERAMİK</div>
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>UŞAK SERAMİK</div>
                 </div>
