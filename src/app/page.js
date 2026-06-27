@@ -1166,6 +1166,18 @@ export default function Home() {
     setDetailDealers([]);
     setDetailDealersLoading(true);
     logInteraction('VIEW', product.id, product.brandId);
+
+    // Fetch full product details asynchronously to keep the main grid query fast
+    if (product && (product.trendyolUrl === undefined && product.hepsiburadaUrl === undefined)) {
+      fetch(`/api/search?q=${product.code}&fullDetail=true`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            setDetailProduct(data[0]);
+          }
+        })
+        .catch(err => console.error('Failed to lazy load product details:', err));
+    }
     
     // Fetch dealers for the product brand
     try {
@@ -1183,7 +1195,7 @@ export default function Home() {
 
   const openProductByCode = async (code) => {
     try {
-      const res = await fetch(`/api/search?q=${code}`);
+      const res = await fetch(`/api/search?q=${code}&fullDetail=true`);
       if (res.ok) {
         const data = await res.json();
         if (data.length > 0) {

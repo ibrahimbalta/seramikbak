@@ -104,35 +104,80 @@ export async function GET(request) {
       });
     }
 
+    const fullDetail = searchParams.get('fullDetail') === 'true';
+
     // Query products
-    const products = await prisma.product.findMany({
-      where,
-      skip,
-      take,
-      orderBy: [
-        { isPremium: 'desc' },
-        { createdAt: 'desc' }
-      ],
-      include: {
-        brand: {
-          select: {
-            id: true,
-            name: true,
-            logoUrl: true
-          }
-        },
-        campaigns: {
-          where: {
-            status: 'ACTIVE',
-            budget: { gt: 0 }
+    let products;
+    if (fullDetail) {
+      products = await prisma.product.findMany({
+        where,
+        skip,
+        take,
+        orderBy: [
+          { isPremium: 'desc' },
+          { createdAt: 'desc' }
+        ],
+        include: {
+          brand: {
+            select: {
+              id: true,
+              name: true,
+              logoUrl: true
+            }
           },
-          select: {
-            id: true,
-            bidAmount: true
+          campaigns: {
+            where: {
+              status: 'ACTIVE',
+              budget: { gt: 0 }
+            },
+            select: {
+              id: true,
+              bidAmount: true
+            }
           }
         }
-      }
-    });
+      });
+    } else {
+      products = await prisma.product.findMany({
+        where,
+        skip,
+        take,
+        orderBy: [
+          { isPremium: 'desc' },
+          { createdAt: 'desc' }
+        ],
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          brandId: true,
+          width: true,
+          height: true,
+          color: true,
+          finish: true,
+          style: true,
+          imageUrl: true,
+          isPremium: true,
+          brand: {
+            select: {
+              id: true,
+              name: true,
+              logoUrl: true
+            }
+          },
+          campaigns: {
+            where: {
+              status: 'ACTIVE',
+              budget: { gt: 0 }
+            },
+            select: {
+              id: true,
+              bidAmount: true
+            }
+          }
+        }
+      });
+    }
 
     // Sort products so that "isPremium" or bid-carrying products appear first
     // This implements the Step 5 Monetization requirement (Premium Featured Listings)
