@@ -1,0 +1,39 @@
+# agent-hub project profile
+# Every super-team agent reads this file before acting.
+# Fill it once per project; leave unknowns as "".
+
+project:
+  name: "seramikbak"
+  type: "fullstack"
+  description: "A Next.js fullstack web application for a ceramics showroom, featuring 3D studio customization and mapping of dealers."
+
+stack:
+  language: "JavaScript"
+  runtime: "Node 18+"
+  framework: "Next.js 16.2.7 (App Router), Tailwind CSS v4, Three.js, Leaflet"
+  database: "SQLite (local) / LibSQL (Turso) via Prisma"
+  packageManager: "npm"
+
+commands:
+  install: "npm install"
+  dev: "npm run dev"
+  test: ""
+  lint: "npm run lint"
+  build: "npm run build"
+
+team:
+  # Specialists active for this project. Remove ones you don't need.
+  active:
+    - tech-lead
+    - architect
+    - backend-engineer
+    - frontend-engineer
+    - code-reviewer
+
+conventions:
+  - "Use @/* for absolute imports pointing to the src/ directory"
+  - "Use the Prisma Client instance exported from src/lib/prisma.js for database operations"
+  - "Use Tailwind CSS v4 for UI styles and layouts"
+
+doNot:
+  - "Do not instantiate PrismaClient directly; use the instance from src/lib/prisma.js"

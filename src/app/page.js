@@ -810,6 +810,11 @@ export default function Home() {
     fetch('/api/search') // Empty search returns all
       .then(res => res.json())
       .then(data => {
+        if (!Array.isArray(data)) {
+          console.error('Failed to load initial search / brands (expected array):', data);
+          setInitialBrandsLoaded(true);
+          return;
+        }
         const uniqueBrands = [];
         const seen = new Set();
         data.forEach(p => {
@@ -906,7 +911,7 @@ export default function Home() {
       const data = await res.json();
       
       // Pricing simulation
-      const simulatedData = data.map(enrichProductData);
+      const simulatedData = Array.isArray(data) ? data.map(enrichProductData) : [];
 
       let sortedData = [...simulatedData];
       if (sortBy === 'price_asc') {
@@ -977,20 +982,24 @@ export default function Home() {
       if (res.ok) {
         const data = await res.json();
         
-        // Enrich products returned from API
-        const enriched = data.products.map(enrichProductData);
-        setProducts(enriched);
+        if (data && Array.isArray(data.products)) {
+          // Enrich products returned from API
+          const enriched = data.products.map(enrichProductData);
+          setProducts(enriched);
+          
+          // Set visual search match metadata for UI indicators
+          const matches = data.products.map(p => ({
+            productId: p.id,
+            productName: p.name,
+            productCode: p.code,
+            score: p.similarityScore
+          }));
+          setVisualSearchMatches(matches);
+        } else {
+          console.error('Invalid visual search response format:', data);
+        }
         
-        // Set visual search match metadata for UI indicators
-        const matches = data.products.map(p => ({
-          productId: p.id,
-          productName: p.name,
-          productCode: p.code,
-          score: p.similarityScore
-        }));
-        setVisualSearchMatches(matches);
-        
-        if (data.warning) {
+        if (data && data.warning) {
           console.warn(data.warning);
         }
       } else {

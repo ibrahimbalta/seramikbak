@@ -639,21 +639,32 @@ export default function AdminPage() {
     setSuccessMsg('');
     setErrorMsg('');
 
-    const localLogs = [
-      `[Scraper] Initializing Playwright sandbox browser...`,
-      `[Scraper] User-Agent set: Mozilla/5.0 (Windows NT 10.0; Win64; x64)...`,
-      `[Scraper] Navigating to target URL: ${scrapeUrl}`,
-      `[Scraper] Connection established. Status: 200 OK. Waiting for networkidle...`,
-      `[Scraper] Emulating human behavior (scrolling viewport, delay 1.2s)...`
-    ];
+    // Detect if this is an ngkutahyaseramik.com.tr URL (SPA site → use sitemap scraper)
+    const isNgKutahya = scrapeUrl.includes('ngkutahyaseramik.com.tr');
+    const apiEndpoint = isNgKutahya ? '/api/admin/scrape-sitemap' : '/api/admin/ingest';
+
+    const localLogs = isNgKutahya
+      ? [
+          `[Sitemap Scraper] NG Kütahya Seramik SPA sitesi algılandı...`,
+          `[Sitemap Scraper] Sitemap XML stratejisi kullanılıyor (SPA uyumlu)...`,
+          `[Sitemap Scraper] Sitemap URL: ${scrapeUrl.split('/urun')[0]}/tr-product/sitemap.xml`,
+          `[Sitemap Scraper] Bağlantı kuruluyor...`,
+        ]
+      : [
+          `[Scraper] Initializing Playwright sandbox browser...`,
+          `[Scraper] User-Agent set: Mozilla/5.0 (Windows NT 10.0; Win64; x64)...`,
+          `[Scraper] Navigating to target URL: ${scrapeUrl}`,
+          `[Scraper] Connection established. Status: 200 OK. Waiting for networkidle...`,
+          `[Scraper] Emulating human behavior (scrolling viewport, delay 1.2s)...`
+        ];
 
     for (let i = 0; i < localLogs.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 350));
+      await new Promise(resolve => setTimeout(resolve, 300));
       setLogs(prev => [...prev, localLogs[i]]);
     }
 
     try {
-      const response = await fetch('/api/admin/ingest', {
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -666,11 +677,16 @@ export default function AdminPage() {
       const data = await response.json();
 
       if (data.success) {
-        for (let i = 5; i < data.logs.length; i++) {
-          await new Promise(resolve => setTimeout(resolve, 200));
+        // Show server-side logs with animation
+        const startIdx = isNgKutahya ? 0 : 5;
+        for (let i = startIdx; i < data.logs.length; i++) {
+          await new Promise(resolve => setTimeout(resolve, 120));
           setLogs(prev => [...prev, data.logs[i]]);
         }
-        setSuccessMsg(`Başarılı! ${data.productsCount} adet yeni ürün başarıyla veritabanına aktarıldı ve normalize edildi.`);
+        const newMsg = data.newCount !== undefined
+          ? `Başarılı! ${data.newCount} yeni ürün eklendi, ${data.updatedCount} mevcut ürün atlandı. Toplam: ${data.productsCount} ürün.`
+          : `Başarılı! ${data.productsCount} adet yeni ürün başarıyla veritabanına aktarıldı ve normalize edildi.`;
+        setSuccessMsg(newMsg);
         setScrapeUrl('');
       } else {
         setLogs(prev => [...prev, `[Error] Ingestion failed: ${data.error}`]);

@@ -1,0 +1,546 @@
+[
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/alba-serisi",
+    "name": "ALBA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/anatolia-serisi",
+    "name": "ANATOLIA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/andezit-serisi",
+    "name": "ANDEZIT"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/angel-serisi",
+    "name": "ANGEL"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/antiasit-serisi",
+    "name": "ANTİASİT"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/aqua-serisi",
+    "name": "AQUA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/argilla-serisi",
+    "name": "ARGILLA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/aroc-serisi",
+    "name": "AROC"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/artemis-serisi",
+    "name": "ARTEMİS"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/asia-serisi",
+    "name": "ASIA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/aspendos-serisi",
+    "name": "ASPENDOS"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/avalon-serisi",
+    "name": "AVALON"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/avanos-serisi",
+    "name": "AVANOS"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/bali-serisi",
+    "name": "BALİ"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/bazalt-serisi",
+    "name": "BAZALT"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/belgium-stone-serisi",
+    "name": "BELGIUM STONE"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/bella-serisi",
+    "name": "BELLA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/beton-serisi",
+    "name": "BETON"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/black-marble-serisi",
+    "name": "BLACK MARBLE"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/black-star-serisi",
+    "name": "BLACK STAR"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/boston-serisi",
+    "name": "BOSTON"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/brugge-serisi",
+    "name": "BRUGGE"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/bumpy-serisi",
+    "name": "BUMPY"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/calacata-marmi-serisi",
+    "name": "CALACATA MARMI"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/california-serisi",
+    "name": "CALIFORNIA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/capella-serisi",
+    "name": "CAPELLA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/carrara-serisi",
+    "name": "CARRARA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/cement-serisi",
+    "name": "CEMENT"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/city-serisi",
+    "name": "CITY"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/classic-wood-serisi",
+    "name": "CLASSIC WOOD"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/classwood-serisi",
+    "name": "CLASSWOOD"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/color-serisi",
+    "name": "COLOR"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/costa-serisi",
+    "name": "COSTA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/crystal-serisi",
+    "name": "CRYSTAL"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/dalyan-serisi",
+    "name": "DALYAN"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/damasko-serisi",
+    "name": "DAMASKO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/dantel-serisi",
+    "name": "DANTEL"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/dekor-serisi",
+    "name": "DEKOR"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/diamond-serisi",
+    "name": "DIAMOND"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/dominica-serisi",
+    "name": "DOMINICA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/ephesus-serisi",
+    "name": "EPHESUS"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/eros-serisi",
+    "name": "EROS"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/etna-serisi",
+    "name": "ETNA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/fontana-serisi",
+    "name": "FONTANA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/forest-serisi",
+    "name": "FOREST"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/galaxy-serisi",
+    "name": "GALAXY"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/genova-serisi",
+    "name": "GENOVA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/giza-serisi",
+    "name": "GIZA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/gloria-serisi",
+    "name": "GLORIA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/gold-calacata-serisi",
+    "name": "GOLD CALACATA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/grunge-serisi",
+    "name": "GRUNGE"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/hardy-serisi",
+    "name": "HARDY"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/harmony-serisi",
+    "name": "HARMONY"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/helena-serisi",
+    "name": "HELENA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/history-serisi",
+    "name": "HISTORY"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/homeros-serisi",
+    "name": "HOMEROS"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/ibiza-serisi",
+    "name": "IBIZA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/icona-serisi",
+    "name": "ICONA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/integra-serisi",
+    "name": "INTEGRA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/istanbul-serisi",
+    "name": "İSTANBUL"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/joy-serisi",
+    "name": "JOY"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/kanyon-serisi",
+    "name": "KANYON"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/keops-serisi",
+    "name": "KEOPS"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/ladin-serisi",
+    "name": "LADIN"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/lady-serisi",
+    "name": "LADY"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/lava-serisi",
+    "name": "LAVA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/lavion-serisi",
+    "name": "LAVION"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/lecce-serisi",
+    "name": "LECCE"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/line-serisi",
+    "name": "LINE"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/loft-serisi",
+    "name": "LOFT"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/magma-serisi",
+    "name": "MAGMA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/massive-wood-touch-serisi",
+    "name": "MASSIVE WOOD TOUCH"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/mat-serisi",
+    "name": "MAT"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/metalica-serisi",
+    "name": "METALICA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/metalik-serisi",
+    "name": "METALİK"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/metro-serisi",
+    "name": "METRO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/metropolis-serisi",
+    "name": "METROPOLIS"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/milano-serisi",
+    "name": "MILANO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/mineral-serisi",
+    "name": "MINERAL"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/mist-serisi",
+    "name": "MIST"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/momentum-serisi",
+    "name": "MOMENTUM"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/monaco-serisi",
+    "name": "MONACO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/mons-serisi",
+    "name": "MONS"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/moon-serisi",
+    "name": "MOON"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/nest-serisi",
+    "name": "NEST"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/nevada-serisi",
+    "name": "NEVADA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/new-orleans-serisi",
+    "name": "NEW ORLEANS"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/new-travertin-serisi",
+    "name": "NEW TRAVERTIN"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/nora-serisi",
+    "name": "NORA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/nordik-serisi",
+    "name": "NORDIK"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/orion-serisi",
+    "name": "ORION"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/orlando-serisi",
+    "name": "ORLANDO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/oscar-serisi",
+    "name": "OSCAR"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/oxford-serisi",
+    "name": "OXFORD"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/pacific-serisi",
+    "name": "PACIFIC"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/palermo-serisi",
+    "name": "PALERMO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/parlak-serisi",
+    "name": "PARLAK"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/parma-serisi",
+    "name": "PARMA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/pergamon-serisi",
+    "name": "PERGAMON"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/pietra-serisi",
+    "name": "PIETRA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/portland-serisi",
+    "name": "PORTLAND"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/porto-serisi",
+    "name": "PORTO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/portofino-serisi",
+    "name": "PORTOFINO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/quantum-serisi",
+    "name": "QUANTUM"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/quarzite-serisi",
+    "name": "QUARZITE"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/ral-serisi",
+    "name": "RAL"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/resolute-serisi",
+    "name": "RESOLUTE"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/river-serisi",
+    "name": "RIVER"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/rock-serisi",
+    "name": "ROCK"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/rosella-serisi",
+    "name": "ROSELLA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/sagano-serisi",
+    "name": "SAGANO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/sanremo-serisi",
+    "name": "SANREMO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/senfoni-serisi",
+    "name": "SENFONI"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/serengeti-serisi",
+    "name": "SERENGETI"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/silver-serisi",
+    "name": "SILVER"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/silver-calacatta-serisi",
+    "name": "SILVER CALACATTA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/snow-serisi",
+    "name": "SNOW"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/star-serisi",
+    "name": "STAR"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/statuario-serisi",
+    "name": "STATUARIO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/sun-serisi",
+    "name": "SUN"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/teak-serisi",
+    "name": "TEAK"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/terra-cotto-serisi",
+    "name": "TERRA COTTO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/trassimeno-serisi",
+    "name": "TRASSIMENO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/traverten-serisi",
+    "name": "TRAVERTEN"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/trio-serisi",
+    "name": "TRIO"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/tropical-serisi",
+    "name": "TROPICAL"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/union-serisi",
+    "name": "UNION"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/urban-serisi",
+    "name": "URBAN"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/venezia-serisi",
+    "name": "VENEZIA"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/venus-serisi",
+    "name": "VENUS"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/victorian-serisi",
+    "name": "VICTORIAN"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/white-marble-serisi",
+    "name": "WHITE MARBLE"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/wood-dream-serisi",
+    "name": "WOOD DREAM"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/yildiz-serisi",
+    "name": "YILDIZ"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/zanzibar-serisi",
+    "name": "ZANZIBAR"
+  },
+  {
+    "url": "https://www.seramiksan.com.tr/seramik/zeus-serisi",
+    "name": "ZEUS"
+  }
+]
