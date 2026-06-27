@@ -633,6 +633,7 @@ export default function Home() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [userFavorites, setUserFavorites] = useState([]);
   const [showFavoritesPanel, setShowFavoritesPanel] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Dealer Signup handler
   const handleDealerSignupSubmit = async (e) => {
@@ -2697,25 +2698,30 @@ export default function Home() {
             {/* Main Layout: Left Sidebar + Results Grid */}
             <div className="main-search-and-results-layout">
               {/* Left Sidebar Filter Section */}
-              <aside className="filters-sidebar-new glass-panel" style={{ position: 'relative' }}>
+              <aside className={`filters-sidebar-new glass-panel ${showMobileFilters ? 'open' : ''}`} style={showMobileFilters ? {} : { position: 'relative' }}>
                 <div className="filter-header-row">
                   <h3 className="filter-title-main" style={{ fontSize: '1.2rem', fontWeight: '750', color: '#0f172a', margin: 0, border: 'none', padding: 0 }}>Filtreler</h3>
-                  <button onClick={() => {
-                    setSelectedBrand('');
-                    setSelectedColor('');
-                    setSelectedFinish('');
-                    setSelectedStyle('');
-                    setSelectedArea('');
-                    setSelectedSize('');
-                    setSelectedRectified('');
-                    setSelectedFrost('');
-                    setSearchQuery('');
-                    setUploadedImagePreview(null);
-                    setVisualSearchMatches(null);
-                    fetchProducts('clear=true');
-                  }} className="clear-all-filters-btn">
-                    Tümünü Temizle
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button onClick={() => {
+                      setSelectedBrand('');
+                      setSelectedColor('');
+                      setSelectedFinish('');
+                      setSelectedStyle('');
+                      setSelectedArea('');
+                      setSelectedSize('');
+                      setSelectedRectified('');
+                      setSelectedFrost('');
+                      setSearchQuery('');
+                      setUploadedImagePreview(null);
+                      setVisualSearchMatches(null);
+                      fetchProducts('clear=true');
+                    }} className="clear-all-filters-btn">
+                      Temizle
+                    </button>
+                    <button onClick={() => setShowMobileFilters(false)} className="mobile-filter-close-btn">
+                      ✕
+                    </button>
+                  </div>
                 </div>
 
                 {/* 1. KATEGORİLER */}
@@ -2929,6 +2935,10 @@ export default function Home() {
                     )}
                   </div>
                   <div className="results-header-actions-new" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <button onClick={() => setShowMobileFilters(true)} className="mobile-filter-trigger-btn">
+                      <SlidersHorizontal size={14} />
+                      <span>Filtrele</span>
+                    </button>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>
                       Sonuç: <strong style={{ color: '#0f172a' }}>{products.length}</strong>
                     </div>
@@ -5314,6 +5324,36 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Mobile Filters Backdrop */}
+      <div className={`mobile-filters-backdrop ${showMobileFilters ? 'show' : ''}`} onClick={() => setShowMobileFilters(false)} />
+
+      {/* Mobile Sticky Bottom Tab Navigation Bar */}
+      <div className="mobile-bottom-nav">
+        <button className={`mobile-nav-item ${activeTab === 'search' ? 'active' : ''}`} onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+          <SearchIcon size={20} />
+          <span>Arama</span>
+        </button>
+        <button className={`mobile-nav-item ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); }}>
+          <Layers size={20} />
+          <span>3D Stüdyo</span>
+        </button>
+        <button className="mobile-nav-item" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { setShowAuthModal(true); } }}>
+          <div style={{ position: 'relative', display: 'inline-flex' }}>
+            <HeartIcon size={20} />
+            {userFavorites.length > 0 && <span className="mobile-nav-badge">{userFavorites.length}</span>}
+          </div>
+          <span>Favoriler</span>
+        </button>
+        <button className={`mobile-nav-item ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); }}>
+          <MapPin size={20} />
+          <span>Bayiler</span>
+        </button>
+        <button className={`mobile-nav-item ${showMobileMenu ? 'active' : ''}`} onClick={() => setShowMobileMenu(!showMobileMenu)}>
+          <MenuIcon size={20} />
+          <span>Menü</span>
+        </button>
+      </div>
 
       {/* Embedded CSS specific to this high-fidelity layout */}
       <style jsx>{`
@@ -10142,6 +10182,165 @@ export default function Home() {
           border-bottom: 1px solid var(--border-color);
           padding-bottom: 16px;
           margin-bottom: 16px;
+        }
+
+        /* MOBILE BOTTOM NAVIGATION & SLIDEOVER FILTERS STYLING */
+        .mobile-bottom-nav {
+          display: none;
+        }
+        .mobile-filter-trigger-btn {
+          display: none;
+        }
+        .mobile-filter-close-btn {
+          display: none;
+        }
+        .mobile-filters-backdrop {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(2px);
+          -webkit-backdrop-filter: blur(2px);
+          z-index: 10001;
+          display: none;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        .mobile-filters-backdrop.show {
+          display: block;
+          opacity: 1;
+        }
+
+        @media (max-width: 900px) {
+          .mobile-filter-trigger-btn {
+            display: flex !important;
+            align-items: center;
+            gap: 6px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: all 0.2s;
+          }
+          .mobile-filter-trigger-btn:active {
+            background: #f1f5f9;
+          }
+          .mobile-filter-close-btn {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.2s;
+          }
+          .mobile-filter-close-btn:active {
+            background: #e2e8f0;
+          }
+
+          .filters-sidebar-new {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 310px;
+            max-width: 80vw;
+            z-index: 10005 !important;
+            background: #ffffff !important;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15) !important;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            overflow-y: auto;
+            border-radius: 0 !important;
+            border-right: 1px solid var(--border-color) !important;
+            padding: 20px !important;
+            display: flex !important;
+          }
+          .filters-sidebar-new.open {
+            transform: translateX(0) !important;
+          }
+          .main-search-and-results-layout {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        @media (max-width: 768px) {
+          :global(body) {
+            padding-bottom: 74px !important;
+          }
+          .mobile-bottom-nav {
+            display: flex;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            z-index: 9998;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.03);
+          }
+          .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+            font-family: var(--font-title);
+            font-weight: 500;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            position: relative;
+            padding: 4px 0;
+          }
+          .mobile-nav-item.active {
+            color: var(--accent-gold);
+            font-weight: 700;
+          }
+          .mobile-nav-item svg {
+            transition: transform 0.2s ease;
+          }
+          .mobile-nav-item:active svg {
+            transform: scale(0.85);
+          }
+          .mobile-nav-badge {
+            position: absolute;
+            top: -2px;
+            right: -8px;
+            background: var(--accent-gold);
+            color: #1a1c24;
+            font-size: 0.55rem;
+            font-weight: 800;
+            border-radius: 50%;
+            min-width: 14px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 3px;
+            line-height: 1;
+            border: 1px solid #fff;
+          }
         }
       `}</style>
     </main>
