@@ -8,21 +8,29 @@ export async function POST(request) {
 
   try {
     const body = await request.json().catch(() => ({}));
-    const { productId } = body;
+    const { productId, limit = 5, offset = 0 } = body;
 
     let products = [];
+    let totalCount = 0;
     if (productId) {
       const p = await prisma.product.findUnique({ where: { id: productId } });
       if (p) products = [p];
+      totalCount = products.length;
     } else {
-      products = await prisma.product.findMany();
+      totalCount = await prisma.product.count();
+      products = await prisma.product.findMany({
+        take: limit,
+        skip: offset,
+        orderBy: { id: 'asc' }
+      });
     }
 
     if (products.length === 0) {
-      return NextResponse.json({ success: true, count: 0, logs: ['[Hata] Güncellenecek ürün bulunamadı.'] });
+      return NextResponse.json({ success: true, count: 0, remaining: 0, logs: ['[Fiyat Botu] Güncellenecek ürün kalmadı.'] });
     }
 
-    logs.push(`[Fiyat Botu] Toplam ${products.length} adet ürün için fiyat taraması başlatılıyor...`);
+    const remaining = Math.max(0, totalCount - (offset + products.length));
+    logs.push(`[Fiyat Botu] Sıra: ${offset + 1} - ${offset + products.length} (Kalan: ${remaining}) | Toplam ${totalCount} üründen ${products.length} adedi taranıyor...`);
     
     if (process.env.SCRAPING_API_KEY) {
       logs.push(`[Sistem] Güvenlik duvarı aşımı için Scrape.do proxy servisi aktif.`);
@@ -101,6 +109,7 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       count: updatedCount,
+      remaining,
       logs
     });
 

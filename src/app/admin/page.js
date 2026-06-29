@@ -521,25 +521,47 @@ export default function AdminPage() {
     setIsCrawlingPrices(true);
     setCrawlSuccess('');
     setCrawlError('');
-    setCrawlLogs(['[Fiyat Botu] Fiyat güncelleme botu başlatılıyor...']);
+    
+    let offset = 0;
+    const limit = 5;
+    let hasMore = true;
+    let totalUpdated = 0;
+    let accumulatedLogs = ['[Fiyat Botu] Fiyat güncelleme botu başlatılıyor...'];
+    setCrawlLogs(accumulatedLogs);
 
     try {
-      const response = await fetch('/api/admin/crawl-prices', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
+      while (hasMore) {
+        const response = await fetch('/api/admin/crawl-prices', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ limit, offset })
+        });
 
-      const data = await response.json();
-      if (data.success) {
-        setCrawlLogs(data.logs || []);
-        setCrawlSuccess(`Başarılı! ${data.count} adet ürünün fiyatları taranıp güncellendi.`);
-        loadAdminProducts(1);
-      } else {
-        setCrawlError(data.error || 'Fiyatlar güncellenirken bir hata oluştu.');
-        if (data.logs) {
-          setCrawlLogs(data.logs);
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(`HTTP Hata: ${response.status} - ${text.substring(0, 100)}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          totalUpdated += data.count;
+          accumulatedLogs = [...accumulatedLogs, ...(data.logs || [])];
+          setCrawlLogs(accumulatedLogs);
+          
+          if (data.count === 0 || data.remaining <= 0) {
+            hasMore = false;
+          } else {
+            offset += limit;
+            // Delay between batches to prevent rate limits
+            await new Promise(resolve => setTimeout(resolve, 1500));
+          }
+        } else {
+          throw new Error(data.error || 'Fiyatlar güncellenirken bir hata oluştu.');
         }
       }
+
+      setCrawlSuccess(`Başarılı! Toplam ${totalUpdated} adet ürünün fiyatları taranıp güncellendi.`);
+      loadAdminProducts(1);
     } catch (err) {
       setCrawlError('API bağlantı hatası: ' + err.message);
     } finally {
