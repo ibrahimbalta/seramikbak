@@ -1808,282 +1808,7 @@ export default function Home() {
     setStripeLoading(false);
   };
 
-  const renderFiltersSidebar = (isMobile = false) => {
-    return (
-      <aside 
-        className={`filters-sidebar-new glass-panel ${isMobile ? 'mobile-sidebar' : 'desktop-sidebar'} ${showMobileFilters && isMobile ? 'open' : ''}`} 
-        style={(showMobileFilters && isMobile) ? {} : { position: 'relative' }}
-      >
-        <div className="filter-header-row">
-          <h3 className="filter-title-main" style={{ fontSize: '1.2rem', fontWeight: '750', color: '#0f172a', margin: 0, border: 'none', padding: 0 }}>Filtreler</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button onClick={() => {
-              setSelectedBrand('');
-              setSelectedColor('');
-              setSelectedFinish('');
-              setSelectedStyle('');
-              setSelectedArea('');
-              setSelectedSize('');
-              setSelectedRectified('');
-              setSelectedFrost('');
-              setSearchQuery('');
-              setUploadedImagePreview(null);
-              setVisualSearchMatches(null);
-              fetchProducts('clear=true');
-            }} className="clear-all-filters-btn">
-              Temizle
-            </button>
-            {isMobile && (
-              <button onClick={() => setShowMobileFilters(false)} className="mobile-filter-close-btn">
-                ✕
-              </button>
-            )}
-          </div>
-        </div>
 
-        {/* Scrollable Filters Content Wrapper */}
-        <div className="filters-scroll-area">
-          {/* 1. KATEGORİLER */}
-          <div className="accordion-section">
-            <div className="accordion-header" onClick={() => toggleSection('categories')}>
-              <span className="accordion-title">Kategoriler</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.categories ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-            </div>
-            {expandedSections.categories && (
-              <div className="accordion-content" style={{ marginTop: '12px' }}>
-                <div className="filters-grid">
-                  {['Mermer', 'Ahşap', 'Beton', 'Taş'].map(styleVal => {
-                    const isSelected = selectedStyle === styleVal;
-                    return (
-                      <button 
-                        key={styleVal} 
-                        onClick={() => setSelectedStyle(isSelected ? '' : styleVal)}
-                        className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
-                      >
-                        {styleVal}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 2. KOLEKSİYON */}
-          <div className="accordion-section">
-            <div className="accordion-header" onClick={() => toggleSection('collection')}>
-              <span className="accordion-title">Koleksiyon</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.collection ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-            </div>
-            {expandedSections.collection && (
-              <div className="accordion-content" style={{ marginTop: '12px' }}>
-                <div className="filters-grid">
-                  {brands.map(brand => {
-                    const isSelected = selectedBrand === brand.id;
-                    return (
-                      <button 
-                        key={brand.id} 
-                        onClick={() => setSelectedBrand(isSelected ? '' : brand.id)}
-                        className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
-                      >
-                        {brand.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 3. DOKU */}
-          <div className="accordion-section">
-            <div className="accordion-header" onClick={() => toggleSection('texture')}>
-              <span className="accordion-title">Doku</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.texture ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-            </div>
-            {expandedSections.texture && (
-              <div className="accordion-content" style={{ marginTop: '12px' }}>
-                <div className="filters-grid">
-                  {[
-                    { name: 'Beyaz', color: '#ffffff', border: '1px solid #cbd5e1' },
-                    { name: 'Bej', color: '#f5f5dc' },
-                    { name: 'Gri', color: '#94a3b8' },
-                    { name: 'Antrasit', color: '#334155' },
-                    { name: 'Kahverengi', color: '#78350f' }
-                  ].map(colorItem => {
-                    const isSelected = selectedColor === colorItem.name;
-                    return (
-                      <button 
-                        key={colorItem.name} 
-                        onClick={() => setSelectedColor(isSelected ? '' : colorItem.name)}
-                        className={`filter-chip-btn color-chip-btn ${isSelected ? 'active' : ''}`}
-                      >
-                        <span 
-                          className="color-dot" 
-                          style={{ 
-                            backgroundColor: colorItem.color, 
-                            border: colorItem.border || 'none' 
-                          }} 
-                        />
-                        <span>{colorItem.name}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 4. EBAT */}
-          <div className="accordion-section">
-            <div className="accordion-header" onClick={() => toggleSection('ebat')}>
-              <span className="accordion-title">Ebat</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.ebat ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-            </div>
-            {expandedSections.ebat && (
-              <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div className="scrollable-ebat-list">
-                  {[
-                    '120x240', '120x120', '60x120', '20x120', '80x80', 
-                    '60x60', '30x60', '31,5x61,5', '42x42', '60x90', 
-                    '61x61', '80x160', '30x85', '33x66', '21x122', 
-                    '15x60', '240x240', '360x240', '100x100', '40x120', 
-                    '30x120', '30x90', '30x40', '20x40', '19,7x19,7'
-                  ].map(sizeVal => {
-                    const parts = sizeVal.replace(',', '.').split('x');
-                    const wCm = parseFloat(parts[0]) || 0;
-                    const hCm = parseFloat(parts[1]) || 0;
-                    const scale = 80 / 175;
-                    const wPx = Math.max(4, Math.round(wCm * scale));
-                    const hPx = Math.max(4, Math.round(hCm * scale));
-
-                    const isSelected = selectedSize === sizeVal;
-
-                    return (
-                      <label key={sizeVal} className="checkbox-label-wrapper" style={{ position: 'relative' }}>
-                        <input 
-                          type="checkbox" 
-                          checked={isSelected} 
-                          onChange={() => setSelectedSize(isSelected ? '' : sizeVal)}
-                        />
-                        <span className="checkbox-custom-box" />
-                        <span className="checkbox-text-label">{sizeVal}</span>
-                        
-                        <div className="size-guide-tooltip">
-                          <span className="tooltip-title">Boyut Kıyaslama</span>
-                          <div className="size-guide-viz">
-                            <div className="viz-human">
-                              <div className="viz-human-head"></div>
-                              <div className="viz-human-body"></div>
-                              <span className="viz-lbl">İnsan (175 cm)</span>
-                            </div>
-                            <div className="viz-tile" style={{ width: `${wPx}px`, height: `${hPx}px`, background: 'var(--accent-gold)', border: '1px solid rgba(255,255,255,0.3)' }}>
-                              <span className="viz-lbl">{sizeVal} cm</span>
-                            </div>
-                          </div>
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 5. ÜRÜN TİPİ */}
-          <div className="accordion-section">
-            <div className="accordion-header" onClick={() => toggleSection('productType')}>
-              <span className="accordion-title">Ürün Tipi</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.productType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-            </div>
-            {expandedSections.productType && (
-              <div className="accordion-content" style={{ marginTop: '12px' }}>
-                <div className="filters-grid">
-                  {['Mat', 'Parlak', 'Lapatto'].map(finishVal => {
-                    const isSelected = selectedFinish === finishVal;
-                    return (
-                      <button 
-                        key={finishVal} 
-                        onClick={() => setSelectedFinish(isSelected ? '' : finishVal)}
-                        className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
-                      >
-                        {finishVal === 'Parlak' ? 'Parlak (Camsı)' : finishVal === 'Lapatto' ? 'Lapatto (Yarı Parlak)' : finishVal}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 6. ÜRÜN ÖZELLİK */}
-          <div className="accordion-section">
-            <div className="accordion-header" onClick={() => toggleSection('productFeature')}>
-              <span className="accordion-title">Ürün Özellik</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.productFeature ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-            </div>
-            {expandedSections.productFeature && (
-              <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label className="checkbox-label-wrapper">
-                  <input 
-                    type="checkbox" 
-                    checked={selectedRectified === 'true'} 
-                    onChange={() => setSelectedRectified(selectedRectified === 'true' ? '' : 'true')}
-                  />
-                  <span className="checkbox-custom-box" />
-                  <span className="checkbox-text-label">Rektifiyeli</span>
-                </label>
-                <label className="checkbox-label-wrapper">
-                  <input 
-                    type="checkbox" 
-                    checked={selectedFrost === 'true'} 
-                    onChange={() => setSelectedFrost(selectedFrost === 'true' ? '' : 'true')}
-                  />
-                  <span className="checkbox-custom-box" />
-                  <span className="checkbox-text-label">Dona Dayanıklı</span>
-                </label>
-              </div>
-            )}
-          </div>
-
-          {/* 7. MEKAN TİPİ */}
-          <div className="accordion-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>
-            <div className="accordion-header" onClick={() => toggleSection('spaceType')}>
-              <span className="accordion-title">Mekan Tipi</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.spaceType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
-            </div>
-            {expandedSections.spaceType && (
-              <div className="accordion-content" style={{ marginTop: '12px' }}>
-                <div className="filters-grid">
-                  {['Banyo', 'Mutfak', 'Salon', 'Balkon', 'Koridor', 'Teras'].map(areaVal => {
-                    const isSelected = selectedArea === areaVal;
-                    return (
-                      <button 
-                        key={areaVal} 
-                        onClick={() => setSelectedArea(isSelected ? '' : areaVal)}
-                        className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
-                      >
-                        {areaVal}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Mobile-only Apply Button at the Bottom */}
-        {isMobile && (
-          <div className="mobile-filter-footer">
-            <button className="mobile-filter-apply-btn" onClick={() => setShowMobileFilters(false)}>
-              Sonuçları Göster ({products.length})
-            </button>
-          </div>
-        )}
-      </aside>
-    );
-  };
 
   if (pageLoading) {
     return (
@@ -2987,7 +2712,256 @@ export default function Home() {
             {/* Main Layout: Left Sidebar + Results Grid */}
             <div className="main-search-and-results-layout">
               {/* Left Sidebar Filter Section */}
-              {renderFiltersSidebar(false)}
+              <aside className="filters-sidebar-new glass-panel desktop-sidebar" style={{ position: 'relative' }}>
+                <div className="filter-header-row">
+                  <h3 className="filter-title-main" style={{ fontSize: '1.2rem', fontWeight: '750', color: '#0f172a', margin: 0, border: 'none', padding: 0 }}>Filtreler</h3>
+                  <button onClick={() => {
+                    setSelectedBrand('');
+                    setSelectedColor('');
+                    setSelectedFinish('');
+                    setSelectedStyle('');
+                    setSelectedArea('');
+                    setSelectedSize('');
+                    setSelectedRectified('');
+                    setSelectedFrost('');
+                    setSearchQuery('');
+                    setUploadedImagePreview(null);
+                    setVisualSearchMatches(null);
+                    fetchProducts('clear=true');
+                  }} className="clear-all-filters-btn">
+                    Temizle
+                  </button>
+                </div>
+
+                {/* 1. KATEGORİLER */}
+                <div className="accordion-section">
+                  <div className="accordion-header" onClick={() => toggleSection('categories')}>
+                    <span className="accordion-title">Kategoriler</span>
+                    <ChevronDown size={16} style={{ transform: expandedSections.categories ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                  </div>
+                  {expandedSections.categories && (
+                    <div className="accordion-content" style={{ marginTop: '12px' }}>
+                      <div className="filters-grid">
+                        {['Mermer', 'Ahşap', 'Beton', 'Taş'].map(styleVal => {
+                          const isSelected = selectedStyle === styleVal;
+                          return (
+                            <button 
+                              key={styleVal} 
+                              onClick={() => setSelectedStyle(isSelected ? '' : styleVal)}
+                              className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                            >
+                              {styleVal}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. KOLEKSİYON */}
+                <div className="accordion-section">
+                  <div className="accordion-header" onClick={() => toggleSection('collection')}>
+                    <span className="accordion-title">Koleksiyon</span>
+                    <ChevronDown size={16} style={{ transform: expandedSections.collection ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                  </div>
+                  {expandedSections.collection && (
+                    <div className="accordion-content" style={{ marginTop: '12px' }}>
+                      <div className="filters-grid">
+                        {brands.map(brand => {
+                          const isSelected = selectedBrand === brand.id;
+                          return (
+                            <button 
+                              key={brand.id} 
+                              onClick={() => setSelectedBrand(isSelected ? '' : brand.id)}
+                              className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                            >
+                              {brand.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. DOKU */}
+                <div className="accordion-section">
+                  <div className="accordion-header" onClick={() => toggleSection('texture')}>
+                    <span className="accordion-title">Doku</span>
+                    <ChevronDown size={16} style={{ transform: expandedSections.texture ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                  </div>
+                  {expandedSections.texture && (
+                    <div className="accordion-content" style={{ marginTop: '12px' }}>
+                      <div className="filters-grid">
+                        {[
+                          { name: 'Beyaz', color: '#ffffff', border: '1px solid #cbd5e1' },
+                          { name: 'Bej', color: '#f5f5dc' },
+                          { name: 'Gri', color: '#94a3b8' },
+                          { name: 'Antrasit', color: '#334155' },
+                          { name: 'Kahverengi', color: '#78350f' }
+                        ].map(colorItem => {
+                          const isSelected = selectedColor === colorItem.name;
+                          return (
+                            <button 
+                              key={colorItem.name} 
+                              onClick={() => setSelectedColor(isSelected ? '' : colorItem.name)}
+                              className={`filter-chip-btn color-chip-btn ${isSelected ? 'active' : ''}`}
+                            >
+                              <span 
+                                className="color-dot" 
+                                style={{ 
+                                  backgroundColor: colorItem.color, 
+                                  border: colorItem.border || 'none' 
+                                }} 
+                              />
+                              <span>{colorItem.name}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 4. EBAT */}
+                <div className="accordion-section">
+                  <div className="accordion-header" onClick={() => toggleSection('ebat')}>
+                    <span className="accordion-title">Ebat</span>
+                    <ChevronDown size={16} style={{ transform: expandedSections.ebat ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                  </div>
+                  {expandedSections.ebat && (
+                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div className="scrollable-ebat-list">
+                        {[
+                          '120x240', '120x120', '60x120', '20x120', '80x80', 
+                          '60x60', '30x60', '31,5x61,5', '42x42', '60x90', 
+                          '61x61', '80x160', '30x85', '33x66', '21x122', 
+                          '15x60', '240x240', '360x240', '100x100', '40x120', 
+                          '30x120', '30x90', '30x40', '20x40', '19,7x19,7'
+                        ].map(sizeVal => {
+                          const parts = sizeVal.replace(',', '.').split('x');
+                          const wCm = parseFloat(parts[0]) || 0;
+                          const hCm = parseFloat(parts[1]) || 0;
+                          const scale = 80 / 175;
+                          const wPx = Math.max(4, Math.round(wCm * scale));
+                          const hPx = Math.max(4, Math.round(hCm * scale));
+
+                          const isSelected = selectedSize === sizeVal;
+
+                          return (
+                            <label key={sizeVal} className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+                              <input 
+                                type="checkbox" 
+                                checked={isSelected} 
+                                onChange={() => setSelectedSize(isSelected ? '' : sizeVal)}
+                              />
+                              <span className="checkbox-custom-box" />
+                              <span className="checkbox-text-label">{sizeVal}</span>
+                              
+                              <div className="size-guide-tooltip">
+                                <span className="tooltip-title">Boyut Kıyaslama</span>
+                                <div className="size-guide-viz">
+                                  <div className="viz-human">
+                                    <div className="viz-human-head"></div>
+                                    <div className="viz-human-body"></div>
+                                    <span className="viz-lbl">İnsan (175 cm)</span>
+                                  </div>
+                                  <div className="viz-tile" style={{ width: `${wPx}px`, height: `${hPx}px`, background: 'var(--accent-gold)', border: '1px solid rgba(255,255,255,0.3)' }}>
+                                    <span className="viz-lbl">{sizeVal} cm</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 5. ÜRÜN TİPİ */}
+                <div className="accordion-section">
+                  <div className="accordion-header" onClick={() => toggleSection('productType')}>
+                    <span className="accordion-title">Ürün Tipi</span>
+                    <ChevronDown size={16} style={{ transform: expandedSections.productType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                  </div>
+                  {expandedSections.productType && (
+                    <div className="accordion-content" style={{ marginTop: '12px' }}>
+                      <div className="filters-grid">
+                        {['Mat', 'Parlak', 'Lapatto'].map(finishVal => {
+                          const isSelected = selectedFinish === finishVal;
+                          return (
+                            <button 
+                              key={finishVal} 
+                              onClick={() => setSelectedFinish(isSelected ? '' : finishVal)}
+                              className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                            >
+                              {finishVal === 'Parlak' ? 'Parlak (Camsı)' : finishVal === 'Lapatto' ? 'Lapatto (Yarı Parlak)' : finishVal}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 6. ÜRÜN ÖZELLİK */}
+                <div className="accordion-section">
+                  <div className="accordion-header" onClick={() => toggleSection('productFeature')}>
+                    <span className="accordion-title">Ürün Özellik</span>
+                    <ChevronDown size={16} style={{ transform: expandedSections.productFeature ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                  </div>
+                  {expandedSections.productFeature && (
+                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <label className="checkbox-label-wrapper">
+                        <input 
+                          type="checkbox" 
+                          checked={selectedRectified === 'true'} 
+                          onChange={() => setSelectedRectified(selectedRectified === 'true' ? '' : 'true')}
+                        />
+                        <span className="checkbox-custom-box" />
+                        <span className="checkbox-text-label">Rektifiyeli</span>
+                      </label>
+                      <label className="checkbox-label-wrapper">
+                        <input 
+                          type="checkbox" 
+                          checked={selectedFrost === 'true'} 
+                          onChange={() => setSelectedFrost(selectedFrost === 'true' ? '' : 'true')}
+                        />
+                        <span className="checkbox-custom-box" />
+                        <span className="checkbox-text-label">Dona Dayanıklı</span>
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {/* 7. MEKAN TİPİ */}
+                <div className="accordion-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>
+                  <div className="accordion-header" onClick={() => toggleSection('spaceType')}>
+                    <span className="accordion-title">Mekan Tipi</span>
+                    <ChevronDown size={16} style={{ transform: expandedSections.spaceType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                  </div>
+                  {expandedSections.spaceType && (
+                    <div className="accordion-content" style={{ marginTop: '12px' }}>
+                      <div className="filters-grid">
+                        {['Banyo', 'Mutfak', 'Salon', 'Balkon', 'Koridor', 'Teras'].map(areaVal => {
+                          const isSelected = selectedArea === areaVal;
+                          return (
+                            <button 
+                              key={areaVal} 
+                              onClick={() => setSelectedArea(isSelected ? '' : areaVal)}
+                              className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                            >
+                              {areaVal}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </aside>
 
               {/* Right Side Content Results area */}
               <div className="results-container-new">
@@ -5394,7 +5368,274 @@ export default function Home() {
       <div className={`mobile-filters-backdrop ${showMobileFilters ? 'show' : ''}`} onClick={() => setShowMobileFilters(false)} />
 
       {/* Mobile Filters Sidebar (Root Level Stacking Context) */}
-      {renderFiltersSidebar(true)}
+      <aside 
+        className={`filters-sidebar-new glass-panel mobile-sidebar ${showMobileFilters ? 'open' : ''}`} 
+        style={showMobileFilters ? {} : { position: 'relative' }}
+      >
+        <div className="filter-header-row">
+          <h3 className="filter-title-main" style={{ fontSize: '1.2rem', fontWeight: '750', color: '#0f172a', margin: 0, border: 'none', padding: 0 }}>Filtreler</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button onClick={() => {
+              setSelectedBrand('');
+              setSelectedColor('');
+              setSelectedFinish('');
+              setSelectedStyle('');
+              setSelectedArea('');
+              setSelectedSize('');
+              setSelectedRectified('');
+              setSelectedFrost('');
+              setSearchQuery('');
+              setUploadedImagePreview(null);
+              setVisualSearchMatches(null);
+              fetchProducts('clear=true');
+            }} className="clear-all-filters-btn">
+              Temizle
+            </button>
+            <button onClick={() => setShowMobileFilters(false)} className="mobile-filter-close-btn">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* Scrollable Filters Content Wrapper */}
+        <div className="filters-scroll-area">
+          {/* 1. KATEGORİLER */}
+          <div className="accordion-section">
+            <div className="accordion-header" onClick={() => toggleSection('categories')}>
+              <span className="accordion-title">Kategoriler</span>
+              <ChevronDown size={16} style={{ transform: expandedSections.categories ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+            </div>
+            {expandedSections.categories && (
+              <div className="accordion-content" style={{ marginTop: '12px' }}>
+                <div className="filters-grid">
+                  {['Mermer', 'Ahşap', 'Beton', 'Taş'].map(styleVal => {
+                    const isSelected = selectedStyle === styleVal;
+                    return (
+                      <button 
+                        key={styleVal} 
+                        onClick={() => setSelectedStyle(isSelected ? '' : styleVal)}
+                        className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                      >
+                        {styleVal}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 2. KOLEKSİYON */}
+          <div className="accordion-section">
+            <div className="accordion-header" onClick={() => toggleSection('collection')}>
+              <span className="accordion-title">Koleksiyon</span>
+              <ChevronDown size={16} style={{ transform: expandedSections.collection ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+            </div>
+            {expandedSections.collection && (
+              <div className="accordion-content" style={{ marginTop: '12px' }}>
+                <div className="filters-grid">
+                  {brands.map(brand => {
+                    const isSelected = selectedBrand === brand.id;
+                    return (
+                      <button 
+                        key={brand.id} 
+                        onClick={() => setSelectedBrand(isSelected ? '' : brand.id)}
+                        className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                      >
+                        {brand.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 3. DOKU */}
+          <div className="accordion-section">
+            <div className="accordion-header" onClick={() => toggleSection('texture')}>
+              <span className="accordion-title">Doku</span>
+              <ChevronDown size={16} style={{ transform: expandedSections.texture ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+            </div>
+            {expandedSections.texture && (
+              <div className="accordion-content" style={{ marginTop: '12px' }}>
+                <div className="filters-grid">
+                  {[
+                    { name: 'Beyaz', color: '#ffffff', border: '1px solid #cbd5e1' },
+                    { name: 'Bej', color: '#f5f5dc' },
+                    { name: 'Gri', color: '#94a3b8' },
+                    { name: 'Antrasit', color: '#334155' },
+                    { name: 'Kahverengi', color: '#78350f' }
+                  ].map(colorItem => {
+                    const isSelected = selectedColor === colorItem.name;
+                    return (
+                      <button 
+                        key={colorItem.name} 
+                        onClick={() => setSelectedColor(isSelected ? '' : colorItem.name)}
+                        className={`filter-chip-btn color-chip-btn ${isSelected ? 'active' : ''}`}
+                      >
+                        <span 
+                          className="color-dot" 
+                          style={{ 
+                            backgroundColor: colorItem.color, 
+                            border: colorItem.border || 'none' 
+                          }} 
+                        />
+                        <span>{colorItem.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 4. EBAT */}
+          <div className="accordion-section">
+            <div className="accordion-header" onClick={() => toggleSection('ebat')}>
+              <span className="accordion-title">Ebat</span>
+              <ChevronDown size={16} style={{ transform: expandedSections.ebat ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+            </div>
+            {expandedSections.ebat && (
+              <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div className="scrollable-ebat-list">
+                  {[
+                    '120x240', '120x120', '60x120', '20x120', '80x80', 
+                    '60x60', '30x60', '31,5x61,5', '42x42', '60x90', 
+                    '61x61', '80x160', '30x85', '33x66', '21x122', 
+                    '15x60', '240x240', '360x240', '100x100', '40x120', 
+                    '30x120', '30x90', '30x40', '20x40', '19,7x19,7'
+                  ].map(sizeVal => {
+                    const parts = sizeVal.replace(',', '.').split('x');
+                    const wCm = parseFloat(parts[0]) || 0;
+                    const hCm = parseFloat(parts[1]) || 0;
+                    const scale = 80 / 175;
+                    const wPx = Math.max(4, Math.round(wCm * scale));
+                    const hPx = Math.max(4, Math.round(hCm * scale));
+
+                    const isSelected = selectedSize === sizeVal;
+
+                    return (
+                      <label key={sizeVal} className="checkbox-label-wrapper" style={{ position: 'relative' }}>
+                        <input 
+                          type="checkbox" 
+                          checked={isSelected} 
+                          onChange={() => setSelectedSize(isSelected ? '' : sizeVal)}
+                        />
+                        <span className="checkbox-custom-box" />
+                        <span className="checkbox-text-label">{sizeVal}</span>
+                        
+                        <div className="size-guide-tooltip">
+                          <span className="tooltip-title">Boyut Kıyaslama</span>
+                          <div className="size-guide-viz">
+                            <div className="viz-human">
+                              <div className="viz-human-head"></div>
+                              <div className="viz-human-body"></div>
+                              <span className="viz-lbl">İnsan (175 cm)</span>
+                            </div>
+                            <div className="viz-tile" style={{ width: `${wPx}px`, height: `${hPx}px`, background: 'var(--accent-gold)', border: '1px solid rgba(255,255,255,0.3)' }}>
+                              <span className="viz-lbl">{sizeVal} cm</span>
+                            </div>
+                          </div>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 5. ÜRÜN TİPİ */}
+          <div className="accordion-section">
+            <div className="accordion-header" onClick={() => toggleSection('productType')}>
+              <span className="accordion-title">Ürün Tipi</span>
+              <ChevronDown size={16} style={{ transform: expandedSections.productType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+            </div>
+            {expandedSections.productType && (
+              <div className="accordion-content" style={{ marginTop: '12px' }}>
+                <div className="filters-grid">
+                  {['Mat', 'Parlak', 'Lapatto'].map(finishVal => {
+                    const isSelected = selectedFinish === finishVal;
+                    return (
+                      <button 
+                        key={finishVal} 
+                        onClick={() => setSelectedFinish(isSelected ? '' : finishVal)}
+                        className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                      >
+                        {finishVal === 'Parlak' ? 'Parlak (Camsı)' : finishVal === 'Lapatto' ? 'Lapatto (Yarı Parlak)' : finishVal}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 6. ÜRÜN ÖZELLİK */}
+          <div className="accordion-section">
+            <div className="accordion-header" onClick={() => toggleSection('productFeature')}>
+              <span className="accordion-title">Ürün Özellik</span>
+              <ChevronDown size={16} style={{ transform: expandedSections.productFeature ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+            </div>
+            {expandedSections.productFeature && (
+              <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label className="checkbox-label-wrapper">
+                  <input 
+                    type="checkbox" 
+                    checked={selectedRectified === 'true'} 
+                    onChange={() => setSelectedRectified(selectedRectified === 'true' ? '' : 'true')}
+                  />
+                  <span className="checkbox-custom-box" />
+                  <span className="checkbox-text-label">Rektifiyeli</span>
+                </label>
+                <label className="checkbox-label-wrapper">
+                  <input 
+                    type="checkbox" 
+                    checked={selectedFrost === 'true'} 
+                    onChange={() => setSelectedFrost(selectedFrost === 'true' ? '' : 'true')}
+                  />
+                  <span className="checkbox-custom-box" />
+                  <span className="checkbox-text-label">Dona Dayanıklı</span>
+                </label>
+              </div>
+            )}
+          </div>
+
+          {/* 7. MEKAN TİPİ */}
+          <div className="accordion-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>
+            <div className="accordion-header" onClick={() => toggleSection('spaceType')}>
+              <span className="accordion-title">Mekan Tipi</span>
+              <ChevronDown size={16} style={{ transform: expandedSections.spaceType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+            </div>
+            {expandedSections.spaceType && (
+              <div className="accordion-content" style={{ marginTop: '12px' }}>
+                <div className="filters-grid">
+                  {['Banyo', 'Mutfak', 'Salon', 'Balkon', 'Koridor', 'Teras'].map(areaVal => {
+                    const isSelected = selectedArea === areaVal;
+                    return (
+                      <button 
+                        key={areaVal} 
+                        onClick={() => setSelectedArea(isSelected ? '' : areaVal)}
+                        className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                      >
+                        {areaVal}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile-only Apply Button at the Bottom */}
+        <div className="mobile-filter-footer">
+          <button className="mobile-filter-apply-btn" onClick={() => setShowMobileFilters(false)}>
+            Sonuçları Göster ({products.length})
+          </button>
+        </div>
+      </aside>
 
       {/* Mobile Sticky Bottom Tab Navigation Bar */}
       <div className="mobile-bottom-nav">
