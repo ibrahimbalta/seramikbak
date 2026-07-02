@@ -1596,7 +1596,10 @@ export default function Home() {
 
         if (imgRoomRef.current) {
           const imgTile = new Image();
-          imgTile.src = activeProduct.textureUrl || '/textures/calacatta_gold.jpg';
+          imgTile.crossOrigin = 'anonymous';
+          imgTile.src = activeProduct.textureUrl 
+            ? `/api/proxy?url=${encodeURIComponent(activeProduct.textureUrl)}` 
+            : '/textures/calacatta_gold.jpg';
           imgTile.onload = () => {
             imgTileRef.current = imgTile;
             const resultDataUrl = processRoomTiling(imgRoomRef.current, imgTile, data.polygon, data.exclude || []);
@@ -1632,7 +1635,10 @@ export default function Home() {
     }
     if (uploadedRoomImage && processedRoomImage && imgRoomRef.current && roomPolygon && activeProduct) {
       const imgTile = new Image();
-      imgTile.src = activeProduct.textureUrl || '/textures/calacatta_gold.jpg';
+      imgTile.crossOrigin = 'anonymous';
+      imgTile.src = activeProduct.textureUrl 
+        ? `/api/proxy?url=${encodeURIComponent(activeProduct.textureUrl)}` 
+        : '/textures/calacatta_gold.jpg';
       imgTile.onload = () => {
         imgTileRef.current = imgTile;
         const resultDataUrl = processRoomTiling(imgRoomRef.current, imgTile, roomPolygon, roomExclude);
@@ -1710,7 +1716,10 @@ export default function Home() {
             imgRoomRef.current = imgRoom;
             
             const imgTile = new Image();
-            imgTile.src = activeProduct.textureUrl || '/textures/calacatta_gold.jpg';
+            imgTile.crossOrigin = 'anonymous';
+            imgTile.src = activeProduct.textureUrl 
+              ? `/api/proxy?url=${encodeURIComponent(activeProduct.textureUrl)}` 
+              : '/textures/calacatta_gold.jpg';
             imgTile.onload = () => {
               imgTileRef.current = imgTile;
               const resultDataUrl = processRoomTiling(imgRoom, imgTile, data.polygon, data.exclude || []);
