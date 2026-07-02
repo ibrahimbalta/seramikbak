@@ -157,6 +157,7 @@ export async function GET(request) {
           finish: true,
           style: true,
           imageUrl: true,
+          textureUrl: true,
           isPremium: true,
           brand: {
             select: {
