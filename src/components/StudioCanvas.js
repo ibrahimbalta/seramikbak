@@ -1059,15 +1059,16 @@ export default function StudioCanvas({
     // Load from URL or generate procedural canvas
     const realTextureUrl = activeProduct.textureUrl || activeProduct.imageUrl;
     if (realTextureUrl) {
-      const proxiedUrl = `/api/proxy?url=${encodeURIComponent(realTextureUrl)}`;
+      const isAbsolute = realTextureUrl.startsWith('http://') || realTextureUrl.startsWith('https://') || realTextureUrl.startsWith('//');
+      const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realTextureUrl)}` : realTextureUrl;
       loader.load(
-        proxiedUrl,
+        finalUrl,
         (loadedTexture) => {
           applyTexture(loadedTexture.image, true);
         },
         undefined,
         () => {
-          console.warn(`Could not load image ${realTextureUrl} via proxy. Using procedural generator.`);
+          console.warn(`Could not load image ${realTextureUrl}. Using procedural generator.`);
           const proceduralCanvas = generateProceduralTexture(activeProduct);
           applyTexture(proceduralCanvas, false);
         }

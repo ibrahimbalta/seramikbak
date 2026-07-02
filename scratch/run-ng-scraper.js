@@ -199,7 +199,19 @@ function extractProductsFromResponse(data) {
 }
 
 async function main() {
-  const brandId = '03e2f32b-e9c0-4033-91ff-460daa6254ef';
+  let brand = await prisma.brand.findFirst({
+    where: { name: { contains: 'NG Kütahya' } }
+  });
+  if (!brand) {
+    console.log('[Veritabanı] NG Kütahya Seramik markası bulunamadı. Oluşturuluyor...');
+    brand = await prisma.brand.create({
+      data: {
+        name: 'NG Kütahya Seramik',
+        logoUrl: '/logos/kutahya.png'
+      }
+    });
+  }
+  const brandId = brand.id;
   
   console.log('[Scraper] NG Kütahya Seramik API üzerinden katalogları çekiyor...');
   

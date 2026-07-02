@@ -1597,8 +1597,9 @@ export default function Home() {
         if (imgRoomRef.current) {
           const imgTile = new Image();
           imgTile.crossOrigin = 'anonymous';
+          const isAbsolute = activeProduct.textureUrl && (activeProduct.textureUrl.startsWith('http://') || activeProduct.textureUrl.startsWith('https://') || activeProduct.textureUrl.startsWith('//'));
           imgTile.src = activeProduct.textureUrl 
-            ? `/api/proxy?url=${encodeURIComponent(activeProduct.textureUrl)}` 
+            ? (isAbsolute ? `/api/proxy?url=${encodeURIComponent(activeProduct.textureUrl)}` : activeProduct.textureUrl) 
             : '/textures/calacatta_gold.jpg';
           imgTile.onload = () => {
             imgTileRef.current = imgTile;
@@ -1636,8 +1637,9 @@ export default function Home() {
     if (uploadedRoomImage && processedRoomImage && imgRoomRef.current && roomPolygon && activeProduct) {
       const imgTile = new Image();
       imgTile.crossOrigin = 'anonymous';
+      const isAbsolute = activeProduct.textureUrl && (activeProduct.textureUrl.startsWith('http://') || activeProduct.textureUrl.startsWith('https://') || activeProduct.textureUrl.startsWith('//'));
       imgTile.src = activeProduct.textureUrl 
-        ? `/api/proxy?url=${encodeURIComponent(activeProduct.textureUrl)}` 
+        ? (isAbsolute ? `/api/proxy?url=${encodeURIComponent(activeProduct.textureUrl)}` : activeProduct.textureUrl) 
         : '/textures/calacatta_gold.jpg';
       imgTile.onload = () => {
         imgTileRef.current = imgTile;
@@ -1717,8 +1719,9 @@ export default function Home() {
             
             const imgTile = new Image();
             imgTile.crossOrigin = 'anonymous';
+            const isAbsolute = activeProduct.textureUrl && (activeProduct.textureUrl.startsWith('http://') || activeProduct.textureUrl.startsWith('https://') || activeProduct.textureUrl.startsWith('//'));
             imgTile.src = activeProduct.textureUrl 
-              ? `/api/proxy?url=${encodeURIComponent(activeProduct.textureUrl)}` 
+              ? (isAbsolute ? `/api/proxy?url=${encodeURIComponent(activeProduct.textureUrl)}` : activeProduct.textureUrl) 
               : '/textures/calacatta_gold.jpg';
             imgTile.onload = () => {
               imgTileRef.current = imgTile;

@@ -8,8 +8,14 @@ export async function GET(request) {
     return new NextResponse('Missing url parameter', { status: 400 });
   }
 
+  let targetUrl = url;
+  if (url.startsWith('/')) {
+    const origin = new URL(request.url).origin;
+    targetUrl = `${origin}${url}`;
+  }
+
   try {
-    const res = await fetch(url);
+    const res = await fetch(targetUrl);
     if (!res.ok) {
       return new NextResponse(`Failed to fetch image: ${res.statusText}`, { status: res.status });
     }

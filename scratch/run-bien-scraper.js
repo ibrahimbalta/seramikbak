@@ -149,7 +149,7 @@ async function main() {
     const style = doku || 'Mermer';
 
     // Image cleanup (get original high-res image and fix relative path issues)
-    let cleanImg = imgUrl.replace('/../', '/');
+    let cleanImg = imgUrl.replace('/../', '/').replace('/uploads/uploads/', '/uploads/');
     if (cleanImg.includes('?')) {
       cleanImg = cleanImg.split('?')[0];
     }
