@@ -156,23 +156,20 @@ export default function StudioCanvas({
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    // Convert physical grout width (mm) to pixels relative to tile size (cm)
-    const tileWidthMm = (product.width || 60) * 10;
+    // Grout line: only 1px on right and bottom edges
+    // When tiles repeat, right+left and bottom+top edges combine into a single thin grout line
     const groutMm = parseFloat(gWidth) || 2;
-    const borderPx = Math.max(1, Math.round((groutMm / tileWidthMm) * 512));
+    const borderPx = groutMm > 0 ? Math.max(1, Math.min(2, Math.round(groutMm * 0.5))) : 0;
 
-    // 1. Draw grout base fill
+    // 1. Fill entire canvas with grout color first
     ctx.fillStyle = gColor || '#888888';
     ctx.fillRect(0, 0, 512, 512);
 
-    // 2. Draw tile image inside the border offset
-    ctx.drawImage(
-      sourceCanvasOrImage, 
-      borderPx, 
-      borderPx, 
-      512 - borderPx * 2, 
-      512 - borderPx * 2
-    );
+    // 2. Draw tile image to fill almost all of the canvas
+    // Leave only a thin line on right and bottom edges for grout
+    const tileW = 512 - borderPx;
+    const tileH = 512 - borderPx;
+    ctx.drawImage(sourceCanvasOrImage, 0, 0, tileW, tileH);
 
     // 3. Create CanvasTexture
     const texture = new THREE.CanvasTexture(canvas);
