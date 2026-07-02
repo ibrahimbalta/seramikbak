@@ -9790,7 +9790,7 @@ export default function Home() {
           border-top: 1.5px solid rgba(255, 255, 255, 0.1);
           color: white;
           padding: 16px 24px;
-          z-index: 999;
+          z-index: 9999;
           box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.5);
           animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -10797,6 +10797,58 @@ export default function Home() {
             padding: 0 3px;
             line-height: 1;
             border: 1px solid #fff;
+          }
+
+          /* Mobile Compare Bar - above the tab navigation */
+          .sticky-compare-bar {
+            bottom: 60px;
+            padding: 10px 12px;
+            z-index: 9999;
+          }
+          .compare-bar-container {
+            flex-direction: column;
+            gap: 10px;
+          }
+          .compare-bar-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+          }
+          .compare-bar-info h4 {
+            font-size: 0.85rem;
+            margin: 0;
+          }
+          .compare-bar-info p {
+            margin: 0;
+            font-size: 0.72rem;
+          }
+          .compare-bar-items {
+            gap: 8px;
+            justify-content: flex-start;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            flex-shrink: 0;
+          }
+          .compare-bar-item {
+            width: 56px;
+          }
+          .compare-bar-item.empty {
+            display: none;
+          }
+          .compare-bar-item-thumb {
+            width: 48px;
+            height: 48px;
+          }
+          .compare-bar-item-name {
+            font-size: 0.58rem;
+          }
+          .compare-bar-actions {
+            width: 100%;
+            justify-content: stretch;
+          }
+          .compare-bar-actions button {
+            flex: 1;
           }
         }
       `}</style>
