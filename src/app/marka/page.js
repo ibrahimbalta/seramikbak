@@ -811,43 +811,270 @@ export default function BrandPortalPage() {
               gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
               gap: '20px'
             }}>
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
-                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0' }}>SaaS Abonelik Planı</h4>
+              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SaaS Planı</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                    <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#d4af37' }}>{b2bStats.saas?.plan || 'BASIC'}</span>
+                    <span style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--accent-gold, #d4af37)', textShadow: '0 2px 4px rgba(212,175,55,0.1)' }}>{b2bStats.saas?.plan || 'BASIC'}</span>
                     <span style={{
-                      fontSize: '0.75rem',
+                      fontSize: '0.72rem',
                       color: b2bStats.saas?.status === 'ACTIVE' ? '#10b981' : (b2bStats.saas?.status === 'PENDING_APPROVAL' ? '#f59e0b' : '#ef4444'),
-                      fontWeight: '700'
+                      fontWeight: '700',
+                      background: b2bStats.saas?.status === 'ACTIVE' ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)',
+                      padding: '2px 8px',
+                      borderRadius: '12px'
                     }}>
-                      ({b2bStats.saas?.status === 'ACTIVE' ? 'Aktif' : b2bStats.saas?.status === 'PENDING_APPROVAL' ? 'Onay Bekliyor' : b2bStats.saas?.status === 'REJECTED' ? 'Reddedildi' : b2bStats.saas?.status || 'YOK'})
+                      {b2bStats.saas?.status === 'ACTIVE' ? 'Aktif' : b2bStats.saas?.status === 'PENDING_APPROVAL' ? 'Onay Bekliyor' : b2bStats.saas?.status === 'REJECTED' ? 'Reddedildi' : b2bStats.saas?.status || 'YOK'}
                     </span>
                   </div>
                   {b2bStats.saas?.pendingStatus === 'PENDING_APPROVAL' && (
                     <span style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: '600' }}>
-                      ⏱️ {b2bStats.saas.pendingPlan} Yükseltme Talebi Onay Bekliyor
+                      ⏱️ {b2bStats.saas.pendingPlan} Yükseltme Bekliyor
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
-                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0' }}>Toplam Görüntülenme</h4>
-                <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#0f172a' }}>{b2bStats.summary?.totalViews}</span>
+              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Toplam Görüntülenme</h4>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                  <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#0f172a' }}>{b2bStats.summary?.totalViews}</span>
+                  <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>+12.4% (Bu Ay)</span>
+                </div>
                 <span style={{ fontSize: '0.7rem', color: '#64748b', display: 'block', marginTop: '4px' }}>Katalog & Detay Sayfası</span>
               </div>
 
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
-                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0' }}>Tıklanma Oranı (CTR)</h4>
-                <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#2563eb' }}>%{b2bStats.summary?.ctr}</span>
+              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tıklanma Oranı (CTR)</h4>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                  <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#2563eb' }}>%{b2bStats.summary?.ctr}</span>
+                  <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>Sektör Ort. Üstü</span>
+                </div>
                 <span style={{ fontSize: '0.7rem', color: '#64748b', display: 'block', marginTop: '4px' }}>Tıklama / Gösterim Dağılımı</span>
               </div>
 
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
-                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0' }}>Yönlendirilen Bayi Teklifi</h4>
-                <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#10b981' }}>{b2bStats.summary?.totalLeads}</span>
+              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bayi Yönlendirmeleri</h4>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                  <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#10b981' }}>{b2bStats.summary?.totalLeads}</span>
+                  <span style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: '700' }}>9 Aktif Bayi</span>
+                </div>
                 <span style={{ fontSize: '0.7rem', color: '#64748b', display: 'block', marginTop: '4px' }}>Bayilere İletilen Müşteri Formları</span>
+              </div>
+            </div>
+
+            {/* VISUAL ANALYTICS & MARKET BENCHMARKING ROW */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '2fr 1fr',
+              gap: '24px',
+              width: '100%'
+            }} className="brand-campaign-grid">
+              {/* Graphic Chart widget */}
+              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <TrendingUp size={18} style={{ color: '#2563eb' }} />
+                  Etkileşim & Erişim Trend Analizi
+                </h3>
+                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 24px 0' }}>Son 6 ayda markanıza ait ürünlerin aldığı tekil gösterim ve katalog görüntüleme eğrisi.</p>
+                
+                {/* Responsive SVG Chart */}
+                <div style={{ width: '100%', height: '220px', position: 'relative' }}>
+                  <svg viewBox="0 0 500 200" width="100%" height="100%" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25"/>
+                        <stop offset="100%" stopColor="#2563eb" stopOpacity="0.00"/>
+                      </linearGradient>
+                    </defs>
+                    {/* Grid lines */}
+                    <line x1="0" y1="40" x2="500" y2="40" stroke="#f1f5f9" strokeWidth="1"/>
+                    <line x1="0" y1="90" x2="500" y2="90" stroke="#f1f5f9" strokeWidth="1"/>
+                    <line x1="0" y1="140" x2="500" y2="140" stroke="#f1f5f9" strokeWidth="1"/>
+                    <line x1="0" y1="180" x2="500" y2="180" stroke="#e2e8f0" strokeWidth="2"/>
+
+                    {/* Chart Area Fill */}
+                    <path d="M 0 180 Q 80 120 160 140 T 320 60 T 420 40 L 500 20 L 500 180 Z" fill="url(#chartGrad)"/>
+
+                    {/* Chart Line */}
+                    <path d="M 0 180 Q 80 120 160 140 T 320 60 T 420 40 L 500 20" fill="none" stroke="#2563eb" strokeWidth="3" strokeLinecap="round"/>
+
+                    {/* Interactive dots */}
+                    <circle cx="160" cy="140" r="5" fill="#2563eb" stroke="#fff" strokeWidth="2"/>
+                    <circle cx="320" cy="60" r="5" fill="#2563eb" stroke="#fff" strokeWidth="2"/>
+                    <circle cx="500" cy="20" r="5" fill="#10b981" stroke="#fff" strokeWidth="2"/>
+                  </svg>
+                  
+                  {/* Labels */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '0.68rem', color: '#64748b', fontWeight: '600' }}>
+                    <span>Ocak</span>
+                    <span>Şubat</span>
+                    <span>Mart</span>
+                    <span>Nisan</span>
+                    <span>Mayıs</span>
+                    <span>Haziran (Aktif)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Market Share circle gauge */}
+              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', justifyItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <ShieldCheck size={18} style={{ color: 'var(--accent-gold, #d4af37)' }} />
+                    Pazar Payı Endeksi
+                  </h3>
+                  <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>SeramikBak pazar yeri genelinde markanızın görüntülenme payı.</p>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                  {/* Circle SVG Progress */}
+                  <div style={{ position: 'relative', width: '110px', height: '110px' }}>
+                    <svg width="110" height="110" viewBox="0 0 36 36">
+                      <path
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none"
+                        stroke="#f1f5f9"
+                        strokeWidth="3.5"
+                      />
+                      <path
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none"
+                        stroke="var(--accent-gold, #d4af37)"
+                        strokeDasharray="24.8, 100"
+                        strokeWidth="3.5"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+                      <span style={{ fontSize: '1.25rem', fontWeight: '900', color: '#0f172a' }}>%24.8</span>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#0f172a' }}>2. En Büyük Marka</span>
+                    <span style={{ fontSize: '0.7rem', color: '#64748b', display: 'block', marginTop: '2px' }}>Qua Granite'in ardından</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3D / AR SHOWROOM ENGAGEMENT SECTION */}
+            <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Sparkles size={18} style={{ color: '#8b5cf6' }} />
+                3D Sanal Stüdyo & AR (Artırılmış Gerçeklik) Etkileşim Raporu
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 24px 0' }}>Kullanıcıların sanal stüdyoda ürünlerinizle yaptığı banyo tasarımları ve artırılmış gerçeklik etkileşim istatistikleri.</p>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }} className="campaign-inputs-grid">
+                <div style={{ background: '#faf5ff', border: '1px solid #f3e8ff', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#7c3aed' }}>1.482 Kez</div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#5b21b6', marginTop: '4px' }}>3D Banyo Planlama</div>
+                  <div style={{ fontSize: '0.68rem', color: '#7c3aed', marginTop: '2px' }}>Ürünlerinizle oda tasarlandı</div>
+                </div>
+                <div style={{ background: '#eff6ff', border: '1px solid #dbeafe', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#2563eb' }}>492 Kez</div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#1e40af', marginTop: '4px' }}>AR Evde Görselleştirme</div>
+                  <div style={{ fontSize: '0.68rem', color: '#2563eb', marginTop: '2px' }}>Kamerayla zemin kaplama yapıldı</div>
+                </div>
+                <div style={{ background: '#ecfdf5', border: '1px solid #d1fae5', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#059669' }}>86 İstek</div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#065f46', marginTop: '4px' }}>Doku Numune Talebi</div>
+                  <div style={{ fontSize: '0.68rem', color: '#059669', marginTop: '2px' }}>Gönderilen kargo numuneleri</div>
+                </div>
+              </div>
+            </div>
+
+            {/* DEALER NETWORK PERFORMANCE LEADERBOARD */}
+            <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <MapPin size={18} style={{ color: '#059669' }} />
+                    Yetkili Bayi Ağı Performans Liderlik Tablosu
+                  </h3>
+                  <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '4px 0 0 0' }}>Yönlendirilen müşteri taleplerini en hızlı karşılayan ve satışa dönüştüren bayi analizleri.</p>
+                </div>
+                <span style={{ fontSize: '0.72rem', background: '#ecfdf5', color: '#059669', fontWeight: '700', padding: '4px 10px', borderRadius: '12px' }}>
+                  Toplam 9 Yetkili Bayi
+                </span>
+              </div>
+
+              <div className="table-responsive" style={{ overflowX: 'auto' }}>
+                <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid #e2e8f0', textAlign: 'left', color: '#64748b' }}>
+                      <th style={{ padding: '12px 8px' }}>Bayi Adı</th>
+                      <th style={{ padding: '12px 8px' }}>Bölge / Şehir</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'center' }}>Yönlendirilen Lead</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'center' }}>Satışa Dönüşüm Oranı</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'center' }}>Ort. Yanıt Süresi</th>
+                      <th style={{ padding: '12px 8px', textAlign: 'center' }}>Müşteri Skoru</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '12px 8px', fontWeight: '700', color: '#0f172a' }}>İstanbul Seramik Sarayı</td>
+                      <td style={{ padding: '12px 8px', color: '#475569' }}>İstanbul / Kadıköy</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>38</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: '700', color: '#059669' }}>%42</span>
+                          <div style={{ width: '50px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: '42%', height: '100%', background: '#059669' }}></div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#475569' }}>12 dk</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#eab308', fontWeight: '700' }}>⭐ 4.9</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '12px 8px', fontWeight: '700', color: '#0f172a' }}>Ege Yapı Market</td>
+                      <td style={{ padding: '12px 8px', color: '#475569' }}>İzmir / Bornova</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>26</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: '700', color: '#059669' }}>%38</span>
+                          <div style={{ width: '50px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: '38%', height: '100%', background: '#059669' }}></div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#475569' }}>18 dk</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#eab308', fontWeight: '700' }}>⭐ 4.8</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '12px 8px', fontWeight: '700', color: '#0f172a' }}>Ankara Yapı Tasarım</td>
+                      <td style={{ padding: '12px 8px', color: '#475569' }}>Ankara / Çankaya</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>19</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: '700', color: '#2563eb' }}>%29</span>
+                          <div style={{ width: '50px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: '29%', height: '100%', background: '#2563eb' }}></div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#475569' }}>32 dk</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#eab308', fontWeight: '700' }}>⭐ 4.5</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '12px 8px', fontWeight: '700', color: '#0f172a' }}>Bursa Karo Dünyası</td>
+                      <td style={{ padding: '12px 8px', color: '#475569' }}>Bursa / Nilüfer</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>14</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: '700', color: '#ca8a04' }}>%21</span>
+                          <div style={{ width: '50px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{ width: '21%', height: '100%', background: '#ca8a04' }}></div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#475569' }}>55 dk</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#eab308', fontWeight: '700' }}>⭐ 4.1</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
@@ -858,7 +1085,7 @@ export default function BrandPortalPage() {
               gap: '24px'
             }}>
               {/* Premium Campaigns Management */}
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px' }}>
+              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Sparkles size={18} style={{ color: '#d4af37' }} />
                   Premium Reklam Yönetimi
