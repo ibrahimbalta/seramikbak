@@ -180,6 +180,65 @@ export default function AdminPage() {
   const [crawlError, setCrawlError] = useState('');
   const [crawlLogs, setCrawlLogs] = useState([]);
 
+  // Brand Credentials Management State
+  const [adminBrands, setAdminBrands] = useState([]);
+  const [editingBrandId, setEditingBrandId] = useState('');
+  const [editingUsername, setEditingUsername] = useState('');
+  const [editingPassword, setEditingPassword] = useState('');
+  const [brandActionSuccess, setBrandActionSuccess] = useState('');
+  const [brandActionError, setBrandActionError] = useState('');
+  const [brandActionLoading, setBrandActionLoading] = useState(false);
+  const [visiblePasswordId, setVisiblePasswordId] = useState('');
+
+  const loadAdminBrands = async () => {
+    try {
+      const res = await fetch('/api/admin/brands');
+      if (res.ok) {
+        const data = await res.json();
+        setAdminBrands(data);
+      }
+    } catch (err) {
+      console.error('Failed to load admin brands:', err);
+    }
+  };
+
+  const handleSaveBrandCredentials = async (e) => {
+    e.preventDefault();
+    if (!editingBrandId || !editingUsername || !editingPassword) {
+      setBrandActionError('Lütfen tüm alanları doldurun.');
+      return;
+    }
+    setBrandActionLoading(true);
+    setBrandActionSuccess('');
+    setBrandActionError('');
+    try {
+      const res = await fetch('/api/admin/brands', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingBrandId,
+          username: editingUsername,
+          password: editingPassword
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setBrandActionSuccess('Marka bilgileri başarıyla güncellendi.');
+        loadAdminBrands();
+        setEditingBrandId('');
+        setEditingUsername('');
+        setEditingPassword('');
+      } else {
+        setBrandActionError(data.error || 'Güncelleme yapılamadı.');
+      }
+    } catch (err) {
+      console.error(err);
+      setBrandActionError('Sunucu bağlantı hatası.');
+    } finally {
+      setBrandActionLoading(false);
+    }
+  };
+
   // Fetch initial datasets
   const loadBrands = async () => {
     try {
@@ -643,6 +702,7 @@ export default function AdminPage() {
       loadDealerSaasConfigs();
       loadAdminProducts(1);
       loadBankSettings();
+      loadAdminBrands();
     }
   }, [isLoggedIn]);
 
@@ -1388,6 +1448,10 @@ export default function AdminPage() {
           <button className={`admin-tab-link ${activeTab === 'saas' ? 'active' : ''}`} onClick={() => setActiveTab('saas')}>
             <CreditCard size={14} />
             <span>SaaS Abonelikleri</span>
+          </button>
+          <button className={`admin-tab-link ${activeTab === 'brands' ? 'active' : ''}`} onClick={() => setActiveTab('brands')}>
+            <Building2 size={14} />
+            <span>Marka Hesapları</span>
           </button>
         </div>
 
@@ -3990,6 +4054,145 @@ export default function AdminPage() {
               </form>
             </div>
           )}
+        </div>
+      )}
+
+      {/* TAB 6: BRAND USER ACCOUNTS */}
+      {activeTab === 'brands' && (
+        <div className="admin-card glass-panel w-full animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', background: '#ffffff', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', padding: '24px' }}>
+          <div className="card-header" style={{ display: 'flex', gap: '12px', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
+            <Building2 size={24} style={{ color: 'var(--accent-gold)' }} />
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>Marka Kullanıcı Hesapları</h3>
+              <p style={{ margin: '4px 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
+                Fabrika yetkililerinin B2B Marka Portalı'na giriş yaparken kullanacağı kullanıcı adı ve şifre bilgilerini yönetin.
+              </p>
+            </div>
+          </div>
+
+          {brandActionSuccess && (
+            <div style={{ padding: '12px 16px', background: 'rgba(5, 150, 105, 0.08)', color: 'var(--accent-green)', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>
+              {brandActionSuccess}
+            </div>
+          )}
+
+          {brandActionError && (
+            <div style={{ padding: '12px 16px', background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>
+              {brandActionError}
+            </div>
+          )}
+
+          {editingBrandId ? (
+            // Edit Mode Form
+            <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <h4 style={{ margin: '0 0 16px 0', fontSize: '1rem', fontWeight: '700' }}>
+                {adminBrands.find(b => b.id === editingBrandId)?.name || 'Marka'} Hesabını Düzenle
+              </h4>
+              <form onSubmit={handleSaveBrandCredentials} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Kullanıcı Adı</label>
+                    <input 
+                      type="text"
+                      value={editingUsername}
+                      onChange={(e) => setEditingUsername(e.target.value.toLowerCase().replace(/\s+/g, ''))}
+                      required
+                      style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                  <div style={{ flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Şifre</label>
+                    <input 
+                      type="text"
+                      value={editingPassword}
+                      onChange={(e) => setEditingPassword(e.target.value)}
+                      required
+                      style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button type="submit" disabled={brandActionLoading} className="btn-primary" style={{ padding: '8px 20px', fontSize: '0.8rem' }}>
+                    {brandActionLoading ? 'Kaydediliyor...' : 'Güncelle ve Kaydet'}
+                  </button>
+                  <button type="button" onClick={() => setEditingBrandId('')} className="btn-secondary" style={{ padding: '8px 20px', fontSize: '0.8rem' }}>
+                    İptal Et
+                  </button>
+                </div>
+              </form>
+            </div>
+          ) : null}
+
+          <div className="table-responsive" style={{ overflowX: 'auto' }}>
+            <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', padding: '12px' }}>Marka Adı</th>
+                  <th style={{ textAlign: 'left', padding: '12px' }}>Kullanıcı Adı</th>
+                  <th style={{ textAlign: 'left', padding: '12px' }}>Giriş Şifresi</th>
+                  <th style={{ textAlign: 'center', padding: '12px', width: '120px' }}>İşlemler</th>
+                </tr>
+              </thead>
+              <tbody>
+                {adminBrands.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>Yükleniyor veya kayıtlı marka bulunamadı.</td>
+                  </tr>
+                ) : (
+                  adminBrands.map((b) => {
+                    const isPasswordVisible = visiblePasswordId === b.id;
+                    return (
+                      <tr key={b.id}>
+                        <td style={{ padding: '12px', fontWeight: '700' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            {b.logoUrl && (
+                              <img src={b.logoUrl} alt={b.name} style={{ height: '24px', maxWidth: '60px', objectFit: 'contain', background: '#f8fafc', padding: '2px', borderRadius: '4px' }} onError={(e) => { e.target.style.display = 'none'; }} />
+                            )}
+                            <span>{b.name}</span>
+                          </div>
+                        </td>
+                        <td style={{ padding: '12px', fontFamily: 'monospace', color: '#0f172a' }}>
+                          {b.username || <em style={{ color: '#94a3b8' }}>Tanımlanmamış</em>}
+                        </td>
+                        <td style={{ padding: '12px', fontFamily: 'monospace' }}>
+                          {b.password ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span>{isPasswordVisible ? b.password : '••••••••'}</span>
+                              <button 
+                                type="button"
+                                onClick={() => setVisiblePasswordId(isPasswordVisible ? '' : b.id)}
+                                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', fontSize: '0.75rem' }}
+                              >
+                                {isPasswordVisible ? 'Gizle' : 'Göster'}
+                              </button>
+                            </div>
+                          ) : (
+                            <em style={{ color: '#94a3b8' }}>Tanımlanmamış</em>
+                          )}
+                        </td>
+                        <td style={{ padding: '12px', textAlign: 'center' }}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingBrandId(b.id);
+                              setEditingUsername(b.username || '');
+                              setEditingPassword(b.password || '');
+                              setBrandActionSuccess('');
+                              setBrandActionError('');
+                            }}
+                            className="btn-primary"
+                            style={{ padding: '4px 10px', fontSize: '0.72rem', fontWeight: '600', borderRadius: '4px' }}
+                          >
+                            Düzenle
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
