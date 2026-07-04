@@ -2039,9 +2039,9 @@ export default function Home() {
                     )}
                   </div>
                 ) : (
-                  <button className="header-btn account-btn" onClick={() => setShowAuthModal(true)}>
+                  <button className="header-btn account-btn" onClick={() => window.location.href = '/uyelik'}>
                     <UserIcon size={16} />
-                    <span>Giriş Yap</span>
+                    <span>Üyelik</span>
                   </button>
                 )}
               </>
@@ -2115,8 +2115,8 @@ export default function Home() {
                   </button>
                 </>
               ) : (
-                <button className="mobile-nav-link login-link" onClick={() => { setShowAuthModal(true); setShowMobileMenu(false); }}>
-                  Giriş Yap
+                <button className="mobile-nav-link login-link" onClick={() => { window.location.href = '/uyelik'; setShowMobileMenu(false); }}>
+                  Üyelik
                 </button>
               )}
             </div>
