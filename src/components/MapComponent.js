@@ -112,6 +112,27 @@ export default function MapComponent({ dealers = [], userCoords = null, activeDe
       map.setView([activeDealer.lat, activeDealer.lng], 14);
     }
 
+    // Draw a dashed route line from user to active dealer
+    if (userCoords && activeDealer) {
+      const latlngs = [
+        [userCoords.lat, userCoords.lng],
+        [activeDealer.lat, activeDealer.lng]
+      ];
+      const routeLine = L.polyline(latlngs, {
+        color: '#b38e47', // premium gold line
+        weight: 4,
+        opacity: 0.8,
+        dashArray: '6, 10',
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(map);
+      
+      markersRef.current.push(routeLine);
+      
+      // Auto-fit to show both markers when route is active
+      map.fitBounds(latlngs, { padding: [80, 80] });
+    }
+
   }, [dealers, userCoords, activeDealer]);
 
   return (
