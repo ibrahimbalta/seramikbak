@@ -1297,6 +1297,34 @@ export default function BrandPortalPage() {
                 <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0' }}>SaaS Planı & Ödeme Yönetimi</h3>
                 <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Markanızın yayın lisans planını yükseltin ve banka havalesi bildirimlerini yapın.</p>
 
+                {/* Feature Comparison List */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+                  <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#1e40af' }}>💎 PRO PAKET ÖZELLİKLERİ</span>
+                    </div>
+                    <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.78rem', color: '#475569' }}>
+                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Sınırsız Ürün Listeleme & Detayları</li>
+                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Premium Reklam Yönetimi (Öne Çıkarma)</li>
+                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ B2B Pazar Trend Raporları (Kelime/İl)</li>
+                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ B2B Proje Taleplerini Listeleme (M3/Ebat)</li>
+                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>❌ Müteahhit/İnşaat İletişim Detayları (Kilitli)</li>
+                    </ul>
+                  </div>
+                  <div style={{ background: '#fcfaf2', border: '1px solid #fde047', borderRadius: '10px', padding: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#ca8a04' }}>👑 ENTERPRISE PAKET ÖZELLİKLERİ</span>
+                    </div>
+                    <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.78rem', color: '#475569' }}>
+                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ PRO Paket İçeriğinin Tamamı</li>
+                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Müteahhit/Mimar İletişim Detayları (Açık)</li>
+                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Bayi Ağı Performans Liderlik Tablosu</li>
+                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Öncelikli ERP/XML Entegrasyon Desteği</li>
+                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Marka Pazar Payı & Rakip Raporları</li>
+                    </ul>
+                  </div>
+                </div>
+
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>Lisans Seçenekleri:</span>
