@@ -991,6 +991,14 @@ export default function Home() {
     }
   };
 
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setUploadedImagePreview(null);
+    setVisualSearchMatches(null);
+    setPage(1);
+    fetchProducts('', 1, false);
+  };
+
   const handleVisualSearch = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
