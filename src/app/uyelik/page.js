@@ -485,9 +485,18 @@ export default function UyelikPage() {
               <span>Anasayfaya Dön</span>
             </button>
 
-            <div className="brand-badge">
-              🔥 50.000+ Mimar & Usta
-            </div>
+            {/* Premium Ceramic Tile Banner */}
+            <div style={{
+              width: '100%',
+              height: '110px',
+              borderRadius: '16px',
+              backgroundImage: 'url("/ceramic_tile_premium.png")',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              border: '1.5px solid rgba(179, 142, 71, 0.25)',
+              boxShadow: '0 8px 24px rgba(15, 23, 42, 0.06)',
+              marginBottom: '24px'
+            }} />
 
             <h1 className="info-title">
               Fırsatlardan ilk <span>sen haberdar ol</span>
