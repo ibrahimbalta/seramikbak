@@ -88,7 +88,7 @@ async function main() {
   console.log('[PLP] Seriler taranıyor...');
   while (hasMore) {
     console.log(`   -> Seriler sayfası ${page} indiriliyor...`);
-    const plpUrl = `https://www.seranit.com.tr/tr/Seriler/getSer?st=${page}&uk=0&ka=0&_do=0&yu=0&bo=0&re=0&val=`;
+    const plpUrl = `https://www.seranit.com.tr/tr/Seriler/getSer?st=${page}&uk=1&ka=0&_do=0&yu=0&bo=0&re=0&val=`;
     
     try {
       const res = await getJsonWithRetry(plpUrl);
@@ -127,6 +127,10 @@ async function main() {
     while (activeIndex < seriesList.length) {
       const currentIndex = activeIndex++;
       const series = seriesList[currentIndex];
+      if (series.ProductGroup !== 1) {
+        console.log(`[Atlanıyor] [${currentIndex + 1}/${seriesList.length}] Banyo Mobilyası serisi: ${series.Name}`);
+        continue;
+      }
       const pdpUrl = `https://www.seranit.com.tr/tr/Seriler/getSeriProduct?se=${series.Id}&si=&_do=&mo=`;
       
       console.log(`[PDP] [${currentIndex + 1}/${seriesList.length}] Ürünler çekiliyor: ${series.Name} (ID: ${series.Id})`);
