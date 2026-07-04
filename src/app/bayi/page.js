@@ -142,10 +142,12 @@ export default function DealerPortalPage() {
     }
   };
 
-  const triggerStripeMockWebhook = async () => {
+  const triggerStripeMockWebhook = async (selectedPlan) => {
     if (!dealerInfo) return;
     setStripeLoading(true);
     setStripeWebhookResult('');
+    
+    const targetPlan = selectedPlan || stripePlan;
     
     try {
       const response = await fetch('/api/webhooks/stripe', {
@@ -154,7 +156,7 @@ export default function DealerPortalPage() {
         body: JSON.stringify({
           eventType: 'checkout.session.completed',
           dealerId: dealerInfo.id,
-          plan: stripePlan,
+          plan: targetPlan,
           durationMonths: 12
         })
       });
@@ -1197,7 +1199,7 @@ export default function DealerPortalPage() {
                     ))}
                   </ul>
                   <button
-                    onClick={() => { setStripePlan('LITE'); triggerStripeMockWebhook(); }}
+                    onClick={() => { setStripePlan('LITE'); triggerStripeMockWebhook('LITE'); }}
                     disabled={stripeLoading || saasInfo?.plan === 'LITE' || hasPending}
                     style={{
                       marginTop: '28px',
@@ -1272,7 +1274,7 @@ export default function DealerPortalPage() {
                     ))}
                   </ul>
                   <button
-                    onClick={() => { setStripePlan('STANDART'); triggerStripeMockWebhook(); }}
+                    onClick={() => { setStripePlan('STANDART'); triggerStripeMockWebhook('STANDART'); }}
                     disabled={stripeLoading || saasInfo?.plan === 'STANDART' || hasPending}
                     style={{
                       marginTop: '28px',
@@ -1343,7 +1345,7 @@ export default function DealerPortalPage() {
                     ))}
                   </ul>
                   <button
-                    onClick={() => { setStripePlan('PREMIUM'); triggerStripeMockWebhook(); }}
+                    onClick={() => { setStripePlan('PREMIUM'); triggerStripeMockWebhook('PREMIUM'); }}
                     disabled={stripeLoading || saasInfo?.plan === 'PREMIUM' || hasPending}
                     style={{
                       marginTop: '28px',
