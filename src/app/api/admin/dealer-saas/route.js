@@ -63,7 +63,10 @@ export async function POST(request) {
               status: 'ACTIVE',
               expiresAt: newExpiresAt,
               pendingPlan: null,
-              pendingStatus: null
+              pendingStatus: null,
+              paymentSender: null,
+              paymentDate: null,
+              paymentNote: null
             }
           });
         } else if (existingSaaS.pendingStatus === 'PENDING_APPROVAL') {
@@ -74,7 +77,10 @@ export async function POST(request) {
               status: 'ACTIVE',
               expiresAt: newExpiresAt,
               pendingPlan: null,
-              pendingStatus: null
+              pendingStatus: null,
+              paymentSender: null,
+              paymentDate: null,
+              paymentNote: null
             }
           });
         } else {
@@ -85,14 +91,20 @@ export async function POST(request) {
           config = await prisma.dealerSaaSConfig.update({
             where: { id: existingSaaS.id },
             data: {
-              status: 'REJECTED'
+              status: 'REJECTED',
+              paymentSender: null,
+              paymentDate: null,
+              paymentNote: null
             }
           });
         } else if (existingSaaS.pendingStatus === 'PENDING_APPROVAL') {
           config = await prisma.dealerSaaSConfig.update({
             where: { id: existingSaaS.id },
             data: {
-              pendingStatus: 'REJECTED'
+              pendingStatus: 'REJECTED',
+              paymentSender: null,
+              paymentDate: null,
+              paymentNote: null
             }
           });
         } else {

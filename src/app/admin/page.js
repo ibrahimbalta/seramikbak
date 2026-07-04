@@ -110,6 +110,14 @@ export default function AdminPage() {
   const [dealerSaasSuccess, setDealerSaasSuccess] = useState('');
   const [dealerSaasError, setDealerSaasError] = useState('');
 
+  // Bank Account Settings State
+  const [bankName, setBankName] = useState('');
+  const [bankRecipient, setBankRecipient] = useState('');
+  const [bankIban, setBankIban] = useState('');
+  const [bankSettingsLoading, setBankSettingsLoading] = useState(false);
+  const [bankSettingsSuccess, setBankSettingsSuccess] = useState('');
+  const [bankSettingsError, setBankSettingsError] = useState('');
+
   // Product Management State
   const [adminProducts, setAdminProducts] = useState([]);
   const [adminProductsTotal, setAdminProductsTotal] = useState(0);
@@ -287,6 +295,20 @@ export default function AdminPage() {
       }
     } catch (err) {
       console.error('Failed to load dealer SaaS configs:', err);
+    }
+  };
+
+  const loadBankSettings = async () => {
+    try {
+      const response = await fetch('/api/admin/settings');
+      const data = await response.json();
+      if (response.ok) {
+        setBankName(data.bank_name || '');
+        setBankRecipient(data.bank_recipient || '');
+        setBankIban(data.bank_iban || '');
+      }
+    } catch (err) {
+      console.error('Failed to load bank settings:', err);
     }
   };
 
@@ -620,6 +642,7 @@ export default function AdminPage() {
       loadSaasConfigs();
       loadDealerSaasConfigs();
       loadAdminProducts(1);
+      loadBankSettings();
     }
   }, [isLoggedIn]);
 
@@ -1034,6 +1057,38 @@ export default function AdminPage() {
       setDealerSaasError('API bağlantı hatası.');
     } finally {
       setIsUpdatingDealerSaas(false);
+    }
+  };
+
+  const handleUpdateBankSettings = async (e) => {
+    e.preventDefault();
+    setBankSettingsLoading(true);
+    setBankSettingsSuccess('');
+    setBankSettingsError('');
+
+    try {
+      const response = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bank_name: bankName,
+          bank_recipient: bankRecipient,
+          bank_iban: bankIban
+        })
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setBankSettingsSuccess('Banka hesap ayarları başarıyla güncellendi.');
+        loadBankSettings();
+      } else {
+        setBankSettingsError(result.error || 'Ayarlar kaydedilirken hata oluştu.');
+      }
+    } catch (err) {
+      setBankSettingsError('Bağlantı hatası.');
+      console.error(err);
+    } finally {
+      setBankSettingsLoading(false);
     }
   };
 
@@ -2616,6 +2671,23 @@ export default function AdminPage() {
             >
               Onay Talepleri ({pendingBrands.length + pendingDealers.length})
             </button>
+            <button 
+              type="button" 
+              className={`admin-subtab-btn ${saasSubTab === 'bank_settings' ? 'active' : ''}`}
+              onClick={() => setSaasSubTab('bank_settings')}
+              style={{
+                padding: '8px 16px',
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                borderRadius: '6px',
+                border: 'none',
+                background: saasSubTab === 'bank_settings' ? 'var(--accent-gold, #d4af37)' : 'transparent',
+                color: saasSubTab === 'bank_settings' ? '#000' : 'var(--text-muted, #666)',
+                cursor: 'pointer'
+              }}
+            >
+              Banka Hesap Ayarları
+            </button>
           </div>
 
           {saasSubTab === 'brand' ? (
@@ -2918,7 +2990,7 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
-          ) : (
+          ) : saasSubTab === 'pending' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
               {/* BRAND REQUESTS */}
               <div className="admin-card glass-panel w-full" style={{ padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
@@ -2938,6 +3010,7 @@ export default function AdminPage() {
                         <th style={{ padding: '10px' }}>Talebi</th>
                         <th style={{ padding: '10px' }}>Mevcut Plan</th>
                         <th style={{ padding: '10px' }}>İstenen Plan</th>
+                        <th style={{ padding: '10px' }}>Ödeme Bilgisi</th>
                         <th style={{ padding: '10px', textAlign: 'right' }}>İşlemler</th>
                       </tr>
                     </thead>
@@ -2966,6 +3039,17 @@ export default function AdminPage() {
                                 {requestedPlanName}
                               </span>
                             </td>
+                            <td style={{ padding: '12px' }}>
+                              {item.saas?.paymentSender ? (
+                                <div style={{ lineHeight: '1.4' }}>
+                                  <div style={{ fontWeight: '700', color: '#1e293b' }}>{item.saas.paymentSender}</div>
+                                  <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Tarih: {item.saas.paymentDate || 'N/A'}</div>
+                                  <div style={{ fontSize: '0.72rem', color: '#b45309', fontStyle: 'italic', fontWeight: '500' }}>Not: {item.saas.paymentNote || '-'}</div>
+                                </div>
+                              ) : (
+                                <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>Ödeme Bildirimi Yok</span>
+                              )}
+                            </td>
                             <td style={{ padding: '12px', textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                               <button
                                 onClick={() => handleApproveRejectBrandSaaS(item.id, 'approve')}
@@ -2985,7 +3069,7 @@ export default function AdminPage() {
                       })}
                       {pendingBrands.length === 0 && (
                         <tr>
-                          <td colSpan="5" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>
+                          <td colSpan="6" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>
                             Onay bekleyen marka talebi bulunmuyor.
                           </td>
                         </tr>
@@ -3013,6 +3097,7 @@ export default function AdminPage() {
                         <th style={{ padding: '10px' }}>Talebi</th>
                         <th style={{ padding: '10px' }}>Mevcut Plan</th>
                         <th style={{ padding: '10px' }}>İstenen Plan</th>
+                        <th style={{ padding: '10px' }}>Ödeme Bilgisi</th>
                         <th style={{ padding: '10px', textAlign: 'right' }}>İşlemler</th>
                       </tr>
                     </thead>
@@ -3044,6 +3129,17 @@ export default function AdminPage() {
                                 {requestedPlanName}
                               </span>
                             </td>
+                            <td style={{ padding: '12px' }}>
+                              {item.saas?.paymentSender ? (
+                                <div style={{ lineHeight: '1.4' }}>
+                                  <div style={{ fontWeight: '700', color: '#1e293b' }}>{item.saas.paymentSender}</div>
+                                  <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Tarih: {item.saas.paymentDate || 'N/A'}</div>
+                                  <div style={{ fontSize: '0.72rem', color: '#b45309', fontStyle: 'italic', fontWeight: '500' }}>Not: {item.saas.paymentNote || '-'}</div>
+                                </div>
+                              ) : (
+                                <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>Ödeme Bildirimi Yok</span>
+                              )}
+                            </td>
                             <td style={{ padding: '12px', textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                               <button
                                 onClick={() => handleApproveRejectDealerSaaS(item.id, 'approve')}
@@ -3063,7 +3159,7 @@ export default function AdminPage() {
                       })}
                       {pendingDealers.length === 0 && (
                         <tr>
-                          <td colSpan="5" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>
+                          <td colSpan="6" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>
                             Onay bekleyen bayi talebi bulunmuyor.
                           </td>
                         </tr>
@@ -3071,6 +3167,89 @@ export default function AdminPage() {
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </div>
+          ) : (
+            <div className="admin-grid animate-fade-in" style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
+              <div className="admin-card glass-panel" style={{ padding: '28px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', width: '100%' }}>
+                <div className="card-header" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
+                  <Settings size={20} className="icon-gold" />
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800' }}>Banka Hesap Bilgileri Ayarları</h3>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: '#64748b' }}>Bayi ve marka paket seçim ekranlarında gösterilecek resmi banka hesap detayları.</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleUpdateBankSettings} className="ingest-form" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {bankSettingsSuccess && (
+                    <div className="success-alert" style={{ background: '#ecfdf5', border: '1px solid #10b981', color: '#065f46', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <CheckCircle size={18} />
+                      <span>{bankSettingsSuccess}</span>
+                    </div>
+                  )}
+
+                  {bankSettingsError && (
+                    <div className="error-alert" style={{ background: '#fef2f2', border: '1px solid #ef4444', color: '#991b1b', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <AlertCircle size={18} />
+                      <span>{bankSettingsError}</span>
+                    </div>
+                  )}
+
+                  <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>Banka Adı</label>
+                    <input 
+                      type="text" 
+                      value={bankName} 
+                      onChange={(e) => setBankName(e.target.value)} 
+                      placeholder="Örn: Akbank" 
+                      required
+                      style={{ padding: '10px', fontSize: '0.85rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>Alıcı Ad Soyad / Ticari Ünvan</label>
+                    <input 
+                      type="text" 
+                      value={bankRecipient} 
+                      onChange={(e) => setBankRecipient(e.target.value)} 
+                      placeholder="Örn: KolayWebci Yazılım ve Danışmanlık A.Ş." 
+                      required
+                      style={{ padding: '10px', fontSize: '0.85rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>IBAN Numarası</label>
+                    <input 
+                      type="text" 
+                      value={bankIban} 
+                      onChange={(e) => setBankIban(e.target.value)} 
+                      placeholder="Örn: TR98 0004 6001 5000 1234 5678 90" 
+                      required
+                      style={{ padding: '10px', fontSize: '0.85rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    />
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={bankSettingsLoading}
+                    style={{ 
+                      background: 'var(--accent-gold, #d4af37)', 
+                      color: '#000', 
+                      border: 'none', 
+                      borderRadius: '8px', 
+                      padding: '12px', 
+                      fontSize: '0.85rem', 
+                      fontWeight: '700', 
+                      cursor: 'pointer',
+                      marginTop: '10px',
+                      opacity: bankSettingsLoading ? 0.7 : 1
+                    }}
+                  >
+                    {bankSettingsLoading ? 'Kaydediliyor...' : 'Hesap Bilgilerini Kaydet'}
+                  </button>
+                </form>
               </div>
             </div>
           )}

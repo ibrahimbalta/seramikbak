@@ -46,10 +46,16 @@ export default function BrandPortalPage() {
   const [campaignErrorMsg, setCampaignErrorMsg] = useState('');
   const [isStartingCampaign, setIsStartingCampaign] = useState(false);
 
-  // Stripe Webhook Sandbox Simulation
-  const [stripePlan, setStripePlan] = useState('PRO');
-  const [stripeWebhookResult, setStripeWebhookResult] = useState('');
-  const [stripeLoading, setStripeLoading] = useState(false);
+  // SaaS Payment States
+  const [bankDetails, setBankDetails] = useState({ bank_name: '', bank_recipient: '', bank_iban: '' });
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPaymentPlan, setSelectedPaymentPlan] = useState('PRO');
+  const [paymentSenderName, setPaymentSenderName] = useState('');
+  const [paymentDate, setPaymentDate] = useState('');
+  const [paymentNote, setPaymentNote] = useState('');
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState('');
+  const [paymentError, setPaymentError] = useState('');
 
   const [activePortalTab, setActivePortalTab] = useState('dashboard');
   const [projects, setProjects] = useState([]);
@@ -79,8 +85,25 @@ export default function BrandPortalPage() {
       fetchB2bStats(brandInfo.id);
       fetchBrandProducts(brandInfo.id);
       loadBrandProjects(brandInfo.id);
+      loadBankDetails();
     }
   }, [isLoggedIn, brandInfo]);
+
+  const loadBankDetails = async () => {
+    try {
+      const res = await fetch('/api/admin/settings');
+      if (res.ok) {
+        const data = await res.json();
+        setBankDetails({
+          bank_name: data.bank_name,
+          bank_recipient: data.bank_recipient,
+          bank_iban: data.bank_iban
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load bank settings:', err);
+    }
+  };
 
   const loadBrandProjects = async (brandId) => {
     if (!brandId) return;
@@ -200,40 +223,44 @@ export default function BrandPortalPage() {
     }
   };
 
-  const triggerStripeMockWebhook = async () => {
-    if (!brandInfo) return;
-    setStripeLoading(true);
-    setStripeWebhookResult('');
-    
+  const handleSendPaymentNotification = async (e) => {
+    e.preventDefault();
+    setPaymentLoading(true);
+    setPaymentSuccess('');
+    setPaymentError('');
+
     try {
-      const response = await fetch('/api/webhooks/stripe', {
+      const response = await fetch('/api/brands/saas-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'checkout.session.completed',
-          data: {
-            object: {
-              client_reference_id: brandInfo.id,
-              metadata: { plan: stripePlan }
-            }
-          }
+          brandId: brandInfo.id,
+          plan: selectedPaymentPlan,
+          paymentSender: paymentSenderName,
+          paymentDate: paymentDate,
+          paymentNote: paymentNote
         })
       });
 
       const result = await response.json();
       if (response.ok && result.success) {
-        setStripeWebhookResult(`Ödeme Başarılı! ${stripePlan} paket talebiniz alındı ve admin onayına gönderildi.`);
-        // Reload stats to show upgraded tier
+        setPaymentSuccess(`Ödeme bildiriminiz başarıyla iletildi. Talebiniz admin onayına gönderilmiştir.`);
         fetchB2bStats(brandInfo.id);
-        loadBrandProjects(brandInfo.id);
+        setTimeout(() => {
+          setShowPaymentModal(false);
+          setPaymentSuccess('');
+          setPaymentSenderName('');
+          setPaymentDate('');
+          setPaymentNote('');
+        }, 3000);
       } else {
-        setStripeWebhookResult('Webhook hatası: ' + (result.error || 'Bilinmeyen Hata'));
+        setPaymentError(result.error || 'Ödeme bildirimi gönderilemedi.');
       }
     } catch (err) {
-      setStripeWebhookResult('Bağlantı hatası.');
+      setPaymentError('Bağlantı hatası.');
       console.error(err);
     } finally {
-      setStripeLoading(false);
+      setPaymentLoading(false);
     }
   };
 
@@ -1038,90 +1065,93 @@ export default function BrandPortalPage() {
                 </div>
               </div>
 
-              {/* Stripe Webhook simulator sandbox */}
+              {/* SaaS Plan & Bank Transfer Payment Notification */}
               <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0' }}>SaaS Plan Yönetimi & Stripe Test Alanı</h3>
-                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Markanızın platform katmanını test etmek amacıyla Stripe Webhook olaylarını simüle edin.</p>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0' }}>SaaS Planı & Ödeme Yönetimi</h3>
+                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Markanızın yayın lisans planını yükseltin ve banka havalesi bildirimlerini yapın.</p>
 
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>Abonelik Katmanı:</span>
+                    <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>Lisans Seçenekleri:</span>
                     <div style={{ display: 'flex', gap: '6px' }}>
                       <button 
-                        onClick={() => setStripePlan('PRO')} 
+                        onClick={() => setSelectedPaymentPlan('PRO')} 
+                        disabled={b2bStats?.saas?.plan === 'PRO'}
                         style={{
                           padding: '6px 12px',
                           fontSize: '0.75rem',
                           borderRadius: '6px',
                           border: '1px solid #cbd5e1',
-                          background: stripePlan === 'PRO' ? '#0f172a' : '#fff',
-                          color: stripePlan === 'PRO' ? '#fff' : '#0f172a',
+                          background: selectedPaymentPlan === 'PRO' ? '#0f172a' : '#fff',
+                          color: selectedPaymentPlan === 'PRO' ? '#fff' : '#0f172a',
                           fontWeight: '600',
-                          cursor: 'pointer'
+                          cursor: b2bStats?.saas?.plan === 'PRO' ? 'default' : 'pointer',
+                          opacity: b2bStats?.saas?.plan === 'PRO' ? 0.6 : 1
                         }}
                       >
-                        PRO
+                        PRO (₺11.990 / Yıl)
                       </button>
                       <button 
-                        onClick={() => setStripePlan('ENTERPRISE')} 
+                        onClick={() => setSelectedPaymentPlan('ENTERPRISE')} 
+                        disabled={b2bStats?.saas?.plan === 'ENTERPRISE'}
                         style={{
                           padding: '6px 12px',
                           fontSize: '0.75rem',
                           borderRadius: '6px',
                           border: '1px solid #cbd5e1',
-                          background: stripePlan === 'ENTERPRISE' ? '#0f172a' : '#fff',
-                          color: stripePlan === 'ENTERPRISE' ? '#fff' : '#0f172a',
+                          background: selectedPaymentPlan === 'ENTERPRISE' ? '#0f172a' : '#fff',
+                          color: selectedPaymentPlan === 'ENTERPRISE' ? '#fff' : '#0f172a',
                           fontWeight: '600',
-                          cursor: 'pointer'
+                          cursor: b2bStats?.saas?.plan === 'ENTERPRISE' ? 'default' : 'pointer',
+                          opacity: b2bStats?.saas?.plan === 'ENTERPRISE' ? 0.6 : 1
                         }}
                       >
-                        ENTERPRISE
+                        ENTERPRISE (₺24.990 / Yıl)
                       </button>
                     </div>
                   </div>
 
-                  <button 
-                    onClick={triggerStripeMockWebhook} 
-                    disabled={stripeLoading || hasPending}
-                    style={{
-                      background: '#fff',
-                      color: hasPending ? '#94a3b8' : '#d4af37',
-                      border: '1px solid ' + (hasPending ? '#e2e8f0' : '#d4af37'),
-                      borderRadius: '8px',
-                      padding: '12px',
-                      fontWeight: '700',
-                      fontSize: '0.8rem',
-                      cursor: hasPending ? 'default' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    {stripeLoading ? 'Webhook Gönderiliyor...' : (hasPending ? 'Onay Bekleyen İstek Var' : `Stripe Webhook Simüle Et (${stripePlan})`)}
-                  </button>
-
-                  {stripeWebhookResult && (
+                  {hasPending ? (
                     <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      background: '#e6f7ed',
-                      color: '#10b981',
-                      border: '1px solid #a7f3d0',
+                      background: '#fffbeb',
+                      border: '1px solid #fde047',
+                      color: '#b45309',
+                      padding: '12px 16px',
                       borderRadius: '8px',
-                      padding: '10px 14px',
-                      fontSize: '0.75rem'
+                      fontSize: '0.78rem',
+                      fontWeight: '600',
+                      lineHeight: '1.4'
                     }}>
-                      <CheckCircle size={14} />
-                      <span>{stripeWebhookResult}</span>
+                      ⏱️ <strong>Abonelik Talebi Onay Bekliyor:</strong> {requestedPlan} paket talebiniz alındı. Banka transferiniz (Gönderen: {b2bStats?.saas?.paymentSender || 'Belirtilmedi'}, Dekont: {b2bStats?.saas?.paymentNote || '-'}) doğrulandıktan sonra admin onayıyla en kısa sürede aktifleşecektir.
                     </div>
+                  ) : (
+                    <button 
+                      onClick={() => setShowPaymentModal(true)} 
+                      disabled={b2bStats?.saas?.plan === selectedPaymentPlan}
+                      style={{
+                        background: b2bStats?.saas?.plan === selectedPaymentPlan ? '#f1f5f9' : 'var(--accent-gold, #d4af37)',
+                        color: b2bStats?.saas?.plan === selectedPaymentPlan ? '#94a3b8' : '#000',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '12px',
+                        fontWeight: '700',
+                        fontSize: '0.8rem',
+                        cursor: b2bStats?.saas?.plan === selectedPaymentPlan ? 'default' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <CheckCircle size={16} />
+                      <span>{b2bStats?.saas?.plan === selectedPaymentPlan ? 'Zaten Aktif Planınız' : `${selectedPaymentPlan} Planı İçin Ödeme Bildirimi Yap`}</span>
+                    </button>
                   )}
                 </div>
 
                 <div style={{ marginTop: '20px', borderTop: '1px solid #e2e8f0', paddingTop: '16px', fontSize: '0.72rem', color: '#64748b', lineHeight: '1.4' }}>
-                  <strong>SeramikBak B2B SaaS modeli</strong> üzerinden markalar aylık abonelik ücretiyle üye olurlar. Webhook simülasyonu, canlı Stripe altyapısında ödeme yapıldığında abonelik durumunun nasıl otomatik güncellendiğini gösterir.
+                  <strong>SeramikBak B2B SaaS Lisanslama:</strong> Markalar lisans planlarıyla yıllık üye olurlar. Ödeme bildirimi yapıldıktan sonra sistem yetkilileri havalenizi onaylayarak plan özelliklerini aktif hale getirecektir.
                 </div>
               </div>
             </div>
@@ -1222,6 +1252,190 @@ export default function BrandPortalPage() {
           }
         }
       `}</style>
+
+      {/* Bank Transfer Payment Modal */}
+      {showPaymentModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div className="glass-panel" style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            border: '1px solid #e2e8f0',
+            width: '100%',
+            maxWidth: '520px',
+            padding: '30px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            position: 'relative',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <button 
+              onClick={() => setShowPaymentModal(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'none',
+                border: 'none',
+                fontSize: '1.25rem',
+                cursor: 'pointer',
+                color: '#64748b',
+                fontWeight: '700'
+              }}
+            >
+              ×
+            </button>
+
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px', color: '#0f172a' }}>
+              Banka Havalesi ile Ödeme Bildirimi
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '20px' }}>
+              Seçtiğiniz <strong>{selectedPaymentPlan}</strong> paketini aktifleştirmek için lütfen aşağıdaki IBAN adresine havale yapın ve ödeme bildirim formunu doldurun.
+            </p>
+
+            {/* Bank details box */}
+            <div style={{
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '24px',
+              fontSize: '0.82rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
+              <div><strong>Banka:</strong> {bankDetails.bank_name || 'Yükleniyor...'}</div>
+              <div><strong>Alıcı:</strong> {bankDetails.bank_recipient || 'Yükleniyor...'}</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban || 'Yükleniyor...'}</span></div>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(bankDetails.bank_iban);
+                    alert('IBAN panoya kopyalandı!');
+                  }}
+                  style={{
+                    background: '#e2e8f0',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '2px 8px',
+                    fontSize: '0.7rem',
+                    cursor: 'pointer',
+                    fontWeight: '600'
+                  }}
+                >
+                  Kopyala
+                </button>
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#64748b', borderTop: '1px solid #e2e8f0', paddingTop: '8px', marginTop: '4px' }}>
+                * Açıklama alanına markanızın adını (<strong>{brandInfo?.name}</strong>) yazmayı unutmayın.
+              </div>
+            </div>
+
+            {/* Notification Form */}
+            <form onSubmit={handleSendPaymentNotification} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {paymentSuccess && (
+                <div style={{ background: '#ecfdf5', border: '1px solid #10b981', color: '#065f46', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <CheckCircle size={18} />
+                  <span>{paymentSuccess}</span>
+                </div>
+              )}
+
+              {paymentError && (
+                <div style={{ background: '#fef2f2', border: '1px solid #ef4444', color: '#991b1b', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertCircle size={18} />
+                  <span>{paymentError}</span>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.78rem', fontWeight: '600', color: '#334155' }}>Ödeme Yapan Ad Soyad</label>
+                <input 
+                  type="text" 
+                  value={paymentSenderName} 
+                  onChange={(e) => setPaymentSenderName(e.target.value)} 
+                  placeholder="Hesap Sahibi Adı Soyadı" 
+                  required
+                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.78rem', fontWeight: '600', color: '#334155' }}>Ödeme Tarihi</label>
+                <input 
+                  type="date" 
+                  value={paymentDate} 
+                  onChange={(e) => setPaymentDate(e.target.value)} 
+                  required
+                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.78rem', fontWeight: '600', color: '#334155' }}>Dekont No / Ek Açıklama</label>
+                <input 
+                  type="text" 
+                  value={paymentNote} 
+                  onChange={(e) => setPaymentNote(e.target.value)} 
+                  placeholder="Referans No veya Not" 
+                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button 
+                  type="button"
+                  onClick={() => setShowPaymentModal(false)}
+                  style={{
+                    flex: 1,
+                    background: '#f1f5f9',
+                    color: '#334155',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    fontSize: '0.82rem',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                >
+                  İptal
+                </button>
+                <button 
+                  type="submit"
+                  disabled={paymentLoading}
+                  style={{
+                    flex: 1,
+                    background: 'var(--accent-gold, #d4af37)',
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    fontSize: '0.82rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    opacity: paymentLoading ? 0.7 : 1
+                  }}
+                >
+                  {paymentLoading ? 'Gönderiliyor...' : 'Bildirimi Gönder'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
