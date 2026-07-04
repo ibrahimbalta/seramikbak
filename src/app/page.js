@@ -999,6 +999,17 @@ export default function Home() {
     setVisualSearchLoading(true);
     setVisualSearchMatches(null);
 
+    // Reset file input target value so selecting the same image fires onChange next time
+    e.target.value = '';
+
+    // Scroll smoothly to results header
+    setTimeout(() => {
+      const el = document.querySelector('.results-header-row-new');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 200);
+
     const formData = new FormData();
     formData.append('file', file);
 
@@ -2149,16 +2160,54 @@ export default function Home() {
                 {/* Wide Centered Search Bar */}
                 <form onSubmit={handleSearchSubmit} className="wide-search-bar-form" style={{ position: 'relative' }}>
                   <div className="search-bar-inner-container">
-                    <SearchIcon size={20} className="search-bar-icon-left" />
+                    {visualSearchLoading ? (
+                      <Loader2 size={20} className="search-bar-icon-left animate-spin" style={{ color: 'var(--accent-gold)' }} />
+                    ) : (
+                      <SearchIcon size={20} className="search-bar-icon-left" />
+                    )}
                     <input 
                       type="text" 
-                      placeholder="Marka, ürün adı, kod, renk, ebat, yüzey, koleksiyon..." 
+                      placeholder={uploadedImagePreview ? "Görsel yüklendi. Sonuçlar aşağıda listeleniyor." : "Marka, ürün adı, kod, renk, ebat, yüzey, koleksiyon..."}
                       value={searchQuery}
                       onChange={handleSearchChange}
                       onFocus={() => { if (searchQuery.trim().length > 1) setShowSuggestions(true); }}
                       onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                       className="wide-search-input"
+                      disabled={!!uploadedImagePreview}
+                      style={{ paddingLeft: uploadedImagePreview ? '100px' : '44px' }}
                     />
+
+                    {/* Image Preview Thumbnail Overlay */}
+                    {uploadedImagePreview && (
+                      <div style={{
+                        position: 'absolute',
+                        left: '42px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: '#f1f5f9',
+                        padding: '4px 8px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
+                        zIndex: 10
+                      }}>
+                        <img 
+                          src={uploadedImagePreview} 
+                          alt="Görsel Arama" 
+                          style={{ width: '24px', height: '24px', borderRadius: '4px', objectFit: 'cover' }} 
+                        />
+                        <button 
+                          type="button" 
+                          onClick={handleClearSearch}
+                          style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold', padding: '0 2px' }}
+                          title="Görseli Kaldır"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
                     
                     {/* Inline Image Upload (Görsel Arama) */}
                     <div className="search-camera-trigger" title="Görsel ile Arama Yap (CLIP)">
@@ -2171,7 +2220,9 @@ export default function Home() {
                       />
                     </div>
                     
-                    <button type="submit" className="wide-search-submit-btn">Ara</button>
+                    <button type="submit" className="wide-search-submit-btn" disabled={visualSearchLoading}>
+                      {visualSearchLoading ? 'Aranıyor...' : 'Ara'}
+                    </button>
                   </div>
 
                   {/* Instant Search Suggestions Dropdown */}
