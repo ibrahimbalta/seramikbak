@@ -212,7 +212,7 @@ async function main() {
     console.log(`DuraTiles ham verisinde ${duratilesRaw.length} adet ürün kaydı var.`);
 
     // Sample/Filter to get a rich representation across collections
-    const limitDuratiles = Math.min(duratilesRaw.length, 60);
+    const limitDuratiles = duratilesRaw.length;
     let duratilesCount = 0;
 
     for (let i = 0; i < limitDuratiles; i++) {
@@ -245,10 +245,10 @@ async function main() {
       }
 
       const sanitizedName = item.seriesName.toUpperCase().replace(/[^A-Z0-9]/g, '-').replace(/-+/g, '-');
-      const code = `DURA-${sanitizedName}-${item.color.toUpperCase()}-${width}X${height}`;
+      const code = `DURA-${sanitizedName}-${(item.color || 'Gri').toUpperCase()}-${width}X${height}`;
 
       const productData = {
-        name: `DuraTiles ${item.seriesName} ${item.color}`,
+        name: `DuraTiles ${item.seriesName} ${item.color || ''}`,
         code: code,
         brandId: duratilesBrand.id,
         width: width,
