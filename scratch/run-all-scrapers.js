@@ -15,7 +15,8 @@ const scripts = [
   'run-termal-scraper.js',
   'import-graniser.js',
   'import-seramiksan.js',
-  'import-seranit.js'
+  'import-seranit.js',
+  'run-decovita-duratiles-scraper.js'
 ];
 
 console.log('======================================================');
