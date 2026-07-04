@@ -250,8 +250,8 @@ async function main() {
         else if (CEMENT_KEYWORDS.some(k => allLower.includes(k))) style = 'Beton';
         else if (MARBLE_KEYWORDS.some(k => allLower.includes(k))) style = 'Mermer';
 
-        // High-res image conversion (replace urun_320 with urun_768 for better textures)
-        const highResImg = rawImgUrl.replace('/urun_320/', '/urun_768/');
+        // Keep urun_320 images as urun_768 returns HTTP 500 Internal Server Error
+        const highResImg = rawImgUrl;
 
         // Display Name
         const displayName = `Yurtbay ${cleanName} ${sizeString}`;
