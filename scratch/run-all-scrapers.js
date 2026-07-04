@@ -11,6 +11,8 @@ const scripts = [
   'run-qua-scraper.js',
   'run-vitra-scraper.js',
   'run-yurtbay-scraper.js',
+  'run-usak-scraper.js',
+  'run-termal-scraper.js',
   'import-graniser.js',
   'import-seramiksan.js',
   'import-seranit.js'
