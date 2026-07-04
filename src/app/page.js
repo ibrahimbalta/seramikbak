@@ -7510,6 +7510,7 @@ export default function Home() {
           display: flex;
           align-items: center;
           gap: 10px;
+          flex-shrink: 0;
         }
 
         .pin-title-icon {
@@ -7520,12 +7521,14 @@ export default function Home() {
           font-size: 1.35rem;
           font-weight: 700;
           color: var(--text-primary);
+          flex-shrink: 0;
         }
 
         .dealers-control-panel .desc {
           font-size: 0.8rem;
           color: var(--text-secondary);
           line-height: 1.5;
+          flex-shrink: 0;
         }
 
         .active-product-badge {
@@ -7536,12 +7539,14 @@ export default function Home() {
           padding: 10px 14px;
           border-radius: var(--border-radius-sm);
           line-height: 1.4;
+          flex-shrink: 0;
         }
 
         .active-product-badge.warning {
           background: rgba(217, 119, 6, 0.05);
           border-color: rgba(217, 119, 6, 0.2);
           color: var(--accent-orange);
+          flex-shrink: 0;
         }
 
         /* GEOLOCATION DETECTOR CARD */
@@ -7557,6 +7562,7 @@ export default function Home() {
           box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
           position: relative;
           overflow: hidden;
+          flex-shrink: 0;
         }
 
         .status-header {
@@ -7674,6 +7680,7 @@ export default function Home() {
           padding: 16px;
           border-radius: var(--border-radius-md);
           border: 1px solid var(--border-color);
+          flex-shrink: 0;
         }
 
         .locator-filters-row {
@@ -7775,6 +7782,10 @@ export default function Home() {
         }
 
         /* SIMULATED PRESETS */
+        .mini-presets {
+          flex-shrink: 0;
+        }
+
         .mini-presets label {
           display: block;
           font-size: 0.72rem;
@@ -7822,6 +7833,8 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 12px;
+          flex: 1;
+          min-height: 0;
         }
 
         .list-header-row {
@@ -7851,7 +7864,7 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 12px;
-          max-height: 380px;
+          flex: 1;
           overflow-y: auto;
           padding-right: 2px;
         }
