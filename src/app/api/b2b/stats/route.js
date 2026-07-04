@@ -25,9 +25,9 @@ export async function GET(request) {
       );
     }
 
-    // 2. Fetch SaaS subscription details
+    // 2. Fetch SaaS subscription details (fetch most recent config, regardless of status, so we see pending requests)
     const saas = await prisma.saaSConfig.findFirst({
-      where: { brandId, status: 'ACTIVE' },
+      where: { brandId },
       orderBy: { expiresAt: 'desc' }
     });
 
@@ -151,7 +151,9 @@ export async function GET(request) {
       saas: saas ? {
         plan: saas.plan,
         status: saas.status,
-        expiresAt: saas.expiresAt
+        expiresAt: saas.expiresAt,
+        pendingPlan: saas.pendingPlan,
+        pendingStatus: saas.pendingStatus
       } : { plan: 'BASIC', status: 'ACTIVE', expiresAt: 'N/A' },
       summary: {
         totalViews,

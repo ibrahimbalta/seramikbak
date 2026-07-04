@@ -61,6 +61,10 @@ export default function DealerPortalPage() {
   // Portal navigation: 'dashboard', 'b2b-projects', 'subscription', 'settings'
   const [activePortalTab, setActivePortalTab] = useState('dashboard');
 
+  const hasPending = saasInfo?.status === 'PENDING_APPROVAL' || saasInfo?.pendingStatus === 'PENDING_APPROVAL';
+  const requestedPlan = saasInfo?.status === 'PENDING_APPROVAL' ? saasInfo.plan : (saasInfo?.pendingStatus === 'PENDING_APPROVAL' ? saasInfo.pendingPlan : null);
+  const isRejected = saasInfo?.status === 'REJECTED' || saasInfo?.pendingStatus === 'REJECTED';
+
   // Profile Form State
   const [showSettings, setShowSettings] = useState(false);
   const [profilePhone, setProfilePhone] = useState('');
@@ -157,7 +161,7 @@ export default function DealerPortalPage() {
 
       const result = await response.json();
       if (response.ok && result.success) {
-        setStripeWebhookResult(`Stripe Webhook Başarılı! Planınız ${stripePlan} (Yıllık) olarak aktifleştirildi.`);
+        setStripeWebhookResult(`Ödeme Başarılı! ${stripePlan} paket talebiniz alındı ve admin onayına gönderildi.`);
         loadDealerLeads();
         loadDealerProjects();
       } else {
@@ -1042,14 +1046,27 @@ export default function DealerPortalPage() {
                     </h2>
                     {saasInfo && (
                       <span style={{
-                        background: saasInfo.status === 'ACTIVE' ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)',
-                        color: saasInfo.status === 'ACTIVE' ? '#34d399' : '#fca5a5',
+                        background: saasInfo.status === 'ACTIVE' ? 'rgba(16,185,129,0.2)' : (saasInfo.status === 'PENDING_APPROVAL' ? 'rgba(245,158,11,0.2)' : (saasInfo.status === 'REJECTED' ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.1)')),
+                        color: saasInfo.status === 'ACTIVE' ? '#34d399' : (saasInfo.status === 'PENDING_APPROVAL' ? '#f59e0b' : (saasInfo.status === 'REJECTED' ? '#ef4444' : '#fca5a5')),
                         padding: '3px 10px',
                         borderRadius: '20px',
                         fontSize: '0.7rem',
                         fontWeight: '700'
                       }}>
-                        {saasInfo.status === 'ACTIVE' ? '● Aktif' : saasInfo.status === 'PAUSED' ? '● Askıda' : '● Süresi Dolmuş'}
+                        {saasInfo.status === 'ACTIVE' ? '● Aktif' : saasInfo.status === 'PENDING_APPROVAL' ? '● Onay Bekliyor' : saasInfo.status === 'PAUSED' ? '● Askıda' : saasInfo.status === 'REJECTED' ? '● Reddedildi' : '● Süresi Dolmuş'}
+                      </span>
+                    )}
+                    {saasInfo && saasInfo.pendingStatus === 'PENDING_APPROVAL' && (
+                      <span style={{
+                        background: 'rgba(245,158,11,0.2)',
+                        color: '#f59e0b',
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        fontSize: '0.7rem',
+                        fontWeight: '700',
+                        marginLeft: '6px'
+                      }}>
+                        ● {saasInfo.pendingPlan} Yükseltme Onay Bekliyor
                       </span>
                     )}
                   </div>
@@ -1085,6 +1102,48 @@ export default function DealerPortalPage() {
                 <h3 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 6px 0', color: '#111' }}>Yıllık Bayi Abonelik Paketleri</h3>
                 <p style={{ fontSize: '0.85rem', color: '#6c757d', margin: 0 }}>İhtiyacınıza uygun paketi seçin ve müşteri taleplerini yönetin. Tüm paketler yıllık faturalandırılır.</p>
               </div>
+
+              {requestedPlan && (
+                <div className="glass-panel" style={{
+                  background: '#fffbeb',
+                  border: '1px solid #fde047',
+                  borderRadius: '12px',
+                  padding: '16px 20px',
+                  marginBottom: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  color: '#b45309',
+                  fontSize: '0.85rem',
+                  fontWeight: '600'
+                }}>
+                  <Loader2 size={18} className="animate-spin" style={{ color: '#d97706', flexShrink: 0 }} />
+                  <div>
+                    <strong>⏱️ Abonelik Talebi Onay Bekliyor:</strong> {requestedPlan} paket talebiniz alındı. Ödemeniz doğrulandıktan sonra admin onayıyla en kısa sürede aktifleşecektir.
+                  </div>
+                </div>
+              )}
+
+              {isRejected && (
+                <div className="glass-panel" style={{
+                  background: '#fef2f2',
+                  border: '1px solid #fca5a5',
+                  borderRadius: '12px',
+                  padding: '16px 20px',
+                  marginBottom: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  color: '#991b1b',
+                  fontSize: '0.85rem',
+                  fontWeight: '600'
+                }}>
+                  <AlertCircle size={18} style={{ color: '#991b1b', flexShrink: 0 }} />
+                  <div>
+                    <strong>❌ Talep Reddedildi:</strong> {saasInfo?.pendingPlan || saasInfo?.plan} paket talebiniz admin tarafından onaylanmadı. Detaylar ve destek için admin ile iletişime geçebilirsiniz.
+                  </div>
+                </div>
+              )}
 
               <div className="dealer-pricing-grid" style={{
                 display: 'grid',
@@ -1139,17 +1198,17 @@ export default function DealerPortalPage() {
                   </ul>
                   <button
                     onClick={() => { setStripePlan('LITE'); triggerStripeMockWebhook(); }}
-                    disabled={stripeLoading || saasInfo?.plan === 'LITE'}
+                    disabled={stripeLoading || saasInfo?.plan === 'LITE' || hasPending}
                     style={{
                       marginTop: '28px',
-                      background: saasInfo?.plan === 'LITE' ? '#e9ecef' : '#f1f3f5',
-                      color: saasInfo?.plan === 'LITE' ? '#adb5bd' : '#111',
-                      border: '1px solid #dee2e6',
+                      background: saasInfo?.plan === 'LITE' ? '#e9ecef' : (requestedPlan === 'LITE' ? '#fffbeb' : '#f1f3f5'),
+                      color: saasInfo?.plan === 'LITE' ? '#adb5bd' : (requestedPlan === 'LITE' ? '#d97706' : '#111'),
+                      border: requestedPlan === 'LITE' ? '1px solid #fde047' : '1px solid #dee2e6',
                       borderRadius: '12px',
                       padding: '13px',
                       fontWeight: '700',
                       fontSize: '0.88rem',
-                      cursor: saasInfo?.plan === 'LITE' ? 'default' : 'pointer',
+                      cursor: (saasInfo?.plan === 'LITE' || hasPending) ? 'default' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1157,8 +1216,8 @@ export default function DealerPortalPage() {
                       transition: 'all 0.2s'
                     }}
                   >
-                    {stripeLoading && stripePlan === 'LITE' ? <Loader2 size={16} className="animate-spin" /> : saasInfo?.plan === 'LITE' ? <CheckCircle size={16} /> : <ArrowRight size={16} />}
-                    <span>{saasInfo?.plan === 'LITE' ? 'Aktif Paketiniz' : 'Lite Paketi Seç'}</span>
+                    {stripeLoading && stripePlan === 'LITE' ? <Loader2 size={16} className="animate-spin" /> : saasInfo?.plan === 'LITE' ? <CheckCircle size={16} /> : (requestedPlan === 'LITE' ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />)}
+                    <span>{saasInfo?.plan === 'LITE' ? 'Aktif Paketiniz' : (requestedPlan === 'LITE' ? 'Onay Bekliyor...' : 'Lite Paketi Seç')}</span>
                   </button>
                 </div>
 
@@ -1214,27 +1273,27 @@ export default function DealerPortalPage() {
                   </ul>
                   <button
                     onClick={() => { setStripePlan('STANDART'); triggerStripeMockWebhook(); }}
-                    disabled={stripeLoading || saasInfo?.plan === 'STANDART'}
+                    disabled={stripeLoading || saasInfo?.plan === 'STANDART' || hasPending}
                     style={{
                       marginTop: '28px',
-                      background: saasInfo?.plan === 'STANDART' ? '#fef3c7' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                      color: saasInfo?.plan === 'STANDART' ? '#b45309' : '#fff',
-                      border: 'none',
+                      background: saasInfo?.plan === 'STANDART' ? '#fef3c7' : (requestedPlan === 'STANDART' ? '#fffbeb' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'),
+                      color: saasInfo?.plan === 'STANDART' ? '#b45309' : (requestedPlan === 'STANDART' ? '#d97706' : '#fff'),
+                      border: requestedPlan === 'STANDART' ? '1px solid #fde047' : 'none',
                       borderRadius: '12px',
                       padding: '13px',
                       fontWeight: '700',
                       fontSize: '0.88rem',
-                      cursor: saasInfo?.plan === 'STANDART' ? 'default' : 'pointer',
+                      cursor: (saasInfo?.plan === 'STANDART' || hasPending) ? 'default' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '8px',
-                      boxShadow: saasInfo?.plan === 'STANDART' ? 'none' : '0 4px 12px rgba(245,158,11,0.3)',
+                      boxShadow: (saasInfo?.plan === 'STANDART' || hasPending) ? 'none' : '0 4px 12px rgba(245,158,11,0.3)',
                       transition: 'all 0.2s'
                     }}
                   >
-                    {stripeLoading && stripePlan === 'STANDART' ? <Loader2 size={16} className="animate-spin" /> : saasInfo?.plan === 'STANDART' ? <CheckCircle size={16} /> : <ArrowRight size={16} />}
-                    <span>{saasInfo?.plan === 'STANDART' ? 'Aktif Paketiniz' : 'Standart Paketi Seç'}</span>
+                    {stripeLoading && stripePlan === 'STANDART' ? <Loader2 size={16} className="animate-spin" /> : saasInfo?.plan === 'STANDART' ? <CheckCircle size={16} /> : (requestedPlan === 'STANDART' ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />)}
+                    <span>{saasInfo?.plan === 'STANDART' ? 'Aktif Paketiniz' : (requestedPlan === 'STANDART' ? 'Onay Bekliyor...' : 'Standart Paketi Seç')}</span>
                   </button>
                 </div>
 
@@ -1285,27 +1344,27 @@ export default function DealerPortalPage() {
                   </ul>
                   <button
                     onClick={() => { setStripePlan('PREMIUM'); triggerStripeMockWebhook(); }}
-                    disabled={stripeLoading || saasInfo?.plan === 'PREMIUM'}
+                    disabled={stripeLoading || saasInfo?.plan === 'PREMIUM' || hasPending}
                     style={{
                       marginTop: '28px',
-                      background: saasInfo?.plan === 'PREMIUM' ? '#f3f4f6' : 'linear-gradient(135deg, #111 0%, #333 100%)',
-                      color: saasInfo?.plan === 'PREMIUM' ? '#6b7280' : '#d4af37',
-                      border: 'none',
+                      background: saasInfo?.plan === 'PREMIUM' ? '#f3f4f6' : (requestedPlan === 'PREMIUM' ? '#fffbeb' : 'linear-gradient(135deg, #111 0%, #333 100%)'),
+                      color: saasInfo?.plan === 'PREMIUM' ? '#6b7280' : (requestedPlan === 'PREMIUM' ? '#d97706' : '#d4af37'),
+                      border: requestedPlan === 'PREMIUM' ? '1px solid #fde047' : 'none',
                       borderRadius: '12px',
                       padding: '13px',
                       fontWeight: '700',
                       fontSize: '0.88rem',
-                      cursor: saasInfo?.plan === 'PREMIUM' ? 'default' : 'pointer',
+                      cursor: (saasInfo?.plan === 'PREMIUM' || hasPending) ? 'default' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '8px',
-                      boxShadow: saasInfo?.plan === 'PREMIUM' ? 'none' : '0 4px 12px rgba(0,0,0,0.15)',
+                      boxShadow: (saasInfo?.plan === 'PREMIUM' || hasPending) ? 'none' : '0 4px 12px rgba(0,0,0,0.15)',
                       transition: 'all 0.2s'
                     }}
                   >
-                    {stripeLoading && stripePlan === 'PREMIUM' ? <Loader2 size={16} className="animate-spin" /> : saasInfo?.plan === 'PREMIUM' ? <CheckCircle size={16} /> : <Crown size={16} />}
-                    <span>{saasInfo?.plan === 'PREMIUM' ? 'Aktif Paketiniz' : 'Premium Paketi Seç'}</span>
+                    {stripeLoading && stripePlan === 'PREMIUM' ? <Loader2 size={16} className="animate-spin" /> : saasInfo?.plan === 'PREMIUM' ? <CheckCircle size={16} /> : (requestedPlan === 'PREMIUM' ? <Loader2 size={16} className="animate-spin" /> : <Crown size={16} />)}
+                    <span>{saasInfo?.plan === 'PREMIUM' ? 'Aktif Paketiniz' : (requestedPlan === 'PREMIUM' ? 'Onay Bekliyor...' : 'Premium Paketi Seç')}</span>
                   </button>
                 </div>
               </div>

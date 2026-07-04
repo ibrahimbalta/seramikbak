@@ -88,14 +88,16 @@ model Dealer {
 }
 
 model DealerSaaSConfig {
-  id        String   @id @default(uuid())
-  dealerId  String
-  dealer    Dealer   @relation(fields: [dealerId], references: [id], onDelete: Cascade)
-  plan      String   // LITE, STANDART, PREMIUM
-  status    String   @default("ACTIVE") // ACTIVE, EXPIRED, PAUSED
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String    @id @default(uuid())
+  dealerId       String
+  dealer         Dealer    @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  plan           String    // LITE, STANDART, PREMIUM
+  status         String    @default("ACTIVE") // ACTIVE, EXPIRED, PAUSED, PENDING_APPROVAL
+  expiresAt      DateTime
+  pendingPlan    String?
+  pendingStatus  String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 
@@ -142,14 +144,16 @@ model AnalyticsLog {
 }
 
 model SaaSConfig {
-  id        String   @id @default(uuid())
-  brandId   String
-  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  plan      String   // BASIC, PRO, ENTERPRISE
-  status    String   @default("ACTIVE") // ACTIVE, EXPIRED, PAUSED
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String    @id @default(uuid())
+  brandId        String
+  brand          Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  plan           String    // BASIC, PRO, ENTERPRISE
+  status         String    @default("ACTIVE") // ACTIVE, EXPIRED, PAUSED, PENDING_APPROVAL
+  expiresAt      DateTime
+  pendingPlan    String?
+  pendingStatus  String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model User {

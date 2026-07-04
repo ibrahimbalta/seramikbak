@@ -55,6 +55,10 @@ export default function BrandPortalPage() {
   const [projects, setProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(false);
 
+  const hasPending = b2bStats?.saas?.status === 'PENDING_APPROVAL' || b2bStats?.saas?.pendingStatus === 'PENDING_APPROVAL';
+  const requestedPlan = b2bStats?.saas?.status === 'PENDING_APPROVAL' ? b2bStats.saas.plan : (b2bStats?.saas?.pendingStatus === 'PENDING_APPROVAL' ? b2bStats.saas.pendingPlan : null);
+  const isRejected = b2bStats?.saas?.status === 'REJECTED' || b2bStats?.saas?.pendingStatus === 'REJECTED';
+
   // Restore session from localStorage on mount
   useEffect(() => {
     const savedSession = localStorage.getItem('sb_brand_session');
@@ -218,7 +222,7 @@ export default function BrandPortalPage() {
 
       const result = await response.json();
       if (response.ok && result.success) {
-        setStripeWebhookResult(`Stripe Webhook Başarılı! Plan ${stripePlan} olarak güncellendi.`);
+        setStripeWebhookResult(`Ödeme Başarılı! ${stripePlan} paket talebiniz alındı ve admin onayına gönderildi.`);
         // Reload stats to show upgraded tier
         fetchB2bStats(brandInfo.id);
         loadBrandProjects(brandInfo.id);
@@ -734,6 +738,46 @@ export default function BrandPortalPage() {
         ) : b2bStats ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             
+            {requestedPlan && (
+              <div className="glass-panel" style={{
+                background: '#fff9db',
+                border: '1px solid #fde047',
+                borderRadius: '12px',
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                color: '#b45309',
+                fontSize: '0.85rem',
+                fontWeight: '600'
+              }}>
+                <Loader2 size={18} className="animate-spin" style={{ color: '#d97706', flexShrink: 0 }} />
+                <div>
+                  <strong>⏱️ Abonelik Talebi Onay Bekliyor:</strong> {requestedPlan} paket talebiniz alındı. Ödemeniz doğrulandıktan sonra admin onayıyla en kısa sürede aktifleşecektir.
+                </div>
+              </div>
+            )}
+
+            {isRejected && (
+              <div className="glass-panel" style={{
+                background: '#fef2f2',
+                border: '1px solid #fca5a5',
+                borderRadius: '12px',
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                color: '#991b1b',
+                fontSize: '0.85rem',
+                fontWeight: '600'
+              }}>
+                <AlertCircle size={18} style={{ color: '#991b1b', flexShrink: 0 }} />
+                <div>
+                  <strong>❌ Talep Reddedildi:</strong> {b2bStats?.saas?.pendingPlan || b2bStats?.saas?.plan} paket talebiniz admin tarafından onaylanmadı. Detaylar ve destek için admin ile iletişime geçebilirsiniz.
+                </div>
+              </div>
+            )}
+            
             {/* METRICS SUMMARY */}
             <div className="brand-stats-grid" style={{
               display: 'grid',
@@ -742,9 +786,22 @@ export default function BrandPortalPage() {
             }}>
               <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px' }}>
                 <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0' }}>SaaS Abonelik Planı</h4>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                  <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#d4af37' }}>{b2bStats.saas?.plan || 'BASIC'}</span>
-                  <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700' }}>({b2bStats.saas?.status || 'ACTIVE'})</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                    <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#d4af37' }}>{b2bStats.saas?.plan || 'BASIC'}</span>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      color: b2bStats.saas?.status === 'ACTIVE' ? '#10b981' : (b2bStats.saas?.status === 'PENDING_APPROVAL' ? '#f59e0b' : '#ef4444'),
+                      fontWeight: '700'
+                    }}>
+                      ({b2bStats.saas?.status === 'ACTIVE' ? 'Aktif' : b2bStats.saas?.status === 'PENDING_APPROVAL' ? 'Onay Bekliyor' : b2bStats.saas?.status === 'REJECTED' ? 'Reddedildi' : b2bStats.saas?.status || 'YOK'})
+                    </span>
+                  </div>
+                  {b2bStats.saas?.pendingStatus === 'PENDING_APPROVAL' && (
+                    <span style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: '600' }}>
+                      ⏱️ {b2bStats.saas.pendingPlan} Yükseltme Talebi Onay Bekliyor
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -1025,16 +1082,16 @@ export default function BrandPortalPage() {
 
                   <button 
                     onClick={triggerStripeMockWebhook} 
-                    disabled={stripeLoading}
+                    disabled={stripeLoading || hasPending}
                     style={{
                       background: '#fff',
-                      color: '#d4af37',
-                      border: '1px solid #d4af37',
+                      color: hasPending ? '#94a3b8' : '#d4af37',
+                      border: '1px solid ' + (hasPending ? '#e2e8f0' : '#d4af37'),
                       borderRadius: '8px',
                       padding: '12px',
                       fontWeight: '700',
                       fontSize: '0.8rem',
-                      cursor: 'pointer',
+                      cursor: hasPending ? 'default' : 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1042,7 +1099,7 @@ export default function BrandPortalPage() {
                       transition: 'all 0.2s'
                     }}
                   >
-                    {stripeLoading ? 'Webhook Gönderiliyor...' : `Stripe Webhook Simüle Et (${stripePlan})`}
+                    {stripeLoading ? 'Webhook Gönderiliyor...' : (hasPending ? 'Onay Bekleyen İstek Var' : `Stripe Webhook Simüle Et (${stripePlan})`)}
                   </button>
 
                   {stripeWebhookResult && (

@@ -1037,6 +1037,44 @@ export default function AdminPage() {
     }
   };
 
+  const handleApproveRejectBrandSaaS = async (brandId, action) => {
+    try {
+      const res = await fetch('/api/admin/saas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ brandId, action })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        loadSaasConfigs();
+      } else {
+        alert(data.error || 'İşlem başarısız.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Bağlantı hatası.');
+    }
+  };
+
+  const handleApproveRejectDealerSaaS = async (dealerId, action) => {
+    try {
+      const res = await fetch('/api/admin/dealer-saas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dealerId, action })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        loadDealerSaasConfigs();
+      } else {
+        alert(data.error || 'İşlem başarısız.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Bağlantı hatası.');
+    }
+  };
+
   if (!isLoggedIn) {
     return (
       <main className="login-layout" style={{
@@ -2520,8 +2558,11 @@ export default function AdminPage() {
       )}
 
       {/* TAB 4: SAAS CONFIGURATION */}
-      {activeTab === 'saas' && (
-        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
+      {activeTab === 'saas' && (() => {
+        const pendingBrands = saasConfigs.filter(item => item.saas?.status === 'PENDING_APPROVAL' || item.saas?.pendingStatus === 'PENDING_APPROVAL');
+        const pendingDealers = dealerSaasConfigs.filter(item => item.saas?.status === 'PENDING_APPROVAL' || item.saas?.pendingStatus === 'PENDING_APPROVAL');
+        return (
+          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
           {/* Sub-tab Navigation */}
           <div className="glass-panel" style={{ display: 'flex', gap: '8px', padding: '10px 16px', borderRadius: 'var(--border-radius-sm)', background: '#ffffff', border: '1px solid var(--border-color)', width: '100%' }}>
             <button 
@@ -2557,6 +2598,23 @@ export default function AdminPage() {
               }}
             >
               Bayi SaaS Abonelikleri (Yıllık Paketler)
+            </button>
+            <button 
+              type="button" 
+              className={`admin-subtab-btn ${saasSubTab === 'pending' ? 'active' : ''}`}
+              onClick={() => setSaasSubTab('pending')}
+              style={{
+                padding: '8px 16px',
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                borderRadius: '6px',
+                border: 'none',
+                background: saasSubTab === 'pending' ? 'var(--accent-gold, #d4af37)' : 'transparent',
+                color: saasSubTab === 'pending' ? '#000' : 'var(--text-muted, #666)',
+                cursor: 'pointer'
+              }}
+            >
+              Onay Talepleri ({pendingBrands.length + pendingDealers.length})
             </button>
           </div>
 
@@ -2704,7 +2762,7 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
-          ) : (
+          ) : saasSubTab === 'dealer' ? (
             <div className="admin-grid">
               {/* Left Form: Configure Dealer SaaS */}
               <div className="admin-card glass-panel">
@@ -2860,9 +2918,165 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%' }}>
+              {/* BRAND REQUESTS */}
+              <div className="admin-card glass-panel w-full" style={{ padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <div className="card-header" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
+                  <Settings size={20} className="icon-gold" />
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800' }}>Marka SaaS Onay Talepleri</h3>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: '#64748b' }}>Platforma üye olmak veya paketini yükseltmek isteyen markaların listesi.</p>
+                  </div>
+                </div>
+
+                <div className="table-responsive">
+                  <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ textAlign: 'left', borderBottom: '2px solid #f1f5f9', fontSize: '0.8rem', color: '#64748b' }}>
+                        <th style={{ padding: '10px' }}>Üretici Marka</th>
+                        <th style={{ padding: '10px' }}>Talebi</th>
+                        <th style={{ padding: '10px' }}>Mevcut Plan</th>
+                        <th style={{ padding: '10px' }}>İstenen Plan</th>
+                        <th style={{ padding: '10px', textAlign: 'right' }}>İşlemler</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pendingBrands.map(item => {
+                        const isNew = item.saas?.status === 'PENDING_APPROVAL';
+                        const requestedPlanName = isNew ? item.saas?.plan : item.saas?.pendingPlan;
+                        return (
+                          <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.82rem' }}>
+                            <td style={{ padding: '12px' }}><strong>{item.name}</strong></td>
+                            <td style={{ padding: '12px' }}>
+                              <span style={{
+                                background: isNew ? '#e0f2fe' : '#fef3c7',
+                                color: isNew ? '#0369a1' : '#b45309',
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                fontSize: '0.7rem',
+                                fontWeight: '700'
+                              }}>
+                                {isNew ? 'Yeni Başvuru' : 'Paket Değişikliği'}
+                              </span>
+                            </td>
+                            <td style={{ padding: '12px' }}>{isNew ? 'YOK' : item.saas?.plan}</td>
+                            <td style={{ padding: '12px' }}>
+                              <span className={`badge-saas-plan ${requestedPlanName?.toLowerCase() || 'none'}`}>
+                                {requestedPlanName}
+                              </span>
+                            </td>
+                            <td style={{ padding: '12px', textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <button
+                                onClick={() => handleApproveRejectBrandSaaS(item.id, 'approve')}
+                                style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
+                              >
+                                Onayla
+                              </button>
+                              <button
+                                onClick={() => handleApproveRejectBrandSaaS(item.id, 'reject')}
+                                style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', marginLeft: '6px' }}
+                              >
+                                Reddet
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {pendingBrands.length === 0 && (
+                        <tr>
+                          <td colSpan="5" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>
+                            Onay bekleyen marka talebi bulunmuyor.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* DEALER REQUESTS */}
+              <div className="admin-card glass-panel w-full" style={{ padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <div className="card-header" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
+                  <Settings size={20} className="icon-blue" />
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800' }}>Bayi SaaS Onay Talepleri</h3>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: '#64748b' }}>Müşteri formları ekranına erişim için yetki veya yükseltme bekleyen bayiler.</p>
+                  </div>
+                </div>
+
+                <div className="table-responsive">
+                  <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ textAlign: 'left', borderBottom: '2px solid #f1f5f9', fontSize: '0.8rem', color: '#64748b' }}>
+                        <th style={{ padding: '10px' }}>Bayi Adı & Konum</th>
+                        <th style={{ padding: '10px' }}>Talebi</th>
+                        <th style={{ padding: '10px' }}>Mevcut Plan</th>
+                        <th style={{ padding: '10px' }}>İstenen Plan</th>
+                        <th style={{ padding: '10px', textAlign: 'right' }}>İşlemler</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pendingDealers.map(item => {
+                        const isNew = item.saas?.status === 'PENDING_APPROVAL';
+                        const requestedPlanName = isNew ? item.saas?.plan : item.saas?.pendingPlan;
+                        return (
+                          <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.82rem' }}>
+                            <td style={{ padding: '12px' }}>
+                              <strong>{item.name}</strong>
+                              <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{item.district || ''}, {item.city}</div>
+                            </td>
+                            <td style={{ padding: '12px' }}>
+                              <span style={{
+                                background: isNew ? '#e0f2fe' : '#fef3c7',
+                                color: isNew ? '#0369a1' : '#b45309',
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                fontSize: '0.7rem',
+                                fontWeight: '700'
+                              }}>
+                                {isNew ? 'Yeni Başvuru' : 'Paket Değişikliği'}
+                              </span>
+                            </td>
+                            <td style={{ padding: '12px' }}>{isNew ? 'YOK' : item.saas?.plan}</td>
+                            <td style={{ padding: '12px' }}>
+                              <span className={`badge-saas-plan ${requestedPlanName?.toLowerCase() || 'none'}`}>
+                                {requestedPlanName}
+                              </span>
+                            </td>
+                            <td style={{ padding: '12px', textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                              <button
+                                onClick={() => handleApproveRejectDealerSaaS(item.id, 'approve')}
+                                style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
+                              >
+                                Onayla
+                              </button>
+                              <button
+                                onClick={() => handleApproveRejectDealerSaaS(item.id, 'reject')}
+                                style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', marginLeft: '6px' }}
+                              >
+                                Reddet
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {pendingDealers.length === 0 && (
+                        <tr>
+                          <td colSpan="5" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>
+                            Onay bekleyen bayi talebi bulunmuyor.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           )}
         </div>
-      )}
+        );
+      })()}
 
       {/* TAB 4.5: B2B PROJECT DEMANDS */}
       {activeTab === 'projects' && (

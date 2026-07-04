@@ -36,30 +36,42 @@ export async function POST(request) {
 
         let saas;
         if (existingConfig) {
-          saas = await prisma.dealerSaaSConfig.update({
-            where: { id: existingConfig.id },
-            data: {
-              plan: selectedPlan,
-              status: 'ACTIVE',
-              expiresAt: expiresAt
-            }
-          });
+          if (existingConfig.status === 'ACTIVE') {
+            saas = await prisma.dealerSaaSConfig.update({
+              where: { id: existingConfig.id },
+              data: {
+                pendingPlan: selectedPlan,
+                pendingStatus: 'PENDING_APPROVAL'
+              }
+            });
+          } else {
+            saas = await prisma.dealerSaaSConfig.update({
+              where: { id: existingConfig.id },
+              data: {
+                plan: selectedPlan,
+                status: 'PENDING_APPROVAL',
+                expiresAt: expiresAt,
+                pendingPlan: null,
+                pendingStatus: null
+              }
+            });
+          }
         } else {
           saas = await prisma.dealerSaaSConfig.create({
             data: {
               dealerId,
               plan: selectedPlan,
-              status: 'ACTIVE',
+              status: 'PENDING_APPROVAL',
               expiresAt: expiresAt
             }
           });
         }
 
-        console.log(`[Subscription Updated] Dealer: ${dealerId} upgraded to ${selectedPlan}. Expires at: ${expiresAt.toISOString()}`);
+        console.log(`[Subscription Requested] Dealer: ${dealerId} requested ${selectedPlan}. Pending admin approval.`);
         
         return NextResponse.json({
           success: true,
-          message: 'Dealer subscription updated successfully',
+          message: 'Dealer subscription request received (pending approval)',
           saasId: saas.id
         });
       } else {
@@ -70,30 +82,42 @@ export async function POST(request) {
 
         let saas;
         if (existingConfig) {
-          saas = await prisma.saaSConfig.update({
-            where: { id: existingConfig.id },
-            data: {
-              plan: selectedPlan,
-              status: 'ACTIVE',
-              expiresAt: expiresAt
-            }
-          });
+          if (existingConfig.status === 'ACTIVE') {
+            saas = await prisma.saaSConfig.update({
+              where: { id: existingConfig.id },
+              data: {
+                pendingPlan: selectedPlan,
+                pendingStatus: 'PENDING_APPROVAL'
+              }
+            });
+          } else {
+            saas = await prisma.saaSConfig.update({
+              where: { id: existingConfig.id },
+              data: {
+                plan: selectedPlan,
+                status: 'PENDING_APPROVAL',
+                expiresAt: expiresAt,
+                pendingPlan: null,
+                pendingStatus: null
+              }
+            });
+          }
         } else {
           saas = await prisma.saaSConfig.create({
             data: {
               brandId,
               plan: selectedPlan,
-              status: 'ACTIVE',
+              status: 'PENDING_APPROVAL',
               expiresAt: expiresAt
             }
           });
         }
 
-        console.log(`[Subscription Updated] Brand: ${brandId} upgraded to ${selectedPlan}. Expires at: ${expiresAt.toISOString()}`);
+        console.log(`[Subscription Requested] Brand: ${brandId} requested ${selectedPlan}. Pending admin approval.`);
         
         return NextResponse.json({
           success: true,
-          message: 'Brand subscription updated successfully',
+          message: 'Brand subscription request received (pending approval)',
           saasId: saas.id
         });
       }
