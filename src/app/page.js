@@ -2036,6 +2036,16 @@ export default function Home() {
     setActiveProduct(product);
     setActiveTab('studio');
     logInteraction('VIEW', product.id, product.brandId);
+    
+    // Smoothly scroll to the 3D studio canvas panel to center it in view
+    setTimeout(() => {
+      const element = document.querySelector('.studio-canvas-panel');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   const navigateToDealers = (product) => {
