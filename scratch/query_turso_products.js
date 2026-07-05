@@ -24,14 +24,31 @@ async function main() {
     authToken: env.TURSO_AUTH_TOKEN
   });
   
-  const searchNames = ['Travertino Classico', 'Calacatta Gold', 'Concrete Light Grey', 'Natural Oak', 'Borneo Antrasit'];
+  const seedNames = [
+    'Calacatta Gold',
+    'Borneo Antrasit',
+    'Travertino Classico',
+    'Natural Oak',
+    'Concrete Light Grey',
+    'Verona Grey',
+    'Vintage Wood',
+    'Marmara Beyazı',
+    'Royal Grey',
+    'Sand Travertine',
+    'Antik Mermer'
+  ];
   
-  for (const name of searchNames) {
+  console.log("Checking seeded products existence in Turso:");
+  for (const name of seedNames) {
     const res = await client.execute({
-      sql: "SELECT id, name, code FROM Product WHERE name LIKE ? LIMIT 3",
-      args: [`%${name}%`]
+      sql: "SELECT name, code FROM Product WHERE name = ? OR name LIKE ? LIMIT 1",
+      args: [name, `%${name}%`]
     });
-    console.log(`Query for "${name}":`, res.rows);
+    if (res.rows.length > 0) {
+      console.log(`✅ [FOUND] "${name}" matches "${res.rows[0].name}" (code: ${res.rows[0].code})`);
+    } else {
+      console.log(`❌ [NOT FOUND] "${name}"`);
+    }
   }
 }
 

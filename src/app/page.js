@@ -6103,7 +6103,10 @@ export default function Home() {
                 </div>
                 <div style={{ textAlign: 'left' }}>
                   <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: '800', color: '#d4af37' }}>SeramikBak AI Asistanı</h4>
-                  <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Çevrimiçi • DeepSeek Yapay Zekası</span>
+                  <span style={{ fontSize: '0.65rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                    <span style={{ width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', display: 'inline-block' }}></span>
+                    Çevrimiçi Asistan
+                  </span>
                 </div>
               </div>
               <button 
