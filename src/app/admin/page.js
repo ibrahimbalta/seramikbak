@@ -117,6 +117,7 @@ export default function AdminPage() {
   const [deepseekApiKey, setDeepseekApiKey] = useState('');
   const [grokApiKey, setGrokApiKey] = useState('');
   const [geminiApiKey, setGeminiApiKey] = useState('');
+  const [scrapingApiKey, setScrapingApiKey] = useState('');
   const [aiProvider, setAiProvider] = useState('deepseek');
   const [bankSettingsLoading, setBankSettingsLoading] = useState(false);
   const [bankSettingsSuccess, setBankSettingsSuccess] = useState('');
@@ -372,6 +373,7 @@ export default function AdminPage() {
         setDeepseekApiKey(data.deepseek_api_key || '');
         setGrokApiKey(data.grok_api_key || '');
         setGeminiApiKey(data.gemini_api_key || '');
+        setScrapingApiKey(data.scraping_api_key || '');
         setAiProvider(data.ai_provider || 'deepseek');
       }
     } catch (err) {
@@ -1145,6 +1147,7 @@ export default function AdminPage() {
           deepseek_api_key: deepseekApiKey,
           grok_api_key: grokApiKey,
           gemini_api_key: geminiApiKey,
+          scraping_api_key: scrapingApiKey,
           ai_provider: aiProvider
         })
       });
@@ -3359,6 +3362,24 @@ export default function AdminPage() {
                       placeholder="xai-..." 
                       style={{ padding: '10px', fontSize: '0.85rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
                     />
+                  </div>
+
+                  <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '8px', marginTop: '14px', marginBottom: '4px' }}>
+                    <strong style={{ fontSize: '0.82rem', color: 'var(--accent-gold, #d4af37)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🔍 Fiyat Güncelleme Botu (Scrape.do Proxy)</strong>
+                  </div>
+
+                  <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>Scrape.do Proxy API Anahtarı</label>
+                    <input 
+                      type="password" 
+                      value={scrapingApiKey} 
+                      onChange={(e) => setScrapingApiKey(e.target.value)} 
+                      placeholder="Scrape.do panelinden aldığınız token anahtarı" 
+                      style={{ padding: '10px', fontSize: '0.85rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    />
+                    <small style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                      Trendyol, Hepsiburada, n11 ve diğer pazaryerlerindeki bot engellerini aşarak güncel fiyatları hatasız çekmek için Scrape.do API key gereklidir.
+                    </small>
                   </div>
 
                   <button 

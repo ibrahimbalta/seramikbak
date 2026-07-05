@@ -35,7 +35,7 @@ export function parsePriceText(text) {
  * @param {string} url - Target URL
  * @returns {Promise<string>} HTML response text
  */
-export async function fetchHtml(url) {
+export async function fetchHtml(url, apiKey = null) {
   const userAgent = USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
   const headers = {
     'User-Agent': userAgent,
@@ -45,9 +45,11 @@ export async function fetchHtml(url) {
     'Pragma': 'no-cache'
   };
 
+  const activeApiKey = apiKey || process.env.SCRAPING_API_KEY;
+
   // Support for residential proxy/anti-bot bypass (e.g. Scrape.do, ScrapingBee)
-  if (process.env.SCRAPING_API_KEY) {
-    const proxyUrl = `https://api.scrape.do?token=${process.env.SCRAPING_API_KEY}&url=${encodeURIComponent(url)}`;
+  if (activeApiKey) {
+    const proxyUrl = `https://api.scrape.do?token=${activeApiKey}&url=${encodeURIComponent(url)}`;
     const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
     if (!response.ok) {
       throw new Error(`Proxy service returned HTTP ${response.status}`);

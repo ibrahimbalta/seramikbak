@@ -29,13 +29,23 @@ export async function POST(request) {
       return NextResponse.json({ success: true, count: 0, remaining: 0, logs: ['[Fiyat Botu] Güncellenecek ürün kalmadı.'] });
     }
 
+    // Load proxy API key from database settings
+    const settings = await prisma.systemSetting.findMany();
+    const settingsMap = {};
+    settings.forEach(s => {
+      settingsMap[s.key] = s.value;
+    });
+    
+    const dbScrapingKey = settingsMap['scraping_api_key'];
+    const scrapingApiKey = dbScrapingKey || process.env.SCRAPING_API_KEY;
+
     const remaining = Math.max(0, totalCount - (offset + products.length));
     logs.push(`[Fiyat Botu] Sıra: ${offset + 1} - ${offset + products.length} (Kalan: ${remaining}) | Toplam ${totalCount} üründen ${products.length} adedi taranıyor...`);
     
-    if (process.env.SCRAPING_API_KEY) {
+    if (scrapingApiKey) {
       logs.push(`[Sistem] Güvenlik duvarı aşımı için Scrape.do proxy servisi aktif.`);
     } else {
-      logs.push(`[Uyarı] Proxy API anahtarı (.env altında SCRAPING_API_KEY) tanımlanmadığı için doğrudan istek atılacak. Engellenme olasılığı yüksektir.`);
+      logs.push(`[Uyarı] Proxy API anahtarı (Ayarlar veya .env altında SCRAPING_API_KEY) tanımlanmadığı için doğrudan istek atılacak. Engellenme olasılığı yüksektir.`);
     }
 
     for (let i = 0; i < products.length; i++) {
@@ -62,7 +72,7 @@ export async function POST(request) {
       // Helper to fetch price with fail-safe fallback
       const getLivePrice = async (url, label, previousPrice, fallbackPrice) => {
         try {
-          const html = await fetchHtml(url);
+          const html = await fetchHtml(url, scrapingApiKey);
           const price = extractPriceFromHtml(html, url);
           if (price && price > 0) {
             logs.push(`[Eşleşti] ${label}: Canlı fiyat çekildi -> ${price} TL`);

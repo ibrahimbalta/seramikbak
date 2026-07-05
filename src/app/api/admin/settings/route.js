@@ -19,6 +19,7 @@ export async function GET() {
       deepseek_api_key: settingsMap['deepseek_api_key'] || '',
       grok_api_key: settingsMap['grok_api_key'] || '',
       gemini_api_key: settingsMap['gemini_api_key'] || '',
+      scraping_api_key: settingsMap['scraping_api_key'] || '',
       ai_provider: settingsMap['ai_provider'] || 'deepseek'
     });
   } catch (error) {
@@ -37,6 +38,7 @@ export async function POST(request) {
       deepseek_api_key,
       grok_api_key,
       gemini_api_key,
+      scraping_api_key,
       ai_provider
     } = body;
 
@@ -47,6 +49,7 @@ export async function POST(request) {
       { key: 'deepseek_api_key', value: deepseek_api_key },
       { key: 'grok_api_key', value: grok_api_key },
       { key: 'gemini_api_key', value: gemini_api_key },
+      { key: 'scraping_api_key', value: scraping_api_key },
       { key: 'ai_provider', value: ai_provider }
     ];
 
