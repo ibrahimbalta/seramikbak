@@ -748,14 +748,14 @@ export default function Home() {
             try {
               const res = await fetch(`/api/search?q=${encodeURIComponent(productQuery)}`);
               const data = await res.json();
-              if (res.ok && data.products && data.products.length > 0) {
+              if (res.ok && Array.isArray(data) && data.length > 0) {
                 // Try to find exact case-insensitive name or code match first
-                const foundProduct = data.products.find(
+                const foundProduct = data.find(
                   p => p.name.toLowerCase() === productQuery.toLowerCase() || 
                        p.code.toLowerCase() === productQuery.toLowerCase()
-                ) || data.products.find(
+                ) || data.find(
                   p => p.name.toLowerCase().includes(productQuery.toLowerCase())
-                ) || data.products[0];
+                ) || data[0];
                 
                 setActiveProduct(foundProduct);
                 setActiveTab('search');
@@ -765,8 +765,8 @@ export default function Home() {
                 if (firstWord && firstWord !== productQuery) {
                   const fallbackRes = await fetch(`/api/search?q=${encodeURIComponent(firstWord)}`);
                   const fallbackData = await fallbackRes.json();
-                  if (fallbackRes.ok && fallbackData.products && fallbackData.products.length > 0) {
-                    setActiveProduct(fallbackData.products[0]);
+                  if (fallbackRes.ok && Array.isArray(fallbackData) && fallbackData.length > 0) {
+                    setActiveProduct(fallbackData[0]);
                     setActiveTab('search');
                     return;
                   }
