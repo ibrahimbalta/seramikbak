@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Extract Signatures</title>
+</head>
+<body>
+  <h3>Ceramic Texture Signatures</h3>
+  <pre id="output">Loading and extracting signatures...</pre>
+
+  <script>
+    const textures = [
+      { name: 'Calacatta Gold', path: '/textures/calacatta_gold.jpg' },
+      { name: 'Borneo Antrasit', path: '/textures/borneo_antrasit.jpg' },
+      { name: 'Travertino Classico', path: '/textures/travertino_classico.jpg' },
+      { name: 'Natural Oak', path: '/textures/natural_oak.jpg' },
+      { name: 'Concrete Light Grey', path: '/textures/concrete_light_grey.jpg' },
+      { name: 'Loft Beton', path: '/textures/loft_beton.jpg' },
+      { name: 'Teak Ahsap', path: '/textures/teak_ahsap.jpg' },
+      { name: 'Vista Bej', path: '/textures/vista_bej.jpg' }
+    ];
+
+    const results = {};
+    let loadedCount = 0;
+
+    textures.forEach(t => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 4;
+        canvas.height = 4;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, 4, 4);
+        const data = ctx.getImageData(0, 0, 4, 4).data;
+        
+        const sig = [];
+        for (let i = 0; i < data.length; i += 4) {
+          sig.push(data[i], data[i+1], data[i+2]);
+        }
+        results[t.name] = sig;
+        
+        loadedCount++;
+        if (loadedCount === textures.length) {
+          document.getElementById('output').textContent = JSON.stringify(results, null, 2);
+        }
+      };
+      img.src = '..' + t.path; // relative to scratch/
+    });
+  </script>
+</body>
+</html>

@@ -1060,6 +1060,36 @@ export default function Home() {
     });
   };
 
+  const extractImageSignature = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = 4;
+            canvas.height = 4;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, 4, 4);
+            const data = ctx.getImageData(0, 0, 4, 4).data;
+            const sig = [];
+            for (let i = 0; i < data.length; i += 4) {
+              sig.push(data[i], data[i+1], data[i+2]);
+            }
+            resolve(sig);
+          } catch (e) {
+            resolve(null);
+          }
+        };
+        img.onerror = () => resolve(null);
+        img.src = event.target.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleVisualSearch = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1087,8 +1117,19 @@ export default function Home() {
       console.warn("Client color extraction failed, defaulting to 'Gri'", colorErr);
     }
 
+    // Extract 4x4 visual signature
+    let signature = null;
+    try {
+      signature = await extractImageSignature(file);
+    } catch (sigErr) {
+      console.warn("Client signature extraction failed", sigErr);
+    }
+
     const formData = new FormData();
     formData.append('file', file);
+    if (signature) {
+      formData.append('signature', JSON.stringify(signature));
+    }
 
     try {
       const res = await fetch(`/api/ai/visual-search?fallbackColor=${encodeURIComponent(detectedColor)}`, {
