@@ -110,10 +110,14 @@ export default function AdminPage() {
   const [dealerSaasSuccess, setDealerSaasSuccess] = useState('');
   const [dealerSaasError, setDealerSaasError] = useState('');
 
-  // Bank Account Settings State
+  // Bank Account & AI Settings State
   const [bankName, setBankName] = useState('');
   const [bankRecipient, setBankRecipient] = useState('');
   const [bankIban, setBankIban] = useState('');
+  const [deepseekApiKey, setDeepseekApiKey] = useState('');
+  const [grokApiKey, setGrokApiKey] = useState('');
+  const [geminiApiKey, setGeminiApiKey] = useState('');
+  const [aiProvider, setAiProvider] = useState('deepseek');
   const [bankSettingsLoading, setBankSettingsLoading] = useState(false);
   const [bankSettingsSuccess, setBankSettingsSuccess] = useState('');
   const [bankSettingsError, setBankSettingsError] = useState('');
@@ -365,9 +369,13 @@ export default function AdminPage() {
         setBankName(data.bank_name || '');
         setBankRecipient(data.bank_recipient || '');
         setBankIban(data.bank_iban || '');
+        setDeepseekApiKey(data.deepseek_api_key || '');
+        setGrokApiKey(data.grok_api_key || '');
+        setGeminiApiKey(data.gemini_api_key || '');
+        setAiProvider(data.ai_provider || 'deepseek');
       }
     } catch (err) {
-      console.error('Failed to load bank settings:', err);
+      console.error('Failed to load settings:', err);
     }
   };
 
@@ -1133,13 +1141,17 @@ export default function AdminPage() {
         body: JSON.stringify({
           bank_name: bankName,
           bank_recipient: bankRecipient,
-          bank_iban: bankIban
+          bank_iban: bankIban,
+          deepseek_api_key: deepseekApiKey,
+          grok_api_key: grokApiKey,
+          gemini_api_key: geminiApiKey,
+          ai_provider: aiProvider
         })
       });
 
       const result = await response.json();
       if (response.ok && result.success) {
-        setBankSettingsSuccess('Banka hesap ayarları başarıyla güncellendi.');
+        setBankSettingsSuccess('Sistem ve Yapay Zeka ayarları başarıyla güncellendi.');
         loadBankSettings();
       } else {
         setBankSettingsError(result.error || 'Ayarlar kaydedilirken hata oluştu.');
@@ -2750,7 +2762,7 @@ export default function AdminPage() {
                 cursor: 'pointer'
               }}
             >
-              Banka Hesap Ayarları
+              Sistem & Yapay Zeka Ayarları
             </button>
           </div>
 
@@ -3239,8 +3251,8 @@ export default function AdminPage() {
                 <div className="card-header" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
                   <Settings size={20} className="icon-gold" />
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800' }}>Banka Hesap Bilgileri Ayarları</h3>
-                    <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: '#64748b' }}>Bayi ve marka paket seçim ekranlarında gösterilecek resmi banka hesap detayları.</p>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800' }}>Sistem ve Yapay Zeka Ayarları</h3>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: '#64748b' }}>Banka IBAN hesap detayları ile AI (DeepSeek, Gemini, Grok) API anahtarı ayarları.</p>
                   </div>
                 </div>
 
@@ -3258,6 +3270,10 @@ export default function AdminPage() {
                       <span>{bankSettingsError}</span>
                     </div>
                   )}
+
+                  <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '8px', marginBottom: '4px' }}>
+                    <strong style={{ fontSize: '0.82rem', color: 'var(--accent-gold, #d4af37)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Resmi Banka Hesap Bilgileri</strong>
+                  </div>
 
                   <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>Banka Adı</label>
@@ -3295,6 +3311,56 @@ export default function AdminPage() {
                     />
                   </div>
 
+                  <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '8px', marginTop: '14px', marginBottom: '4px' }}>
+                    <strong style={{ fontSize: '0.82rem', color: 'var(--accent-gold, #d4af37)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🤖 Yapay Zeka (AI) Entegrasyon Ayarları</strong>
+                  </div>
+
+                  <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>Aktif Yapay Zeka Sağlayıcısı</label>
+                    <select 
+                      value={aiProvider} 
+                      onChange={(e) => setAiProvider(e.target.value)}
+                      style={{ padding: '10px', fontSize: '0.85rem', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff' }}
+                    >
+                      <option value="deepseek">DeepSeek (Tavsiye Edilen - Akıllı Metin & Asistan)</option>
+                      <option value="gemini">Google Gemini (3D Studio Görsel Üretimi)</option>
+                      <option value="grok">xAI Grok (Çoklu Model)</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>DeepSeek API Anahtarı (Asistan & Chat için)</label>
+                    <input 
+                      type="password" 
+                      value={deepseekApiKey} 
+                      onChange={(e) => setDeepseekApiKey(e.target.value)} 
+                      placeholder="sk-..." 
+                      style={{ padding: '10px', fontSize: '0.85rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>Google Gemini API Anahtarı (3D Oda Görsel Üretimi için)</label>
+                    <input 
+                      type="password" 
+                      value={geminiApiKey} 
+                      onChange={(e) => setGeminiApiKey(e.target.value)} 
+                      placeholder="AIzaSy..." 
+                      style={{ padding: '10px', fontSize: '0.85rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '600', color: '#334155' }}>xAI Grok API Anahtarı</label>
+                    <input 
+                      type="password" 
+                      value={grokApiKey} 
+                      onChange={(e) => setGrokApiKey(e.target.value)} 
+                      placeholder="xai-..." 
+                      style={{ padding: '10px', fontSize: '0.85rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                    />
+                  </div>
+
                   <button 
                     type="submit" 
                     disabled={bankSettingsLoading}
@@ -3307,11 +3373,11 @@ export default function AdminPage() {
                       fontSize: '0.85rem', 
                       fontWeight: '700', 
                       cursor: 'pointer',
-                      marginTop: '10px',
+                      marginTop: '16px',
                       opacity: bankSettingsLoading ? 0.7 : 1
                     }}
                   >
-                    {bankSettingsLoading ? 'Kaydediliyor...' : 'Hesap Bilgilerini Kaydet'}
+                    {bankSettingsLoading ? 'Kaydediliyor...' : 'Tüm Sistem Ayarlarını Kaydet'}
                   </button>
                 </form>
               </div>

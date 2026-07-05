@@ -635,6 +635,14 @@ export default function Home() {
   const [showFavoritesPanel, setShowFavoritesPanel] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
+  // AI Assistant Chatbot State
+  const [showAiChatbot, setShowAiChatbot] = useState(false);
+  const [aiChatMessages, setAiChatMessages] = useState([
+    { role: 'assistant', content: 'Merhaba! Ben SeramikBak Yapay Zeka Tasarım Asistanı. Seramik seçimi, stil uyumu veya metraj hesaplama konularında size yardımcı olabilirim. Nasıl yardımcı olabilirim?' }
+  ]);
+  const [aiChatInput, setAiChatInput] = useState('');
+  const [aiChatLoading, setAiChatLoading] = useState(false);
+
   // Dealer Signup handler
   const handleDealerSignupSubmit = async (e) => {
     e.preventDefault();
@@ -676,6 +684,39 @@ export default function Home() {
       setSignupError('Sunucu bağlantı hatası.');
     } finally {
       setIsSubmittingSignup(false);
+    }
+  };
+
+  const handleSendAiChatMessage = async (e) => {
+    if (e) e.preventDefault();
+    if (!aiChatInput.trim() || aiChatLoading) return;
+
+    const userMessage = { role: 'user', content: aiChatInput };
+    setAiChatMessages(prev => [...prev, userMessage]);
+    setAiChatInput('');
+    setAiChatLoading(true);
+
+    try {
+      const history = aiChatMessages.map(m => ({ role: m.role, content: m.content }));
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...history, userMessage]
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setAiChatMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+      } else {
+        setAiChatMessages(prev => [...prev, { role: 'assistant', content: 'Üzgünüm, şu anda yanıt veremiyorum. Lütfen tekrar deneyin.' }]);
+      }
+    } catch (err) {
+      console.error('Chat error:', err);
+      setAiChatMessages(prev => [...prev, { role: 'assistant', content: 'Bağlantı hatası oluştu. Lütfen internet bağlantınızı kontrol edin.' }]);
+    } finally {
+      setAiChatLoading(false);
     }
   };
 
@@ -5886,6 +5927,189 @@ export default function Home() {
           <MenuIcon size={20} />
           <span>Menü</span>
         </button>
+      </div>
+
+      {/* FLOATING AI CHATBOT WIDGET */}
+      <div className="floating-ai-chatbot" style={{ zIndex: 9999 }}>
+        {!showAiChatbot ? (
+          <button 
+            className="ai-chatbot-toggle-btn"
+            onClick={() => setShowAiChatbot(true)}
+            style={{
+              position: 'fixed',
+              bottom: '90px',
+              right: '24px',
+              background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+              color: '#d4af37',
+              border: '2px solid #d4af37',
+              borderRadius: '50px',
+              padding: '12px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              boxShadow: '0 10px 25px rgba(212, 175, 55, 0.25)',
+              cursor: 'pointer',
+              fontWeight: '700',
+              fontSize: '0.82rem',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              letterSpacing: '0.03em'
+            }}
+          >
+            <span style={{ fontSize: '1.2rem' }}>🤖</span>
+            <span>Yapay Zeka Tasarım Asistanı</span>
+          </button>
+        ) : (
+          <div 
+            className="ai-chatbot-window glass-panel"
+            style={{
+              position: 'fixed',
+              bottom: '90px',
+              right: '24px',
+              width: '360px',
+              height: '480px',
+              background: '#ffffff',
+              borderRadius: '16px',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              border: '1px solid rgba(212, 175, 55, 0.3)'
+            }}
+          >
+            {/* Header */}
+            <div 
+              className="ai-chat-header"
+              style={{
+                background: 'linear-gradient(135deg, #0b0f19 0%, #1e293b 100%)',
+                color: '#fff',
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                borderBottom: '2px solid #d4af37'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '1.4rem' }}>🤖</span>
+                <div style={{ textAlign: 'left' }}>
+                  <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: '800', color: '#d4af37' }}>SeramikBak AI Asistanı</h4>
+                  <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Çevrimiçi • DeepSeek Yapay Zekası</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowAiChatbot(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#94a3b8',
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Messages Area */}
+            <div 
+              className="ai-chat-messages"
+              style={{
+                flex: 1,
+                padding: '16px',
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                background: '#f8fafc',
+                textAlign: 'left'
+              }}
+            >
+              {aiChatMessages.map((msg, idx) => (
+                <div 
+                  key={idx} 
+                  style={{
+                    alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                    maxWidth: '80%',
+                    background: msg.role === 'user' ? '#1e293b' : '#ffffff',
+                    color: msg.role === 'user' ? '#ffffff' : '#0f172a',
+                    padding: '10px 14px',
+                    borderRadius: msg.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                    fontSize: '0.78rem',
+                    lineHeight: '1.4',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                    border: msg.role === 'user' ? 'none' : '1px solid #e2e8f0',
+                    whiteSpace: 'pre-line'
+                  }}
+                >
+                  {msg.content}
+                </div>
+              ))}
+              {aiChatLoading && (
+                <div 
+                  style={{
+                    alignSelf: 'flex-start',
+                    background: '#ffffff',
+                    color: '#64748b',
+                    padding: '10px 14px',
+                    borderRadius: '12px 12px 12px 2px',
+                    fontSize: '0.75rem',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                    border: '1px solid #e2e8f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <span className="dot-typing-animation">Düşünüyor...</span>
+                </div>
+              )}
+            </div>
+
+            {/* Input Form */}
+            <form 
+              onSubmit={handleSendAiChatMessage}
+              style={{
+                padding: '12px',
+                borderTop: '1px solid #e2e8f0',
+                display: 'flex',
+                gap: '8px',
+                background: '#fff'
+              }}
+            >
+              <input 
+                type="text"
+                value={aiChatInput}
+                onChange={e => setAiChatInput(e.target.value)}
+                placeholder="Tasarım veya ölçü sorusu sorun..."
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  borderRadius: '8px',
+                  border: '1px solid #cbd5e1',
+                  fontSize: '0.78rem',
+                  outline: 'none'
+                }}
+              />
+              <button 
+                type="submit"
+                disabled={aiChatLoading || !aiChatInput.trim()}
+                style={{
+                  background: aiChatInput.trim() ? '#1e293b' : '#cbd5e1',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px 16px',
+                  fontSize: '0.78rem',
+                  fontWeight: '700',
+                  cursor: aiChatInput.trim() ? 'pointer' : 'default'
+                }}
+              >
+                Gönder
+              </button>
+            </form>
+          </div>
+        )}
       </div>
 
       {/* Embedded CSS specific to this high-fidelity layout */}
