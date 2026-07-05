@@ -3891,23 +3891,7 @@ export default function Home() {
                       )}
                     </div>
                   )}
-                  <div className="ai-actions-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '6px' }}>
-                    {/* Yükleme Kartı */}
-                    <div className="ai-uploader-card glass-panel" style={{ position: 'relative', overflow: 'hidden', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '6px', cursor: 'pointer', minHeight: '110px', justifyContent: 'center' }}>
-                      <UploadCloud size={20} style={{ color: 'var(--accent-gold)' }} />
-                      <div className="uploader-text">
-                        <h5 style={{ fontSize: '0.72rem', fontWeight: '700', margin: '0 0 2px 0' }}>Kendi Odanı Tasarla</h5>
-                        <p style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.2 }}>Oda fotoğrafı yükle ve üzerine kapla</p>
-                      </div>
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleRoomImageUpload} 
-                        className="calc-file-input"
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
-                      />
-                    </div>
-
+                  <div className="ai-actions-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', marginTop: '6px' }}>
                     {/* Sıfırdan Tasarlama Kartı */}
                     <div 
                       onClick={generateAIBathroomImage}
@@ -3929,8 +3913,8 @@ export default function Home() {
                     >
                       <Sparkles size={20} style={{ color: 'var(--accent-gold)' }} />
                       <div className="uploader-text">
-                        <h5 style={{ fontSize: '0.72rem', fontWeight: '700', margin: '0 0 2px 0', color: 'var(--accent-gold)' }}>Yapay Zeka Tasarla</h5>
-                        <p style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.2 }}>Seçili seramik ile sıfırdan banyo üret</p>
+                        <h5 style={{ fontSize: '0.72rem', fontWeight: '700', margin: '0 0 2px 0', color: 'var(--accent-gold)' }}>Yapay Zeka ile Banyo Tasarla</h5>
+                        <p style={{ fontSize: '0.58rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.2 }}>Seçili seramik ile sıfırdan yapay zeka tasarımı üret</p>
                       </div>
                     </div>
                   </div>
