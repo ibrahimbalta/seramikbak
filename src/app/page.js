@@ -722,8 +722,8 @@ export default function Home() {
 
   const renderChatMessage = (content) => {
     if (!content) return '';
-    // Matches markdown link pattern: [Text](product:CODE)
-    const regex = /\[([^\]]+)\]\(product:([a-zA-Z0-9_\-]+)\)/g;
+    // Matches markdown link pattern: [Text](product:ANYTHING_BUT_CLOSE_PAREN)
+    const regex = /\[([^\]]+)\]\(product:([^)]+)\)/g;
     
     const parts = [];
     let lastIndex = 0;
@@ -736,7 +736,7 @@ export default function Home() {
       }
       
       const linkText = match[1];
-      const productCode = match[2];
+      const productQuery = match[2].trim();
       
       parts.push(
         <a 
@@ -744,17 +744,33 @@ export default function Home() {
           href="#"
           onClick={async (e) => {
             e.preventDefault();
-            // Fetch product by code
+            // Fetch product by code or name query
             try {
-              const res = await fetch(`/api/search?q=${encodeURIComponent(productCode)}`);
+              const res = await fetch(`/api/search?q=${encodeURIComponent(productQuery)}`);
               const data = await res.json();
               if (res.ok && data.products && data.products.length > 0) {
-                // Find exact match or first product
-                const foundProduct = data.products.find(p => p.code.toLowerCase() === productCode.toLowerCase()) || data.products[0];
+                // Try to find exact case-insensitive name or code match first
+                const foundProduct = data.products.find(
+                  p => p.name.toLowerCase() === productQuery.toLowerCase() || 
+                       p.code.toLowerCase() === productQuery.toLowerCase()
+                ) || data.products.find(
+                  p => p.name.toLowerCase().includes(productQuery.toLowerCase())
+                ) || data.products[0];
+                
                 setActiveProduct(foundProduct);
-                // Switch tab to search so the details sidebar is shown
                 setActiveTab('search');
               } else {
+                // Fallback: If no products found, try searching with just the first word of the query
+                const firstWord = productQuery.split(' ')[0];
+                if (firstWord && firstWord !== productQuery) {
+                  const fallbackRes = await fetch(`/api/search?q=${encodeURIComponent(firstWord)}`);
+                  const fallbackData = await fallbackRes.json();
+                  if (fallbackRes.ok && fallbackData.products && fallbackData.products.length > 0) {
+                    setActiveProduct(fallbackData.products[0]);
+                    setActiveTab('search');
+                    return;
+                  }
+                }
                 alert('Ürün bulunamadı veya katalogda mevcut değil.');
               }
             } catch (err) {
