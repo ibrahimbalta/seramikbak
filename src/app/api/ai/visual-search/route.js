@@ -35,10 +35,17 @@ export async function POST(request) {
     } catch (aiError) {
       console.warn('Python AI Service is offline or unreachable. Using database fallback logic.', aiError);
       
-      // FALLBACK LOGIC: If AI service is offline, return products matching 
-      // some random similarity based on color or name matching if any hint is given,
-      // or simply return the premium products with a simulated score.
+      const { searchParams } = new URL(request.url);
+      const fallbackColor = searchParams.get('fallbackColor') || 'Gri';
+
+      // Query database for products matching the detected dominant color category
       const fallbackProducts = await prisma.product.findMany({
+        where: {
+          OR: [
+            { color: { contains: fallbackColor } },
+            { name: { contains: fallbackColor } }
+          ]
+        },
         take: 5,
         include: {
           brand: {
@@ -47,7 +54,25 @@ export async function POST(request) {
         }
       });
       
-      const mockedResults = fallbackProducts.map((p, idx) => ({
+      let finalFallback = fallbackProducts;
+      
+      // If we don't have enough matching color products, append other random products
+      if (finalFallback.length < 5) {
+        const extraProducts = await prisma.product.findMany({
+          where: {
+            id: { notIn: fallbackProducts.map(p => p.id) }
+          },
+          take: 5 - fallbackProducts.length,
+          include: {
+            brand: {
+              select: { id: true, name: true, logoUrl: true }
+            }
+          }
+        });
+        finalFallback = [...fallbackProducts, ...extraProducts];
+      }
+      
+      const mockedResults = finalFallback.map((p, idx) => ({
         ...p,
         similarityScore: 90 - (idx * 5) - Math.floor(Math.random() * 5),
         isFallback: true

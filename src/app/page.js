@@ -999,6 +999,67 @@ export default function Home() {
     fetchProducts('', 1, false);
   };
 
+  const detectImageColor = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = 10;
+            canvas.height = 10;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, 10, 10);
+            const data = ctx.getImageData(0, 0, 10, 10).data;
+            
+            let r = 0, g = 0, b = 0;
+            for (let i = 0; i < data.length; i += 4) {
+              r += data[i];
+              g += data[i+1];
+              b += data[i+2];
+            }
+            r = Math.round(r / 100);
+            g = Math.round(g / 100);
+            b = Math.round(b / 100);
+            
+            const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+            
+            if (brightness < 85) {
+              resolve('Gri'); // Dark colors default to Gray/Anthracite in db
+            } else if (brightness > 200) {
+              resolve('Beyaz');
+            } else {
+              const max = Math.max(r, g, b);
+              const min = Math.min(r, g, b);
+              const saturation = max === 0 ? 0 : (max - min) / max;
+              
+              if (saturation < 0.15) {
+                resolve('Gri');
+              } else {
+                if (r > b) {
+                  if (g > b) {
+                    resolve('Bej'); // Also covers Krem
+                  } else {
+                    resolve('Kahve'); // Covers wood/brown tones
+                  }
+                } else {
+                  resolve('Gri');
+                }
+              }
+            }
+          } catch (e) {
+            resolve('Gri');
+          }
+        };
+        img.onerror = () => resolve('Gri');
+        img.src = event.target.result;
+      };
+      reader.onerror = () => resolve('Gri');
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleVisualSearch = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1018,11 +1079,19 @@ export default function Home() {
       }
     }, 200);
 
+    // Detect color of the uploaded image
+    let detectedColor = 'Gri';
+    try {
+      detectedColor = await detectImageColor(file);
+    } catch (colorErr) {
+      console.warn("Client color extraction failed, defaulting to 'Gri'", colorErr);
+    }
+
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      const res = await fetch('/api/ai/visual-search', {
+      const res = await fetch(`/api/ai/visual-search?fallbackColor=${encodeURIComponent(detectedColor)}`, {
         method: 'POST',
         body: formData
       });
@@ -1041,7 +1110,8 @@ export default function Home() {
             productId: p.id,
             productName: p.name,
             productCode: p.code,
-            score: p.similarityScore
+            score: p.similarityScore,
+            isFallback: p.isFallback
           }));
           setVisualSearchMatches(matches);
         } else {
@@ -3039,7 +3109,19 @@ export default function Home() {
                 <div className="results-header-row-new" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', marginBottom: '20px' }}>
                   <div className="results-header-text-new">
                     {uploadedImagePreview ? (
-                      <h3>Görsel Arama Sonuçları <span className="results-new-badge gold">AI Eşleşme</span></h3>
+                      <div>
+                        <h3>
+                          Görsel Arama Sonuçları{" "}
+                          <span className="results-new-badge gold">
+                            {products.some(p => p.isFallback) ? 'Renk & Doku Analizi' : 'AI Eşleşme'}
+                          </span>
+                        </h3>
+                        {products.some(p => p.isFallback) && (
+                          <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px', fontWeight: '500' }}>
+                            ⚠️ AI CLIP Sunucusu çevrimdışı; tarayıcı tabanlı renk ve ton eşleştirme algoritması devrede.
+                          </p>
+                        )}
+                      </div>
                     ) : (
                       <h3>Katalog Sonuçları</h3>
                     )}
@@ -3134,7 +3216,7 @@ export default function Home() {
                               <span className="card-badge-tag-new grey">{product.finish}</span>
                               {product.similarityScore !== undefined && product.similarityScore > 0 && (
                                 <span className="card-badge-tag-new gold animate-pulse">
-                                  %{product.similarityScore} Eşleşme
+                                  %{product.similarityScore} {product.isFallback ? 'Renk Uyumu' : 'Eşleşme'}
                                 </span>
                               )}
                             </div>
