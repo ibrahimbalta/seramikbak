@@ -5955,7 +5955,23 @@ export default function Home() {
               letterSpacing: '0.03em'
             }}
           >
-            <span style={{ fontSize: '1.2rem' }}>🤖</span>
+            <div style={{
+              width: '24px',
+              height: '24px',
+              background: 'linear-gradient(135deg, #d4af37 0%, #987532 100%)',
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              fontWeight: '850',
+              fontSize: '0.72rem',
+              boxShadow: '0 2px 6px rgba(179, 142, 71, 0.3)',
+              lineHeight: '1',
+              flexShrink: 0
+            }}>
+              SB
+            </div>
             <span>Yapay Zeka Tasarım Asistanı</span>
           </button>
         ) : (
@@ -5989,8 +6005,24 @@ export default function Home() {
                 borderBottom: '2px solid #d4af37'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '1.4rem' }}>🤖</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  background: 'linear-gradient(135deg, #d4af37 0%, #987532 100%)',
+                  borderRadius: '7px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#ffffff',
+                  fontWeight: '850',
+                  fontSize: '0.88rem',
+                  boxShadow: '0 2px 8px rgba(179, 142, 71, 0.3)',
+                  lineHeight: '1',
+                  flexShrink: 0
+                }}>
+                  SB
+                </div>
                 <div style={{ textAlign: 'left' }}>
                   <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: '800', color: '#d4af37' }}>SeramikBak AI Asistanı</h4>
                   <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Çevrimiçi • DeepSeek Yapay Zekası</span>
