@@ -720,6 +720,68 @@ export default function Home() {
     }
   };
 
+  const renderChatMessage = (content) => {
+    if (!content) return '';
+    // Matches markdown link pattern: [Text](product:CODE)
+    const regex = /\[([^\]]+)\]\(product:([a-zA-Z0-9_\-]+)\)/g;
+    
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+    
+    while ((match = regex.exec(content)) !== null) {
+      // Add text before the link
+      if (match.index > lastIndex) {
+        parts.push(content.substring(lastIndex, match.index));
+      }
+      
+      const linkText = match[1];
+      const productCode = match[2];
+      
+      parts.push(
+        <a 
+          key={match.index}
+          href="#"
+          onClick={async (e) => {
+            e.preventDefault();
+            // Fetch product by code
+            try {
+              const res = await fetch(`/api/search?q=${encodeURIComponent(productCode)}`);
+              const data = await res.json();
+              if (res.ok && data.products && data.products.length > 0) {
+                // Find exact match or first product
+                const foundProduct = data.products.find(p => p.code.toLowerCase() === productCode.toLowerCase()) || data.products[0];
+                setActiveProduct(foundProduct);
+                // Switch tab to search so the details sidebar is shown
+                setActiveTab('search');
+              } else {
+                alert('Ürün bulunamadı veya katalogda mevcut değil.');
+              }
+            } catch (err) {
+              console.error('Failed to load product link:', err);
+            }
+          }}
+          style={{
+            color: 'var(--accent-gold, #d4af37)',
+            fontWeight: 'bold',
+            textDecoration: 'underline',
+            cursor: 'pointer'
+          }}
+        >
+          {linkText}
+        </a>
+      );
+      
+      lastIndex = regex.lastIndex;
+    }
+    
+    if (lastIndex < content.length) {
+      parts.push(content.substring(lastIndex));
+    }
+    
+    return parts.length > 0 ? parts : content;
+  };
+
   // ---- USER AUTH HANDLERS ----
   // Restore session from localStorage
   useEffect(() => {
@@ -6074,7 +6136,7 @@ export default function Home() {
                     whiteSpace: 'pre-line'
                   }}
                 >
-                  {msg.content}
+                  {renderChatMessage(msg.content)}
                 </div>
               ))}
               {aiChatLoading && (
