@@ -66,7 +66,7 @@ export async function POST(request) {
       const tyUrl = p.trendyolUrl || `https://www.trendyol.com/sr?q=${encodeURIComponent(p.code)}`;
       const hbUrl = p.hepsiburadaUrl || `https://www.hepsiburada.com/ara?q=${encodeURIComponent(p.code)}`;
       const n11Url = p.n11Url || `https://www.n11.com/arama?q=${encodeURIComponent(p.code)}`;
-      const kcUrl = p.koctasUrl || `https://www.koctas.com.tr/arama?q=${encodeURIComponent(p.code)}`;
+      const kcUrl = p.koctasUrl || `https://www.koctas.com.tr/search?q=${encodeURIComponent(p.code)}`;
       const bhUrl = p.bauhausUrl || `https://www.bauhaus.com.tr/arama?q=${encodeURIComponent(p.code)}`;
 
       // Helper to fetch price with fail-safe fallback
@@ -82,17 +82,23 @@ export async function POST(request) {
             return previousPrice || fallbackPrice;
           }
         } catch (err) {
-          logs.push(`[Engellendi/Hata] ${label}: Bağlantı engellendi veya hata oluştu (${err.message}). Mevcut fiyat korunuyor.`);
+          if (err.message.includes('404')) {
+            logs.push(`[Bilgi] ${label}: Ürün bu pazaryerinde bulunamadı (404 Not Found).`);
+          } else {
+            logs.push(`[Engellendi/Hata] ${label}: Bağlantı engellendi veya hata oluştu (${err.message}). Mevcut fiyat korunuyor.`);
+          }
           return previousPrice || fallbackPrice;
         }
       };
 
-      // Crawl each marketplace
-      const trendyolPrice = await getLivePrice(tyUrl, 'Trendyol', p.trendyolPrice, tyFallback);
-      const hepsiburadaPrice = await getLivePrice(hbUrl, 'Hepsiburada', p.hepsiburadaPrice, hbFallback);
-      const n11Price = await getLivePrice(n11Url, 'n11', p.n11Price, n11Fallback);
-      const koctasPrice = await getLivePrice(kcUrl, 'Koçtaş', p.koctasPrice, kcFallback);
-      const bauhausPrice = await getLivePrice(bhUrl, 'Bauhaus', p.bauhausPrice, bhFallback);
+      // Crawl each marketplace in parallel to prevent Next.js request timeouts
+      const [trendyolPrice, hepsiburadaPrice, n11Price, koctasPrice, bauhausPrice] = await Promise.all([
+        getLivePrice(tyUrl, 'Trendyol', p.trendyolPrice, tyFallback),
+        getLivePrice(hbUrl, 'Hepsiburada', p.hepsiburadaPrice, hbFallback),
+        getLivePrice(n11Url, 'n11', p.n11Price, n11Fallback),
+        getLivePrice(kcUrl, 'Koçtaş', p.koctasPrice, kcFallback),
+        getLivePrice(bhUrl, 'Bauhaus', p.bauhausPrice, bhFallback)
+      ]);
 
       // 2. Update Database
       await prisma.product.update({
