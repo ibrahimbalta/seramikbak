@@ -638,7 +638,7 @@ export default function Home() {
   // AI Assistant Chatbot State
   const [showAiChatbot, setShowAiChatbot] = useState(false);
   const [aiChatMessages, setAiChatMessages] = useState([
-    { role: 'assistant', content: 'Merhaba! Ben SeramikBak Yapay Zeka Tasarım Asistanı. Seramik seçimi, stil uyumu veya metraj hesaplama konularında size yardımcı olabilirim. Nasıl yardımcı olabilirim?' }
+    { role: 'assistant', content: 'Merhaba! Ben SeramikBak Asistanı. Seramik seçimi, stil uyumu veya metraj hesaplama konularında size yardımcı olabilirim. Nasıl yardımcı olabilirim?' }
   ]);
   const [aiChatInput, setAiChatInput] = useState('');
   const [aiChatLoading, setAiChatLoading] = useState(false);
@@ -6077,7 +6077,7 @@ export default function Home() {
             }}>
               SB
             </div>
-            <span>Yapay Zeka Tasarım Asistanı</span>
+            <span>Asistan</span>
           </button>
         ) : (
           <div 
