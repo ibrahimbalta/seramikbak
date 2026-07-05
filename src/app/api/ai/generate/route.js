@@ -109,18 +109,14 @@ export async function POST(request) {
       });
 
       if (!response.ok) {
-        console.warn('[AI Generate] Gemini Image Gen failed or not supported. Falling back to Unsplash.');
-        const fallbacks = [
-          'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?q=80&w=1024&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1024&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1620626011761-996317b8d101?q=80&w=1024&auto=format&fit=crop'
-        ];
-        const randomImage = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+        console.warn('[AI Generate] Gemini Image Gen failed or not supported. Falling back to Pollinations AI.');
+        const seed = Math.floor(Math.random() * 1000000);
+        const generatedImageUrl = `https://image.pollinations.ai/p/${encodeURIComponent(prompt)}?width=1024&height=576&seed=${seed}&nologo=true`;
         return NextResponse.json({
           success: true,
-          image: randomImage,
+          image: generatedImageUrl,
           isFallback: true,
-          message: 'Gemini Image Generation fallback applied.'
+          message: 'Gemini Image Generation failed. Generated via free Pollinations AI fallback.'
         });
       }
 
@@ -134,17 +130,14 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('[AI Generate Route Error]', error);
-    const fallbacks = [
-      'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?q=80&w=1024&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1024&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1620626011761-996317b8d101?q=80&w=1024&auto=format&fit=crop'
-    ];
-    const randomImage = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    const seed = Math.floor(Math.random() * 1000000);
+    const generatedImageUrl = `https://image.pollinations.ai/p/${encodeURIComponent(prompt)}?width=1024&height=576&seed=${seed}&nologo=true`;
     return NextResponse.json({
       success: true,
-      image: randomImage,
+      image: generatedImageUrl,
       isFallback: true,
-      error: error.message
+      error: error.message,
+      message: 'Route error. Generated via free Pollinations AI fallback.'
     });
   }
 }

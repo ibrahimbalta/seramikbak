@@ -1825,7 +1825,7 @@ export default function Home() {
     const brandName = activeProduct.brand?.name || '';
 
     // Create a precise generative prompt describing the bathroom tiled with the selected product
-    const basePrompt = `A hyper-realistic photorealistic luxury modern bathroom. The entire walls and floor surfaces are beautifully tiled with large-format ${engColor} ${engStyle} ceramic tiles with a ${engFinish} finish, styled exactly like the "${tileName}" series ${brandName ? `by ${brandName}` : ''}. The bathroom features a modern white freestanding bathtub, an elegant wood vanity with integrated sink, gold minimalist fixtures, warm ambient architectural lighting, clean seamless grout lines, high-end interior design catalog photography, 8k resolution, highly detailed, realistic shadow depth and specular reflections.`;
+    const basePrompt = `Tiled bathroom design. A luxury modern bathroom where the entire walls and floors are fully covered in large-format ${engColor} ${engStyle} ceramic tiles with a ${engFinish} finish, styled exactly like the "${tileName}" series ${brandName ? `by ${brandName}` : ''}. Clean seamless grout lines. The walls are 100% tiled from floor to ceiling, no bare plaster, no drywalls. Inside the tiled bathroom, there is a modern white freestanding bathtub, an elegant wood vanity with integrated sink, gold minimalist fixtures, warm ambient architectural lighting, high-end interior design catalog photography, 8k resolution, photorealistic, realistic shadow depth and reflections.`;
     
     try {
       const response = await fetch('/api/ai/generate', {
