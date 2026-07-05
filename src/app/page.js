@@ -757,7 +757,21 @@ export default function Home() {
                   p => p.name.toLowerCase().includes(productQuery.toLowerCase())
                 ) || data[0];
                 
-                setActiveProduct(foundProduct);
+                // Clear all filters to prevent search conflicts
+                setSelectedBrand('');
+                setSelectedColor('');
+                setSelectedFinish('');
+                setSelectedStyle('');
+                setSelectedArea('');
+                setSelectedSize('');
+                setSelectedRectified('');
+                setSelectedFrost('');
+                setSearchQuery('');
+                setUploadedImagePreview(null);
+                setVisualSearchMatches(null);
+
+                // Open the product details sidebar and trigger search tab
+                handleProductCardClick(foundProduct);
                 setActiveTab('search');
               } else {
                 // Fallback: If no products found, try searching with just the first word of the query
@@ -766,7 +780,20 @@ export default function Home() {
                   const fallbackRes = await fetch(`/api/search?q=${encodeURIComponent(firstWord)}`);
                   const fallbackData = await fallbackRes.json();
                   if (fallbackRes.ok && Array.isArray(fallbackData) && fallbackData.length > 0) {
-                    setActiveProduct(fallbackData[0]);
+                    // Clear all filters
+                    setSelectedBrand('');
+                    setSelectedColor('');
+                    setSelectedFinish('');
+                    setSelectedStyle('');
+                    setSelectedArea('');
+                    setSelectedSize('');
+                    setSelectedRectified('');
+                    setSelectedFrost('');
+                    setSearchQuery('');
+                    setUploadedImagePreview(null);
+                    setVisualSearchMatches(null);
+
+                    handleProductCardClick(fallbackData[0]);
                     setActiveTab('search');
                     return;
                   }
