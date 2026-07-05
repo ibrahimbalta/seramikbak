@@ -1780,12 +1780,52 @@ export default function Home() {
       }, s.delay);
     });
 
-    const color = activeProduct.color || 'light grey';
-    const style = activeProduct.style || 'modern';
-    const finish = activeProduct.finish || 'matte';
+    // Translate Turkish terms to detailed English descriptions for the AI image engine
+    const styleTranslations = {
+      'Mermer': 'elegant marble pattern',
+      'Ahşap': 'natural wood grain plank style',
+      'Beton': 'minimalist concrete texture',
+      'Taş': 'rustic natural stone design',
+      'Metal': 'sleek metallic surface',
+      'Düz': 'plain monochromatic style',
+      'Tuğla': 'brick style layout',
+      'Desenli': 'decorative patterned artistic layout'
+    };
+
+    const colorTranslations = {
+      'Beyaz': 'pristine white',
+      'Siyah': 'rich luxury black',
+      'Gri': 'modern slate grey',
+      'Antrasit': 'dark anthracite charcoal',
+      'Bej': 'warm beige',
+      'Kahverengi': 'earthy brown',
+      'Altın': 'luxury gold and white',
+      'Yeşil': 'emerald green',
+      'Mavi': 'deep ocean blue',
+      'Vizon': 'taupe mink',
+      'Krem': 'smooth cream'
+    };
+
+    const finishTranslations = {
+      'Parlak': 'high-gloss polished reflective',
+      'Mat': 'matte natural non-reflective',
+      'Lapatto': 'semi-polished lappato',
+      'Saten': 'satin smooth'
+    };
+
+    const rawColor = activeProduct.color || '';
+    const rawStyle = activeProduct.style || '';
+    const rawFinish = activeProduct.finish || '';
+
+    const engColor = colorTranslations[rawColor] || rawColor.toLowerCase() || 'neutral grey';
+    const engStyle = styleTranslations[rawStyle] || `${rawStyle.toLowerCase()} patterned`;
+    const engFinish = finishTranslations[rawFinish] || rawFinish.toLowerCase() || 'matte';
     
-    // Create generative prompt describing the bathroom design in detail
-    const basePrompt = `A hyper-realistic photorealistic luxury modern bathroom. The entire walls and floor surfaces are beautifully tiled with ${color} ${style} style marble ceramic tiles with ${finish} finish. Modern white freestanding bathtub in center, elegant black wood vanity cabinet, soft architectural lighting, gold bathroom fixtures, clean aesthetic, architectural digest interior design photography, 8k resolution, highly detailed, realistic shadows and highlights`;
+    const tileName = activeProduct.name || 'premium ceramic';
+    const brandName = activeProduct.brand?.name || '';
+
+    // Create a precise generative prompt describing the bathroom tiled with the selected product
+    const basePrompt = `A hyper-realistic photorealistic luxury modern bathroom. The entire walls and floor surfaces are beautifully tiled with large-format ${engColor} ${engStyle} ceramic tiles with a ${engFinish} finish, styled exactly like the "${tileName}" series ${brandName ? `by ${brandName}` : ''}. The bathroom features a modern white freestanding bathtub, an elegant wood vanity with integrated sink, gold minimalist fixtures, warm ambient architectural lighting, clean seamless grout lines, high-end interior design catalog photography, 8k resolution, highly detailed, realistic shadow depth and specular reflections.`;
     
     try {
       const response = await fetch('/api/ai/generate', {
@@ -3739,158 +3779,6 @@ export default function Home() {
 
                 </div>
 
-                {/* AI ROOM FOTOĞRAF YÜKLEYİCİ */}
-                <div className="control-group ai-room-uploader-group">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <label style={{ margin: 0 }}>Yapay Zeka ile Kendi Odanı Tasarla</label>
-                    <button 
-                      type="button" 
-                      onClick={() => setShowApiKeyInput(!showApiKeyInput)}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: (aiProvider === 'grok' ? grokApiKey : geminiApiKey) ? 'var(--accent-green)' : 'var(--text-secondary)',
-                        fontSize: '0.65rem',
-                        cursor: 'pointer',
-                        fontWeight: '600',
-                        textDecoration: 'underline',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      <span>🔑 {aiProvider === 'grok' ? (grokApiKey ? 'Grok Aktif' : 'Grok API Key Tanımla') : (geminiApiKey ? 'Gemini Aktif' : 'Gemini API Key Tanımla')}</span>
-                    </button>
-                  </div>
-
-                  {showApiKeyInput && (
-                    <div className="glass-panel" style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '10px', background: '#f8f9fc', border: '1px solid var(--border-color)', borderRadius: '6px' }}>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--text-primary)', fontWeight: '700' }}>Yapay Zeka Seçenekleri</span>
-                      
-                      <div style={{ display: 'flex', gap: '4px', backgroundColor: '#cbd5e1', padding: '2px', borderRadius: '4px' }}>
-                        <button
-                          type="button"
-                          onClick={() => handleSaveProvider('grok')}
-                          style={{
-                            flex: 1,
-                            padding: '4px 8px',
-                            fontSize: '0.65rem',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: 'pointer',
-                            fontWeight: '600',
-                            backgroundColor: aiProvider === 'grok' ? '#fff' : 'transparent',
-                            color: aiProvider === 'grok' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                            boxShadow: aiProvider === 'grok' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
-                          }}
-                        >
-                          Grok (xAI)
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleSaveProvider('gemini')}
-                          style={{
-                            flex: 1,
-                            padding: '4px 8px',
-                            fontSize: '0.65rem',
-                            border: 'none',
-                            borderRadius: '3px',
-                            cursor: 'pointer',
-                            fontWeight: '600',
-                            backgroundColor: aiProvider === 'gemini' ? '#fff' : 'transparent',
-                            color: aiProvider === 'gemini' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                            boxShadow: aiProvider === 'gemini' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
-                          }}
-                        >
-                          Gemini
-                        </button>
-                      </div>
-
-                      {aiProvider === 'grok' ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '600' }}>xAI Grok API Anahtarı</span>
-                          <div style={{ display: 'flex', gap: '6px' }}>
-                            <input 
-                              type="password" 
-                              placeholder="xai-..." 
-                              defaultValue={grokApiKey}
-                              onBlur={(e) => handleSaveGrokKey(e.target.value)}
-                              style={{
-                                flex: 1,
-                                padding: '6px 10px',
-                                fontSize: '0.72rem',
-                                border: '1px solid var(--border-color)',
-                                borderRadius: '4px',
-                                backgroundColor: '#fff',
-                                color: '#000',
-                                outline: 'none'
-                              }}
-                            />
-                            <button 
-                              type="button" 
-                              onClick={() => setShowApiKeyInput(false)}
-                              style={{
-                                padding: '6px 12px',
-                                fontSize: '0.7rem',
-                                backgroundColor: 'var(--text-primary)',
-                                color: 'var(--bg-primary)',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontWeight: '600'
-                              }}
-                            >
-                              Kaydet
-                            </button>
-                          </div>
-                          <a href="https://console.x.ai/" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.6rem', color: 'var(--accent-gold)', textDecoration: 'underline' }}>
-                            Grok API Anahtarı Almak İçin Tıklayın
-                          </a>
-                        </div>
-                      ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Google Gemini API Anahtarı</span>
-                          <div style={{ display: 'flex', gap: '6px' }}>
-                            <input 
-                              type="password" 
-                              placeholder="AIzaSy..." 
-                              defaultValue={geminiApiKey}
-                              onBlur={(e) => handleSaveGeminiKey(e.target.value)}
-                              style={{
-                                flex: 1,
-                                padding: '6px 10px',
-                                fontSize: '0.72rem',
-                                border: '1px solid var(--border-color)',
-                                borderRadius: '4px',
-                                backgroundColor: '#fff',
-                                color: '#000',
-                                outline: 'none'
-                              }}
-                            />
-                            <button 
-                              type="button" 
-                              onClick={() => setShowApiKeyInput(false)}
-                              style={{
-                                padding: '6px 12px',
-                                fontSize: '0.7rem',
-                                backgroundColor: 'var(--text-primary)',
-                                color: 'var(--bg-primary)',
-                                border: 'none',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontWeight: '600'
-                              }}
-                            >
-                              Kaydet
-                            </button>
-                          </div>
-                          <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.6rem', color: 'var(--accent-gold)', textDecoration: 'underline' }}>
-                            Ücretsiz Gemini API Anahtarı Almak İçin Tıklayın
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  )}
                   <div className="ai-actions-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', marginTop: '6px' }}>
                     {/* Sıfırdan Tasarlama Kartı */}
                     <div 
@@ -3918,7 +3806,6 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                </div>
 
                 <div className="studio-physics-details">
                   <h4>Malzeme Fizik Özellikleri</h4>

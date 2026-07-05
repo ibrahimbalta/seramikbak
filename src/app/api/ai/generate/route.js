@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
 export async function POST(request) {
   try {
@@ -9,24 +10,31 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Prompt is required.' }, { status: 400 });
     }
 
-    const provider = request.headers.get('x-ai-provider') || 'grok';
-    const apiKey = request.headers.get('x-ai-key') || process.env.GROK_API_KEY || process.env.GEMINI_API_KEY;
+    // Retrieve API keys from database settings
+    const settings = await prisma.systemSetting.findMany();
+    const settingsMap = {};
+    settings.forEach(s => {
+      settingsMap[s.key] = s.value;
+    });
 
-    // If no API key, fall back to a beautiful public image (curated modern bathrooms)
+    const dbProvider = settingsMap['ai_provider'] || 'gemini';
+    const dbGeminiKey = settingsMap['gemini_api_key'];
+    const dbGrokKey = settingsMap['grok_api_key'];
+
+    const provider = request.headers.get('x-ai-provider') || dbProvider;
+    const apiKey = request.headers.get('x-ai-key') || (provider === 'grok' ? dbGrokKey : dbGeminiKey) || process.env.GROK_API_KEY || process.env.GEMINI_API_KEY;
+
+    // If no API key is configured, generate a customized room concept using Pollinations AI for free
     if (!apiKey) {
-      console.warn('[AI Generate] No API Key. Falling back to a high-quality free Unsplash bathroom image.');
-      const fallbacks = [
-        'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?q=80&w=1024&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=1024&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1620626011761-996317b8d101?q=80&w=1024&auto=format&fit=crop',
-        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1024&auto=format&fit=crop'
-      ];
-      const randomImage = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+      console.log('[AI Generate] No API Key. Generating custom image using Pollinations AI free service.');
+      const seed = Math.floor(Math.random() * 1000000);
+      const generatedImageUrl = `https://image.pollinations.ai/p/${encodeURIComponent(prompt)}?width=1024&height=576&seed=${seed}&nologo=true`;
+      
       return NextResponse.json({
         success: true,
-        image: randomImage,
-        isFallback: true,
-        message: 'No API key provided. Curated mockup applied.'
+        image: generatedImageUrl,
+        isFallback: false,
+        message: 'Generated via free Pollinations AI service'
       });
     }
 
