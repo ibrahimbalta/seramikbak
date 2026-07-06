@@ -951,6 +951,18 @@ export default function Home() {
   const [campaignProduct, setCampaignProduct] = useState('');
   const [campaignSuccessMsg, setCampaignSuccessMsg] = useState('');
 
+  // Active Homepage Ad Campaigns Showcase
+  const [activeAdCampaigns, setActiveAdCampaigns] = useState([]);
+  const [currentAdIndex, setCurrentAdIndex] = useState(0);
+
+  useEffect(() => {
+    if (activeAdCampaigns.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentAdIndex((prev) => (prev + 1) % activeAdCampaigns.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [activeAdCampaigns]);
+
   // Stripe Sandbox Webhook simulator
   const [stripePlan, setStripePlan] = useState('PRO');
   const [stripeWebhookResult, setStripeWebhookResult] = useState('');
@@ -958,6 +970,16 @@ export default function Home() {
 
   // Fetch initial brands & weekly products
   useEffect(() => {
+    // Fetch active ad campaigns for public showcase
+    fetch('/api/b2b/campaigns')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setActiveAdCampaigns(data);
+        }
+      })
+      .catch(err => console.error('Failed to fetch ad campaigns:', err));
+
     // Fetch brands list (fast, ~14 records)
     fetch('/api/brands')
       .then(res => res.json())
@@ -2203,6 +2225,32 @@ export default function Home() {
             <span>YENİ KOLEKSİYONLAR</span>
           </div>
         </div>
+
+        {/* Dynamic Ad Campaign Showcase */}
+        {activeAdCampaigns.length > 0 && activeAdCampaigns[currentAdIndex]?.product && (
+          <div className="banner-ad-showcase" onClick={() => {
+            const camp = activeAdCampaigns[currentAdIndex];
+            const prod = camp.product;
+            // Record analytics click
+            fetch('/api/analytics/log', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: 'AD_CLICK', campaignId: camp.id })
+            }).catch(console.error);
+            
+            // Enrich and open details
+            const enriched = enrichProductData(prod);
+            handleProductCardClick(enriched);
+          }}>
+            <span className="ad-badge">SPONSORLU</span>
+            <img src={activeAdCampaigns[currentAdIndex].product?.imageUrl || '/ceramic_placeholder.png'} alt="Ad" className="ad-thumb" />
+            <div className="ad-info">
+              <span className="ad-brand">{activeAdCampaigns[currentAdIndex].product?.brand?.name || 'Marka'}</span>
+              <span className="ad-name">{activeAdCampaigns[currentAdIndex].product?.name || 'Ürün'}</span>
+            </div>
+          </div>
+        )}
+
         <div className="banner-marquee-wrapper">
           <div className="banner-marquee-track">
             {/* First set */}
@@ -6011,6 +6059,73 @@ export default function Home() {
           white-space: nowrap;
         }
 
+        .banner-ad-showcase {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(15, 23, 42, 0.4) 100%);
+          border-left: 1px solid rgba(212, 175, 55, 0.25);
+          border-right: 1px solid rgba(212, 175, 55, 0.25);
+          padding: 8px 20px;
+          height: 100%;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          position: relative;
+          z-index: 3;
+          flex-shrink: 0;
+          min-width: 250px;
+        }
+        
+        .banner-ad-showcase:hover {
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(15, 23, 42, 0.6) 100%);
+          box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.15);
+        }
+
+        .ad-badge {
+          font-size: 0.6rem;
+          font-weight: 900;
+          color: #1e1b10;
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          padding: 2px 8px;
+          border-radius: 4px;
+          letter-spacing: 0.05em;
+          box-shadow: 0 2px 6px rgba(212, 175, 55, 0.2);
+          text-shadow: none;
+        }
+
+        .ad-thumb {
+          width: 38px;
+          height: 38px;
+          border-radius: 8px;
+          object-fit: cover;
+          border: 1.5px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .ad-info {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          line-height: 1.25;
+        }
+
+        .ad-brand {
+          font-size: 0.65rem;
+          color: #d4af37;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+        }
+
+        .ad-name {
+          font-size: 0.74rem;
+          color: #ffffff;
+          font-weight: 700;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 140px;
+        }
+
         .banner-marquee-wrapper {
           flex-grow: 1;
           overflow: hidden;
@@ -8706,6 +8821,9 @@ export default function Home() {
           outline: none;
           font-size: 0.75rem;
           font-family: var(--font-body);
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
         }
 
         .form-group-inline input:focus {
@@ -10587,6 +10705,18 @@ export default function Home() {
             background: #0b0f19;
             justify-content: center;
             padding: 12px;
+          }
+          .banner-ad-showcase {
+            min-width: unset;
+            padding: 8px 14px;
+            justify-content: center;
+            border-left: none;
+            border-right: none;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+          }
+          .ad-name {
+            max-width: 100px;
           }
           .banner-marquee-wrapper {
             padding: 10px 0;

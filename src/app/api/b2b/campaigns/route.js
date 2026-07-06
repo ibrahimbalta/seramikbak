@@ -7,7 +7,22 @@ export async function GET(request) {
     const brandId = searchParams.get('brandId');
 
     if (!brandId) {
-      return NextResponse.json({ error: 'Missing brandId parameter' }, { status: 400 });
+      const activeCampaigns = await prisma.adCampaign.findMany({
+        where: {
+          status: 'ACTIVE'
+        },
+        include: {
+          product: {
+            include: {
+              brand: {
+                select: { name: true }
+              }
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+      return NextResponse.json(activeCampaigns);
     }
 
     const campaigns = await prisma.adCampaign.findMany({

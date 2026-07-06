@@ -1247,14 +1247,14 @@ export default function AdminPage() {
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
           border: '1px solid rgba(212, 175, 55, 0.25)',
-          borderRadius: '28px',
-          padding: '44px 40px',
+          borderRadius: 'clamp(18px, 4vw, 28px)',
+          padding: 'clamp(24px, 5vw, 44px) clamp(20px, 4vw, 40px)',
           width: '100%',
           maxWidth: '440px',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(212, 175, 55, 0.1)',
           display: 'flex',
           flexDirection: 'column',
-          gap: '28px',
+          gap: 'clamp(18px, 3vw, 28px)',
           zIndex: 1
         }}>
           <div className="login-header" style={{ textAlign: 'center' }}>
@@ -1287,7 +1287,7 @@ export default function AdminPage() {
               boxShadow: '0 8px 20px rgba(212, 175, 55, 0.3)'
             }}>SB</div>
             
-            <h3 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#ffffff', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
+            <h3 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.6rem)', fontWeight: '800', color: '#ffffff', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
               Yönetim Paneli Girişi
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.5)', margin: 0 }}>
@@ -3632,7 +3632,7 @@ export default function AdminPage() {
                   }}
                   placeholder="SKU veya isim ara..."
                   className="form-input"
-                  style={{ padding: '6px 12px', fontSize: '0.75rem', width: '180px' }}
+                  style={{ padding: '6px 12px', fontSize: '0.75rem', width: '100%', maxWidth: '180px' }}
                 />
               </div>
             )}
@@ -4416,24 +4416,215 @@ export default function AdminPage() {
           }
           .admin-header {
             flex-direction: column;
-            align-items: flex-start;
+            align-items: stretch;
+            padding: 14px 16px;
+            gap: 12px;
           }
           .admin-tabs-nav {
             width: 100%;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+          .admin-tabs-nav::-webkit-scrollbar {
+            display: none;
+          }
+          .header-actions {
+            justify-content: flex-end;
           }
         }
 
         @media (max-width: 768px) {
-          .form-group-row {
-            grid-template-columns: 1fr;
-            gap: 16px;
+          .admin-layout {
+            padding: 12px 8px;
+            gap: 14px;
+          }
+          .admin-header {
+            padding: 12px;
+            gap: 10px;
+            border-radius: 10px;
+          }
+          .header-brand {
+            gap: 10px;
+          }
+          .logo-icon {
+            width: 34px;
+            height: 34px;
+            font-size: 1rem;
+            border-radius: 6px;
+          }
+          .logo-text {
+            font-size: 1rem;
+          }
+          .system-badge {
+            font-size: 0.58rem;
+          }
+          .admin-tabs-nav {
+            padding: 3px;
+            gap: 2px;
+            border-radius: 6px;
+          }
+          .admin-tab-link {
+            padding: 7px 10px;
+            font-size: 0.72rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+          }
+          .admin-tab-link span {
+            display: inline;
+          }
+          .header-actions {
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+          .header-actions a,
+          .btn-logout {
+            font-size: 0.72rem;
+            padding: 7px 12px;
           }
           .admin-card {
-            padding: 16px;
+            padding: 14px;
+            border-radius: 10px;
+            gap: 14px;
+          }
+          .card-header {
+            padding-bottom: 12px;
+            gap: 10px;
+          }
+          .card-header h3 {
+            font-size: 0.95rem;
+          }
+          .card-header p {
+            font-size: 0.68rem;
+          }
+          .form-group-row {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+          .form-group label {
+            font-size: 0.7rem;
+          }
+          .form-select, .form-input {
+            padding: 9px 12px;
+            font-size: 0.78rem;
+          }
+          .ingest-form {
+            gap: 12px;
+          }
+          .segmented-control {
+            flex-wrap: wrap;
+          }
+          .segmented-control button {
+            font-size: 0.72rem;
+            padding: 7px 6px;
+            min-width: 0;
+          }
+          .admin-grid {
+            gap: 14px;
+          }
+          .admin-filters-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 10px !important;
+          }
+          .table-responsive {
+            max-height: 400px;
+            border-radius: 6px;
+          }
+          .admin-table {
+            font-size: 0.7rem;
+          }
+          .admin-table th,
+          .admin-table td {
+            padding: 8px 10px;
+          }
+          .console-terminal {
+            min-height: 200px;
+            max-height: 360px;
+            padding: 12px;
+            border-radius: 6px;
+          }
+          .console-empty {
+            height: 180px;
+            font-size: 0.72rem;
+          }
+          .console-line {
+            font-size: 0.68rem;
+            gap: 8px;
+          }
+          .flex-btn {
+            font-size: 0.72rem;
+            padding: 7px 14px;
+          }
+          .flex-center-btn {
+            gap: 6px;
+          }
+          .success-alert, .error-alert {
+            font-size: 0.72rem;
+            padding: 10px;
+          }
+          .badge-brand {
+            font-size: 0.6rem;
+          }
+          .badge-saas-plan {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+          }
+          .badge-saas-status {
+            font-size: 0.6rem;
+          }
+          .status-select {
+            font-size: 0.68rem;
+            padding: 3px 6px;
+          }
+          .btn-action-delete {
+            width: 26px;
+            height: 26px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .admin-layout {
+            padding: 8px 6px;
+            gap: 10px;
+          }
+          .admin-header {
+            padding: 10px;
+          }
+          .logo-text {
+            font-size: 0.88rem;
+          }
+          .admin-tab-link {
+            padding: 6px 8px;
+            font-size: 0.68rem;
+            gap: 4px;
+          }
+          .admin-card {
+            padding: 12px;
+            gap: 12px;
+          }
+          .card-header h3 {
+            font-size: 0.88rem;
           }
           .admin-filters-grid {
             grid-template-columns: 1fr !important;
+          }
+          .admin-table th,
+          .admin-table td {
+            padding: 6px 8px;
+            font-size: 0.66rem;
+          }
+          .header-actions {
+            width: 100%;
+          }
+          .header-actions a {
+            flex: 1;
+            text-align: center;
+            justify-content: center;
+          }
+          .btn-logout {
+            flex: 1;
+            text-align: center;
           }
         }
 
