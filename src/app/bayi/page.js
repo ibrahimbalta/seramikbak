@@ -82,6 +82,138 @@ export default function DealerPortalPage() {
   const [profileError, setProfileError] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
+  // New Dealer Registration State
+  const [registerTab, setRegisterTab] = useState('login'); // 'login' or 'register'
+  const [brands, setBrands] = useState([]);
+  const [regName, setRegName] = useState('');
+  const [regBrandId, setRegBrandId] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regPhone, setRegPhone] = useState('');
+  const [regAddress, setRegAddress] = useState('');
+  const [regCity, setRegCity] = useState('');
+  const [regDistrict, setRegDistrict] = useState('');
+  const [regLat, setRegLat] = useState('');
+  const [regLng, setRegLng] = useState('');
+  const [regSuccess, setRegSuccess] = useState('');
+  const [regError, setRegError] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+
+  // Load brands on mount
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await fetch('/api/brands');
+        if (res.ok) {
+          const data = await res.json();
+          setBrands(data);
+        }
+      } catch (err) {
+        console.error('Failed to load brands:', err);
+      }
+    };
+    fetchBrands();
+  }, []);
+
+  const handleGeocode = async () => {
+    if (!regAddress || !regCity || !regDistrict) {
+      setRegError('Konum bulabilmemiz için lütfen önce Şube Adresi, İlçe ve Şehir alanlarını doldurun.');
+      return;
+    }
+    setIsGeocoding(true);
+    setRegError('');
+    setRegSuccess('');
+    try {
+      const query = `${regAddress} ${regDistrict} ${regCity}`;
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.length > 0) {
+          setRegLat(data[0].lat);
+          setRegLng(data[0].lon);
+          setRegSuccess('Harita konumunuz adresinizden başarıyla tespit edildi!');
+        } else {
+          // Fallback to district + city
+          const fallbackQuery = `${regDistrict} ${regCity}`;
+          const resFallback = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fallbackQuery)}&limit=1`);
+          if (resFallback.ok) {
+            const dataFallback = await resFallback.json();
+            if (dataFallback && dataFallback.length > 0) {
+              setRegLat(dataFallback[0].lat);
+              setRegLng(dataFallback[0].lon);
+              setRegSuccess('Tam adres bulunamadı, şube konumu ilçe merkezine göre ayarlandı.');
+            } else {
+              setRegError('Adresiniz haritada tespit edilemedi. Lütfen manuel koordinat girin.');
+            }
+          } else {
+            setRegError('Konum bulucu servis yanıt vermedi. Lütfen manuel koordinat girin.');
+          }
+        }
+      } else {
+        setRegError('Konum bulucu servise erişilemedi. Lütfen manuel koordinat girin.');
+      }
+    } catch (err) {
+      setRegError('Konum tespiti sırasında hata oluştu.');
+      console.error(err);
+    } finally {
+      setIsGeocoding(false);
+    }
+  };
+
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    setRegError('');
+    setRegSuccess('');
+    setIsRegistering(true);
+
+    try {
+      const response = await fetch('/api/dealers/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: regName,
+          brandId: regBrandId,
+          phone: regPhone,
+          email: regEmail,
+          password: regPassword,
+          address: regAddress,
+          city: regCity,
+          district: regDistrict,
+          lat: parseFloat(regLat) || 40.9901,
+          lng: parseFloat(regLng) || 29.0278
+        })
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setRegSuccess('Bayilik kayıt başvurunuz başarıyla alındı! Yönetici onayından sonra giriş yapabilirsiniz.');
+        // Reset form
+        setRegName('');
+        setRegBrandId('');
+        setRegEmail('');
+        setRegPassword('');
+        setRegPhone('');
+        setRegAddress('');
+        setRegCity('');
+        setRegDistrict('');
+        setRegLat('');
+        setRegLng('');
+        setTimeout(() => {
+          setRegisterTab('login');
+          setRegSuccess('');
+        }, 5000);
+      } else {
+        setRegError(result.error || 'Başvuru gönderilirken bir hata oluştu.');
+      }
+    } catch (err) {
+      setRegError('Sunucu bağlantı hatası.');
+      console.error(err);
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
   // Restore session from localStorage on mount
   useEffect(() => {
     const savedSession = localStorage.getItem('sb_dealer_session');
@@ -339,161 +471,636 @@ export default function DealerPortalPage() {
 
   if (!isLoggedIn) {
     return (
-      <main className="login-layout" style={{
+      <main className="login-layout-split" style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+        background: '#f8fafc',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+        color: '#0f172a'
       }}>
-        <div className="login-card glass-panel" style={{
-          background: 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.4)',
-          borderRadius: '24px',
-          padding: '40px',
-          width: '100%',
-          maxWidth: '440px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.06)'
+        {/* LEFT BRANDING/BENEFITS COLUMN */}
+        <div className="login-left-panel" style={{
+          flex: '1.2',
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+          color: '#ffffff',
+          padding: '60px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          position: 'relative',
+          overflow: 'hidden'
         }}>
-          <div className="login-header" style={{ textAlign: 'center', marginBottom: '32px' }}>
+          {/* Subtle gold decoration sphere */}
+          <div style={{
+            position: 'absolute',
+            top: '-10%',
+            right: '-10%',
+            width: '400px',
+            height: '400px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%)',
+            pointerEvents: 'none'
+          }} />
+          <div style={{
+            position: 'absolute',
+            bottom: '-10%',
+            left: '-10%',
+            width: '300px',
+            height: '300px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(99,102,241,0.05) 0%, transparent 70%)',
+            pointerEvents: 'none'
+          }} />
+
+          {/* Logo & Back button */}
+          <div style={{ position: 'relative', zIndex: 10 }}>
             <Link href="/" style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
+              color: '#94a3b8',
               textDecoration: 'none',
-              color: 'var(--text-primary, #111)',
-              marginBottom: '16px',
               fontSize: '0.85rem',
-              fontWeight: '600'
-            }}>
-              <ArrowLeft size={14} /> Ana Sayfaya Dön
+              fontWeight: '600',
+              transition: 'color 0.2s',
+              marginBottom: '40px'
+            }} className="hover-white">
+              <ArrowLeft size={16} /> <span>Ana Sayfaya Dön</span>
             </Link>
-            <div className="logo-icon" style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #111 0%, #444 100%)',
-              color: '#d4af37',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '900',
-              fontSize: '1.4rem',
-              margin: '0 auto 16px auto',
-              boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
-            }}>SB</div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#111', margin: '0 0 6px 0' }}>Yetkili Bayi Portalı</h3>
-            <p style={{ fontSize: '0.85rem', color: '#666', margin: 0 }}>Gelen fiyat tekliflerini ve talepleri yönetin.</p>
-          </div>
-
-          <form onSubmit={handleLogin} className="login-form" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-            {loginError && (
-              <div className="error-alert" style={{
-                background: '#fee2e2',
-                color: '#ef4444',
-                border: '1px solid #fca5a5',
-                borderRadius: '12px',
-                padding: '12px 16px',
-                fontSize: '0.8rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <AlertCircle size={16} />
-                <span>{loginError}</span>
-              </div>
-            )}
-
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#333' }}>E-posta Adresi veya Telefon</label>
-              <div style={{ position: 'relative' }}>
-                <input 
-                  type="text" 
-                  value={emailOrPhone} 
-                  onChange={(e) => setEmailOrPhone(e.target.value)} 
-                  required 
-                  placeholder="bayi@seramik.com veya 0216..." 
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px 12px 40px',
-                    borderRadius: '12px',
-                    border: '1px solid #ced4da',
-                    fontSize: '0.9rem',
-                    background: '#fff',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-                <User size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: '#888' }} />
-              </div>
-            </div>
-
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#333' }}>Şifre</label>
-              <div style={{ position: 'relative' }}>
-                <input 
-                  type="password" 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
-                  required 
-                  placeholder="••••••••" 
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px 12px 40px',
-                    borderRadius: '12px',
-                    border: '1px solid #ced4da',
-                    fontSize: '0.9rem',
-                    background: '#fff',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-                <Lock size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: '#888' }} />
-              </div>
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={isLoading}
-              style={{
-                background: 'linear-gradient(135deg, #111 0%, #333 100%)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '12px',
-                padding: '14px',
-                fontWeight: '700',
-                fontSize: '0.95rem',
-                cursor: 'pointer',
-                boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                color: '#0f172a',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px',
-                marginTop: '8px',
-                transition: 'all 0.2s'
-              }}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>Bağlanılıyor...</span>
-                </>
-              ) : (
-                <>
-                  <ShieldCheck size={16} />
-                  <span>Portal Girişi Yap</span>
-                </>
-              )}
-            </button>
-          </form>
+                fontWeight: '900',
+                fontSize: '1.3rem',
+                boxShadow: '0 8px 20px rgba(179, 142, 71, 0.25)'
+              }}>SB</div>
+              <div>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0, letterSpacing: '-0.02em' }}>SeramikBak</h2>
+                <span style={{ fontSize: '0.72rem', color: '#b38e47', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>B2B İş Ortaklığı Ağı</span>
+              </div>
+            </div>
+          </div>
 
-          <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.75rem', color: '#888' }}>
-            SeramikBak Yetkili Bayi Ağ Güvenliği Altındadır.
+          {/* Main Proposition */}
+          <div style={{ position: 'relative', zIndex: 10, margin: '40px 0' }}>
+            <h1 style={{
+              fontSize: '2.5rem',
+              fontWeight: '900',
+              lineHeight: '1.2',
+              marginBottom: '20px',
+              letterSpacing: '-0.03em',
+              background: 'linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}>
+              Müşterileriniz Sizleri Dijitalde Keşfetsin
+            </h1>
+            <p style={{ color: '#94a3b8', fontSize: '1rem', lineHeight: '1.6', marginBottom: '36px', maxWidth: '520px' }}>
+              SeramikBak B2B Bayi Ağı'na katılarak, bölgenizdeki seramik alıcılarına doğrudan ulaşın, sıcak satış teklifleri toplayın ve toplu inşaat ihalelerine teklif sunun.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {[
+                { icon: <TrendingUp size={20} />, title: "Doğrudan Teklif Talepleri", desc: "Ziyaretçilerin seçtikleri seramik modelleri için konumlarına en yakın yetkili bayi olarak anında sıcak teklifler alın." },
+                { icon: <Building2 size={20} />, title: "B2B Toplu Proje İhaleleri", desc: "Müteahhit ve mimarların sisteme yüklediği binlerce metrekarelik toplu seramik alım taleplerine teklif sunun." },
+                { icon: <Activity size={20} />, title: "Kiosk Teşhir Modu", desc: "Showroomunuzda sergilediğiniz veya dijitaldeki 25.000+ seramiği kendi bayi fiyatlarınızla müşterilere sunun." },
+                { icon: <ShieldCheck size={20} />, title: "Detaylı Bölge Analitiği", desc: "Bölgenizde hangi seramik markalarının, renklerinin ve boyutlarının daha çok arandığını canlı veriyle analiz edin." }
+              ].map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '10px',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    color: '#b38e47',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>{item.icon}</div>
+                  <div>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#f8fafc', margin: '0 0 4px 0' }}>{item.title}</h3>
+                    <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0, lineHeight: '1.4' }}>{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Social Proof */}
+          <div style={{
+            position: 'relative',
+            zIndex: 10,
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            paddingTop: '24px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <div>
+              <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#b38e47' }}>120+</div>
+              <div style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'uppercase', fontWeight: '700' }}>Yetkili Bayi</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#ffffff' }}>24.500+</div>
+              <div style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'uppercase', fontWeight: '700' }}>Yönlendirilen Talep</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '1.5rem', fontWeight: '800', color: '#ffffff' }}>100%</div>
+              <div style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'uppercase', fontWeight: '700' }}>Güvenli B2B Altyapı</div>
+            </div>
           </div>
         </div>
+
+        {/* RIGHT FORM COLUMN */}
+        <div className="login-right-panel" style={{
+          flex: '1',
+          padding: '60px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          background: '#ffffff',
+          overflowY: 'auto'
+        }}>
+          <div style={{ maxWidth: '460px', width: '100%', margin: '0 auto' }}>
+            
+            {/* Header for mobile view (shows logo if left panel hidden) */}
+            <div className="mobile-header-only" style={{ marginBottom: '32px', display: 'none', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                color: '#0f172a',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: '900',
+                fontSize: '1.1rem'
+              }}>SB</div>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0 }}>SeramikBak Bayi Portalı</h2>
+            </div>
+
+            {/* Tab Switcher */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              background: '#f1f5f9',
+              padding: '4px',
+              borderRadius: '12px',
+              marginBottom: '32px'
+            }}>
+              <button
+                type="button"
+                onClick={() => { setRegisterTab('login'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
+                style={{
+                  background: registerTab === 'login' ? '#ffffff' : 'transparent',
+                  border: 'none',
+                  padding: '12px',
+                  fontSize: '0.88rem',
+                  fontWeight: '700',
+                  color: registerTab === 'login' ? '#0f172a' : '#64748b',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  boxShadow: registerTab === 'login' ? '0 4px 12px rgba(15, 23, 42, 0.05)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Giriş Yap
+              </button>
+              <button
+                type="button"
+                onClick={() => { setRegisterTab('register'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
+                style={{
+                  background: registerTab === 'register' ? '#ffffff' : 'transparent',
+                  border: 'none',
+                  padding: '12px',
+                  fontSize: '0.88rem',
+                  fontWeight: '700',
+                  color: registerTab === 'register' ? '#0f172a' : '#64748b',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  boxShadow: registerTab === 'register' ? '0 4px 12px rgba(15, 23, 42, 0.05)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Bayilik Başvurusu
+              </button>
+            </div>
+
+            {/* LOGIN FORM */}
+            {registerTab === 'login' ? (
+              <div className="login-form-wrapper">
+                <div style={{ marginBottom: '24px' }}>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 6px 0' }}>Yetkili Girişi</h3>
+                  <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>Portalınıza erişmek için bilgilerinizi doğrulayın.</p>
+                </div>
+
+                {loginError && (
+                  <div style={{
+                    background: '#fee2e2',
+                    color: '#ef4444',
+                    border: '1px solid #fecaca',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    fontSize: '0.82rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '20px'
+                  }}>
+                    <AlertCircle size={16} />
+                    <span>{loginError}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>E-posta veya Telefon</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type="text"
+                        value={emailOrPhone}
+                        onChange={(e) => setEmailOrPhone(e.target.value)}
+                        required
+                        placeholder="bayi@seramik.com veya 0216..."
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px 12px 40px',
+                          borderRadius: '10px',
+                          border: '1px solid #cbd5e1',
+                          fontSize: '0.88rem',
+                          background: '#fff',
+                          outline: 'none',
+                          boxSizing: 'border-box',
+                          transition: 'border-color 0.2s'
+                        }}
+                        className="form-input-field"
+                      />
+                      <User size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: '#64748b' }} />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Şifre</label>
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        placeholder="••••••••"
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px 12px 40px',
+                          borderRadius: '10px',
+                          border: '1px solid #cbd5e1',
+                          fontSize: '0.88rem',
+                          background: '#fff',
+                          outline: 'none',
+                          boxSizing: 'border-box',
+                          transition: 'border-color 0.2s'
+                        }}
+                        className="form-input-field"
+                      />
+                      <Lock size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: '#64748b' }} />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    style={{
+                      background: '#0f172a',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '10px',
+                      padding: '14px',
+                      fontWeight: '700',
+                      fontSize: '0.9rem',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(15, 23, 42, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      marginTop: '8px',
+                      transition: 'all 0.2s'
+                    }}
+                    className="hover-gold-bg"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        <span>Doğrulanıyor...</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck size={16} />
+                        <span>Portal Girişi Yap</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+            ) : (
+              /* REGISTRATION FORM */
+              <div className="register-form-wrapper">
+                <div style={{ marginBottom: '24px' }}>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 6px 0' }}>Bayilik Başvurusu</h3>
+                  <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>Başvurunuz sisteme kaydedilecek ve onay sürecine alınacaktır.</p>
+                </div>
+
+                {regSuccess && (
+                  <div style={{
+                    background: '#ecfdf5',
+                    color: '#10b981',
+                    border: '1px solid #a7f3d0',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    fontSize: '0.82rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '20px'
+                  }}>
+                    <CheckCircle size={16} />
+                    <span>{regSuccess}</span>
+                  </div>
+                )}
+
+                {regError && (
+                  <div style={{
+                    background: '#fee2e2',
+                    color: '#ef4444',
+                    border: '1px solid #fca5a5',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    fontSize: '0.82rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    marginBottom: '20px'
+                  }}>
+                    <AlertCircle size={16} />
+                    <span>{regError}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleRegisterSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Bayi Adı / Şube</label>
+                      <input
+                        type="text"
+                        value={regName}
+                        onChange={(e) => setRegName(e.target.value)}
+                        required
+                        placeholder="Örn: Qua Seramik Kadıköy"
+                        style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                      />
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Yetkili Marka</label>
+                      <select
+                        value={regBrandId}
+                        onChange={(e) => setRegBrandId(e.target.value)}
+                        required
+                        style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', background: '#fff' }}
+                      >
+                        <option value="">Seçiniz...</option>
+                        {brands.map(b => (
+                          <option key={b.id} value={b.id}>{b.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>E-posta</label>
+                      <input
+                        type="email"
+                        value={regEmail}
+                        onChange={(e) => setRegEmail(e.target.value)}
+                        required
+                        placeholder="bayi@mail.com"
+                        style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                      />
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Telefon</label>
+                      <input
+                        type="tel"
+                        value={regPhone}
+                        onChange={(e) => setRegPhone(e.target.value)}
+                        required
+                        placeholder="0216 123 4567"
+                        style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Şifre</label>
+                    <input
+                      type="password"
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                      required
+                      placeholder="Min. 6 karakter"
+                      style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>İlçe</label>
+                      <input
+                        type="text"
+                        value={regDistrict}
+                        onChange={(e) => setRegDistrict(e.target.value)}
+                        required
+                        placeholder="Kadıköy"
+                        style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                      />
+                    </div>
+                    <div style={{ flex: 0.8, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Şehir</label>
+                      <input
+                        type="text"
+                        value={regCity}
+                        onChange={(e) => setRegCity(e.target.value)}
+                        required
+                        placeholder="İstanbul"
+                        style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Şube Açık Adresi</label>
+                    <textarea
+                      value={regAddress}
+                      onChange={(e) => setRegAddress(e.target.value)}
+                      required
+                      placeholder="Göztepe Mah. Bağdat Cad. No:120"
+                      rows={2}
+                      style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', fontFamily: 'inherit' }}
+                    />
+                  </div>
+
+                  {/* Lat Lng Section with Geocoding helper */}
+                  <div style={{
+                    background: '#f8fafc',
+                    padding: '14px',
+                    borderRadius: '10px',
+                    border: '1px dashed #e2e8f0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#475569' }}>Harita Konum Koordinatları</span>
+                      <button
+                        type="button"
+                        onClick={handleGeocode}
+                        disabled={isGeocoding}
+                        style={{
+                          background: '#e0f2fe',
+                          color: '#0369a1',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '4px 10px',
+                          fontSize: '0.7rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        {isGeocoding ? <Loader2 size={10} className="animate-spin" /> : <MapPin size={10} />}
+                        <span>{isGeocoding ? 'Aranıyor...' : 'Adresten Konumu Bul'}</span>
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <label style={{ fontSize: '0.65rem', fontWeight: '600', color: '#64748b' }}>Enlem (Lat)</label>
+                        <input
+                          type="text"
+                          value={regLat}
+                          onChange={(e) => setRegLat(e.target.value)}
+                          required
+                          placeholder="Örn: 40.9901"
+                          style={{ padding: '6px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem', outline: 'none' }}
+                        />
+                      </div>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <label style={{ fontSize: '0.65rem', fontWeight: '600', color: '#64748b' }}>Boylam (Lng)</label>
+                        <input
+                          type="text"
+                          value={regLng}
+                          onChange={(e) => setRegLng(e.target.value)}
+                          required
+                          placeholder="Örn: 29.0278"
+                          style={{ padding: '6px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem', outline: 'none' }}
+                        />
+                      </div>
+                    </div>
+                    <small style={{ fontSize: '0.62rem', color: '#64748b', lineHeight: '1.2' }}>
+                      * Müşterilere en yakın yetkili bayi olarak gösterilmeniz için koordinatlar gereklidir. Adresten bulamazsa manuel koordinat yazabilirsiniz.
+                    </small>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isRegistering}
+                    style={{
+                      background: '#b38e47',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '10px',
+                      padding: '14px',
+                      fontWeight: '700',
+                      fontSize: '0.9rem',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(179, 142, 71, 0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s',
+                      marginTop: '6px'
+                    }}
+                  >
+                    {isRegistering ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        <span>Başvuru İletiliyor...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle size={16} />
+                        <span>Kayıt Başvurusunu Gönder</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* Footer security badge */}
+            <div style={{
+              textAlign: 'center',
+              marginTop: '40px',
+              fontSize: '0.72rem',
+              color: '#94a3b8',
+              borderTop: '1px solid #f1f5f9',
+              paddingTop: '20px'
+            }}>
+              🔒 SeramikBak SSL ve Yetkili Bayi Ağ Güvenliği Koruması Altındadır.
+            </div>
+
+          </div>
+        </div>
+
+        {/* Global utility styles inside component */}
+        <style jsx global>{`
+          .hover-white:hover {
+            color: #ffffff !important;
+          }
+          .hover-gold-bg:hover:not(:disabled) {
+            background: #b38e47 !important;
+            box-shadow: 0 4px 14px rgba(179, 142, 71, 0.3) !important;
+          }
+          .form-input-field:focus {
+            border-color: #b38e47 !important;
+            box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.1) !important;
+          }
+          
+          /* RESPONSIVE LAYOUT RULES */
+          @media (max-width: 991px) {
+            .login-left-panel {
+              display: none !important;
+            }
+            .login-right-panel {
+              flex: 1 !important;
+              padding: 40px 20px !important;
+            }
+            .mobile-header-only {
+              display: flex !important;
+            }
+          }
+        `}</style>
       </main>
     );
   }
