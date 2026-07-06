@@ -143,19 +143,20 @@ export default function UyelikPage() {
         /* LEFT INFO SIDE */
         .uyelik-info-side {
           padding: 60px 50px;
-          background: #f8fafc;
-          border-right: 1px solid #f1f5f9;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          color: #ffffff;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
           position: relative;
+          overflow: hidden;
         }
 
         .back-btn {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          color: #64748b;
+          color: #94a3b8;
           font-size: 0.85rem;
           font-weight: 600;
           text-decoration: none;
@@ -168,12 +169,12 @@ export default function UyelikPage() {
         }
 
         .back-btn:hover {
-          color: #0f172a;
+          color: #ffffff;
         }
 
         .brand-badge {
-          background: rgba(179, 142, 71, 0.1);
-          color: #b38e47;
+          background: rgba(212, 175, 55, 0.15);
+          color: #d4af37;
           font-size: 0.72rem;
           font-weight: 700;
           padding: 6px 14px;
@@ -188,21 +189,21 @@ export default function UyelikPage() {
         .info-title {
           font-size: 2.1rem;
           font-weight: 900;
-          color: #0f172a;
+          color: #ffffff;
           line-height: 1.25;
           margin: 0 0 16px 0;
           letter-spacing: -0.02em;
         }
 
         .info-title span {
-          background: linear-gradient(135deg, #b38e47 0%, #0f172a 100%);
+          background: linear-gradient(135deg, #d4af37 0%, #ffffff 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
 
         .info-subtitle {
           font-size: 0.95rem;
-          color: #475569;
+          color: #94a3b8;
           line-height: 1.6;
           margin: 0 0 40px 0;
         }
@@ -230,28 +231,28 @@ export default function UyelikPage() {
         }
 
         .feature-icon-box.purple {
-          background: rgba(179, 142, 71, 0.1);
-          color: #b38e47;
+          background: rgba(212, 175, 55, 0.15);
+          color: #d4af37;
         }
         
         .feature-icon-box.blue {
-          background: #e0f2fe;
-          color: #0284c7;
+          background: rgba(2, 132, 199, 0.15);
+          color: #38bdf8;
         }
 
         .feature-icon-box.amber {
-          background: #fef3c7;
-          color: #d97706;
+          background: rgba(217, 119, 6, 0.15);
+          color: #fbbf24;
         }
 
         .feature-icon-box.green {
-          background: #d1fae5;
-          color: #059669;
+          background: rgba(16, 185, 129, 0.15);
+          color: #34d399;
         }
 
         .feature-icon-box.rose {
-          background: #ffe4e6;
-          color: #e11d48;
+          background: rgba(225, 29, 72, 0.15);
+          color: #fda4af;
         }
 
         .feature-texts {
@@ -263,12 +264,12 @@ export default function UyelikPage() {
         .feature-title {
           font-size: 0.9rem;
           font-weight: 700;
-          color: #0f172a;
+          color: #ffffff;
         }
 
         .feature-desc {
           font-size: 0.8rem;
-          color: #64748b;
+          color: #94a3b8;
           line-height: 1.4;
         }
 
@@ -479,23 +480,45 @@ export default function UyelikPage() {
         
         {/* LEFT COLUMN - PROPOSITION */}
         <div className="uyelik-info-side">
-          <div>
+          {/* Subtle gold decoration spheres */}
+          <div style={{
+            position: 'absolute',
+            top: '-10%',
+            right: '-10%',
+            width: '400px',
+            height: '400px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%)',
+            pointerEvents: 'none'
+          }} />
+          <div style={{
+            position: 'absolute',
+            bottom: '-10%',
+            left: '-10%',
+            width: '300px',
+            height: '300px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(99,102,241,0.05) 0%, transparent 70%)',
+            pointerEvents: 'none'
+          }} />
+
+          <div style={{ position: 'relative', zIndex: 10 }}>
             <button onClick={() => window.location.href = '/'} className="back-btn">
               <ArrowLeft size={16} />
               <span>Anasayfaya Dön</span>
             </button>
 
-            {/* Premium Ceramic Tile Banner */}
+            {/* Premium Ceramic Tile Banner - Larger size */}
             <div style={{
               width: '100%',
-              height: '110px',
+              height: '180px',
               borderRadius: '16px',
               backgroundImage: 'url("/ceramic_tile_premium.png")',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              border: '1.5px solid rgba(179, 142, 71, 0.25)',
-              boxShadow: '0 8px 24px rgba(15, 23, 42, 0.06)',
-              marginBottom: '24px'
+              border: '1.5px solid rgba(212, 175, 55, 0.3)',
+              boxShadow: '0 12px 32px rgba(0, 0, 0, 0.25)',
+              marginBottom: '28px'
             }} />
 
             <h1 className="info-title">
@@ -506,7 +529,7 @@ export default function UyelikPage() {
             </p>
           </div>
 
-          <div className="info-features-list">
+          <div className="info-features-list" style={{ position: 'relative', zIndex: 10 }}>
             <div className="info-feature-item">
               <div className="feature-icon-box purple">
                 <Heart size={20} />

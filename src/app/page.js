@@ -916,7 +916,7 @@ export default function Home() {
 
   const handleToggleFavorite = async (productId) => {
     if (!currentUser) {
-      setShowAuthModal(true);
+      window.location.href = '/uyelik';
       return;
     }
     try {
@@ -2335,7 +2335,7 @@ export default function Home() {
                   <TrendingUp size={14} />
                   <span>Marka Girişi</span>
                 </Link>
-                <button className="header-btn favorites-btn" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { setShowAuthModal(true); } }}>
+                <button className="header-btn favorites-btn" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}>
                   <HeartIcon size={16} />
                   <span>Favorilerim</span>
                   {userFavorites.length > 0 && <span className="fav-count-badge">{userFavorites.length}</span>}
@@ -2429,7 +2429,7 @@ export default function Home() {
               
               <button 
                 className="mobile-nav-link fav-link" 
-                onClick={() => { if(currentUser) { setShowFavoritesPanel(true); } else { setShowAuthModal(true); } setShowMobileMenu(false); }}
+                onClick={() => { if(currentUser) { setShowFavoritesPanel(true); } else { window.location.href = '/uyelik'; } setShowMobileMenu(false); }}
               >
                 <span>Favorilerim ({userFavorites.length})</span>
               </button>
@@ -5721,7 +5721,7 @@ export default function Home() {
           <Layers size={20} />
           <span>3D Stüdyo</span>
         </button>
-        <button className="mobile-nav-item" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { setShowAuthModal(true); } }}>
+        <button className="mobile-nav-item" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}>
           <div style={{ position: 'relative', display: 'inline-flex' }}>
             <HeartIcon size={20} />
             {userFavorites.length > 0 && <span className="mobile-nav-badge">{userFavorites.length}</span>}
