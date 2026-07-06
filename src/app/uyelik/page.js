@@ -48,6 +48,15 @@ export default function UyelikPage() {
       setName(user.name);
       setEmail(user.email);
       loadDashboardData(user);
+
+      // Parse query tab parameter
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const t = params.get('tab');
+        if (t === 'settings' || t === 'favorites' || t === 'projects' || t === 'overview') {
+          setActiveTab(t);
+        }
+      }
     }
   }, []);
 
@@ -303,6 +312,67 @@ export default function UyelikPage() {
             font-size: 0.72rem;
             font-weight: 700;
             text-transform: uppercase;
+          }
+          .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+            width: 100%;
+          }
+          .input-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #475569;
+          }
+          .auth-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            color: #0f172a;
+            outline: none;
+            transition: all 0.2s;
+          }
+          .auth-input:focus {
+            border-color: #b38e47;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.12);
+          }
+          .submit-btn {
+            background: #0f172a;
+            color: #ffffff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+          }
+          .submit-btn:hover {
+            background: #b38e47;
+          }
+          .form-feedback {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+          }
+          .form-feedback.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+          }
+          .form-feedback.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
           }
         `}</style>
 

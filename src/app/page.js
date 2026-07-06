@@ -2369,11 +2369,13 @@ export default function Home() {
                             <div className="user-dropdown-email">{currentUser.email}</div>
                           </div>
                         </div>
-                        <div className="user-dropdown-divider" />
+                        <button className="user-dropdown-item" onClick={() => { window.location.href = '/uyelik?tab=overview'; setShowUserMenu(false); }}>
+                          <Activity size={14} /> Panelim
+                        </button>
                         <button className="user-dropdown-item" onClick={() => { setShowFavoritesPanel(true); setShowUserMenu(false); }}>
                           <HeartIcon size={14} /> Favorilerim ({userFavorites.length})
                         </button>
-                        <button className="user-dropdown-item" onClick={() => { window.location.href = '/uyelik'; setShowUserMenu(false); }}>
+                        <button className="user-dropdown-item" onClick={() => { window.location.href = '/uyelik?tab=settings'; setShowUserMenu(false); }}>
                           <Settings size={14} /> Hesap Ayarları
                         </button>
                         <div className="user-dropdown-divider" />
