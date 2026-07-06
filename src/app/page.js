@@ -9885,22 +9885,22 @@ export default function Home() {
 
         /* PREMIUM FOOTER STYLES */
         .site-footer {
-          background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          background: linear-gradient(180deg, #090d16 0%, #03050a 100%);
+          border-top: 2px solid rgba(179, 142, 71, 0.35);
           border-radius: var(--border-radius-lg);
-          padding: 48px 40px 24px 40px;
-          color: #94a3b8;
+          padding: 60px 48px 30px 48px;
+          color: #8a99ad;
           display: flex;
           flex-direction: column;
-          gap: 40px;
-          margin-top: 24px;
-          box-shadow: 0 -10px 30px -10px rgba(0, 0, 0, 0.2);
+          gap: 48px;
+          margin-top: 40px;
+          box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.4);
         }
 
         .footer-grid {
           display: grid;
           grid-template-columns: 2fr 1fr 1fr 1fr;
-          gap: 32px;
+          gap: 40px;
         }
 
         @media (max-width: 900px) {
@@ -9918,10 +9918,10 @@ export default function Home() {
         .footer-col h4 {
           color: #ffffff;
           font-family: var(--font-title);
-          font-size: 0.95rem;
+          font-size: 0.9rem;
           font-weight: 700;
-          margin-bottom: 18px;
-          letter-spacing: 0.03em;
+          margin-bottom: 20px;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
           position: relative;
         }
@@ -9931,9 +9931,9 @@ export default function Home() {
           position: absolute;
           left: 0;
           bottom: -6px;
-          width: 24px;
+          width: 32px;
           height: 2px;
-          background: var(--accent-gold);
+          background: linear-gradient(90deg, var(--accent-gold) 0%, rgba(179, 142, 71, 0.2) 100%);
           border-radius: 2px;
         }
 
@@ -9943,28 +9943,28 @@ export default function Home() {
           margin: 0;
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 12px;
         }
 
-        .footer-col ul a {
-          color: #94a3b8;
+        .footer-col ul :global(a) {
+          color: #8a99ad;
           text-decoration: none;
-          font-size: 0.8rem;
+          font-size: 0.82rem;
           font-family: var(--font-body);
           font-weight: 500;
-          transition: all 0.2s ease;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           display: inline-block;
         }
 
-        .footer-col ul a:hover {
-          color: #ffffff;
-          transform: translateX(4px);
+        .footer-col ul :global(a):hover {
+          color: var(--accent-gold);
+          transform: translateX(6px);
         }
 
         .brand-col {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 20px;
         }
 
         .footer-logo {
@@ -9975,31 +9975,31 @@ export default function Home() {
         }
 
         .footer-logo .logo-icon {
-          width: 38px;
-          height: 38px;
+          width: 40px;
+          height: 40px;
           background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
-          border-radius: var(--border-radius-sm);
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
           font-family: var(--font-title);
           font-weight: 850;
           color: #ffffff;
-          font-size: 1.15rem;
-          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.2);
+          font-size: 1.20rem;
+          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.35);
         }
 
         .footer-logo .logo-text {
           font-family: var(--font-title);
-          font-size: 1.35rem;
+          font-size: 1.4rem;
           font-weight: 800;
           color: #ffffff;
-          letter-spacing: -0.01em;
+          letter-spacing: -0.010em;
         }
 
         .footer-tagline {
-          font-size: 0.8rem;
-          line-height: 1.6;
+          font-size: 0.82rem;
+          line-height: 1.65;
           color: #64748b;
           margin: 0;
           max-width: 320px;
@@ -10007,12 +10007,12 @@ export default function Home() {
 
         .footer-socials {
           display: flex;
-          gap: 8px;
+          gap: 10px;
         }
 
         .social-icon-btn {
-          width: 32px;
-          height: 32px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.05);
@@ -10027,18 +10027,18 @@ export default function Home() {
           background: var(--accent-gold);
           border-color: transparent;
           color: #ffffff;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 10px rgba(179, 142, 71, 0.3);
+          transform: translateY(-3px);
+          box-shadow: 0 6px 12px rgba(179, 142, 71, 0.35);
         }
 
         .footer-bottom {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          border-top: 1px solid rgba(255, 255, 255, 0.05);
-          padding-top: 20px;
-          font-size: 0.75rem;
-          color: #64748b;
+          border-top: 1px solid rgba(255, 255, 255, 0.04);
+          padding-top: 24px;
+          font-size: 0.76rem;
+          color: #475569;
           flex-wrap: wrap;
           gap: 12px;
         }
@@ -10051,8 +10051,13 @@ export default function Home() {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          font-weight: 600;
-          color: #475569;
+          padding: 4px 12px;
+          background: rgba(179, 142, 71, 0.08);
+          border: 1px solid rgba(179, 142, 71, 0.15);
+          border-radius: 20px;
+          color: #b38e47;
+          font-size: 0.72rem;
+          font-weight: 700;
         }
 
         /* Compare Button on Card Overlay */
