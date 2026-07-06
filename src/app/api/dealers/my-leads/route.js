@@ -69,6 +69,82 @@ export async function GET(request) {
     const pendingLeads = leads.filter(l => l.status === 'PENDING').length;
     const respondedLeads = leads.filter(l => l.status === 'RESPONDED' || l.status === 'COMPLETED').length;
 
+    // Compute regional analytics based on dealer's city
+    const dealer = await prisma.dealer.findUnique({
+      where: { id: dealerId },
+      select: { city: true }
+    });
+
+    let regionalAnalytics = {
+      popularQueries: [],
+      popularBrands: [],
+      popularStyles: []
+    };
+
+    if (dealer && dealer.city) {
+      try {
+        // Fetch SEARCH logs for this city
+        const searchLogs = await prisma.analyticsLog.findMany({
+          where: {
+            city: { contains: dealer.city },
+            action: 'SEARCH'
+          },
+          take: 150
+        });
+
+        const queryCounts = {};
+        searchLogs.forEach(log => {
+          if (log.query && log.query.trim().length > 1) {
+            const q = log.query.trim().toLowerCase();
+            queryCounts[q] = (queryCounts[q] || 0) + 1;
+          }
+        });
+
+        regionalAnalytics.popularQueries = Object.entries(queryCounts)
+          .map(([query, count]) => ({ query: query.charAt(0).toUpperCase() + query.slice(1), count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+
+        // Fetch VIEW logs in this city
+        const viewLogs = await prisma.analyticsLog.findMany({
+          where: {
+            city: { contains: dealer.city },
+            action: 'VIEW'
+          },
+          include: {
+            product: {
+              include: { brand: true }
+            }
+          },
+          take: 200
+        });
+
+        const brandCounts = {};
+        const styleCounts = {};
+        viewLogs.forEach(log => {
+          if (log.product) {
+            const bName = log.product.brand?.name || 'Qua';
+            brandCounts[bName] = (brandCounts[bName] || 0) + 1;
+
+            const sizeStyle = `${log.product.width}x${log.product.height} ${log.product.style || 'Mermer'}`;
+            styleCounts[sizeStyle] = (styleCounts[sizeStyle] || 0) + 1;
+          }
+        });
+
+        regionalAnalytics.popularBrands = Object.entries(brandCounts)
+          .map(([name, count]) => ({ name, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+
+        regionalAnalytics.popularStyles = Object.entries(styleCounts)
+          .map(([style, count]) => ({ style, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+      } catch (err) {
+        console.error('Failed to compute regional analytics:', err);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       leads: processedLeads,
@@ -81,7 +157,8 @@ export async function GET(request) {
         totalLeads,
         pendingLeads,
         respondedLeads
-      }
+      },
+      regionalAnalytics
     });
 
   } catch (error) {

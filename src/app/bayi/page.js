@@ -51,6 +51,7 @@ export default function DealerPortalPage() {
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [projects, setProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(false);
+  const [regionalAnalytics, setRegionalAnalytics] = useState({ popularQueries: [], popularBrands: [], popularStyles: [] });
 
   // Dealer SaaS State
   const [saasInfo, setSaasInfo] = useState(null);
@@ -277,6 +278,9 @@ export default function DealerPortalPage() {
           setLeads(data.leads);
           setStats(data.stats);
           setSaasInfo(data.saas);
+          if (data.regionalAnalytics) {
+            setRegionalAnalytics(data.regionalAnalytics);
+          }
         }
       }
     } catch (err) {
@@ -1233,6 +1237,27 @@ export default function DealerPortalPage() {
                 <span>Proje Talepleri (B2B)</span>
               </button>
               <button 
+                onClick={() => { setActivePortalTab('analytics'); setShowSettings(false); }}
+                style={{
+                  background: activePortalTab === 'analytics' ? '#fff' : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  fontSize: '0.75rem',
+                  fontWeight: activePortalTab === 'analytics' ? '700' : '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  color: activePortalTab === 'analytics' ? '#111' : '#6c757d',
+                  boxShadow: activePortalTab === 'analytics' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <TrendingUp size={13} />
+                <span>Bölge Analitiği</span>
+              </button>
+              <button 
                 onClick={() => { setActivePortalTab('subscription'); setShowSettings(false); }}
                 style={{
                   background: activePortalTab === 'subscription' ? '#fff' : 'transparent',
@@ -1666,6 +1691,162 @@ export default function DealerPortalPage() {
                 </button>
               </form>
             </div>
+          </div>
+        ) : activePortalTab === 'analytics' ? (
+          /* ===== REGIONAL ANALYTICS TAB ===== */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div className="analytics-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <TrendingUp size={22} style={{ color: '#b38e47' }} />
+                  Bölgesel Arama & Seramik Analitiği
+                </h2>
+                <p style={{ fontSize: '0.82rem', color: '#6c757d', margin: 0 }}>
+                  {dealerInfo?.city} şehrindeki tüketicilerin seramik arama, marka ve ebat/tarz tercihlerini canlı analiz edin.
+                </p>
+              </div>
+            </div>
+
+            {/* Check Subscription Tier: must be STANDART or PREMIUM */}
+            {(!saasInfo || (saasInfo.plan !== 'STANDART' && saasInfo.plan !== 'PREMIUM')) ? (
+              <div style={{
+                background: '#fff',
+                border: '1px solid #e9ecef',
+                borderRadius: '20px',
+                padding: '48px 24px',
+                textAlign: 'center',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.01)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '16px'
+              }}>
+                <div style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '50%',
+                  background: '#fef3c7',
+                  color: '#d97706',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Lock size={24} />
+                </div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0 }}>Detaylı Analiz Kilitli</h3>
+                <p style={{ fontSize: '0.82rem', color: '#6c757d', maxWidth: '450px', margin: 0 }}>
+                  Şehrinizdeki popüler seramik modellerini, arama terimlerini ve ebat taleplerini görebilmek için Standart veya Premium pakete yükseltin.
+                </p>
+                <button
+                  onClick={() => setActivePortalTab('subscription')}
+                  style={{
+                    background: 'linear-gradient(135deg, #111 0%, #333 100%)',
+                    color: '#d4af37',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '10px 20px',
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Paketleri İncele & Etkinleştir
+                </button>
+              </div>
+            ) : (
+              /* ACTIVE SUBSCRIPTION - RENDER LIVE ANALYTICS */
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                
+                {/* Card 1: Popular Search Queries */}
+                <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    🔍 En Sık Aranan Kelimeler
+                  </h4>
+                  {regionalAnalytics.popularQueries.length === 0 ? (
+                    <div style={{ fontSize: '0.8rem', color: '#888', fontStyle: 'italic', padding: '12px 0' }}>Bölgenizde yeterli arama kaydı yok.</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {regionalAnalytics.popularQueries.map((item, i) => (
+                        <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
+                            <span style={{ fontWeight: '600' }}>"{item.query}"</span>
+                            <span style={{ color: '#6c757d' }}>{item.count} arama</span>
+                          </div>
+                          <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{
+                              width: `${Math.min(100, (item.count / regionalAnalytics.popularQueries[0].count) * 100)}%`,
+                              height: '100%',
+                              background: '#b38e47',
+                              borderRadius: '3px'
+                            }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Card 2: Popular Ceramic Brands */}
+                <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    🏢 Popüler Marka İncelemeleri
+                  </h4>
+                  {regionalAnalytics.popularBrands.length === 0 ? (
+                    <div style={{ fontSize: '0.8rem', color: '#888', fontStyle: 'italic', padding: '12px 0' }}>Bölgenizde yeterli marka verisi yok.</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {regionalAnalytics.popularBrands.map((item, i) => (
+                        <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
+                            <span style={{ fontWeight: '600' }}>{item.name}</span>
+                            <span style={{ color: '#6c757d' }}>{item.count} görüntülenme</span>
+                          </div>
+                          <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{
+                              width: `${Math.min(100, (item.count / regionalAnalytics.popularBrands[0].count) * 100)}%`,
+                              height: '100%',
+                              background: '#0284c7',
+                              borderRadius: '3px'
+                            }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Card 3: Popular Sizes and Styles */}
+                <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    📐 Boyut & Tarz Tercihleri
+                  </h4>
+                  {regionalAnalytics.popularStyles.length === 0 ? (
+                    <div style={{ fontSize: '0.8rem', color: '#888', fontStyle: 'italic', padding: '12px 0' }}>Bölgenizde yeterli ebat verisi yok.</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {regionalAnalytics.popularStyles.map((item, i) => (
+                        <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
+                            <span style={{ fontWeight: '600' }}>{item.style}</span>
+                            <span style={{ color: '#6c757d' }}>{item.count} kez incelendi</span>
+                          </div>
+                          <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div style={{
+                              width: `${Math.min(100, (item.count / regionalAnalytics.popularStyles[0].count) * 100)}%`,
+                              height: '100%',
+                              background: '#8b5cf6',
+                              borderRadius: '3px'
+                            }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            )}
           </div>
         ) : activePortalTab === 'subscription' ? (
           /* ===== SUBSCRIPTION TAB ===== */
@@ -2218,6 +2399,104 @@ export default function DealerPortalPage() {
                   <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#6c757d', margin: '0 0 4px 0' }}>Cevaplanan Talepler</h4>
                   <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#10b981' }}>{stats.respondedLeads} Adet</span>
                 </div>
+              </div>
+            </div>
+
+            {/* QUICK B2B TOOLS GRID */}
+            <div className="dealer-tools-grid" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '20px',
+              marginBottom: '28px'
+            }}>
+              {/* Kiosk Mode tool */}
+              <div className="glass-panel" style={{
+                background: '#fff',
+                border: '1px solid #e9ecef',
+                borderRadius: '16px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                gap: '16px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
+              }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(212,175,55,0.1)', color: '#d4af37', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Activity size={18} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: '0 0 2px 0' }}>Kiosk Teşhir Modu</h4>
+                    <p style={{ fontSize: '0.75rem', color: '#6c757d', margin: 0 }}>Bu cihazı veya mağazadaki bir tableti dijital kiosk ekranına dönüştürün.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => window.open('/?kiosk=true', '_blank')}
+                  style={{
+                    width: '100%',
+                    background: '#0f172a',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '10px',
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <ExternalLink size={13} />
+                  <span>Kiosk Teşhir Modunu Aç</span>
+                </button>
+              </div>
+
+              {/* Analytics tool */}
+              <div className="glass-panel" style={{
+                background: '#fff',
+                border: '1px solid #e9ecef',
+                borderRadius: '16px',
+                padding: '24px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                gap: '16px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
+              }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(2,132,199,0.1)', color: '#0284c7', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <TrendingUp size={18} />
+                  </div>
+                  <div>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: '0 0 2px 0' }}>Bölgesel Arama Analizleri</h4>
+                    <p style={{ fontSize: '0.75rem', color: '#6c757d', margin: 0 }}>{dealerInfo?.city} şehrindeki tüketicilerin en çok aradığı modelleri analiz edin.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActivePortalTab('analytics')}
+                  style={{
+                    width: '100%',
+                    background: '#f1f5f9',
+                    color: '#0f172a',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '10px',
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <TrendingUp size={13} />
+                  <span>Detaylı Bölge Analitiğini Gör</span>
+                </button>
               </div>
             </div>
 

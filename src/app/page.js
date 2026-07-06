@@ -1023,6 +1023,16 @@ export default function Home() {
     }
   }, [locatorBrandId, userCoords, activeTab]);
 
+  // Check for kiosk mode query parameter on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('kiosk') === 'true') {
+        setIsKioskMode(true);
+      }
+    }
+  }, []);
+
   // Sync B2B stats whenever dashboard brand is switched
   useEffect(() => {
     if (activeTab === 'b2b' && b2bBrandId) {
