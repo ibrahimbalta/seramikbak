@@ -35,12 +35,24 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const dealerId = searchParams.get('dealerId');
     const brandId = searchParams.get('brandId');
+    const email = searchParams.get('email');
 
-    if (!dealerId && !brandId) {
+    if (!dealerId && !brandId && !email) {
       return NextResponse.json(
-        { error: 'Giriş yapan bayiId veya markaId belirtilmelidir.' },
+        { error: 'Giriş yapan bayiId, markaId veya e-posta adresi belirtilmelidir.' },
         { status: 400 }
       );
+    }
+
+    if (email) {
+      const userProjects = await prisma.projectRequest.findMany({
+        where: { contactEmail: email },
+        orderBy: { createdAt: 'desc' }
+      });
+      return NextResponse.json({
+        success: true,
+        projects: userProjects
+      });
     }
 
     // Get all approved/active projects (or all PENDING and APPROVED ones for portal view)

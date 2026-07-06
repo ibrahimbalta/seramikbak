@@ -1030,6 +1030,19 @@ export default function Home() {
       if (params.get('kiosk') === 'true') {
         setIsKioskMode(true);
       }
+
+      // Load preselected favorite product in studio
+      const preselected = localStorage.getItem('seramikbak_preselected_product');
+      if (preselected) {
+        try {
+          const prod = JSON.parse(preselected);
+          setActiveProduct(prod);
+          setActiveTab('studio');
+        } catch (e) {
+          console.error('Failed to load preselected product:', e);
+        }
+        localStorage.removeItem('seramikbak_preselected_product');
+      }
     }
   }, []);
 
@@ -2360,7 +2373,7 @@ export default function Home() {
                         <button className="user-dropdown-item" onClick={() => { setShowFavoritesPanel(true); setShowUserMenu(false); }}>
                           <HeartIcon size={14} /> Favorilerim ({userFavorites.length})
                         </button>
-                        <button className="user-dropdown-item" onClick={() => { setShowUserMenu(false); }}>
+                        <button className="user-dropdown-item" onClick={() => { window.location.href = '/uyelik'; setShowUserMenu(false); }}>
                           <Settings size={14} /> Hesap Ayarları
                         </button>
                         <div className="user-dropdown-divider" />
