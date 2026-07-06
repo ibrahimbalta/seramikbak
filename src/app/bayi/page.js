@@ -114,6 +114,13 @@ export default function DealerPortalPage() {
       }
     };
     fetchBrands();
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('tab') === 'register') {
+        setRegisterTab('register');
+      }
+    }
   }, []);
 
   const handleGeocode = async () => {

@@ -2317,13 +2317,9 @@ export default function Home() {
                   <span>Proje Talebi</span>
                   <span className="b2b-badge">B2B</span>
                 </Link>
-                <button onClick={() => setShowDealerSignup(true)} className="header-btn highlight">
-                  <MapPin size={14} />
-                  <span>Bayimiz Olun</span>
-                </button>
                 <Link href="/bayi" className="header-btn portal-btn" style={{ textDecoration: 'none', color: 'inherit' }}>
                   <UserIcon size={14} />
-                  <span>Bayi Girişi</span>
+                  <span>Bayi Portalı</span>
                 </Link>
                 <Link href="/marka" className="header-btn portal-btn" style={{ textDecoration: 'none', color: 'inherit' }}>
                   <TrendingUp size={14} />
@@ -2412,11 +2408,8 @@ export default function Home() {
               <Link href="/proje-talep" className="mobile-nav-link b2b-link" onClick={() => setShowMobileMenu(false)}>
                 <span>Proje Talebi (B2B)</span>
               </Link>
-              <button className="mobile-nav-link highlight-link" onClick={() => { setShowDealerSignup(true); setShowMobileMenu(false); }}>
-                Bayimiz Olun
-              </button>
               <Link href="/bayi" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
-                Bayi Girişi
+                Bayi Portalı
               </Link>
               <Link href="/marka" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
                 Marka Girişi
@@ -4516,187 +4509,7 @@ export default function Home() {
 
       </div>
 
-      {/* DEALER SIGNUP MODAL */}
-      {showDealerSignup && (
-        <div className="modal-overlay animate-fade-in" onClick={() => setShowDealerSignup(false)}>
-          <div className="modal-content glass-panel" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', width: '100%', padding: '28px' }}>
-            <div className="modal-header" style={{ marginBottom: '16px' }}>
-              <div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0 }}>Bayi Kayıt Başvurusu</h3>
-                <small className="code-text" style={{ color: 'var(--accent-gold)', fontWeight: '700' }}>SeramikBak Yetkili Bayi Ağı</small>
-              </div>
-              <button onClick={() => setShowDealerSignup(false)} className="close-modal-btn">✕</button>
-            </div>
 
-            <form onSubmit={handleDealerSignupSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {signupSuccess && (
-                <div className="success-alert" style={{ background: '#e6f7ed', color: '#10b981', border: '1px solid #a7f3d0', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <CheckCircle size={16} />
-                  <span>{signupSuccess}</span>
-                </div>
-              )}
-
-              {signupError && (
-                <div className="error-alert" style={{ background: '#fee2e2', color: '#ef4444', border: '1px solid #fca5a5', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <AlertCircle size={16} />
-                  <span>{signupError}</span>
-                </div>
-              )}
-
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Bayi Adı / Şube</label>
-                  <input 
-                    type="text" 
-                    value={signupName} 
-                    onChange={(e) => setSignupName(e.target.value)} 
-                    required 
-                    placeholder="Örn: VitrA Kadıköy Şubesi"
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
-                  />
-                </div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Yetkili Marka</label>
-                  <select 
-                    value={signupBrandId} 
-                    onChange={(e) => setSignupBrandId(e.target.value)} 
-                    required
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
-                  >
-                    <option value="">Seçiniz...</option>
-                    {brands.map(b => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>E-posta</label>
-                  <input 
-                    type="email" 
-                    value={signupEmail} 
-                    onChange={(e) => setSignupEmail(e.target.value)} 
-                    required 
-                    placeholder="bayi@mail.com"
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
-                  />
-                </div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Şifre</label>
-                  <input 
-                    type="password" 
-                    value={signupPassword} 
-                    onChange={(e) => setSignupPassword(e.target.value)} 
-                    required 
-                    placeholder="••••••••"
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>İletişim Telefonu</label>
-                  <input 
-                    type="tel" 
-                    value={signupPhone} 
-                    onChange={(e) => setSignupPhone(e.target.value)} 
-                    required 
-                    placeholder="0216 123 4567"
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
-                  />
-                </div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>İlçe / Şehir</label>
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <input 
-                      type="text" 
-                      value={signupDistrict} 
-                      onChange={(e) => setSignupDistrict(e.target.value)} 
-                      required 
-                      placeholder="Kadıköy"
-                      style={{ flex: 1, padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem', width: '100%', minWidth: 0 }}
-                    />
-                    <input 
-                      type="text" 
-                      value={signupCity} 
-                      onChange={(e) => setSignupCity(e.target.value)} 
-                      required 
-                      style={{ width: '80px', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Şube Adresi</label>
-                <textarea 
-                  value={signupAddress} 
-                  onChange={(e) => setSignupAddress(e.target.value)} 
-                  required 
-                  placeholder="Göztepe Mah. Bağdat Cad. No:120 Kadıköy"
-                  rows={2}
-                  style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem', fontFamily: 'inherit' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Harita Enlem (Lat)</label>
-                  <input 
-                    type="text" 
-                    value={signupLat} 
-                    onChange={(e) => setSignupLat(e.target.value)} 
-                    required 
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
-                  />
-                </div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Harita Boylam (Lng)</label>
-                  <input 
-                    type="text" 
-                    value={signupLng} 
-                    onChange={(e) => setSignupLng(e.target.value)} 
-                    required 
-                    style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)', fontSize: '0.8rem' }}
-                  />
-                </div>
-              </div>
-
-              <button 
-                type="submit" 
-                disabled={isSubmittingSignup}
-                style={{
-                  background: 'var(--text-primary)',
-                  color: 'var(--bg-primary)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  padding: '12px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  fontSize: '0.85rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  marginTop: '10px'
-                }}
-              >
-                {isSubmittingSignup ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    <span>Kaydediliyor...</span>
-                  </>
-                ) : (
-                  <span>Başvuruyu Tamamla</span>
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* PRODUCT DETAIL COMPARISON MODAL */}
       {showDetailModal && detailProduct && (
@@ -5339,7 +5152,7 @@ export default function Home() {
               <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('search'); }}>Arama Motoru</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('studio'); }}>3D Sanal Stüdyo</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('dealers'); }}>Bayi Bulucu</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); setShowDealerSignup(true); }}>Bayimiz Olun (B2B Başvuru)</a></li>
+              <li><Link href="/bayi?tab=register">Bayimiz Olun (B2B Başvuru)</Link></li>
               <li><Link href="/bayi">Bayi Giriş Portalı</Link></li>
               <li><Link href="/marka">B2B Marka Portalı</Link></li>
             </ul>
