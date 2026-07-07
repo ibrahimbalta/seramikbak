@@ -60,7 +60,8 @@ async function main() {
   console.log('         Hitit Seramik & Kalebodur Kaldırma          ');
   console.log('======================================================\n');
 
-  // 1. Remove Kalebodur
+  // 1. Remove Kalebodur (Disabled to prevent deleting restored Kalebodur products)
+  /*
   console.log('[Veritabanı] "Kalebodur" markası ve ilişkili tüm veriler temizleniyor...');
   try {
     const delResult = await prisma.brand.deleteMany({
@@ -70,6 +71,7 @@ async function main() {
   } catch (err) {
     console.error('[Hata] Kalebodur silinirken hata oluştu:', err.message);
   }
+  */
 
   // 2. Create Hitit Seramik Brand
   let brand = await prisma.brand.findFirst({
