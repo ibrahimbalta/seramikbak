@@ -1212,8 +1212,7 @@ export default function DealerPortalPage() {
               </div>
             )}
 
-            {/* Tab Navigation Buttons */}
-            <div className="dealer-tabs-nav" style={{ display: 'flex', gap: '4px', background: '#f1f3f5', borderRadius: '8px', padding: '3px' }}>
+            <div className="dealer-tabs-nav" style={{ display: 'flex', gap: '4px', background: '#f1f3f5', borderRadius: '8px', padding: '3px', flexWrap: 'wrap' }}>
               <button 
                 onClick={() => { setActivePortalTab('dashboard'); setShowSettings(false); }}
                 style={{

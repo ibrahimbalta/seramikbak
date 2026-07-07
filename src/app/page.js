@@ -4316,20 +4316,17 @@ export default function Home() {
                                   <MessageSquare size={12} />
                                   <span>WhatsApp</span>
                                 </a>
-                                <button 
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedDetailDealer(dealer);
-                                    setActiveGalleryIndex(0);
-                                    setShowDealerDetailModal(true);
-                                  }}
+                                <Link 
+                                  href={`/bayi/${dealer.id}`}
+                                  target="_blank"
+                                  onClick={(e) => e.stopPropagation()}
                                   className="quick-action-link showroom"
-                                  title="Showroom & Detayları İncele"
-                                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                  title="Showroom & Detay Sayfasını İncele"
+                                  style={{ display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
                                 >
                                   <Sparkles size={12} style={{ color: 'var(--accent-gold)' }} />
                                   <span>Showroom</span>
-                                </button>
+                                </Link>
                               </div>
                               <button 
                                 onClick={(e) => {
@@ -5247,19 +5244,28 @@ export default function Home() {
                       <span>WhatsApp</span>
                     </a>
                   </div>
-                  <button 
-                    onClick={() => {
-                      setLeadProduct(activeProduct || { name: `${selectedDetailDealer.brand?.name} Serisi`, brandId: selectedDetailDealer.brandId, brand: { name: selectedDetailDealer.brand?.name } });
-                      setLeadDealer(selectedDetailDealer);
-                      setLeadSuccessMsg('');
-                      setShowDealerDetailModal(false); // close showroom modal
-                      setShowLeadModal(true); // open quote request modal
-                    }}
-                    className="btn-primary w-full-btn"
-                    style={{ padding: '12px', fontWeight: '800', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#0f172a', border: 'none', marginTop: '4px' }}
-                  >
-                    Fiyat Teklifi İste
-                  </button>
+                    <Link
+                      href={`/bayi/${selectedDetailDealer.id}`}
+                      target="_blank"
+                      className="btn-secondary w-full-btn"
+                      style={{ padding: '10px', fontWeight: '700', border: '1px solid #cbd5e1', textDecoration: 'none', textAlign: 'center', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.8rem', borderRadius: '8px', marginBottom: '8px' }}
+                    >
+                      <Sparkles size={12} style={{ color: 'var(--accent-gold)' }} />
+                      Detay Sayfasını Aç
+                    </Link>
+                    <button 
+                      onClick={() => {
+                        setLeadProduct(activeProduct || { name: `${selectedDetailDealer.brand?.name} Serisi`, brandId: selectedDetailDealer.brandId, brand: { name: selectedDetailDealer.brand?.name } });
+                        setLeadDealer(selectedDetailDealer);
+                        setLeadSuccessMsg('');
+                        setShowDealerDetailModal(false); // close showroom modal
+                        setShowLeadModal(true); // open quote request modal
+                      }}
+                      className="btn-primary w-full-btn"
+                      style={{ padding: '12px', fontWeight: '800', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#0f172a', border: 'none', marginTop: '4px' }}
+                    >
+                      Fiyat Teklifi İste
+                    </button>
                 </div>
 
               </div>
