@@ -53,7 +53,11 @@ export async function POST(request) {
         district: dealer.district,
         address: dealer.address,
         lat: dealer.lat,
-        lng: dealer.lng
+        lng: dealer.lng,
+        logoUrl: dealer.logoUrl,
+        showroomImages: dealer.showroomImages,
+        virtualTourUrl: dealer.virtualTourUrl,
+        specialConcepts: dealer.specialConcepts
       }
     });
 

@@ -79,6 +79,10 @@ export default function DealerPortalPage() {
   const [profilePassword, setProfilePassword] = useState('');
   const [profileLat, setProfileLat] = useState('');
   const [profileLng, setProfileLng] = useState('');
+  const [profileLogoUrl, setProfileLogoUrl] = useState('');
+  const [profileShowroomImages, setProfileShowroomImages] = useState('');
+  const [profileVirtualTourUrl, setProfileVirtualTourUrl] = useState('');
+  const [profileSpecialConcepts, setProfileSpecialConcepts] = useState('');
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -236,6 +240,10 @@ export default function DealerPortalPage() {
         setProfilePassword(session.password || '');
         setProfileLat(session.lat ? String(session.lat) : '');
         setProfileLng(session.lng ? String(session.lng) : '');
+        setProfileLogoUrl(session.logoUrl || '');
+        setProfileShowroomImages(session.showroomImages || '');
+        setProfileVirtualTourUrl(session.virtualTourUrl || '');
+        setProfileSpecialConcepts(session.specialConcepts || '');
       } catch (err) {
         console.error('Session restore failed:', err);
       }
@@ -373,6 +381,10 @@ export default function DealerPortalPage() {
         setProfilePassword(password); // use the successfully typed password
         setProfileLat(data.dealer.lat ? String(data.dealer.lat) : '');
         setProfileLng(data.dealer.lng ? String(data.dealer.lng) : '');
+        setProfileLogoUrl(data.dealer.logoUrl || '');
+        setProfileShowroomImages(data.dealer.showroomImages || '');
+        setProfileVirtualTourUrl(data.dealer.virtualTourUrl || '');
+        setProfileSpecialConcepts(data.dealer.specialConcepts || '');
       } else {
         setLoginError(data.error || 'Giriş başarısız oldu.');
       }
@@ -452,6 +464,10 @@ export default function DealerPortalPage() {
           password: profilePassword,
           lat: parseFloat(profileLat) || dealerInfo.lat,
           lng: parseFloat(profileLng) || dealerInfo.lng,
+          logoUrl: profileLogoUrl,
+          showroomImages: profileShowroomImages,
+          virtualTourUrl: profileVirtualTourUrl,
+          specialConcepts: profileSpecialConcepts,
           status: 'APPROVED' // Keep approved status
         })
       });
@@ -465,7 +481,11 @@ export default function DealerPortalPage() {
           phone: profilePhone,
           address: profileAddress,
           lat: parseFloat(profileLat) || dealerInfo.lat,
-          lng: parseFloat(profileLng) || dealerInfo.lng
+          lng: parseFloat(profileLng) || dealerInfo.lng,
+          logoUrl: profileLogoUrl,
+          showroomImages: profileShowroomImages,
+          virtualTourUrl: profileVirtualTourUrl,
+          specialConcepts: profileSpecialConcepts
         };
         setDealerInfo(updatedSession);
         localStorage.setItem('sb_dealer_session', JSON.stringify(updatedSession));
@@ -1660,6 +1680,51 @@ export default function DealerPortalPage() {
                       style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
                     />
                   </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Bayi Logo URL</label>
+                  <input 
+                    type="text" 
+                    value={profileLogoUrl} 
+                    onChange={(e) => setProfileLogoUrl(e.target.value)} 
+                    placeholder="/logos/kutahya.png veya görsel url'i"
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Showroom Fotoğrafları (Virgülle Ayrılmış Görsel Linkleri)</label>
+                  <textarea 
+                    value={profileShowroomImages} 
+                    onChange={(e) => setProfileShowroomImages(e.target.value)} 
+                    placeholder="https://gorsel1.jpg, https://gorsel2.jpg"
+                    rows={2}
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem', fontFamily: 'inherit' }}
+                  />
+                  <span style={{ fontSize: '0.7rem', color: '#6c757d' }}>Showroom içinden birden fazla görsel eklemek için linkleri aralarına virgül koyarak yazın.</span>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>3D Showroom / Sanal Tur URL (Matterport / 360° Linki)</label>
+                  <input 
+                    type="text" 
+                    value={profileVirtualTourUrl} 
+                    onChange={(e) => setProfileVirtualTourUrl(e.target.value)} 
+                    placeholder="https://my.matterport.com/show/?m=..."
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Özel Teşhir Konseptleri</label>
+                  <input 
+                    type="text" 
+                    value={profileSpecialConcepts} 
+                    onChange={(e) => setProfileSpecialConcepts(e.target.value)} 
+                    placeholder="Mermer Serisi Alanı, Banyo Tasarımları vb."
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
+                  />
                 </div>
 
                 <button 

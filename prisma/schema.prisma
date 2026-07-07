@@ -85,6 +85,12 @@ model Dealer {
   saas      DealerSaaSConfig[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Showroom & Profile Customizations
+  logoUrl         String?
+  showroomImages  String? // Comma-separated string of image URLs
+  virtualTourUrl  String? // 3D Showroom / Virtual Tour Link (Matterport, 360 etc.)
+  specialConcepts String? // Special concepts showcased in showroom
 }
 
 model DealerSaaSConfig {

@@ -78,15 +78,39 @@ export async function DELETE(request) {
 export async function PUT(request) {
   try {
     const body = await request.json();
-    const { id, status } = body;
+    const { 
+      id, 
+      status, 
+      phone, 
+      address, 
+      password, 
+      lat, 
+      lng, 
+      logoUrl, 
+      showroomImages, 
+      virtualTourUrl, 
+      specialConcepts 
+    } = body;
 
-    if (!id || !status) {
-      return NextResponse.json({ error: 'Missing dealer id or status' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: 'Missing dealer id' }, { status: 400 });
     }
+
+    const updateData = {};
+    if (status !== undefined) updateData.status = status;
+    if (phone !== undefined) updateData.phone = phone;
+    if (address !== undefined) updateData.address = address;
+    if (password !== undefined) updateData.password = password;
+    if (lat !== undefined) updateData.lat = parseFloat(lat);
+    if (lng !== undefined) updateData.lng = parseFloat(lng);
+    if (logoUrl !== undefined) updateData.logoUrl = logoUrl;
+    if (showroomImages !== undefined) updateData.showroomImages = showroomImages;
+    if (virtualTourUrl !== undefined) updateData.virtualTourUrl = virtualTourUrl;
+    if (specialConcepts !== undefined) updateData.specialConcepts = specialConcepts;
 
     const updatedDealer = await prisma.dealer.update({
       where: { id },
-      data: { status },
+      data: updateData,
       include: {
         brand: {
           select: { name: true }

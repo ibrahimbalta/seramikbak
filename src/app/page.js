@@ -603,6 +603,11 @@ export default function Home() {
   const [leadEmail, setLeadEmail] = useState('');
   const [leadNotes, setLeadNotes] = useState('');
   const [leadSuccessMsg, setLeadSuccessMsg] = useState('');
+  
+  // Dealer Details Modal State
+  const [showDealerDetailModal, setShowDealerDetailModal] = useState(false);
+  const [selectedDetailDealer, setSelectedDetailDealer] = useState(null);
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
 
   // Dealer Signup State
   const [showDealerSignup, setShowDealerSignup] = useState(false);
@@ -4311,6 +4316,20 @@ export default function Home() {
                                   <MessageSquare size={12} />
                                   <span>WhatsApp</span>
                                 </a>
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedDetailDealer(dealer);
+                                    setActiveGalleryIndex(0);
+                                    setShowDealerDetailModal(true);
+                                  }}
+                                  className="quick-action-link showroom"
+                                  title="Showroom & Detayları İncele"
+                                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                >
+                                  <Sparkles size={12} style={{ color: 'var(--accent-gold)' }} />
+                                  <span>Showroom</span>
+                                </button>
                               </div>
                               <button 
                                 onClick={(e) => {
@@ -5025,6 +5044,227 @@ export default function Home() {
                 <button type="submit" className="btn-primary w-full-btn" style={{ marginTop: '10px' }}>Teklifi Gönder</button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* DEALER SHOWROOM DETAILS MODAL */}
+      {showDealerDetailModal && selectedDetailDealer && (
+        <div className="modal-overlay animate-fade-in" onClick={(e) => { if(e.target === e.currentTarget) setShowDealerDetailModal(false); }}>
+          <div className="modal-content glass-panel-gold dealer-showroom-modal" style={{ maxWidth: '850px', width: '90%', padding: '0', overflow: 'hidden' }}>
+            <div style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(212,175,55,0.15)', background: 'linear-gradient(90deg, #0f172a 0%, #1e293b 100%)', color: '#fff' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {selectedDetailDealer.logoUrl ? (
+                  <img 
+                    src={selectedDetailDealer.logoUrl} 
+                    alt={selectedDetailDealer.name} 
+                    style={{ width: '40px', height: '40px', objectFit: 'contain', borderRadius: '6px', background: '#fff', padding: '4px' }} 
+                  />
+                ) : (
+                  <div style={{ width: '40px', height: '40px', borderRadius: '6px', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0f172a', fontWeight: 'bold' }}>
+                    SB
+                  </div>
+                )}
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: '800', letterSpacing: '-0.01em', color: '#fff' }}>{selectedDetailDealer.name}</h3>
+                  <span style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '600' }}>{selectedDetailDealer.brand?.name || 'Yetkili'} Bayi Showroom Detayları</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowDealerDetailModal(false)} 
+                className="close-modal-btn" 
+                style={{ color: '#fff', fontSize: '1.2rem', background: 'transparent', border: 'none', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="showroom-modal-grid">
+              {/* LEFT COLUMN: GALLERY / 3D TOUR */}
+              <div className="showroom-gallery-column">
+                {selectedDetailDealer.virtualTourUrl ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', height: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#b38e47', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Sparkles size={14} /> 3D SANAL SHOWROOM TURU
+                      </span>
+                    </div>
+                    <div style={{ position: 'relative', width: '100%', height: '320px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+                      <iframe 
+                        src={selectedDetailDealer.virtualTourUrl} 
+                        width="100%" 
+                        height="100%" 
+                        style={{ border: 'none' }} 
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  /* IMAGE GALLERY */
+                  (() => {
+                    const images = selectedDetailDealer.showroomImages ? selectedDetailDealer.showroomImages.split(',').filter(Boolean) : [];
+                    if (images.length === 0) {
+                      return (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', height: '280px', color: '#94a3b8' }}>
+                          <ImageIcon size={48} strokeWidth={1.5} />
+                          <p style={{ fontSize: '0.85rem', fontWeight: '600' }}>Showroom görselleri yakında eklenecektir.</p>
+                        </div>
+                      );
+                    }
+                    const activeImg = images[activeGalleryIndex] || images[0];
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+                        <div style={{ width: '100%', height: '260px', borderRadius: '12px', overflow: 'hidden', position: 'relative', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+                          <img 
+                            src={activeImg} 
+                            alt="Showroom Görseli" 
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                          />
+                        </div>
+                        {images.length > 1 && (
+                          <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+                            {images.map((img, idx) => (
+                              <button 
+                                key={idx} 
+                                onClick={() => setActiveGalleryIndex(idx)}
+                                style={{ 
+                                  width: '60px', 
+                                  height: '45px', 
+                                  borderRadius: '6px', 
+                                  overflow: 'hidden', 
+                                  border: activeGalleryIndex === idx ? '2px solid #b38e47' : '2px solid transparent',
+                                  padding: '0',
+                                  cursor: 'pointer',
+                                  flexShrink: '0',
+                                  opacity: activeGalleryIndex === idx ? 1 : 0.6,
+                                  transition: 'all 0.2s'
+                                }}
+                              >
+                                <img src={img} alt="Showroom Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()
+                )}
+              </div>
+
+              {/* RIGHT COLUMN: INFO & CTA */}
+              <div className="showroom-info-column">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  
+                  {/* Special Concepts */}
+                  {selectedDetailDealer.specialConcepts && (
+                    <div>
+                      <h4 style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: '#64748b', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Sergilenen Özel Konseptler</h4>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {selectedDetailDealer.specialConcepts.split(',').map((concept, idx) => (
+                          <span 
+                            key={idx} 
+                            style={{ 
+                              fontSize: '0.7rem', 
+                              fontWeight: '700', 
+                              background: '#fef3c7', 
+                              color: '#d97706', 
+                              padding: '4px 10px', 
+                              borderRadius: '20px',
+                              border: '1px solid #fde68a'
+                            }}
+                          >
+                            ✨ {concept.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Showroom Gallery Toggle if 3D Tour is active (so users can switch back to photos if they want) */}
+                  {selectedDetailDealer.virtualTourUrl && selectedDetailDealer.showroomImages && (
+                    <div>
+                      <h4 style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: '#64748b', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Showroom Fotoğrafları</h4>
+                      <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
+                        {selectedDetailDealer.showroomImages.split(',').filter(Boolean).map((img, idx) => (
+                          <div 
+                            key={idx}
+                            style={{ 
+                              width: '45px', 
+                              height: '35px', 
+                              borderRadius: '4px', 
+                              overflow: 'hidden',
+                              position: 'relative'
+                            }}
+                          >
+                            <img src={img} alt="Showroom Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Address and phone */}
+                  <div>
+                    <h4 style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: '#64748b', margin: '0 0 6px 0', letterSpacing: '0.05em' }}>İletişim & Konum</h4>
+                    <p style={{ fontSize: '0.82rem', margin: '0 0 6px 0', color: '#334155', lineHeight: '1.4' }}>
+                      📍 {selectedDetailDealer.address}<br/>
+                      <strong>{selectedDetailDealer.district}, {selectedDetailDealer.city}</strong>
+                    </p>
+                    <p style={{ fontSize: '0.82rem', margin: 0, color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      📞 <strong>{selectedDetailDealer.phone}</strong>
+                    </p>
+                  </div>
+
+                  {/* Hours */}
+                  <div>
+                    <h4 style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: '#64748b', margin: '0 0 4px 0', letterSpacing: '0.05em' }}>Çalışma Saatleri</h4>
+                    <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: '700' }}>● Açık • Kapanış 19:00</span>
+                  </div>
+
+                </div>
+
+                {/* Actions */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '16px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <a 
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${selectedDetailDealer.lat},${selectedDetailDealer.lng}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="quick-action-link maps"
+                      style={{ textDecoration: 'none', display: 'flex', justifyContent: 'center', padding: '10px', boxSizing: 'border-box' }}
+                    >
+                      <Navigation size={14} />
+                      <span>Yol Tarifi</span>
+                    </a>
+                    <a 
+                      href={`https://wa.me/${selectedDetailDealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20sizinle%20SeramikBak%20%C3%BCzerinden%20ileti%C5%9Fime%20ge%C3%A7iyorum.`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="quick-action-link whatsapp"
+                      style={{ textDecoration: 'none', display: 'flex', justifyContent: 'center', padding: '10px', boxSizing: 'border-box' }}
+                    >
+                      <MessageSquare size={14} />
+                      <span>WhatsApp</span>
+                    </a>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setLeadProduct(activeProduct || { name: `${selectedDetailDealer.brand?.name} Serisi`, brandId: selectedDetailDealer.brandId, brand: { name: selectedDetailDealer.brand?.name } });
+                      setLeadDealer(selectedDetailDealer);
+                      setLeadSuccessMsg('');
+                      setShowDealerDetailModal(false); // close showroom modal
+                      setShowLeadModal(true); // open quote request modal
+                    }}
+                    className="btn-primary w-full-btn"
+                    style={{ padding: '12px', fontWeight: '800', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#0f172a', border: 'none', marginTop: '4px' }}
+                  >
+                    Fiyat Teklifi İste
+                  </button>
+                </div>
+
+              </div>
+            </div>
+
           </div>
         </div>
       )}
@@ -8453,6 +8693,16 @@ export default function Home() {
           background-color: rgba(37, 211, 102, 0.15);
         }
 
+        .quick-action-link.showroom {
+          background-color: rgba(212, 175, 55, 0.08);
+          color: var(--accent-gold);
+          border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .quick-action-link.showroom:hover {
+          background-color: rgba(212, 175, 55, 0.15);
+        }
+
         .quote-btn {
           font-size: 0.72rem !important;
           padding: 6px 14px !important;
@@ -8956,6 +9206,53 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 16px;
+        }
+
+        /* Showroom Modal Custom Styling */
+        .dealer-showroom-modal {
+          animation: scaleUp 0.3s ease-out;
+        }
+
+        .showroom-modal-grid {
+          display: grid;
+          grid-template-columns: 1.2fr 1fr;
+          min-height: 400px;
+        }
+
+        .showroom-gallery-column {
+          padding: 24px;
+          background: #f8fafc;
+          border-right: 1px solid #e2e8f0;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+        }
+
+        .showroom-info-column {
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          gap: 20px;
+          background: #fff;
+          box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+          .showroom-modal-grid {
+            grid-template-columns: 1fr;
+          }
+          .showroom-gallery-column {
+            border-right: none;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px;
+          }
+          .showroom-info-column {
+            padding: 16px;
+          }
         }
 
         .modal-header {

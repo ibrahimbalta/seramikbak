@@ -317,22 +317,126 @@ async function main() {
   console.log('Seeding dealers (locations around Istanbul)...');
   const dealersData = [
     // Kütahya Dealers
-    { name: 'NG Kütahya Seramik Kadıköy Bayi', brandId: kutahya.id, phone: '0216 123 45 67', address: 'Bağdat Cad. No:45 Kadıköy', city: 'İstanbul', district: 'Kadıköy', lat: 40.9901, lng: 29.0278 },
-    { name: 'NG Kütahya Seramik Beşiktaş Showroom', brandId: kutahya.id, phone: '0212 987 65 43', address: 'Barbaros Bulvarı No:12 Beşiktaş', city: 'İstanbul', district: 'Beşiktaş', lat: 41.0428, lng: 29.0075 },
+    { 
+      name: 'NG Kütahya Seramik Kadıköy Bayi', 
+      brandId: kutahya.id, 
+      phone: '0216 123 45 67', 
+      address: 'Bağdat Cad. No:45 Kadıköy', 
+      city: 'İstanbul', 
+      district: 'Kadıköy', 
+      lat: 40.9901, 
+      lng: 29.0278,
+      logoUrl: '/logos/kutahya.png',
+      showroomImages: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c,https://images.unsplash.com/photo-1600607687939-ce8a6c25118c,https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b',
+      virtualTourUrl: 'https://my.matterport.com/show/?m=sH9f1yPcr5g',
+      specialConcepts: 'Büyük Ebatlı Porselen Karolar, Modern Banyo Teşhirleri, Calacatta Özel Alanı'
+    },
+    { 
+      name: 'NG Kütahya Seramik Beşiktaş Showroom', 
+      brandId: kutahya.id, 
+      phone: '0212 987 65 43', 
+      address: 'Barbaros Bulvarı No:12 Beşiktaş', 
+      city: 'İstanbul', 
+      district: 'Beşiktaş', 
+      lat: 41.0428, 
+      lng: 29.0075,
+      logoUrl: '/logos/kutahya.png',
+      showroomImages: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6,https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e',
+      virtualTourUrl: 'https://my.matterport.com/show/?m=JGPmBB6qCmg',
+      specialConcepts: 'Lüks Mermer Konseptleri, Dış Cephe Kaplamaları'
+    },
     
     // Bien Dealers
-    { name: 'Bien Seramik Ümraniye Yetkili Satıcı', brandId: bien.id, phone: '0216 333 44 55', address: 'Alemdağ Cad. No:190 Ümraniye', city: 'İstanbul', district: 'Ümraniye', lat: 41.0252, lng: 29.0963 },
-    { name: 'Bien Seramik Şişli Concept Store', brandId: bien.id, phone: '0212 222 33 44', address: 'Büyükdere Cad. No:88 Şişli', city: 'İstanbul', district: 'Şişli', lat: 41.0602, lng: 28.9876 },
+    { 
+      name: 'Bien Seramik Ümraniye Yetkili Satıcı', 
+      brandId: bien.id, 
+      phone: '0216 333 44 55', 
+      address: 'Alemdağ Cad. No:190 Ümraniye', 
+      city: 'İstanbul', 
+      district: 'Ümraniye', 
+      lat: 41.0252, 
+      lng: 29.0963,
+      logoUrl: '/logos/bien.png',
+      showroomImages: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a,https://images.unsplash.com/photo-1616486338812-3dadae4b4ace',
+      virtualTourUrl: 'https://my.matterport.com/show/?m=sH9f1yPcr5g',
+      specialConcepts: 'Ahşap Görünümlü Seramikler, Islak Hacim Çözümleri'
+    },
+    { 
+      name: 'Bien Seramik Şişli Concept Store', 
+      brandId: bien.id, 
+      phone: '0212 222 33 44', 
+      address: 'Büyükdere Cad. No:88 Şişli', 
+      city: 'İstanbul', 
+      district: 'Şişli', 
+      lat: 41.0602, 
+      lng: 28.9876,
+      logoUrl: '/logos/bien.png',
+      showroomImages: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f,https://images.unsplash.com/photo-1507089947368-19c1da9775ae',
+      virtualTourUrl: 'https://my.matterport.com/show/?m=JGPmBB6qCmg',
+      specialConcepts: 'Mimari Tasarım Alanı, İtalyan Serisi Teşhiri'
+    },
     
     // Ege Dealers
-    { name: 'Ege Seramik Ataşehir Merkez Bayi', brandId: ege.id, phone: '0216 555 66 77', address: 'Atatürk Mah. No:3 Ataşehir', city: 'İstanbul', district: 'Ataşehir', lat: 40.9950, lng: 29.1170 },
-    { name: 'Ege Seramik Kağıthane Showroom', brandId: ege.id, phone: '0212 444 55 66', address: 'Cendere Cad. No:54 Kağıthane', city: 'İstanbul', district: 'Kağıthane', lat: 41.0815, lng: 28.9740 },
+    { 
+      name: 'Ege Seramik Ataşehir Merkez Bayi', 
+      brandId: ege.id, 
+      phone: '0216 555 66 77', 
+      address: 'Atatürk Mah. No:3 Ataşehir', 
+      city: 'İstanbul', 
+      district: 'Ataşehir', 
+      lat: 40.9950, 
+      lng: 29.1170,
+      logoUrl: '/logos/ege.png',
+      showroomImages: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d',
+      virtualTourUrl: 'https://my.matterport.com/show/?m=sH9f1yPcr5g',
+      specialConcepts: 'Rustik ve Etnik Desenler, Bahçe ve Teras Seramikleri'
+    },
+    { 
+      name: 'Ege Seramik Kağıthane Showroom', 
+      brandId: ege.id, 
+      phone: '0212 444 55 66', 
+      address: 'Cendere Cad. No:54 Kağıthane', 
+      city: 'İstanbul', 
+      district: 'Kağıthane', 
+      lat: 41.0815, 
+      lng: 28.9740,
+      logoUrl: '/logos/ege.png',
+      showroomImages: 'https://images.unsplash.com/photo-1513694203232-719a280e022f',
+      virtualTourUrl: '',
+      specialConcepts: 'Teknik Granit Teşhir Bölümü'
+    },
     
     // Güral Dealers
-    { name: 'Güral Seramik Kartal Depo & Showroom', brandId: gural.id, phone: '0216 777 88 99', address: 'E-5 Yan Yol No:10 Kartal', city: 'İstanbul', district: 'Kartal', lat: 40.8988, lng: 29.1834 },
+    { 
+      name: 'Güral Seramik Kartal Depo & Showroom', 
+      brandId: gural.id, 
+      phone: '0216 777 88 99', 
+      address: 'E-5 Yan Yol No:10 Kartal', 
+      city: 'İstanbul', 
+      district: 'Kartal', 
+      lat: 40.8988, 
+      lng: 29.1834,
+      logoUrl: '/logos/gural.png',
+      showroomImages: '',
+      virtualTourUrl: '',
+      specialConcepts: 'Klasik Seri Seramikler, Büyük Proje Depo Teslimat'
+    },
     
     // VitrA Dealers
-    { name: 'VitrA Nişantaşı Concept Store', brandId: vitra.id, phone: '0212 345 67 89', address: 'Valikonağı Cad. No:101 Şişli', city: 'İstanbul', district: 'Şişli', lat: 41.0526, lng: 28.9912 }
+    { 
+      name: 'VitrA Nişantaşı Concept Store', 
+      brandId: vitra.id, 
+      phone: '0212 345 67 89', 
+      address: 'Valikonağı Cad. No:101 Şişli', 
+      city: 'İstanbul', 
+      district: 'Şişli', 
+      lat: 41.0526, 
+      lng: 28.9912,
+      logoUrl: '/logos/vitra.png',
+      showroomImages: 'https://images.unsplash.com/photo-1552566626-52f8b828add9,https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af',
+      virtualTourUrl: 'https://my.matterport.com/show/?m=sH9f1yPcr5g',
+      specialConcepts: 'VitrA Exclusive Tasarımlar, Akıllı Banyo Teknolojileri'
+    }
   ];
 
   for (const dealer of dealersData) {
