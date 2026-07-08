@@ -1680,26 +1680,10 @@ export default function DealerPortalPage() {
                             }}
                           >
                             <Crown size={14} style={{ color: '#d4af37' }} />
-                            <span>İletişimi Açmak İçin Premium'a Geç</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-        ) : activePortalTab === 'settings' ? (
+            ) : activePortalTab === 'settings' ? (
           /* SETTINGS TAB */
-          <div style={{ maxWidth: '850px', margin: '0 auto' }}>
-            <div className="glass-panel" style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
-              borderRadius: '24px',
-              padding: '40px',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.02)'
-            }}>
+          <div className="settings-container">
+            <div className="settings-card">
               <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '20px', marginBottom: '28px' }}>
                 <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a', fontFamily: 'var(--font-title)' }}>Bayi Profil Bilgileri Güncelleme</h2>
                 <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>Aşağıdaki alanları güncelleyerek müşterilere gösterilen şube kartınızı güncel tutun.</p>
@@ -1742,21 +1726,13 @@ export default function DealerPortalPage() {
                 )}
 
                 {/* SECTION 1: TEMEL BİLGİLER */}
-                <div style={{
-                  background: '#f8fafc',
-                  border: '1px solid #f1f5f9',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '20px'
-                }}>
+                <div className="settings-section">
                   <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-title)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '4px', height: '14px', background: 'var(--accent-gold)', borderRadius: '2px' }}></span>
                     İletişim & Güvenlik
                   </h3>
                   
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }} className="settings-grid-row">
+                  <div className="settings-grid-2">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Şube İletişim Telefonu</label>
                       <input 
@@ -1783,21 +1759,13 @@ export default function DealerPortalPage() {
                 </div>
 
                 {/* SECTION 2: ADRES & KONUM */}
-                <div style={{
-                  background: '#f8fafc',
-                  border: '1px solid #f1f5f9',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '20px'
-                }}>
+                <div className="settings-section">
                   <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-title)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '4px', height: '14px', background: 'var(--accent-gold)', borderRadius: '2px' }}></span>
                     Şube Adres & Konum
                   </h3>
                   
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '20px' }} className="settings-grid-row">
+                  <div className="settings-grid-address">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Açık Adres</label>
                       <textarea 
@@ -1838,15 +1806,7 @@ export default function DealerPortalPage() {
                 </div>
 
                 {/* SECTION 3: LOGO & SHOWROOM GALERİSİ */}
-                <div style={{
-                  background: '#f8fafc',
-                  border: '1px solid #f1f5f9',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '20px'
-                }}>
+                <div className="settings-section">
                   <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-title)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '4px', height: '14px', background: 'var(--accent-gold)', borderRadius: '2px' }}></span>
                     Logo & Showroom Görselleri
@@ -1855,7 +1815,7 @@ export default function DealerPortalPage() {
                   {/* Logo Group */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Bayi Logo URL</label>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                    <div className="settings-upload-row">
                       {profileLogoUrl && (
                         <div style={{ width: '50px', height: '50px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
                           <img src={profileLogoUrl} style={{ maxWidth: '85%', maxHeight: '85%', objectFit: 'contain' }} />
@@ -1872,6 +1832,7 @@ export default function DealerPortalPage() {
                       <label style={{
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         gap: '6px',
                         padding: '12px 18px',
                         background: '#ffffff',
@@ -1898,7 +1859,7 @@ export default function DealerPortalPage() {
 
                   {/* Showroom Photos Group */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                       <div>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Showroom Fotoğrafları</label>
                         <span style={{ fontSize: '0.68rem', color: '#64748b', display: 'block', marginTop: '2px' }}>Cihazınızdan fotoğraf yükleyin veya aşağıdaki kutuya linkleri virgülle ayırarak girin.</span>
@@ -1925,7 +1886,7 @@ export default function DealerPortalPage() {
                           style={{ display: 'none' }}
                           disabled={isUploadingPhoto}
                         />
-                        {isUploadingPhoto ? 'Yükleniyor...' : '+ Cihazdan Fotoğraf Ekle'}
+                        {isUploadingPhoto ? 'Görsel Yükleniyor...' : '+ Cihazdan Fotoğraf Ekle'}
                       </label>
                     </div>
 
@@ -1981,15 +1942,7 @@ export default function DealerPortalPage() {
                 </div>
 
                 {/* SECTION 4: 3D SANAL TUR & KONSEPTLER */}
-                <div style={{
-                  background: '#f8fafc',
-                  border: '1px solid #f1f5f9',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '20px'
-                }}>
+                <div className="settings-section">
                   <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-title)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '4px', height: '14px', background: 'var(--accent-gold)', borderRadius: '2px' }}></span>
                     3D Sanal Tur & Konseptler
@@ -2104,6 +2057,17 @@ export default function DealerPortalPage() {
                   className="portal-submit-btn"
                 >
                   {isSavingProfile ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      <span>Değişiklikler Kaydediliyor...</span>
+                    </>
+                  ) : (
+                    <span>Değişiklikleri Kaydet</span>
+                  )}
+                </button>
+              </form>
+            </div>
+          </div>? (
                     <>
                       <Loader2 size={18} className="animate-spin" />
                       <span>Değişiklikler Kaydediliyor...</span>
@@ -3175,6 +3139,45 @@ export default function DealerPortalPage() {
         }
 
         /* ===== PORTAL SETTINGS CUSTOM STYLES ===== */
+        .settings-container {
+          max-width: 850px;
+          width: 100%;
+          margin: 0 auto;
+          box-sizing: border-box;
+        }
+        .settings-card {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 24px;
+          padding: 40px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.02);
+          transition: all 0.3s ease;
+        }
+        .settings-section {
+          background: #f8fafc;
+          border: 1px solid #f1f5f9;
+          border-radius: 16px;
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+        .settings-grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+        .settings-grid-address {
+          display: grid;
+          grid-template-columns: 1.2fr 0.8fr;
+          gap: 20px;
+        }
+        .settings-upload-row {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+        }
+
         .portal-input {
           transition: all 0.2s ease-in-out !important;
           background-color: #f8fafc !important;
@@ -3213,10 +3216,30 @@ export default function DealerPortalPage() {
         .portal-submit-btn:active {
           transform: translateY(0) !important;
         }
+
+        /* Mobile overrides */
         @media (max-width: 768px) {
-          .settings-grid-row {
+          .settings-card {
+            padding: 20px !important;
+            border-radius: 16px !important;
+          }
+          .settings-section {
+            padding: 16px !important;
+            gap: 16px !important;
+          }
+          .settings-grid-2,
+          .settings-grid-address {
             grid-template-columns: 1fr !important;
             gap: 16px !important;
+          }
+        }
+        @media (max-width: 580px) {
+          .settings-upload-row {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+          .settings-upload-row > div {
+            align-self: center !important;
           }
         }
       `}</style>
