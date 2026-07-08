@@ -11605,6 +11605,29 @@ export default function Home() {
             flex: 1;
           }
         }
+
+        /* Responsive AI Chatbot styling for mobile */
+        @media (max-width: 600px) {
+          .ai-chatbot-window {
+            position: fixed !important;
+            bottom: 0px !important;
+            right: 0px !important;
+            left: 0px !important;
+            width: 100% !important;
+            height: 100% !important;
+            height: -webkit-fill-available !important;
+            border-radius: 0px !important;
+            border: none !important;
+            z-index: 99999 !important;
+          }
+          .ai-chatbot-window form {
+            padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)) 16px !important;
+          }
+          .ai-chat-header button {
+            padding: 12px !important;
+            font-size: 1.25rem !important;
+          }
+        }
       `}</style>
     </main>
   );
