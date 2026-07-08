@@ -87,6 +87,13 @@ export default function DealerPortalPage() {
   const [profileError, setProfileError] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
+  // Upload States
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [isUploading360, setIsUploading360] = useState(false);
+  const [upload360Success, setUpload360Success] = useState('');
+  const [upload360Error, setUpload360Error] = useState('');
+
   // New Dealer Registration State
   const [registerTab, setRegisterTab] = useState('login'); // 'login' or 'register'
   const [brands, setBrands] = useState([]);
@@ -444,6 +451,111 @@ export default function DealerPortalPage() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setIsUploadingLogo(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const res = await fetch('/api/dealers/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64Data: reader.result,
+            filename: file.name,
+            folder: 'seramikbak/logos'
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setProfileLogoUrl(data.url);
+        } else {
+          alert(data.error || 'Logo yüklenemedi.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Bağlantı hatası.');
+      } finally {
+        setIsUploadingLogo(false);
+      }
+    };
+  };
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setIsUploadingPhoto(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const res = await fetch('/api/dealers/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64Data: reader.result,
+            filename: file.name,
+            folder: 'seramikbak/showroom_photos'
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          const currentImages = profileShowroomImages ? profileShowroomImages.split(',').filter(Boolean) : [];
+          currentImages.push(data.url);
+          setProfileShowroomImages(currentImages.join(', '));
+        } else {
+          alert(data.error || 'Dosya yüklenemedi.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Bağlantı hatası.');
+      } finally {
+        setIsUploadingPhoto(false);
+      }
+    };
+  };
+
+  const handle360ImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      setUpload360Error('Görsel boyutu 10MB\'dan küçük olmalıdır.');
+      return;
+    }
+    setIsUploading360(true);
+    setUpload360Error('');
+    setUpload360Success('');
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const res = await fetch('/api/dealers/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64Data: reader.result,
+            filename: file.name,
+            folder: 'seramikbak/showroom_360'
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setProfileVirtualTourUrl(data.url);
+          setUpload360Success('360° Panoramik fotoğraf başarıyla yüklendi!');
+        } else {
+          setUpload360Error(data.error || 'Dosya yüklenemedi.');
+        }
+      } catch (err) {
+        console.error(err);
+        setUpload360Error('Bağlantı hatası oluştu.');
+      } finally {
+        setIsUploading360(false);
+      }
+    };
   };
 
   const handleUpdateProfile = async (e) => {
@@ -1683,13 +1795,37 @@ export default function DealerPortalPage() {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Bayi Logo URL</label>
-                  <input 
-                    type="text" 
-                    value={profileLogoUrl} 
-                    onChange={(e) => setProfileLogoUrl(e.target.value)} 
-                    placeholder="/logos/kutahya.png veya görsel url'i"
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
-                  />
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input 
+                      type="text" 
+                      value={profileLogoUrl} 
+                      onChange={(e) => setProfileLogoUrl(e.target.value)} 
+                      placeholder="/logos/kutahya.png veya görsel url'i"
+                      style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
+                    />
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '10px 14px',
+                      background: '#f1f5f9',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
+                      userSelect: 'none'
+                    }}>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleLogoUpload} 
+                        style={{ display: 'none' }} 
+                        disabled={isUploadingLogo}
+                      />
+                      {isUploadingLogo ? 'Yükleniyor...' : 'Logo Yükle'}
+                    </label>
+                  </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -1701,7 +1837,29 @@ export default function DealerPortalPage() {
                     rows={2}
                     style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem', fontFamily: 'inherit' }}
                   />
-                  <span style={{ fontSize: '0.7rem', color: '#6c757d' }}>Showroom içinden birden fazla görsel eklemek için linkleri aralarına virgül koyarak yazın.</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
+                    <span style={{ fontSize: '0.7rem', color: '#6c757d' }}>Showroom içinden birden fazla görsel eklemek için linkleri aralarına virgül koyarak yazın.</span>
+                    <label style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '6px 12px',
+                      background: '#e2e8f0',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      fontWeight: '700'
+                    }}>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handlePhotoUpload} 
+                        style={{ display: 'none' }}
+                        disabled={isUploadingPhoto}
+                      />
+                      {isUploadingPhoto ? 'Yükleniyor...' : '+ Cihazdan Fotoğraf Ekle'}
+                    </label>
+                  </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -1713,6 +1871,38 @@ export default function DealerPortalPage() {
                     placeholder="https://my.matterport.com/show/?m=..."
                     style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
                   />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#475569' }}>Cihazınızdan 360° Panoramik Showroom Fotoğrafı Yükleyin:</span>
+                      <label style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '8px 14px',
+                        background: '#b38e47',
+                        color: '#fff',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '0.75rem',
+                        fontWeight: '700',
+                        boxShadow: '0 2px 4px rgba(179, 142, 71, 0.15)'
+                      }}>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={handle360ImageUpload} 
+                          style={{ display: 'none' }}
+                          disabled={isUploading360}
+                        />
+                        {isUploading360 ? 'Yükleniyor...' : '360° Görsel Seç'}
+                      </label>
+                    </div>
+                    {upload360Success && <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '600' }}>✓ {upload360Success}</span>}
+                    {upload360Error && <span style={{ fontSize: '0.72rem', color: '#ef4444', fontWeight: '600' }}>⚠️ {upload360Error}</span>}
+                    <span style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                      Not: Cep telefonunuzun panorama moduyla çektiğiniz geniş açılı görseli yükleyebilirsiniz. SeramikBak 3D motoru otomatik olarak 360 derece sanal gezinti ekranını oluşturacaktır.
+                    </span>
+                  </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>

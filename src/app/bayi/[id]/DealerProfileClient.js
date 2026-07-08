@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   MapPin, 
@@ -34,6 +34,51 @@ export default function DealerProfileClient({ dealer, products }) {
 
   const images = dealer.showroomImages ? dealer.showroomImages.split(',').filter(Boolean) : [];
   const concepts = dealer.specialConcepts ? dealer.specialConcepts.split(',').filter(Boolean) : [];
+
+  const isPanoramicImage = dealer.virtualTourUrl && 
+    (/\.(jpg|jpeg|png|webp|gif)($|\?)/i.test(dealer.virtualTourUrl) || 
+     dealer.virtualTourUrl.includes('res.cloudinary.com') ||
+     dealer.virtualTourUrl.includes('/uploads/showroom/') ||
+     dealer.virtualTourUrl.startsWith('data:image/'));
+
+  useEffect(() => {
+    if (galleryTab === '3d' && isPanoramicImage) {
+      // 1. Check/load CSS
+      if (!document.getElementById('pannellum-css')) {
+        const link = document.createElement('link');
+        link.id = 'pannellum-css';
+        link.rel = 'stylesheet';
+        link.href = 'https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css';
+        document.head.appendChild(link);
+      }
+
+      // 2. Load script & initialize
+      const initViewer = () => {
+        const container = document.getElementById('panorama-container');
+        if (container) {
+          container.innerHTML = ''; // Clean previous DOM leftovers
+        }
+        if (window.pannellum) {
+          window.pannellum.viewer('panorama-container', {
+            type: 'equirectangular',
+            panorama: dealer.virtualTourUrl,
+            autoLoad: true,
+            compass: false,
+            mouseZoom: true
+          });
+        }
+      };
+
+      if (!window.pannellum) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js';
+        script.onload = initViewer;
+        document.body.appendChild(script);
+      } else {
+        setTimeout(initViewer, 100);
+      }
+    }
+  }, [galleryTab, dealer.virtualTourUrl, isPanoramicImage]);
 
   const handleLeadSubmit = async (e) => {
     e.preventDefault();
@@ -178,16 +223,25 @@ export default function DealerProfileClient({ dealer, products }) {
               {galleryTab === '3d' && dealer.virtualTourUrl ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div className="virtual-tour-iframe-container">
-                    <iframe 
-                      src={dealer.virtualTourUrl} 
-                      width="100%" 
-                      height="100%" 
-                      style={{ border: 'none' }}
-                      allowFullScreen
-                    />
+                    {isPanoramicImage ? (
+                      <div 
+                        id="panorama-container" 
+                        style={{ width: '100%', height: '100%', position: 'relative' }}
+                      />
+                    ) : (
+                      <iframe 
+                        src={dealer.virtualTourUrl} 
+                        width="100%" 
+                        height="100%" 
+                        style={{ border: 'none' }}
+                        allowFullScreen
+                      />
+                    )}
                   </div>
                   <span className="tour-hint">
-                    Showroom içinde gezinmek için tıklayıp sürükleyin, ilerlemek için zemin noktalarına dokunun.
+                    {isPanoramicImage 
+                      ? "Görseli 360° döndürmek için tıklayıp sürükleyin, yakınlaştırmak için fare tekerleğini kullanın."
+                      : "Showroom içinde gezinmek için tıklayıp sürükleyin, ilerlemek için zemin noktalarına dokunun."}
                   </span>
                 </div>
               ) : (
