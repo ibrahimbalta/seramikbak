@@ -8649,9 +8649,8 @@ export default function Home() {
         /* CARD ACTION LINKS */
         .dealer-actions-new {
           display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 12px;
+          flex-direction: column;
+          gap: 8px;
           margin-top: 6px;
           border-top: 1px dashed var(--border-color);
           padding-top: 10px;
@@ -8660,6 +8659,7 @@ export default function Home() {
         .dealer-quick-links {
           display: flex;
           gap: 8px;
+          width: 100%;
         }
 
         .quick-action-link {
@@ -8674,6 +8674,7 @@ export default function Home() {
           text-decoration: none;
           border-radius: var(--border-radius-sm);
           transition: all 0.2s;
+          flex: 1;
         }
 
         .quick-action-link.maps {
@@ -8708,8 +8709,12 @@ export default function Home() {
 
         .quote-btn {
           font-size: 0.72rem !important;
-          padding: 6px 14px !important;
+          padding: 8px 14px !important;
           border-radius: var(--border-radius-sm) !important;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         /* EMPTY STATE */
