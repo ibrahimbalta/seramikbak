@@ -430,28 +430,39 @@ export default function DealerProfileClient({ dealer, products }) {
           box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
         }
 
-        .back-link {
+        :global(.back-link) {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          padding: 8px 18px;
-          background: rgba(0, 0, 0, 0.03);
-          border: 1px solid rgba(0, 0, 0, 0.06);
-          border-radius: 30px;
-          color: var(--text-secondary);
-          font-size: 0.82rem;
-          font-weight: 700;
-          text-decoration: none;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          font-family: var(--font-title);
+          gap: 10px;
+          padding: 10px 22px;
+          background: #ffffff !important;
+          border: 1.5px solid rgba(179, 142, 71, 0.25) !important;
+          border-radius: 30px !important;
+          color: #0f172a !important;
+          font-size: 0.85rem !important;
+          font-weight: 700 !important;
+          text-decoration: none !important;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          font-family: var(--font-title) !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
         }
 
-        .back-link:hover {
-          background: #ffffff;
-          color: var(--accent-gold);
-          border-color: rgba(179, 142, 71, 0.35);
-          box-shadow: 0 8px 20px rgba(179, 142, 71, 0.1);
-          transform: translateX(-4px);
+        :global(.back-link:hover) {
+          background: var(--accent-gold) !important;
+          color: #ffffff !important;
+          border-color: var(--accent-gold) !important;
+          box-shadow: 0 8px 24px rgba(179, 142, 71, 0.25) !important;
+          transform: translateX(-4px) !important;
+        }
+
+        :global(.back-link svg) {
+          transition: transform 0.3s ease !important;
+          color: var(--accent-gold) !important;
+        }
+
+        :global(.back-link:hover svg) {
+          color: #ffffff !important;
+          transform: translateX(-2px) !important;
         }
 
         .header-title-container {
@@ -877,14 +888,14 @@ export default function DealerProfileClient({ dealer, products }) {
           line-height: 1.45;
         }
 
-        .info-value.tel-link, .info-value.mail-link {
-          text-decoration: none;
-          font-weight: 700;
-          transition: color 0.2s;
+        :global(.tel-link), :global(.mail-link) {
+          color: var(--text-primary) !important;
+          text-decoration: none !important;
+          transition: color 0.2s ease !important;
         }
 
-        .info-value.tel-link:hover, .info-value.mail-link:hover {
-          color: var(--accent-gold);
+        :global(.tel-link:hover), :global(.mail-link:hover) {
+          color: var(--accent-gold) !important;
         }
 
         .info-value.highlight-value {
