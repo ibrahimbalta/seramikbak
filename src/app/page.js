@@ -8461,8 +8461,6 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 12px;
-          flex: 1;
-          min-height: 0;
         }
 
         .list-header-row {
@@ -8492,8 +8490,6 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 12px;
-          flex: 1;
-          overflow-y: auto;
           padding-right: 2px;
         }
 
