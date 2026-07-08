@@ -1692,252 +1692,421 @@ export default function DealerPortalPage() {
           </div>
         ) : activePortalTab === 'settings' ? (
           /* SETTINGS TAB */
-          <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <div style={{ maxWidth: '850px', margin: '0 auto' }}>
             <div className="glass-panel" style={{
-              background: '#fff',
-              border: '1px solid #e9ecef',
-              borderRadius: '16px',
-              padding: '32px',
-              boxShadow: '0 8px 16px rgba(0,0,0,0.02)'
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '24px',
+              padding: '40px',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.02)'
             }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 6px 0' }}>Bayi Profil Bilgileri Güncelleme</h2>
-              <p style={{ fontSize: '0.8rem', color: '#6c757d', margin: '0 0 24px 0' }}>Aşağıdaki alanları güncelleyerek müşterilere gösterilen şube kartınızı güncel tutun.</p>
+              <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '20px', marginBottom: '28px' }}>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a', fontFamily: 'var(--font-title)' }}>Bayi Profil Bilgileri Güncelleme</h2>
+                <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>Aşağıdaki alanları güncelleyerek müşterilere gösterilen şube kartınızı güncel tutun.</p>
+              </div>
 
-              <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
                 {profileSuccess && (
                   <div style={{
-                    background: '#e6f7ed',
-                    color: '#10b981',
+                    background: '#ecfdf5',
+                    color: '#059669',
                     border: '1px solid #a7f3d0',
-                    borderRadius: '8px',
-                    padding: '10px 14px',
-                    fontSize: '0.8rem',
+                    borderRadius: '12px',
+                    padding: '14px 18px',
+                    fontSize: '0.82rem',
+                    fontWeight: '600',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px'
+                    gap: '8px'
                   }}>
-                    <CheckCircle size={16} />
+                    <CheckCircle size={18} />
                     <span>{profileSuccess}</span>
                   </div>
                 )}
                 {profileError && (
                   <div style={{
-                    background: '#fee2e2',
+                    background: '#fef2f2',
                     color: '#ef4444',
                     border: '1px solid #fca5a5',
-                    borderRadius: '8px',
-                    padding: '10px 14px',
-                    fontSize: '0.8rem',
+                    borderRadius: '12px',
+                    padding: '14px 18px',
+                    fontSize: '0.82rem',
+                    fontWeight: '600',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px'
+                    gap: '8px'
                   }}>
-                    <AlertCircle size={16} />
+                    <AlertCircle size={18} />
                     <span>{profileError}</span>
                   </div>
                 )}
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Şube İletişim Telefonu</label>
-                  <input 
-                    type="text" 
-                    value={profilePhone} 
-                    onChange={(e) => setProfilePhone(e.target.value)} 
-                    required 
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Şube Giriş Şifresi</label>
-                  <input 
-                    type="password" 
-                    value={profilePassword} 
-                    onChange={(e) => setProfilePassword(e.target.value)} 
-                    required 
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Açık Adres</label>
-                  <textarea 
-                    value={profileAddress} 
-                    onChange={(e) => setProfileAddress(e.target.value)} 
-                    required 
-                    rows={3}
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem', fontFamily: 'inherit' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Enlem (Latitude)</label>
-                    <input 
-                      type="text" 
-                      value={profileLat} 
-                      onChange={(e) => setProfileLat(e.target.value)} 
-                      required 
-                      style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
-                    />
-                  </div>
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Boylam (Longitude)</label>
-                    <input 
-                      type="text" 
-                      value={profileLng} 
-                      onChange={(e) => setProfileLng(e.target.value)} 
-                      required 
-                      style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
-                    />
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Bayi Logo URL</label>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <input 
-                      type="text" 
-                      value={profileLogoUrl} 
-                      onChange={(e) => setProfileLogoUrl(e.target.value)} 
-                      placeholder="/logos/kutahya.png veya görsel url'i"
-                      style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
-                    />
-                    <label style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      padding: '10px 14px',
-                      background: '#f1f5f9',
-                      border: '1px solid #cbd5e1',
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      fontSize: '0.8rem',
-                      fontWeight: '600',
-                      userSelect: 'none'
-                    }}>
+                {/* SECTION 1: TEMEL BİLGİLER */}
+                <div style={{
+                  background: '#f8fafc',
+                  border: '1px solid #f1f5f9',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '20px'
+                }}>
+                  <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-title)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '4px', height: '14px', background: 'var(--accent-gold)', borderRadius: '2px' }}></span>
+                    İletişim & Güvenlik
+                  </h3>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }} className="settings-grid-row">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Şube İletişim Telefonu</label>
                       <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleLogoUpload} 
-                        style={{ display: 'none' }} 
-                        disabled={isUploadingLogo}
+                        type="text" 
+                        value={profilePhone} 
+                        onChange={(e) => setProfilePhone(e.target.value)} 
+                        required 
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
+                        className="portal-input"
                       />
-                      {isUploadingLogo ? 'Yükleniyor...' : 'Logo Yükle'}
-                    </label>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Showroom Fotoğrafları (Virgülle Ayrılmış Görsel Linkleri)</label>
-                  <textarea 
-                    value={profileShowroomImages} 
-                    onChange={(e) => setProfileShowroomImages(e.target.value)} 
-                    placeholder="https://gorsel1.jpg, https://gorsel2.jpg"
-                    rows={2}
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem', fontFamily: 'inherit' }}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
-                    <span style={{ fontSize: '0.7rem', color: '#6c757d' }}>Showroom içinden birden fazla görsel eklemek için linkleri aralarına virgül koyarak yazın.</span>
-                    <label style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      padding: '6px 12px',
-                      background: '#e2e8f0',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontSize: '0.75rem',
-                      fontWeight: '700'
-                    }}>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Şube Giriş Şifresi</label>
                       <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handlePhotoUpload} 
-                        style={{ display: 'none' }}
-                        disabled={isUploadingPhoto}
+                        type="password" 
+                        value={profilePassword} 
+                        onChange={(e) => setProfilePassword(e.target.value)} 
+                        required 
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
+                        className="portal-input"
                       />
-                      {isUploadingPhoto ? 'Yükleniyor...' : '+ Cihazdan Fotoğraf Ekle'}
-                    </label>
+                    </div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>3D Showroom / Sanal Tur URL (Matterport / 360° Linki)</label>
-                  <input 
-                    type="text" 
-                    value={profileVirtualTourUrl} 
-                    onChange={(e) => setProfileVirtualTourUrl(e.target.value)} 
-                    placeholder="https://my.matterport.com/show/?m=..."
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
-                  />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#475569' }}>Cihazınızdan 360° Panoramik Showroom Fotoğrafı Yükleyin:</span>
+                {/* SECTION 2: ADRES & KONUM */}
+                <div style={{
+                  background: '#f8fafc',
+                  border: '1px solid #f1f5f9',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '20px'
+                }}>
+                  <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-title)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '4px', height: '14px', background: 'var(--accent-gold)', borderRadius: '2px' }}></span>
+                    Şube Adres & Konum
+                  </h3>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '20px' }} className="settings-grid-row">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Açık Adres</label>
+                      <textarea 
+                        value={profileAddress} 
+                        onChange={(e) => setProfileAddress(e.target.value)} 
+                        required 
+                        rows={4}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', fontFamily: 'inherit', resize: 'vertical', transition: 'all 0.2s' }}
+                        className="portal-input"
+                      />
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Enlem (Latitude)</label>
+                        <input 
+                          type="text" 
+                          value={profileLat} 
+                          onChange={(e) => setProfileLat(e.target.value)} 
+                          required 
+                          style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
+                          className="portal-input"
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Boylam (Longitude)</label>
+                        <input 
+                          type="text" 
+                          value={profileLng} 
+                          onChange={(e) => setProfileLng(e.target.value)} 
+                          required 
+                          style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', transition: 'all 0.2s' }}
+                          className="portal-input"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SECTION 3: LOGO & SHOWROOM GALERİSİ */}
+                <div style={{
+                  background: '#f8fafc',
+                  border: '1px solid #f1f5f9',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '20px'
+                }}>
+                  <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-title)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '4px', height: '14px', background: 'var(--accent-gold)', borderRadius: '2px' }}></span>
+                    Logo & Showroom Görselleri
+                  </h3>
+                  
+                  {/* Logo Group */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Bayi Logo URL</label>
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                      {profileLogoUrl && (
+                        <div style={{ width: '50px', height: '50px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                          <img src={profileLogoUrl} style={{ maxWidth: '85%', maxHeight: '85%', objectFit: 'contain' }} />
+                        </div>
+                      )}
+                      <input 
+                        type="text" 
+                        value={profileLogoUrl} 
+                        onChange={(e) => setProfileLogoUrl(e.target.value)} 
+                        placeholder="/logos/kutahya.png veya görsel url'i"
+                        style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        className="portal-input"
+                      />
+                      <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '12px 18px',
+                        background: '#ffffff',
+                        border: '1.5px solid var(--accent-gold)',
+                        color: 'var(--accent-gold)',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        fontSize: '0.82rem',
+                        fontWeight: '700',
+                        userSelect: 'none',
+                        transition: 'all 0.2s'
+                      }} className="hover-gold-btn">
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={handleLogoUpload} 
+                          style={{ display: 'none' }} 
+                          disabled={isUploadingLogo}
+                        />
+                        {isUploadingLogo ? 'Yükleniyor...' : 'Logo Yükle'}
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Showroom Photos Group */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                      <div>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Showroom Fotoğrafları</label>
+                        <span style={{ fontSize: '0.68rem', color: '#64748b', display: 'block', marginTop: '2px' }}>Cihazınızdan fotoğraf yükleyin veya aşağıdaki kutuya linkleri virgülle ayırarak girin.</span>
+                      </div>
+                      
                       <label style={{
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px',
-                        padding: '8px 14px',
-                        background: '#b38e47',
-                        color: '#fff',
-                        borderRadius: '6px',
+                        padding: '8px 16px',
+                        background: '#ffffff',
+                        border: '1.5px solid var(--accent-gold)',
+                        color: 'var(--accent-gold)',
+                        borderRadius: '8px',
                         cursor: 'pointer',
-                        fontSize: '0.75rem',
+                        fontSize: '0.78rem',
                         fontWeight: '700',
-                        boxShadow: '0 2px 4px rgba(179, 142, 71, 0.15)'
-                      }}>
+                        transition: 'all 0.2s'
+                      }} className="hover-gold-btn">
                         <input 
                           type="file" 
                           accept="image/*" 
-                          onChange={handle360ImageUpload} 
+                          onChange={handlePhotoUpload} 
                           style={{ display: 'none' }}
-                          disabled={isUploading360}
+                          disabled={isUploadingPhoto}
                         />
-                        {isUploading360 ? 'Yükleniyor...' : '360° Görsel Seç'}
+                        {isUploadingPhoto ? 'Yükleniyor...' : '+ Cihazdan Fotoğraf Ekle'}
                       </label>
                     </div>
-                    {upload360Success && <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '600' }}>✓ {upload360Success}</span>}
-                    {upload360Error && <span style={{ fontSize: '0.72rem', color: '#ef4444', fontWeight: '600' }}>⚠️ {upload360Error}</span>}
-                    <span style={{ fontSize: '0.68rem', color: '#64748b' }}>
-                      Not: Cep telefonunuzun panorama moduyla çektiğiniz geniş açılı görseli yükleyebilirsiniz. SeramikBak 3D motoru otomatik olarak 360 derece sanal gezinti ekranını oluşturacaktır.
-                    </span>
+
+                    {/* Interactive Showroom Image Previews */}
+                    {profileShowroomImages && profileShowroomImages.split(',').map(s => s.trim()).filter(Boolean).length > 0 && (
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', background: '#ffffff', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0', marginTop: '4px' }}>
+                        {profileShowroomImages.split(',').map(s => s.trim()).filter(Boolean).map((url, idx) => (
+                          <div key={idx} style={{ position: 'relative', width: '80px', height: '60px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0' }} className="showroom-thumb-wrapper">
+                            <img src={url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <button 
+                              type="button" 
+                              onClick={() => {
+                                const current = profileShowroomImages.split(',').map(s => s.trim()).filter(Boolean);
+                                const updated = current.filter(u => u !== url);
+                                setProfileShowroomImages(updated.join(', '));
+                              }} 
+                              style={{
+                                position: 'absolute',
+                                top: '3px',
+                                right: '3px',
+                                background: 'rgba(239, 68, 68, 0.9)',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '18px',
+                                height: '18px',
+                                fontSize: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                              }}
+                              title="Görseli Kaldır"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <textarea 
+                      value={profileShowroomImages} 
+                      onChange={(e) => setProfileShowroomImages(e.target.value)} 
+                      placeholder="https://gorsel1.jpg, https://gorsel2.jpg"
+                      rows={2}
+                      style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', fontFamily: 'inherit', resize: 'vertical' }}
+                      className="portal-input"
+                    />
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.78rem', fontWeight: '700' }}>Özel Teşhir Konseptleri</label>
-                  <input 
-                    type="text" 
-                    value={profileSpecialConcepts} 
-                    onChange={(e) => setProfileSpecialConcepts(e.target.value)} 
-                    placeholder="Mermer Serisi Alanı, Banyo Tasarımları vb."
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ced4da', fontSize: '0.9rem' }}
-                  />
+                {/* SECTION 4: 3D SANAL TUR & KONSEPTLER */}
+                <div style={{
+                  background: '#f8fafc',
+                  border: '1px solid #f1f5f9',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '20px'
+                }}>
+                  <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-title)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '4px', height: '14px', background: 'var(--accent-gold)', borderRadius: '2px' }}></span>
+                    3D Sanal Tur & Konseptler
+                  </h3>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>3D Showroom / Sanal Tur URL (Matterport veya 360° Panorama Görsel Linki)</label>
+                      <input 
+                        type="text" 
+                        value={profileVirtualTourUrl} 
+                        onChange={(e) => setProfileVirtualTourUrl(e.target.value)} 
+                        placeholder="https://my.matterport.com/show/?m=... veya 360° görsel linki"
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        className="portal-input"
+                      />
+                    </div>
+
+                    {/* Elegant 360 Panorama Upload Box */}
+                    <div style={{
+                      background: '#ffffff',
+                      border: '1px dashed #cbd5e1',
+                      borderRadius: '12px',
+                      padding: '20px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(179,142,71,0.08)', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', color: 'var(--accent-gold)' }}>
+                            <Sparkles size={18} />
+                          </div>
+                          <div>
+                            <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e293b', display: 'block' }}>Kendi 360° Panoramik Görselinizi Yükleyin</span>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>Matterport üyeliğiniz yoksa cep telefonunuzun panoramik moduyla çektiğiniz 360 resmi yükleyin!</span>
+                          </div>
+                        </div>
+
+                        <label style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '10px 18px',
+                          background: 'linear-gradient(135deg, var(--accent-gold) 0%, #a27e3c 100%)',
+                          color: '#ffffff',
+                          borderRadius: '10px',
+                          cursor: 'pointer',
+                          fontSize: '0.78rem',
+                          fontWeight: '700',
+                          boxShadow: '0 4px 10px rgba(179, 142, 71, 0.2)',
+                          transition: 'all 0.2s'
+                        }} className="hover-gold-solid-btn">
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={handle360ImageUpload} 
+                            style={{ display: 'none' }}
+                            disabled={isUploading360}
+                          />
+                          {isUploading360 ? 'Yükleniyor...' : '360° Görsel Seç & Yükle'}
+                        </label>
+                      </div>
+
+                      {upload360Success && (
+                        <div style={{ fontSize: '0.72rem', color: '#059669', background: '#ecfdf5', padding: '8px 12px', borderRadius: '8px', border: '1px solid #a7f3d0', fontWeight: '600' }}>
+                          ✓ {upload360Success}
+                        </div>
+                      )}
+                      {upload360Error && (
+                        <div style={{ fontSize: '0.72rem', color: '#ef4444', background: '#fef2f2', padding: '8px 12px', borderRadius: '8px', border: '1px solid #fca5a5', fontWeight: '600' }}>
+                          ⚠️ {upload360Error}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Özel Teşhir Konseptleri</label>
+                    <input 
+                      type="text" 
+                      value={profileSpecialConcepts} 
+                      onChange={(e) => setProfileSpecialConcepts(e.target.value)} 
+                      placeholder="Mermer Serisi Alanı, Banyo Tasarımları vb."
+                      style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                      className="portal-input"
+                    />
+                  </div>
                 </div>
 
                 <button 
                   type="submit" 
                   disabled={isSavingProfile}
                   style={{
-                    background: '#111',
+                    background: 'linear-gradient(135deg, var(--accent-gold) 0%, #a27e3c 100%)',
                     color: '#fff',
                     border: 'none',
-                    borderRadius: '8px',
-                    padding: '12px',
-                    fontWeight: '700',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    fontWeight: '800',
+                    fontSize: '0.98rem',
                     cursor: 'pointer',
-                    marginTop: '8px',
+                    marginTop: '12px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '8px'
+                    gap: '8px',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: '0 8px 24px rgba(179, 142, 71, 0.25)',
+                    fontFamily: 'var(--font-title)'
                   }}
+                  className="portal-submit-btn"
                 >
                   {isSavingProfile ? (
                     <>
-                      <Loader2 size={16} className="animate-spin" />
-                      <span>Kaydediliyor...</span>
+                      <Loader2 size={18} className="animate-spin" />
+                      <span>Değişiklikler Kaydediliyor...</span>
                     </>
                   ) : (
                     <span>Değişiklikleri Kaydet</span>
@@ -3002,6 +3171,52 @@ export default function DealerPortalPage() {
           }
           .login-card {
             padding: 20px 14px !important;
+          }
+        }
+
+        /* ===== PORTAL SETTINGS CUSTOM STYLES ===== */
+        .portal-input {
+          transition: all 0.2s ease-in-out !important;
+          background-color: #f8fafc !important;
+        }
+        .portal-input:focus {
+          border-color: var(--accent-gold) !important;
+          box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.12) !important;
+          background-color: #ffffff !important;
+        }
+        .hover-gold-btn {
+          transition: all 0.2s ease-in-out !important;
+        }
+        .hover-gold-btn:hover {
+          background-color: var(--accent-gold) !important;
+          color: #ffffff !important;
+          border-color: var(--accent-gold) !important;
+        }
+        .hover-gold-solid-btn {
+          transition: all 0.25s ease-in-out !important;
+        }
+        .hover-gold-solid-btn:hover {
+          opacity: 0.95 !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 6px 16px rgba(179, 142, 71, 0.3) !important;
+        }
+        .showroom-thumb-wrapper:hover button {
+          transform: scale(1.1) !important;
+        }
+        .portal-submit-btn {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        .portal-submit-btn:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 12px 28px rgba(179, 142, 71, 0.32) !important;
+        }
+        .portal-submit-btn:active {
+          transform: translateY(0) !important;
+        }
+        @media (max-width: 768px) {
+          .settings-grid-row {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
           }
         }
       `}</style>
