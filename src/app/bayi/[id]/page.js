@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import { notFound } from 'next/navigation';
+import { slugify } from '@/lib/slugify';
 import DealerProfileClient from './DealerProfileClient';
 
 export default async function Page({ params }) {
@@ -10,13 +11,28 @@ export default async function Page({ params }) {
     notFound();
   }
 
-  // Fetch dealer details
-  const dealer = await prisma.dealer.findUnique({
-    where: { id },
-    include: {
-      brand: true
-    }
-  });
+  let dealer = null;
+
+  // Try to find by UUID first
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  if (isUuid) {
+    dealer = await prisma.dealer.findUnique({
+      where: { id },
+      include: {
+        brand: true
+      }
+    });
+  }
+
+  // If not found (or not UUID), try to match by name slug
+  if (!dealer) {
+    const allDealers = await prisma.dealer.findMany({
+      include: {
+        brand: true
+      }
+    });
+    dealer = allDealers.find(d => slugify(d.name) === id);
+  }
 
   if (!dealer) {
     notFound();

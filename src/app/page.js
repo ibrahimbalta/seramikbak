@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { slugify } from '@/lib/slugify';
 
 import { 
   Search as SearchIcon, 
@@ -4317,7 +4318,7 @@ export default function Home() {
                                   <span>WhatsApp</span>
                                 </a>
                                 <Link 
-                                  href={`/bayi/${dealer.id}`}
+                                  href={`/bayi/${slugify(dealer.name)}`}
                                   target="_blank"
                                   onClick={(e) => e.stopPropagation()}
                                   className="quick-action-link showroom"
@@ -5245,7 +5246,7 @@ export default function Home() {
                     </a>
                   </div>
                     <Link
-                      href={`/bayi/${selectedDetailDealer.id}`}
+                      href={`/bayi/${slugify(selectedDetailDealer.name)}`}
                       target="_blank"
                       className="btn-secondary w-full-btn"
                       style={{ padding: '10px', fontWeight: '700', border: '1px solid #cbd5e1', textDecoration: 'none', textAlign: 'center', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.8rem', borderRadius: '8px', marginBottom: '8px' }}
