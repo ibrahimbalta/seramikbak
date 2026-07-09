@@ -7,6 +7,7 @@ import { uploadImage } from '@/lib/cloudinary';
 
 // Helper to save base64 image (tries Cloudinary first, falls back to local storage)
 async function saveBase64Image(base64Data, filename) {
+  let cloudinaryError = null;
   try {
     // If Cloudinary credentials are set, upload directly to Cloudinary
     if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
@@ -20,6 +21,7 @@ async function saveBase64Image(base64Data, filename) {
     }
   } catch (cloudinaryErr) {
     console.error('[Products API] Cloudinary upload failed, falling back to local storage:', cloudinaryErr);
+    cloudinaryError = cloudinaryErr.message || String(cloudinaryErr);
   }
 
   // Fallback to local storage (existing code)
@@ -39,7 +41,15 @@ async function saveBase64Image(base64Data, filename) {
     return `/textures/${filename}`;
   } catch (err) {
     console.error('[Products API] Failed to save image locally:', err);
-    return null;
+    const isVercel = process.env.VERCEL || process.env.NOW_BUILDER || process.cwd().includes('vercel');
+    let errorMsg = 'Görsel sunucuya kaydedilemedi.';
+    if (isVercel) {
+      errorMsg = 'Vercel salt-okunur (read-only) dosya sistemine sahip olduğu için yerel yükleme başarısız oldu. Lütfen Vercel panelinde Cloudinary API anahtarlarını (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) Çevre Değişkenleri olarak ekleyin.';
+    }
+    if (cloudinaryError) {
+      errorMsg += ` (Cloudinary Hatası: ${cloudinaryError})`;
+    }
+    throw new Error(errorMsg);
   }
 }
 

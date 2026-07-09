@@ -13,6 +13,7 @@ export async function POST(request) {
     }
 
     let fileUrl = null;
+    let cloudinaryError = null;
 
     // 1. Try Cloudinary first
     try {
@@ -28,6 +29,7 @@ export async function POST(request) {
       }
     } catch (cloudinaryErr) {
       console.error('[Upload API] Cloudinary upload failed:', cloudinaryErr);
+      cloudinaryError = cloudinaryErr.message || String(cloudinaryErr);
     }
 
     // 2. Fallback to Local Storage
@@ -51,7 +53,21 @@ export async function POST(request) {
         fileUrl = `/uploads/showroom/${uniqueFilename}`;
       } catch (err) {
         console.error('[Upload API] Failed to save image locally:', err);
-        return NextResponse.json({ success: false, error: 'Dosya sunucuya kaydedilemedi.' }, { status: 500 });
+        const isVercel = process.env.VERCEL || process.env.NOW_BUILDER || process.cwd().includes('vercel');
+        let errorMsg = 'Dosya sunucuya kaydedilemedi.';
+        
+        if (isVercel) {
+          errorMsg = 'Vercel salt-okunur (read-only) dosya sistemine sahip olduğu için yerel yükleme başarısız oldu. Lütfen Vercel panelinde Cloudinary API anahtarlarını (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) Çevre Değişkenleri (Environment Variables) olarak ekleyin.';
+          if (cloudinaryError) {
+            errorMsg += ` (Cloudinary Hatası: ${cloudinaryError})`;
+          }
+        } else {
+          if (cloudinaryError) {
+            errorMsg += ` (Cloudinary Hatası: ${cloudinaryError})`;
+          }
+        }
+        
+        return NextResponse.json({ success: false, error: errorMsg }, { status: 500 });
       }
     }
 
