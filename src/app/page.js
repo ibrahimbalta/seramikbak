@@ -606,11 +606,13 @@ export default function Home() {
   const [leadEmail, setLeadEmail] = useState('');
   const [leadNotes, setLeadNotes] = useState('');
   const [leadSuccessMsg, setLeadSuccessMsg] = useState('');
+  const [leadErrorMsg, setLeadErrorMsg] = useState('');
   const [requestedUsta, setRequestedUsta] = useState(false);
   const [requestedArchitect, setRequestedArchitect] = useState(false);
   const [projectDimensions, setProjectDimensions] = useState('');
   const [projectPhotoUrl, setProjectPhotoUrl] = useState('');
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [isSubmittingLead, setIsSubmittingLead] = useState(false);
   
   // Dealer Details Modal State
   const [showDealerDetailModal, setShowDealerDetailModal] = useState(false);
@@ -1438,6 +1440,8 @@ export default function Home() {
   const handleLeadSubmit = async (e) => {
     e.preventDefault();
     setLeadSuccessMsg('');
+    setLeadErrorMsg('');
+    setIsSubmittingLead(true);
     try {
       const res = await fetch('/api/leads/create', {
         method: 'POST',
@@ -1456,7 +1460,7 @@ export default function Home() {
         })
       });
       const data = await res.json();
-      if (data.success) {
+      if (res.ok && data.success) {
         setLeadSuccessMsg('Teklif talebiniz yetkili bayiye iletilmiştir.');
         setLeadName('');
         setLeadPhone('');
@@ -1466,9 +1470,14 @@ export default function Home() {
         setRequestedArchitect(false);
         setProjectDimensions('');
         setProjectPhotoUrl('');
+      } else {
+        setLeadErrorMsg(data.error || 'Teklif talebi gönderilemedi. Lütfen bilgileri kontrol edip tekrar deneyin.');
       }
     } catch (err) {
       console.error(err);
+      setLeadErrorMsg('Sistemsel bir bağlantı hatası oluştu. Lütfen daha sonra tekrar deneyin.');
+    } finally {
+      setIsSubmittingLead(false);
     }
   };
   const handleLeadPhotoUpload = async (e) => {
@@ -4943,8 +4952,14 @@ export default function Home() {
           <div className="modal-content glass-panel-gold">
             <div className="modal-header">
               <h3>Bayiden Fiyat Teklifi Al</h3>
-              <button onClick={() => { setShowLeadModal(false); setLeadSuccessMsg(''); }} className="close-modal-btn">✕</button>
+              <button onClick={() => { setShowLeadModal(false); setLeadSuccessMsg(''); setLeadErrorMsg(''); }} className="close-modal-btn">✕</button>
             </div>
+            
+            {leadErrorMsg && (
+              <div className="alert-box error" style={{ margin: '12px', padding: '10px 14px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#f87171', fontSize: '0.85rem' }}>
+                ⚠️ {leadErrorMsg}
+              </div>
+            )}
             
             {leadSuccessMsg ? (
               <div className="modal-success-state">
@@ -5039,8 +5054,8 @@ export default function Home() {
                   </div>
                 )}
 
-                <button type="submit" className="btn-primary w-full-btn" style={{ marginTop: '10px' }} disabled={isUploadingPhoto}>
-                  {isUploadingPhoto ? 'Görsel Yükleniyor...' : 'Teklifi Gönder'}
+                <button type="submit" className="btn-primary w-full-btn" style={{ marginTop: '10px' }} disabled={isUploadingPhoto || isSubmittingLead}>
+                  {isUploadingPhoto ? 'Görsel Yükleniyor...' : isSubmittingLead ? 'Teklif Gönderiliyor...' : 'Teklifi Gönder'}
                 </button>
               </form>
             )}

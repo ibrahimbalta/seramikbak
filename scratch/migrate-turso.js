@@ -11,52 +11,50 @@ if (fs.existsSync(envPath)) {
   });
 }
 
-if (!process.env.TURSO_DATABASE_URL || !process.env.TURSO_AUTH_TOKEN) {
-  console.error('TURSO_DATABASE_URL or TURSO_AUTH_TOKEN is missing in .env!');
-  process.exit(1);
-}
-
-const client = createClient({
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN,
-});
-
 async function main() {
-  console.log('Connecting to Turso to run DDL migrations...');
+  const url = process.env.TURSO_DATABASE_URL;
+  const authToken = process.env.TURSO_AUTH_TOKEN;
+
+  console.log('Connecting to Turso database:', url);
+  const client = createClient({ url, authToken });
 
   try {
-    console.log('Adding pendingPlan to DealerSaaSConfig...');
-    await client.execute('ALTER TABLE DealerSaaSConfig ADD COLUMN pendingPlan TEXT;');
-    console.log('Successfully added pendingPlan to DealerSaaSConfig.');
-  } catch (err) {
-    console.log('DealerSaaSConfig pendingPlan: ' + err.message);
-  }
+    // 1. Get info on Lead table columns
+    const columnsResult = await client.execute('PRAGMA table_info("Lead");');
+    const columns = columnsResult.rows.map(row => row.name);
+    console.log('Current columns in Lead table:', columns);
 
-  try {
-    console.log('Adding pendingStatus to DealerSaaSConfig...');
-    await client.execute('ALTER TABLE DealerSaaSConfig ADD COLUMN pendingStatus TEXT;');
-    console.log('Successfully added pendingStatus to DealerSaaSConfig.');
-  } catch (err) {
-    console.log('DealerSaaSConfig pendingStatus: ' + err.message);
-  }
+    const requiredColumns = [
+      { name: 'requestedUsta', type: 'INTEGER DEFAULT 0' },
+      { name: 'requestedArchitect', type: 'INTEGER DEFAULT 0' },
+      { name: 'projectDimensions', type: 'TEXT' },
+      { name: 'projectPhotoUrl', type: 'TEXT' }
+    ];
 
-  try {
-    console.log('Adding pendingPlan to SaaSConfig...');
-    await client.execute('ALTER TABLE SaaSConfig ADD COLUMN pendingPlan TEXT;');
-    console.log('Successfully added pendingPlan to SaaSConfig.');
-  } catch (err) {
-    console.log('SaaSConfig pendingPlan: ' + err.message);
-  }
+    let modified = false;
+    for (const col of requiredColumns) {
+      if (!columns.includes(col.name)) {
+        console.log(`Column "${col.name}" is missing. Adding it...`);
+        await client.execute(`ALTER TABLE "Lead" ADD COLUMN "${col.name}" ${col.type};`);
+        console.log(`Column "${col.name}" added successfully.`);
+        modified = true;
+      } else {
+        console.log(`Column "${col.name}" already exists.`);
+      }
+    }
 
-  try {
-    console.log('Adding pendingStatus to SaaSConfig...');
-    await client.execute('ALTER TABLE SaaSConfig ADD COLUMN pendingStatus TEXT;');
-    console.log('Successfully added pendingStatus to SaaSConfig.');
-  } catch (err) {
-    console.log('SaaSConfig pendingStatus: ' + err.message);
-  }
+    if (modified) {
+      const newColumnsResult = await client.execute('PRAGMA table_info("Lead");');
+      console.log('New columns in Lead table:', newColumnsResult.rows.map(row => row.name));
+    } else {
+      console.log('No database migrations were needed.');
+    }
 
-  console.log('Migrations completed.');
+  } catch (err) {
+    console.error('Migration error:', err);
+  } finally {
+    client.close();
+  }
 }
 
-main().catch(console.error).finally(() => process.exit(0));
+main();
