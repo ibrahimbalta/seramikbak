@@ -4,7 +4,18 @@ import prisma from '@/lib/prisma';
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { productId, dealerId, clientName, clientPhone, clientEmail, notes } = body;
+    const { 
+      productId, 
+      dealerId, 
+      clientName, 
+      clientPhone, 
+      clientEmail, 
+      notes,
+      requestedUsta,
+      requestedArchitect,
+      projectDimensions,
+      projectPhotoUrl
+    } = body;
 
     // Validate inputs
     if (!productId || !dealerId || !clientName || !clientPhone || !clientEmail) {
@@ -39,6 +50,10 @@ export async function POST(request) {
         clientPhone,
         clientEmail,
         notes: notes || '',
+        requestedUsta: !!requestedUsta,
+        requestedArchitect: !!requestedArchitect,
+        projectDimensions: projectDimensions || null,
+        projectPhotoUrl: projectPhotoUrl || null,
         status: 'PENDING'
       }
     });

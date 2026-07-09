@@ -1680,7 +1680,17 @@ export default function DealerPortalPage() {
                             }}
                           >
                             <Crown size={14} style={{ color: '#d4af37' }} />
-            ) : activePortalTab === 'settings' ? (
+                            <span>İletişimi Açmak İçin Premium'a Geç</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        ) : activePortalTab === 'settings' ? (
           /* SETTINGS TAB */
           <div className="settings-container">
             <div className="settings-card">
@@ -2057,17 +2067,6 @@ export default function DealerPortalPage() {
                   className="portal-submit-btn"
                 >
                   {isSavingProfile ? (
-                    <>
-                      <Loader2 size={18} className="animate-spin" />
-                      <span>Değişiklikler Kaydediliyor...</span>
-                    </>
-                  ) : (
-                    <span>Değişiklikleri Kaydet</span>
-                  )}
-                </button>
-              </form>
-            </div>
-          </div>? (
                     <>
                       <Loader2 size={18} className="animate-spin" />
                       <span>Değişiklikler Kaydediliyor...</span>
@@ -2950,6 +2949,20 @@ export default function DealerPortalPage() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#6c757d', marginTop: '2px' }}>
                               <Mail size={10} /> {lead.clientEmail}
                             </div>
+                            
+                            {/* Badges for requested services */}
+                            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '6px' }}>
+                              {lead.requestedUsta && (
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '2px 6px', borderRadius: '4px', background: '#fff7ed', color: '#ea580c', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid #ffedd5' }}>
+                                  🛠️ Usta Talebi
+                                </span>
+                              )}
+                              {lead.requestedArchitect && (
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '2px 6px', borderRadius: '4px', background: '#eff6ff', color: '#2563eb', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid #dbeafe' }}>
+                                  📐 Mimar Talebi
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td style={{ padding: '16px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -2968,6 +2981,25 @@ export default function DealerPortalPage() {
                           </td>
                           <td style={{ padding: '16px', maxWidth: '240px', color: '#495057', lineHeight: '1.4' }}>
                             {lead.notes || <span style={{ color: '#adb5bd', fontStyle: 'italic' }}>Not bırakılmadı</span>}
+                            
+                            {lead.projectDimensions && (
+                              <div style={{ marginTop: '6px', fontSize: '0.75rem', background: '#f8fafc', padding: '4px 8px', borderRadius: '4px', border: '1px solid #e2e8f0', color: '#334155' }}>
+                                <strong>Ölçüler:</strong> {lead.projectDimensions}
+                              </div>
+                            )}
+                            
+                            {lead.projectPhotoUrl && (
+                              <div style={{ marginTop: '6px' }}>
+                                <a 
+                                  href={lead.projectPhotoUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: '#2563eb', fontWeight: 'bold', textDecoration: 'underline' }}
+                                >
+                                  🖼️ Fotoğraf / Kroki Gör ↗
+                                </a>
+                              </div>
+                            )}
                           </td>
                           <td style={{ padding: '16px', color: '#6c757d', fontSize: '0.75rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

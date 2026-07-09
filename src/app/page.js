@@ -38,7 +38,9 @@ import {
   Globe,
   Mail,
   Flame,
-  Building2
+  Building2,
+  Wrench,
+  Palette
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -604,6 +606,11 @@ export default function Home() {
   const [leadEmail, setLeadEmail] = useState('');
   const [leadNotes, setLeadNotes] = useState('');
   const [leadSuccessMsg, setLeadSuccessMsg] = useState('');
+  const [requestedUsta, setRequestedUsta] = useState(false);
+  const [requestedArchitect, setRequestedArchitect] = useState(false);
+  const [projectDimensions, setProjectDimensions] = useState('');
+  const [projectPhotoUrl, setProjectPhotoUrl] = useState('');
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   
   // Dealer Details Modal State
   const [showDealerDetailModal, setShowDealerDetailModal] = useState(false);
@@ -1441,7 +1448,11 @@ export default function Home() {
           clientName: leadName,
           clientPhone: leadPhone,
           clientEmail: leadEmail,
-          notes: leadNotes
+          notes: leadNotes,
+          requestedUsta,
+          requestedArchitect,
+          projectDimensions,
+          projectPhotoUrl
         })
       });
       const data = await res.json();
@@ -1451,9 +1462,45 @@ export default function Home() {
         setLeadPhone('');
         setLeadEmail('');
         setLeadNotes('');
+        setRequestedUsta(false);
+        setRequestedArchitect(false);
+        setProjectDimensions('');
+        setProjectPhotoUrl('');
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+  const handleLeadPhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setIsUploadingPhoto(true);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Data = reader.result;
+        const res = await fetch('/api/dealers/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64Data,
+            filename: file.name,
+            folder: 'seramikbak/leads'
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setProjectPhotoUrl(data.url);
+        } else {
+          alert('Dosya yüklenemedi: ' + data.error);
+        }
+        setIsUploadingPhoto(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error(err);
+      alert('Dosya yüklenirken hata oluştu.');
+      setIsUploadingPhoto(false);
     }
   };
 
@@ -4882,124 +4929,53 @@ export default function Home() {
                     <p className="no-channel-data">Bu marka için yakınlarda yetkili bayi bulunamadı.</p>
                   )}
                 </div>
-
-                {/* 2. Online Pazaryerleri */}
+                
+                {/* 2. Usta ve Uygulama Desteği */}
                 <div className="channel-box">
                   <h4 className="channel-title">
-                    <CreditCard size={16} style={{ color: 'var(--accent-gold)' }} />
-                    <span>Online Pazaryeri Mağazaları</span>
+                    <Wrench size={16} style={{ color: 'var(--accent-orange)' }} />
+                    <span>Usta & Döşeme Hizmeti</span>
                   </h4>
-                  <p className="channel-desc">Distribütör satıcılarından kapıya teslim palet siparişi verebilirsiniz.</p>
+                  <p className="channel-desc">Bayiniz aracılığıyla seramiklerinizi döşeyecek uzman usta ekibi talep edebilirsiniz.</p>
                   
                   <div className="affiliate-prices-list">
-                    {/* Trendyol (Cheapest) */}
-                    <div className="affiliate-row cheapest-row">
+                    <div className="affiliate-row" style={{ background: 'rgba(249,115,22,0.05)', borderColor: 'rgba(249,115,22,0.15)', padding: '10px 14px', borderRadius: '8px', border: '1px solid' }}>
                       <div className="aff-store-meta">
-                        <span className="cheapest-badge">EN UCUZ SEÇENEK</span>
-                        <span className="store-name font-bold">Trendyol Pazaryeri</span>
+                        <span className="store-name font-bold">Ortalama İşçilik Maliyeti</span>
                       </div>
                       <div className="aff-price-action">
-                        <span className="aff-price">{detailProduct.trendyolPrice} TL/m²</span>
-                        <a 
-                          href={detailProduct.trendyolUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={() => logInteraction('CLICK', detailProduct.id, detailProduct.brandId)}
-                          className="aff-btn"
-                        >
-                          Satın Al ↗
-                        </a>
+                        <span className="aff-price" style={{ color: 'var(--accent-orange)', fontWeight: 'bold' }}>250 - 450 TL/m²</span>
                       </div>
                     </div>
-
-                    {/* Hepsiburada */}
-                    <div className="affiliate-row">
-                      <div className="aff-store-meta">
-                        <span className="store-name">Hepsiburada Satıcıları</span>
-                      </div>
-                      <div className="aff-price-action">
-                        <span className="aff-price">{detailProduct.hepsiPrice} TL/m²</span>
-                        <a 
-                          href={detailProduct.hepsiburadaUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={() => logInteraction('CLICK', detailProduct.id, detailProduct.brandId)}
-                          className="aff-btn-secondary"
-                        >
-                          İncele ↗
-                        </a>
-                      </div>
-                    </div>
-
-                    {/* n11 */}
-                    <div className="affiliate-row">
-                      <div className="aff-store-meta">
-                        <span className="store-name">n11 Distribütörleri</span>
-                      </div>
-                      <div className="aff-price-action">
-                        <span className="aff-price">{detailProduct.n11Price} TL/m²</span>
-                        <a 
-                          href={detailProduct.n11Url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={() => logInteraction('CLICK', detailProduct.id, detailProduct.brandId)}
-                          className="aff-btn-secondary"
-                        >
-                          İncele ↗
-                        </a>
-                      </div>
+                    <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '8px', lineHeight: '1.4' }}>
+                      💡 En doğru işçilik fiyatı için teklif isteme ekranında <strong>"Seramik Döşeme Ustası İstiyorum"</strong> kutucuğunu işaretleyebilirsiniz.
                     </div>
                   </div>
                 </div>
 
-                {/* 3. Dev Yapı Marketler */}
+                {/* 3. Ücretsiz Mimari Tasarım */}
                 <div className="channel-box">
                   <h4 className="channel-title">
-                    <Layers size={16} style={{ color: 'var(--accent-orange)' }} />
-                    <span>Dev Yapı Marketler</span>
+                    <Palette size={16} style={{ color: 'var(--accent-blue)' }} />
+                    <span>Ücretsiz Mimari Tasarım & 3D Proje</span>
                   </h4>
-                  <p className="channel-desc">Türkiye genelinde mağazalarda hazır stoklu standart seriler.</p>
+                  <p className="channel-desc">Tasarım ekibimiz banyonuzun ölçülerine göre 3D yerleşim planı hazırlayarak kararsızlığı giderir.</p>
                   
                   <div className="affiliate-prices-list">
-                    {/* Koçtaş */}
-                    <div className="affiliate-row">
+                    <div className="affiliate-row" style={{ background: 'rgba(59,130,246,0.05)', borderColor: 'rgba(59,130,246,0.15)', padding: '10px 14px', borderRadius: '8px', border: '1px solid' }}>
                       <div className="aff-store-meta">
-                        <span className="store-name">Koçtaş Mağazaları</span>
+                        <span className="store-name font-bold">3D Görselleştirme Desteği</span>
                       </div>
                       <div className="aff-price-action">
-                        <span className="aff-price">{detailProduct.koctasPrice} TL/m²</span>
-                        <a 
-                          href={detailProduct.koctasUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={() => logInteraction('CLICK', detailProduct.id, detailProduct.brandId)}
-                          className="aff-btn-secondary"
-                        >
-                          Satın Al ↗
-                        </a>
+                        <span className="aff-price" style={{ color: 'var(--accent-blue)', fontSize: '0.85rem', fontWeight: 'bold' }}>ÜCRETSİZ / 0 TL</span>
                       </div>
                     </div>
-
-                    {/* Bauhaus */}
-                    <div className="affiliate-row">
-                      <div className="aff-store-meta">
-                        <span className="store-name">Bauhaus Yapı Market</span>
-                      </div>
-                      <div className="aff-price-action">
-                        <span className="aff-price">{detailProduct.bauhausPrice} TL/m²</span>
-                        <a 
-                          href={detailProduct.bauhausUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          onClick={() => logInteraction('CLICK', detailProduct.id, detailProduct.brandId)}
-                          className="aff-btn-secondary"
-                        >
-                          İncele ↗
-                        </a>
-                      </div>
+                    <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '8px', lineHeight: '1.4' }}>
+                      💡 Banyonuzun ölçülerini girip varsa krokisini yüklemek için teklif isteme ekranında <strong>"Mimar Desteği İstiyorum"</strong> seçeneğini seçin.
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -5039,7 +5015,78 @@ export default function Home() {
                   <div className="form-group"><label>E-Posta</label><input type="email" className="form-input" value={leadEmail} onChange={(e) => setLeadEmail(e.target.value)} required placeholder="ahmet@mail.com" /></div>
                 </div>
                 <div className="form-group"><label>Notlar</label><textarea className="form-input form-textarea" value={leadNotes} onChange={(e) => setLeadNotes(e.target.value)} placeholder="Miktar ve nakliye detaylarını ekleyebilirsiniz..." rows={2} /></div>
-                <button type="submit" className="btn-primary w-full-btn" style={{ marginTop: '10px' }}>Teklifi Gönder</button>
+                
+                {/* Additional services */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', margin: '12px 0', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '12px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={requestedUsta} 
+                      onChange={(e) => setRequestedUsta(e.target.checked)} 
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <span>🛠️ Seramik Döşeme Ustası İstiyorum (+ Fiyat Tahmini)</span>
+                  </label>
+                  
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={requestedArchitect} 
+                      onChange={(e) => setRequestedArchitect(e.target.checked)} 
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <span>📐 Ücretsiz Mimar Desteği ve 3D Tasarım İstiyorum</span>
+                  </label>
+                </div>
+
+                {/* Conditional fields for Architect Support */}
+                {requestedArchitect && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '10px', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', border: '1px dashed rgba(255,255,255,0.1)', marginBottom: '12px' }}>
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--accent-gold)' }}>Oda/Banyo Ölçüleri</label>
+                      <input 
+                        type="text" 
+                        className="form-input" 
+                        value={projectDimensions} 
+                        onChange={(e) => setProjectDimensions(e.target.value)} 
+                        placeholder="Örn: En: 2m, Boy: 3.5m, Yükseklik: 2.6m"
+                        style={{ height: '36px', fontSize: '0.8rem' }}
+                      />
+                    </div>
+                    
+                    <div className="form-group" style={{ margin: 0 }}>
+                      <label style={{ fontSize: '0.75rem', color: 'var(--accent-gold)' }}>Kroki veya Oda Fotoğrafı Yükle</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={handleLeadPhotoUpload} 
+                          style={{ display: 'none' }}
+                          id="lead-photo-upload-input"
+                        />
+                        <label 
+                          htmlFor="lead-photo-upload-input" 
+                          className="btn-secondary btn-sm"
+                          style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', height: '36px', padding: '0 12px' }}
+                        >
+                          <UploadCloud size={14} />
+                          {isUploadingPhoto ? 'Yükleniyor...' : 'Görsel Seç'}
+                        </label>
+                        {projectPhotoUrl ? (
+                          <span style={{ fontSize: '0.72rem', color: 'var(--accent-blue)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '200px' }}>
+                            ✓ Fotoğraf Eklendi
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: '0.72rem', color: '#64748b' }}>Henüz dosya seçilmedi (isteğe bağlı)</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <button type="submit" className="btn-primary w-full-btn" style={{ marginTop: '10px' }} disabled={isUploadingPhoto}>
+                  {isUploadingPhoto ? 'Görsel Yükleniyor...' : 'Teklifi Gönder'}
+                </button>
               </form>
             )}
           </div>

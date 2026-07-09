@@ -60,7 +60,9 @@ export async function GET(request) {
         clientName: maskedName,
         clientPhone: maskedPhone,
         clientEmail: maskedEmail,
-        notes: 'Abonelik Gerekli - Müşteri notunu görmek ve teklife cevap vermek için lütfen paketinizi etkinleştirin.'
+        notes: 'Abonelik Gerekli - Müşteri notunu görmek ve teklife cevap vermek için lütfen paketinizi etkinleştirin.',
+        projectDimensions: l.projectDimensions ? 'Abonelik Gerekli' : null,
+        projectPhotoUrl: null
       };
     });
 

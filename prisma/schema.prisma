@@ -111,18 +111,25 @@ model DealerSaaSConfig {
 
 
 model Lead {
-  id          String   @id @default(uuid())
-  productId   String
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  dealerId    String
-  dealer      Dealer   @relation(fields: [dealerId], references: [id], onDelete: Cascade)
-  clientName  String
-  clientPhone String
-  clientEmail String
-  notes       String?
-  status      String   @default("PENDING") // PENDING, RESPONDED, COMPLETED
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                 String   @id @default(uuid())
+  productId          String
+  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  dealerId           String
+  dealer             Dealer   @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  clientName         String
+  clientPhone        String
+  clientEmail        String
+  notes              String?
+  status             String   @default("PENDING") // PENDING, RESPONDED, COMPLETED
+  
+  // New columns for Usta and Architect integration
+  requestedUsta      Boolean  @default(false)
+  requestedArchitect Boolean  @default(false)
+  projectDimensions  String?
+  projectPhotoUrl    String?
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 model AdCampaign {
