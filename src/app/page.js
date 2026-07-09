@@ -4930,48 +4930,75 @@ export default function Home() {
                   )}
                 </div>
                 
-                {/* 2. Usta ve Uygulama Desteği */}
+                {/* 2. Ürün Teknik Performans & Standartlar */}
                 <div className="channel-box">
                   <h4 className="channel-title">
-                    <Wrench size={16} style={{ color: 'var(--accent-orange)' }} />
-                    <span>Usta & Döşeme Hizmeti</span>
+                    <Activity size={16} style={{ color: 'var(--accent-orange)' }} />
+                    <span>Teknik Performans & Standartlar</span>
                   </h4>
-                  <p className="channel-desc">Bayiniz aracılığıyla seramiklerinizi döşeyecek uzman usta ekibi talep edebilirsiniz.</p>
+                  <p className="channel-desc">Seçilen seramiğin fabrika standartları ve kullanım alanlarına uygunluk verileri.</p>
                   
-                  <div className="affiliate-prices-list">
-                    <div className="affiliate-row" style={{ background: 'rgba(249,115,22,0.05)', borderColor: 'rgba(249,115,22,0.15)', padding: '10px 14px', borderRadius: '8px', border: '1px solid' }}>
-                      <div className="aff-store-meta">
-                        <span className="store-name font-bold">Ortalama İşçilik Maliyeti</span>
-                      </div>
-                      <div className="aff-price-action">
-                        <span className="aff-price" style={{ color: 'var(--accent-orange)', fontWeight: 'bold' }}>250 - 450 TL/m²</span>
-                      </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '12px' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', padding: '8px 10px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Aşınma Sınıfı (PEI)</span>
+                      <strong style={{ fontSize: '0.8rem', color: '#f1f5f9' }}>
+                        {detailProduct.peiRating ? `PEI ${detailProduct.peiRating} (${detailProduct.peiRating >= 4 ? 'Yoğun Yaya' : 'Konut/Banyo'})` : 'PEI 3-4 (Orta-Yoğun)'}
+                      </strong>
                     </div>
-                    <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '8px', lineHeight: '1.4' }}>
-                      💡 En doğru işçilik fiyatı için teklif isteme ekranında <strong>"Seramik Döşeme Ustası İstiyorum"</strong> kutucuğunu işaretleyebilirsiniz.
+                    
+                    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', padding: '8px 10px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Kaymazlık Değeri</span>
+                      <strong style={{ fontSize: '0.8rem', color: '#f1f5f9' }}>
+                        {detailProduct.slipResistance || 'R9 (Mat Standart)'}
+                      </strong>
+                    </div>
+
+                    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', padding: '8px 10px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Kenar Kesimi</span>
+                      <strong style={{ fontSize: '0.8rem', color: '#f1f5f9' }}>
+                        {detailProduct.rectified ? 'Rektifiyeli (Sıfır Derz)' : 'Rektifiyesiz (Derzli)'}
+                      </strong>
+                    </div>
+
+                    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', padding: '8px 10px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Donma Dayanımı</span>
+                      <strong style={{ fontSize: '0.8rem', color: detailProduct.frostResistance !== false ? '#10b981' : '#ef4444' }}>
+                        {detailProduct.frostResistance !== false ? 'Dayanıklı (Dış Mekan)' : 'Duyarlı (İç Mekan)'}
+                      </strong>
                     </div>
                   </div>
                 </div>
 
-                {/* 3. Ücretsiz Mimari Tasarım */}
+                {/* 3. Tasarım & Uygulama Önerileri */}
                 <div className="channel-box">
                   <h4 className="channel-title">
-                    <Palette size={16} style={{ color: 'var(--accent-blue)' }} />
-                    <span>Ücretsiz Mimari Tasarım & 3D Proje</span>
+                    <Sparkles size={16} style={{ color: 'var(--accent-gold)' }} />
+                    <span>Tasarım Uyum & Uygulama Önerisi</span>
                   </h4>
-                  <p className="channel-desc">Tasarım ekibimiz banyonuzun ölçülerine göre 3D yerleşim planı hazırlayarak kararsızlığı giderir.</p>
+                  <p className="channel-desc">Döşeme esnasında estetik ve yapısal olarak en iyi sonucu almanız için öneriler.</p>
                   
-                  <div className="affiliate-prices-list">
-                    <div className="affiliate-row" style={{ background: 'rgba(59,130,246,0.05)', borderColor: 'rgba(59,130,246,0.15)', padding: '10px 14px', borderRadius: '8px', border: '1px solid' }}>
-                      <div className="aff-store-meta">
-                        <span className="store-name font-bold">3D Görselleştirme Desteği</span>
-                      </div>
-                      <div className="aff-price-action">
-                        <span className="aff-price" style={{ color: 'var(--accent-blue)', fontSize: '0.85rem', fontWeight: 'bold' }}>ÜCRETSİZ / 0 TL</span>
-                      </div>
+                  <div className="affiliate-prices-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                      <span style={{ color: '#94a3b8' }}>Önerilen Derz Artısı</span>
+                      <strong style={{ color: 'var(--accent-gold)' }}>{detailProduct.rectified ? '1 - 1.5 mm' : '2 - 3 mm'}</strong>
                     </div>
-                    <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '8px', lineHeight: '1.4' }}>
-                      💡 Banyonuzun ölçülerini girip varsa krokisini yüklemek için teklif isteme ekranında <strong>"Mimar Desteği İstiyorum"</strong> seçeneğini seçin.
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                      <span style={{ color: '#94a3b8' }}>Uyumlu Derz Rengi</span>
+                      <strong style={{ color: '#f1f5f9' }}>
+                        {(() => {
+                          const col = (detailProduct.color || '').toLowerCase();
+                          if (col.includes('antrasit') || col.includes('siyah') || col.includes('füme')) return 'Koyu Gri / Antrasit';
+                          if (col.includes('bej') || col.includes('krem') || col.includes('kahve')) return 'Bahama Bej / Fildişi';
+                          if (col.includes('gri')) return 'Kül Grisi / Gümüş';
+                          return 'Mat Beyaz / Açık Gri';
+                        })()}
+                      </strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', padding: '6px 0' }}>
+                      <span style={{ color: '#94a3b8' }}>Tavsiye Edilen Döşeme</span>
+                      <strong style={{ color: '#f1f5f9' }}>
+                        {detailProduct.height >= 100 ? '1/3 Şaşırtmalı Derz' : 'Düz/Standart Derz'}
+                      </strong>
                     </div>
                   </div>
                 </div>
