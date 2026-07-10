@@ -6331,7 +6331,7 @@ export default function Home() {
           font-family: var(--font-title);
           font-size: 0.74rem;
           color: #475569;
-          margin-bottom: -24px;
+          margin-bottom: 0px;
           z-index: 1001;
           position: relative;
           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
@@ -6480,8 +6480,8 @@ export default function Home() {
         }
 
         .logo-icon {
-          width: 48px; /* enlarged logo icon */
-          height: 48px;
+          width: 54px; /* enlarged logo icon */
+          height: 54px;
           background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
           border-radius: var(--border-radius-sm);
           display: flex;
@@ -6490,7 +6490,7 @@ export default function Home() {
           font-family: var(--font-title);
           font-weight: 850;
           color: #ffffff;
-          font-size: 1.4rem;
+          font-size: 1.55rem;
           box-shadow: 0 4px 14px rgba(179, 142, 71, 0.3);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
@@ -6499,10 +6499,10 @@ export default function Home() {
 
         .logo-text {
           font-family: var(--font-title);
-          font-size: 1.65rem; /* enlarged logo text */
-          font-weight: 800;
+          font-size: 1.85rem; /* enlarged logo text */
+          font-weight: 900;
           color: var(--text-primary);
-          letter-spacing: -0.025em;
+          letter-spacing: -0.03em;
           background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-gold) 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
