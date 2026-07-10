@@ -12,32 +12,46 @@ export async function POST(request) {
       );
     }
 
-    // Retrieve DeepSeek API key from database system settings
+    // Retrieve API provider and keys from database system settings
     const settings = await prisma.systemSetting.findMany();
     const settingsMap = {};
     settings.forEach(s => {
       settingsMap[s.key] = s.value;
     });
 
-    // Use stored key or default to user's provided key
-    const deepseekKey = settingsMap['deepseek_api_key'] || 'sk-81324cd7ab0749abaee06efafb9013a2';
+    const provider = settingsMap['ai_provider'] || 'deepseek';
 
-    if (!deepseekKey) {
+    let apiKey = '';
+    let apiUrl = '';
+    let apiModel = '';
+
+    if (provider === 'grok') {
+      apiKey = settingsMap['grok_api_key'];
+      apiUrl = 'https://api.x.ai/v1/chat/completions';
+      apiModel = 'grok-beta'; // xAI Grok standard model
+    } else {
+      // Default to deepseek
+      apiKey = settingsMap['deepseek_api_key'] || 'sk-81324cd7ab0749abaee06efafb9013a2';
+      apiUrl = 'https://api.deepseek.com/chat/completions';
+      apiModel = 'deepseek-chat';
+    }
+
+    if (!apiKey) {
       return NextResponse.json(
-        { success: false, error: 'DeepSeek API key is not configured.' },
+        { success: false, error: `${provider === 'grok' ? 'Grok' : 'DeepSeek'} API key is not configured.` },
         { status: 400 }
       );
     }
 
-    // Call DeepSeek API Chat Completions endpoint
-    const response = await fetch('https://api.deepseek.com/chat/completions', {
+    // Call selected API Chat Completions endpoint
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${deepseekKey}`
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'deepseek-chat',
+        model: apiModel,
         messages: [
           {
             role: 'system',
@@ -51,9 +65,9 @@ export async function POST(request) {
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('[DeepSeek API Error]', errText);
+      console.error(`[${provider.toUpperCase()} API Error]`, errText);
       return NextResponse.json(
-        { success: false, error: 'DeepSeek API response error', details: errText },
+        { success: false, error: `${provider.toUpperCase()} API response error`, details: errText },
         { status: response.status }
       );
     }
