@@ -32,7 +32,7 @@ export async function POST(request) {
     } else if (provider === 'gemini') {
       apiKey = settingsMap['gemini_api_key'];
       apiUrl = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
-      apiModel = 'gemini-3.5-flash';
+      apiModel = 'gemini-flash-lite-latest';
     } else {
       // Default to deepseek
       apiKey = settingsMap['deepseek_api_key'] || 'sk-81324cd7ab0749abaee06efafb9013a2';
