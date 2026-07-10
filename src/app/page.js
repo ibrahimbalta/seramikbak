@@ -2415,6 +2415,16 @@ export default function Home() {
             </span>
           </div>
           <div className="utility-right">
+            <Link href="/hakkimizda" className="utility-item portal-link">
+              <Info size={12} />
+              <span>Hakkımızda</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/ilham" className="utility-item portal-link">
+              <Sparkles size={12} />
+              <span>İlham Galerisi & Trendler</span>
+            </Link>
+            <span className="utility-divider">|</span>
             <button 
               onClick={() => setIsKioskMode(true)} 
               className="utility-item kiosk-btn-link"
@@ -2470,14 +2480,6 @@ export default function Home() {
                 <MapPin size={14} />
                 <span>Bayi Bulucu</span>
               </button>
-              <Link href="/hakkimizda" className="nav-link" style={{ textDecoration: 'none' }}>
-                <Info size={14} />
-                <span>Hakkımızda</span>
-              </Link>
-              <Link href="/ilham" className="nav-link" style={{ textDecoration: 'none' }}>
-                <Sparkles size={14} />
-                <span>İlham Galerisi & Trendler</span>
-              </Link>
             </>
           )}
         </nav>
