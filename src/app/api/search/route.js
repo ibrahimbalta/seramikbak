@@ -34,42 +34,44 @@ export async function GET(request) {
       }
     }
 
-    // Construct Prisma where filters
-    const where = {};
+    // Construct Prisma where filters using AND array to support multiple active criteria
+    const andConditions = [];
 
     if (brandId) {
-      where.brandId = brandId;
+      andConditions.push({ brandId: brandId });
     }
 
     if (color) {
-      where.color = color;
+      andConditions.push({ color: color });
     }
 
     if (finish) {
-      where.finish = finish;
+      andConditions.push({ finish: finish });
     }
 
     if (style) {
-      where.style = style;
+      andConditions.push({ style: style });
     }
 
     if (rectified) {
-      where.rectified = rectified === 'true';
+      andConditions.push({ rectified: rectified === 'true' });
     }
 
     if (frost) {
-      where.frostResistance = frost === 'true';
+      andConditions.push({ frostResistance: frost === 'true' });
     }
 
     if (isPremium) {
-      where.isPremium = isPremium === 'true';
+      andConditions.push({ isPremium: isPremium === 'true' });
     }
 
     if (area) {
       // Since area is stored as "Banyo,Mutfak", we perform a contains search
-      where.area = {
-        contains: area
-      };
+      andConditions.push({
+        area: {
+          contains: area
+        }
+      });
     }
 
     if (size) {
@@ -78,31 +80,48 @@ export async function GET(request) {
         const width = parseFloat(parts[0].replace(',', '.'));
         const height = parseFloat(parts[1].replace(',', '.'));
         if (!isNaN(width) && !isNaN(height)) {
-          where.OR = [
-            { width: width, height: height },
-            { width: height, height: width } // support swapped dimensions
-          ];
+          andConditions.push({
+            OR: [
+              { width: width, height: height },
+              { width: height, height: width } // support swapped dimensions
+            ]
+          });
         }
       }
     }
 
     if (query) {
-      where.OR = [
-        { name: { contains: query } },
-        { code: { contains: query } },
-        { style: { contains: query } },
-        { color: { contains: query } }
-      ];
+      const tokens = query.trim().split(/\s+/).filter(Boolean);
+      if (tokens.length > 0) {
+        tokens.forEach(token => {
+          andConditions.push({
+            OR: [
+              { name: { contains: token } },
+              { code: { contains: token } },
+              { style: { contains: token } },
+              { color: { contains: token } },
+              { finish: { contains: token } },
+              { brand: { name: { contains: token } } }
+            ]
+          });
+        });
+      }
 
       // Log the search query in analytics
-      await prisma.analyticsLog.create({
-        data: {
-          action: 'SEARCH',
-          query: query,
-          city: searchParams.get('city') || 'İstanbul'
-        }
-      });
+      try {
+        await prisma.analyticsLog.create({
+          data: {
+            action: 'SEARCH',
+            query: query,
+            city: searchParams.get('city') || 'İstanbul'
+          }
+        });
+      } catch (err) {
+        console.error('Analytics log failed:', err);
+      }
     }
+
+    const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
     const fullDetail = searchParams.get('fullDetail') === 'true';
 

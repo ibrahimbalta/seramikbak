@@ -7553,19 +7553,25 @@ export default function Home() {
         }
 
         .filters-sidebar-new {
-          padding: 20px;
+          padding: 24px;
           height: fit-content;
           display: flex;
           flex-direction: column;
           gap: 20px;
           background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.05);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.015);
+          border-radius: var(--border-radius-lg);
+          transition: all 0.3s ease;
         }
 
         .filter-title-main {
-          font-size: 1.1rem;
-          font-weight: 700;
-          border-bottom: 1px solid var(--border-color);
-          padding-bottom: 12px;
+          font-size: 1.15rem;
+          font-weight: 800;
+          color: #0f172a;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          padding-bottom: 14px;
+          letter-spacing: -0.015em;
         }
 
         .filter-group-new {
@@ -7609,35 +7615,36 @@ export default function Home() {
         }
 
         .checkbox-custom-box {
-          height: 16px;
-          width: 16px;
-          background-color: #f1f3f7;
-          border: 1px solid #d1d5db;
-          border-radius: 4px;
-          transition: all 0.2s ease;
+          height: 18px;
+          width: 18px;
+          background-color: #f8fafc;
+          border: 1.5px solid #cbd5e1;
+          border-radius: 6px;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           display: flex;
           align-items: center;
           justify-content: center;
         }
 
         .checkbox-label-wrapper:hover input ~ .checkbox-custom-box {
-          background-color: #e5e7eb;
-          border-color: var(--accent-gold);
+          background-color: #ffffff;
+          border-color: #8c6b30;
+          box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.1);
         }
 
         .checkbox-label-wrapper input:checked ~ .checkbox-custom-box {
-          background-color: var(--accent-gold);
-          border-color: var(--accent-gold);
+          background-color: #0f172a;
+          border-color: #0f172a;
         }
 
         .checkbox-custom-box::after {
           content: "";
           display: none;
-          width: 4px;
-          height: 8px;
+          width: 5px;
+          height: 9px;
           border: solid white;
           border-width: 0 2px 2px 0;
-          transform: rotate(45deg) translate(-1px, -1px);
+          transform: rotate(45deg) translate(-0.5px, -1px);
         }
 
         .checkbox-label-wrapper input:checked ~ .checkbox-custom-box::after {
@@ -11319,7 +11326,7 @@ export default function Home() {
         }
 
         .accordion-section {
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
           padding-bottom: 16px;
           margin-bottom: 16px;
         }
@@ -11329,14 +11336,20 @@ export default function Home() {
           align-items: center;
           cursor: pointer;
           user-select: none;
-          padding: 4px 0;
+          padding: 8px 4px;
+          border-radius: 6px;
+          transition: all 0.2s ease;
+        }
+        .accordion-header:hover {
+          background: rgba(0, 0, 0, 0.015);
+          padding-left: 8px;
         }
         .accordion-title {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: var(--text-primary);
+          font-size: 0.8rem;
+          font-weight: 700;
+          color: #1e293b;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.03em;
         }
         .clear-all-filters-btn {
           background: none;
@@ -11348,7 +11361,7 @@ export default function Home() {
           transition: color 0.2s;
         }
         .clear-all-filters-btn:hover {
-          color: var(--accent-gold);
+          color: #8c6b30;
         }
         .scrollable-ebat-list {
           display: flex;
@@ -11370,13 +11383,13 @@ export default function Home() {
           border-radius: 2px;
         }
         .scrollable-ebat-list::-webkit-scrollbar-thumb:hover {
-          background: var(--accent-gold);
+          background: #8c6b30;
         }
         .filter-header-row {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
           padding-bottom: 16px;
           margin-bottom: 16px;
         }
@@ -11407,7 +11420,7 @@ export default function Home() {
           opacity: 1;
         }
 
-        /* Modern Filter Chips Styles */
+        /* Modern Filter Chips Styles - Sleek Capsules */
         .filters-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
@@ -11420,29 +11433,30 @@ export default function Home() {
           align-items: center;
           justify-content: center;
           padding: 8px 6px;
-          background: #f1f5f9;
-          border: 1px solid var(--border-color);
-          border-radius: 8px;
-          font-size: 0.72rem;
+          background: rgba(0, 0, 0, 0.02);
+          border: 1px solid rgba(0, 0, 0, 0.04);
+          border-radius: 20px; /* capsule rounded */
+          font-size: 0.74rem;
           font-family: var(--font-body);
           font-weight: 600;
           color: var(--text-secondary);
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           text-align: center;
           word-break: break-word;
           min-height: 38px;
         }
         .filter-chip-btn:hover {
-          border-color: var(--accent-gold);
-          color: var(--accent-gold);
-          background: rgba(179, 142, 71, 0.03);
+          border-color: #8c6b30;
+          color: #8c6b30;
+          background: rgba(179, 142, 71, 0.04);
+          transform: translateY(-1px);
         }
         .filter-chip-btn.active {
-          background: rgba(179, 142, 71, 0.1) !important;
-          border-color: var(--accent-gold) !important;
-          color: var(--accent-gold) !important;
-          box-shadow: 0 2px 8px rgba(179, 142, 71, 0.08);
+          background: #0f172a !important; /* solid contrast charcoal black */
+          border-color: #0f172a !important;
+          color: #ffffff !important;
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
         }
         .color-chip-btn {
           justify-content: flex-start;
