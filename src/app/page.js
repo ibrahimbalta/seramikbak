@@ -6315,26 +6315,26 @@ export default function Home() {
       {/* Embedded CSS specific to this high-fidelity layout */}
       <style jsx>{`
         /* ==========================================================================
-           NEW UTILITY BAR & REDESIGNED HEADER STYLE
+           NEW LIGHT LUXURY UTILITY BAR & HEADER STYLE
            ========================================================================== */
 
-        /* Top Utility Bar with Global Selectors to override Next.js scoping issue */
+        /* Top Utility Bar - Light Luxury Version */
         :global(.top-utility-bar) {
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 8px 28px;
-          background: #07090f; /* ultra deep obsidian */
-          border: 1px solid rgba(212, 175, 55, 0.15);
+          background: #ffffff; /* pure white background */
+          border: 1px solid rgba(0, 0, 0, 0.06);
           border-bottom: none;
           border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
           font-family: var(--font-title);
           font-size: 0.74rem;
-          color: rgba(255, 255, 255, 0.55);
+          color: #475569;
           margin-bottom: -24px;
           z-index: 1001;
           position: relative;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
         }
 
         :global(.utility-left) {
@@ -6346,13 +6346,13 @@ export default function Home() {
           display: flex;
           align-items: center;
           gap: 6px;
-          font-weight: 500;
+          font-weight: 600;
           letter-spacing: 0.03em;
         }
 
         :global(.text-gold) {
-          color: #ecd099;
-          text-shadow: 0 0 8px rgba(236, 208, 153, 0.3);
+          color: #8c6b30;
+          font-weight: 700;
         }
 
         :global(.utility-right) {
@@ -6365,7 +6365,7 @@ export default function Home() {
           display: flex;
           align-items: center;
           gap: 6px;
-          color: rgba(255, 255, 255, 0.65) !important;
+          color: #475569 !important;
           text-decoration: none !important;
           font-weight: 600;
           transition: all 0.25s ease;
@@ -6377,21 +6377,21 @@ export default function Home() {
         }
 
         :global(.utility-item:hover) {
-          color: #ffffff !important;
-          background: rgba(255, 255, 255, 0.05);
+          color: #0f172a !important;
+          background: rgba(0, 0, 0, 0.03);
         }
 
         :global(.utility-item) svg {
-          color: rgba(255, 255, 255, 0.45) !important;
+          color: #64748b !important;
           transition: color 0.25s ease;
         }
 
         :global(.utility-item:hover) svg {
-          color: #ecd099 !important;
+          color: #b38e47 !important;
         }
 
         :global(.utility-divider) {
-          color: rgba(255, 255, 255, 0.12);
+          color: rgba(0, 0, 0, 0.08);
           user-select: none;
         }
 
@@ -6415,21 +6415,21 @@ export default function Home() {
         }
 
         :global(.b2b-btn-link) {
-          background: rgba(236, 208, 153, 0.08) !important;
-          border: 1px solid rgba(236, 208, 153, 0.2) !important;
-          color: #ecd099 !important;
+          background: rgba(179, 142, 71, 0.06) !important;
+          border: 1px solid rgba(179, 142, 71, 0.25) !important;
+          color: #8c6b30 !important;
           padding: 4px 10px !important;
           border-radius: 12px !important;
         }
 
         :global(.b2b-btn-link:hover) {
-          background: rgba(236, 208, 153, 0.16) !important;
-          border-color: rgba(236, 208, 153, 0.45) !important;
-          color: #ffffff !important;
+          background: rgba(179, 142, 71, 0.12) !important;
+          border-color: rgba(179, 142, 71, 0.45) !important;
+          color: #8c6b30 !important;
         }
 
         :global(.b2b-small-badge) {
-          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          background: linear-gradient(135deg, #ecd099 0%, #b38e47 100%);
           color: #ffffff !important;
           font-size: 0.58rem;
           font-weight: 800;
@@ -6441,22 +6441,20 @@ export default function Home() {
         .kiosk-status-text {
           font-size: 0.85rem;
           font-weight: 700;
-          color: var(--accent-gold);
+          color: #8c6b30;
           letter-spacing: 0.08em;
-          text-shadow: 0 0 10px rgba(179, 142, 71, 0.15);
+          text-shadow: 0 0 10px rgba(179, 142, 71, 0.1);
         }
 
-        /* Redesigned Premium Header */
+        /* Redesigned Premium White Header */
         .main-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 14px 28px;
           border-radius: var(--border-radius-lg);
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(25px);
-          -webkit-backdrop-filter: blur(25px);
-          border: 1px solid rgba(255, 255, 255, 0.6);
+          background: #ffffff; /* solid white */
+          border: 1px solid rgba(0, 0, 0, 0.06);
           box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.03), 
                       0 1px 0 rgba(255, 255, 255, 0.8) inset;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -6467,24 +6465,23 @@ export default function Home() {
         /* Adjust header border-radius if Top Utility Bar is present */
         :global(.top-utility-bar) + .main-header {
           border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
-          border-top: 1px solid rgba(0, 0, 0, 0.03);
+          border-top: 1px solid rgba(0, 0, 0, 0.04);
         }
 
         .main-header:hover {
-          border-color: rgba(212, 175, 55, 0.18);
-          box-shadow: 0 15px 35px -10px rgba(212, 175, 55, 0.08), 
-                      0 1px 0 rgba(255, 255, 255, 0.85) inset;
+          border-color: rgba(212, 175, 55, 0.25);
+          box-shadow: 0 15px 35px -10px rgba(179, 142, 71, 0.08);
         }
 
         .header-brand {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 14px;
         }
 
         .logo-icon {
-          width: 42px;
-          height: 42px;
+          width: 48px; /* enlarged logo icon */
+          height: 48px;
           background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
           border-radius: var(--border-radius-sm);
           display: flex;
@@ -6493,7 +6490,7 @@ export default function Home() {
           font-family: var(--font-title);
           font-weight: 850;
           color: #ffffff;
-          font-size: 1.25rem;
+          font-size: 1.4rem;
           box-shadow: 0 4px 14px rgba(179, 142, 71, 0.3);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
@@ -6502,7 +6499,7 @@ export default function Home() {
 
         .logo-text {
           font-family: var(--font-title);
-          font-size: 1.45rem;
+          font-size: 1.65rem; /* enlarged logo text */
           font-weight: 800;
           color: var(--text-primary);
           letter-spacing: -0.025em;
@@ -6513,10 +6510,10 @@ export default function Home() {
 
         .header-nav {
           display: flex;
-          background: rgba(15, 23, 42, 0.03);
+          background: rgba(0, 0, 0, 0.035); /* dark glass backdrop in light header */
           padding: 5px;
           border-radius: 30px;
-          border: 1px solid rgba(0, 0, 0, 0.05);
+          border: 1px solid rgba(0, 0, 0, 0.04);
           backdrop-filter: blur(5px);
           gap: 4px;
         }
@@ -6524,13 +6521,13 @@ export default function Home() {
         .nav-link {
           background: transparent;
           border: none;
-          color: var(--text-secondary);
+          color: #475569;
           padding: 8px 24px;
           border-radius: 24px;
           cursor: pointer;
           font-family: var(--font-title);
           font-weight: 700;
-          font-size: 0.84rem;
+          font-size: 0.85rem;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           display: flex;
           align-items: center;
@@ -6539,12 +6536,12 @@ export default function Home() {
         }
 
         .nav-link svg {
-          color: var(--text-muted);
+          color: #64748b;
           transition: color 0.3s ease, transform 0.3s ease;
         }
 
         .nav-link:hover {
-          color: var(--text-primary);
+          color: #0f172a;
           background: rgba(255, 255, 255, 0.6);
         }
 
@@ -6555,9 +6552,9 @@ export default function Home() {
 
         .nav-link.active {
           color: #ffffff !important;
-          background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-          border: 1px solid rgba(212, 175, 55, 0.2);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          background: #0f172a; /* high contrast modern charcoal button */
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
         }
 
         .nav-link.active svg {
@@ -6580,9 +6577,9 @@ export default function Home() {
           display: flex;
           align-items: center;
           gap: 8px;
-          background: rgba(255, 255, 255, 0.7);
+          background: rgba(0, 0, 0, 0.02);
           border: 1px solid rgba(0, 0, 0, 0.05);
-          color: var(--text-secondary);
+          color: #475569;
           padding: 9px 18px;
           border-radius: 20px;
           cursor: pointer;
@@ -6597,7 +6594,7 @@ export default function Home() {
           transform: translateY(-2px);
           background: #ffffff;
           border-color: rgba(212, 175, 55, 0.25);
-          color: var(--text-primary);
+          color: #0f172a;
           box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
         }
 
@@ -6622,7 +6619,7 @@ export default function Home() {
         }
 
         .heart-icon-gold {
-          color: var(--text-muted);
+          color: #64748b;
           transition: color 0.3s ease;
         }
 
@@ -6679,7 +6676,7 @@ export default function Home() {
         .hamburger-menu-btn {
           background: transparent;
           border: none;
-          color: var(--text-primary);
+          color: #0f172a;
           cursor: pointer;
           padding: 8px;
           display: none;
@@ -6695,20 +6692,19 @@ export default function Home() {
         }
 
         /* ==========================================================================
-           REDESIGNED NEW COLLECTIONS BANNER STYLE
+           REDESIGNED LIGHT LUXURY COLLECTIONS BANNER STYLE
            ========================================================================== */
 
         .project-top-banner {
           display: flex;
           align-items: center;
-          background: radial-gradient(ellipse at top, rgba(22, 29, 45, 0.95) 0%, rgba(7, 9, 15, 0.99) 100%);
-          border: 1px solid rgba(212, 175, 55, 0.18);
+          background: linear-gradient(135deg, #fdfbf7 0%, #f5efe1 100%); /* warm champagne cream */
+          border: 1px solid rgba(179, 142, 71, 0.22);
           border-radius: var(--border-radius-lg);
           padding: 0;
           gap: 0;
-          box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3), 
-                      inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                      0 0 20px rgba(179, 142, 71, 0.04);
+          box-shadow: 0 10px 30px rgba(179, 142, 71, 0.05), 
+                      inset 0 1px 0 #ffffff;
           overflow: hidden;
           position: relative;
         }
@@ -6719,37 +6715,37 @@ export default function Home() {
           display: flex;
           align-items: center;
           z-index: 2;
-          background: linear-gradient(90deg, #07090f 85%, transparent 100%);
+          background: linear-gradient(90deg, #fdfbf7 85%, transparent 100%);
         }
 
         .banner-badge {
           display: flex;
           align-items: center;
           gap: 8px;
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
-          border: 1px solid rgba(212, 175, 55, 0.4);
-          color: #ecd099;
+          background: #ffffff;
+          border: 1px solid rgba(179, 142, 71, 0.35);
+          color: #8c6b30;
           padding: 8px 18px;
           border-radius: 20px;
           font-size: 0.74rem;
           font-weight: 800;
           letter-spacing: 0.08em;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(212, 175, 55, 0.1);
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.06);
           white-space: nowrap;
         }
 
         .banner-badge svg {
-          color: #ecd099;
-          filter: drop-shadow(0 0 3px rgba(236, 208, 153, 0.5));
+          color: #8c6b30;
+          filter: drop-shadow(0 0 2px rgba(179, 142, 71, 0.2));
         }
 
         .banner-ad-showcase {
           display: flex;
           align-items: center;
           gap: 14px;
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(15, 23, 42, 0.3) 100%);
-          border-left: 1px solid rgba(212, 175, 55, 0.18);
-          border-right: 1px solid rgba(212, 175, 55, 0.18);
+          background: linear-gradient(135deg, rgba(179, 142, 71, 0.05) 0%, rgba(255, 255, 255, 0.2) 100%);
+          border-left: 1px solid rgba(179, 142, 71, 0.12);
+          border-right: 1px solid rgba(179, 142, 71, 0.12);
           padding: 10px 22px;
           height: 100%;
           cursor: pointer;
@@ -6762,21 +6758,19 @@ export default function Home() {
         }
 
         .banner-ad-showcase:hover {
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.18) 0%, rgba(15, 23, 42, 0.5) 100%);
-          box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.15);
-          transform: translateY(0) scale(1.02);
+          background: linear-gradient(135deg, rgba(179, 142, 71, 0.1) 0%, rgba(255, 255, 255, 0.4) 100%);
+          box-shadow: inset 0 0 10px rgba(179, 142, 71, 0.08);
+          transform: scale(1.01);
         }
 
         .ad-badge {
           font-size: 0.58rem;
           font-weight: 900;
-          color: #0f172a;
-          background: linear-gradient(135deg, #ecd099 0%, #c5a059 100%);
+          color: #ffffff;
+          background: #0f172a;
           padding: 3px 8px;
           border-radius: 4px;
           letter-spacing: 0.06em;
-          box-shadow: 0 2px 6px rgba(212, 175, 55, 0.25);
-          text-shadow: none;
         }
 
         .ad-thumb {
@@ -6784,14 +6778,14 @@ export default function Home() {
           height: 70px;
           border-radius: 10px;
           object-fit: cover;
-          border: 1.5px solid rgba(212, 175, 55, 0.25);
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+          border: 1.5px solid rgba(179, 142, 71, 0.2);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
           transition: all 0.3s ease;
         }
 
         .banner-ad-showcase:hover .ad-thumb {
-          border-color: #ecd099;
-          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+          border-color: #8c6b30;
+          box-shadow: 0 4px 10px rgba(179, 142, 71, 0.15);
         }
 
         .ad-info {
@@ -6803,7 +6797,7 @@ export default function Home() {
 
         .ad-brand {
           font-size: 0.65rem;
-          color: #ecd099;
+          color: #8c6b30;
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 0.04em;
@@ -6811,7 +6805,7 @@ export default function Home() {
 
         .ad-name {
           font-size: 0.76rem;
-          color: #ffffff;
+          color: #1e293b;
           font-weight: 700;
           white-space: nowrap;
           overflow: hidden;
@@ -6845,7 +6839,7 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
 
-        /* Banner styles */
+        /* Banner Showcase Slabs - Light Version */
         .banner-item {
           display: flex;
           align-items: center;
@@ -6855,17 +6849,19 @@ export default function Home() {
           padding: 8px 16px 8px 8px;
           border-radius: 18px;
           flex-shrink: 0;
-          background: rgba(255, 255, 255, 0.015);
-          border: 1px solid rgba(212, 175, 55, 0.12);
+          background: rgba(255, 255, 255, 0.8); /* white glass tiles */
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(179, 142, 71, 0.15);
           width: 300px;
           height: 130px;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
 
         .banner-item:hover {
-          transform: translateY(-3px) scale(1.03);
-          background: rgba(255, 255, 255, 0.06);
-          border-color: rgba(212, 175, 55, 0.45);
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(212, 175, 55, 0.12);
+          transform: translateY(-3px) scale(1.02);
+          background: #ffffff;
+          border-color: rgba(179, 142, 71, 0.45);
+          box-shadow: 0 10px 25px rgba(179, 142, 71, 0.12);
         }
 
         .banner-img {
@@ -6873,15 +6869,15 @@ export default function Home() {
           height: 110px;
           border-radius: 12px;
           object-fit: cover;
-          border: 1.5px solid rgba(255, 255, 255, 0.1);
+          border: 1.5px solid rgba(0, 0, 0, 0.06);
           transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
           flex-shrink: 0;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
         }
 
         .banner-item:hover .banner-img {
-          border-color: #ecd099;
-          box-shadow: 0 0 14px rgba(212, 175, 55, 0.35);
+          border-color: #8c6b30;
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.2);
         }
 
         .banner-item-info {
@@ -6891,7 +6887,7 @@ export default function Home() {
         }
 
         .banner-brand-name {
-          color: #c5a059;
+          color: #8c6b30; /* gold-bronze */
           font-size: 0.72rem;
           font-weight: 800;
           letter-spacing: 0.06em;
@@ -6899,7 +6895,7 @@ export default function Home() {
         }
 
         .banner-product-name {
-          color: rgba(255, 255, 255, 0.85);
+          color: #1e293b;
           font-size: 0.85rem;
           font-weight: 600;
           white-space: nowrap;
@@ -6907,7 +6903,7 @@ export default function Home() {
         }
 
         .banner-item:hover .banner-product-name {
-          color: #ffffff;
+          color: #0f172a;
         }
 
         .spin-icon-slow {
