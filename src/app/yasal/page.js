@@ -3,11 +3,47 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Shield, FileText, Settings, Sparkles } from 'lucide-react';
+import { ArrowLeft, Shield, FileText, Settings } from 'lucide-react';
 
 function LegalContentReader() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState('kvkk');
+
+  // Dynamic States
+  const [legalData, setLegalData] = useState({
+    kvkk: `
+      <p>SeramikBak Teknoloji A.Ş. (“SeramikBak” veya “Şirket”) olarak, çevrimiçi ziyaretçilerimizin, bayilerimizin ve marka ortaklarımızın kişisel verilerinin korunmasına büyük önem veriyoruz. Bu metin, 6698 sayılı Kişisel Verilerin Korunması Kanunu (“Kanun”) kapsamında veri sorumlusu sıfatıyla tarafımızca toplanan verilerin işlenme şartlarını açıklamak amacıyla hazırlanmıştır.</p>
+      <h3>1. Hangi Kişisel Verileri İşliyoruz?</h3>
+      <p>SeramikBak platformunu kullanımınız sırasında aşağıdaki verileriniz işlenmektedir:</p>
+      <ul>
+        <li><strong>Kimlik ve İletişim Bilgileri:</strong> Adınız, soyadınız, telefon numaranız, e-posta adresiniz (üye olurken veya bayilerden teklif isterken sağladığınız bilgiler).</li>
+        <li><strong>Konum Bilgileri:</strong> Bayi bulucu aracılığıyla en yakın bayiyi göstermek için tarayıcı izninizle toplanan yaklaşık coğrafi koordinatlarınız.</li>
+        <li><strong>Kullanım ve İşlem Bilgileri:</strong> Arama geçmişiniz, tıkladığınız ve karşılaştırdığınız seramik modelleri, stüdyoya yüklediğiniz zemin fotoğrafları.</li>
+      </ul>
+      <h3>2. Veri İşleme Amaçlarımız</h3>
+      <p>Toplanan kişisel verileriniz, aşağıdaki hukuki ve ticari amaçlarla işlenmektedir:</p>
+      <ul>
+        <li>Beğendiğiniz seramik ürünleriyle ilgili size en yakın bayiden teklif/bilgi almanızı sağlamak.</li>
+        <li>Odanızın fotoğrafına seramik giydirebilmeniz için 3D Sanal Stüdyo hizmetini sunmak.</li>
+        <li>B2B marka ortaklarımızın reklam ve ürün analizlerini yürüterek platform performansını iyileştirmek.</li>
+      </ul>
+    `,
+    kullanim: `
+      <p>Lütfen SeramikBak internet sitesini (seramikbak.com) ve mobil uygulamasını kullanmadan önce bu kullanım koşullarını dikkatlice okuyunuz. Sitemizi kullanarak bu koşulları peşinen kabul etmiş sayılırsınız.</p>
+      <h3>1. Hizmetin Niteliği</h3>
+      <p>SeramikBak, seramik üreticisi markaları ve onun yetkili satıcılarını tüketicilerle buluşturan bağımsız bir arama motoru, karşılaştırma ve 3D görselleştirme portalıdır. SeramikBak, doğrudan seramik satışı yapmaz, ödeme tahsil etmez ve nakliye süreçlerini üstlenmez. Tüm ticari alışveriş ilişkisi son kullanıcı ile bağımsız yetkili bayiler arasında gerçekleşir.</p>
+      <h3>2. Fikri Mülkiyet Hakları</h3>
+      <p>Sitede yer alan tüm yazılımlar, tasarım kodları, logolar, 3D stüdyo algoritmaları ve sergilenen ürün görselleri/doku kaplamaları SeramikBak'a veya lisans ortaklarına aittir.</p>
+    `,
+    cerez: `
+      <p>SeramikBak internet sitesinde, ziyaretçilerimize daha iyi bir kullanıcı deneyimi sunabilmek ve platform trafiğini analiz edebilmek amacıyla çerezler (cookies) kullanılmaktadır. Çerezler, tarayıcınız aracılığıyla bilgisayarınıza veya mobil cihazınıza kaydedilen küçük metin dosyalarıdır.</p>
+      <h3>1. Kullandığımız Çerez Türleri</h3>
+      <ul>
+        <li><strong>Zorunlu Çerezler:</strong> Sitenin düzgün çalışması, üye girişi yapılabilmesi ve favori seramiklerinizin tarayıcıda saklanabilmesi için zorunlu olan teknik çerezlerdir.</li>
+        <li><strong>Performans Çerezleri:</strong> Aramaları ölçümleyerek sitemizi optimize etmemize yarayan çerezlerdir.</li>
+      </ul>
+    `
+  });
 
   useEffect(() => {
     const tabParam = searchParams.get('tab');
@@ -16,81 +52,38 @@ function LegalContentReader() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.page_yasal_content) {
+          setLegalData(data.page_yasal_content);
+        }
+      })
+      .catch(err => console.error('Failed to load legal settings:', err));
+  }, []);
+
   const tabs = [
     {
       id: 'kvkk',
       label: 'KVKK ve Gizlilik',
       icon: <Shield size={16} />,
       title: 'Kişisel Verilerin Korunması Kanunu (KVKK) ve Gizlilik Politikası',
-      content: (
-        <>
-          <p><strong>Son Güncelleme:</strong> 10 Temmuz 2026</p>
-          <p>SeramikBak Teknoloji A.Ş. (“SeramikBak” veya “Şirket”) olarak, çevrimiçi ziyaretçilerimizin, bayilerimizin ve marka ortaklarımızın kişisel verilerinin korunmasına büyük önem veriyoruz. Bu metin, 6698 sayılı Kişisel Verilerin Korunması Kanunu (“Kanun”) kapsamında veri sorumlusu sıfatıyla tarafımızca toplanan verilerin işlenme şartlarını açıklamak amacıyla hazırlanmıştır.</p>
-          
-          <h3>1. Hangi Kişisel Verileri İşliyoruz?</h3>
-          <p>SeramikBak platformunu kullanımınız sırasında aşağıdaki verileriniz işlenmektedir:</p>
-          <ul>
-            <li><strong>Kimlik ve İletişim Bilgileri:</strong> Adınız, soyadınız, telefon numaranız, e-posta adresiniz (üye olurken veya bayilerden teklif isterken sağladığınız bilgiler).</li>
-            <li><strong>Konum Bilgileri:</strong> Bayi bulucu aracılığıyla en yakın bayiyi göstermek için tarayıcı izninizle toplanan yaklaşık coğrafi koordinatlarınız.</li>
-            <li><strong>Kullanım ve İşlem Bilgileri:</strong> Arama geçmişiniz, tıkladığınız ve karşılaştırdığınız seramik modelleri, stüdyoya yüklediğiniz zemin fotoğrafları.</li>
-          </ul>
-
-          <h3>2. Veri İşleme Amaçlarımız</h3>
-          <p>Toplanan kişisel verileriniz, aşağıdaki hukuki ve ticari amaçlarla işlenmektedir:</p>
-          <ul>
-            <li>Beğendiğiniz seramik ürünleriyle ilgili size en yakın bayiden teklif/bilgi almanızı sağlamak.</li>
-            <li>Odanızın fotoğrafına seramik giydirebilmeniz için 3D Sanal Stüdyo hizmetini sunmak.</li>
-            <li>B2B marka ortaklarımızın reklam ve ürün analizlerini yürüterek platform performansını iyileştirmek.</li>
-            <li>Platform güvenliğini sağlamak ve yasal yükümlülüklerimizi yerine getirmek.</li>
-          </ul>
-
-          <h3>3. Verilerin Üçüncü Kişilerle Paylaşılması</h3>
-          <p>SeramikBak, onayınız olmaksızın kişisel verilerinizi üçüncü taraflarla reklam amacıyla paylaşmaz. Ancak, bir üründen <strong>'Teklif İste'</strong> veya <strong>'Bilgi Al'</strong> formunu doldurarak talebinizi gönderdiğinizde, sağladığınız iletişim bilgileri talebinizin yerine getirilmesi amacıyla <strong>seçtiğiniz yetkili bayilerle</strong> otomatik olarak paylaşılır.</p>
-        </>
-      )
+      content: legalData.kvkk
     },
     {
       id: 'kullanim',
       label: 'Kullanım Koşulları',
       icon: <FileText size={16} />,
       title: 'SeramikBak Platformu Kullanım Koşulları',
-      content: (
-        <>
-          <p><strong>Son Güncelleme:</strong> 10 Temmuz 2026</p>
-          <p>Lütfen SeramikBak internet sitesini (seramikbak.com) ve mobil uygulamasını kullanmadan önce bu kullanım koşullarını dikkatlice okuyunuz. Sitemizi kullanarak bu koşulları peşinen kabul etmiş sayılırsınız.</p>
-          
-          <h3>1. Hizmetin Niteliği</h3>
-          <p>SeramikBak, seramik üreticisi markaları ve onların yetkili satıcılarını tüketicilerle buluşturan bağımsız bir arama motoru, karşılaştırma ve 3D görselleştirme portalıdır. SeramikBak, doğrudan seramik satışı yapmaz, ödeme tahsil etmez ve nakliye süreçlerini üstlenmez. Tüm ticari alışveriş ilişkisi son kullanıcı ile bağımsız yetkili bayiler arasında gerçekleşir.</p>
-
-          <h3>2. Fikri Mülkiyet Hakları</h3>
-          <p>Sitede yer alan tüm yazılımlar, tasarım kodları, logolar, 3D stüdyo algoritmaları ve sergilenen ürün görselleri/doku kaplamaları SeramikBak'a veya lisans ortaklarına aittir. İzinsiz kopyalanması, kazınması (scraping) veya ticari amaçlarla başka platformlarda yayınlanması yasaktır.</p>
-
-          <h3>3. Kullanıcı Sorumlulukları</h3>
-          <p>3D Sanal Stüdyo modülüne yüklediğiniz oda fotoğraflarının yasal haklarına sahip olmanız gerekir. Başka şahısların mahremiyetini ihlal eden veya telif hakkı içeren görsellerin yüklenmesinden doğacak tüm hukuki sorumluluk yükleyen kullanıcıya aittir.</p>
-        </>
-      )
+      content: legalData.kullanim
     },
     {
       id: 'cerez',
       label: 'Çerez Politikası',
       icon: <Settings size={16} />,
       title: 'Çerez (Cookie) Kullanımı ve Bildirim Metni',
-      content: (
-        <>
-          <p><strong>Son Güncelleme:</strong> 10 Temmuz 2026</p>
-          <p>SeramikBak internet sitesinde, ziyaretçilerimize daha iyi bir kullanıcı deneyimi sunabilmek ve platform trafiğini analiz edebilmek amacıyla çerezler (cookies) kullanılmaktadır. Çerezler, tarayıcınız aracılığıyla bilgisayarınıza veya mobil cihazınıza kaydedilen küçük metin dosyalarıdır.</p>
-
-          <h3>1. Kullandığımız Çerez Türleri</h3>
-          <ul>
-            <li><strong>Zorunlu Çerezler:</strong> Sitenin düzgün çalışması, üye girişi yapılabilmesi ve favori seramiklerinizin tarayıcıda saklanabilmesi için zorunlu olan teknik çerezlerdir.</li>
-            <li><strong>Performans ve Analitik Çerezleri:</strong> Hangi seramik markalarının veya boyutlarının daha çok arandığını ölçümleyerek sitemizi optimize etmemize yarayan çerezlerdir (Google Analytics vb.).</li>
-            <li><strong>Kişiselleştirme Çerezleri:</strong> 3D stüdyo tercihlerinizin, seçtiğiniz dilin ve konumunuzun hatırlanmasını sağlayan çerezlerdir.</li>
-          </ul>
-
-          <h3>2. Çerezleri Nasıl Kontrol Edebilirsiniz?</h3>
-          <p>Tarayıcınızın ayarlarından tüm çerezleri engelleyebilir, kaydedilmiş çerezleri silebilir veya çerez kaydedilirken uyarı almayı seçebilirsiniz. Ancak çerezleri tamamen devre dışı bırakmanız halinde, SeramikBak'ın bazı kişiselleştirilmiş özellikleri (örneğin favorilere ekleme veya 3D oda tasarımı geçmişi) kararlı çalışmayabilir.</p>
-        </>
-      )
+      content: legalData.cerez
     }
   ];
 
@@ -200,9 +193,8 @@ function LegalContentReader() {
               color: '#334155'
             }}
             className="legal-doc-content"
-          >
-            {currentTab.content}
-          </div>
+            dangerouslySetInnerHTML={{ __html: currentTab.content }}
+          />
         </div>
       </div>
     </div>

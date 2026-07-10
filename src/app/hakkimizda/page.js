@@ -1,9 +1,34 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles, Building2, ShieldCheck, Heart, Award, Cpu } from 'lucide-react';
 
 export default function AboutUsPage() {
+  const [aboutData, setAboutData] = useState({
+    hero_title: 'Seramik Seçimini Yeniden Tanımlıyoruz',
+    hero_subtitle: 'SeramikBak; üreticileri, bayileri ve tasarım severleri yapay zeka, Web 3D ve artırılmış gerçeklik teknolojileriyle bir araya getiren bağımsız, lüks bir dijital pazaryeri ve showroom ekosistemidir.',
+    mission: 'Tüm yerel ve küresel markaların kataloglarını zengin detaylarla tek bir arama motorunda birleştirmek; bayilerin potansiyel müşterilere zahmetsizce ulaşabileceği B2B SaaS araçları sunmak ve tüketicilerin hayallerindeki mimari tasarımları hızlı fiyat teklifleriyle gerçeğe dönüştürmelerini sağlamak.',
+    vision: 'Geleneksel ve zahmetli olan seramik alışverişi sürecini, fiziksel mağazalarda kaybolmadan, tamamen dijital, şeffaf ve kusursuz bir deneyime dönüştürmek. Üç boyutlu modelleme ve yapay zeka ile müşterilerin yaşam alanlarında seramikleri canlı olarak deneyimlemesini sağlayarak sektörün dijital lideri olmak.',
+    stats: [
+      { num: '100+', label: 'Karşılaştırılan Marka & Üretici' },
+      { num: '10,000+', label: 'Aktif Seramik & Karo Ürünü' },
+      { num: '500+', label: 'Türkiye Genelinde Yetkili Bayi' },
+      { num: '2.5 Saniye', label: 'AI Destekli Arama ve Öneri Hızı' }
+    ]
+  });
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.page_about_content) {
+          setAboutData(data.page_about_content);
+        }
+      })
+      .catch(err => console.error('Failed to load about settings:', err));
+  }, []);
+
   return (
     <main style={{
       minHeight: '100vh',
@@ -111,11 +136,15 @@ export default function AboutUsPage() {
             color: '#0f172a',
             margin: '0 0 24px 0'
           }}>
-            Seramik Seçimini <span style={{
-              background: 'linear-gradient(135deg, #b38e47 0%, #8c6b30 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>Yeniden Tanımlıyoruz</span>
+            {aboutData.hero_title.includes('Yeniden Tanımlıyoruz') ? (
+              <>
+                Seramik Seçimini <span style={{
+                  background: 'linear-gradient(135deg, #b38e47 0%, #8c6b30 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>Yeniden Tanımlıyoruz</span>
+              </>
+            ) : aboutData.hero_title}
           </h1>
           <p style={{
             fontSize: '1.15rem',
@@ -124,7 +153,7 @@ export default function AboutUsPage() {
             maxWidth: '720px',
             margin: '0 auto'
           }}>
-            SeramikBak; üreticileri, bayileri ve tasarım severleri yapay zeka, Web 3D ve artırılmış gerçeklik teknolojileriyle bir araya getiren bağımsız, lüks bir dijital pazaryeri ve showroom ekosistemidir.
+            {aboutData.hero_subtitle}
           </p>
         </section>
 
@@ -135,12 +164,7 @@ export default function AboutUsPage() {
           gap: '24px',
           marginBottom: '80px'
         }}>
-          {[
-            { num: '100+', label: 'Karşılaştırılan Marka & Üretici' },
-            { num: '10,000+', label: 'Aktif Seramik & Karo Ürünü' },
-            { num: '500+', label: 'Türkiye Genelinde Yetkili Bayi' },
-            { num: '2.5 Saniye', label: 'AI Destekli Arama ve Öneri Hızı' }
-          ].map((stat, idx) => (
+          {aboutData.stats && aboutData.stats.map((stat, idx) => (
             <div key={idx} style={{
               background: '#ffffff',
               border: '1px solid rgba(0, 0, 0, 0.04)',
@@ -194,7 +218,7 @@ export default function AboutUsPage() {
             </div>
             <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '16px' }}>Vizyonumuz</h3>
             <p style={{ fontSize: '0.95rem', lineHeight: '1.6', color: '#475569', margin: 0 }}>
-              Geleneksel ve zahmetli olan seramik alışverişi sürecini, fiziksel mağazalarda kaybolmadan, tamamen dijital, şeffaf ve kusursuz bir deneyime dönüştürmek. Üç boyutlu modelleme ve yapay zeka ile müşterilerin yaşam alanlarında seramikleri canlı olarak deneyimlemesini sağlayarak sektörün dijital lideri olmak.
+              {aboutData.vision}
             </p>
           </div>
 
@@ -220,7 +244,7 @@ export default function AboutUsPage() {
             </div>
             <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '16px' }}>Misyonumuz</h3>
             <p style={{ fontSize: '0.95rem', lineHeight: '1.6', color: '#475569', margin: 0 }}>
-              Tüm yerel ve küresel markaların kataloglarını zengin detaylarla tek bir arama motorunda birleştirmek; bayilerin potansiyel müşterilere zahmetsizce ulaşabileceği B2B SaaS araçları sunmak ve tüketicilerin hayallerindeki mimari tasarımları hızlı fiyat teklifleriyle gerçeğe dönüştürmelerini sağlamak.
+              {aboutData.mission}
             </p>
           </div>
         </section>

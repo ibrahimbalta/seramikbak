@@ -2470,6 +2470,14 @@ export default function Home() {
                 <MapPin size={14} />
                 <span>Bayi Bulucu</span>
               </button>
+              <Link href="/hakkimizda" className="nav-link" style={{ textDecoration: 'none' }}>
+                <Info size={14} />
+                <span>Hakkımızda</span>
+              </Link>
+              <Link href="/ilham" className="nav-link" style={{ textDecoration: 'none' }}>
+                <Sparkles size={14} />
+                <span>İlham Galerisi & Trendler</span>
+              </Link>
             </>
           )}
         </nav>
@@ -2567,6 +2575,13 @@ export default function Home() {
                 Bayi Bulucu
               </button>
               
+              <Link href="/hakkimizda" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => setShowMobileMenu(false)}>
+                Hakkımızda
+              </Link>
+              <Link href="/ilham" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => setShowMobileMenu(false)}>
+                İlham Galerisi & Trendler
+              </Link>
+
               <div className="mobile-menu-divider" />
               
               <Link href="/proje-talep" className="mobile-nav-link b2b-link" onClick={() => setShowMobileMenu(false)}>
@@ -5511,7 +5526,7 @@ export default function Home() {
             </ul>
           </div>
 
-          {/* Column 4: Hızlı Erişim */}
+          {/* Column 4: Kurumsal & Portallar */}
           <div className="footer-col">
             <h4>Kurumsal & Portallar</h4>
             <ul>
@@ -5524,20 +5539,25 @@ export default function Home() {
             </ul>
           </div>
 
+          {/* Column 5: Kurumsal & Destek */}
+          <div className="footer-col">
+            <h4>Kurumsal & Destek</h4>
+            <ul>
+              <li><Link href="/hakkimizda">Hakkımızda</Link></li>
+              <li><Link href="/iletisim">İletişim & SSS</Link></li>
+              <li><Link href="/ilham">İlham Galerisi & Trendler</Link></li>
+              <li><Link href="/yasal?tab=kvkk">KVKK & Gizlilik</Link></li>
+              <li><Link href="/yasal?tab=kullanim">Kullanım Koşulları</Link></li>
+              <li><Link href="/yasal?tab=cerez">Çerez Politikası</Link></li>
+            </ul>
+          </div>
+
         </div>
 
         {/* Footer Bottom Bar */}
         <div className="footer-bottom">
           <div className="footer-bottom-left">
             <p>© 2026 SeramikBak. Tüm hakları saklıdır. Türkiye'nin Seramik Arama Motoru.</p>
-            <div className="footer-legal-links" style={{ display: 'flex', gap: '16px', marginTop: '8px', fontSize: '0.75rem', flexWrap: 'wrap' }}>
-              <Link href="/hakkimizda" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }} className="footer-bottom-link">Hakkımızda</Link>
-              <Link href="/iletisim" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }} className="footer-bottom-link">İletişim & SSS</Link>
-              <Link href="/ilham" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }} className="footer-bottom-link">İlham Galerisi & Trendler</Link>
-              <Link href="/yasal?tab=kvkk" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }} className="footer-bottom-link">KVKK & Gizlilik</Link>
-              <Link href="/yasal?tab=kullanim" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }} className="footer-bottom-link">Kullanım Koşulları</Link>
-              <Link href="/yasal?tab=cerez" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }} className="footer-bottom-link">Çerez Politikası</Link>
-            </div>
           </div>
           <div className="footer-bottom-right">
             <span className="footer-security-tag">🔒 256-Bit SSL Güvenli Bağlantı</span>
@@ -10412,7 +10432,7 @@ export default function Home() {
 
         .footer-grid {
           display: grid;
-          grid-template-columns: 2fr 1fr 1fr 1fr;
+          grid-template-columns: 2fr repeat(4, 1fr);
           gap: 40px;
         }
 

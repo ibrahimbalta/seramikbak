@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, BookOpen, Compass, ChevronRight, X, Clock, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Sparkles, BookOpen, Compass, ChevronRight, X, Clock } from 'lucide-react';
 
 export default function InspirationGalleryPage() {
   const [selectedArticle, setSelectedArticle] = useState(null);
 
-  const galleryItems = [
+  // Dynamic States
+  const [galleryItems, setGalleryItems] = useState([
     {
       title: 'İskandinav Ahşap Zarafeti',
       desc: 'Banyo ve mutfaklarda sıcacık, doğal bir doku.',
@@ -29,9 +30,9 @@ export default function InspirationGalleryPage() {
       tag: 'Modern',
       img: '/hero/modern_living.png'
     }
-  ];
+  ]);
 
-  const articles = [
+  const [articles, setArticles] = useState([
     {
       id: 1,
       title: 'Rektifiyeli Seramik Nedir? Derz Aralıkları Nasıl Olmalıdır?',
@@ -40,7 +41,7 @@ export default function InspirationGalleryPage() {
       readTime: '4 dk okuma',
       content: `
         <h3>Rektifiyeli Seramik Nedir?</h3>
-        <p>Rektifiyeli seramik veya porselen karolar, pişirilme aşamasından sonra kenarlarının özel elmas bıçaklarla traşlanarak tam 90 derecelik dik açılara getirilmesi işlemidir. Standart seramiklerde kenarlar hafif yuvarlak ve pahlı gelirken, rektifiyeli ürünlerin kenarları jilet gibi düzdür.</p>
+        <p>Rektifiyeli seramik veya porselen karolar, pişirilme aşamasından sonra kenarlarının özel elmas bıçaklarla traşlanarak tam 90 derecelik dik açılara getirilmesi işlemidir. Standart seramiklerde kenarlar hafif yuvarlak ve pahlı gelirken, rektifiyeli ürünlerin kenarları jilet gibi düzdir.</p>
         
         <h3>Rektifiyeli Seramiklerin Avantajları Nelerdir?</h3>
         <ul>
@@ -100,7 +101,23 @@ export default function InspirationGalleryPage() {
         <p>Klasik krom bataryalar yerine mat fırçalanmış bronz veya altın bataryalar tercih ediliyor. Bu bataryalar sıcak traverten karolarla mükemmel bir görsel uyum yakalıyor.</p>
       `
     }
-  ];
+  ]);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          if (data.page_ilham_list) {
+            setGalleryItems(data.page_ilham_list);
+          }
+          if (data.page_blog_list) {
+            setArticles(data.page_blog_list);
+          }
+        }
+      })
+      .catch(err => console.error('Failed to load inspiration settings:', err));
+  }, []);
 
   return (
     <main style={{

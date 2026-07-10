@@ -11,7 +11,6 @@ export async function GET() {
       settingsMap[s.key] = s.value;
     });
 
-    // Provide default fallbacks if missing
     return NextResponse.json({
       bank_name: settingsMap['bank_name'] || 'Akbank',
       bank_recipient: settingsMap['bank_recipient'] || 'SeramikBak Yazılım A.Ş.',
@@ -20,7 +19,15 @@ export async function GET() {
       grok_api_key: settingsMap['grok_api_key'] || '',
       gemini_api_key: settingsMap['gemini_api_key'] || '',
       scraping_api_key: settingsMap['scraping_api_key'] || '',
-      ai_provider: settingsMap['ai_provider'] || 'deepseek'
+      ai_provider: settingsMap['ai_provider'] || 'deepseek',
+      
+      // Page contents loaded from database or null (so default fallbacks are used)
+      page_about_content: settingsMap['page_about_content'] ? JSON.parse(settingsMap['page_about_content']) : null,
+      page_contact_content: settingsMap['page_contact_content'] ? JSON.parse(settingsMap['page_contact_content']) : null,
+      page_faq_list: settingsMap['page_faq_list'] ? JSON.parse(settingsMap['page_faq_list']) : null,
+      page_ilham_list: settingsMap['page_ilham_list'] ? JSON.parse(settingsMap['page_ilham_list']) : null,
+      page_blog_list: settingsMap['page_blog_list'] ? JSON.parse(settingsMap['page_blog_list']) : null,
+      page_yasal_content: settingsMap['page_yasal_content'] ? JSON.parse(settingsMap['page_yasal_content']) : null
     });
   } catch (error) {
     console.error('Failed to fetch system settings:', error);
@@ -39,7 +46,13 @@ export async function POST(request) {
       grok_api_key,
       gemini_api_key,
       scraping_api_key,
-      ai_provider
+      ai_provider,
+      page_about_content,
+      page_contact_content,
+      page_faq_list,
+      page_ilham_list,
+      page_blog_list,
+      page_yasal_content
     } = body;
 
     const settingsToUpdate = [
@@ -50,7 +63,13 @@ export async function POST(request) {
       { key: 'grok_api_key', value: grok_api_key },
       { key: 'gemini_api_key', value: gemini_api_key },
       { key: 'scraping_api_key', value: scraping_api_key },
-      { key: 'ai_provider', value: ai_provider }
+      { key: 'ai_provider', value: ai_provider },
+      { key: 'page_about_content', value: page_about_content ? JSON.stringify(page_about_content) : undefined },
+      { key: 'page_contact_content', value: page_contact_content ? JSON.stringify(page_contact_content) : undefined },
+      { key: 'page_faq_list', value: page_faq_list ? JSON.stringify(page_faq_list) : undefined },
+      { key: 'page_ilham_list', value: page_ilham_list ? JSON.stringify(page_ilham_list) : undefined },
+      { key: 'page_blog_list', value: page_blog_list ? JSON.stringify(page_blog_list) : undefined },
+      { key: 'page_yasal_content', value: page_yasal_content ? JSON.stringify(page_yasal_content) : undefined }
     ];
 
     for (const item of settingsToUpdate) {

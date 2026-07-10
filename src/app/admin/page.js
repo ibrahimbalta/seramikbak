@@ -123,6 +123,40 @@ export default function AdminPage() {
   const [bankSettingsSuccess, setBankSettingsSuccess] = useState('');
   const [bankSettingsError, setBankSettingsError] = useState('');
 
+  // Corporate Pages Settings State
+  const [pageAboutHeroTitle, setPageAboutHeroTitle] = useState('');
+  const [pageAboutHeroSubtitle, setPageAboutHeroSubtitle] = useState('');
+  const [pageAboutVision, setPageAboutVision] = useState('');
+  const [pageAboutMission, setPageAboutMission] = useState('');
+  const [pageAboutStats, setPageAboutStats] = useState([]);
+  
+  const [pageContactAddress, setPageContactAddress] = useState('');
+  const [pageContactEmail, setPageContactEmail] = useState('');
+  const [pageContactPhone, setPageContactPhone] = useState('');
+  const [pageContactWhatsapp, setPageContactWhatsapp] = useState('');
+  
+  const [pageFaqList, setPageFaqList] = useState([]);
+  const [pageIlhamList, setPageIlhamList] = useState([]);
+  const [pageBlogList, setPageBlogList] = useState([]);
+  
+  const [pageYasalKvkk, setPageYasalKvkk] = useState('');
+  const [pageYasalKullanim, setPageYasalKullanim] = useState('');
+  const [pageYasalCerez, setPageYasalCerez] = useState('');
+
+  const [pageManagerSubTab, setPageManagerSubTab] = useState('about'); // 'about', 'contact', 'blog', 'legal'
+  
+  const [newFaqQ, setNewFaqQ] = useState('');
+  const [newFaqA, setNewFaqA] = useState('');
+  const [newBlogTitle, setNewBlogTitle] = useState('');
+  const [newBlogSummary, setNewBlogSummary] = useState('');
+  const [newBlogCategory, setNewBlogCategory] = useState('Genel');
+  const [newBlogReadTime, setNewBlogReadTime] = useState('3 dk okuma');
+  const [newBlogContent, setNewBlogContent] = useState('');
+
+  const [pageSettingsLoading, setPageSettingsLoading] = useState(false);
+  const [pageSettingsSuccess, setPageSettingsSuccess] = useState('');
+  const [pageSettingsError, setPageSettingsError] = useState('');
+
   // Product Management State
   const [adminProducts, setAdminProducts] = useState([]);
   const [adminProductsTotal, setAdminProductsTotal] = useState(0);
@@ -375,6 +409,80 @@ export default function AdminPage() {
         setGeminiApiKey(data.gemini_api_key || '');
         setScrapingApiKey(data.scraping_api_key || '');
         setAiProvider(data.ai_provider || 'deepseek');
+
+        // Populate corporate page settings if they exist
+        if (data.page_about_content) {
+          setPageAboutHeroTitle(data.page_about_content.hero_title || '');
+          setPageAboutHeroSubtitle(data.page_about_content.hero_subtitle || '');
+          setPageAboutVision(data.page_about_content.vision || '');
+          setPageAboutMission(data.page_about_content.mission || '');
+          setPageAboutStats(data.page_about_content.stats || []);
+        } else {
+          setPageAboutHeroTitle('Seramik Seçimini Yeniden Tanımlıyoruz');
+          setPageAboutHeroSubtitle('SeramikBak; üreticileri, bayileri ve tasarım severleri yapay zeka, Web 3D ve artırılmış gerçeklik teknolojileriyle bir araya getiren bağımsız, lüks bir dijital pazaryeri ve showroom ekosistemidir.');
+          setPageAboutVision('Geleneksel ve zahmetli olan seramik alışverişi sürecini, fiziksel mağazalarda kaybolmadan, tamamen dijital, şeffaf ve kusursuz bir deneyime dönüştürmek. Üç boyutlu modelleme ve yapay zeka ile müşterilerin yaşam alanlarında seramikleri canlı olarak deneyimlemesini sağlayarak sektörün dijital lideri olmak.');
+          setPageAboutMission('Tüm yerel ve küresel markaların kataloglarını zengin detaylarla tek bir arama motorunda birleştirmek; bayilerin potansiyel müşterilere zahmetsizce ulaşabileceği B2B SaaS araçları sunmak ve tüketicilerin hayallerindeki mimari tasarımları hızlı fiyat teklifleriyle gerçeğe dönüştürmelerini sağlamak.');
+          setPageAboutStats([
+            { num: '100+', label: 'Karşılaştırılan Marka & Üretici' },
+            { num: '10,000+', label: 'Aktif Seramik & Karo Ürünü' },
+            { num: '500+', label: 'Türkiye Genelinde Yetkili Bayi' },
+            { num: '2.5 Saniye', label: 'AI Destekli Arama ve Öneri Hızı' }
+          ]);
+        }
+
+        if (data.page_contact_content) {
+          setPageContactAddress(data.page_contact_content.address || '');
+          setPageContactEmail(data.page_contact_content.email || '');
+          setPageContactPhone(data.page_contact_content.phone || '');
+          setPageContactWhatsapp(data.page_contact_content.whatsapp || '');
+        } else {
+          setPageContactAddress('Kozyatağı Mahallesi, Bayar Caddesi, Plaza 34, Kat: 8, No: 12, Kadıköy / İstanbul, Türkiye');
+          setPageContactEmail('destek@seramikbak.com');
+          setPageContactPhone('0850 123 45 67');
+          setPageContactWhatsapp('+90 850 123 45 67');
+        }
+
+        if (data.page_faq_list) {
+          setPageFaqList(data.page_faq_list);
+        } else {
+          setPageFaqList([
+            { q: "SeramikBak üzerinden doğrudan ürün siparişi verebiliyor muyum?", a: "SeramikBak, doğrudan satış yapan bir e-ticaret sitesi değildir; bağımsız bir dijital showroom ve arama motorudur. Beğendiğiniz ürünlerin detay sayfasından 'En Yakın Bayiyi Bul' butonuna basarak bölgenizdeki yetkili satıcılardan (bayilerden) anında teklif isteyebilir veya iletişime geçerek satın alma işlemlerinizi yapabilirsiniz." },
+            { q: "Nasıl numune (örnek ürün) talep edebilirim?", a: "Ürünlerin detay sayfasında bulunan 'Bayiden Bilgi Al' formu üzerinden bayilere numune talebinizi iletebilirsiniz. Bayiler stok durumuna göre adresinize kargo ile numune karo gönderebilir veya sizi showrooma davet edebilir." },
+            { q: "Yetkili bayi olarak platforma nasıl kaydolabilirim?", a: "Sitemizin üst barında yer alan veya sayfa altındaki 'Bayi Portalı' linkine tıklayarak 'Yeni Bayi Başvurusu' yapabilirsiniz. Bilgileriniz onaylandıktan sonra paneliniz aktifleşecek ve bölgenizden gelen satın alma taleplerini almaya başlayabileceksiniz." },
+            { q: "3D Sanal Stüdyo'da kendi odamın fotoğrafını kullanabilir miyim?", a: "Evet! 3D Sanal Stüdyo alanında yer alan 'Kendi Odamı Tasarla' (Görsel Yükle) özelliğini kullanarak banyo, mutfak veya salonunuzun fotoğrafını yükleyebilirsiniz. Akıllı yapay zeka algoritması zemin veya duvar alanlarını saniyeler içinde analiz eder ve seçtiğiniz karoları odanıza döşer." },
+            { q: "Farklı markaların ürün fiyatları neden değişiklik göstermektedir?", a: "Fiyatlar markaların üretim teknolojileri, malzeme kalitesi (porselen, seramik, rektifiyeli olması), boyutları ve bayilerin bölgesel nakliye/lojistik maliyetlerine göre değişiklik göstermektedir. Platformumuzdaki en ucuz bayi tekliflerini karşılaştırarak bütçenize en uygun satıcıyı seçebilirsiniz." }
+          ]);
+        }
+
+        if (data.page_ilham_list) {
+          setPageIlhamList(data.page_ilham_list);
+        } else {
+          setPageIlhamList([
+            { title: 'İskandinav Ahşap Zarafeti', desc: 'Banyo ve mutfaklarda sıcacık, doğal bir doku.', style: 'Ahşap', tag: 'Minimalist', img: '/hero/scandinavian_kitchen.png' },
+            { title: 'Lüks Calacatta Mermer', desc: 'Geniş banyolarda kesintisiz ve camsı parlak yansımalar.', style: 'Mermer', tag: 'Premium Luxury', img: '/hero/luxury_bathroom.png' },
+            { title: 'Endüstriyel Beton & Loft', desc: 'Salon ve koridorlarda modern brütist gri tonlar.', style: 'Beton', tag: 'Modern', img: '/hero/modern_living.png' }
+          ]);
+        }
+
+        if (data.page_blog_list) {
+          setPageBlogList(data.page_blog_list);
+        } else {
+          setPageBlogList([
+            { id: 1, title: 'Rektifiyeli Seramik Nedir? Derz Aralıkları Nasıl Olmalıdır?', summary: 'Seramiklerin kenarlarının lazerle kesilerek dikleştirilmesi işlemine rektifiye denir. Peki montajda nelere dikkat edilmeli?', category: 'Teknik Rehber', readTime: '4 dk okuma', content: '<h3>Rektifiyeli Seramik Nedir?</h3><p>Rektifiyeli seramik veya porselen karolar, pişirilme aşamasından sonra kenarlarının özel elmas bıçaklarla traşlanarak tam 90 derecelik dik açılara getirilmesi işlemidir...</p>' },
+            { id: 2, title: 'Mat mı, Parlak (Cilalı) Porselen mi? Doğru Seçim Nasıl Yapılır?', summary: 'Zemin ve duvar karolarında mat ve parlak yüzeylerin kaymazlık, leke tutma ve ışık yansıtma karşılaştırması.', category: 'Tasarım İpuçları', readTime: '5 dk okuma', content: '<h3>Mat ve Parlak Karoların Karşılaştırması</h3><p>Seramik seçiminde en çok kararsız kalınan noktalardan biri yüzey bitişidir...</p>' },
+            { id: 3, title: '2026 Banyo Tasarım Trendleri: Doğallığa Dönüş ve Toprak Tonları', summary: 'Bu yıl banyolarda mermer soğukluğundan ziyade sıcak traverten tonları, ham meşe ahşap dokuları ve yeşil bitkiler hakim.', category: 'Trendler', readTime: '3 dk okuma', content: '<h3>2026 Banyo Tasarımlarında Öne Çıkanlar</h3><p>Banyolar artık sadece temizlenilen alanlar değil; evlerin kişisel spa merkezleri ve dinlenme köşeleri haline geldi...</p>' }
+          ]);
+        }
+
+        if (data.page_yasal_content) {
+          setPageYasalKvkk(data.page_yasal_content.kvkk || '');
+          setPageYasalKullanim(data.page_yasal_content.kullanim || '');
+          setPageYasalCerez(data.page_yasal_content.cerez || '');
+        } else {
+          setPageYasalKvkk('<p>SeramikBak Teknoloji A.Ş. olarak kişisel verilerinizin korunmasına önem veriyoruz...</p>');
+          setPageYasalKullanim('<p>SeramikBak internet sitesini kullanarak bu kullanım koşullarını kabul etmiş sayılırsınız...</p>');
+          setPageYasalCerez('<p>Sitemizde kullanıcı deneyimini artırmak amacıyla çerezler kullanılmaktadır...</p>');
+        }
       }
     } catch (err) {
       console.error('Failed to load settings:', err);
@@ -1167,6 +1275,98 @@ export default function AdminPage() {
     }
   };
 
+  const handleUpdatePageSettings = async (e) => {
+    e.preventDefault();
+    setPageSettingsLoading(true);
+    setPageSettingsSuccess('');
+    setPageSettingsError('');
+
+    try {
+      const response = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          page_about_content: {
+            hero_title: pageAboutHeroTitle,
+            hero_subtitle: pageAboutHeroSubtitle,
+            vision: pageAboutVision,
+            mission: pageAboutMission,
+            stats: pageAboutStats
+          },
+          page_contact_content: {
+            address: pageContactAddress,
+            email: pageContactEmail,
+            phone: pageContactPhone,
+            whatsapp: pageContactWhatsapp
+          },
+          page_faq_list: pageFaqList,
+          page_ilham_list: pageIlhamList,
+          page_blog_list: pageBlogList,
+          page_yasal_content: {
+            kvkk: pageYasalKvkk,
+            kullanim: pageYasalKullanim,
+            cerez: pageYasalCerez
+          }
+        })
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setPageSettingsSuccess('Kurumsal sayfa içerikleri başarıyla kaydedildi ve canlı yayına alındı!');
+        loadBankSettings();
+      } else {
+        setPageSettingsError(result.error || 'İçerikler kaydedilirken hata oluştu.');
+      }
+    } catch (err) {
+      console.error(err);
+      setPageSettingsError('Bağlantı hatası.');
+    } finally {
+      setPageSettingsLoading(false);
+    }
+  };
+
+  const handleAddFaq = () => {
+    if (!newFaqQ || !newFaqA) return;
+    setPageFaqList(prev => [...prev, { q: newFaqQ, a: newFaqA }]);
+    setNewFaqQ('');
+    setNewFaqA('');
+  };
+
+  const handleDeleteFaq = (indexToDelete) => {
+    setPageFaqList(prev => prev.filter((_, idx) => idx !== indexToDelete));
+  };
+
+  const handleAddBlog = () => {
+    if (!newBlogTitle || !newBlogContent) return;
+    const newId = pageBlogList.length > 0 ? Math.max(...pageBlogList.map(b => b.id)) + 1 : 1;
+    setPageBlogList(prev => [
+      ...prev,
+      {
+        id: newId,
+        title: newBlogTitle,
+        summary: newBlogSummary,
+        category: newBlogCategory,
+        readTime: newBlogReadTime,
+        content: newBlogContent
+      }
+    ]);
+    setNewBlogTitle('');
+    setNewBlogSummary('');
+    setNewBlogContent('');
+  };
+
+  const handleDeleteBlog = (idToDelete) => {
+    setPageBlogList(prev => prev.filter(b => b.id !== idToDelete));
+  };
+
+  const handleUpdateStat = (idx, field, value) => {
+    setPageAboutStats(prev => {
+      const updated = [...prev];
+      updated[idx] = { ...updated[idx], [field]: value };
+      return updated;
+    });
+  };
+
   const handleApproveRejectBrandSaaS = async (brandId, action) => {
     try {
       const res = await fetch('/api/admin/saas', {
@@ -1467,6 +1667,10 @@ export default function AdminPage() {
           <button className={`admin-tab-link ${activeTab === 'brands' ? 'active' : ''}`} onClick={() => setActiveTab('brands')}>
             <Building2 size={14} />
             <span>Marka Hesapları</span>
+          </button>
+          <button className={`admin-tab-link ${activeTab === 'pages' ? 'active' : ''}`} onClick={() => setActiveTab('pages')}>
+            <FileText size={14} />
+            <span>Kurumsal Sayfalar</span>
           </button>
         </div>
 
@@ -4280,6 +4484,406 @@ export default function AdminPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* TAB 7: CORPORATE PAGES MANAGEMENT */}
+      {activeTab === 'pages' && (
+        <div className="admin-card glass-panel w-full animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', background: '#ffffff', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', padding: '24px' }}>
+          <div className="card-header" style={{ display: 'flex', gap: '12px', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <FileText size={24} style={{ color: 'var(--accent-gold)' }} />
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>Kurumsal Sayfa İçerik Yönetimi</h3>
+                <p style={{ margin: '4px 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
+                  Hakkımızda, İletişim, SSS, İlham Galerisi, Blog ve Yasal metinlerin içeriklerini dinamik olarak düzenleyin.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Sub-tab Navigation */}
+          <div style={{ display: 'flex', gap: '8px', background: '#f1f5f9', padding: '4px', borderRadius: '8px', width: 'fit-content' }}>
+            {[
+              { id: 'about', label: 'Hakkımızda' },
+              { id: 'contact', label: 'İletişim & SSS' },
+              { id: 'blog', label: 'İlham & Blog' },
+              { id: 'legal', label: 'Yasal Metinler' }
+            ].map(sub => (
+              <button
+                key={sub.id}
+                type="button"
+                onClick={() => {
+                  setPageManagerSubTab(sub.id);
+                  setPageSettingsSuccess('');
+                  setPageSettingsError('');
+                }}
+                style={{
+                  padding: '6px 16px',
+                  fontSize: '0.8rem',
+                  fontWeight: '700',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: pageManagerSubTab === sub.id ? 'var(--accent-gold, #d4af37)' : 'transparent',
+                  color: pageManagerSubTab === sub.id ? '#000' : '#475569',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {sub.label}
+              </button>
+            ))}
+          </div>
+
+          <form onSubmit={handleUpdatePageSettings} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {pageSettingsSuccess && (
+              <div style={{ padding: '12px 16px', background: 'rgba(5, 150, 105, 0.08)', color: 'var(--accent-green)', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>
+                {pageSettingsSuccess}
+              </div>
+            )}
+
+            {pageSettingsError && (
+              <div style={{ padding: '12px 16px', background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444', borderRadius: '8px', fontSize: '0.85rem', fontWeight: '600' }}>
+                {pageSettingsError}
+              </div>
+            )}
+
+            {/* Sub-tab 1: About Us */}
+            {pageManagerSubTab === 'about' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Hero Başlığı</label>
+                  <input 
+                    type="text" 
+                    value={pageAboutHeroTitle} 
+                    onChange={(e) => setPageAboutHeroTitle(e.target.value)} 
+                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Hero Alt Başlık / Giriş Paragrafı</label>
+                  <textarea 
+                    value={pageAboutHeroSubtitle} 
+                    onChange={(e) => setPageAboutHeroSubtitle(e.target.value)} 
+                    rows={3}
+                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.85rem', resize: 'none' }}
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Vizyonumuz</label>
+                    <textarea 
+                      value={pageAboutVision} 
+                      onChange={(e) => setPageAboutVision(e.target.value)} 
+                      rows={5}
+                      style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.85rem', resize: 'none' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Misyonumuz</label>
+                    <textarea 
+                      value={pageAboutMission} 
+                      onChange={(e) => setPageAboutMission(e.target.value)} 
+                      rows={5}
+                      style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.85rem', resize: 'none' }}
+                    />
+                  </div>
+                </div>
+
+                {/* About Stats management */}
+                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                  <h4 style={{ margin: '0 0 12px 0', fontSize: '0.9rem', fontWeight: '800' }}>İstatistik Sayaçları</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+                    {pageAboutStats && pageAboutStats.map((stat, idx) => (
+                      <div key={idx} style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ fontSize: '0.78rem', fontWeight: '800', color: '#64748b' }}>Sayaç {idx + 1}</div>
+                        <input 
+                          type="text" 
+                          value={stat.num} 
+                          placeholder="Değer (örn: 100+)"
+                          onChange={(e) => handleUpdateStat(idx, 'num', e.target.value)}
+                          style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.8rem' }}
+                        />
+                        <input 
+                          type="text" 
+                          value={stat.label} 
+                          placeholder="Etiket (örn: Markalar)"
+                          onChange={(e) => handleUpdateStat(idx, 'label', e.target.value)}
+                          style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border-color)', fontSize: '0.8rem' }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sub-tab 2: Contact & FAQs */}
+            {pageManagerSubTab === 'contact' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Müşteri Hizmetleri Telefonu</label>
+                    <input 
+                      type="text" 
+                      value={pageContactPhone} 
+                      onChange={(e) => setPageContactPhone(e.target.value)} 
+                      style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>WhatsApp Destek Numarası</label>
+                    <input 
+                      type="text" 
+                      value={pageContactWhatsapp} 
+                      onChange={(e) => setPageContactWhatsapp(e.target.value)} 
+                      style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Destek E-Posta Adresi</label>
+                    <input 
+                      type="email" 
+                      value={pageContactEmail} 
+                      onChange={(e) => setPageContactEmail(e.target.value)} 
+                      style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Merkez Ofis Adresi</label>
+                    <textarea 
+                      value={pageContactAddress} 
+                      onChange={(e) => setPageContactAddress(e.target.value)} 
+                      rows={2}
+                      style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.85rem', resize: 'none' }}
+                    />
+                  </div>
+                </div>
+
+                {/* FAQ Manager */}
+                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                  <h4 style={{ margin: '0 0 16px 0', fontSize: '0.9rem', fontWeight: '800' }}>Sıkça Sorulan Sorular (SSS) Yönetimi</h4>
+                  
+                  {/* List of existing FAQs */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+                    {pageFaqList && pageFaqList.map((faq, idx) => (
+                      <div key={idx} style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#0f172a', marginBottom: '4px' }}>Soru: {faq.q}</div>
+                          <div style={{ fontSize: '0.8rem', color: '#475569', lineHeight: '1.4' }}>Cevap: {faq.a}</div>
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => handleDeleteFaq(idx)} 
+                          style={{ background: '#fee2e2', border: 'none', color: '#ef4444', padding: '4px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer' }}
+                        >
+                          Sil
+                        </button>
+                      </div>
+                    ))}
+                    {(!pageFaqList || pageFaqList.length === 0) && <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>Kayıtlı soru bulunmuyor.</p>}
+                  </div>
+
+                  {/* Add FAQ Sub-form */}
+                  <div style={{ background: '#f1f5f9', padding: '20px', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#475569' }}>Yeni Soru Ekle</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <input 
+                        type="text" 
+                        value={newFaqQ} 
+                        placeholder="Soru metni..."
+                        onChange={(e) => setNewFaqQ(e.target.value)} 
+                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <textarea 
+                        value={newFaqA} 
+                        placeholder="Cevap metni..."
+                        rows={2}
+                        onChange={(e) => setNewFaqA(e.target.value)} 
+                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', resize: 'none' }}
+                      />
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={handleAddFaq}
+                      style={{ background: '#0f172a', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '700', alignSelf: 'flex-start', cursor: 'pointer' }}
+                    >
+                      Soru Listesine Ekle
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sub-tab 3: Inspiration & Blogs */}
+            {pageManagerSubTab === 'blog' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <h4 style={{ margin: '0 0 12px 0', fontSize: '0.9rem', fontWeight: '800' }}>Blog Yazıları Yönetimi</h4>
+                
+                {/* List of articles */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+                  {pageBlogList && pageBlogList.map((blog) => (
+                    <div key={blog.id} style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '6px' }}>
+                          <span style={{ background: 'rgba(179, 142, 71, 0.1)', color: '#8c6b30', fontSize: '0.68rem', padding: '2px 8px', borderRadius: '4px', fontWeight: '700' }}>{blog.category}</span>
+                          <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{blog.readTime}</span>
+                        </div>
+                        <h5 style={{ margin: '0 0 4px 0', fontSize: '0.9rem', fontWeight: '800', color: '#0f172a' }}>{blog.title}</h5>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: '#475569', lineHeight: '1.4' }}>{blog.summary}</p>
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={() => handleDeleteBlog(blog.id)} 
+                        style={{ background: '#fee2e2', border: 'none', color: '#ef4444', padding: '4px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer' }}
+                      >
+                        Sil
+                      </button>
+                    </div>
+                  ))}
+                  {(!pageBlogList || pageBlogList.length === 0) && <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>Kayıtlı blog yazısı bulunmuyor.</p>}
+                </div>
+
+                {/* Add Blog Form */}
+                <div style={{ background: '#f1f5f9', padding: '24px', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#475569' }}>Yeni Blog Yazısı Ekle</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Yazı Başlığı</label>
+                      <input 
+                        type="text" 
+                        value={newBlogTitle} 
+                        placeholder="Örn: Rektifiyeli Seramik Avantajları"
+                        onChange={(e) => setNewBlogTitle(e.target.value)} 
+                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Kategori</label>
+                      <input 
+                        type="text" 
+                        value={newBlogCategory} 
+                        placeholder="Örn: Teknik Rehber, Trendler"
+                        onChange={(e) => setNewBlogCategory(e.target.value)} 
+                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Okuma Süresi</label>
+                      <input 
+                        type="text" 
+                        value={newBlogReadTime} 
+                        placeholder="Örn: 4 dk okuma"
+                        onChange={(e) => setNewBlogReadTime(e.target.value)} 
+                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Kısa Özet (Summary)</label>
+                      <input 
+                        type="text" 
+                        value={newBlogSummary} 
+                        placeholder="Listeleme sayfasında görünecek kısa açıklama..."
+                        onChange={(e) => setNewBlogSummary(e.target.value)} 
+                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Yazı Detay İçeriği (HTML formatında)</label>
+                    <textarea 
+                      value={newBlogContent} 
+                      placeholder="<h3>Başlık</h3><p>Paragraf yazısı...</p>"
+                      rows={5}
+                      onChange={(e) => setNewBlogContent(e.target.value)} 
+                      style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', fontFamily: 'monospace', resize: 'none' }}
+                    />
+                  </div>
+
+                  <button 
+                    type="button" 
+                    onClick={handleAddBlog}
+                    style={{ background: '#0f172a', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '700', alignSelf: 'flex-start', cursor: 'pointer' }}
+                  >
+                    Yazıyı Listeye Ekle
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Sub-tab 4: Legal documents */}
+            {pageManagerSubTab === 'legal' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>KVKK ve Gizlilik Politikası Metni (HTML formatında)</label>
+                  <textarea 
+                    value={pageYasalKvkk} 
+                    onChange={(e) => setPageYasalKvkk(e.target.value)} 
+                    rows={6}
+                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.82rem', fontFamily: 'monospace', resize: 'none' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Kullanım Koşulları Metni (HTML formatında)</label>
+                  <textarea 
+                    value={pageYasalKullanim} 
+                    onChange={(e) => setPageYasalKullanim(e.target.value)} 
+                    rows={6}
+                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.82rem', fontFamily: 'monospace', resize: 'none' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Çerez Politikası Metni (HTML formatında)</label>
+                  <textarea 
+                    value={pageYasalCerez} 
+                    onChange={(e) => setPageYasalCerez(e.target.value)} 
+                    rows={6}
+                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.82rem', fontFamily: 'monospace', resize: 'none' }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <button 
+              type="submit" 
+              disabled={pageSettingsLoading}
+              style={{
+                background: 'linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-hover) 100%)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '14px',
+                fontWeight: '700',
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                boxShadow: '0 8px 16px rgba(179,142,71,0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                marginTop: '12px',
+                width: 'fit-content',
+                opacity: pageSettingsLoading ? 0.7 : 1
+              }}
+            >
+              {pageSettingsLoading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>Kaydediliyor...</span>
+                </>
+              ) : (
+                <span>Kurumsal Değişiklikleri Canlıya Al</span>
+              )}
+            </button>
+          </form>
         </div>
       )}
 

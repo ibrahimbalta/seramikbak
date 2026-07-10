@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Mail, Phone, MapPin, MessageSquare, ChevronDown, CheckCircle, HelpCircle, Send } from 'lucide-react';
 
@@ -14,10 +14,15 @@ export default function ContactAndFaqPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // FAQ Accordion State
-  const [expandedFaq, setExpandedFaq] = useState(null);
+  // Dynamic Settings State
+  const [contactData, setContactData] = useState({
+    address: 'Kozyatağı Mahallesi, Bayar Caddesi, Plaza 34, Kat: 8, No: 12, Kadıköy / İstanbul, Türkiye',
+    email: 'destek@seramikbak.com',
+    phone: '0850 123 45 67',
+    whatsapp: '+90 850 123 45 67'
+  });
 
-  const faqs = [
+  const [faqs, setFaqs] = useState([
     {
       q: "SeramikBak üzerinden doğrudan ürün siparişi verebiliyor muyum?",
       a: "SeramikBak, doğrudan satış yapan bir e-ticaret sitesi değildir; bağımsız bir dijital showroom ve arama motorudur. Beğendiğiniz ürünlerin detay sayfasından 'En Yakın Bayiyi Bul' butonuna basarak bölgenizdeki yetkili satıcılardan (bayilerden) anında teklif isteyebilir veya iletişime geçerek satın alma işlemlerinizi yapabilirsiniz."
@@ -38,7 +43,26 @@ export default function ContactAndFaqPage() {
       q: "Farklı markaların ürün fiyatları neden değişiklik göstermektedir?",
       a: "Fiyatlar markaların üretim teknolojileri, malzeme kalitesi (porselen, seramik, rektifiyeli olması), boyutları ve bayilerin bölgesel nakliye/lojistik maliyetlerine göre değişiklik göstermektedir. Platformumuzdaki en ucuz bayi tekliflerini karşılaştırarak bütçenize en uygun satıcıyı seçebilirsiniz."
     }
-  ];
+  ]);
+
+  // FAQ Accordion State
+  const [expandedFaq, setExpandedFaq] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          if (data.page_contact_content) {
+            setContactData(data.page_contact_content);
+          }
+          if (data.page_faq_list) {
+            setFaqs(data.page_faq_list);
+          }
+        }
+      })
+      .catch(err => console.error('Failed to load contact settings:', err));
+  }, []);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -170,24 +194,24 @@ export default function ContactAndFaqPage() {
             {
               icon: <Phone size={20} />,
               title: 'Müşteri Hizmetleri',
-              val: '0850 123 45 67',
-              link: 'tel:08501234567',
+              val: contactData.phone,
+              link: `tel:${contactData.phone.replace(/\s+/g, '')}`,
               color: 'rgba(179, 142, 71, 0.08)',
               textCol: '#b38e47'
             },
             {
               icon: <MessageSquare size={20} />,
               title: 'WhatsApp Destek',
-              val: '+90 850 123 45 67',
-              link: 'https://wa.me/908501234567',
+              val: contactData.whatsapp,
+              link: `https://wa.me/${contactData.whatsapp.replace(/[^0-9]/g, '')}`,
               color: 'rgba(34, 197, 94, 0.08)',
               textCol: '#22c55e'
             },
             {
               icon: <Mail size={20} />,
               title: 'E-Posta Adresi',
-              val: 'destek@seramikbak.com',
-              link: 'mailto:destek@seramikbak.com',
+              val: contactData.email,
+              link: `mailto:${contactData.email}`,
               color: 'rgba(2, 132, 199, 0.08)',
               textCol: '#0284c7'
             }
@@ -399,8 +423,7 @@ export default function ContactAndFaqPage() {
                 <div>
                   <strong>SeramikBak Teknoloji A.Ş.</strong>
                   <p style={{ margin: '4px 0 0 0', lineHeight: '1.5' }}>
-                    Kozyatağı Mahallesi, Bayar Caddesi, Plaza 34, Kat: 8, No: 12<br />
-                    Kadıköy / İstanbul, Türkiye
+                    {contactData.address}
                   </p>
                 </div>
               </div>
