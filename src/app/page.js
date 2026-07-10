@@ -3303,7 +3303,7 @@ export default function Home() {
                   {expandedSections.collection && (
                     <div className="accordion-content" style={{ marginTop: '12px' }}>
                       <div className="filters-grid">
-                        {brands.map(brand => {
+                        {brands.filter(b => b.name.toLowerCase() !== 'kalebodur').map(brand => {
                           const isSelected = selectedBrand === brand.id;
                           return (
                             <button 
@@ -5864,7 +5864,7 @@ export default function Home() {
             {expandedSections.collection && (
               <div className="accordion-content" style={{ marginTop: '12px' }}>
                 <div className="filters-grid">
-                  {brands.map(brand => {
+                  {brands.filter(b => b.name.toLowerCase() !== 'kalebodur').map(brand => {
                     const isSelected = selectedBrand === brand.id;
                     return (
                       <button 
