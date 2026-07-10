@@ -2459,12 +2459,15 @@ export default function Home() {
           ) : (
             <>
               <button className={`nav-link ${activeTab === 'search' ? 'active' : ''}`} onClick={() => setActiveTab('search')}>
+                <SearchIcon size={14} />
                 <span>Arama Motoru</span>
               </button>
               <button className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); }}>
+                <Palette size={14} />
                 <span>3D Sanal Stüdyo</span>
               </button>
               <button className={`nav-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); }}>
+                <MapPin size={14} />
                 <span>Bayi Bulucu</span>
               </button>
             </>
@@ -6315,14 +6318,14 @@ export default function Home() {
            NEW UTILITY BAR & REDESIGNED HEADER STYLE
            ========================================================================== */
 
-        /* Top Utility Bar */
-        .top-utility-bar {
+        /* Top Utility Bar with Global Selectors to override Next.js scoping issue */
+        :global(.top-utility-bar) {
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 8px 28px;
-          background: #090c15;
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          background: #07090f; /* ultra deep obsidian */
+          border: 1px solid rgba(212, 175, 55, 0.15);
           border-bottom: none;
           border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
           font-family: var(--font-title);
@@ -6334,12 +6337,12 @@ export default function Home() {
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
 
-        .utility-left {
+        :global(.utility-left) {
           display: flex;
           align-items: center;
         }
 
-        .utility-message {
+        :global(.utility-message) {
           display: flex;
           align-items: center;
           gap: 6px;
@@ -6347,22 +6350,22 @@ export default function Home() {
           letter-spacing: 0.03em;
         }
 
-        .text-gold {
-          color: var(--accent-gold);
-          text-shadow: 0 0 8px rgba(179, 142, 71, 0.4);
+        :global(.text-gold) {
+          color: #ecd099;
+          text-shadow: 0 0 8px rgba(236, 208, 153, 0.3);
         }
 
-        .utility-right {
+        :global(.utility-right) {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 14px;
         }
 
-        .utility-item {
+        :global(.utility-item) {
           display: flex;
           align-items: center;
           gap: 6px;
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(255, 255, 255, 0.65) !important;
           text-decoration: none !important;
           font-weight: 600;
           transition: all 0.25s ease;
@@ -6373,30 +6376,30 @@ export default function Home() {
           border-radius: 6px;
         }
 
-        .utility-item:hover {
-          color: #ffffff;
+        :global(.utility-item:hover) {
+          color: #ffffff !important;
           background: rgba(255, 255, 255, 0.05);
         }
 
-        .utility-item svg {
-          color: rgba(255, 255, 255, 0.45);
+        :global(.utility-item) svg {
+          color: rgba(255, 255, 255, 0.45) !important;
           transition: color 0.25s ease;
         }
 
-        .utility-item:hover svg {
-          color: var(--accent-gold);
+        :global(.utility-item:hover) svg {
+          color: #ecd099 !important;
         }
 
-        .utility-divider {
+        :global(.utility-divider) {
           color: rgba(255, 255, 255, 0.12);
           user-select: none;
         }
 
-        .kiosk-btn-link {
+        :global(.kiosk-btn-link) {
           position: relative;
         }
 
-        .pulse-indicator-green {
+        :global(.pulse-indicator-green) {
           width: 7px;
           height: 7px;
           background-color: #10b981;
@@ -6411,21 +6414,23 @@ export default function Home() {
           100% { transform: scale(0.95); opacity: 0.8; }
         }
 
-        .b2b-btn-link {
-          background: rgba(179, 142, 71, 0.08);
-          border: 1px solid rgba(179, 142, 71, 0.2) !important;
-          color: #dfba6b !important;
+        :global(.b2b-btn-link) {
+          background: rgba(236, 208, 153, 0.08) !important;
+          border: 1px solid rgba(236, 208, 153, 0.2) !important;
+          color: #ecd099 !important;
+          padding: 4px 10px !important;
+          border-radius: 12px !important;
         }
 
-        .b2b-btn-link:hover {
-          background: rgba(179, 142, 71, 0.16) !important;
-          border-color: rgba(179, 142, 71, 0.45) !important;
+        :global(.b2b-btn-link:hover) {
+          background: rgba(236, 208, 153, 0.16) !important;
+          border-color: rgba(236, 208, 153, 0.45) !important;
           color: #ffffff !important;
         }
 
-        .b2b-small-badge {
+        :global(.b2b-small-badge) {
           background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-          color: #ffffff;
+          color: #ffffff !important;
           font-size: 0.58rem;
           font-weight: 800;
           padding: 2px 5px;
@@ -6448,27 +6453,26 @@ export default function Home() {
           align-items: center;
           padding: 14px 28px;
           border-radius: var(--border-radius-lg);
-          background: rgba(255, 255, 255, 0.8);
+          background: rgba(255, 255, 255, 0.85);
           backdrop-filter: blur(25px);
           -webkit-backdrop-filter: blur(25px);
           border: 1px solid rgba(255, 255, 255, 0.6);
           box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.03), 
-                      0 1px 0 rgba(255, 255, 255, 0.8) inset, 
-                      0 0 30px rgba(179, 142, 71, 0.01);
+                      0 1px 0 rgba(255, 255, 255, 0.8) inset;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           z-index: 1000;
         }
 
         /* Adjust header border-radius if Top Utility Bar is present */
-        .top-utility-bar + .main-header {
+        :global(.top-utility-bar) + .main-header {
           border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
           border-top: 1px solid rgba(0, 0, 0, 0.03);
         }
 
         .main-header:hover {
-          border-color: rgba(179, 142, 71, 0.18);
-          box-shadow: 0 15px 35px -10px rgba(179, 142, 71, 0.08), 
+          border-color: rgba(212, 175, 55, 0.18);
+          box-shadow: 0 15px 35px -10px rgba(212, 175, 55, 0.08), 
                       0 1px 0 rgba(255, 255, 255, 0.85) inset;
         }
 
@@ -6496,31 +6500,6 @@ export default function Home() {
           overflow: hidden;
         }
 
-        .logo-icon::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -150%;
-          width: 50%;
-          height: 100%;
-          background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
-          transform: skewX(-25deg);
-          transition: none;
-        }
-
-        .header-brand:hover .logo-icon {
-          transform: rotate(5deg) scale(1.05);
-          box-shadow: 0 6px 18px rgba(179, 142, 71, 0.45);
-        }
-
-        .header-brand:hover .logo-icon::before {
-          animation: logoShine 1s ease-in-out;
-        }
-
-        @keyframes logoShine {
-          100% { left: 200%; }
-        }
-
         .logo-text {
           font-family: var(--font-title);
           font-size: 1.45rem;
@@ -6530,47 +6509,59 @@ export default function Home() {
           background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-gold) 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-          transition: all 0.3s ease;
-        }
-
-        .header-brand:hover .logo-text {
-          background: linear-gradient(135deg, var(--accent-gold) 0%, var(--text-primary) 70%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
         }
 
         .header-nav {
           display: flex;
           background: rgba(15, 23, 42, 0.03);
-          padding: 4px;
+          padding: 5px;
           border-radius: 30px;
-          border: 1px solid rgba(0, 0, 0, 0.04);
+          border: 1px solid rgba(0, 0, 0, 0.05);
           backdrop-filter: blur(5px);
+          gap: 4px;
         }
 
         .nav-link {
           background: transparent;
           border: none;
           color: var(--text-secondary);
-          padding: 8px 22px;
+          padding: 8px 24px;
           border-radius: 24px;
           cursor: pointer;
           font-family: var(--font-title);
-          font-weight: 600;
-          font-size: 0.82rem;
+          font-weight: 700;
+          font-size: 0.84rem;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          letter-spacing: 0.02em;
+        }
+
+        .nav-link svg {
+          color: var(--text-muted);
+          transition: color 0.3s ease, transform 0.3s ease;
         }
 
         .nav-link:hover {
           color: var(--text-primary);
-          background: rgba(255, 255, 255, 0.7);
+          background: rgba(255, 255, 255, 0.6);
+        }
+
+        .nav-link:hover svg {
+          color: var(--accent-gold);
+          transform: translateY(-1px);
         }
 
         .nav-link.active {
           color: #ffffff !important;
-          background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
-          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.35);
+          background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+          border: 1px solid rgba(212, 175, 55, 0.2);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-link.active svg {
+          color: #ecd099 !important;
         }
 
         .header-right-buttons {
@@ -6605,7 +6596,7 @@ export default function Home() {
         .header-btn:hover {
           transform: translateY(-2px);
           background: #ffffff;
-          border-color: rgba(179, 142, 71, 0.25);
+          border-color: rgba(212, 175, 55, 0.25);
           color: var(--text-primary);
           box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
         }
@@ -6854,6 +6845,7 @@ export default function Home() {
           100% { transform: translateX(-50%); }
         }
 
+        /* Banner styles */
         .banner-item {
           display: flex;
           align-items: center;
@@ -6864,31 +6856,32 @@ export default function Home() {
           border-radius: 18px;
           flex-shrink: 0;
           background: rgba(255, 255, 255, 0.015);
-          border: 1px solid rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(212, 175, 55, 0.12);
+          width: 300px;
+          height: 130px;
         }
 
         .banner-item:hover {
-          transform: translateY(-2px) scale(1.04);
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(212, 175, 55, 0.25);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.08);
+          transform: translateY(-3px) scale(1.03);
+          background: rgba(255, 255, 255, 0.06);
+          border-color: rgba(212, 175, 55, 0.45);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(212, 175, 55, 0.12);
         }
 
         .banner-img {
-          width: 130px;
-          height: 150px;
+          width: 90px;
+          height: 110px;
           border-radius: 12px;
           object-fit: cover;
-          border: 2px solid rgba(255, 255, 255, 0.1);
+          border: 1.5px solid rgba(255, 255, 255, 0.1);
           transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
           flex-shrink: 0;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .banner-item:hover .banner-img {
           border-color: #ecd099;
           box-shadow: 0 0 14px rgba(212, 175, 55, 0.35);
-          transform: scale(1.02);
         }
 
         .banner-item-info {
@@ -6926,62 +6919,7 @@ export default function Home() {
           to { transform: rotate(360deg); }
         }
 
-        /* Mobile Menu Drawer Styles overrides */
-        .mobile-menu-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
-          backdrop-filter: blur(4px);
-          z-index: 11000;
-          display: flex;
-          justify-content: flex-end;
-          animation: fadeIn 0.2s ease forwards;
-        }
-
-        .mobile-menu-drawer {
-          width: 300px;
-          height: 100%;
-          background: rgba(255, 255, 255, 0.95);
-          display: flex;
-          flex-direction: column;
-          padding: 24px;
-          box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
-          animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .mobile-menu-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 24px;
-          border-bottom: 1px solid var(--border-color);
-          padding-bottom: 12px;
-        }
-
-        .mobile-menu-title {
-          font-family: var(--font-title);
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: var(--text-primary);
-        }
-
-        .mobile-menu-close {
-          background: transparent;
-          border: none;
-          font-size: 1.2rem;
-          cursor: pointer;
-          color: var(--text-secondary);
-        }
-
-        .mobile-menu-nav {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
+        /* Mobile Menu */
         :global(.mobile-nav-link) {
           display: flex;
           align-items: center;
