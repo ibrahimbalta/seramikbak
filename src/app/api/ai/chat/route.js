@@ -29,6 +29,10 @@ export async function POST(request) {
       apiKey = settingsMap['grok_api_key'];
       apiUrl = 'https://api.x.ai/v1/chat/completions';
       apiModel = 'grok-beta'; // xAI Grok standard model
+    } else if (provider === 'gemini') {
+      apiKey = settingsMap['gemini_api_key'];
+      apiUrl = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
+      apiModel = 'gemini-1.5-flash';
     } else {
       // Default to deepseek
       apiKey = settingsMap['deepseek_api_key'] || 'sk-81324cd7ab0749abaee06efafb9013a2';
@@ -38,7 +42,7 @@ export async function POST(request) {
 
     if (!apiKey) {
       return NextResponse.json(
-        { success: false, error: `${provider === 'grok' ? 'Grok' : 'DeepSeek'} API key is not configured.` },
+        { success: false, error: `${provider === 'grok' ? 'Grok' : provider === 'gemini' ? 'Gemini' : 'DeepSeek'} API key is not configured.` },
         { status: 400 }
       );
     }
