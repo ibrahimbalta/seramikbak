@@ -6358,11 +6358,12 @@ export default function Home() {
         }
 
         .ad-thumb {
-          width: 38px;
-          height: 38px;
-          border-radius: 8px;
+          width: 80px;
+          height: 80px;
+          border-radius: 12px;
           object-fit: cover;
-          border: 1.5px solid rgba(212, 175, 55, 0.3);
+          border: 2px solid rgba(212, 175, 55, 0.3);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .ad-info {
@@ -6401,10 +6402,10 @@ export default function Home() {
         .banner-marquee-track {
           display: flex;
           align-items: center;
-          gap: 28px;
-          animation: marqueeScroll 30s linear infinite;
+          gap: 32px;
+          animation: marqueeScroll 35s linear infinite;
           width: max-content;
-          padding: 14px 0;
+          padding: 10px 0;
         }
 
         .banner-marquee-track:hover {
@@ -6419,11 +6420,11 @@ export default function Home() {
         .banner-item {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 14px;
           cursor: pointer;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           padding: 6px 10px;
-          border-radius: 12px;
+          border-radius: 16px;
           flex-shrink: 0;
         }
 
@@ -6433,13 +6434,14 @@ export default function Home() {
         }
 
         .banner-img {
-          width: 56px;
-          height: 56px;
-          border-radius: 10px;
+          width: 150px;
+          height: 170px;
+          border-radius: 14px;
           object-fit: cover;
-          border: 1.5px solid rgba(255, 255, 255, 0.15);
+          border: 2px solid rgba(255, 255, 255, 0.15);
           transition: all 0.3s ease;
           flex-shrink: 0;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
         }
 
         .banner-item:hover .banner-img {
@@ -6455,15 +6457,15 @@ export default function Home() {
 
         .banner-brand-name {
           color: #d4af37;
-          font-size: 0.72rem;
+          font-size: 0.82rem;
           font-weight: 800;
           letter-spacing: 0.04em;
         }
 
         .banner-product-name {
           color: rgba(255, 255, 255, 0.85);
-          font-size: 0.8rem;
-          font-weight: 500;
+          font-size: 0.9rem;
+          font-weight: 600;
           white-space: nowrap;
         }
 
@@ -11039,11 +11041,23 @@ export default function Home() {
             border-top: 1px solid rgba(212, 175, 55, 0.2);
             border-bottom: 1px solid rgba(212, 175, 55, 0.2);
           }
+          .ad-thumb {
+            width: 60px;
+            height: 60px;
+          }
           .ad-name {
             max-width: 100px;
           }
+          .banner-img {
+            width: 100px;
+            height: 115px;
+            border-radius: 10px;
+          }
           .banner-marquee-wrapper {
-            padding: 10px 0;
+            padding: 8px 0;
+          }
+          .banner-marquee-track {
+            gap: 20px;
           }
           .showroom-hero-banner {
             padding: 24px 20px;
