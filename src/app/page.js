@@ -2554,46 +2554,60 @@ export default function Home() {
         <div className="mobile-menu-overlay" onClick={() => setShowMobileMenu(false)}>
           <div className="mobile-menu-drawer glass-panel" onClick={(e) => e.stopPropagation()}>
             <div className="mobile-menu-header">
-              <span className="mobile-menu-title">Menü</span>
-              <button className="mobile-menu-close" onClick={() => setShowMobileMenu(false)}>✕</button>
+              <div className="mobile-menu-brand">
+                <div className="mobile-menu-logo">SB</div>
+                <div className="mobile-menu-brand-info">
+                  <span className="mobile-menu-brand-name">SeramikBak</span>
+                  <span className="mobile-menu-brand-tag">Dijital Showroom</span>
+                </div>
+              </div>
+              <button className="mobile-menu-close" onClick={() => setShowMobileMenu(false)} aria-label="Kapat">✕</button>
             </div>
             <div className="mobile-menu-nav">
               <button 
                 className={`mobile-nav-link ${activeTab === 'search' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('search'); setShowMobileMenu(false); }}
               >
-                Arama Motoru
+                <SearchIcon size={16} />
+                <span>Arama Motoru</span>
               </button>
               <button 
                 className={`mobile-nav-link ${activeTab === 'studio' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); }}
               >
-                3D Sanal Stüdyo
+                <Palette size={16} />
+                <span>3D Sanal Stüdyo</span>
               </button>
               <button 
                 className={`mobile-nav-link ${activeTab === 'dealers' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); }}
               >
-                Bayi Bulucu
+                <MapPin size={16} />
+                <span>Bayi Bulucu</span>
               </button>
               
               <Link href="/hakkimizda" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => setShowMobileMenu(false)}>
-                Hakkımızda
+                <Info size={16} />
+                <span>Hakkımızda</span>
               </Link>
               <Link href="/ilham" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => setShowMobileMenu(false)}>
-                İlham Galerisi & Trendler
+                <Sparkles size={16} />
+                <span>İlham Galerisi & Trendler</span>
               </Link>
 
               <div className="mobile-menu-divider" />
               
               <Link href="/proje-talep" className="mobile-nav-link b2b-link" onClick={() => setShowMobileMenu(false)}>
+                <Building2 size={16} />
                 <span>Proje Talebi (B2B)</span>
               </Link>
               <Link href="/bayi" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
-                Bayi Portalı
+                <UserIcon size={16} />
+                <span>Bayi Portalı</span>
               </Link>
               <Link href="/marka" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
-                Marka Girişi
+                <TrendingUp size={16} />
+                <span>Marka Girişi</span>
               </Link>
               
               <div className="mobile-menu-divider" />
@@ -2602,6 +2616,7 @@ export default function Home() {
                 className="mobile-nav-link fav-link" 
                 onClick={() => { if(currentUser) { setShowFavoritesPanel(true); } else { window.location.href = '/uyelik'; } setShowMobileMenu(false); }}
               >
+                <HeartIcon size={16} />
                 <span>Favorilerim ({userFavorites.length})</span>
               </button>
               
@@ -2611,12 +2626,14 @@ export default function Home() {
                     Giriş yapan: <strong>{currentUser.name}</strong>
                   </div>
                   <button className="mobile-nav-link logout-link" onClick={() => { handleLogout(); setShowMobileMenu(false); }}>
-                    Çıkış Yap
+                    <ArrowRight size={16} />
+                    <span>Çıkış Yap</span>
                   </button>
                 </>
               ) : (
                 <button className="mobile-nav-link login-link" onClick={() => { window.location.href = '/uyelik'; setShowMobileMenu(false); }}>
-                  Üyelik
+                  <UserIcon size={16} />
+                  <span>Üyelik</span>
                 </button>
               )}
             </div>
@@ -6894,61 +6911,125 @@ export default function Home() {
           box-shadow: 0 10px 25px rgba(179, 142, 71, 0.12);
         }
 
-        .banner-img {
-          width: 90px;
-          height: 110px;
-          border-radius: 12px;
-          object-fit: cover;
-          border: 1.5px solid rgba(0, 0, 0, 0.06);
-          transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-          flex-shrink: 0;
-          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        /* Mobile Menu Drawer Styles */
+        .mobile-menu-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(15, 23, 42, 0.35); /* Elegant overlay color */
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          z-index: 11000;
+          display: flex;
+          justify-content: flex-end;
+          animation: fadeIn 0.3s ease forwards;
         }
 
-        .banner-item:hover .banner-img {
-          border-color: #8c6b30;
-          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.2);
-        }
-
-        .banner-item-info {
+        .mobile-menu-drawer {
+          width: 320px;
+          max-width: 85vw;
+          height: 100%;
+          background: rgba(255, 255, 255, 0.88) !important; /* Premium semi-transparent white */
+          backdrop-filter: blur(25px) !important;
+          -webkit-backdrop-filter: blur(25px) !important;
+          border: none !important;
+          border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
+          border-radius: 0px !important; /* Full height should be square on the screen edges */
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          padding: 32px 24px;
+          box-shadow: -10px 0 40px rgba(15, 23, 42, 0.08) !important;
+          animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .banner-brand-name {
-          color: #8c6b30; /* gold-bronze */
-          font-size: 0.72rem;
+        .mobile-menu-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 28px;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+          padding-bottom: 18px;
+        }
+
+        .mobile-menu-brand {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .mobile-menu-logo {
+          width: 34px;
+          height: 34px;
+          background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: var(--font-title);
+          font-weight: 850;
+          color: #ffffff;
+          font-size: 1rem;
+          box-shadow: 0 4px 10px rgba(179, 142, 71, 0.25);
+        }
+
+        .mobile-menu-brand-info {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .mobile-menu-brand-name {
+          font-family: var(--font-title);
+          font-size: 1.1rem;
           font-weight: 800;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
+          color: var(--text-primary);
+          line-height: 1.1;
+          letter-spacing: -0.01em;
         }
 
-        .banner-product-name {
-          color: #1e293b;
-          font-size: 0.85rem;
+        .mobile-menu-brand-tag {
+          font-size: 0.68rem;
+          color: var(--text-muted);
           font-weight: 600;
-          white-space: nowrap;
-          transition: color 0.25s ease;
+          letter-spacing: 0.02em;
         }
 
-        .banner-item:hover .banner-product-name {
-          color: #0f172a;
+        .mobile-menu-close {
+          background: rgba(0, 0, 0, 0.03);
+          border: 1px solid rgba(0, 0, 0, 0.05);
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.85rem;
+          color: var(--text-secondary);
+          cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .spin-icon-slow {
-          animation: spin 8s linear infinite;
+        .mobile-menu-close:hover {
+          background: rgba(239, 68, 68, 0.08);
+          color: #ef4444;
+          border-color: rgba(239, 68, 68, 0.15);
+          transform: rotate(90deg);
         }
 
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        .mobile-menu-nav {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          overflow-y: auto;
+          flex-grow: 1;
         }
 
-        /* Mobile Menu */
+        /* Mobile Menu Link Styling */
         :global(.mobile-nav-link) {
           display: flex;
           align-items: center;
+          gap: 12px;
           padding: 12px 16px;
           border-radius: var(--border-radius-sm);
           font-family: var(--font-title);
@@ -6960,6 +7041,108 @@ export default function Home() {
           text-align: left;
           cursor: pointer;
           text-decoration: none !important;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        :global(.mobile-nav-link:hover) {
+          background: rgba(0, 0, 0, 0.03);
+          color: var(--text-primary);
+          transform: translateX(4px);
+        }
+
+        :global(.mobile-nav-link svg) {
+          color: var(--text-muted);
+          transition: all 0.2s ease;
+        }
+
+        :global(.mobile-nav-link:hover svg) {
+          color: var(--accent-gold);
+          transform: scale(1.1);
+        }
+
+        :global(.mobile-nav-link.active) {
+          background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%) !important;
+          color: #ffffff !important;
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.2);
+        }
+
+        :global(.mobile-nav-link.active svg) {
+          color: #ffffff !important;
+        }
+
+        :global(.mobile-nav-link.b2b-link) {
+          color: var(--accent-blue-hover) !important;
+          background: rgba(37, 99, 235, 0.05);
+        }
+
+        :global(.mobile-nav-link.b2b-link svg) {
+          color: var(--accent-blue-hover) !important;
+        }
+
+        :global(.mobile-nav-link.b2b-link:hover) {
+          background: rgba(37, 99, 235, 0.1);
+        }
+
+        :global(.mobile-nav-link.fav-link) {
+          color: var(--accent-gold) !important;
+          background: rgba(179, 142, 71, 0.06);
+        }
+
+        :global(.mobile-nav-link.fav-link svg) {
+          color: var(--accent-gold) !important;
+        }
+
+        :global(.mobile-nav-link.fav-link:hover) {
+          background: rgba(179, 142, 71, 0.12);
+        }
+
+        :global(.mobile-nav-link.login-link) {
+          color: var(--text-primary) !important;
+          background: rgba(0, 0, 0, 0.02);
+          border: 1px solid rgba(0, 0, 0, 0.06);
+          margin-top: 10px;
+          justify-content: center;
+        }
+
+        :global(.mobile-nav-link.login-link:hover) {
+          background: rgba(0, 0, 0, 0.06);
+          border-color: rgba(0, 0, 0, 0.12);
+        }
+
+        .mobile-menu-divider {
+          height: 1px;
+          background: rgba(0, 0, 0, 0.06);
+          margin: 14px 0;
+        }
+
+        .mobile-user-info {
+          font-size: 0.78rem;
+          color: var(--text-secondary);
+          padding: 8px 16px;
+          background: rgba(0, 0, 0, 0.02);
+          border-radius: 8px;
+          margin-top: 10px;
+          border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        :global(.mobile-nav-link.logout-link) {
+          color: #ef4444 !important;
+          background: rgba(239, 68, 68, 0.05);
+          margin-top: 6px;
+        }
+
+        :global(.mobile-nav-link.logout-link svg) {
+          color: #ef4444 !important;
+        }
+
+        :global(.mobile-nav-link.logout-link:hover) {
+          background: rgba(239, 68, 68, 0.1);
+        }
+
+        @keyframes slideInRight {
+          from { transform: translateX(100%); }
+          to { transform: translateX(0); }
+        }   text-decoration: none !important;
           transition: all 0.2s ease;
         }
 
