@@ -7743,13 +7743,21 @@ export default function Home() {
           flex-direction: column;
           height: 100%;
           cursor: pointer;
-          transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
           position: relative;
+          border: 1.5px solid transparent;
+          box-shadow: 0 4px 15px rgba(15, 23, 42, 0.02);
         }
 
         .product-card-new:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+          transform: translateY(-6px) scale(1.015);
+          box-shadow: 0 20px 40px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15, 23, 42, 0.02);
+          border-color: rgba(179, 142, 71, 0.2);
+        }
+
+        .product-card-new.active {
+          border-color: var(--accent-gold) !important;
+          box-shadow: 0 12px 30px rgba(179, 142, 71, 0.18);
         }
 
         .card-texture-container-new {
