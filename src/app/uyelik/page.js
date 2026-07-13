@@ -39,6 +39,7 @@ export default function UyelikPage() {
   const [userFavorites, setUserFavorites] = useState([]);
   const [userProjects, setUserProjects] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('seramikbak_user');
@@ -58,6 +59,7 @@ export default function UyelikPage() {
         }
       }
     }
+    setIsCheckingAuth(false);
   }, []);
 
   const loadDashboardData = async (user) => {
@@ -163,6 +165,27 @@ export default function UyelikPage() {
       window.location.href = '/';
     }, 1200);
   };
+
+  if (isCheckingAuth) {
+    return (
+      <div className="uyelik-page-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)' }}>
+        <style jsx global>{`
+          .loading-spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+          }
+        `}</style>
+        <div className="loading-spinner-container">
+          <Loader2 className="animate-spin" size={32} style={{ color: '#b38e47' }} />
+          <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>Yükleniyor...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (currentUser) {
     return (
