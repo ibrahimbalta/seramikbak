@@ -3,6 +3,8 @@ import * as THREE from 'three';
 
 export default function StudioCanvas({ 
   activeProduct, 
+  floorProduct,
+  wallProduct,
   applyFloor = true, 
   applyWalls = true, 
   onToggleTarget,
@@ -1158,14 +1160,14 @@ export default function StudioCanvas({
     const loader = new THREE.TextureLoader();
 
     // 1. FLOOR TILING LOGIC
-    if (applyFloor && activeProduct) {
-      const w_m = activeProduct.width / 100;
-      const h_m = activeProduct.height / 100;
+    if (applyFloor && floorProduct) {
+      const w_m = floorProduct.width / 100;
+      const h_m = floorProduct.height / 100;
       const repeatX = ROOM_WIDTH / w_m;
       const repeatY = ROOM_DEPTH / h_m;
 
       const applyFloorTexture = (sourceImageOrCanvas, isImage = true) => {
-        const texture = generateGroutOverlay(sourceImageOrCanvas, activeProduct, groutWidth, groutColor, tileRotation, layPattern);
+        const texture = generateGroutOverlay(sourceImageOrCanvas, floorProduct, groutWidth, groutColor, tileRotation, layPattern);
         texture.repeat.set(repeatX, repeatY);
         texture.colorSpace = THREE.SRGBColorSpace;
 
@@ -1174,15 +1176,15 @@ export default function StudioCanvas({
         let clearcoat = 0.0;
         let clearcoatRoughness = 0.0;
 
-        if (activeProduct.finish === 'Parlak') {
+        if (floorProduct.finish === 'Parlak') {
           roughness = 0.08;
           metalness = 0.15;
           clearcoat = 1.0;
           clearcoatRoughness = 0.05;
-        } else if (activeProduct.finish === 'Mat') {
+        } else if (floorProduct.finish === 'Mat') {
           roughness = 0.85;
           metalness = 0.05;
-        } else if (activeProduct.finish === 'Lapatto') {
+        } else if (floorProduct.finish === 'Lapatto') {
           roughness = 0.35;
           metalness = 0.1;
           clearcoat = 0.4;
@@ -1205,7 +1207,7 @@ export default function StudioCanvas({
         setTextureStatus(isImage ? 'Real JPG Image Loaded' : 'Procedural Fallback Generated');
       };
 
-      const realTextureUrl = activeProduct.textureUrl || activeProduct.imageUrl;
+      const realTextureUrl = floorProduct.textureUrl || floorProduct.imageUrl;
       if (realTextureUrl) {
         const isAbsolute = realTextureUrl.startsWith('http://') || realTextureUrl.startsWith('https://') || realTextureUrl.startsWith('//');
         const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realTextureUrl)}` : realTextureUrl;
@@ -1216,12 +1218,12 @@ export default function StudioCanvas({
           },
           undefined,
           () => {
-            const proceduralCanvas = generateProceduralTexture(activeProduct);
+            const proceduralCanvas = generateProceduralTexture(floorProduct);
             applyFloorTexture(proceduralCanvas, false);
           }
         );
       } else {
-        const proceduralCanvas = generateProceduralTexture(activeProduct);
+        const proceduralCanvas = generateProceduralTexture(floorProduct);
         applyFloorTexture(proceduralCanvas, false);
       }
     } else {
@@ -1234,15 +1236,15 @@ export default function StudioCanvas({
     }
 
     // 2. WALLS TILING LOGIC
-    if (applyWalls && activeProduct) {
-      const w_m = activeProduct.width / 100;
-      const h_m = activeProduct.height / 100;
+    if (applyWalls && wallProduct) {
+      const w_m = wallProduct.width / 100;
+      const h_m = wallProduct.height / 100;
       const repeatX = ROOM_WIDTH / w_m;
       const repeatY = ROOM_DEPTH / h_m;
       const wallRepeatY = ROOM_HEIGHT / h_m;
 
       const applyWallsTexture = (sourceImageOrCanvas, isImage = true) => {
-        const texture = generateGroutOverlay(sourceImageOrCanvas, activeProduct, groutWidth, groutColor, tileRotation, layPattern);
+        const texture = generateGroutOverlay(sourceImageOrCanvas, wallProduct, groutWidth, groutColor, tileRotation, layPattern);
         texture.colorSpace = THREE.SRGBColorSpace;
 
         let roughness = 0.5;
@@ -1250,15 +1252,15 @@ export default function StudioCanvas({
         let clearcoat = 0.0;
         let clearcoatRoughness = 0.0;
 
-        if (activeProduct.finish === 'Parlak') {
+        if (wallProduct.finish === 'Parlak') {
           roughness = 0.08;
           metalness = 0.15;
           clearcoat = 1.0;
           clearcoatRoughness = 0.05;
-        } else if (activeProduct.finish === 'Mat') {
+        } else if (wallProduct.finish === 'Mat') {
           roughness = 0.85;
           metalness = 0.05;
-        } else if (activeProduct.finish === 'Lapatto') {
+        } else if (wallProduct.finish === 'Lapatto') {
           roughness = 0.35;
           metalness = 0.1;
           clearcoat = 0.4;
@@ -1298,7 +1300,7 @@ export default function StudioCanvas({
         }
       };
 
-      const realTextureUrl = activeProduct.textureUrl || activeProduct.imageUrl;
+      const realTextureUrl = wallProduct.textureUrl || wallProduct.imageUrl;
       if (realTextureUrl) {
         const isAbsolute = realTextureUrl.startsWith('http://') || realTextureUrl.startsWith('https://') || realTextureUrl.startsWith('//');
         const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realTextureUrl)}` : realTextureUrl;
@@ -1309,12 +1311,12 @@ export default function StudioCanvas({
           },
           undefined,
           () => {
-            const proceduralCanvas = generateProceduralTexture(activeProduct);
+            const proceduralCanvas = generateProceduralTexture(wallProduct);
             applyWallsTexture(proceduralCanvas, false);
           }
         );
       } else {
-        const proceduralCanvas = generateProceduralTexture(activeProduct);
+        const proceduralCanvas = generateProceduralTexture(wallProduct);
         applyWallsTexture(proceduralCanvas, false);
       }
     } else {
@@ -1331,7 +1333,7 @@ export default function StudioCanvas({
       }
     }
 
-  }, [activeProduct, applyFloor, applyWalls, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
+  }, [floorProduct, wallProduct, applyFloor, applyWalls, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
 
   const downloadSnapshot = () => {
     if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return;

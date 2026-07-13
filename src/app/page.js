@@ -350,6 +350,8 @@ export default function Home() {
   const [studioTarget, setStudioTarget] = useState('floor'); // floor, walls
   const [studioApplyFloor, setStudioApplyFloor] = useState(true);
   const [studioApplyWalls, setStudioApplyWalls] = useState(true);
+  const [studioFloorProduct, setStudioFloorProduct] = useState(null);
+  const [studioWallProduct, setStudioWallProduct] = useState(null);
   const [studioRoomType, setStudioRoomType] = useState('bathroom'); // bathroom, livingroom, kitchen, hallway, terrace
   const [studioGroutWidth, setStudioGroutWidth] = useState('2'); // 1, 2, 3, 5 mm
   const [studioGroutColor, setStudioGroutColor] = useState('#888888'); // hex
@@ -847,6 +849,8 @@ export default function Home() {
         try {
           const prod = JSON.parse(preselected);
           setActiveProduct(prod);
+          setStudioFloorProduct(prod);
+          setStudioWallProduct(prod);
           setActiveTab('studio');
         } catch (e) {
           console.error('Failed to load preselected product:', e);
@@ -918,8 +922,9 @@ export default function Home() {
       } else {
         setProducts(sortedData);
         if (sortedData.length > 0) {
-          // Keep activeProduct if it exists in the new list, or set it to the first one
           setActiveProduct(sortedData[0]);
+          setStudioFloorProduct(sortedData[0]);
+          setStudioWallProduct(sortedData[0]);
         }
       }
 
@@ -1954,6 +1959,10 @@ export default function Home() {
 
   const navigateTo3DStudio = (product) => {
     setActiveProduct(product);
+    setStudioFloorProduct(product);
+    setStudioWallProduct(product);
+    setStudioApplyFloor(true);
+    setStudioApplyWalls(true);
     setActiveTab('studio');
     logInteraction('VIEW', product.id, product.brandId);
     
@@ -3424,14 +3433,18 @@ export default function Home() {
                   </div>
                 )}
 
-                <div className="control-group">
+                 <div className="control-group">
                   <label>Seramik Giydirme Alanı</label>
                   <div className="segmented-control">
                     <button 
-                      className={studioApplyFloor ? 'active' : ''} 
+                      className={studioApplyFloor && studioFloorProduct?.id === activeProduct?.id ? 'active' : ''} 
                       onClick={() => {
-                        setStudioApplyFloor(!studioApplyFloor);
-                        setStudioTarget('floor');
+                        if (studioApplyFloor && studioFloorProduct?.id === activeProduct?.id) {
+                          setStudioApplyFloor(false);
+                        } else {
+                          setStudioFloorProduct(activeProduct);
+                          setStudioApplyFloor(true);
+                        }
                         if (uploadedRoomImage) {
                           reprocessTiling('floor');
                         }
@@ -3440,10 +3453,14 @@ export default function Home() {
                       Zemin Döşeme
                     </button>
                     <button 
-                      className={studioApplyWalls ? 'active' : ''} 
+                      className={studioApplyWalls && studioWallProduct?.id === activeProduct?.id ? 'active' : ''} 
                       onClick={() => {
-                        setStudioApplyWalls(!studioApplyWalls);
-                        setStudioTarget('walls');
+                        if (studioApplyWalls && studioWallProduct?.id === activeProduct?.id) {
+                          setStudioApplyWalls(false);
+                        } else {
+                          setStudioWallProduct(activeProduct);
+                          setStudioApplyWalls(true);
+                        }
                         if (uploadedRoomImage) {
                           reprocessTiling('walls');
                         }
@@ -3451,6 +3468,58 @@ export default function Home() {
                     >
                       Duvar Kaplama
                     </button>
+                  </div>
+                  
+                  {/* Applied Products Summary Box */}
+                  <div className="studio-applied-summary" style={{
+                    marginTop: '10px',
+                    padding: '10px',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                    borderRadius: '8px',
+                    fontSize: '0.72rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Zemin Kaplama:</span>
+                      {studioApplyFloor && studioFloorProduct ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontWeight: '600', color: 'var(--accent-gold)' }}>
+                            {studioFloorProduct.name.split(' ')[0]} {studioFloorProduct.code}
+                          </span>
+                          <button 
+                            onClick={() => setStudioApplyFloor(false)} 
+                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px', fontSize: '0.75rem', fontWeight: 'bold' }}
+                            title="Temizle"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Düz (Boyalı/Sıvalı)</span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Duvar Kaplama:</span>
+                      {studioApplyWalls && studioWallProduct ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontWeight: '600', color: 'var(--accent-gold)' }}>
+                            {studioWallProduct.name.split(' ')[0]} {studioWallProduct.code}
+                          </span>
+                          <button 
+                            onClick={() => setStudioApplyWalls(false)} 
+                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px', fontSize: '0.75rem', fontWeight: 'bold' }}
+                            title="Temizle"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Düz (Boyalı/Sıvalı)</span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -3878,11 +3947,27 @@ export default function Home() {
                 ) : activeProduct ? (
                   <StudioCanvas 
                     activeProduct={activeProduct} 
+                    floorProduct={studioFloorProduct}
+                    wallProduct={studioWallProduct}
                     applyFloor={studioApplyFloor} 
                     applyWalls={studioApplyWalls} 
                     onToggleTarget={(target) => {
-                      if (target === 'floor') setStudioApplyFloor(prev => !prev);
-                      if (target === 'walls') setStudioApplyWalls(prev => !prev);
+                      if (target === 'floor') {
+                        if (studioApplyFloor && studioFloorProduct?.id === activeProduct?.id) {
+                          setStudioApplyFloor(false);
+                        } else {
+                          setStudioFloorProduct(activeProduct);
+                          setStudioApplyFloor(true);
+                        }
+                      }
+                      if (target === 'walls') {
+                        if (studioApplyWalls && studioWallProduct?.id === activeProduct?.id) {
+                          setStudioApplyWalls(false);
+                        } else {
+                          setStudioWallProduct(activeProduct);
+                          setStudioApplyWalls(true);
+                        }
+                      }
                     }}
                     roomType={studioRoomType}
                     groutWidth={studioGroutWidth}
@@ -3908,7 +3993,7 @@ export default function Home() {
                 {products.slice(0, 6).map((prod) => (
                   <div 
                     key={prod.id} 
-                    onClick={() => handleProductCardClick(prod)}
+                    onClick={() => setActiveProduct(prod)}
                     className={`swapper-card ${activeProduct?.id === prod.id ? 'active' : ''}`}
                     style={{ position: 'relative', overflow: 'hidden' }}
                   >
