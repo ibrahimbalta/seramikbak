@@ -45,8 +45,30 @@ import {
 import dynamic from 'next/dynamic';
 
 // Dynamically import client-only components to prevent Next.js SSR hydration mismatches
-const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { ssr: false });
-const MapComponent = dynamic(() => import('@/components/MapComponent'), { ssr: false });
+const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
+  ssr: false,
+  loading: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '600px', background: '#101216', borderRadius: '16px', color: '#94a3b8' }}>
+      <svg className="animate-spin" style={{ width: '40px', height: '40px', color: 'var(--accent-gold, #d4af37)', marginBottom: '16px' }} fill="none" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" style={{ opacity: 0.25 }}></circle>
+        <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" style={{ opacity: 0.75 }}></path>
+      </svg>
+      <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>3D Sanal Stüdyo Yükleniyor...</span>
+    </div>
+  )
+});
+const MapComponent = dynamic(() => import('@/components/MapComponent'), { 
+  ssr: false,
+  loading: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '450px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', color: '#64748b' }}>
+      <svg className="animate-spin" style={{ width: '32px', height: '32px', color: '#0f172a', marginBottom: '12px' }} fill="none" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" style={{ opacity: 0.25 }}></circle>
+        <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" style={{ opacity: 0.75 }}></path>
+      </svg>
+      <span style={{ fontSize: '0.82rem', fontWeight: '600' }}>Bayi Haritası Hazırlanıyor...</span>
+    </div>
+  )
+});
 
 // ----------------------------------------------------------------------
 // PROCEDURAL TILE VISUAL PREVIEW COMPONENT
