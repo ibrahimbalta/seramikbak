@@ -348,6 +348,8 @@ export default function Home() {
 
   // 3D Studio Options
   const [studioTarget, setStudioTarget] = useState('floor'); // floor, walls
+  const [studioApplyFloor, setStudioApplyFloor] = useState(true);
+  const [studioApplyWalls, setStudioApplyWalls] = useState(true);
   const [studioRoomType, setStudioRoomType] = useState('bathroom'); // bathroom, livingroom, kitchen, hallway, terrace
   const [studioGroutWidth, setStudioGroutWidth] = useState('2'); // 1, 2, 3, 5 mm
   const [studioGroutColor, setStudioGroutColor] = useState('#888888'); // hex
@@ -3426,8 +3428,9 @@ export default function Home() {
                   <label>Seramik Giydirme Alanı</label>
                   <div className="segmented-control">
                     <button 
-                      className={studioTarget === 'floor' ? 'active' : ''} 
+                      className={studioApplyFloor ? 'active' : ''} 
                       onClick={() => {
+                        setStudioApplyFloor(!studioApplyFloor);
                         setStudioTarget('floor');
                         if (uploadedRoomImage) {
                           reprocessTiling('floor');
@@ -3437,8 +3440,9 @@ export default function Home() {
                       Zemin Döşeme
                     </button>
                     <button 
-                      className={studioTarget === 'walls' ? 'active' : ''} 
+                      className={studioApplyWalls ? 'active' : ''} 
                       onClick={() => {
+                        setStudioApplyWalls(!studioApplyWalls);
                         setStudioTarget('walls');
                         if (uploadedRoomImage) {
                           reprocessTiling('walls');
@@ -3867,7 +3871,12 @@ export default function Home() {
                 ) : activeProduct ? (
                   <StudioCanvas 
                     activeProduct={activeProduct} 
-                    applyTo={studioTarget} 
+                    applyFloor={studioApplyFloor} 
+                    applyWalls={studioApplyWalls} 
+                    onToggleTarget={(target) => {
+                      if (target === 'floor') setStudioApplyFloor(prev => !prev);
+                      if (target === 'walls') setStudioApplyWalls(prev => !prev);
+                    }}
                     roomType={studioRoomType}
                     groutWidth={studioGroutWidth}
                     groutColor={studioGroutColor}

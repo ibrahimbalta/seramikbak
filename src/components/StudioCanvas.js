@@ -3,7 +3,9 @@ import * as THREE from 'three';
 
 export default function StudioCanvas({ 
   activeProduct, 
-  applyTo = 'floor', 
+  applyFloor = true, 
+  applyWalls = true, 
+  onToggleTarget,
   roomType = 'bathroom',
   groutWidth = '2',
   groutColor = '#888888',
@@ -23,6 +25,11 @@ export default function StudioCanvas({
   const backWallMeshRef = useRef(null);
   const leftWallMeshRef = useRef(null);
   const furnishingsGroupRef = useRef(null);
+  const onToggleTargetRef = useRef(onToggleTarget);
+
+  useEffect(() => {
+    onToggleTargetRef.current = onToggleTarget;
+  }, [onToggleTarget]);
 
   const ambientLightRef = useRef(null);
   const directionalLightRef = useRef(null);
@@ -291,6 +298,8 @@ export default function StudioCanvas({
 
     // Simple custom orbit drag controls using mouse events
     let isDragging = false;
+    let startX = 0;
+    let startY = 0;
     let previousMousePosition = { x: 0, y: 0 };
     let theta = Math.PI / 4; 
     let phi = Math.PI / 3;   
@@ -304,24 +313,85 @@ export default function StudioCanvas({
     };
     updateCameraPosition();
 
+    // Setup Raycasting for interactive surface selection (floor & walls)
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    const onContainerClick = (e) => {
+      if (!containerRef.current) return;
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+
+      const targets = [];
+      if (floorMeshRef.current) targets.push(floorMeshRef.current);
+      if (backWallMeshRef.current) targets.push(backWallMeshRef.current);
+      if (leftWallMeshRef.current) targets.push(leftWallMeshRef.current);
+
+      const intersects = raycaster.intersectObjects(targets);
+      if (intersects.length > 0) {
+        const hit = intersects[0].object;
+        if (hit === floorMeshRef.current) {
+          if (onToggleTargetRef.current) onToggleTargetRef.current('floor');
+        } else {
+          if (onToggleTargetRef.current) onToggleTargetRef.current('walls');
+        }
+      }
+    };
+
     const onMouseDown = (e) => {
       isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
       previousMousePosition = { x: e.clientX, y: e.clientY };
     };
 
     const onMouseMove = (e) => {
-      if (!isDragging) return;
-      const deltaX = e.clientX - previousMousePosition.x;
-      const deltaY = e.clientY - previousMousePosition.y;
+      const container = containerRef.current;
+      if (!container) return;
 
-      theta -= deltaX * 0.005;
-      phi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, phi - deltaY * 0.005));
+      if (isDragging) {
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
 
-      previousMousePosition = { x: e.clientX, y: e.clientY };
-      updateCameraPosition();
+        theta -= deltaX * 0.005;
+        phi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, phi - deltaY * 0.005));
+
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+        updateCameraPosition();
+        return;
+      }
+
+      // Hover pointer cursor change
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const targets = [];
+      if (floorMeshRef.current) targets.push(floorMeshRef.current);
+      if (backWallMeshRef.current) targets.push(backWallMeshRef.current);
+      if (leftWallMeshRef.current) targets.push(leftWallMeshRef.current);
+
+      const intersects = raycaster.intersectObjects(targets);
+      if (intersects.length > 0) {
+        container.style.cursor = 'pointer';
+      } else {
+        container.style.cursor = 'grab';
+      }
     };
 
-    const onMouseUp = () => { isDragging = false; };
+    const onMouseUp = (e) => {
+      isDragging = false;
+      const dragDistance = Math.sqrt(
+        Math.pow(e.clientX - startX, 2) + Math.pow(e.clientY - startY, 2)
+      );
+      if (dragDistance < 5) {
+        onContainerClick(e);
+      }
+    };
 
     const onWheel = (e) => {
       radius = Math.max(3.2, Math.min(12, radius + e.deltaY * 0.004));
@@ -330,7 +400,7 @@ export default function StudioCanvas({
 
     const container = containerRef.current;
     container.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mousemove', onMouseMove);
+    container.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
     container.addEventListener('wheel', onWheel);
 
@@ -358,10 +428,12 @@ export default function StudioCanvas({
       cancelAnimationFrame(animationFrameId);
       setIsSceneReady(false);
       window.removeEventListener('resize', handleResize);
-      container.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('mousemove', onMouseMove);
+      if (container) {
+        container.removeEventListener('mousedown', onMouseDown);
+        container.removeEventListener('mousemove', onMouseMove);
+        container.removeEventListener('wheel', onWheel);
+      }
       window.removeEventListener('mouseup', onMouseUp);
-      container.removeEventListener('wheel', onWheel);
       if (rendererRef.current) {
         rendererRef.current.dispose();
       }
@@ -969,61 +1041,118 @@ export default function StudioCanvas({
 
   // Regenerate tile textures and repeat maps reactively
   useEffect(() => {
-    if (!isSceneReady || !activeProduct || !sceneRef.current) return;
+    if (!isSceneReady || !sceneRef.current) return;
 
     const loader = new THREE.TextureLoader();
-    
-    const w_m = activeProduct.width / 100;
-    const h_m = activeProduct.height / 100;
-    const repeatX = ROOM_WIDTH / w_m;
-    const repeatY = ROOM_DEPTH / h_m;
 
-    const applyTexture = (sourceImageOrCanvas, isImage = true) => {
-      // 1. Generate grout overlay and apply pattern/rotation
-      const texture = generateGroutOverlay(sourceImageOrCanvas, activeProduct, groutWidth, groutColor, tileRotation, layPattern);
+    // 1. FLOOR TILING LOGIC
+    if (applyFloor && activeProduct) {
+      const w_m = activeProduct.width / 100;
+      const h_m = activeProduct.height / 100;
+      const repeatX = ROOM_WIDTH / w_m;
+      const repeatY = ROOM_DEPTH / h_m;
 
-      texture.repeat.set(repeatX, repeatY);
-      texture.colorSpace = THREE.SRGBColorSpace;
+      const applyFloorTexture = (sourceImageOrCanvas, isImage = true) => {
+        const texture = generateGroutOverlay(sourceImageOrCanvas, activeProduct, groutWidth, groutColor, tileRotation, layPattern);
+        texture.repeat.set(repeatX, repeatY);
+        texture.colorSpace = THREE.SRGBColorSpace;
 
-      // 2. Materials properties mapping
-      let roughness = 0.5;
-      let metalness = 0.1;
-      let clearcoat = 0.0;
-      let clearcoatRoughness = 0.0;
+        let roughness = 0.5;
+        let metalness = 0.1;
+        let clearcoat = 0.0;
+        let clearcoatRoughness = 0.0;
 
-      if (activeProduct.finish === 'Parlak') {
-        roughness = 0.08;
-        metalness = 0.15;
-        clearcoat = 1.0;
-        clearcoatRoughness = 0.05;
-      } else if (activeProduct.finish === 'Mat') {
-        roughness = 0.85;
-        metalness = 0.05;
-      } else if (activeProduct.finish === 'Lapatto') {
-        roughness = 0.35;
-        metalness = 0.1;
-        clearcoat = 0.4;
-        clearcoatRoughness = 0.2;
+        if (activeProduct.finish === 'Parlak') {
+          roughness = 0.08;
+          metalness = 0.15;
+          clearcoat = 1.0;
+          clearcoatRoughness = 0.05;
+        } else if (activeProduct.finish === 'Mat') {
+          roughness = 0.85;
+          metalness = 0.05;
+        } else if (activeProduct.finish === 'Lapatto') {
+          roughness = 0.35;
+          metalness = 0.1;
+          clearcoat = 0.4;
+          clearcoatRoughness = 0.2;
+        }
+
+        const newMaterial = new THREE.MeshPhysicalMaterial({
+          map: texture,
+          roughness: roughness,
+          metalness: metalness,
+          clearcoat: clearcoat,
+          clearcoatRoughness: clearcoatRoughness
+        });
+
+        if (floorMeshRef.current) {
+          if (floorMeshRef.current.material.map) floorMeshRef.current.material.map.dispose();
+          floorMeshRef.current.material.dispose();
+          floorMeshRef.current.material = newMaterial;
+        }
+        setTextureStatus(isImage ? 'Real JPG Image Loaded' : 'Procedural Fallback Generated');
+      };
+
+      const realTextureUrl = activeProduct.textureUrl || activeProduct.imageUrl;
+      if (realTextureUrl) {
+        const isAbsolute = realTextureUrl.startsWith('http://') || realTextureUrl.startsWith('https://') || realTextureUrl.startsWith('//');
+        const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realTextureUrl)}` : realTextureUrl;
+        loader.load(
+          finalUrl,
+          (loadedTexture) => {
+            applyFloorTexture(loadedTexture.image, true);
+          },
+          undefined,
+          () => {
+            const proceduralCanvas = generateProceduralTexture(activeProduct);
+            applyFloorTexture(proceduralCanvas, false);
+          }
+        );
+      } else {
+        const proceduralCanvas = generateProceduralTexture(activeProduct);
+        applyFloorTexture(proceduralCanvas, false);
       }
-
-      const newMaterial = new THREE.MeshPhysicalMaterial({
-        map: texture,
-        roughness: roughness,
-        metalness: metalness,
-        clearcoat: clearcoat,
-        clearcoatRoughness: clearcoatRoughness,
-        clearcoatNormalScale: new THREE.Vector2(0.2, 0.2)
-      });
-
-      // 3. Bind to zemin or duvarlar target
-      if (applyTo === 'floor' && floorMeshRef.current) {
+    } else {
+      // Apply default plain floor
+      if (floorMeshRef.current) {
         if (floorMeshRef.current.material.map) floorMeshRef.current.material.map.dispose();
         floorMeshRef.current.material.dispose();
-        floorMeshRef.current.material = newMaterial;
-      } 
-      else if (applyTo === 'walls') {
-        const wallRepeatY = ROOM_HEIGHT / h_m;
-        
+        floorMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#272b33', roughness: 0.8 });
+      }
+    }
+
+    // 2. WALLS TILING LOGIC
+    if (applyWalls && activeProduct) {
+      const w_m = activeProduct.width / 100;
+      const h_m = activeProduct.height / 100;
+      const repeatX = ROOM_WIDTH / w_m;
+      const repeatY = ROOM_DEPTH / h_m;
+      const wallRepeatY = ROOM_HEIGHT / h_m;
+
+      const applyWallsTexture = (sourceImageOrCanvas, isImage = true) => {
+        const texture = generateGroutOverlay(sourceImageOrCanvas, activeProduct, groutWidth, groutColor, tileRotation, layPattern);
+        texture.colorSpace = THREE.SRGBColorSpace;
+
+        let roughness = 0.5;
+        let metalness = 0.1;
+        let clearcoat = 0.0;
+        let clearcoatRoughness = 0.0;
+
+        if (activeProduct.finish === 'Parlak') {
+          roughness = 0.08;
+          metalness = 0.15;
+          clearcoat = 1.0;
+          clearcoatRoughness = 0.05;
+        } else if (activeProduct.finish === 'Mat') {
+          roughness = 0.85;
+          metalness = 0.05;
+        } else if (activeProduct.finish === 'Lapatto') {
+          roughness = 0.35;
+          metalness = 0.1;
+          clearcoat = 0.4;
+          clearcoatRoughness = 0.2;
+        }
+
         // Back Wall
         const backTexture = texture.clone();
         backTexture.repeat.set(repeatX, wallRepeatY);
@@ -1034,9 +1163,11 @@ export default function StudioCanvas({
           clearcoat: clearcoat,
           clearcoatRoughness: clearcoatRoughness
         });
-        if (backWallMeshRef.current.material.map) backWallMeshRef.current.material.map.dispose();
-        backWallMeshRef.current.material.dispose();
-        backWallMeshRef.current.material = backWallMat;
+        if (backWallMeshRef.current) {
+          if (backWallMeshRef.current.material.map) backWallMeshRef.current.material.map.dispose();
+          backWallMeshRef.current.material.dispose();
+          backWallMeshRef.current.material = backWallMat;
+        }
 
         // Left Wall
         const leftTexture = texture.clone();
@@ -1048,37 +1179,59 @@ export default function StudioCanvas({
           clearcoat: clearcoat,
           clearcoatRoughness: clearcoatRoughness
         });
+        if (leftWallMeshRef.current) {
+          if (leftWallMeshRef.current.material.map) leftWallMeshRef.current.material.map.dispose();
+          leftWallMeshRef.current.material.dispose();
+          leftWallMeshRef.current.material = leftWallMat;
+        }
+      };
+
+      const realTextureUrl = activeProduct.textureUrl || activeProduct.imageUrl;
+      if (realTextureUrl) {
+        const isAbsolute = realTextureUrl.startsWith('http://') || realTextureUrl.startsWith('https://') || realTextureUrl.startsWith('//');
+        const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realTextureUrl)}` : realTextureUrl;
+        loader.load(
+          finalUrl,
+          (loadedTexture) => {
+            applyWallsTexture(loadedTexture.image, true);
+          },
+          undefined,
+          () => {
+            const proceduralCanvas = generateProceduralTexture(activeProduct);
+            applyWallsTexture(proceduralCanvas, false);
+          }
+        );
+      } else {
+        const proceduralCanvas = generateProceduralTexture(activeProduct);
+        applyWallsTexture(proceduralCanvas, false);
+      }
+    } else {
+      // Apply default plain walls
+      if (backWallMeshRef.current) {
+        if (backWallMeshRef.current.material.map) backWallMeshRef.current.material.map.dispose();
+        backWallMeshRef.current.material.dispose();
+        backWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#23272f', roughness: 0.9 });
+      }
+      if (leftWallMeshRef.current) {
         if (leftWallMeshRef.current.material.map) leftWallMeshRef.current.material.map.dispose();
         leftWallMeshRef.current.material.dispose();
-        leftWallMeshRef.current.material = leftWallMat;
+        leftWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#1f2229', roughness: 0.9 });
       }
-
-      setTextureStatus(isImage ? 'Real JPG Image Loaded' : 'Procedural Fallback Generated');
-    };
-
-    // Load from URL or generate procedural canvas
-    const realTextureUrl = activeProduct.textureUrl || activeProduct.imageUrl;
-    if (realTextureUrl) {
-      const isAbsolute = realTextureUrl.startsWith('http://') || realTextureUrl.startsWith('https://') || realTextureUrl.startsWith('//');
-      const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realTextureUrl)}` : realTextureUrl;
-      loader.load(
-        finalUrl,
-        (loadedTexture) => {
-          applyTexture(loadedTexture.image, true);
-        },
-        undefined,
-        () => {
-          console.warn(`Could not load image ${realTextureUrl}. Using procedural generator.`);
-          const proceduralCanvas = generateProceduralTexture(activeProduct);
-          applyTexture(proceduralCanvas, false);
-        }
-      );
-    } else {
-      const proceduralCanvas = generateProceduralTexture(activeProduct);
-      applyTexture(proceduralCanvas, false);
     }
 
-  }, [activeProduct, applyTo, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
+  }, [activeProduct, applyFloor, applyWalls, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
+
+  const downloadSnapshot = () => {
+    if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return;
+    // Force a render pass to clear standard render buffers
+    rendererRef.current.render(sceneRef.current, cameraRef.current);
+    const dataUrl = rendererRef.current.domElement.toDataURL('image/jpeg', 0.95);
+    
+    const link = document.createElement('a');
+    link.download = `seramikbak-tasarim-${activeProduct?.name || 'sanal-studyo'}.jpg`;
+    link.href = dataUrl;
+    link.click();
+  };
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -1088,29 +1241,39 @@ export default function StudioCanvas({
       />
       {/* Information Overlay */}
       <div className="canvas-overlay">
-        <div className="overlay-badge">
-          <span>Doku Modu: </span>
-          <strong style={{ color: textureStatus.includes('Real') ? 'var(--accent-green)' : 'var(--accent-gold)' }}>
-            {textureStatus}
-          </strong>
+        <div className="overlay-left-badges">
+          <div className="overlay-badge">
+            <span>Doku: </span>
+            <strong style={{ color: textureStatus.includes('Real') ? 'var(--accent-green)' : 'var(--accent-gold)' }}>
+              {textureStatus}
+            </strong>
+          </div>
+          <div className="overlay-badge">
+            <span>Sahne: </span>
+            <strong style={{ textTransform: 'capitalize', color: 'var(--accent-gold)' }}>
+              {roomType === 'bathroom' ? 'Lüks Banyo' : 
+               roomType === 'livingroom' ? 'Modern Salon' : 
+               roomType === 'kitchen' ? 'İndüstriyel Mutfak' :
+               roomType === 'hallway' ? 'Modern Antre' : 'Açık Teras'}
+            </strong>
+          </div>
+          <div className="overlay-badge">
+            <span>Kaplama: </span>
+            <strong style={{ textTransform: 'capitalize', color: '#38bdf8' }}>
+              {applyFloor && applyWalls ? 'Zemin & Duvar' : 
+               applyFloor ? 'Sadece Zemin' : 
+               applyWalls ? 'Sadece Duvar' : 'Döşenmemiş'}
+            </strong>
+          </div>
         </div>
-        <div className="overlay-badge">
-          <span>Sahne: </span>
-          <strong style={{ textTransform: 'capitalize', color: 'var(--accent-gold)' }}>
-            {roomType === 'bathroom' ? 'Lüks Banyo' : 
-             roomType === 'livingroom' ? 'Modern Salon' : 
-             roomType === 'kitchen' ? 'İndüstriyel Mutfak' :
-             roomType === 'hallway' ? 'Modern Antre' : 'Açık Teras'}
-          </strong>
-        </div>
-        <div className="overlay-badge">
-          <span>Döşeme Hedefi: </span>
-          <strong style={{ textTransform: 'capitalize', color: 'var(--accent-blue)' }}>
-            {applyTo === 'floor' ? 'Zemin' : 'Duvarlar'}
-          </strong>
-        </div>
-        <div className="overlay-instructions">
-          Sürükleyip Döndür • Kaydırıp Yakınlaş
+        
+        <div className="overlay-right-actions">
+          <button onClick={downloadSnapshot} className="overlay-action-btn">
+            📷 Fotoğrafı İndir
+          </button>
+          <div className="overlay-instructions">
+            Zemine/Duvara Tıklayarak Kapla
+          </div>
         </div>
       </div>
       <style jsx>{`
@@ -1120,32 +1283,65 @@ export default function StudioCanvas({
           left: 16px;
           right: 16px;
           display: flex;
-          flex-wrap: wrap;
           justify-content: space-between;
-          align-items: center;
+          align-items: flex-end;
           pointer-events: none;
+          gap: 12px;
+        }
+        .overlay-left-badges {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          pointer-events: none;
+        }
+        .overlay-right-actions {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
           gap: 8px;
+          pointer-events: auto;
         }
         .overlay-badge {
-          background: rgba(20, 22, 28, 0.85);
-          border: 1px solid var(--border-color);
+          background: rgba(15, 23, 42, 0.85);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           color: #fff;
           padding: 6px 12px;
-          border-radius: var(--border-radius-sm);
-          font-size: 0.75rem;
+          border-radius: 8px;
+          font-size: 0.72rem;
           font-family: var(--font-body);
-          backdrop-filter: blur(4px);
+          backdrop-filter: blur(8px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .overlay-action-btn {
+          background: linear-gradient(135deg, var(--accent-gold) 0%, #d4af37 100%);
+          color: #0f172a;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 8px;
+          font-size: 0.72rem;
+          font-family: var(--font-title);
+          font-weight: 700;
+          cursor: pointer;
+          pointer-events: auto;
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.3);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .overlay-action-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(179, 142, 71, 0.45);
         }
         .overlay-instructions {
-          background: rgba(197, 160, 89, 0.1);
-          border: 1px solid var(--border-gold);
+          background: rgba(15, 23, 42, 0.9);
+          border: 1px solid rgba(179, 142, 71, 0.3);
           color: var(--accent-gold);
           padding: 6px 12px;
-          border-radius: var(--border-radius-sm);
-          font-size: 0.75rem;
-          font-weight: 500;
+          border-radius: 8px;
+          font-size: 0.7rem;
+          font-weight: 600;
           font-family: var(--font-title);
-          backdrop-filter: blur(4px);
+          backdrop-filter: blur(8px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          text-align: right;
         }
       `}</style>
     </div>
