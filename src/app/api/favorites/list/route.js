@@ -41,13 +41,7 @@ export async function GET(request) {
       }
     });
 
-    // Extract the products from the favorites table
-    const products = favorites.map(fav => fav.product);
-
-    return NextResponse.json({
-      success: true,
-      products
-    });
+    return NextResponse.json(favorites);
   } catch (error) {
     console.error('List Favorites API Error:', error);
     return NextResponse.json(
