@@ -3492,6 +3492,13 @@ export default function Home() {
                     >
                       Teras
                     </button>
+                    <button 
+                      className={studioRoomType === 'bedroom' ? 'active' : ''} 
+                      onClick={() => setStudioRoomType('bedroom')}
+                      style={{ fontSize: '0.72rem', padding: '6px' }}
+                    >
+                      Yatak Odası
+                    </button>
                   </div>
                 </div>
 

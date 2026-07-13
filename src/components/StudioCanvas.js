@@ -934,7 +934,7 @@ export default function StudioCanvas({
 
       for (let dx of [-0.15, 0.15]) {
         for (let dz of [-0.15, 0.15]) {
-          const leg = new THREE.Mesh(chairLegGeo, railingMat);
+      const leg = new THREE.Mesh(chairLegGeo, railingMat);
           leg.position.set(0.4 + dx, 0.2, 0.35 + dz);
           leg.castShadow = true;
           group.add(leg);
@@ -963,6 +963,118 @@ export default function StudioCanvas({
         leaf.castShadow = true;
         group.add(leaf);
       }
+    } else if (roomType === 'bedroom') {
+      // --- 1. DOUBLE BED ---
+      const bedBaseGeo = new THREE.BoxGeometry(1.6, 0.35, 2.0);
+      const bedBaseMat = new THREE.MeshStandardMaterial({ color: '#5c4033', roughness: 0.65 });
+      const bedBase = new THREE.Mesh(bedBaseGeo, bedBaseMat);
+      bedBase.position.set(0, 0.175, -ROOM_DEPTH / 2 + 1.25);
+      bedBase.castShadow = true;
+      bedBase.receiveShadow = true;
+      group.add(bedBase);
+
+      const mattressGeo = new THREE.BoxGeometry(1.56, 0.28, 1.96);
+      const mattressMat = new THREE.MeshPhysicalMaterial({ color: '#f8fafc', roughness: 0.9, clearcoat: 0.0 });
+      const mattress = new THREE.Mesh(mattressGeo, mattressMat);
+      mattress.position.set(0, 0.35 + 0.14, -ROOM_DEPTH / 2 + 1.27);
+      mattress.castShadow = true;
+      mattress.receiveShadow = true;
+      group.add(mattress);
+
+      const headboardGeo = new THREE.BoxGeometry(1.7, 1.0, 0.08);
+      const headboard = new THREE.Mesh(headboardGeo, bedBaseMat);
+      headboard.position.set(0, 0.5, -ROOM_DEPTH / 2 + 0.04);
+      headboard.castShadow = true;
+      group.add(headboard);
+
+      const pillowGeo = new THREE.BoxGeometry(0.62, 0.08, 0.38);
+      const pillowMat = new THREE.MeshStandardMaterial({ color: '#e2e8f0', roughness: 0.95 });
+      
+      const pillowL = new THREE.Mesh(pillowGeo, pillowMat);
+      pillowL.position.set(-0.35, 0.49 + 0.04, -ROOM_DEPTH / 2 + 0.3);
+      pillowL.rotation.x = -Math.PI / 15;
+      pillowL.castShadow = true;
+      group.add(pillowL);
+
+      const pillowR = new THREE.Mesh(pillowGeo, pillowMat);
+      pillowR.position.set(0.35, 0.49 + 0.04, -ROOM_DEPTH / 2 + 0.3);
+      pillowR.rotation.x = -Math.PI / 15;
+      pillowR.castShadow = true;
+      group.add(pillowR);
+
+      // --- 2. BEDSIDE NIGHTSTANDS ---
+      const nightstandGeo = new THREE.BoxGeometry(0.4, 0.45, 0.4);
+      const darkNightstandMat = new THREE.MeshStandardMaterial({ color: '#1a1c22', roughness: 0.8 });
+      
+      const nightstandL = new THREE.Mesh(nightstandGeo, darkNightstandMat);
+      nightstandL.position.set(-1.08, 0.225, -ROOM_DEPTH / 2 + 0.24);
+      nightstandL.castShadow = true;
+      nightstandL.receiveShadow = true;
+      group.add(nightstandL);
+
+      const nightstandR = new THREE.Mesh(nightstandGeo, darkNightstandMat);
+      nightstandR.position.set(1.08, 0.225, -ROOM_DEPTH / 2 + 0.24);
+      nightstandR.castShadow = true;
+      nightstandR.receiveShadow = true;
+      group.add(nightstandR);
+
+      // --- 3. BEDSIDE LAMPS ---
+      const lampBaseGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.015, 12);
+      const brassMat = new THREE.MeshStandardMaterial({ color: '#d4af37', metalness: 0.85, roughness: 0.15 });
+      const lampPoleGeo = new THREE.CylinderGeometry(0.008, 0.008, 0.24);
+      const shadeGeo = new THREE.CylinderGeometry(0.08, 0.12, 0.14, 12);
+      const shadeMat = new THREE.MeshStandardMaterial({ color: '#f1f5f9', roughness: 0.9 });
+
+      // Left Lamp
+      const lampBaseL = new THREE.Mesh(lampBaseGeo, brassMat);
+      lampBaseL.position.set(-1.08, 0.45 + 0.008, -ROOM_DEPTH / 2 + 0.24);
+      group.add(lampBaseL);
+
+      const lampPoleL = new THREE.Mesh(lampPoleGeo, brassMat);
+      lampPoleL.position.set(-1.08, 0.45 + 0.12, -ROOM_DEPTH / 2 + 0.24);
+      group.add(lampPoleL);
+
+      const lampShadeL = new THREE.Mesh(shadeGeo, shadeMat);
+      lampShadeL.position.set(-1.08, 0.45 + 0.31, -ROOM_DEPTH / 2 + 0.24);
+      lampShadeL.castShadow = true;
+      group.add(lampShadeL);
+
+      const bedsideLightL = new THREE.PointLight('#ffa62b', 0.85, 3.5);
+      bedsideLightL.position.set(-1.08, 0.45 + 0.22, -ROOM_DEPTH / 2 + 0.24);
+      group.add(bedsideLightL);
+
+      // Right Lamp
+      const lampBaseR = new THREE.Mesh(lampBaseGeo, brassMat);
+      lampBaseR.position.set(1.08, 0.45 + 0.008, -ROOM_DEPTH / 2 + 0.24);
+      group.add(lampBaseR);
+
+      const lampPoleR = new THREE.Mesh(lampPoleGeo, brassMat);
+      lampPoleR.position.set(1.08, 0.45 + 0.12, -ROOM_DEPTH / 2 + 0.24);
+      group.add(lampPoleR);
+
+      const lampShadeR = new THREE.Mesh(shadeGeo, shadeMat);
+      lampShadeR.position.set(1.08, 0.45 + 0.31, -ROOM_DEPTH / 2 + 0.24);
+      lampShadeR.castShadow = true;
+      group.add(lampShadeR);
+
+      const bedsideLightR = new THREE.PointLight('#ffa62b', 0.85, 3.5);
+      bedsideLightR.position.set(1.08, 0.45 + 0.22, -ROOM_DEPTH / 2 + 0.24);
+      group.add(bedsideLightR);
+
+      // --- 4. TALL WARDROBE ---
+      const wardrobeGeo = new THREE.BoxGeometry(0.55, 2.1, 1.15);
+      const wardrobeMat = new THREE.MeshStandardMaterial({ color: '#1a1c22', roughness: 0.85 });
+      const wardrobe = new THREE.Mesh(wardrobeGeo, wardrobeMat);
+      wardrobe.position.set(-ROOM_WIDTH / 2 + 0.275, 1.05, 0.8);
+      wardrobe.castShadow = true;
+      wardrobe.receiveShadow = true;
+      group.add(wardrobe);
+
+      const doorTrimGeo = new THREE.BoxGeometry(0.56, 2.11, 0.02);
+      const doorTrim = new THREE.Mesh(doorTrimGeo, bedBaseMat);
+      doorTrim.position.set(-ROOM_WIDTH / 2 + 0.28, 1.055, 1.38);
+      doorTrim.castShadow = true;
+      group.add(doorTrim);
     }
 
   }, [roomType, isSceneReady]);
@@ -1254,7 +1366,8 @@ export default function StudioCanvas({
               {roomType === 'bathroom' ? 'Lüks Banyo' : 
                roomType === 'livingroom' ? 'Modern Salon' : 
                roomType === 'kitchen' ? 'İndüstriyel Mutfak' :
-               roomType === 'hallway' ? 'Modern Antre' : 'Açık Teras'}
+               roomType === 'hallway' ? 'Modern Antre' : 
+               roomType === 'bedroom' ? 'Yatak Odası' : 'Açık Teras'}
             </strong>
           </div>
           <div className="overlay-badge">
