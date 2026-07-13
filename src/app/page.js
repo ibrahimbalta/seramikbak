@@ -5553,6 +5553,9 @@ export default function Home() {
         className={`filters-sidebar-new glass-panel mobile-sidebar ${showMobileFilters ? 'open' : ''}`} 
         style={showMobileFilters ? {} : { position: 'relative' }}
       >
+        <div className="bottom-sheet-handle-wrapper">
+          <div className="bottom-sheet-handle" />
+        </div>
         <div className="filter-header-row">
           <h3 className="filter-title-main" style={{ fontSize: '1.2rem', fontWeight: '750', color: '#0f172a', margin: 0, border: 'none', padding: 0 }}>Filtreler</h3>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -11503,25 +11506,45 @@ export default function Home() {
             background: #e2e8f0;
           }
 
+          .bottom-sheet-handle-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 8px 0 16px 0;
+            cursor: grab;
+          }
+          .bottom-sheet-handle {
+            width: 36px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 2px;
+          }
           .filters-sidebar-new {
             position: fixed !important;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 310px;
-            max-width: 80vw;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            top: auto !important;
+            width: 100% !important;
+            max-width: 100vw !important;
+            height: 80vh !important;
+            max-height: 80vh !important;
             z-index: 10005 !important;
             background: #ffffff !important;
-            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15) !important;
-            transform: translateX(-100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            border-radius: 0 !important;
-            border-right: 1px solid var(--border-color) !important;
-            padding: 20px !important;
+            box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.15) !important;
+            transform: translateY(100%) !important;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            border-radius: 20px 20px 0 0 !important;
+            border-top: 1px solid var(--border-color) !important;
+            border-left: none !important;
+            border-right: none !important;
+            padding: 0 20px 20px 20px !important;
             display: flex !important;
+            flex-direction: column !important;
           }
           .filters-sidebar-new.open {
-            transform: translateX(0) !important;
+            transform: translateY(0) !important;
           }
           .main-search-and-results-layout {
             grid-template-columns: 1fr !important;
