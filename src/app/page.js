@@ -6618,6 +6618,54 @@ export default function Home() {
           box-shadow: 0 10px 25px rgba(179, 142, 71, 0.12);
         }
 
+        .banner-img {
+          width: 100px;
+          height: 112px;
+          object-fit: cover;
+          border-radius: 12px;
+          flex-shrink: 0;
+          border: 1px solid rgba(179, 142, 71, 0.1);
+          transition: transform 0.3s ease;
+        }
+
+        .banner-item:hover .banner-img {
+          transform: scale(1.03);
+        }
+
+        .banner-item-info {
+          display: flex;
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          justify-content: center;
+          text-align: left;
+          min-width: 0;
+        }
+
+        .banner-brand-name {
+          font-size: 0.68rem;
+          font-weight: 800;
+          color: #8c6b30;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .banner-product-name {
+          font-size: 0.82rem;
+          font-weight: 700;
+          color: #0f172a;
+          line-height: 1.25;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
         /* Mobile Menu Drawer Styles */
         .mobile-menu-overlay {
           position: fixed;
