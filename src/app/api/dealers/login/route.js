@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyPassword } from '@/lib/auth';
 
 export async function POST(request) {
   try {
@@ -23,7 +24,7 @@ export async function POST(request) {
       }
     });
 
-    if (!dealer || dealer.password !== password) {
+    if (!dealer || !verifyPassword(password, dealer.password)) {
       return NextResponse.json({ error: 'Hatalı e-posta/telefon veya şifre.' }, { status: 401 });
     }
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { hashPassword } from '@/lib/auth';
 
 export async function GET() {
   try {
@@ -43,11 +44,12 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Bu kullanıcı adı başka bir marka tarafından kullanılıyor.' }, { status: 400 });
     }
 
+    const finalPassword = password.includes(':') ? password : hashPassword(password);
     const updated = await prisma.brand.update({
       where: { id },
       data: {
         username,
-        password
+        password: finalPassword
       }
     });
 

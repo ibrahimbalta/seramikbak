@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { hashPassword } from '@/lib/auth';
 
 export async function POST(request) {
   try {
@@ -25,13 +26,13 @@ export async function POST(request) {
       );
     }
 
-    // Create the user (Storing password in plain text for simplicity and seed compatibility,
-    // or bcrypt in full production. SQLite seed passwords in the project are stored as plain text)
+    // Create the user with a securely hashed password
+    const hashedPassword = hashPassword(password);
     const user = await prisma.user.create({
       data: {
         name,
         email,
-        password
+        password: hashedPassword
       }
     });
 

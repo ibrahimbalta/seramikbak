@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyPassword } from '@/lib/auth';
 
 export async function POST(request) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request) {
       where: { username }
     });
 
-    if (!brand || brand.password !== password) {
+    if (!brand || !verifyPassword(password, brand.password)) {
       return NextResponse.json({ error: 'Hatalı kullanıcı adı veya şifre.' }, { status: 401 });
     }
 

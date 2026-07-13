@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { hashPassword } from '@/lib/auth';
 
 export async function POST(request) {
   try {
@@ -30,13 +31,14 @@ export async function POST(request) {
     const latitude = parseFloat(lat) || 40.9901;
     const longitude = parseFloat(lng) || 29.0278;
 
+    const hashedPassword = hashPassword(password);
     const newDealer = await prisma.dealer.create({
       data: {
         name,
         brandId,
         phone,
         email: email || null,
-        password,
+        password: hashedPassword,
         status: 'PENDING_APPROVAL',
         address,
         city,

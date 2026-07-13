@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { hashPassword } from '@/lib/auth';
 
 export async function GET() {
   try {
@@ -100,7 +101,9 @@ export async function PUT(request) {
     if (status !== undefined) updateData.status = status;
     if (phone !== undefined) updateData.phone = phone;
     if (address !== undefined) updateData.address = address;
-    if (password !== undefined) updateData.password = password;
+    if (password !== undefined) {
+      updateData.password = password.includes(':') ? password : hashPassword(password);
+    }
     if (lat !== undefined) updateData.lat = parseFloat(lat);
     if (lng !== undefined) updateData.lng = parseFloat(lng);
     if (logoUrl !== undefined) updateData.logoUrl = logoUrl;
