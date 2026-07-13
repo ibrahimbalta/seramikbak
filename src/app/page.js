@@ -4442,9 +4442,9 @@ export default function Home() {
                                   onClick={(e) => e.stopPropagation()}
                                   className="quick-action-link showroom"
                                   title="Showroom & Detay Sayfasını İncele"
-                                  style={{ display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
+                                  style={{ textDecoration: 'none' }}
                                 >
-                                  <Sparkles size={12} style={{ color: 'var(--accent-gold)' }} />
+                                  <Sparkles size={12} />
                                   <span>Showroom</span>
                                 </Link>
                               </div>
@@ -5329,9 +5329,9 @@ export default function Home() {
                       href={`/bayi/${slugify(selectedDetailDealer.name)}`}
                       target="_blank"
                       className="btn-secondary w-full-btn"
-                      style={{ padding: '10px', fontWeight: '700', border: '1px solid #cbd5e1', textDecoration: 'none', textAlign: 'center', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.8rem', borderRadius: '8px', marginBottom: '8px' }}
+                      style={{ padding: '8px', fontWeight: '700', border: '1px solid rgba(179, 142, 71, 0.12)', textDecoration: 'none', textAlign: 'center', boxSizing: 'border-box', color: '#b38e47', background: 'rgba(179, 142, 71, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.72rem', borderRadius: '8px', marginBottom: '8px' }}
                     >
-                      <Sparkles size={12} style={{ color: 'var(--accent-gold)' }} />
+                      <Sparkles size={12} />
                       Detay Sayfasını Aç
                     </Link>
                     <button 
@@ -5343,7 +5343,7 @@ export default function Home() {
                         setShowLeadModal(true); // open quote request modal
                       }}
                       className="btn-primary w-full-btn"
-                      style={{ padding: '12px', fontWeight: '800', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#0f172a', border: 'none', marginTop: '4px' }}
+                      style={{ padding: '8px 12px', fontWeight: '700', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#0f172a', border: 'none', marginTop: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.72rem', borderRadius: '8px', textTransform: 'uppercase', letterSpacing: '0.03em', width: '100%', boxSizing: 'border-box', cursor: 'pointer' }}
                     >
                       Fiyat Teklifi İste
                     </button>
@@ -8952,7 +8952,7 @@ export default function Home() {
 
         .dealer-quick-links {
           display: flex;
-          gap: 8px;
+          gap: 6px;
           width: 100%;
         }
 
@@ -8961,54 +8961,68 @@ export default function Home() {
           align-items: center;
           justify-content: center;
           gap: 4px;
-          padding: 6px 10px;
+          padding: 6px 8px;
           font-family: var(--font-title);
-          font-weight: 600;
-          font-size: 0.7rem;
+          font-weight: 700;
+          font-size: 0.65rem;
           text-decoration: none;
-          border-radius: var(--border-radius-sm);
-          transition: all 0.2s;
+          border-radius: 8px;
+          transition: all 0.2s ease-in-out;
           flex: 1;
+          white-space: nowrap;
         }
 
         .quick-action-link.maps {
-          background-color: #f1f5f9;
-          color: var(--text-primary);
-          border: 1px solid var(--border-color);
+          background-color: rgba(15, 23, 42, 0.04);
+          color: #0f172a;
+          border: 1px solid rgba(15, 23, 42, 0.08);
         }
 
         .quick-action-link.maps:hover {
-          background-color: #e2e8f0;
+          background-color: rgba(15, 23, 42, 0.08);
+          transform: translateY(-1px);
         }
 
         .quick-action-link.whatsapp {
-          background-color: rgba(37, 211, 102, 0.08);
-          color: #25d366;
-          border: 1px solid rgba(37, 211, 102, 0.2);
+          background-color: rgba(37, 211, 102, 0.05);
+          color: #128c7e;
+          border: 1px solid rgba(37, 211, 102, 0.12);
         }
 
         .quick-action-link.whatsapp:hover {
-          background-color: rgba(37, 211, 102, 0.15);
+          background-color: rgba(37, 211, 102, 0.1);
+          transform: translateY(-1px);
         }
 
         .quick-action-link.showroom {
-          background-color: rgba(212, 175, 55, 0.08);
-          color: var(--accent-gold);
-          border: 1px solid rgba(212, 175, 55, 0.2);
+          background-color: rgba(179, 142, 71, 0.05);
+          color: #b38e47;
+          border: 1px solid rgba(179, 142, 71, 0.12);
         }
 
         .quick-action-link.showroom:hover {
-          background-color: rgba(212, 175, 55, 0.15);
+          background-color: rgba(179, 142, 71, 0.1);
+          transform: translateY(-1px);
         }
 
         .quote-btn {
           font-size: 0.72rem !important;
-          padding: 8px 14px !important;
-          border-radius: var(--border-radius-sm) !important;
+          padding: 8px 12px !important;
+          border-radius: 8px !important;
           width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
+          font-weight: 700 !important;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+          box-shadow: 0 2px 4px rgba(179, 142, 71, 0.08);
+          transition: all 0.2s ease-in-out !important;
+        }
+
+        .quote-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 10px rgba(179, 142, 71, 0.15);
         }
 
         /* EMPTY STATE */
