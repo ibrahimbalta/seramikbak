@@ -1435,6 +1435,30 @@ export default function Home() {
       suggestedGroutColor = 'Antrasit';
     }
 
+    // Labor Cost Calculation
+    let laborRatePerM2 = 240; // Base rate in TL/m2
+    
+    // Diagonal difficulty
+    if (layout === 'diagonal') {
+      laborRatePerM2 += 40; 
+    }
+    
+    // Size difficulty
+    const maxDimension = Math.max(prod.width || 0, prod.height || 0);
+    const tileArea = ((prod.width || 60) * (prod.height || 60)) / 10000; // in m2
+    if (maxDimension >= 120) {
+      laborRatePerM2 += 110; // Large format premium
+    } else if (tileArea < 0.15) {
+      laborRatePerM2 += 30; // Small format premium
+    }
+    
+    // Premium premium
+    if (prod.isPremium) {
+      laborRatePerM2 += 20;
+    }
+    
+    const laborCostTotal = Math.round(totalAreaNeeded * laborRatePerM2);
+
     setCalcResults({
       rawArea: rawArea.toFixed(2),
       totalAreaNeeded: totalAreaNeeded.toFixed(2),
@@ -1444,7 +1468,9 @@ export default function Home() {
       adhesiveKg,
       adhesiveBags,
       groutKg,
-      suggestedGroutColor
+      suggestedGroutColor,
+      laborRatePerM2,
+      laborCostTotal
     });
   };
 
@@ -4932,6 +4958,55 @@ export default function Home() {
                         </div>
                       </div>
                       
+                      {/* DYNAMICS: ESTIMATED LABOR COST */}
+                      <div className="labor-cost-box" style={{
+                        background: 'rgba(16, 185, 129, 0.03)',
+                        border: '1px dashed rgba(16, 185, 129, 0.25)',
+                        borderRadius: '8px',
+                        padding: '14px',
+                        marginBottom: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px'
+                      }}>
+                        <span className="logistics-lbl" style={{ 
+                          fontSize: '0.78rem', 
+                          fontWeight: '700', 
+                          color: '#10b981', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '6px' 
+                        }}>
+                          👷 Tahmini İşçilik & Uygulama Maliyeti
+                        </span>
+                        <div className="logistics-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#64748b' }}>
+                          <span>Uygulama Alanı (Zayiat Dahil):</span>
+                          <strong style={{ color: '#334155' }}>{calcResults.totalAreaNeeded} m²</strong>
+                        </div>
+                        <div className="logistics-row" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#64748b' }}>
+                          <span>Birim İşçilik (Ebat & Yöntem Ayarlı):</span>
+                          <strong style={{ color: '#334155' }}>{calcResults.laborRatePerM2} TL/m²</strong>
+                        </div>
+                        <div className="logistics-row highlight-price" style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          fontSize: '0.78rem', 
+                          borderTop: '1px dashed rgba(16, 185, 129, 0.2)', 
+                          paddingTop: '6px', 
+                          marginTop: '2px', 
+                          fontWeight: '700', 
+                          color: '#10b981' 
+                        }}>
+                          <span>Toplam Tahmini İşçilik Bedeli:</span>
+                          <strong className="logistics-price" style={{ fontSize: '0.9rem' }}>
+                            {calcResults.laborCostTotal.toLocaleString('tr-TR')} TL
+                          </strong>
+                        </div>
+                        <p style={{ fontSize: '0.6rem', color: '#94a3b8', margin: 0, fontStyle: 'italic', lineHeight: '1.3' }}>
+                          * Fiyatlar Türkiye geneli ortalama seramik usta işçilik piyasasını yansıtır. Büyük ebatlı porselen ve çapraz döşemede işçilik farkı dahildir.
+                        </p>
+                      </div>
+
                       {/* DYNAMICS: HEAVY FREIGHT PALLET LOGISTICS ESTIMATION */}
                       <div className="pallet-logistics-box">
                         <span className="logistics-lbl">🚚 Kargo & Ağır Yük Lojistiği (Borusan Entegrasyonu)</span>
