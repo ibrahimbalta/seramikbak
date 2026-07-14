@@ -142,6 +142,10 @@ export default function Home() {
   // Additional Filter States
   const [selectedRectified, setSelectedRectified] = useState(''); // '', 'true', 'false'
   const [selectedFrost, setSelectedFrost] = useState(''); // '', 'true', 'false'
+  const [selectedSlipResistance, setSelectedSlipResistance] = useState(''); // '', 'R9', 'R10', 'R11'
+  const [selectedThickness, setSelectedThickness] = useState(''); // '', 'thin', 'standard', 'thick'
+  const [selectedPeiRating, setSelectedPeiRating] = useState(''); // '', '3', '4', '5'
+  const [selectedIsPremium, setSelectedIsPremium] = useState(''); // '', 'true'
 
   // Navigation
   const [activeTab, setActiveTab] = useState('search'); // search, studio, dealers, b2b
@@ -900,6 +904,10 @@ export default function Home() {
         if (selectedSize) params.append('size', selectedSize);
         if (selectedRectified) params.append('rectified', selectedRectified);
         if (selectedFrost) params.append('frost', selectedFrost);
+        if (selectedSlipResistance) params.append('slip', selectedSlipResistance);
+        if (selectedThickness) params.append('thicknessRange', selectedThickness);
+        if (selectedPeiRating) params.append('pei', selectedPeiRating);
+        if (selectedIsPremium) params.append('isPremium', selectedIsPremium);
         params.append('page', String(targetPage));
         params.append('limit', String(limit));
         url += params.toString();
@@ -944,7 +952,22 @@ export default function Home() {
   useEffect(() => {
     setPage(1);
     fetchProducts('', 1, false);
-  }, [sortBy, searchQuery, selectedBrand, selectedColor, selectedFinish, selectedStyle, selectedArea, selectedSize, selectedRectified, selectedFrost]);
+  }, [
+    sortBy,
+    searchQuery,
+    selectedBrand,
+    selectedColor,
+    selectedFinish,
+    selectedStyle,
+    selectedArea,
+    selectedSize,
+    selectedRectified,
+    selectedFrost,
+    selectedSlipResistance,
+    selectedThickness,
+    selectedPeiRating,
+    selectedIsPremium
+  ]);
 
   const handleLoadMore = () => {
     if (fetchingMore || !hasMore) return;
@@ -3064,8 +3087,8 @@ export default function Home() {
             <div className="main-search-and-results-layout">
               {/* Left Sidebar Filter Section */}
               <aside className="filters-sidebar-new glass-panel desktop-sidebar" style={{ position: 'relative' }}>
-                <div className="filter-header-row">
-                  <h3 className="filter-title-main" style={{ fontSize: '1.2rem', fontWeight: '750', color: '#0f172a', margin: 0, border: 'none', padding: 0 }}>Filtreler</h3>
+                <div className="filter-header-row" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: '12px' }}>
+                  <h3 className="filter-title-main" style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', margin: 0, border: 'none', padding: 0, letterSpacing: '-0.02em' }}>Filtreler</h3>
                   <button onClick={() => {
                     setSelectedBrand('');
                     setSelectedColor('');
@@ -3075,6 +3098,10 @@ export default function Home() {
                     setSelectedSize('');
                     setSelectedRectified('');
                     setSelectedFrost('');
+                    setSelectedSlipResistance('');
+                    setSelectedThickness('');
+                    setSelectedPeiRating('');
+                    setSelectedIsPremium('');
                     setSearchQuery('');
                     setUploadedImagePreview(null);
                     setVisualSearchMatches(null);
@@ -3084,11 +3111,49 @@ export default function Home() {
                   </button>
                 </div>
 
+                {/* Standalone Premium Series Switch */}
+                <div className="premium-toggle-card" style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between', 
+                  padding: '12px 14px', 
+                  borderRadius: '12px', 
+                  background: selectedIsPremium === 'true' 
+                    ? 'linear-gradient(135deg, rgba(179,142,71,0.15) 0%, rgba(140,107,48,0.06) 100%)' 
+                    : 'linear-gradient(135deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.005) 100%)', 
+                  border: selectedIsPremium === 'true' 
+                    ? '1px solid rgba(179,142,71,0.35)' 
+                    : '1px solid rgba(0,0,0,0.05)', 
+                  marginBottom: '8px', 
+                  transition: 'all 0.3s ease',
+                  boxShadow: selectedIsPremium === 'true' ? '0 4px 12px rgba(179,142,71,0.08)' : 'none'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <Sparkles size={16} style={{ color: selectedIsPremium === 'true' ? 'var(--accent-gold)' : '#64748b', transition: 'color 0.2s' }} />
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: selectedIsPremium === 'true' ? '#b38e47' : '#0f172a', transition: 'color 0.2s' }}>Premium Seçim</span>
+                      <span style={{ fontSize: '0.62rem', color: '#64748b' }}>Mimari ve özel seriler</span>
+                    </div>
+                  </div>
+                  <label className="toggle-switch-wrapper">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedIsPremium === 'true'} 
+                      onChange={() => setSelectedIsPremium(selectedIsPremium === 'true' ? '' : 'true')}
+                    />
+                    <span className="toggle-switch-slider" />
+                  </label>
+                </div>
+
                 {/* 1. KATEGORİLER */}
                 <div className="accordion-section">
                   <div className="accordion-header" onClick={() => toggleSection('categories')}>
-                    <span className="accordion-title">Kategoriler</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.categories ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <SlidersHorizontal size={14} style={{ color: selectedStyle ? 'var(--accent-gold)' : '#64748b' }} />
+                      <span className="accordion-title">Kategoriler</span>
+                      {selectedStyle !== '' && <span className="accordion-active-dot" />}
+                    </div>
+                    <ChevronDown size={14} style={{ transform: expandedSections.categories ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
                   </div>
                   {expandedSections.categories && (
                     <div className="accordion-content" style={{ marginTop: '12px' }}>
@@ -3113,8 +3178,12 @@ export default function Home() {
                 {/* 2. KOLEKSİYON */}
                 <div className="accordion-section">
                   <div className="accordion-header" onClick={() => toggleSection('collection')}>
-                    <span className="accordion-title">Koleksiyon</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.collection ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Building2 size={14} style={{ color: selectedBrand ? 'var(--accent-gold)' : '#64748b' }} />
+                      <span className="accordion-title">Koleksiyon (Marka)</span>
+                      {selectedBrand !== '' && <span className="accordion-active-dot" />}
+                    </div>
+                    <ChevronDown size={14} style={{ transform: expandedSections.collection ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
                   </div>
                   {expandedSections.collection && (
                     <div className="accordion-content" style={{ marginTop: '12px' }}>
@@ -3139,15 +3208,19 @@ export default function Home() {
                 {/* 3. DOKU */}
                 <div className="accordion-section">
                   <div className="accordion-header" onClick={() => toggleSection('texture')}>
-                    <span className="accordion-title">Doku</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.texture ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Palette size={14} style={{ color: selectedColor ? 'var(--accent-gold)' : '#64748b' }} />
+                      <span className="accordion-title">Renk & Doku</span>
+                      {selectedColor !== '' && <span className="accordion-active-dot" />}
+                    </div>
+                    <ChevronDown size={14} style={{ transform: expandedSections.texture ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
                   </div>
                   {expandedSections.texture && (
                     <div className="accordion-content" style={{ marginTop: '12px' }}>
                       <div className="filters-grid">
                         {[
                           { name: 'Beyaz', color: '#ffffff', border: '1px solid #cbd5e1' },
-                          { name: 'Bej', color: '#f5f5dc' },
+                          { name: 'Bej', color: '#f5f5dc', border: '1px solid #e2e8f0' },
                           { name: 'Gri', color: '#94a3b8' },
                           { name: 'Antrasit', color: '#334155' },
                           { name: 'Kahverengi', color: '#78350f' }
@@ -3163,7 +3236,8 @@ export default function Home() {
                                 className="color-dot" 
                                 style={{ 
                                   backgroundColor: colorItem.color, 
-                                  border: colorItem.border || 'none' 
+                                  border: colorItem.border || 'none',
+                                  boxShadow: isSelected ? '0 0 0 2px #ffffff, 0 0 0 3px var(--accent-gold)' : 'none'
                                 }} 
                               />
                               <span>{colorItem.name}</span>
@@ -3178,8 +3252,12 @@ export default function Home() {
                 {/* 4. EBAT */}
                 <div className="accordion-section">
                   <div className="accordion-header" onClick={() => toggleSection('ebat')}>
-                    <span className="accordion-title">Ebat</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.ebat ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Layers2 size={14} style={{ color: selectedSize ? 'var(--accent-gold)' : '#64748b' }} />
+                      <span className="accordion-title">Ebatlar</span>
+                      {selectedSize !== '' && <span className="accordion-active-dot" />}
+                    </div>
+                    <ChevronDown size={14} style={{ transform: expandedSections.ebat ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
                   </div>
                   {expandedSections.ebat && (
                     <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -3208,7 +3286,7 @@ export default function Home() {
                                 onChange={() => setSelectedSize(isSelected ? '' : sizeVal)}
                               />
                               <span className="checkbox-custom-box" />
-                              <span className="checkbox-text-label">{sizeVal}</span>
+                              <span className="checkbox-text-label" style={{ color: isSelected ? '#0f172a' : 'var(--text-secondary)', fontWeight: isSelected ? '600' : '500' }}>{sizeVal}</span>
                               
                               <div className="size-guide-tooltip">
                                 <span className="tooltip-title">Boyut Kıyaslama</span>
@@ -3231,11 +3309,15 @@ export default function Home() {
                   )}
                 </div>
 
-                {/* 5. ÜRÜN TİPİ */}
+                {/* 5. ÜRÜN TİPİ (YÜZEY BİTİŞİ) */}
                 <div className="accordion-section">
                   <div className="accordion-header" onClick={() => toggleSection('productType')}>
-                    <span className="accordion-title">Ürün Tipi</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.productType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Layers size={14} style={{ color: selectedFinish ? 'var(--accent-gold)' : '#64748b' }} />
+                      <span className="accordion-title">Yüzey Bitişi</span>
+                      {selectedFinish !== '' && <span className="accordion-active-dot" />}
+                    </div>
+                    <ChevronDown size={14} style={{ transform: expandedSections.productType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
                   </div>
                   {expandedSections.productType && (
                     <div className="accordion-content" style={{ marginTop: '12px' }}>
@@ -3248,7 +3330,7 @@ export default function Home() {
                               onClick={() => setSelectedFinish(isSelected ? '' : finishVal)}
                               className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
                             >
-                              {finishVal === 'Parlak' ? 'Parlak (Camsı)' : finishVal === 'Lapatto' ? 'Lapatto (Yarı Parlak)' : finishVal}
+                              {finishVal === 'Parlak' ? 'Parlak (Camsı)' : finishVal === 'Lapatto' ? 'Lapatto (Yarı)' : finishVal}
                             </button>
                           );
                         })}
@@ -3257,32 +3339,133 @@ export default function Home() {
                   )}
                 </div>
 
-                {/* 6. ÜRÜN ÖZELLİK */}
+                {/* YENİ: TEKNİK BİLGİLER / DURAMLILIK */}
+                <div className="accordion-section">
+                  <div className="accordion-header" onClick={() => toggleSection('techSpecs')}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Activity size={14} style={{ color: (selectedSlipResistance || selectedThickness || selectedPeiRating) ? 'var(--accent-gold)' : '#64748b' }} />
+                      <span className="accordion-title">Performans & Dayanım</span>
+                      {(selectedSlipResistance !== '' || selectedThickness !== '' || selectedPeiRating !== '') && <span className="accordion-active-dot" />}
+                    </div>
+                    <ChevronDown size={14} style={{ transform: expandedSections.techSpecs ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                  </div>
+                  {expandedSections.techSpecs && (
+                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      
+                      {/* Slip Resistance */}
+                      <div className="tech-filter-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Kaymazlık (R)</span>
+                          <span style={{ fontSize: '0.62rem', color: '#b38e47', display: 'flex', alignItems: 'center', gap: '2px' }} title="R9: Ev içi kuru, R10: Banyo/Mutfak, R11: Islak dış mekan/Havuz">
+                            <Info size={11} /> Bilgi
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          {['R9', 'R10', 'R11'].map(rVal => {
+                            const isSelected = selectedSlipResistance === rVal;
+                            return (
+                              <button
+                                key={rVal}
+                                onClick={() => setSelectedSlipResistance(isSelected ? '' : rVal)}
+                                className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                                style={{ flex: 1, minHeight: '32px', fontSize: '0.75rem', padding: '4px' }}
+                              >
+                                {rVal}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Thickness */}
+                      <div className="tech-filter-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Kalınlık</span>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          {[
+                            { name: 'İnce', value: 'thin', desc: '≤ 8.5 mm' },
+                            { name: 'Standart', value: 'standard', desc: '9-10 mm' },
+                            { name: 'Kalın', value: 'thick', desc: '> 10 mm' }
+                          ].map(thickObj => {
+                            const isSelected = selectedThickness === thickObj.value;
+                            return (
+                              <button
+                                key={thickObj.value}
+                                onClick={() => setSelectedThickness(isSelected ? '' : thickObj.value)}
+                                className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                                style={{ flex: 1, minHeight: '34px', fontSize: '0.7rem', display: 'flex', flexDirection: 'column', gap: '1px', padding: '4px 2px' }}
+                              >
+                                <span style={{ fontWeight: '700' }}>{thickObj.name}</span>
+                                <span style={{ fontSize: '0.52rem', opacity: isSelected ? 0.9 : 0.6 }}>{thickObj.desc}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* PEI Rating */}
+                      <div className="tech-filter-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Aşınma Sınıfı (PEI)</span>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          {[
+                            { name: 'PEI 3+', value: '3', label: 'Orta' },
+                            { name: 'PEI 4+', value: '4', label: 'Yoğun' },
+                            { name: 'PEI 5', value: '5', label: 'Ekstra' }
+                          ].map(peiObj => {
+                            const isSelected = selectedPeiRating === peiObj.value;
+                            return (
+                              <button
+                                key={peiObj.value}
+                                onClick={() => setSelectedPeiRating(isSelected ? '' : peiObj.value)}
+                                className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                                style={{ flex: 1, minHeight: '34px', fontSize: '0.7rem', display: 'flex', flexDirection: 'column', gap: '1px', padding: '4px 2px' }}
+                                title={peiObj.label}
+                              >
+                                <span style={{ fontWeight: '700' }}>{peiObj.name}</span>
+                                <span style={{ fontSize: '0.52rem', opacity: isSelected ? 0.9 : 0.6 }}>{peiObj.label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
+                </div>
+
+                {/* 6. ÜRÜN ÖZELLİKLERİ */}
                 <div className="accordion-section">
                   <div className="accordion-header" onClick={() => toggleSection('productFeature')}>
-                    <span className="accordion-title">Ürün Özellik</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.productFeature ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Wrench size={14} style={{ color: (selectedRectified || selectedFrost) ? 'var(--accent-gold)' : '#64748b' }} />
+                      <span className="accordion-title">Kenar & Yapı</span>
+                      {(selectedRectified !== '' || selectedFrost !== '') && <span className="accordion-active-dot" />}
+                    </div>
+                    <ChevronDown size={14} style={{ transform: expandedSections.productFeature ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
                   </div>
                   {expandedSections.productFeature && (
-                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <label className="checkbox-label-wrapper">
-                        <input 
-                          type="checkbox" 
-                          checked={selectedRectified === 'true'} 
-                          onChange={() => setSelectedRectified(selectedRectified === 'true' ? '' : 'true')}
-                        />
-                        <span className="checkbox-custom-box" />
-                        <span className="checkbox-text-label">Rektifiyeli</span>
-                      </label>
-                      <label className="checkbox-label-wrapper">
-                        <input 
-                          type="checkbox" 
-                          checked={selectedFrost === 'true'} 
-                          onChange={() => setSelectedFrost(selectedFrost === 'true' ? '' : 'true')}
-                        />
-                        <span className="checkbox-custom-box" />
-                        <span className="checkbox-text-label">Dona Dayanıklı</span>
-                      </label>
+                    <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <div className="toggle-filter-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '2px 0' }}>
+                        <span style={{ fontSize: '0.78rem', fontWeight: '500', color: 'var(--text-secondary)' }}>Rektifiyeli (Düz Kenar)</span>
+                        <label className="toggle-switch-wrapper">
+                          <input 
+                            type="checkbox" 
+                            checked={selectedRectified === 'true'} 
+                            onChange={() => setSelectedRectified(selectedRectified === 'true' ? '' : 'true')}
+                          />
+                          <span className="toggle-switch-slider" />
+                        </label>
+                      </div>
+                      <div className="toggle-filter-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '2px 0' }}>
+                        <span style={{ fontSize: '0.78rem', fontWeight: '500', color: 'var(--text-secondary)' }}>Dona Dayanıklı</span>
+                        <label className="toggle-switch-wrapper">
+                          <input 
+                            type="checkbox" 
+                            checked={selectedFrost === 'true'} 
+                            onChange={() => setSelectedFrost(selectedFrost === 'true' ? '' : 'true')}
+                          />
+                          <span className="toggle-switch-slider" />
+                        </label>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -3290,8 +3473,12 @@ export default function Home() {
                 {/* 7. MEKAN TİPİ */}
                 <div className="accordion-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>
                   <div className="accordion-header" onClick={() => toggleSection('spaceType')}>
-                    <span className="accordion-title">Mekan Tipi</span>
-                    <ChevronDown size={16} style={{ transform: expandedSections.spaceType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Globe size={14} style={{ color: selectedArea ? 'var(--accent-gold)' : '#64748b' }} />
+                      <span className="accordion-title">Mekan Tipi</span>
+                      {selectedArea !== '' && <span className="accordion-active-dot" />}
+                    </div>
+                    <ChevronDown size={14} style={{ transform: expandedSections.spaceType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
                   </div>
                   {expandedSections.spaceType && (
                     <div className="accordion-content" style={{ marginTop: '12px' }}>
@@ -5657,8 +5844,8 @@ export default function Home() {
         <div className="bottom-sheet-handle-wrapper">
           <div className="bottom-sheet-handle" />
         </div>
-        <div className="filter-header-row">
-          <h3 className="filter-title-main" style={{ fontSize: '1.2rem', fontWeight: '750', color: '#0f172a', margin: 0, border: 'none', padding: 0 }}>Filtreler</h3>
+        <div className="filter-header-row" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: '12px' }}>
+          <h3 className="filter-title-main" style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a', margin: 0, border: 'none', padding: 0 }}>Filtreler</h3>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button onClick={() => {
               setSelectedBrand('');
@@ -5669,6 +5856,10 @@ export default function Home() {
               setSelectedSize('');
               setSelectedRectified('');
               setSelectedFrost('');
+              setSelectedSlipResistance('');
+              setSelectedThickness('');
+              setSelectedPeiRating('');
+              setSelectedIsPremium('');
               setSearchQuery('');
               setUploadedImagePreview(null);
               setVisualSearchMatches(null);
@@ -5684,11 +5875,49 @@ export default function Home() {
 
         {/* Scrollable Filters Content Wrapper */}
         <div className="filters-scroll-area">
+          {/* Standalone Premium Series Switch */}
+          <div className="premium-toggle-card" style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            padding: '12px 14px', 
+            borderRadius: '12px', 
+            background: selectedIsPremium === 'true' 
+              ? 'linear-gradient(135deg, rgba(179,142,71,0.15) 0%, rgba(140,107,48,0.06) 100%)' 
+              : 'linear-gradient(135deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.005) 100%)', 
+            border: selectedIsPremium === 'true' 
+              ? '1px solid rgba(179,142,71,0.35)' 
+              : '1px solid rgba(0,0,0,0.05)', 
+            marginBottom: '16px', 
+            transition: 'all 0.3s ease',
+            boxShadow: selectedIsPremium === 'true' ? '0 4px 12px rgba(179,142,71,0.08)' : 'none'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Sparkles size={16} style={{ color: selectedIsPremium === 'true' ? 'var(--accent-gold)' : '#64748b', transition: 'color 0.2s' }} />
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: selectedIsPremium === 'true' ? '#b38e47' : '#0f172a', transition: 'color 0.2s' }}>Premium Seçim</span>
+                <span style={{ fontSize: '0.62rem', color: '#64748b' }}>Mimari ve özel seriler</span>
+              </div>
+            </div>
+            <label className="toggle-switch-wrapper">
+              <input 
+                type="checkbox" 
+                checked={selectedIsPremium === 'true'} 
+                onChange={() => setSelectedIsPremium(selectedIsPremium === 'true' ? '' : 'true')}
+              />
+              <span className="toggle-switch-slider" />
+            </label>
+          </div>
+
           {/* 1. KATEGORİLER */}
           <div className="accordion-section">
             <div className="accordion-header" onClick={() => toggleSection('categories')}>
-              <span className="accordion-title">Kategoriler</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.categories ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <SlidersHorizontal size={14} style={{ color: selectedStyle ? 'var(--accent-gold)' : '#64748b' }} />
+                <span className="accordion-title">Kategoriler</span>
+                {selectedStyle !== '' && <span className="accordion-active-dot" />}
+              </div>
+              <ChevronDown size={14} style={{ transform: expandedSections.categories ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
             </div>
             {expandedSections.categories && (
               <div className="accordion-content" style={{ marginTop: '12px' }}>
@@ -5713,8 +5942,12 @@ export default function Home() {
           {/* 2. KOLEKSİYON */}
           <div className="accordion-section">
             <div className="accordion-header" onClick={() => toggleSection('collection')}>
-              <span className="accordion-title">Koleksiyon</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.collection ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Building2 size={14} style={{ color: selectedBrand ? 'var(--accent-gold)' : '#64748b' }} />
+                <span className="accordion-title">Koleksiyon (Marka)</span>
+                {selectedBrand !== '' && <span className="accordion-active-dot" />}
+              </div>
+              <ChevronDown size={14} style={{ transform: expandedSections.collection ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
             </div>
             {expandedSections.collection && (
               <div className="accordion-content" style={{ marginTop: '12px' }}>
@@ -5739,15 +5972,19 @@ export default function Home() {
           {/* 3. DOKU */}
           <div className="accordion-section">
             <div className="accordion-header" onClick={() => toggleSection('texture')}>
-              <span className="accordion-title">Doku</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.texture ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Palette size={14} style={{ color: selectedColor ? 'var(--accent-gold)' : '#64748b' }} />
+                <span className="accordion-title">Renk & Doku</span>
+                {selectedColor !== '' && <span className="accordion-active-dot" />}
+              </div>
+              <ChevronDown size={14} style={{ transform: expandedSections.texture ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
             </div>
             {expandedSections.texture && (
               <div className="accordion-content" style={{ marginTop: '12px' }}>
                 <div className="filters-grid">
                   {[
                     { name: 'Beyaz', color: '#ffffff', border: '1px solid #cbd5e1' },
-                    { name: 'Bej', color: '#f5f5dc' },
+                    { name: 'Bej', color: '#f5f5dc', border: '1px solid #e2e8f0' },
                     { name: 'Gri', color: '#94a3b8' },
                     { name: 'Antrasit', color: '#334155' },
                     { name: 'Kahverengi', color: '#78350f' }
@@ -5763,7 +6000,8 @@ export default function Home() {
                           className="color-dot" 
                           style={{ 
                             backgroundColor: colorItem.color, 
-                            border: colorItem.border || 'none' 
+                            border: colorItem.border || 'none',
+                            boxShadow: isSelected ? '0 0 0 2px #ffffff, 0 0 0 3px var(--accent-gold)' : 'none'
                           }} 
                         />
                         <span>{colorItem.name}</span>
@@ -5778,8 +6016,12 @@ export default function Home() {
           {/* 4. EBAT */}
           <div className="accordion-section">
             <div className="accordion-header" onClick={() => toggleSection('ebat')}>
-              <span className="accordion-title">Ebat</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.ebat ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Layers2 size={14} style={{ color: selectedSize ? 'var(--accent-gold)' : '#64748b' }} />
+                <span className="accordion-title">Ebatlar</span>
+                {selectedSize !== '' && <span className="accordion-active-dot" />}
+              </div>
+              <ChevronDown size={14} style={{ transform: expandedSections.ebat ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
             </div>
             {expandedSections.ebat && (
               <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -5808,7 +6050,7 @@ export default function Home() {
                           onChange={() => setSelectedSize(isSelected ? '' : sizeVal)}
                         />
                         <span className="checkbox-custom-box" />
-                        <span className="checkbox-text-label">{sizeVal}</span>
+                        <span className="checkbox-text-label" style={{ color: isSelected ? '#0f172a' : 'var(--text-secondary)', fontWeight: isSelected ? '600' : '500' }}>{sizeVal}</span>
                         
                         <div className="size-guide-tooltip">
                           <span className="tooltip-title">Boyut Kıyaslama</span>
@@ -5831,11 +6073,15 @@ export default function Home() {
             )}
           </div>
 
-          {/* 5. ÜRÜN TİPİ */}
+          {/* 5. ÜRÜN TİPİ (YÜZEY BİTİŞİ) */}
           <div className="accordion-section">
             <div className="accordion-header" onClick={() => toggleSection('productType')}>
-              <span className="accordion-title">Ürün Tipi</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.productType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Layers size={14} style={{ color: selectedFinish ? 'var(--accent-gold)' : '#64748b' }} />
+                <span className="accordion-title">Yüzey Bitişi</span>
+                {selectedFinish !== '' && <span className="accordion-active-dot" />}
+              </div>
+              <ChevronDown size={14} style={{ transform: expandedSections.productType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
             </div>
             {expandedSections.productType && (
               <div className="accordion-content" style={{ marginTop: '12px' }}>
@@ -5848,7 +6094,7 @@ export default function Home() {
                         onClick={() => setSelectedFinish(isSelected ? '' : finishVal)}
                         className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
                       >
-                        {finishVal === 'Parlak' ? 'Parlak (Camsı)' : finishVal === 'Lapatto' ? 'Lapatto (Yarı Parlak)' : finishVal}
+                        {finishVal === 'Parlak' ? 'Parlak (Camsı)' : finishVal === 'Lapatto' ? 'Lapatto (Yarı)' : finishVal}
                       </button>
                     );
                   })}
@@ -5857,32 +6103,133 @@ export default function Home() {
             )}
           </div>
 
-          {/* 6. ÜRÜN ÖZELLİK */}
+          {/* YENİ: TEKNİK BİLGİLER / DURAMLILIK */}
+          <div className="accordion-section">
+            <div className="accordion-header" onClick={() => toggleSection('techSpecs')}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Activity size={14} style={{ color: (selectedSlipResistance || selectedThickness || selectedPeiRating) ? 'var(--accent-gold)' : '#64748b' }} />
+                <span className="accordion-title">Performans & Dayanım</span>
+                {(selectedSlipResistance !== '' || selectedThickness !== '' || selectedPeiRating !== '') && <span className="accordion-active-dot" />}
+              </div>
+              <ChevronDown size={14} style={{ transform: expandedSections.techSpecs ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+            </div>
+            {expandedSections.techSpecs && (
+              <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                
+                {/* Slip Resistance */}
+                <div className="tech-filter-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Kaymazlık (R)</span>
+                    <span style={{ fontSize: '0.62rem', color: '#b38e47', display: 'flex', alignItems: 'center', gap: '2px' }} title="R9: Ev içi kuru, R10: Banyo/Mutfak, R11: Islak dış mekan/Havuz">
+                      <Info size={11} /> Bilgi
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {['R9', 'R10', 'R11'].map(rVal => {
+                      const isSelected = selectedSlipResistance === rVal;
+                      return (
+                        <button
+                          key={rVal}
+                          onClick={() => setSelectedSlipResistance(isSelected ? '' : rVal)}
+                          className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                          style={{ flex: 1, minHeight: '32px', fontSize: '0.75rem', padding: '4px' }}
+                        >
+                          {rVal}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Thickness */}
+                <div className="tech-filter-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Kalınlık</span>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {[
+                      { name: 'İnce', value: 'thin', desc: '≤ 8.5 mm' },
+                      { name: 'Standart', value: 'standard', desc: '9-10 mm' },
+                      { name: 'Kalın', value: 'thick', desc: '> 10 mm' }
+                    ].map(thickObj => {
+                      const isSelected = selectedThickness === thickObj.value;
+                      return (
+                        <button
+                          key={thickObj.value}
+                          onClick={() => setSelectedThickness(isSelected ? '' : thickObj.value)}
+                          className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                          style={{ flex: 1, minHeight: '34px', fontSize: '0.7rem', display: 'flex', flexDirection: 'column', gap: '1px', padding: '4px 2px' }}
+                        >
+                          <span style={{ fontWeight: '700' }}>{thickObj.name}</span>
+                          <span style={{ fontSize: '0.52rem', opacity: isSelected ? 0.9 : 0.6 }}>{thickObj.desc}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* PEI Rating */}
+                <div className="tech-filter-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Aşınma Sınıfı (PEI)</span>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {[
+                      { name: 'PEI 3+', value: '3', label: 'Orta' },
+                      { name: 'PEI 4+', value: '4', label: 'Yoğun' },
+                      { name: 'PEI 5', value: '5', label: 'Ekstra' }
+                    ].map(peiObj => {
+                      const isSelected = selectedPeiRating === peiObj.value;
+                      return (
+                        <button
+                          key={peiObj.value}
+                          onClick={() => setSelectedPeiRating(isSelected ? '' : peiObj.value)}
+                          className={`filter-chip-btn ${isSelected ? 'active' : ''}`}
+                          style={{ flex: 1, minHeight: '34px', fontSize: '0.7rem', display: 'flex', flexDirection: 'column', gap: '1px', padding: '4px 2px' }}
+                          title={peiObj.label}
+                        >
+                          <span style={{ fontWeight: '700' }}>{peiObj.name}</span>
+                          <span style={{ fontSize: '0.52rem', opacity: isSelected ? 0.9 : 0.6 }}>{peiObj.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+              </div>
+            )}
+          </div>
+
+          {/* 6. ÜRÜN ÖZELLİKLERİ */}
           <div className="accordion-section">
             <div className="accordion-header" onClick={() => toggleSection('productFeature')}>
-              <span className="accordion-title">Ürün Özellik</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.productFeature ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Wrench size={14} style={{ color: (selectedRectified || selectedFrost) ? 'var(--accent-gold)' : '#64748b' }} />
+                <span className="accordion-title">Kenar & Yapı</span>
+                {(selectedRectified !== '' || selectedFrost !== '') && <span className="accordion-active-dot" />}
+              </div>
+              <ChevronDown size={14} style={{ transform: expandedSections.productFeature ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
             </div>
             {expandedSections.productFeature && (
-              <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label className="checkbox-label-wrapper">
-                  <input 
-                    type="checkbox" 
-                    checked={selectedRectified === 'true'} 
-                    onChange={() => setSelectedRectified(selectedRectified === 'true' ? '' : 'true')}
-                  />
-                  <span className="checkbox-custom-box" />
-                  <span className="checkbox-text-label">Rektifiyeli</span>
-                </label>
-                <label className="checkbox-label-wrapper">
-                  <input 
-                    type="checkbox" 
-                    checked={selectedFrost === 'true'} 
-                    onChange={() => setSelectedFrost(selectedFrost === 'true' ? '' : 'true')}
-                  />
-                  <span className="checkbox-custom-box" />
-                  <span className="checkbox-text-label">Dona Dayanıklı</span>
-                </label>
+              <div className="accordion-content" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div className="toggle-filter-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '2px 0' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: '500', color: 'var(--text-secondary)' }}>Rektifiyeli (Düz Kenar)</span>
+                  <label className="toggle-switch-wrapper">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedRectified === 'true'} 
+                      onChange={() => setSelectedRectified(selectedRectified === 'true' ? '' : 'true')}
+                    />
+                    <span className="toggle-switch-slider" />
+                  </label>
+                </div>
+                <div className="toggle-filter-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '2px 0' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: '500', color: 'var(--text-secondary)' }}>Dona Dayanıklı</span>
+                  <label className="toggle-switch-wrapper">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedFrost === 'true'} 
+                      onChange={() => setSelectedFrost(selectedFrost === 'true' ? '' : 'true')}
+                    />
+                    <span className="toggle-switch-slider" />
+                  </label>
+                </div>
               </div>
             )}
           </div>
@@ -5890,8 +6237,12 @@ export default function Home() {
           {/* 7. MEKAN TİPİ */}
           <div className="accordion-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}>
             <div className="accordion-header" onClick={() => toggleSection('spaceType')}>
-              <span className="accordion-title">Mekan Tipi</span>
-              <ChevronDown size={16} style={{ transform: expandedSections.spaceType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Globe size={14} style={{ color: selectedArea ? 'var(--accent-gold)' : '#64748b' }} />
+                <span className="accordion-title">Mekan Tipi</span>
+                {selectedArea !== '' && <span className="accordion-active-dot" />}
+              </div>
+              <ChevronDown size={14} style={{ transform: expandedSections.spaceType ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease', color: 'var(--text-secondary)' }} />
             </div>
             {expandedSections.spaceType && (
               <div className="accordion-content" style={{ marginTop: '12px' }}>
@@ -11239,6 +11590,65 @@ export default function Home() {
             padding: 10px !important;
             text-align: center !important;
           }
+        }
+
+        /* Custom Toggle Switch (iOS Style) */
+        .toggle-switch-wrapper {
+          position: relative;
+          display: inline-block;
+          width: 36px;
+          height: 18px;
+        }
+        .toggle-switch-wrapper input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+        .toggle-switch-slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: #cbd5e1;
+          transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
+          border-radius: 18px;
+        }
+        .toggle-switch-slider:before {
+          position: absolute;
+          content: "";
+          height: 14px;
+          width: 14px;
+          left: 2px;
+          bottom: 2px;
+          background-color: white;
+          transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
+          border-radius: 50%;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .toggle-switch-wrapper input:checked + .toggle-switch-slider {
+          background-color: var(--accent-gold);
+        }
+        .toggle-switch-wrapper input:checked + .toggle-switch-slider:before {
+          transform: translateX(18px);
+        }
+        
+        /* Accordion Active Indicator Dot */
+        .accordion-active-dot {
+          width: 6px;
+          height: 6px;
+          background-color: var(--accent-gold);
+          border-radius: 50%;
+          display: inline-block;
+          box-shadow: 0 0 6px var(--accent-gold);
+          margin-left: 6px;
+          animation: accordion-pulse-glow 2s infinite ease-in-out;
+          flex-shrink: 0;
+        }
+        @keyframes accordion-pulse-glow {
+          0%, 100% { opacity: 0.6; transform: scale(0.9); }
+          50% { opacity: 1; transform: scale(1.15); }
         }
 
         .accordion-section {

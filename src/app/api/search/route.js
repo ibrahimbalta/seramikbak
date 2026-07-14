@@ -16,6 +16,9 @@ export async function GET(request) {
     const rectified = searchParams.get('rectified');
     const frost = searchParams.get('frost');
     const isPremium = searchParams.get('isPremium');
+    const pei = searchParams.get('pei');
+    const slip = searchParams.get('slip');
+    const thicknessRange = searchParams.get('thicknessRange');
 
     // Pagination parameters
     const limitParam = searchParams.get('limit');
@@ -63,6 +66,27 @@ export async function GET(request) {
 
     if (isPremium) {
       andConditions.push({ isPremium: isPremium === 'true' });
+    }
+
+    if (pei) {
+      const peiVal = parseInt(pei, 10);
+      if (!isNaN(peiVal)) {
+        andConditions.push({ peiRating: { gte: peiVal } });
+      }
+    }
+
+    if (slip) {
+      andConditions.push({ slipResistance: slip });
+    }
+
+    if (thicknessRange) {
+      if (thicknessRange === 'thin') {
+        andConditions.push({ thickness: { lte: 8.5 } });
+      } else if (thicknessRange === 'standard') {
+        andConditions.push({ thickness: { gt: 8.5, lte: 10.0 } });
+      } else if (thicknessRange === 'thick') {
+        andConditions.push({ thickness: { gt: 10.0 } });
+      }
     }
 
     if (area) {
