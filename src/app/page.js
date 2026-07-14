@@ -5268,7 +5268,7 @@ export default function Home() {
             ) : (
               <div className="favorites-list">
                 {userFavorites.map(fav => (
-                  <div key={fav.id} className="favorite-item" onClick={() => { setActiveProduct(fav.product); setShowFavoritesPanel(false); }}>
+                  <div key={fav.id} className="favorite-item" onClick={() => { if (fav.product) { handleProductCardClick(fav.product); setShowFavoritesPanel(false); } }}>
                     <div className="favorite-item-preview">
                       {fav.product?.imageUrl ? (
                         <img src={fav.product.imageUrl} alt={fav.product.name} />
