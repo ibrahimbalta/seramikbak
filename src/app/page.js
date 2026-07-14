@@ -9221,8 +9221,9 @@ export default function Home() {
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
-          backdrop-filter: blur(8px);
+          background: rgba(15, 23, 42, 0.6);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -9237,6 +9238,10 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 16px;
+          background: #ffffff !important;
+          border: 1px solid rgba(179, 142, 71, 0.25) !important;
+          border-radius: var(--border-radius-md) !important;
+          box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.25) !important;
         }
 
         /* Showroom Modal Custom Styling */

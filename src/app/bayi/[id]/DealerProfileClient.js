@@ -21,6 +21,14 @@ import {
 export default function DealerProfileClient({ dealer, products }) {
   const [galleryTab, setGalleryTab] = useState(dealer.virtualTourUrl ? '3d' : 'photos');
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const [iframeLoading, setIframeLoading] = useState(true);
+
+  const handleTabChange = (tab) => {
+    setGalleryTab(tab);
+    if (tab === '3d') {
+      setIframeLoading(true);
+    }
+  };
   
   // Lead form states
   const [clientName, setClientName] = useState('');
@@ -43,6 +51,7 @@ export default function DealerProfileClient({ dealer, products }) {
 
   useEffect(() => {
     if (galleryTab === '3d' && isPanoramicImage) {
+      setIframeLoading(true);
       // 1. Check/load CSS
       if (!document.getElementById('pannellum-css')) {
         const link = document.createElement('link');
@@ -66,6 +75,7 @@ export default function DealerProfileClient({ dealer, products }) {
             compass: false,
             mouseZoom: true
           });
+          setIframeLoading(false);
         }
       };
 
@@ -143,7 +153,7 @@ export default function DealerProfileClient({ dealer, products }) {
         
         {/* Profile Card & Info Header */}
         <div className="profile-banner-card animate-fade-in">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap', zIndex: 1 }}>
+          <div className="profile-banner-info">
             <div className="profile-logo-box">
               {dealer.logoUrl ? (
                 <img src={dealer.logoUrl} alt={dealer.brand?.name} style={{ maxWidth: '85%', maxHeight: '85%', objectFit: 'contain' }} />
@@ -151,7 +161,7 @@ export default function DealerProfileClient({ dealer, products }) {
                 <Building2 size={36} style={{ color: 'var(--accent-gold)' }} />
               )}
             </div>
-            <div>
+            <div className="profile-text-group">
               <span className="profile-badge">
                 {dealer.brand?.name || 'QUA Granite'} YETKİLİ SATICISI
               </span>
@@ -202,14 +212,14 @@ export default function DealerProfileClient({ dealer, products }) {
                 {dealer.virtualTourUrl && images.length > 0 && (
                   <div className="gallery-tab-toggle">
                     <button 
-                      onClick={() => setGalleryTab('3d')}
+                      onClick={() => handleTabChange('3d')}
                       className={`toggle-btn ${galleryTab === '3d' ? 'active' : ''}`}
                     >
                       <Sparkles size={12} />
                       3D Sanal Tur
                     </button>
                     <button 
-                      onClick={() => setGalleryTab('photos')}
+                      onClick={() => handleTabChange('photos')}
                       className={`toggle-btn ${galleryTab === 'photos' ? 'active' : ''}`}
                     >
                       <ImageIcon size={12} />
@@ -222,7 +232,16 @@ export default function DealerProfileClient({ dealer, products }) {
               {/* Tab Content */}
               {galleryTab === '3d' && dealer.virtualTourUrl ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div className="virtual-tour-iframe-container">
+                  <div className="virtual-tour-iframe-container" style={{ position: 'relative' }}>
+                    {iframeLoading && (
+                      <div className="iframe-skeleton-loader">
+                        <div className="ceramic-tile-spinner mini">
+                          <div className="tile-face face-front"></div>
+                          <div className="tile-face face-back"></div>
+                        </div>
+                        <span>Sanal Tur Hazırlanıyor...</span>
+                      </div>
+                    )}
                     {isPanoramicImage ? (
                       <div 
                         id="panorama-container" 
@@ -235,6 +254,7 @@ export default function DealerProfileClient({ dealer, products }) {
                         height="100%" 
                         style={{ border: 'none' }}
                         allowFullScreen
+                        onLoad={() => setIframeLoading(false)}
                       />
                     )}
                   </div>
@@ -459,6 +479,28 @@ export default function DealerProfileClient({ dealer, products }) {
 
       </div>
 
+      {/* Mobile Sticky Action Bar */}
+      <div className="mobile-sticky-actions">
+        <a 
+          href={`https://wa.me/${dealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20profil%20sayfan%C4%B1zdan%20ula%C5%9F%C4%B1yorum.%20Showroom%27daki%20seramikleriniz%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="btn-whatsapp-mobile"
+        >
+          <MessageSquare size={16} />
+          <span>WhatsApp</span>
+        </a>
+        <a 
+          href={`https://www.google.com/maps/dir/?api=1&destination=${dealer.lat},${dealer.lng}`} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="btn-maps-mobile"
+        >
+          <Compass size={16} />
+          <span>Yol Tarifi</span>
+        </a>
+      </div>
+
       {/* CSS Styles */}
       <style jsx>{`
         .profile-page-wrapper {
@@ -466,14 +508,14 @@ export default function DealerProfileClient({ dealer, products }) {
           background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f1f5f9 100%);
           font-family: var(--font-body), system-ui, -apple-system, sans-serif;
           color: var(--text-primary);
-          padding-bottom: 60px;
+          padding-bottom: 80px;
         }
 
         .profile-header-bar {
           background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(179, 142, 71, 0.15);
           padding: 16px 40px;
           position: sticky;
           top: 0;
@@ -549,12 +591,12 @@ export default function DealerProfileClient({ dealer, products }) {
         }
 
         .profile-banner-card {
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          background: linear-gradient(135deg, #090d16 0%, #1e293b 100%);
           border-radius: 24px;
           padding: 36px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(212, 175, 55, 0.15);
           border-left: 5px solid var(--accent-gold);
-          box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+          box-shadow: 0 25px 50px -12px rgba(9, 13, 22, 0.25);
           display: flex;
           flex-direction: row;
           align-items: center;
@@ -569,7 +611,7 @@ export default function DealerProfileClient({ dealer, products }) {
 
         .profile-banner-card:hover {
           transform: translateY(-2px);
-          box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.4);
+          box-shadow: 0 30px 60px -15px rgba(9, 13, 22, 0.35);
         }
 
         .profile-banner-card::before {
@@ -583,24 +625,37 @@ export default function DealerProfileClient({ dealer, products }) {
           pointer-events: none;
         }
 
+        .profile-banner-info {
+          display: flex;
+          align-items: center;
+          gap: 24px;
+          z-index: 1;
+        }
+
         .profile-logo-box {
-          width: 80px;
-          height: 80px;
-          border-radius: 18px;
+          width: 90px;
+          height: 90px;
+          border-radius: 20px;
           background: #ffffff;
-          border: 2px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(179, 142, 71, 0.2);
           display: flex;
           align-items: center;
           justify-content: center;
           overflow: hidden;
           flex-shrink: 0;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
           transition: transform 0.3s ease;
+          padding: 6px;
         }
 
         .profile-banner-card:hover .profile-logo-box {
           transform: scale(1.03);
           border-color: rgba(179, 142, 71, 0.4);
+        }
+
+        .profile-text-group {
+          display: flex;
+          flex-direction: column;
         }
 
         .profile-badge {
@@ -615,6 +670,7 @@ export default function DealerProfileClient({ dealer, products }) {
           letter-spacing: 0.08em;
           display: inline-block;
           font-family: var(--font-title);
+          width: fit-content;
         }
 
         .profile-name {
@@ -646,7 +702,7 @@ export default function DealerProfileClient({ dealer, products }) {
           align-items: center;
           gap: 8px;
           padding: 12px 24px;
-          background: #25d366;
+          background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
           color: #ffffff;
           border-radius: 12px;
           font-weight: 700;
@@ -660,7 +716,7 @@ export default function DealerProfileClient({ dealer, products }) {
         .btn-whatsapp:hover {
           transform: translateY(-2px);
           box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
-          background: #20ba59;
+          filter: brightness(1.05);
         }
 
         .btn-maps {
@@ -694,13 +750,11 @@ export default function DealerProfileClient({ dealer, products }) {
         }
 
         .section-glass-card {
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.7);
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
           border-radius: 24px;
           padding: 32px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.01);
+          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
           display: flex;
           flex-direction: column;
           gap: 20px;
@@ -708,8 +762,8 @@ export default function DealerProfileClient({ dealer, products }) {
         }
 
         .section-glass-card:hover {
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
-          border-color: rgba(255, 255, 255, 1);
+          box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+          border-color: #cbd5e1;
         }
 
         .section-title {
@@ -743,18 +797,18 @@ export default function DealerProfileClient({ dealer, products }) {
 
         .gallery-tab-toggle {
           display: flex;
-          background: #e2e8f0;
-          padding: 3px;
-          border-radius: 10px;
+          background: #f1f5f9;
+          padding: 4px;
+          border-radius: 30px;
           gap: 2px;
           border: 1px solid rgba(0, 0, 0, 0.02);
         }
 
         .toggle-btn {
-          padding: 8px 16px;
+          padding: 8px 18px;
           background: transparent;
           border: none;
-          border-radius: 8px;
+          border-radius: 20px;
           font-size: 0.72rem;
           font-weight: 700;
           color: var(--text-secondary);
@@ -768,17 +822,43 @@ export default function DealerProfileClient({ dealer, products }) {
         .toggle-btn.active {
           background: #ffffff;
           color: var(--accent-gold);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.12);
         }
 
         .virtual-tour-iframe-container {
           width: 100%;
-          height: 440px;
+          height: 460px;
           border-radius: 18px;
           overflow: hidden;
           background: #000;
-          border: 1px solid rgba(179, 142, 71, 0.2);
+          border: 1px solid #cbd5e1;
           box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .iframe-skeleton-loader {
+          position: absolute;
+          inset: 0;
+          background: #090d16;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          color: #ffffff;
+          z-index: 10;
+          font-family: var(--font-title);
+          font-weight: 600;
+          font-size: 0.85rem;
+        }
+
+        /* 3D Spinner for iframe loading */
+        .ceramic-tile-spinner.mini {
+          width: 36px;
+          height: 36px;
+        }
+        .ceramic-tile-spinner.mini .tile-face {
+          border-width: 1.5px;
+          box-shadow: 0 0 15px rgba(179, 142, 71, 0.3);
         }
 
         .tour-hint {
@@ -1009,7 +1089,7 @@ export default function DealerProfileClient({ dealer, products }) {
         .form-input, .form-select, .form-textarea {
           padding: 12px 16px;
           border-radius: 12px;
-          border: 1px solid #cbd5e1;
+          border: 1.5px solid #cbd5e1;
           font-size: 0.88rem;
           background: rgba(248, 250, 252, 0.8);
           font-family: var(--font-body);
@@ -1021,7 +1101,7 @@ export default function DealerProfileClient({ dealer, products }) {
         .form-input:focus, .form-select:focus, .form-textarea:focus {
           border-color: var(--accent-gold);
           background: #ffffff;
-          box-shadow: 0 4px 20px rgba(179, 142, 71, 0.08), 0 0 0 3px rgba(179, 142, 71, 0.15);
+          box-shadow: 0 0 0 4px rgba(179, 142, 71, 0.1);
           transform: translateY(-1px);
         }
 
@@ -1084,6 +1164,37 @@ export default function DealerProfileClient({ dealer, products }) {
           scrollbar-width: none;
         }
 
+        /* 3D Spinner Animation Definitions */
+        .ceramic-tile-spinner {
+          position: relative;
+          transform-style: preserve-3d;
+          animation: spin3DTile 2.5s infinite cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        .ceramic-tile-spinner .tile-face {
+          position: absolute;
+          inset: 0;
+          border-radius: 8px;
+          border: 2px solid #b38e47;
+        }
+        .ceramic-tile-spinner .face-front {
+          background: linear-gradient(135deg, rgba(179, 142, 71, 0.2) 0%, rgba(30, 41, 59, 0.9) 100%);
+          transform: translateZ(1px);
+        }
+        .ceramic-tile-spinner .face-back {
+          background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(179, 142, 71, 0.2) 100%);
+          transform: rotateY(180deg) translateZ(1px);
+        }
+
+        .mobile-sticky-actions {
+          display: none;
+        }
+
+        @keyframes spin3DTile {
+          0% { transform: rotateY(0deg) rotateX(0deg); }
+          50% { transform: rotateY(180deg) rotateX(180deg); }
+          100% { transform: rotateY(360deg) rotateX(360deg); }
+        }
+
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(12px); }
           to { opacity: 1; transform: translateY(0); }
@@ -1095,6 +1206,75 @@ export default function DealerProfileClient({ dealer, products }) {
       `}</style>
       <style jsx global>{`
         @media (max-width: 900px) {
+          .profile-page-wrapper {
+            padding-bottom: 90px !important;
+          }
+          .profile-banner-info {
+            flex-direction: column !important;
+            text-align: center !important;
+            align-items: center !important;
+            gap: 16px !important;
+            width: 100% !important;
+          }
+          .profile-text-group {
+            align-items: center !important;
+          }
+          .profile-actions {
+            display: none !important;
+          }
+          .mobile-sticky-actions {
+            display: flex !important;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(179, 142, 71, 0.15);
+            padding: 12px 20px;
+            gap: 12px;
+            z-index: 9999;
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.08);
+          }
+          .btn-whatsapp-mobile {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+            color: #ffffff;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+            font-family: var(--font-title);
+          }
+          .btn-maps-mobile {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid rgba(179, 142, 71, 0.3);
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            font-family: var(--font-title);
+          }
+          .btn-maps-mobile:hover {
+            background: var(--accent-gold);
+            color: #ffffff;
+            border-color: var(--accent-gold);
+          }
           .showroom-main-grid {
             grid-template-columns: 1fr !important;
             gap: 24px !important;
@@ -1107,12 +1287,29 @@ export default function DealerProfileClient({ dealer, products }) {
           }
           .profile-banner-card {
             padding: 24px !important;
+            border-radius: 18px !important;
+            text-align: center;
+            justify-content: center;
+          }
+          .profile-logo-box {
+            width: 80px !important;
+            height: 80px !important;
+            border-radius: 16px !important;
           }
           .profile-name {
             font-size: 1.5rem !important;
           }
           .section-glass-card {
             padding: 20px !important;
+            border-radius: 18px !important;
+          }
+          .virtual-tour-iframe-container {
+            height: 320px !important;
+            border-radius: 14px !important;
+          }
+          .active-photo-container {
+            height: 260px !important;
+            border-radius: 14px !important;
           }
         }
       `}</style>
