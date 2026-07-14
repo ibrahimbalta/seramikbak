@@ -52,6 +52,7 @@ export default function DealerPortalPage() {
   const [projects, setProjects] = useState([]);
   const [projectsLoading, setProjectsLoading] = useState(false);
   const [regionalAnalytics, setRegionalAnalytics] = useState({ popularQueries: [], popularBrands: [], popularStyles: [] });
+  const [brandProducts, setBrandProducts] = useState([]);
 
   // Dealer SaaS State
   const [saasInfo, setSaasInfo] = useState(null);
@@ -83,9 +84,24 @@ export default function DealerPortalPage() {
   const [profileShowroomImages, setProfileShowroomImages] = useState('');
   const [profileVirtualTourUrl, setProfileVirtualTourUrl] = useState('');
   const [profileSpecialConcepts, setProfileSpecialConcepts] = useState('');
+  const [profileAboutText, setProfileAboutText] = useState('');
+  const [profileLogisticsServices, setProfileLogisticsServices] = useState('shipping,showroom_stock,credit_card,install_support');
+  const [profileFeaturedProducts, setProfileFeaturedProducts] = useState([]);
+  const [profileDealerCampaigns, setProfileDealerCampaigns] = useState([]);
+  const [profileReferenceProjects, setProfileReferenceProjects] = useState([]);
+  const [profileDealerFaqs, setProfileDealerFaqs] = useState([]);
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  const safeParseJSON = (str, fallback) => {
+    if (!str) return fallback;
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return fallback;
+    }
+  };
 
   // Upload States
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
@@ -251,6 +267,12 @@ export default function DealerPortalPage() {
         setProfileShowroomImages(session.showroomImages || '');
         setProfileVirtualTourUrl(session.virtualTourUrl || '');
         setProfileSpecialConcepts(session.specialConcepts || '');
+        setProfileAboutText(session.aboutText || '');
+        setProfileLogisticsServices(session.logisticsServices || 'shipping,showroom_stock,credit_card,install_support');
+        setProfileFeaturedProducts(safeParseJSON(session.featuredProducts, []));
+        setProfileDealerCampaigns(safeParseJSON(session.dealerCampaigns, []));
+        setProfileReferenceProjects(safeParseJSON(session.referenceProjects, []));
+        setProfileDealerFaqs(safeParseJSON(session.dealerFaqs, []));
       } catch (err) {
         console.error('Session restore failed:', err);
       }
@@ -263,8 +285,24 @@ export default function DealerPortalPage() {
       loadDealerLeads();
       loadDealerProjects();
       loadBankDetails();
+      loadBrandProducts();
     }
   }, [isLoggedIn, dealerInfo]);
+
+  const loadBrandProducts = async () => {
+    if (!dealerInfo?.brandId) return;
+    try {
+      const res = await fetch(`/api/admin/products?brandId=${dealerInfo.brandId}&limit=100`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setBrandProducts(data.products || []);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load brand products:', err);
+    }
+  };
 
   const loadBankDetails = async () => {
     try {
@@ -392,6 +430,12 @@ export default function DealerPortalPage() {
         setProfileShowroomImages(data.dealer.showroomImages || '');
         setProfileVirtualTourUrl(data.dealer.virtualTourUrl || '');
         setProfileSpecialConcepts(data.dealer.specialConcepts || '');
+        setProfileAboutText(data.dealer.aboutText || '');
+        setProfileLogisticsServices(data.dealer.logisticsServices || 'shipping,showroom_stock,credit_card,install_support');
+        setProfileFeaturedProducts(safeParseJSON(data.dealer.featuredProducts, []));
+        setProfileDealerCampaigns(safeParseJSON(data.dealer.dealerCampaigns, []));
+        setProfileReferenceProjects(safeParseJSON(data.dealer.referenceProjects, []));
+        setProfileDealerFaqs(safeParseJSON(data.dealer.dealerFaqs, []));
       } else {
         setLoginError(data.error || 'Giriş başarısız oldu.');
       }
@@ -558,6 +602,66 @@ export default function DealerPortalPage() {
     };
   };
 
+  const toggleLogisticsService = (service) => {
+    let services = profileLogisticsServices ? profileLogisticsServices.split(',').filter(Boolean) : [];
+    if (services.includes(service)) {
+      services = services.filter(s => s !== service);
+    } else {
+      services.push(service);
+    }
+    setProfileLogisticsServices(services.join(','));
+  };
+
+  const toggleFeaturedProduct = (productId) => {
+    if (profileFeaturedProducts.includes(productId)) {
+      setProfileFeaturedProducts(profileFeaturedProducts.filter(id => id !== productId));
+    } else {
+      setProfileFeaturedProducts([...profileFeaturedProducts, productId]);
+    }
+  };
+
+  const addCampaign = () => {
+    setProfileDealerCampaigns([...profileDealerCampaigns, { title: '', desc: '', expiresAt: '' }]);
+  };
+
+  const updateCampaign = (index, field, value) => {
+    const updated = [...profileDealerCampaigns];
+    updated[index][field] = value;
+    setProfileDealerCampaigns(updated);
+  };
+
+  const removeCampaign = (index) => {
+    setProfileDealerCampaigns(profileDealerCampaigns.filter((_, i) => i !== index));
+  };
+
+  const addReferenceProject = () => {
+    setProfileReferenceProjects([...profileReferenceProjects, { title: '', desc: '', imageUrl: '' }]);
+  };
+
+  const updateReferenceProject = (index, field, value) => {
+    const updated = [...profileReferenceProjects];
+    updated[index][field] = value;
+    setProfileReferenceProjects(updated);
+  };
+
+  const removeReferenceProject = (index) => {
+    setProfileReferenceProjects(profileReferenceProjects.filter((_, i) => i !== index));
+  };
+
+  const addFaq = () => {
+    setProfileDealerFaqs([...profileDealerFaqs, { q: '', a: '' }]);
+  };
+
+  const updateFaq = (index, field, value) => {
+    const updated = [...profileDealerFaqs];
+    updated[index][field] = value;
+    setProfileDealerFaqs(updated);
+  };
+
+  const removeFaq = (index) => {
+    setProfileDealerFaqs(profileDealerFaqs.filter((_, i) => i !== index));
+  };
+
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     if (!dealerInfo) return;
@@ -580,6 +684,12 @@ export default function DealerPortalPage() {
           showroomImages: profileShowroomImages,
           virtualTourUrl: profileVirtualTourUrl,
           specialConcepts: profileSpecialConcepts,
+          aboutText: profileAboutText,
+          logisticsServices: profileLogisticsServices,
+          featuredProducts: JSON.stringify(profileFeaturedProducts),
+          dealerCampaigns: JSON.stringify(profileDealerCampaigns),
+          referenceProjects: JSON.stringify(profileReferenceProjects),
+          dealerFaqs: JSON.stringify(profileDealerFaqs),
           status: 'APPROVED' // Keep approved status
         })
       });
@@ -597,7 +707,13 @@ export default function DealerPortalPage() {
           logoUrl: profileLogoUrl,
           showroomImages: profileShowroomImages,
           virtualTourUrl: profileVirtualTourUrl,
-          specialConcepts: profileSpecialConcepts
+          specialConcepts: profileSpecialConcepts,
+          aboutText: profileAboutText,
+          logisticsServices: profileLogisticsServices,
+          featuredProducts: JSON.stringify(profileFeaturedProducts),
+          dealerCampaigns: JSON.stringify(profileDealerCampaigns),
+          referenceProjects: JSON.stringify(profileReferenceProjects),
+          dealerFaqs: JSON.stringify(profileDealerFaqs)
         };
         setDealerInfo(updatedSession);
         localStorage.setItem('sb_dealer_session', JSON.stringify(updatedSession));
@@ -2040,6 +2156,181 @@ export default function DealerPortalPage() {
                       style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
                       className="portal-input"
                     />
+                  </div>
+                </div>
+
+                {/* SECTION 5: GELİŞMİŞ PROFİL ÖZELLİKLERİ */}
+                <div className="settings-section">
+                  <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-title)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '4px', height: '14px', background: 'var(--accent-gold)', borderRadius: '2px' }}></span>
+                    Gelişmiş Profil Özellikleri (Showroom Pazarlama)
+                  </h3>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                    {/* About Text */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Hakkımızda / Şube Açıklaması</label>
+                      <textarea 
+                        value={profileAboutText} 
+                        onChange={(e) => setProfileAboutText(e.target.value)} 
+                        placeholder="Şubenizin geçmişi, showroom büyüklüğü ve müşterilerinize sunduğunuz hizmetler hakkında kısa bir bilgi yazın..."
+                        rows={4}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', resize: 'vertical', fontFamily: 'inherit' }}
+                        className="portal-input"
+                      />
+                    </div>
+
+                    {/* Logistics checkboxes */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Sunulan Şube Hizmetleri (Rozetler)</label>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px', marginTop: '6px' }}>
+                        {[
+                          { id: 'shipping', label: '🚚 Nakliye/Sevk Desteği' },
+                          { id: 'showroom_stock', label: '🏬 Showroom & Hazır Stok' },
+                          { id: 'credit_card', label: '💳 Kredi Kartına Taksit' },
+                          { id: 'install_support', label: '🛠️ Uygulayıcı / Usta Desteği' }
+                        ].map(service => {
+                          const isChecked = (profileLogisticsServices || '').split(',').includes(service.id);
+                          return (
+                            <label key={service.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', fontWeight: '600', color: '#1e293b', cursor: 'pointer' }}>
+                              <input 
+                                type="checkbox" 
+                                checked={isChecked}
+                                onChange={() => toggleLogisticsService(service.id)}
+                                style={{ width: '16px', height: '16px', accentColor: 'var(--accent-gold)' }}
+                              />
+                              <span>{service.label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Featured Products */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Öne Çıkan Ürünler (Maks. 6 Adet)</label>
+                      <span style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '-6px' }}>Şube vitrininizde sergilenecek ürünleri seçin.</span>
+                      <div style={{ maxHeight: '180px', overflowY: 'auto', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', background: '#f8fafc' }} className="scrollbar-hidden">
+                        {brandProducts.length > 0 ? brandProducts.map(prod => {
+                          const isChecked = profileFeaturedProducts.includes(prod.id);
+                          return (
+                            <label key={prod.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: '600', color: '#334155', cursor: 'pointer' }}>
+                              <input 
+                                type="checkbox" 
+                                checked={isChecked}
+                                onChange={() => toggleFeaturedProduct(prod.id)}
+                                style={{ width: '15px', height: '15px', accentColor: 'var(--accent-gold)' }}
+                              />
+                              <span>{prod.name} ({prod.code})</span>
+                            </label>
+                          );
+                        }) : (
+                          <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontStyle: 'italic' }}>Markanıza ait ürün bulunamadı.</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Campaigns */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Aktif Şube Kampanyaları</label>
+                        <button type="button" onClick={addCampaign} style={{ padding: '6px 12px', fontSize: '0.72rem', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', color: 'var(--accent-gold)' }}>+ Kampanya Ekle</button>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {profileDealerCampaigns.map((camp, idx) => (
+                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', position: 'relative' }}>
+                            <button type="button" onClick={() => removeCampaign(idx)} style={{ position: 'absolute', top: '10px', right: '12px', background: 'transparent', border: 'none', color: '#ef4444', fontWeight: '700', cursor: 'pointer', fontSize: '0.85rem' }}>✕</button>
+                            <input 
+                              type="text" 
+                              value={camp.title} 
+                              onChange={(e) => updateCampaign(idx, 'title', e.target.value)} 
+                              placeholder="Kampanya Başlığı (Örn: Lapatto Serisinde %10 İndirim)"
+                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none' }}
+                            />
+                            <textarea 
+                              value={camp.desc} 
+                              onChange={(e) => updateCampaign(idx, 'desc', e.target.value)} 
+                              placeholder="Kampanya Açıklaması/Koşulları..."
+                              rows={2}
+                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none', resize: 'vertical' }}
+                            />
+                            <input 
+                              type="text" 
+                              value={camp.expiresAt} 
+                              onChange={(e) => updateCampaign(idx, 'expiresAt', e.target.value)} 
+                              placeholder="Geçerlilik Tarihi (Örn: 31 Ağustos'a kadar)"
+                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none' }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Reference Projects */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Referans Projeler (Portföy)</label>
+                        <button type="button" onClick={addReferenceProject} style={{ padding: '6px 12px', fontSize: '0.72rem', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', color: 'var(--accent-gold)' }}>+ Proje Ekle</button>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {profileReferenceProjects.map((proj, idx) => (
+                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', position: 'relative' }}>
+                            <button type="button" onClick={() => removeReferenceProject(idx)} style={{ position: 'absolute', top: '10px', right: '12px', background: 'transparent', border: 'none', color: '#ef4444', fontWeight: '700', cursor: 'pointer', fontSize: '0.85rem' }}>✕</button>
+                            <input 
+                              type="text" 
+                              value={proj.title} 
+                              onChange={(e) => updateReferenceProject(idx, 'title', e.target.value)} 
+                              placeholder="Proje Adı (Örn: Rixos Hotel Lobby Kaplaması)"
+                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none' }}
+                            />
+                            <input 
+                              type="text" 
+                              value={proj.imageUrl} 
+                              onChange={(e) => updateReferenceProject(idx, 'imageUrl', e.target.value)} 
+                              placeholder="Proje Görsel URL'si (http://... veya /textures/...)"
+                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none' }}
+                            />
+                            <textarea 
+                              value={proj.desc} 
+                              onChange={(e) => updateReferenceProject(idx, 'desc', e.target.value)} 
+                              placeholder="Kullanılan ürünler ve proje detayı..."
+                              rows={2}
+                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none', resize: 'vertical' }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* FAQ */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Sıkça Sorulan Sorular (FAQ)</label>
+                        <button type="button" onClick={addFaq} style={{ padding: '6px 12px', fontSize: '0.72rem', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: '700', cursor: 'pointer', color: 'var(--accent-gold)' }}>+ Soru Ekle</button>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {profileDealerFaqs.map((faq, idx) => (
+                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', position: 'relative' }}>
+                            <button type="button" onClick={() => removeFaq(idx)} style={{ position: 'absolute', top: '10px', right: '12px', background: 'transparent', border: 'none', color: '#ef4444', fontWeight: '700', cursor: 'pointer', fontSize: '0.85rem' }}>✕</button>
+                            <input 
+                              type="text" 
+                              value={faq.q} 
+                              onChange={(e) => updateFaq(idx, 'q', e.target.value)} 
+                              placeholder="Soru (Örn: Şehir dışı nakliye yapıyor musunuz?)"
+                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none' }}
+                            />
+                            <textarea 
+                              value={faq.a} 
+                              onChange={(e) => updateFaq(idx, 'a', e.target.value)} 
+                              placeholder="Cevap..."
+                              rows={2}
+                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none', resize: 'vertical' }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
                   </div>
                 </div>
 

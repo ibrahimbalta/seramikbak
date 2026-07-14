@@ -91,6 +91,12 @@ model Dealer {
   showroomImages  String? // Comma-separated string of image URLs
   virtualTourUrl  String? // 3D Showroom / Virtual Tour Link (Matterport, 360 etc.)
   specialConcepts String? // Special concepts showcased in showroom
+  aboutText         String?
+  logisticsServices String?
+  featuredProducts  String?
+  dealerCampaigns   String?
+  referenceProjects  String?
+  dealerFaqs        String?
 }
 
 model DealerSaaSConfig {

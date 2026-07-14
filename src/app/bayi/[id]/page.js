@@ -41,12 +41,7 @@ export default async function Page({ params }) {
   // Fetch products of this brand to let user select in direct quote form
   const products = await prisma.product.findMany({
     where: { brandId: dealer.brandId },
-    take: 30,
-    select: {
-      id: true,
-      name: true,
-      code: true
-    }
+    take: 100
   });
 
   return <DealerProfileClient dealer={dealer} products={products} />;

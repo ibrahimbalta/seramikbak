@@ -90,7 +90,13 @@ export async function PUT(request) {
       logoUrl, 
       showroomImages, 
       virtualTourUrl, 
-      specialConcepts 
+      specialConcepts,
+      aboutText,
+      logisticsServices,
+      featuredProducts,
+      dealerCampaigns,
+      referenceProjects,
+      dealerFaqs
     } = body;
 
     if (!id) {
@@ -110,6 +116,12 @@ export async function PUT(request) {
     if (showroomImages !== undefined) updateData.showroomImages = showroomImages;
     if (virtualTourUrl !== undefined) updateData.virtualTourUrl = virtualTourUrl;
     if (specialConcepts !== undefined) updateData.specialConcepts = specialConcepts;
+    if (aboutText !== undefined) updateData.aboutText = aboutText;
+    if (logisticsServices !== undefined) updateData.logisticsServices = logisticsServices;
+    if (featuredProducts !== undefined) updateData.featuredProducts = featuredProducts;
+    if (dealerCampaigns !== undefined) updateData.dealerCampaigns = dealerCampaigns;
+    if (referenceProjects !== undefined) updateData.referenceProjects = referenceProjects;
+    if (dealerFaqs !== undefined) updateData.dealerFaqs = dealerFaqs;
 
     const updatedDealer = await prisma.dealer.update({
       where: { id },

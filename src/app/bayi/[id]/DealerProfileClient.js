@@ -44,6 +44,33 @@ export default function DealerProfileClient({ dealer, products }) {
   const images = dealer.showroomImages ? dealer.showroomImages.split(',').filter(Boolean) : [];
   const concepts = dealer.specialConcepts ? dealer.specialConcepts.split(',').filter(Boolean) : [];
 
+  const safeParseJSON = (str, fallback) => {
+    if (!str) return fallback;
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return fallback;
+    }
+  };
+
+  const featuredProductIds = safeParseJSON(dealer.featuredProducts, []);
+  const campaigns = safeParseJSON(dealer.dealerCampaigns, []);
+  const referenceProjects = safeParseJSON(dealer.referenceProjects, []);
+  const faqs = safeParseJSON(dealer.dealerFaqs, []);
+  const servicesList = dealer.logisticsServices ? dealer.logisticsServices.split(',').filter(Boolean) : [];
+
+  const featuredProductsList = products.filter(p => featuredProductIds.includes(p.id));
+
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
+
+  const handleFeatureClick = (prodId) => {
+    setSelectedProductId(prodId);
+    const element = document.getElementById('quote-form-section');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const isPanoramicImage = dealer.virtualTourUrl && 
     (/\.(jpg|jpeg|png|webp|gif)($|\?)/i.test(dealer.virtualTourUrl) || 
      dealer.virtualTourUrl.includes('res.cloudinary.com') ||
@@ -171,6 +198,23 @@ export default function DealerProfileClient({ dealer, products }) {
                 <MapPin size={14} style={{ color: 'var(--accent-gold)', flexShrink: 0 }} />
                 <span>{dealer.district}, {dealer.city}</span>
               </div>
+              {servicesList.length > 0 && (
+                <div className="header-services-badges" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '10px' }}>
+                  {servicesList.map(s => {
+                    const labelMap = {
+                      shipping: '🚚 Nakliye Desteği',
+                      showroom_stock: '🏬 Hazır Stok',
+                      credit_card: '💳 Kart Taksiti',
+                      install_support: '🛠️ Usta Desteği'
+                    };
+                    return labelMap[s] ? (
+                      <span key={s} className="service-badge" style={{ fontSize: '0.65rem', background: 'rgba(255,255,255,0.1)', color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.15)', padding: '3px 8px', borderRadius: '6px', fontWeight: '700', fontFamily: 'var(--font-title)' }}>
+                        {labelMap[s]}
+                      </span>
+                    ) : null;
+                  })}
+                </div>
+              )}
             </div>
           </div>
           
@@ -319,6 +363,16 @@ export default function DealerProfileClient({ dealer, products }) {
                 </div>
               </div>
             )}
+
+            {/* About Us Card */}
+            {dealer.aboutText && (
+              <div className="section-glass-card">
+                <h3 className="section-subtitle">Hakkımızda</h3>
+                <p style={{ margin: 0, fontSize: '0.86rem', color: '#475569', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
+                  {dealer.aboutText}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* RIGHT COLUMN: CONTACT INFO & QUOTE REQUEST */}
@@ -374,7 +428,7 @@ export default function DealerProfileClient({ dealer, products }) {
             </div>
 
             {/* Direct lead quote form */}
-            <div className="section-glass-card">
+            <div className="section-glass-card" id="quote-form-section">
               <h3 className="section-title">Fiyat Teklifi ve Bilgi Alın</h3>
               <p className="form-desc">
                 Aşağıdaki formu doldurarak bu bayiden ilgilendiğiniz seramik ürünleri için palet bazında özel teklif veya showroom randevusu isteyin.
@@ -477,6 +531,115 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
 
         </div>
+
+        {/* SECTION: CAMPAIGNS */}
+        {campaigns.length > 0 && (
+          <div className="showroom-campaigns-section" style={{ marginTop: '48px' }}>
+            <h2 className="section-main-heading">
+              Aktif Kampanyalar & Fırsatlar
+            </h2>
+            <div className="campaigns-grid">
+              {campaigns.map((camp, idx) => (
+                <div key={idx} className="campaign-card">
+                  <span className="campaign-badge">AKTİF FIRSAT</span>
+                  <h3 className="campaign-card-title">{camp.title}</h3>
+                  <p className="campaign-card-desc">{camp.desc}</p>
+                  {camp.expiresAt && (
+                    <div className="campaign-card-footer">
+                      🕒 Son Geçerlilik: {camp.expiresAt}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION: FEATURED PRODUCTS */}
+        {featuredProductsList.length > 0 && (
+          <div className="featured-products-section" style={{ marginTop: '48px' }}>
+            <h2 className="section-main-heading">
+              Showroom Öne Çıkan Ürünler
+            </h2>
+            <div className="featured-products-grid">
+              {featuredProductsList.map(prod => (
+                <div key={prod.id} className="featured-product-card">
+                  <div className="featured-product-image-container">
+                    <img src={prod.imageUrl} alt={prod.name} />
+                  </div>
+                  <div className="featured-product-info">
+                    <span className="featured-product-style">{prod.style} serisi</span>
+                    <h3 className="featured-product-name">{prod.name}</h3>
+                    <span className="featured-product-meta">Kod: {prod.code} • Ebat: {prod.width}x{prod.height} cm • Yüzey: {prod.finish}</span>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => handleFeatureClick(prod.id)}
+                    className="featured-product-action-btn"
+                  >
+                    <span>Teklif Talebi Listesine Ekle</span>
+                    <ArrowRight size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION: REFERENCE PROJECTS */}
+        {referenceProjects.length > 0 && (
+          <div className="reference-projects-section" style={{ marginTop: '48px' }}>
+            <h2 className="section-main-heading">
+              Referans Projelerimiz
+            </h2>
+            <div className="projects-grid">
+              {referenceProjects.map((proj, idx) => (
+                <div key={idx} className="project-card">
+                  {proj.imageUrl && (
+                    <div className="project-card-image-container">
+                      <img src={proj.imageUrl} alt={proj.title} />
+                    </div>
+                  )}
+                  <div className="project-card-body">
+                    <h3 className="project-card-title">{proj.title}</h3>
+                    <p className="project-card-desc">{proj.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION: FAQ */}
+        {faqs.length > 0 && (
+          <div className="faq-section" style={{ marginTop: '48px' }}>
+            <h2 className="section-main-heading">
+              Sıkça Sorulan Sorular
+            </h2>
+            <div className="faq-accordion">
+              {faqs.map((faq, idx) => {
+                const isOpen = openFaqIndex === idx;
+                return (
+                  <div key={idx} className="faq-item">
+                    <button 
+                      type="button"
+                      onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                      className="faq-question-btn"
+                    >
+                      <span className="faq-question-text">{faq.q}</span>
+                      <span className="faq-toggle-icon">{isOpen ? '−' : '+'}</span>
+                    </button>
+                    {isOpen && (
+                      <div className="faq-answer-content">
+                        {faq.a}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
       </div>
 
