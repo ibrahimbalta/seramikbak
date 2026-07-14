@@ -5008,18 +5008,21 @@ export default function Home() {
                       </div>
 
                       {/* DYNAMICS: HEAVY FREIGHT PALLET LOGISTICS ESTIMATION */}
-                      <div className="pallet-logistics-box">
-                        <span className="logistics-lbl">🚚 Kargo & Ağır Yük Lojistiği (Borusan Entegrasyonu)</span>
+                      <div className="pallet-logistics-box" style={{ background: 'rgba(241, 245, 249, 0.5)', border: '1px solid #e2e8f0' }}>
+                        <span className="logistics-lbl" style={{ color: '#475569' }}>🚚 Ağır Yük Lojistik ve Sevk Bilgisi</span>
                         <div className="logistics-row">
-                          <span>Toplam Ağırlık:</span>
+                          <span>Toplam Ürün Ağırlığı:</span>
                           <strong>{Math.round(parseFloat(calcResults.actualAreaPurchased) * 18)} kg ({Math.ceil(Math.round(parseFloat(calcResults.actualAreaPurchased) * 18) / 1000)} Palet)</strong>
                         </div>
-                        <div className="logistics-row highlight-price">
-                          <span>Lojistik Sevk Bedeli (Bayiden Adrese):</span>
-                          <strong className="logistics-price">
-                            {Math.round(350 + (Math.ceil(Math.round(parseFloat(calcResults.actualAreaPurchased) * 18) / 1000) * 250))} TL
-                          </strong>
+                        <div className="logistics-row highlight-price" style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '8px', marginTop: '4px' }}>
+                          <span style={{ color: '#475569', fontWeight: '600' }}>Lojistik Sevk Bedeli:</span>
+                          <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textAlign: 'right' }}>
+                            Mesafeye Göre Bayi Tarafından Hesaplanır
+                          </span>
                         </div>
+                        <p style={{ fontSize: '0.62rem', color: '#94a3b8', margin: '4px 0 0 0', lineHeight: '1.3', fontStyle: 'italic' }}>
+                          * Seramikler ağır yük sınıfında paletli gönderildiği için sevk bedeli teslimat adresinin uzaklığına ve bayi anlaşmalarına göre değişkenlik gösterir. Teklif istenirken net lojistik tutarını sorabilirsiniz.
+                        </p>
                       </div>
                     </div>
                   )}
