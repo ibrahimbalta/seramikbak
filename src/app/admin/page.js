@@ -38,6 +38,8 @@ export default function AdminPage() {
   const [leads, setLeads] = useState([]);
   const [projects, setProjects] = useState([]);
   const [saasConfigs, setSaasConfigs] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
+  const [campaignsLoading, setCampaignsLoading] = useState(false);
 
   // Scraper Sub-tab: 'crawler', 'excel', 'zip'
   const [scraperSubTab, setScraperSubTab] = useState('crawler');
@@ -821,6 +823,7 @@ export default function AdminPage() {
       loadAdminProducts(1);
       loadBankSettings();
       loadAdminBrands();
+      loadCampaigns();
     }
   }, [isLoggedIn]);
 
@@ -1405,6 +1408,42 @@ export default function AdminPage() {
     }
   };
 
+  const loadCampaigns = async () => {
+    setCampaignsLoading(true);
+    try {
+      const res = await fetch('/api/admin/campaigns');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setCampaigns(data.campaigns);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load campaigns:', err);
+    } finally {
+      setCampaignsLoading(false);
+    }
+  };
+
+  const handleCampaignAction = async (campaignId, action) => {
+    try {
+      const res = await fetch('/api/admin/campaigns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campaignId, action })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        loadCampaigns();
+      } else {
+        alert(data.error || 'İşlem başarısız.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Bağlantı hatası.');
+    }
+  };
+
   if (!isLoggedIn) {
     return (
       <main className="login-layout" style={{
@@ -1667,6 +1706,10 @@ export default function AdminPage() {
           <button className={`admin-tab-link ${activeTab === 'brands' ? 'active' : ''}`} onClick={() => setActiveTab('brands')}>
             <Building2 size={14} />
             <span>Marka Hesapları</span>
+          </button>
+          <button className={`admin-tab-link ${activeTab === 'campaigns' ? 'active' : ''}`} onClick={() => { setActiveTab('campaigns'); loadCampaigns(); }}>
+            <Sparkles size={14} style={{ color: '#d4af37' }} />
+            <span>Sponsorlu Reklamlar ({campaigns.filter(c => c.status === 'PENDING_APPROVAL').length})</span>
           </button>
           <button className={`admin-tab-link ${activeTab === 'pages' ? 'active' : ''}`} onClick={() => setActiveTab('pages')}>
             <FileText size={14} />
@@ -4484,6 +4527,161 @@ export default function AdminPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* TAB 8: SPONSORLU REKLAM KAMPANYALARI */}
+      {activeTab === 'campaigns' && (
+        <div className="admin-card glass-panel w-full animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', background: '#ffffff', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', padding: '24px' }}>
+          <div className="card-header" style={{ display: 'flex', gap: '12px', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <Sparkles size={24} style={{ color: '#d4af37' }} />
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>Sponsorlu Reklam & Vitrin Başvuruları</h3>
+                <p style={{ margin: '4px 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
+                  Markaların ana sayfada öne çıkmak için havale ile yaptığı reklam süre başvurularını yönetin ve onaylayın.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Metrics */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
+              <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase' }}>Onay Bekleyenler</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#d97706', marginTop: '4px' }}>
+                {campaigns.filter(c => c.status === 'PENDING_APPROVAL').length}
+              </div>
+            </div>
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
+              <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase' }}>Aktif Yayında Olanlar</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#10b981', marginTop: '4px' }}>
+                {campaigns.filter(c => c.status === 'ACTIVE' && (!c.expiresAt || new Date(c.expiresAt) > new Date())).length}
+              </div>
+            </div>
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
+              <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase' }}>Toplam Toplanan Gelir</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#0f172a', marginTop: '4px' }}>
+                {campaigns.reduce((sum, c) => sum + (c.status === 'ACTIVE' ? c.price : 0), 0).toLocaleString('tr-TR')} TL
+              </div>
+            </div>
+          </div>
+
+          {campaignsLoading ? (
+            <div style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
+              <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
+              <span>Reklam başvuruları yükleniyor...</span>
+            </div>
+          ) : campaigns.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '48px', color: '#64748b', border: '1px dashed #cbd5e1', borderRadius: '12px' }}>
+              Hiç reklam başvurusu bulunmamaktadır.
+            </div>
+          ) : (
+            <div className="table-responsive" style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                    <th style={{ padding: '12px' }}>Marka</th>
+                    <th style={{ padding: '12px' }}>Hedef Ürün</th>
+                    <th style={{ padding: '12px' }}>Süre</th>
+                    <th style={{ padding: '12px' }}>Tutar</th>
+                    <th style={{ padding: '12px' }}>Dekont No</th>
+                    <th style={{ padding: '12px' }}>Tarihler</th>
+                    <th style={{ padding: '12px', textAlign: 'center' }}>Durum</th>
+                    <th style={{ padding: '12px', textAlign: 'right' }}>İşlemler</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {campaigns.map(camp => {
+                    const isExpired = camp.expiresAt && new Date(camp.expiresAt) < new Date();
+                    
+                    let statusLabel = 'Onay Bekliyor';
+                    let statusColor = '#d97706';
+                    let statusBg = '#fffbeb';
+
+                    if (isExpired) {
+                      statusLabel = 'Süresi Dolmuş';
+                      statusColor = '#64748b';
+                      statusBg = '#f1f5f9';
+                    } else if (camp.status === 'ACTIVE') {
+                      statusLabel = 'Yayında';
+                      statusColor = '#10b981';
+                      statusBg = '#ecfdf5';
+                    } else if (camp.status === 'REJECTED') {
+                      statusLabel = 'Reddedildi';
+                      statusColor = '#ef4444';
+                      statusBg = '#fef2f2';
+                    } else if (camp.status === 'PAUSED') {
+                      statusLabel = 'Durduruldu';
+                      statusColor = '#4b5563';
+                      statusBg = '#f3f4f6';
+                    }
+
+                    return (
+                      <tr key={camp.id} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.2s' }}>
+                        <td style={{ padding: '12px', fontWeight: '700' }}>{camp.brand?.name}</td>
+                        <td style={{ padding: '12px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {camp.product?.imageUrl && (
+                              <img src={camp.product.imageUrl} alt={camp.product.name} style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #e2e8f0' }} />
+                            )}
+                            <div>
+                              <div>{camp.product?.name}</div>
+                              <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Kod: {camp.product?.code}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ padding: '12px' }}>{camp.durationDays} Gün</td>
+                        <td style={{ padding: '12px', fontWeight: '700', color: '#10b981' }}>{camp.price} TL</td>
+                        <td style={{ padding: '12px', fontFamily: 'monospace' }}>{camp.paymentRef || '-'}</td>
+                        <td style={{ padding: '12px', fontSize: '0.75rem', color: '#475569' }}>
+                          {camp.expiresAt ? (
+                            <>
+                              <div>Başlangıç: {new Date(camp.updatedAt).toLocaleDateString('tr-TR')}</div>
+                              <div>Bitiş: {new Date(camp.expiresAt).toLocaleDateString('tr-TR')}</div>
+                            </>
+                          ) : (
+                            <em style={{ color: '#94a3b8' }}>Aktif değil</em>
+                          )}
+                        </td>
+                        <td style={{ padding: '12px', textAlign: 'center' }}>
+                          <span style={{ fontSize: '0.7rem', background: statusBg, color: statusColor, padding: '4px 8px', borderRadius: '20px', fontWeight: '700', display: 'inline-block' }}>
+                            {statusLabel}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px', textAlign: 'right' }}>
+                          {camp.status === 'PENDING_APPROVAL' && (
+                            <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                              <button
+                                onClick={() => handleCampaignAction(camp.id, 'approve')}
+                                style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: '600' }}
+                              >
+                                Onayla
+                              </button>
+                              <button
+                                onClick={() => handleCampaignAction(camp.id, 'reject')}
+                                style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: '600' }}
+                              >
+                                Reddet
+                              </button>
+                            </div>
+                          )}
+                          {camp.status === 'ACTIVE' && !isExpired && (
+                            <button
+                              onClick={() => handleCampaignAction(camp.id, 'cancel')}
+                              style={{ background: '#64748b', color: '#fff', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: '600' }}
+                            >
+                              Yayını Durdur
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 

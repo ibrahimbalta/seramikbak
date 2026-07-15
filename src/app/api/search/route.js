@@ -171,7 +171,10 @@ export async function GET(request) {
           campaigns: {
             where: {
               status: 'ACTIVE',
-              budget: { gt: 0 }
+              OR: [
+                { expiresAt: null },
+                { expiresAt: { gt: new Date() } }
+              ]
             },
             select: {
               id: true,
@@ -212,7 +215,10 @@ export async function GET(request) {
           campaigns: {
             where: {
               status: 'ACTIVE',
-              budget: { gt: 0 }
+              OR: [
+                { expiresAt: null },
+                { expiresAt: { gt: new Date() } }
+              ]
             },
             select: {
               id: true,

@@ -142,18 +142,22 @@ model Lead {
 }
 
 model AdCampaign {
-  id          String   @id @default(uuid())
-  brandId     String
-  brand       Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  productId   String
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  bidAmount   Float    // CPC (Cost Per Click) in TRY
-  status      String   @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED
-  budget      Float    // Remaining budget in TRY
-  clicks      Int      @default(0)
-  impressions Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String    @id @default(uuid())
+  brandId      String
+  brand        Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  bidAmount    Float     @default(0) // Obsolete/CPC fallback
+  status       String    @default("PENDING_APPROVAL") // PENDING_APPROVAL, ACTIVE, PAUSED, EXPIRED, REJECTED
+  budget       Float     @default(0) // Remaining budget / price paid
+  clicks       Int       @default(0)
+  impressions  Int       @default(0)
+  durationDays Int       @default(7) // 7 (1 week), 30 (1 month), 90 (3 months), 180 (6 months)
+  paymentRef   String?   // bank transfer reference/dekont no
+  price        Float     @default(0) // Price paid for campaign
+  expiresAt    DateTime? // calculated expiration timestamp
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model AnalyticsLog {

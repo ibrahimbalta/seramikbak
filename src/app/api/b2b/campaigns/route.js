@@ -7,9 +7,14 @@ export async function GET(request) {
     const brandId = searchParams.get('brandId');
 
     if (!brandId) {
+      // Fetch active campaigns (where status is ACTIVE and expiresAt has not passed)
       const activeCampaigns = await prisma.adCampaign.findMany({
         where: {
-          status: 'ACTIVE'
+          status: 'ACTIVE',
+          OR: [
+            { expiresAt: null },
+            { expiresAt: { gt: new Date() } }
+          ]
         },
         include: {
           product: {
@@ -45,16 +50,16 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { brandId, productId, bidAmount, budget } = body;
+    const { brandId, productId, durationDays, paymentRef, price } = body;
 
-    if (!brandId || !productId || !bidAmount || !budget) {
+    if (!brandId || !productId || !durationDays || !paymentRef || !price) {
       return NextResponse.json(
-        { error: 'Missing parameters (brandId, productId, bidAmount, budget)' },
+        { error: 'Eksik parametreler (brandId, productId, durationDays, paymentRef, price)' },
         { status: 400 }
       );
     }
 
-    // Check if campaign already exists for this product
+    // Check if there is already a campaign for this product (e.g. pending or active)
     const existingCampaign = await prisma.adCampaign.findFirst({
       where: { productId, brandId }
     });
@@ -62,42 +67,46 @@ export async function POST(request) {
     let campaign;
 
     if (existingCampaign) {
-      // Top up budget and update bid
+      // If it exists, update it to PENDING_APPROVAL with new duration and payment info
       campaign = await prisma.adCampaign.update({
         where: { id: existingCampaign.id },
         data: {
-          bidAmount: parseFloat(bidAmount),
-          budget: existingCampaign.budget + parseFloat(budget),
-          status: 'ACTIVE' // Reactivate if it was completed
+          durationDays: parseInt(durationDays, 10),
+          paymentRef,
+          price: parseFloat(price),
+          budget: parseFloat(price),
+          status: 'PENDING_APPROVAL',
+          expiresAt: null, // Reset expiry until approved
+          updatedAt: new Date()
         }
       });
     } else {
-      // Create new campaign
+      // Create new campaign with PENDING_APPROVAL status
       campaign = await prisma.adCampaign.create({
         data: {
           brandId,
           productId,
-          bidAmount: parseFloat(bidAmount),
-          budget: parseFloat(budget),
-          status: 'ACTIVE'
+          durationDays: parseInt(durationDays, 10),
+          paymentRef,
+          price: parseFloat(price),
+          budget: parseFloat(price),
+          status: 'PENDING_APPROVAL',
+          bidAmount: 0,
+          expiresAt: null
         }
       });
     }
 
-    // Update product flag
-    await prisma.product.update({
-      where: { id: productId },
-      data: { isPremium: true }
-    });
+    // Note: We do not set product.isPremium to true here. That is done by admin approval.
 
     return NextResponse.json({
       success: true,
-      message: 'Campaign configured successfully',
+      message: 'Reklam başvurusu alındı. Admin onayı bekleniyor.',
       campaign
     });
 
   } catch (error) {
     console.error('B2B Campaigns POST Error:', error);
-    return NextResponse.json({ error: 'Failed to configure campaign', details: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Kampanya başvurusu sırasında hata oluştu.', details: error.message }, { status: 500 });
   }
 }

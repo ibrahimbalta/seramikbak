@@ -39,9 +39,10 @@ export default function BrandPortalPage() {
   const [brandProducts, setBrandProducts] = useState([]);
   
   // Ad Campaign Creator Form
-  const [campaignBid, setCampaignBid] = useState('2.50');
-  const [campaignBudget, setCampaignBudget] = useState('1000');
   const [campaignProduct, setCampaignProduct] = useState('');
+  const [campaignDuration, setCampaignDuration] = useState('30'); // default 30 days
+  const [campaignPaymentRef, setCampaignPaymentRef] = useState('');
+  const [showCampaignPaymentModal, setShowCampaignPaymentModal] = useState(false);
   const [campaignSuccessMsg, setCampaignSuccessMsg] = useState('');
   const [campaignErrorMsg, setCampaignErrorMsg] = useState('');
   const [isStartingCampaign, setIsStartingCampaign] = useState(false);
@@ -188,12 +189,27 @@ export default function BrandPortalPage() {
     setPassword('');
   };
 
-  const handleCampaignSubmit = async (e) => {
+  const handleCampaignSubmit = (e) => {
     e.preventDefault();
     if (!brandInfo || !campaignProduct) return;
+    setCampaignSuccessMsg('');
+    setCampaignErrorMsg('');
+    setShowCampaignPaymentModal(true);
+  };
+
+  const handleCampaignPaymentConfirm = async (e) => {
+    e.preventDefault();
+    if (!brandInfo || !campaignProduct || !campaignPaymentRef.trim()) return;
     setIsStartingCampaign(true);
     setCampaignSuccessMsg('');
     setCampaignErrorMsg('');
+
+    // Determine price based on duration
+    let price = 1500;
+    if (campaignDuration === '7') price = 500;
+    if (campaignDuration === '30') price = 1500;
+    if (campaignDuration === '90') price = 4000;
+    if (campaignDuration === '180') price = 7500;
 
     try {
       const res = await fetch('/api/b2b/campaigns', {
@@ -202,15 +218,18 @@ export default function BrandPortalPage() {
         body: JSON.stringify({
           brandId: brandInfo.id,
           productId: campaignProduct,
-          bidAmount: parseFloat(campaignBid) || 2.50,
-          budget: parseFloat(campaignBudget) || 1000
+          durationDays: parseInt(campaignDuration, 10),
+          paymentRef: campaignPaymentRef,
+          price
         })
       });
 
       const data = await res.json();
       if (res.ok && data.success) {
-        setCampaignSuccessMsg('Reklam kampanyası başarıyla başlatıldı ve yayına alındı!');
+        setCampaignSuccessMsg('Reklam talebiniz alındı! Ödemeniz doğrulandıktan sonra admin tarafından onaylanıp yayına alınacaktır.');
+        setShowCampaignPaymentModal(false);
         setCampaignProduct('');
+        setCampaignPaymentRef('');
         fetchB2bStats(brandInfo.id);
       } else {
         setCampaignErrorMsg(data.error || 'Kampanya oluşturulamadı.');
@@ -1088,42 +1107,82 @@ export default function BrandPortalPage() {
               <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Sparkles size={18} style={{ color: '#d4af37' }} />
-                  Premium Reklam Yönetimi
+                  Premium Vitrin & Reklam Yönetimi
                 </h3>
-                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Arama sonuçlarında en üst sırada yer almak için ürün bazlı sponsorlu bütçe tanımlayın.</p>
+                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Ürünlerinizi ana sayfada "Yeni Koleksiyonlar" vitrininde yayınlamak için reklam süresi satın alın.</p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '240px', overflowY: 'auto', marginBottom: '20px', paddingRight: '8px' }}>
-                  {b2bStats.campaigns.map(camp => (
-                    <div key={camp.id} style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '12px',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      fontSize: '0.8rem'
-                    }}>
-                      <div>
-                        <strong style={{ color: '#0f172a' }}>{camp.product?.name}</strong>
-                        <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Kod: {camp.product?.code}</div>
+                  {b2bStats.campaigns.map(camp => {
+                    const isExpired = camp.expiresAt && new Date(camp.expiresAt) < new Date();
+                    
+                    let statusLabel = 'Onay Bekliyor';
+                    let statusColor = '#d97706';
+                    let statusBg = '#fffbeb';
+
+                    if (isExpired) {
+                      statusLabel = 'Süresi Dolmuş';
+                      statusColor = '#64748b';
+                      statusBg = '#f1f5f9';
+                    } else if (camp.status === 'ACTIVE') {
+                      statusLabel = 'Yayında';
+                      statusColor = '#10b981';
+                      statusBg = '#ecfdf5';
+                    } else if (camp.status === 'REJECTED') {
+                      statusLabel = 'Reddedildi';
+                      statusColor = '#ef4444';
+                      statusBg = '#fef2f2';
+                    } else if (camp.status === 'PAUSED') {
+                      statusLabel = 'Durduruldu';
+                      statusColor = '#4b5563';
+                      statusBg = '#f3f4f6';
+                    }
+
+                    return (
+                      <div key={camp.id} style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '12px',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        fontSize: '0.8rem'
+                      }}>
+                        <div>
+                          <strong style={{ color: '#0f172a' }}>{camp.product?.name}</strong>
+                          <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Kod: {camp.product?.code}</div>
+                          <div style={{ display: 'flex', gap: '6px', marginTop: '4px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '0.62rem', background: statusBg, color: statusColor, padding: '2px 6px', borderRadius: '4px', fontWeight: '700' }}>
+                              {statusLabel}
+                            </span>
+                            {camp.paymentRef && (
+                              <span style={{ fontSize: '0.62rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>
+                                Ref: {camp.paymentRef}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div>Tıklanma: <strong style={{ color: 'var(--accent-gold, #b38e47)' }}>{camp.clicks} tık</strong></div>
+                          <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Süre: <strong>{camp.durationDays} Gün</strong> ({camp.price} TL)</div>
+                          {camp.expiresAt && (
+                            <div style={{ fontSize: '0.65rem', color: '#64748b', marginTop: '2px' }}>
+                              Bitiş: {new Date(camp.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div>Tık: <strong>{camp.clicks}</strong></div>
-                        <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Maliyet: <strong>{camp.bidAmount} TL / tık</strong></div>
-                        <div style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: '700' }}>Kalan Bütçe: {camp.budget.toFixed(2)} TL</div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {b2bStats.campaigns.length === 0 && (
                     <div style={{ textAlign: 'center', padding: '24px', color: '#64748b', fontStyle: 'italic', fontSize: '0.8rem' }}>
-                      Henüz aktif bir reklam kampanyası bulunmamaktadır.
+                      Henüz aktif veya onay bekleyen bir reklam talebiniz bulunmamaktadır.
                     </div>
                   )}
                 </div>
 
                 <form onSubmit={handleCampaignSubmit} style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: 0 }}>Yeni Reklam Kampanyası Başlat</h4>
+                  <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: 0 }}>Yeni Vitrin Reklamı Satın Al</h4>
                   
                   {campaignSuccessMsg && (
                     <div style={{ background: '#e6f7ed', color: '#10b981', padding: '8px 12px', borderRadius: '6px', fontSize: '0.75rem' }}>{campaignSuccessMsg}</div>
@@ -1132,14 +1191,14 @@ export default function BrandPortalPage() {
                     <div style={{ background: '#fee2e2', color: '#ef4444', padding: '8px 12px', borderRadius: '6px', fontSize: '0.75rem' }}>{campaignErrorMsg}</div>
                   )}
 
-                  <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                  <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '10px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Hedef Ürün</label>
+                      <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Öne Çıkarılacak Ürün</label>
                       <select 
                         value={campaignProduct} 
                         onChange={(e) => setCampaignProduct(e.target.value)} 
                         required
-                        style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem' }}
+                        style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem', background: '#fff' }}
                       >
                         <option value="">Seçiniz...</option>
                         {brandProducts.map(p => (
@@ -1148,31 +1207,22 @@ export default function BrandPortalPage() {
                       </select>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Tık Başına Teklif (TL)</label>
-                      <input 
-                        type="number" 
-                        step="0.1" 
-                        value={campaignBid} 
-                        onChange={(e) => setCampaignBid(e.target.value)} 
-                        required 
-                        style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem' }}
-                      />
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Toplam Bütçe (TL)</label>
-                      <input 
-                        type="number" 
-                        value={campaignBudget} 
-                        onChange={(e) => setCampaignBudget(e.target.value)} 
-                        required 
-                        style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem' }}
-                      />
+                      <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Yayın Süresi</label>
+                      <select
+                        value={campaignDuration}
+                        onChange={(e) => setCampaignDuration(e.target.value)}
+                        style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem', background: '#fff' }}
+                      >
+                        <option value="7">1 Hafta (500 TL)</option>
+                        <option value="30">1 Ay (1500 TL)</option>
+                        <option value="90">3 Ay (4000 TL)</option>
+                        <option value="180">6 Ay (7500 TL)</option>
+                      </select>
                     </div>
                   </div>
 
                   <button 
                     type="submit" 
-                    disabled={isStartingCampaign}
                     style={{
                       background: '#0f172a',
                       color: '#fff',
@@ -1188,8 +1238,8 @@ export default function BrandPortalPage() {
                       gap: '6px'
                     }}
                   >
-                    {isStartingCampaign ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                    <span>Reklam Kampanyasını Yayına Al</span>
+                    <Plus size={14} />
+                    <span>Reklam Satın Alma Başvurusu</span>
                   </button>
                 </form>
               </div>
@@ -1574,7 +1624,7 @@ export default function BrandPortalPage() {
             }}>
               <div><strong>Banka:</strong> {bankDetails.bank_name || 'Yükleniyor...'}</div>
               <div><strong>Alıcı:</strong> {bankDetails.bank_recipient || 'Yükleniyor...'}</div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'space-between' }}>
                 <div><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban || 'Yükleniyor...'}</span></div>
                 <button 
                   type="button"
@@ -1685,6 +1735,157 @@ export default function BrandPortalPage() {
                   }}
                 >
                   {paymentLoading ? 'Gönderiliyor...' : 'Bildirimi Gönder'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Brand Campaign Payment Modal */}
+      {showCampaignPaymentModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div className="glass-panel" style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            border: '1px solid #e2e8f0',
+            width: '100%',
+            maxWidth: '500px',
+            padding: '30px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            position: 'relative',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <button 
+              onClick={() => setShowCampaignPaymentModal(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'none',
+                border: 'none',
+                fontSize: '1.25rem',
+                cursor: 'pointer',
+                color: '#64748b',
+                fontWeight: '700'
+              }}
+            >
+              ×
+            </button>
+
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px', color: '#0f172a' }}>
+              Vitrin Reklamı Ödeme Bilgileri
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '20px' }}>
+              Seçtiğiniz reklam süresi: <strong>{campaignDuration === '7' ? '1 Hafta' : campaignDuration === '30' ? '1 Ay' : campaignDuration === '90' ? '3 Ay' : '6 Ay'}</strong>. Lütfen havaleyi gerçekleştirip dekont numarasını girin.
+            </p>
+
+            <div style={{
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              borderRadius: '12px',
+              padding: '16px',
+              marginBottom: '24px',
+              fontSize: '0.82rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
+              <div><strong>Banka:</strong> {bankDetails.bank_name || 'Akbank'}</div>
+              <div><strong>Alıcı:</strong> {bankDetails.bank_recipient || 'KolayWebci SeramikBak Ltd. Şti.'}</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'space-between' }}>
+                <div><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban || 'TR87 0004 6000 1234 5678 9012 34'}</span></div>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(bankDetails.bank_iban || 'TR87 0004 6000 1234 5678 9012 34');
+                    alert('IBAN panoya kopyalandı!');
+                  }}
+                  style={{
+                    background: '#e2e8f0',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '2px 8px',
+                    fontSize: '0.7rem',
+                    cursor: 'pointer',
+                    fontWeight: '600'
+                  }}
+                >
+                  Kopyala
+                </button>
+              </div>
+              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '8px', marginTop: '4px' }}>
+                <strong>Ödenecek Tutar:</strong> <span style={{ color: '#10b981', fontWeight: '800', fontSize: '1rem' }}>
+                  {campaignDuration === '7' ? '500' : campaignDuration === '30' ? '1500' : campaignDuration === '90' ? '4000' : '7500'} TL
+                </span>
+              </div>
+              <div style={{ fontSize: '0.72rem', color: '#64748b' }}>
+                * Havale açıklama kısmına <strong>{brandInfo?.name} Reklam Ödemesi</strong> yazın.
+              </div>
+            </div>
+
+            <form onSubmit={handleCampaignPaymentConfirm} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.78rem', fontWeight: '600', color: '#334155' }}>Havale Dekont No / İşlem Kodu</label>
+                <input 
+                  type="text" 
+                  value={campaignPaymentRef} 
+                  onChange={(e) => setCampaignPaymentRef(e.target.value)} 
+                  placeholder="İşlem veya Referans No" 
+                  required
+                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button 
+                  type="button"
+                  onClick={() => setShowCampaignPaymentModal(false)}
+                  style={{
+                    flex: 1,
+                    background: '#f1f5f9',
+                    color: '#334155',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    fontSize: '0.82rem',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Vazgeç
+                </button>
+                <button 
+                  type="submit"
+                  disabled={isStartingCampaign}
+                  style={{
+                    flex: 1,
+                    background: 'var(--accent-gold, #d4af37)',
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '12px',
+                    fontSize: '0.82rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    opacity: isStartingCampaign ? 0.7 : 1
+                  }}
+                >
+                  {isStartingCampaign ? 'Gönderiliyor...' : 'Ödemeyi Bildir'}
                 </button>
               </div>
             </form>
