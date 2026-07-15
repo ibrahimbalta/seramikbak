@@ -17,6 +17,26 @@ export default function RootLayout({ children }) {
     <html lang="tr">
       <head>
         <link rel="icon" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="SeramikBak" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(function(reg) {
+                    console.log('SeramikBak ServiceWorker registered:', reg.scope);
+                  }).catch(function(err) {
+                    console.warn('SeramikBak ServiceWorker registration failed:', err);
+                  });
+                });
+              }
+            `,
+          }}
+        />
       </head>
       <body>
         {children}
