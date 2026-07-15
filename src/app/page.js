@@ -5917,7 +5917,7 @@ export default function Home() {
       {/* Mobile Filters Sidebar (Root Level Stacking Context) */}
       <aside 
         className={`filters-sidebar-new glass-panel mobile-sidebar ${showMobileFilters ? 'open' : ''}`} 
-        style={showMobileFilters ? {} : { position: 'relative' }}
+        style={showMobileFilters ? { position: 'fixed', transform: 'translateY(0)' } : { position: 'fixed', transform: 'translateY(100%)', pointerEvents: 'none' }}
       >
         <div className="bottom-sheet-handle-wrapper">
           <div className="bottom-sheet-handle" />
@@ -12134,22 +12134,24 @@ export default function Home() {
         @media (max-width: 600px) {
           .ai-chatbot-window {
             position: fixed !important;
-            bottom: 0px !important;
+            bottom: 60px !important; /* sit above bottom tab navigation */
             right: 0px !important;
             left: 0px !important;
             width: 100% !important;
-            height: 100% !important;
-            height: -webkit-fill-available !important;
-            border-radius: 0px !important;
+            height: 48vh !important; /* 48% viewport height */
+            max-height: 48vh !important;
+            border-radius: 20px 20px 0 0 !important;
             border: none !important;
-            z-index: 99999 !important;
+            border-top: 2px solid #d4af37 !important;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15) !important;
+            z-index: 9999 !important;
           }
           .ai-chatbot-window form {
-            padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)) 16px !important;
+            padding: 12px 16px !important;
           }
           .ai-chat-header button {
-            padding: 12px !important;
-            font-size: 1.25rem !important;
+            padding: 8px !important;
+            font-size: 1.1rem !important;
           }
         }
       `}</style>
