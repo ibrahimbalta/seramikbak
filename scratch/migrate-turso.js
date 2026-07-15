@@ -1,60 +1,67 @@
+const { createClient } = require('@libsql/client');
 const fs = require('fs');
 const path = require('path');
-const { createClient } = require('@libsql/client');
 
-// Load .env
-const envPath = path.join(__dirname, '..', '.env');
-if (fs.existsSync(envPath)) {
-  fs.readFileSync(envPath, 'utf8').split('\n').forEach(line => {
-    const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
-    if (match) process.env[match[1]] = (match[2] || '').trim();
-  });
+// Manually parse .env file if it exists
+try {
+  const envPath = path.join(__dirname, '..', '.env');
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    envContent.split('\n').forEach(line => {
+      const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+      if (match) {
+        const key = match[1];
+        let value = match[2] || '';
+        if (value.startsWith('"') && value.endsWith('"')) {
+          value = value.slice(1, -1);
+        } else if (value.startsWith("'") && value.endsWith("'")) {
+          value = value.slice(1, -1);
+        }
+        process.env[key] = value.trim();
+      }
+    });
+  }
+} catch (e) {
+  console.error('Error reading .env file:', e);
 }
 
-async function main() {
-  const url = process.env.TURSO_DATABASE_URL;
+async function run() {
+  const url = process.env.TURSO_DATABASE_URL || 'libsql://seramikbak-ibrahimbalta.aws-eu-west-1.turso.io';
   const authToken = process.env.TURSO_AUTH_TOKEN;
 
-  console.log('Connecting to Turso database:', url);
+  if (!authToken) {
+    console.error('Error: TURSO_AUTH_TOKEN is missing in env!');
+    return;
+  }
+
+  console.log(`Connecting to Turso database: ${url}`);
   const client = createClient({ url, authToken });
 
-  try {
-    // 1. Get info on Lead table columns
-    const columnsResult = await client.execute('PRAGMA table_info("Lead");');
-    const columns = columnsResult.rows.map(row => row.name);
-    console.log('Current columns in Lead table:', columns);
+  const columnsToAdd = [
+    { name: 'aboutText', type: 'TEXT' },
+    { name: 'logisticsServices', type: 'TEXT' },
+    { name: 'featuredProducts', type: 'TEXT' },
+    { name: 'dealerCampaigns', type: 'TEXT' },
+    { name: 'referenceProjects', type: 'TEXT' },
+    { name: 'dealerFaqs', type: 'TEXT' }
+  ];
 
-    const requiredColumns = [
-      { name: 'requestedUsta', type: 'INTEGER DEFAULT 0' },
-      { name: 'requestedArchitect', type: 'INTEGER DEFAULT 0' },
-      { name: 'projectDimensions', type: 'TEXT' },
-      { name: 'projectPhotoUrl', type: 'TEXT' }
-    ];
-
-    let modified = false;
-    for (const col of requiredColumns) {
-      if (!columns.includes(col.name)) {
-        console.log(`Column "${col.name}" is missing. Adding it...`);
-        await client.execute(`ALTER TABLE "Lead" ADD COLUMN "${col.name}" ${col.type};`);
-        console.log(`Column "${col.name}" added successfully.`);
-        modified = true;
+  for (const col of columnsToAdd) {
+    try {
+      console.log(`Adding column ${col.name}...`);
+      await client.execute(`ALTER TABLE Dealer ADD COLUMN ${col.name} ${col.type}`);
+      console.log(`✓ Column ${col.name} added successfully.`);
+    } catch (err) {
+      if (err.message && (err.message.includes('duplicate column name') || err.message.includes('already exists'))) {
+        console.log(`⚠ Column ${col.name} already exists.`);
       } else {
-        console.log(`Column "${col.name}" already exists.`);
+        console.error(`✕ Failed to add column ${col.name}:`, err.message || err);
       }
     }
-
-    if (modified) {
-      const newColumnsResult = await client.execute('PRAGMA table_info("Lead");');
-      console.log('New columns in Lead table:', newColumnsResult.rows.map(row => row.name));
-    } else {
-      console.log('No database migrations were needed.');
-    }
-
-  } catch (err) {
-    console.error('Migration error:', err);
-  } finally {
-    client.close();
   }
+
+  console.log('Migration complete.');
+  client.close();
 }
 
-main();
+run().catch(console.error);
