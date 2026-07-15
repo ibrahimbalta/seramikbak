@@ -31,7 +31,11 @@ import {
   Clock,
   Package,
   ArrowRight,
-  Building2
+  Building2,
+  Upload,
+  RefreshCw,
+  Plus,
+  Layers
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -53,6 +57,23 @@ export default function DealerPortalPage() {
   const [projectsLoading, setProjectsLoading] = useState(false);
   const [regionalAnalytics, setRegionalAnalytics] = useState({ popularQueries: [], popularBrands: [], popularStyles: [] });
   const [brandProducts, setBrandProducts] = useState([]);
+
+  // Inventory & Stock Management State
+  const [inventoryList, setInventoryList] = useState([]);
+  const [inventoryLoading, setInventoryLoading] = useState(false);
+  const [xmlFeedUrlInput, setXmlFeedUrlInput] = useState('');
+  const [xmlSyncLoading, setXmlSyncLoading] = useState(false);
+  const [csvContentInput, setCsvContentInput] = useState('');
+  const [csvLoading, setCsvLoading] = useState(false);
+  const [inventorySuccess, setInventorySuccess] = useState('');
+  const [inventoryError, setInventoryError] = useState('');
+
+  // Add Item Modal state
+  const [showAddInventoryModal, setShowAddInventoryModal] = useState(false);
+  const [addInventoryProduct, setAddInventoryProduct] = useState('');
+  const [addInventoryStock, setAddInventoryStock] = useState('0');
+  const [addInventoryPrice, setAddInventoryPrice] = useState('');
+  const [addInventoryStatus, setAddInventoryStatus] = useState('IN_STOCK');
 
   // Dealer SaaS State
   const [saasInfo, setSaasInfo] = useState(null);
@@ -286,6 +307,7 @@ export default function DealerPortalPage() {
       loadDealerProjects();
       loadBankDetails();
       loadBrandProducts();
+      loadDealerInventory();
     }
   }, [isLoggedIn, dealerInfo]);
 
@@ -340,6 +362,216 @@ export default function DealerPortalPage() {
       console.error('Failed to load leads:', err);
     } finally {
       setLeadsLoading(false);
+    }
+  };
+
+  const loadDealerInventory = async () => {
+    if (!dealerInfo) return;
+    setInventoryLoading(true);
+    try {
+      const res = await fetch(`/api/dealers/inventory?dealerId=${dealerInfo.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setInventoryList(data.inventory || []);
+          setXmlFeedUrlInput(data.xmlFeedUrl || '');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load inventory:', err);
+    } finally {
+      setInventoryLoading(false);
+    }
+  };
+
+  const handleCsvUpload = async (e) => {
+    e.preventDefault();
+    if (!csvContentInput.trim() || !dealerInfo) return;
+    setCsvLoading(true);
+    setInventorySuccess('');
+    setInventoryError('');
+
+    try {
+      const res = await fetch('/api/dealers/inventory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'upload_csv',
+          dealerId: dealerInfo.id,
+          csvContent: csvContentInput
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setInventorySuccess(`CSV başarıyla yüklendi! ${data.successCount} ürün güncellendi/eklendi. ${data.errorCount} hata oluştu.`);
+        if (data.errors && data.errors.length > 0) {
+          setInventoryError(`Hatalar: ${data.errors.join(', ')}`);
+        }
+        setCsvContentInput('');
+        loadDealerInventory();
+      } else {
+        setInventoryError(data.error || 'CSV yüklenirken hata oluştu.');
+      }
+    } catch (err) {
+      console.error(err);
+      setInventoryError('Bağlantı hatası.');
+    } finally {
+      setCsvLoading(false);
+    }
+  };
+
+  const handleSaveXmlFeed = async (e) => {
+    e.preventDefault();
+    if (!dealerInfo) return;
+    setInventorySuccess('');
+    setInventoryError('');
+
+    try {
+      const res = await fetch('/api/dealers/inventory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_xml_feed',
+          dealerId: dealerInfo.id,
+          xmlFeedUrl: xmlFeedUrlInput
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setInventorySuccess('XML Feed linki başarıyla kaydedildi.');
+        setXmlFeedUrlInput(data.xmlFeedUrl || '');
+      } else {
+        setInventoryError(data.error || 'Link kaydedilemedi.');
+      }
+    } catch (err) {
+      console.error(err);
+      setInventoryError('Bağlantı hatası.');
+    }
+  };
+
+  const handleXmlSync = async () => {
+    if (!dealerInfo) return;
+    setXmlSyncLoading(true);
+    setInventorySuccess('');
+    setInventoryError('');
+
+    try {
+      const res = await fetch('/api/dealers/inventory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'xml_sync',
+          dealerId: dealerInfo.id
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setInventorySuccess(`XML eşitleme tamamlandı! ${data.successCount} ürün başarıyla eşitlendi.`);
+        loadDealerInventory();
+      } else {
+        setInventoryError(data.error || 'XML eşitleme başarısız oldu.');
+      }
+    } catch (err) {
+      console.error(err);
+      setInventoryError('Bağlantı hatası veya zaman aşımı.');
+    } finally {
+      setXmlSyncLoading(false);
+    }
+  };
+
+  const handleDeleteInventoryItem = async (productId) => {
+    if (!dealerInfo || !confirm('Bu ürünü envanterinizden silmek istediğinize emin misiniz?')) return;
+    setInventorySuccess('');
+    setInventoryError('');
+
+    try {
+      const res = await fetch('/api/dealers/inventory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete_item',
+          dealerId: dealerInfo.id,
+          productId
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setInventorySuccess('Ürün envanterden silindi.');
+        loadDealerInventory();
+      } else {
+        setInventoryError(data.error || 'Ürün silinemedi.');
+      }
+    } catch (err) {
+      console.error(err);
+      setInventoryError('Bağlantı hatası.');
+    }
+  };
+
+  const handleUpdateInventoryItem = async (productId, stock, price, status) => {
+    if (!dealerInfo) return;
+    setInventorySuccess('');
+    setInventoryError('');
+
+    try {
+      const res = await fetch('/api/dealers/inventory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_item',
+          dealerId: dealerInfo.id,
+          productId,
+          stock: parseFloat(stock) || 0,
+          price: price ? parseFloat(price) : null,
+          status: status || 'IN_STOCK'
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setInventorySuccess('Ürün envanterinizde güncellendi.');
+        loadDealerInventory();
+      } else {
+        setInventoryError(data.error || 'Güncelleme başarısız.');
+      }
+    } catch (err) {
+      console.error(err);
+      setInventoryError('Bağlantı hatası.');
+    }
+  };
+
+  const handleAddInventoryItem = async (e) => {
+    e.preventDefault();
+    if (!dealerInfo || !addInventoryProduct) return;
+    setInventorySuccess('');
+    setInventoryError('');
+
+    try {
+      const res = await fetch('/api/dealers/inventory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_item',
+          dealerId: dealerInfo.id,
+          productId: addInventoryProduct,
+          stock: parseFloat(addInventoryStock) || 0,
+          price: addInventoryPrice ? parseFloat(addInventoryPrice) : null,
+          status: addInventoryStatus
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setInventorySuccess('Ürün başarıyla envantere eklendi.');
+        setShowAddInventoryModal(false);
+        setAddInventoryProduct('');
+        setAddInventoryStock('0');
+        setAddInventoryPrice('');
+        setAddInventoryStatus('IN_STOCK');
+        loadDealerInventory();
+      } else {
+        setInventoryError(data.error || 'Ürün eklenemedi.');
+      }
+    } catch (err) {
+      console.error(err);
+      setInventoryError('Bağlantı hatası.');
     }
   };
 
@@ -1524,6 +1756,27 @@ export default function DealerPortalPage() {
               >
                 <CreditCard size={13} />
                 <span>Abonelik</span>
+              </button>
+              <button 
+                onClick={() => { setActivePortalTab('inventory'); setShowSettings(false); }}
+                style={{
+                  background: activePortalTab === 'inventory' ? '#fff' : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '6px 12px',
+                  fontSize: '0.75rem',
+                  fontWeight: activePortalTab === 'inventory' ? '700' : '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  color: activePortalTab === 'inventory' ? '#111' : '#6c757d',
+                  boxShadow: activePortalTab === 'inventory' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <Package size={13} />
+                <span>Envanter & Stok</span>
               </button>
               <button 
                 onClick={() => { setActivePortalTab('settings'); setShowSettings(true); }}
@@ -2946,6 +3199,266 @@ export default function DealerPortalPage() {
               </div>
             </div>
           </div>
+        ) : activePortalTab === 'inventory' ? (
+          /* ===== INVENTORY & STOCK MANAGEMENT TAB ===== */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+              <div>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Package size={22} style={{ color: 'var(--accent-gold)' }} />
+                  Bayi Envanter & Stok Yönetimi
+                </h2>
+                <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                  Showroomunuzda sergilenen veya deponuzda bulunan hazır ürünlerin stok ve fiyat bilgilerini güncelleyin.
+                </p>
+              </div>
+              <button 
+                onClick={() => {
+                  if (brandProducts.length === 0) {
+                    loadBrandProducts();
+                  }
+                  setShowAddInventoryModal(true);
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, #b38e47 0%, #8c6b30 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '10px 18px',
+                  fontWeight: '700',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 4px 12px rgba(179, 142, 71, 0.2)'
+                }}
+              >
+                <Plus size={14} />
+                <span>Manuel Ürün Ekle</span>
+              </button>
+            </div>
+
+            {inventorySuccess && (
+              <div style={{ background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', borderRadius: '12px', padding: '12px 16px', fontSize: '0.82rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CheckCircle size={16} />
+                <span>{inventorySuccess}</span>
+              </div>
+            )}
+
+            {inventoryError && (
+              <div style={{ background: '#fef2f2', color: '#ef4444', border: '1px solid #fca5a5', borderRadius: '12px', padding: '12px 16px', fontSize: '0.82rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <AlertCircle size={16} />
+                <span>{inventoryError}</span>
+              </div>
+            )}
+
+            <div className="inventory-dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '1.1fr 1.9fr', gap: '24px' }}>
+              
+              {/* LEFT SIDE: UPLOAD & SYNC */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                
+                {/* Excel/CSV Card */}
+                <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 12px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Upload size={16} style={{ color: 'var(--accent-gold)' }} />
+                    Excel / CSV ile Yükleme
+                  </h3>
+                  <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0 0 16px 0', lineHeight: '1.5' }}>
+                    Aşağıdaki alana Excel'den kopyaladığınız CSV formatındaki ürün kodları ve stok miktarlarını yapıştırarak toplu güncelleme yapabilirsiniz.
+                  </p>
+                  
+                  <div style={{ marginBottom: '14px' }}>
+                    <a 
+                      href="data:text/csv;charset=utf-8,UrunKodu,StokMiktari,Fiyat,Durum%0ADECO-AGREGA-120X240,150,1250,IN_STOCK%0ADECO-TRAVERTEN-60X120,0,0,DISPLAY_ONLY" 
+                      download="seramikbak_stok_sablonu.csv"
+                      style={{ fontSize: '0.75rem', color: '#b38e47', fontWeight: '700', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      📥 CSV Şablonu İndir
+                    </a>
+                  </div>
+
+                  <form onSubmit={handleCsvUpload} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <textarea 
+                      value={csvContentInput}
+                      onChange={(e) => setCsvContentInput(e.target.value)}
+                      placeholder="UrunKodu,StokMiktari,Fiyat,Durum&#10;DECO-AGREGA-120X240,150,1250,IN_STOCK&#10;DECO-TRAVERTEN-60X120,0,0,DISPLAY_ONLY"
+                      rows={6}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.78rem', fontFamily: 'monospace', resize: 'vertical' }}
+                    />
+                    <button 
+                      type="submit" 
+                      disabled={csvLoading || !csvContentInput.trim()}
+                      style={{
+                        background: '#0f172a',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '10px',
+                        fontSize: '0.8rem',
+                        fontWeight: '700',
+                        cursor: csvLoading ? 'default' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      {csvLoading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                      <span>Stok Listesini Yükle</span>
+                    </button>
+                  </form>
+                </div>
+
+                {/* XML Feed Card */}
+                <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 12px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <RefreshCw size={16} style={{ color: 'var(--accent-gold)' }} />
+                    XML Feed Canlı Entegrasyon
+                  </h3>
+                  <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0 0 16px 0', lineHeight: '1.5' }}>
+                    Muhasebe veya ERP (Logo, Nebim vb.) sisteminizdeki seramik stok XML linkini kaydederek envanterin her gün otomatik güncellenmesini sağlayabilirsiniz.
+                  </p>
+
+                  <form onSubmit={handleSaveXmlFeed} style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+                    <input 
+                      type="url"
+                      value={xmlFeedUrlInput}
+                      onChange={(e) => setXmlFeedUrlInput(e.target.value)}
+                      placeholder="https://firmamiz.com/xml/stok-feed"
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                    />
+                    <button 
+                      type="submit"
+                      style={{
+                        background: '#f1f5f9',
+                        color: '#334155',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '8px',
+                        padding: '10px',
+                        fontSize: '0.8rem',
+                        fontWeight: '700',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Kaydet
+                    </button>
+                  </form>
+
+                  <button 
+                    onClick={handleXmlSync}
+                    disabled={xmlSyncLoading || !xmlFeedUrlInput}
+                    style={{
+                      width: '100%',
+                      background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+                      color: '#d4af37',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '12px',
+                      fontSize: '0.82rem',
+                      fontWeight: '700',
+                      cursor: (xmlSyncLoading || !xmlFeedUrlInput) ? 'default' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    {xmlSyncLoading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                    <span>Şimdi Eşitle (Canlı Sync)</span>
+                  </button>
+                </div>
+
+              </div>
+
+              {/* RIGHT SIDE: CURRENT INVENTORY TABLE */}
+              <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>Aktif Showroom Envanteri</h3>
+                  <span style={{ fontSize: '0.75rem', background: '#f1f5f9', color: '#475569', padding: '3px 10px', borderRadius: '20px', fontWeight: '700' }}>
+                    {inventoryList.length} Ürün Listeleniyor
+                  </span>
+                </div>
+
+                {inventoryLoading ? (
+                  <div style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
+                    <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
+                    <span>Envanter yükleniyor...</span>
+                  </div>
+                ) : inventoryList.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8', border: '1px dashed #cbd5e1', borderRadius: '12px' }}>
+                    <Package size={32} style={{ margin: '0 auto 10px auto', color: '#cbd5e1' }} />
+                    <span style={{ fontSize: '0.85rem', display: 'block', marginBottom: '8px' }}>Envanterinizde henüz ürün bulunmuyor.</span>
+                    <span style={{ fontSize: '0.75rem' }}>Sol taraftaki panelden CSV yükleyebilir veya üstteki butondan manuel ekleyebilirsiniz.</span>
+                  </div>
+                ) : (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left' }}>
+                          <th style={{ padding: '10px', color: '#64748b' }}>Ürün</th>
+                          <th style={{ padding: '10px', color: '#64748b' }}>Stok (m²)</th>
+                          <th style={{ padding: '10px', color: '#64748b' }}>Özel Fiyat (₺)</th>
+                          <th style={{ padding: '10px', color: '#64748b' }}>Durum</th>
+                          <th style={{ padding: '10px', textAlign: 'right' }}>İşlem</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {inventoryList.map(item => (
+                          <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                            <td style={{ padding: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <img src={item.product?.imageUrl} alt={item.product?.name} style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover', background: '#f8fafc' }} />
+                              <div>
+                                <span style={{ fontWeight: '700', color: '#0f172a', display: 'block' }}>{item.product?.name}</span>
+                                <span style={{ fontSize: '0.65rem', color: '#64748b' }}>Kod: {item.product?.code}</span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '10px' }}>
+                              <input 
+                                type="number"
+                                defaultValue={item.stock}
+                                onBlur={(e) => handleUpdateInventoryItem(item.productId, e.target.value, item.price, item.status)}
+                                style={{ width: '60px', padding: '4px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', textAlign: 'center' }}
+                              />
+                            </td>
+                            <td style={{ padding: '10px' }}>
+                              <input 
+                                type="number"
+                                defaultValue={item.price || ''}
+                                placeholder="Liste"
+                                onBlur={(e) => handleUpdateInventoryItem(item.productId, item.stock, e.target.value, item.status)}
+                                style={{ width: '70px', padding: '4px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', textAlign: 'center' }}
+                              />
+                            </td>
+                            <td style={{ padding: '10px' }}>
+                              <select
+                                value={item.status}
+                                onChange={(e) => handleUpdateInventoryItem(item.productId, item.stock, item.price, e.target.value)}
+                                style={{ padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.75rem', background: '#fff' }}
+                              >
+                                <option value="IN_STOCK">🟢 Stokta Var</option>
+                                <option value="DISPLAY_ONLY">🟡 Teşhir Ürünü</option>
+                                <option value="ORDER_ONLY">🔵 Sipariş Üzerine</option>
+                              </select>
+                            </td>
+                            <td style={{ padding: '10px', textAlign: 'right' }}>
+                              <button 
+                                onClick={() => handleDeleteInventoryItem(item.productId)}
+                                style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px' }}
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
         ) : (
           /* ===== DASHBOARD VIEW ===== */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -3744,6 +4257,114 @@ export default function DealerPortalPage() {
                   }}
                 >
                   {paymentLoading ? 'Gönderiliyor...' : 'Bildirimi Gönder'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Manuel Ürün Ekleme Modali */}
+      {showAddInventoryModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            border: '1px solid #e2e8f0',
+            width: '100%',
+            maxWidth: '480px',
+            padding: '30px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+            position: 'relative'
+          }}>
+            <button 
+              onClick={() => setShowAddInventoryModal(false)}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b' }}
+            >
+              <X size={18} />
+            </button>
+
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 20px 0', color: '#0f172a' }}>Manüel Envanter Ekle</h3>
+
+            <form onSubmit={handleAddInventoryItem} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Ürün Seçin</label>
+                <select 
+                  value={addInventoryProduct}
+                  onChange={(e) => setAddInventoryProduct(e.target.value)}
+                  required
+                  style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                >
+                  <option value="">Ürün Seçiniz...</option>
+                  {brandProducts.map(prod => (
+                    <option key={prod.id} value={prod.id}>{prod.name} ({prod.code})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Stok Miktarı (m²)</label>
+                  <input 
+                    type="number"
+                    value={addInventoryStock}
+                    onChange={(e) => setAddInventoryStock(e.target.value)}
+                    required
+                    min="0"
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                  />
+                </div>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Özel Fiyat (₺ / m²)</label>
+                  <input 
+                    type="number"
+                    value={addInventoryPrice}
+                    onChange={(e) => setAddInventoryPrice(e.target.value)}
+                    placeholder="Liste Fiyatı"
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Durum</label>
+                <select 
+                  value={addInventoryStatus}
+                  onChange={(e) => setAddInventoryStatus(e.target.value)}
+                  style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                >
+                  <option value="IN_STOCK">🟢 Stokta Var</option>
+                  <option value="DISPLAY_ONLY">🟡 Teşhir Ürünü</option>
+                  <option value="ORDER_ONLY">🔵 Sipariş Üzerine</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button 
+                  type="button"
+                  onClick={() => setShowAddInventoryModal(false)}
+                  style={{ flex: 1, background: '#f1f5f9', color: '#334155', border: 'none', borderRadius: '8px', padding: '12px', fontSize: '0.82rem', fontWeight: '700', cursor: 'pointer' }}
+                >
+                  İptal
+                </button>
+                <button 
+                  type="submit"
+                  style={{ flex: 1, background: 'linear-gradient(135deg, #b38e47 0%, #8c6b30 100%)', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px', fontSize: '0.82rem', fontWeight: '700', cursor: 'pointer' }}
+                >
+                  Envantere Ekle
                 </button>
               </div>
             </form>

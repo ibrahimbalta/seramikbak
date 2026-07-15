@@ -555,6 +555,93 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
         )}
 
+        {/* SECTION: SHOWROOM ENVANTERİ */}
+        {dealer.inventories && dealer.inventories.length > 0 && (
+          <div className="featured-products-section" style={{ marginTop: '48px' }}>
+            <h2 className="section-main-heading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <Building2 size={24} style={{ color: 'var(--accent-gold)' }} />
+              Şube Stokları & Hazır Envanter Listesi
+            </h2>
+            <p style={{ fontSize: '0.86rem', color: '#64748b', textAlign: 'center', marginTop: '-8px', marginBottom: '28px' }}>
+              Bayimizin showroomunda sergilenen ve depolarında teslimata hazır bulunan güncel seramik envanteri.
+            </p>
+            <div className="featured-products-grid">
+              {dealer.inventories.map(item => {
+                if (!item.product) return null;
+                const prod = item.product;
+                
+                let statusLabel = 'Stokta Var';
+                let statusColor = '#10b981';
+                let statusBg = '#ecfdf5';
+
+                if (item.status === 'DISPLAY_ONLY') {
+                  statusLabel = 'Teşhir Ürünü';
+                  statusColor = '#d97706';
+                  statusBg = '#fffbeb';
+                } else if (item.status === 'ORDER_ONLY') {
+                  statusLabel = 'Sipariş Üzerine';
+                  statusColor = '#2563eb';
+                  statusBg = '#eff6ff';
+                }
+
+                return (
+                  <div key={item.id} className="featured-product-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <div className="featured-product-image-container" style={{ position: 'relative' }}>
+                      <img src={prod.imageUrl} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <span style={{
+                        position: 'absolute',
+                        top: '12px',
+                        left: '12px',
+                        fontSize: '0.68rem',
+                        fontWeight: '800',
+                        color: statusColor,
+                        background: statusBg,
+                        padding: '4px 10px',
+                        borderRadius: '20px',
+                        border: `1px solid ${statusColor}33`,
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                      }}>
+                        {statusLabel}
+                      </span>
+                    </div>
+                    <div className="featured-product-info" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <span className="featured-product-style">{prod.style} serisi</span>
+                      <h3 className="featured-product-name">{prod.name}</h3>
+                      <span className="featured-product-meta" style={{ flex: 1 }}>Kod: {prod.code} • Ebat: {prod.width}x{prod.height} cm • Yüzey: {prod.finish}</span>
+                      
+                      <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                        <div>
+                          <span style={{ fontSize: '0.68rem', color: '#64748b', display: 'block' }}>Mevcut Stok</span>
+                          <span style={{ fontSize: '0.9rem', fontWeight: '800', color: '#1e293b' }}>
+                            {item.status === 'IN_STOCK' ? `${item.stock.toLocaleString('tr-TR')} m²` : (item.status === 'DISPLAY_ONLY' ? 'Teşhir / Numune' : 'Siparişle (3-7 Gün)')}
+                          </span>
+                        </div>
+                        {item.price && (
+                          <div style={{ textAlign: 'right' }}>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b', display: 'block' }}>Bayi Özel Fiyatı</span>
+                            <span style={{ fontSize: '0.95rem', fontWeight: '900', color: 'var(--accent-gold, #b38e47)' }}>
+                              ₺{item.price.toLocaleString('tr-TR')} 
+                              <span style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: '500' }}> / m²</span>
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => handleFeatureClick(prod.id)}
+                      className="featured-product-action-btn"
+                    >
+                      <span>Stoktan Teklif İsteyin</span>
+                      <ArrowRight size={12} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* SECTION: FEATURED PRODUCTS */}
         {featuredProductsList.length > 0 && (
           <div className="featured-products-section" style={{ marginTop: '48px' }}>

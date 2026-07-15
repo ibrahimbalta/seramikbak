@@ -19,7 +19,12 @@ export default async function Page({ params }) {
     dealer = await prisma.dealer.findUnique({
       where: { id },
       include: {
-        brand: true
+        brand: true,
+        inventories: {
+          include: {
+            product: true
+          }
+        }
       }
     });
   }
@@ -28,7 +33,12 @@ export default async function Page({ params }) {
   if (!dealer) {
     const allDealers = await prisma.dealer.findMany({
       include: {
-        brand: true
+        brand: true,
+        inventories: {
+          include: {
+            product: true
+          }
+        }
       }
     });
     dealer = allDealers.find(d => slugify(d.name) === id);
