@@ -148,6 +148,22 @@ export async function GET(request) {
     const where = andConditions.length > 0 ? { AND: andConditions } : {};
 
     const fullDetail = searchParams.get('fullDetail') === 'true';
+    const selectSimple = searchParams.get('selectSimple') === 'true';
+
+    if (selectSimple) {
+      const simpleProducts = await prisma.product.findMany({
+        where,
+        skip,
+        take,
+        select: {
+          id: true,
+          name: true,
+          code: true
+        },
+        orderBy: { name: 'asc' }
+      });
+      return NextResponse.json(simpleProducts);
+    }
 
     // Query products
     let products;

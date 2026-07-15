@@ -67,10 +67,19 @@ export async function GET(request) {
       }
     });
 
-    // 6. Aggregate Market Trends (Top searched terms across the whole platform - sold as premium insights)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    thirtyDaysAgo.setHours(0, 0, 0, 0);
+
+    // 6. Aggregate Market Trends (Top searched terms in the past 30 days - platform wide)
     const searchLogs = await prisma.analyticsLog.findMany({
-      where: { action: 'SEARCH', query: { not: null } },
-      select: { query: true }
+      where: { 
+        action: 'SEARCH', 
+        query: { not: null },
+        createdAt: { gte: thirtyDaysAgo }
+      },
+      select: { query: true },
+      take: 2000 // sanity cap to prevent memory bloat
     });
 
     const keywordCounts = {};
@@ -84,9 +93,13 @@ export async function GET(request) {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
 
-    // 7. Aggregate User Demographics (Cities searching this brand)
+    // 7. Aggregate User Demographics (Cities searching this brand in the past 30 days)
     const brandViewLogs = await prisma.analyticsLog.findMany({
-      where: { brandId, city: { not: null } },
+      where: { 
+        brandId, 
+        city: { not: null },
+        createdAt: { gte: thirtyDaysAgo }
+      },
       select: { city: true }
     });
 
@@ -100,51 +113,46 @@ export async function GET(request) {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
 
-    // 8. Generate Time-Series Graph Data for the last 30 days
-    const dailyStats = [];
+    // 8. Generate Time-Series Graph Data for the last 30 days (Optimized to exactly 1 query)
+    const dailyLogs = await prisma.analyticsLog.findMany({
+      where: {
+        brandId,
+        createdAt: { gte: thirtyDaysAgo },
+        action: { in: ['VIEW', 'CLICK', 'LEAD'] }
+      },
+      select: {
+        action: true,
+        createdAt: true
+      }
+    });
+
     const now = new Date();
-    
+    const dailyStatsMap = {};
+
+    // Pre-populate keys for the last 30 days to guarantee correct ordering and display empty dates
     for (let i = 29; i >= 0; i--) {
       const date = new Date();
       date.setDate(now.getDate() - i);
-      
-      const startOfDay = new Date(date.setHours(0, 0, 0, 0));
-      const endOfDay = new Date(date.setHours(23, 59, 59, 999));
-
-      const views = await prisma.analyticsLog.count({
-        where: {
-          brandId,
-          action: 'VIEW',
-          createdAt: { gte: startOfDay, lte: endOfDay }
-        }
-      });
-
-      const clicks = await prisma.analyticsLog.count({
-        where: {
-          brandId,
-          action: 'CLICK',
-          createdAt: { gte: startOfDay, lte: endOfDay }
-        }
-      });
-
-      const leads = await prisma.analyticsLog.count({
-        where: {
-          brandId,
-          action: 'LEAD',
-          createdAt: { gte: startOfDay, lte: endOfDay }
-        }
-      });
-
-      // Format date label as "DD MMM"
-      const dateLabel = startOfDay.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
-
-      dailyStats.push({
-        date: dateLabel,
-        views,
-        clicks,
-        leads
-      });
+      const dateLabel = date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+      dailyStatsMap[dateLabel] = { views: 0, clicks: 0, leads: 0 };
     }
+
+    // Populate counts in memory
+    dailyLogs.forEach(log => {
+      const dateLabel = new Date(log.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+      if (dailyStatsMap[dateLabel]) {
+        if (log.action === 'VIEW') dailyStatsMap[dateLabel].views++;
+        else if (log.action === 'CLICK') dailyStatsMap[dateLabel].clicks++;
+        else if (log.action === 'LEAD') dailyStatsMap[dateLabel].leads++;
+      }
+    });
+
+    const dailyStats = Object.entries(dailyStatsMap).map(([dateLabel, stats]) => ({
+      date: dateLabel,
+      views: stats.views,
+      clicks: stats.clicks,
+      leads: stats.leads
+    }));
 
     return NextResponse.json({
       brandName: brand.name,
