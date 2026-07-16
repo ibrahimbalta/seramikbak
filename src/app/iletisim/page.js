@@ -13,6 +13,7 @@ export default function ContactAndFaqPage() {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
 
   // Dynamic Settings State
   const [contactData, setContactData] = useState({
@@ -66,6 +67,10 @@ export default function ContactAndFaqPage() {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
+    if (!kvkkAccepted) {
+      alert('Lütfen KVKK Aydınlatma Metni\'ni okuyup onaylayınız.');
+      return;
+    }
     setIsSubmitting(true);
     
     // Simulate API request
@@ -76,6 +81,7 @@ export default function ContactAndFaqPage() {
       setEmail('');
       setPhone('');
       setMessage('');
+      setKvkkAccepted(false);
       setTimeout(() => setSubmitSuccess(false), 5000);
     }, 1500);
   };
@@ -375,6 +381,20 @@ export default function ContactAndFaqPage() {
                       resize: 'none'
                     }}
                   />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginTop: '4px', marginBottom: '12px' }}>
+                  <input 
+                    type="checkbox" 
+                    id="kvkk-check" 
+                    checked={kvkkAccepted} 
+                    onChange={(e) => setKvkkAccepted(e.target.checked)} 
+                    required
+                    style={{ marginTop: '3px', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="kvkk-check" style={{ fontSize: '0.78rem', color: '#475569', lineHeight: '1.4', cursor: 'pointer', userSelect: 'none' }}>
+                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: '#b38e47', fontWeight: '600', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> okudum ve kabul ediyorum.
+                  </label>
                 </div>
 
                 <button 

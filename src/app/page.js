@@ -386,6 +386,7 @@ export default function Home() {
   const [leadNotes, setLeadNotes] = useState('');
   const [leadSuccessMsg, setLeadSuccessMsg] = useState('');
   const [leadErrorMsg, setLeadErrorMsg] = useState('');
+  const [leadKvkkAccepted, setLeadKvkkAccepted] = useState(false);
   const [requestedUsta, setRequestedUsta] = useState(false);
   const [requestedArchitect, setRequestedArchitect] = useState(false);
   const [projectDimensions, setProjectDimensions] = useState('');
@@ -1242,6 +1243,11 @@ export default function Home() {
     e.preventDefault();
     setLeadSuccessMsg('');
     setLeadErrorMsg('');
+    if (!leadKvkkAccepted) {
+      setLeadErrorMsg('Lütfen KVKK Aydınlatma Metni\'ni okuyup onaylayınız.');
+      setIsSubmittingLead(false);
+      return;
+    }
     setIsSubmittingLead(true);
     try {
       const res = await fetch('/api/leads/create', {
@@ -1267,6 +1273,7 @@ export default function Home() {
         setLeadPhone('');
         setLeadEmail('');
         setLeadNotes('');
+        setLeadKvkkAccepted(false);
         setRequestedUsta(false);
         setRequestedArchitect(false);
         setProjectDimensions('');
@@ -5186,6 +5193,20 @@ export default function Home() {
                     </div>
                   </div>
                 )}
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', margin: '12px 0' }}>
+                  <input 
+                    type="checkbox" 
+                    id="lead-kvkk-check" 
+                    checked={leadKvkkAccepted} 
+                    onChange={(e) => setLeadKvkkAccepted(e.target.checked)} 
+                    required
+                    style={{ marginTop: '3px', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="lead-kvkk-check" style={{ fontSize: '0.78rem', color: '#94a3b8', lineHeight: '1.4', cursor: 'pointer', userSelect: 'none' }}>
+                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: 'var(--accent-gold, #d4af37)', fontWeight: '600', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> okudum ve kabul ediyorum.
+                  </label>
+                </div>
 
                 <button type="submit" className="btn-primary w-full-btn" style={{ marginTop: '10px' }} disabled={isUploadingPhoto || isSubmittingLead}>
                   {isUploadingPhoto ? 'Görsel Yükleniyor...' : isSubmittingLead ? 'Teklif Gönderiliyor...' : 'Teklifi Gönder'}

@@ -148,6 +148,7 @@ export default function DealerPortalPage() {
   const [regError, setRegError] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
 
   // Load brands on mount
   useEffect(() => {
@@ -221,6 +222,10 @@ export default function DealerPortalPage() {
     e.preventDefault();
     setRegError('');
     setRegSuccess('');
+    if (!kvkkAccepted) {
+      setRegError('Lütfen Bayi Sözleşmesi ve KVKK Aydınlatma Metni\'ni okuyup onaylayınız.');
+      return;
+    }
     setIsRegistering(true);
 
     try {
@@ -255,6 +260,7 @@ export default function DealerPortalPage() {
         setRegDistrict('');
         setRegLat('');
         setRegLng('');
+        setKvkkAccepted(false);
         setTimeout(() => {
           setRegisterTab('login');
           setRegSuccess('');
@@ -1510,6 +1516,20 @@ export default function DealerPortalPage() {
                     <small style={{ fontSize: '0.62rem', color: '#64748b', lineHeight: '1.2' }}>
                       * Müşterilere en yakın yetkili bayi olarak gösterilmeniz için koordinatlar gereklidir. Adresten bulamazsa manuel koordinat yazabilirsiniz.
                     </small>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginTop: '14px', marginBottom: '8px' }}>
+                    <input 
+                      type="checkbox" 
+                      id="kvkk-check" 
+                      checked={kvkkAccepted} 
+                      onChange={(e) => setKvkkAccepted(e.target.checked)} 
+                      required
+                      style={{ marginTop: '3px', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="kvkk-check" style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: '1.4', cursor: 'pointer', userSelect: 'none' }}>
+                      Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: '#b38e47', fontWeight: '600', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> ve <Link href="/yasal?tab=bayi-sozlesme" target="_blank" style={{ color: '#b38e47', fontWeight: '600', textDecoration: 'underline' }}>Bayi Üyelik Sözleşmesi'ni</Link> okudum, kabul ediyorum.
+                    </label>
                   </div>
 
                   <button

@@ -42,12 +42,25 @@ function LegalContentReader() {
         <li><strong>Zorunlu Çerezler:</strong> Sitenin düzgün çalışması, üye girişi yapılabilmesi ve favori seramiklerinizin tarayıcıda saklanabilmesi için zorunlu olan teknik çerezlerdir.</li>
         <li><strong>Performans Çerezleri:</strong> Aramaları ölçümleyerek sitemizi optimize etmemize yarayan çerezlerdir.</li>
       </ul>
+    `,
+    'bayi-sozlesme': `
+      <p>Bu sözleşme, SeramikBak Platformu ile platforma yetkili bayi olarak kayıt yaptıran ticari işletmeler (Bayi) arasındaki hak, yükümlülük ve üyelik şartlarını düzenler.</p>
+      <h3>1. Hizmetin Tanımı ve Kapsamı</h3>
+      <p>SeramikBak, Bayi'ye kendi marka yetkisinde bulunan seramik ürünlerinin envanter ve stok durumlarını dijital showroom ekranlarında sergileme ve son kullanıcılardan teklif talebi (lead) alma imkanı sunar.</p>
+      <h3>2. Bayinin Yükümlülükleri</h3>
+      <ul>
+        <li><strong>Bilgi Doğruluğu:</strong> Bayi, platform üzerinde sergilediği fiyat, stok ve lojistik/teslimat bilgilerinin doğruluğunu garanti eder.</li>
+        <li><strong>Müşteri Geri Dönüşleri:</strong> Bayi, platform üzerinden kendisine iletilen son kullanıcı teklif taleplerine makul iş süreleri (en geç 48 saat) içerisinde dönüş yapmayı taahhüt eder.</li>
+        <li><strong>Üyelik ve Paketler:</strong> Bayi, seçtiği üyelik planı (LITE, STANDART, PREMIUM) kapsamındaki ödeme ve abonelik şartlarına uymakla yükümlüdür.</li>
+      </ul>
+      <h3>3. Sözleşmenin Feshi</h3>
+      <p>SeramikBak, yanlış bilgi beyan eden, kullanıcıları yanıltıcı işlemler yapan veya B2B etik kurallarına uymayan bayilerin üyeliklerini tek taraflı olarak askıya alma veya iptal etme hakkını saklı tutar.</p>
     `
   });
 
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['kvkk', 'kullanim', 'cerez'].includes(tabParam)) {
+    if (tabParam && ['kvkk', 'kullanim', 'cerez', 'bayi-sozlesme'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
@@ -84,6 +97,13 @@ function LegalContentReader() {
       icon: <Settings size={16} />,
       title: 'Çerez (Cookie) Kullanımı ve Bildirim Metni',
       content: legalData.cerez
+    },
+    {
+      id: 'bayi-sozlesme',
+      label: 'Bayi Üyelik Sözleşmesi',
+      icon: <FileText size={16} />,
+      title: 'SeramikBak Yetkili Bayi Üyelik Sözleşmesi',
+      content: legalData['bayi-sozlesme'] || ''
     }
   ];
 

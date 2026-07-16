@@ -27,6 +27,7 @@ export default function ProjectDemandPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [success, setSuccess] = useState(false);
   const [referenceId, setReferenceId] = useState('');
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -125,6 +126,10 @@ export default function ProjectDemandPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+    if (!kvkkAccepted) {
+      setErrorMsg('Lütfen KVKK Aydınlatma Metni\'ni okuyup onaylayınız.');
+      return;
+    }
     const err = validateStep3();
     if (err) { setErrorMsg(err); return; }
 
@@ -152,6 +157,7 @@ export default function ProjectDemandPage() {
       if (res.ok && data.success) {
         setSuccess(true);
         setReferenceId(data.projectId);
+        setKvkkAccepted(false);
       } else {
         setErrorMsg(data.error || 'Talep gönderilirken bir hata oluştu.');
       }
@@ -1005,6 +1011,20 @@ export default function ProjectDemandPage() {
                       }}
                     />
                   </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginTop: '12px', marginBottom: '8px' }}>
+                  <input 
+                    type="checkbox" 
+                    id="kvkk-check" 
+                    checked={kvkkAccepted} 
+                    onChange={(e) => setKvkkAccepted(e.target.checked)} 
+                    required
+                    style={{ marginTop: '3px', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="kvkk-check" style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: '1.4', cursor: 'pointer', userSelect: 'none' }}>
+                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: '#d4af37', fontWeight: '600', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> okudum ve kabul ediyorum.
+                  </label>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
