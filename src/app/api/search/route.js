@@ -1,5 +1,33 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import prisma from '@/lib/prisma';
+
+// In-memory buffer for analytics logs to prevent DB write-lock contention under load
+let logBuffer = global.analyticsLogBuffer;
+if (!logBuffer) {
+  logBuffer = [];
+  global.analyticsLogBuffer = logBuffer;
+}
+
+async function flushAnalyticsLogs() {
+  if (logBuffer.length === 0) return;
+  const batch = [...logBuffer];
+  logBuffer.length = 0; // Clear the buffer
+  
+  try {
+    await prisma.analyticsLog.createMany({
+      data: batch
+    });
+  } catch (err) {
+    console.error('Failed to flush analytics logs asynchronously:', err.message);
+  }
+}
+
+// Flush logs every 5 seconds
+if (!global.analyticsFlushInterval) {
+  global.analyticsFlushInterval = setInterval(() => {
+    flushAnalyticsLogs().catch(err => console.error('Interval flush error:', err.message));
+  }, 5000);
+}
 
 export async function GET(request) {
   try {
@@ -131,17 +159,23 @@ export async function GET(request) {
         });
       }
 
-      // Log the search query in analytics
-      try {
-        await prisma.analyticsLog.create({
-          data: {
-            action: 'SEARCH',
-            query: query,
-            city: searchParams.get('city') || 'İstanbul'
-          }
-        });
-      } catch (err) {
-        console.error('Analytics log failed:', err);
+      // Log the search query in analytics via in-memory buffer
+      logBuffer.push({
+        action: 'SEARCH',
+        query: query,
+        city: searchParams.get('city') || 'İstanbul'
+      });
+
+      // Flush asynchronously if the buffer reaches 50 items
+      if (logBuffer.length >= 50) {
+        try {
+          after(() => {
+            flushAnalyticsLogs().catch(err => console.error(err));
+          });
+        } catch (e) {
+          // Fallback if after() is not supported in this runtime
+          flushAnalyticsLogs().catch(err => console.error(err));
+        }
       }
     }
 
