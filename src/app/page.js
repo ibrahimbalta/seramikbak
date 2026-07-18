@@ -264,6 +264,9 @@ export default function Home() {
   const [roomPolygon, setRoomPolygon] = useState(null);
   const [roomExclude, setRoomExclude] = useState([]);
   
+  const [roomTileScale, setRoomTileScale] = useState(1.0);
+  const [roomBlendMode, setRoomBlendMode] = useState('multiply'); // 'multiply' or 'normal'
+  
   const [showPointEditor, setShowPointEditor] = useState(false);
   const [dragIndex, setDragIndex] = useState(null);
   const containerRef = useRef(null);
@@ -1505,7 +1508,7 @@ export default function Home() {
     }, 1500);
   };
 
-  const processRoomTiling = (imgRoom, imgTile, polygonPercentages, excludePercentages = []) => {
+  const processRoomTiling = (imgRoom, imgTile, polygonPercentages, excludePercentages = [], tileScale = 1.0, blendMode = 'multiply', rotation = 0) => {
     const canvas = document.createElement('canvas');
     canvas.width = imgRoom.naturalWidth;
     canvas.height = imgRoom.naturalHeight;
@@ -1535,8 +1538,9 @@ export default function Home() {
     patternCanvas.height = patternHeight;
     const pCtx = patternCanvas.getContext('2d');
 
-    const tileWidth = 150;
-    const tileHeight = tileWidth * ((activeProduct?.height || 120) / (activeProduct?.width || 60));
+    const baseWidth = 150 * (tileScale || 1.0);
+    const tileWidth = rotation === 90 ? baseWidth * ((activeProduct?.height || 120) / (activeProduct?.width || 60)) : baseWidth;
+    const tileHeight = rotation === 90 ? baseWidth : baseWidth * ((activeProduct?.height || 120) / (activeProduct?.width || 60));
 
     // Fill patternCanvas with tiles in a grid
     for (let y = 0; y < patternCanvas.height; y += tileHeight) {
@@ -1642,7 +1646,7 @@ export default function Home() {
 
     ctx.save();
     ctx.globalCompositeOperation = 'multiply';
-    ctx.globalAlpha = 0.35; // reduced from 0.85 to make tiles look solid and opaque
+    ctx.globalAlpha = blendMode === 'multiply' ? 0.35 : 0.08;
     
     ctx.beginPath();
     ctx.moveTo(p0.x, p0.y);
@@ -1667,10 +1671,10 @@ export default function Home() {
     ctx.drawImage(shadowCanvas, 0, 0);
     ctx.restore();
 
-    // 7. Draw original overlay at 12% soft screen to preserve highlights
+    // 7. Draw original overlay at soft screen to preserve highlights
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = 0.12; // reduced from 0.20 to make textures look richer
+    ctx.globalAlpha = blendMode === 'multiply' ? 0.12 : 0.04;
     
     ctx.beginPath();
     ctx.moveTo(p0.x, p0.y);
@@ -1885,7 +1889,70 @@ export default function Home() {
     }
   };
 
-  // Auto update AI tiled image when activeProduct changes
+  // Helper to load sample room presets
+  const loadPresetRoom = (presetUrl, initialPolygon, target = 'floor') => {
+    if (!activeProduct) {
+      alert('Lütfen banyo/mutfağa giydirmek istediğiniz seramik modelini seçin.');
+      return;
+    }
+    setIsProcessingRoomImage(true);
+    setProcessedRoomImage(null);
+    setShowPointEditor(false);
+    setRoomProcessingStep('Örnek Oda Yükleniyor...');
+    setStudioTarget(target);
+
+    const imgRoom = new Image();
+    imgRoom.crossOrigin = 'anonymous';
+    imgRoom.src = presetUrl;
+    imgRoom.onload = () => {
+      imgRoomRef.current = imgRoom;
+      setUploadedRoomImage(presetUrl);
+      setRoomPolygon(initialPolygon);
+      setRoomExclude([]);
+
+      const imgTile = new Image();
+      imgTile.crossOrigin = 'anonymous';
+      const isAbsolute = activeProduct.textureUrl && (activeProduct.textureUrl.startsWith('http://') || activeProduct.textureUrl.startsWith('https://') || activeProduct.textureUrl.startsWith('//'));
+      imgTile.src = activeProduct.textureUrl 
+        ? (isAbsolute ? `/api/proxy?url=${encodeURIComponent(activeProduct.textureUrl)}` : activeProduct.textureUrl) 
+        : '/textures/calacatta_gold.jpg';
+
+      imgTile.onload = () => {
+        imgTileRef.current = imgTile;
+        const resultDataUrl = processRoomTiling(
+          imgRoom, 
+          imgTile, 
+          initialPolygon, 
+          [], 
+          roomTileScale, 
+          roomBlendMode, 
+          studioTileRotation
+        );
+        setProcessedRoomImage(resultDataUrl);
+        setIsProcessingRoomImage(false);
+      };
+      imgTile.onerror = () => {
+        const fallbackTile = new Image();
+        fallbackTile.src = '/textures/calacatta_gold.jpg';
+        fallbackTile.onload = () => {
+          imgTileRef.current = fallbackTile;
+          const resultDataUrl = processRoomTiling(
+            imgRoom, 
+            fallbackTile, 
+            initialPolygon, 
+            [], 
+            roomTileScale, 
+            roomBlendMode, 
+            studioTileRotation
+          );
+          setProcessedRoomImage(resultDataUrl);
+          setIsProcessingRoomImage(false);
+        };
+      };
+    };
+  };
+
+  // Auto update AI tiled image when activeProduct, roomTileScale, roomBlendMode, or studioTileRotation changes
   useEffect(() => {
     if (isAiGeneratedRoom) {
       generateAIBathroomImage();
@@ -1900,7 +1967,15 @@ export default function Home() {
         : '/textures/calacatta_gold.jpg';
       imgTile.onload = () => {
         imgTileRef.current = imgTile;
-        const resultDataUrl = processRoomTiling(imgRoomRef.current, imgTile, roomPolygon, roomExclude);
+        const resultDataUrl = processRoomTiling(
+          imgRoomRef.current, 
+          imgTile, 
+          roomPolygon, 
+          roomExclude, 
+          roomTileScale, 
+          roomBlendMode, 
+          studioTileRotation
+        );
         setProcessedRoomImage(resultDataUrl);
       };
       imgTile.onerror = () => {
@@ -1908,12 +1983,20 @@ export default function Home() {
         fallbackTile.src = '/textures/calacatta_gold.jpg';
         fallbackTile.onload = () => {
           imgTileRef.current = fallbackTile;
-          const resultDataUrl = processRoomTiling(imgRoomRef.current, fallbackTile, roomPolygon, roomExclude);
+          const resultDataUrl = processRoomTiling(
+            imgRoomRef.current, 
+            fallbackTile, 
+            roomPolygon, 
+            roomExclude, 
+            roomTileScale, 
+            roomBlendMode, 
+            studioTileRotation
+          );
           setProcessedRoomImage(resultDataUrl);
         };
       };
     }
-  }, [activeProduct]);
+  }, [activeProduct, roomTileScale, roomBlendMode, studioTileRotation]);
 
   const handleRoomImageUpload = (e) => {
     const file = e.target.files?.[0];
@@ -3972,6 +4055,51 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* SECTION: ÖRNEK ODA ŞABLONLARI */}
+                  <div className="studio-toolbox-section" style={{ borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '10px' }}>
+                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Örnek Odalarla Dene</span>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                      <button 
+                        onClick={() => loadPresetRoom('/textures/sample_bathroom.png', [[18, 55], [82, 55], [98, 98], [2, 98]], 'floor')}
+                        style={{
+                          padding: '8px 10px',
+                          fontSize: '0.68rem',
+                          borderRadius: '6px',
+                          background: 'rgba(197, 160, 89, 0.1)',
+                          border: '1px solid var(--accent-gold)',
+                          color: '#fff',
+                          cursor: 'pointer',
+                          fontWeight: '600',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        🛀 Örnek Banyo
+                      </button>
+                      <button 
+                        onClick={() => loadPresetRoom('/textures/sample_kitchen.png', [[10, 55], [90, 55], [100, 100], [0, 100]], 'floor')}
+                        style={{
+                          padding: '8px 10px',
+                          fontSize: '0.68rem',
+                          borderRadius: '6px',
+                          background: 'rgba(197, 160, 89, 0.1)',
+                          border: '1px solid var(--accent-gold)',
+                          color: '#fff',
+                          cursor: 'pointer',
+                          fontWeight: '600',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        🍳 Örnek Mutfak
+                      </button>
+                    </div>
+                  </div>
+
                 </div>
 
                   <div className="ai-actions-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', marginTop: '6px' }}>
@@ -4028,13 +4156,88 @@ export default function Home() {
                     <div className="ai-progress-bar"><div className="ai-progress-fill" /></div>
                   </div>
                 ) : processedRoomImage ? (
-                  <div className="ai-rendered-room-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#1e293b' }}>
-                    <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%', maxHeight: '100%' }}>
+                  <div className="ai-rendered-room-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#1e293b' }}>
+                    
+                    {/* Top Overlay Controls Bar */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '12px',
+                      left: '12px',
+                      right: '12px',
+                      zIndex: 30,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: 'rgba(15, 23, 42, 0.85)',
+                      backdropFilter: 'blur(8px)',
+                      padding: '8px 14px',
+                      borderRadius: '10px',
+                      border: '1px solid rgba(255,255,255,0.1)'
+                    }}>
+                      <div className="ai-watermark-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-gold)', fontSize: '0.72rem', fontWeight: '700' }}>
+                        <Sparkles size={14} />
+                        <span>{isAiGeneratedRoom ? 'AI BANYO KONSEPTİ' : 'FOTOĞRAF ÜZERİNE SERAMİK KAPLAMA'}</span>
+                      </div>
+
+                      {/* Scale & Blend Controls */}
+                      {!isAiGeneratedRoom && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Karo Boyutu:</span>
+                            <input 
+                              type="range" 
+                              min="0.5" 
+                              max="2.0" 
+                              step="0.1" 
+                              value={roomTileScale}
+                              onChange={(e) => setRoomTileScale(parseFloat(e.target.value))}
+                              style={{ width: '80px', accentColor: 'var(--accent-gold)' }}
+                            />
+                            <span style={{ fontSize: '0.65rem', color: '#fff', width: '28px' }}>{Math.round(roomTileScale * 100)}%</span>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <button 
+                              onClick={() => setRoomBlendMode('multiply')}
+                              style={{
+                                fontSize: '0.62rem',
+                                padding: '3px 8px',
+                                borderRadius: '4px',
+                                border: roomBlendMode === 'multiply' ? '1px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.1)',
+                                background: roomBlendMode === 'multiply' ? 'rgba(197, 160, 89, 0.2)' : 'transparent',
+                                color: roomBlendMode === 'multiply' ? 'var(--accent-gold)' : '#94a3b8',
+                                cursor: 'pointer',
+                                fontWeight: '600'
+                              }}
+                            >
+                              Doğal Gölgeli
+                            </button>
+                            <button 
+                              onClick={() => setRoomBlendMode('normal')}
+                              style={{
+                                fontSize: '0.62rem',
+                                padding: '3px 8px',
+                                borderRadius: '4px',
+                                border: roomBlendMode === 'normal' ? '1px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.1)',
+                                background: roomBlendMode === 'normal' ? 'rgba(197, 160, 89, 0.2)' : 'transparent',
+                                color: roomBlendMode === 'normal' ? 'var(--accent-gold)' : '#94a3b8',
+                                cursor: 'pointer',
+                                fontWeight: '600'
+                              }}
+                            >
+                              Net / Parlak
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ position: 'relative', display: 'inline-block', maxWidth: '100%', maxHeight: '100%', marginTop: '30px' }}>
                       <img 
                         src={processedRoomImage} 
                         alt="AI Kaplanmış Oda" 
                         className="ai-room-img" 
-                        style={{ display: 'block', maxWidth: '100%', maxHeight: '480px', width: 'auto', height: 'auto', borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }} 
+                        style={{ display: 'block', maxWidth: '100%', maxHeight: '440px', width: 'auto', height: 'auto', borderRadius: '8px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }} 
                       />
                       
                       {/* SVG & Draggable Corners Overlay */}
