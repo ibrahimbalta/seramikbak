@@ -70,6 +70,11 @@ const MapComponent = dynamic(() => import('@/components/MapComponent'), {
   )
 });
 
+const ModelViewerAR = dynamic(() => import('@/components/ModelViewerAR'), { 
+  ssr: false,
+  loading: () => null
+});
+
 import TileVisualPreview from '@/components/TileVisualPreview';
 import ProductCard from '@/components/ProductCard';
 
