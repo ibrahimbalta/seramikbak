@@ -4065,11 +4065,11 @@ export default function Home() {
                           padding: '8px 10px',
                           fontSize: '0.68rem',
                           borderRadius: '6px',
-                          background: 'rgba(197, 160, 89, 0.1)',
+                          background: 'rgba(197, 160, 89, 0.15)',
                           border: '1px solid var(--accent-gold)',
-                          color: '#fff',
+                          color: 'var(--accent-gold)',
                           cursor: 'pointer',
-                          fontWeight: '600',
+                          fontWeight: '700',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -4084,11 +4084,11 @@ export default function Home() {
                           padding: '8px 10px',
                           fontSize: '0.68rem',
                           borderRadius: '6px',
-                          background: 'rgba(197, 160, 89, 0.1)',
+                          background: 'rgba(197, 160, 89, 0.15)',
                           border: '1px solid var(--accent-gold)',
-                          color: '#fff',
+                          color: 'var(--accent-gold)',
                           cursor: 'pointer',
-                          fontWeight: '600',
+                          fontWeight: '700',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -4302,11 +4302,6 @@ export default function Home() {
                       )}
                     </div>
 
-                    <div className="ai-watermark-badge" style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 10 }}>
-                      <Sparkles size={14} />
-                      <span>{isAiGeneratedRoom ? 'AI BANYO KONSEPTİ (JENERATİF)' : 'AI KAPLANMIŞ ODA (SİMÜLASYON)'}</span>
-                    </div>
-
                     {isAiGeneratedRoom ? (
                       <button 
                         onClick={generateAIBathroomImage} 
@@ -4316,16 +4311,17 @@ export default function Home() {
                           bottom: '12px',
                           left: '12px',
                           fontSize: '0.72rem',
-                          padding: '6px 12px',
-                          boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
-                          zIndex: 20,
+                          padding: '6px 14px',
+                          boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+                          zIndex: 35,
                           display: 'flex',
                           alignItems: 'center',
                           gap: '6px',
                           backgroundColor: 'var(--accent-gold)',
                           color: '#fff',
                           border: 'none',
-                          fontWeight: '600'
+                          fontWeight: '700',
+                          borderRadius: '6px'
                         }}
                       >
                         <Sparkles size={12} />
@@ -4340,15 +4336,17 @@ export default function Home() {
                           bottom: '12px',
                           left: '12px',
                           fontSize: '0.72rem',
-                          padding: '6px 12px',
-                          boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
-                          zIndex: 20,
+                          padding: '6px 14px',
+                          boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+                          zIndex: 35,
                           display: 'flex',
                           alignItems: 'center',
                           gap: '4px',
-                          backgroundColor: showPointEditor ? 'var(--accent-gold)' : 'var(--bg-primary)',
-                          color: showPointEditor ? '#fff' : 'var(--text-primary)',
-                          border: showPointEditor ? 'none' : '1px solid var(--border-color)'
+                          backgroundColor: showPointEditor ? 'var(--accent-gold)' : '#0f172a',
+                          color: '#fff',
+                          border: showPointEditor ? 'none' : '1px solid var(--accent-gold)',
+                          fontWeight: '700',
+                          borderRadius: '6px'
                         }}
                       >
                         <span>✏️ {showPointEditor ? 'Ayarları Kaydet' : 'Köşeleri Elle Düzenle'}</span>
@@ -4361,8 +4359,21 @@ export default function Home() {
                         setUploadedRoomImage(null);
                         setIsAiGeneratedRoom(false);
                       }} 
-                      className="btn-secondary remove-ai-room-btn" 
-                      style={{ zIndex: 20 }}
+                      className="btn-secondary" 
+                      style={{ 
+                        position: 'absolute',
+                        bottom: '12px',
+                        right: '12px',
+                        zIndex: 35,
+                        fontSize: '0.72rem',
+                        padding: '6px 14px',
+                        backgroundColor: '#0f172a',
+                        color: '#fff',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: '6px',
+                        fontWeight: '600',
+                        boxShadow: '0 4px 14px rgba(0,0,0,0.4)'
+                      }}
                     >
                       3D Stüdyo Moduna Geri Dön
                     </button>
