@@ -12,7 +12,8 @@ export default function ProductCard({
   navigateTo3DStudio,
   navigateToDealers,
   getProductBadge,
-  handleProductCardClick
+  handleProductCardClick,
+  onOpenAR
 }) {
   const hasAd = product.campaigns && product.campaigns.length > 0;
   
@@ -54,16 +55,26 @@ export default function ProductCard({
         </button>
 
         {/* Hover action layout */}
-        <div className="card-quick-actions-row">
+        <div className="card-quick-actions-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px' }}>
           <button 
             onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
             className="btn-primary card-action-btn-new"
+            style={{ fontSize: '0.65rem', padding: '6px 4px' }}
           >
             3D Dene
           </button>
           <button 
+            onClick={(e) => { e.stopPropagation(); onOpenAR ? onOpenAR(product) : navigateTo3DStudio(product); }}
+            className="btn-primary card-action-btn-new"
+            style={{ fontSize: '0.65rem', padding: '6px 4px', backgroundColor: 'var(--accent-gold)', borderColor: 'var(--accent-gold)' }}
+            title="Kamerayla Evinizde Görün (AR)"
+          >
+            📷 AR
+          </button>
+          <button 
             onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}
             className="btn-secondary card-action-btn-new"
+            style={{ fontSize: '0.65rem', padding: '6px 4px' }}
           >
             Bayi Bul
           </button>

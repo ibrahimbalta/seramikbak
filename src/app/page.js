@@ -249,6 +249,9 @@ export default function Home() {
   const [isDownloadingCAD, setIsDownloadingCAD] = useState(false);
   const [cadDownloadSuccess, setCadDownloadSuccess] = useState(false);
 
+  // 1:1 Scale AR Viewer Modal State
+  const [arModalProduct, setArModalProduct] = useState(null);
+
   // AI Room Visualizer State
   const [uploadedRoomImage, setUploadedRoomImage] = useState(null);
   const [isProcessingRoomImage, setIsProcessingRoomImage] = useState(false);
@@ -3672,6 +3675,7 @@ export default function Home() {
                         navigateToDealers={navigateToDealers}
                         getProductBadge={getProductBadge}
                         handleProductCardClick={handleProductCardClick}
+                        onOpenAR={(p) => setArModalProduct(p)}
                       />
                     ))
                   )}
@@ -6524,9 +6528,13 @@ export default function Home() {
                 Gönder
               </button>
             </form>
-          </div>
-        )}
-      </div>
+      {/* 1:1 SCALE MOBILE & DESKTOP AR VIEWER MODAL */}
+      {arModalProduct && (
+        <ModelViewerAR 
+          product={arModalProduct} 
+          onClose={() => setArModalProduct(null)} 
+        />
+      )}
 
       {/* Embedded CSS specific to this high-fidelity layout */}
       <style jsx>{`
