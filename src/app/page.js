@@ -6528,6 +6528,10 @@ export default function Home() {
                 Gönder
               </button>
             </form>
+          </div>
+        )}
+      </div>
+
       {/* 1:1 SCALE MOBILE & DESKTOP AR VIEWER MODAL */}
       {arModalProduct && (
         <ModelViewerAR 
