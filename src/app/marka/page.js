@@ -19,7 +19,20 @@ import {
   LogOut,
   Calendar,
   ExternalLink,
-  Building2
+  Building2,
+  Menu,
+  X,
+  Search,
+  Filter,
+  Users,
+  Megaphone,
+  Briefcase,
+  Layers,
+  ChevronRight,
+  Eye,
+  MousePointerClick,
+  Handshake,
+  DollarSign
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -33,11 +46,49 @@ export default function BrandPortalPage() {
   // Brand Session Info
   const [brandInfo, setBrandInfo] = useState(null);
 
+  // Layout states
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [activePortalTab, setActivePortalTab] = useState('dashboard');
+
   // Dashboard Metrics & Campaign States
   const [b2bStats, setB2bStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [brandProducts, setBrandProducts] = useState([]);
   
+  // Chart toggle metric: 'views', 'clicks', 'leads'
+  const [chartMetric, setChartMetric] = useState('views');
+
+  // Catalog search and filter states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStyle, setSelectedStyle] = useState('ALL');
+  const [selectedFinish, setSelectedFinish] = useState('ALL');
+
+  // Dealer Management states
+  const [dealers, setDealers] = useState([]);
+  const [dealersLoading, setDealersLoading] = useState(false);
+  const [showAddDealerModal, setShowAddDealerModal] = useState(false);
+  const [newDealerData, setNewDealerData] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    city: '',
+    district: '',
+    lat: '40.9901',
+    lng: '29.0278'
+  });
+  const [addDealerError, setAddDealerError] = useState('');
+  const [addDealerLoading, setAddDealerLoading] = useState(false);
+
+  // B2B Project Bidding states
+  const [projects, setProjects] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [biddingProject, setBiddingProject] = useState(null); // project selected for bidding
+  const [bidPrice, setBidPrice] = useState('');
+  const [bidProduct, setBidProduct] = useState('');
+  const [bidTimeline, setBidTimeline] = useState('30 gün içinde');
+  const [bidNote, setBidNote] = useState('');
+  const [bids, setBids] = useState([]); // local localStorage-backed bids
+
   // Ad Campaign Creator Form
   const [campaignProduct, setCampaignProduct] = useState('');
   const [campaignDuration, setCampaignDuration] = useState('30'); // default 30 days
@@ -58,15 +109,11 @@ export default function BrandPortalPage() {
   const [paymentSuccess, setPaymentSuccess] = useState('');
   const [paymentError, setPaymentError] = useState('');
 
-  const [activePortalTab, setActivePortalTab] = useState('dashboard');
-  const [projects, setProjects] = useState([]);
-  const [projectsLoading, setProjectsLoading] = useState(false);
-
   const hasPending = b2bStats?.saas?.status === 'PENDING_APPROVAL' || b2bStats?.saas?.pendingStatus === 'PENDING_APPROVAL';
   const requestedPlan = b2bStats?.saas?.status === 'PENDING_APPROVAL' ? b2bStats.saas.plan : (b2bStats?.saas?.pendingStatus === 'PENDING_APPROVAL' ? b2bStats.saas.pendingPlan : null);
   const isRejected = b2bStats?.saas?.status === 'REJECTED' || b2bStats?.saas?.pendingStatus === 'REJECTED';
 
-  // Restore session from localStorage on mount
+  // Restore session & bids from localStorage on mount
   useEffect(() => {
     const savedSession = localStorage.getItem('sb_brand_session');
     if (savedSession) {
@@ -78,15 +125,25 @@ export default function BrandPortalPage() {
         console.error('Session restore failed:', err);
       }
     }
+
+    const savedBids = localStorage.getItem('sb_brand_bids');
+    if (savedBids) {
+      try {
+        setBids(JSON.parse(savedBids));
+      } catch (err) {
+        console.error('Bids restore failed:', err);
+      }
+    }
   }, []);
 
-  // Fetch stats and products once logged in
+  // Fetch stats, products, and dealers once logged in
   useEffect(() => {
     if (isLoggedIn && brandInfo) {
       fetchB2bStats(brandInfo.id);
       fetchBrandProducts(brandInfo.id);
       loadBrandProjects(brandInfo.id);
       loadBankDetails();
+      fetchDealers();
     }
   }, [isLoggedIn, brandInfo]);
 
@@ -96,9 +153,9 @@ export default function BrandPortalPage() {
       if (res.ok) {
         const data = await res.json();
         setBankDetails({
-          bank_name: data.bank_name,
-          bank_recipient: data.bank_recipient,
-          bank_iban: data.bank_iban
+          bank_name: data.bank_name || 'Akbank',
+          bank_recipient: data.bank_recipient || 'KolayWebci SeramikBak Ltd. Şti.',
+          bank_iban: data.bank_iban || 'TR87 0004 6000 1234 5678 9012 34'
         });
       }
     } catch (err) {
@@ -151,6 +208,82 @@ export default function BrandPortalPage() {
     }
   };
 
+  const fetchDealers = async () => {
+    if (!brandInfo) return;
+    setDealersLoading(true);
+    try {
+      const res = await fetch('/api/admin/dealers');
+      if (res.ok) {
+        const allDealers = await res.json();
+        // Filter dealers belonging to this brand
+        const brandDealers = allDealers.filter(d => d.brandId === brandInfo.id);
+        setDealers(brandDealers);
+      }
+    } catch (err) {
+      console.error('Failed to fetch dealers:', err);
+    } finally {
+      setDealersLoading(false);
+    }
+  };
+
+  const handleUpdateDealerStatus = async (dealerId, newStatus) => {
+    try {
+      const res = await fetch('/api/admin/dealers', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: dealerId, status: newStatus })
+      });
+      if (res.ok) {
+        // Refresh dealer network
+        fetchDealers();
+      } else {
+        const errData = await res.json();
+        alert('Bayi durumu güncellenemedi: ' + (errData.error || 'Bilinmeyen hata'));
+      }
+    } catch (err) {
+      console.error('Failed to update dealer status:', err);
+    }
+  };
+
+  const handleAddDealer = async (e) => {
+    e.preventDefault();
+    setAddDealerError('');
+    setAddDealerLoading(true);
+
+    try {
+      const res = await fetch('/api/admin/dealers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...newDealerData,
+          brandId: brandInfo.id
+        })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setShowAddDealerModal(false);
+        setNewDealerData({
+          name: '',
+          phone: '',
+          address: '',
+          city: '',
+          district: '',
+          lat: '40.9901',
+          lng: '29.0278'
+        });
+        fetchDealers();
+      } else {
+        setAddDealerError(data.error || 'Bayi eklenemedi.');
+      }
+    } catch (err) {
+      setAddDealerError('Bağlantı hatası.');
+      console.error(err);
+    } finally {
+      setAddDealerLoading(false);
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
@@ -185,8 +318,10 @@ export default function BrandPortalPage() {
     setBrandInfo(null);
     setB2bStats(null);
     setBrandProducts([]);
+    setDealers([]);
     setUsername('');
     setPassword('');
+    setActivePortalTab('dashboard');
   };
 
   const handleCampaignSubmit = (e) => {
@@ -283,64 +418,191 @@ export default function BrandPortalPage() {
     }
   };
 
+  const handleB2bBidSubmit = (e) => {
+    e.preventDefault();
+    if (!biddingProject || !bidProduct || !bidPrice) return;
+
+    const selectedProduct = brandProducts.find(p => p.id === bidProduct);
+    const newBid = {
+      id: 'bid-' + Date.now(),
+      projectId: biddingProject.id,
+      projectName: biddingProject.projectName,
+      companyName: biddingProject.companyName || biddingProject.projectName,
+      productId: selectedProduct.id,
+      productName: selectedProduct.name,
+      productCode: selectedProduct.code,
+      priceM2: parseFloat(bidPrice),
+      totalPrice: parseFloat(bidPrice) * biddingProject.quantityM2,
+      timeline: bidTimeline,
+      note: bidNote,
+      status: 'PENDING_APPROVAL',
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedBids = [...bids, newBid];
+    setBids(updatedBids);
+    localStorage.setItem('sb_brand_bids', JSON.stringify(updatedBids));
+
+    // Clear form and modal
+    setBiddingProject(null);
+    setBidPrice('');
+    setBidProduct('');
+    setBidTimeline('30 gün içinde');
+    setBidNote('');
+
+    alert('Toptan seramik fiyat teklifiniz başarıyla simüle edildi ve proje sahiplerine iletildi!');
+  };
+
+  // Dynamic SVG Chart Coordinates Generator
+  const generateChartPaths = () => {
+    if (!b2bStats || !b2bStats.timeline || b2bStats.timeline.length === 0) {
+      return { linePath: '', areaPath: '', maxVal: 10, points: [] };
+    }
+
+    const timeline = b2bStats.timeline;
+    // Map values based on selected metric
+    const values = timeline.map(day => {
+      if (chartMetric === 'clicks') return day.clicks || 0;
+      if (chartMetric === 'leads') return day.leads || 0;
+      return day.views || 0;
+    });
+
+    const maxVal = Math.max(...values, 5); // Avoid division by zero, min height factor is 5
+    const width = 500;
+    const height = 200;
+    const paddingLeft = 10;
+    const paddingRight = 10;
+    const paddingTop = 30;
+    const paddingBottom = 20;
+
+    const chartWidth = width - paddingLeft - paddingRight;
+    const chartHeight = height - paddingTop - paddingBottom;
+
+    const points = timeline.map((day, i) => {
+      const x = paddingLeft + (i / (timeline.length - 1)) * chartWidth;
+      const val = chartMetric === 'clicks' ? (day.clicks || 0) : (chartMetric === 'leads' ? (day.leads || 0) : (day.views || 0));
+      const y = height - paddingBottom - (val / maxVal) * chartHeight;
+      return { x, y, val, label: day.date };
+    });
+
+    // Build SVG Path
+    let linePath = '';
+    let areaPath = '';
+
+    if (points.length > 0) {
+      linePath = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 1; i < points.length; i++) {
+        linePath += ` L ${points[i].x} ${points[i].y}`;
+      }
+
+      areaPath = `M ${points[0].x} ${height - paddingBottom}`;
+      for (let i = 0; i < points.length; i++) {
+        areaPath += ` L ${points[i].x} ${points[i].y}`;
+      }
+      areaPath += ` L ${points[points.length - 1].x} ${height - paddingBottom} Z`;
+    }
+
+    return { linePath, areaPath, maxVal, points };
+  };
+
+  // Get Metallic membership badge style based on SaaS plan
+  const getPlanBadgeStyle = (plan) => {
+    if (plan === 'ENTERPRISE') {
+      return {
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
+        color: '#f8fafc',
+        border: '1px solid #64748b',
+        boxShadow: '0 0 10px rgba(148, 163, 184, 0.25)',
+        textShadow: '0 1px 2px rgba(0,0,0,0.8)'
+      };
+    }
+    if (plan === 'PRO') {
+      return {
+        background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 50%, #fef08a 100%)',
+        color: '#1e293b',
+        border: '1px solid #ca8a04',
+        boxShadow: '0 0 12px rgba(212, 175, 55, 0.45)',
+        fontWeight: '800'
+      };
+    }
+    // BASIC or default
+    return {
+      background: 'linear-gradient(135deg, #64748b 0%, #94a3b8 100%)',
+      color: '#f8fafc',
+      border: '1px solid #cbd5e1'
+    };
+  };
+
+  // 1. LOGIN LAYOUT (Premium Dark theme with gold highlight)
   if (!isLoggedIn) {
     return (
       <main className="login-layout" style={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+        background: 'linear-gradient(135deg, #090d16 0%, #111827 50%, #1f2937 100%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '20px',
-        fontFamily: 'Inter, system-ui, sans-serif'
+        padding: '24px',
+        fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)'
       }}>
         <div className="login-card glass-panel" style={{
-          background: 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.4)',
-          borderRadius: '24px',
-          padding: '40px',
+          background: 'rgba(17, 24, 39, 0.75)',
+          backdropFilter: 'var(--glass-backdrop, blur(16px))',
+          border: '1px solid rgba(212, 175, 55, 0.2)',
+          borderRadius: 'var(--border-radius-lg, 24px)',
+          padding: '44px 36px',
           width: '100%',
-          maxWidth: '440px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.06)'
+          maxWidth: '450px',
+          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05)'
         }}>
           <div className="login-header" style={{ textAlign: 'center', marginBottom: '32px' }}>
             <Link href="/" style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               textDecoration: 'none',
-              color: 'var(--text-primary, #111)',
-              marginBottom: '16px',
-              fontSize: '0.85rem',
-              fontWeight: '600'
-            }}>
+              color: 'var(--text-muted, #94a3b8)',
+              marginBottom: '20px',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              transition: 'color 0.2s'
+            }} className="hover-gold-text">
               <ArrowLeft size={14} /> Ana Sayfaya Dön
             </Link>
             <div className="logo-icon" style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #111 0%, #444 100%)',
+              width: '54px',
+              height: '54px',
+              borderRadius: '14px',
+              background: 'linear-gradient(135deg, #111 0%, #1e293b 100%)',
               color: '#d4af37',
+              border: '1px solid #d4af37',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '900',
-              fontSize: '1.4rem',
+              fontSize: '1.6rem',
               margin: '0 auto 16px auto',
-              boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              boxShadow: '0 0 20px rgba(212,175,55,0.3)'
             }}>SB</div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#111', margin: '0 0 6px 0' }}>B2B Marka Portalı</h3>
-            <p style={{ fontSize: '0.85rem', color: '#666', margin: 0 }}>Fabrika yetkilileri için analiz ve reklam yönetim paneli.</p>
+            <h3 style={{ 
+              fontSize: '1.6rem', 
+              fontWeight: '800', 
+              color: '#fff', 
+              margin: '0 0 8px 0',
+              fontFamily: 'var(--font-title, "Outfit", sans-serif)',
+              letterSpacing: '-0.02em'
+            }}>B2B Marka Portalı</h3>
+            <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: 0, lineHeight: '1.5' }}>
+              Seramik fabrikaları ve üretici yetkilileri için akıllı analiz, bayi ve reklam kontrol paneli.
+            </p>
           </div>
 
-          <form onSubmit={handleLogin} className="login-form" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <form onSubmit={handleLogin} className="login-form" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {loginError && (
               <div className="error-alert" style={{
-                background: '#fee2e2',
-                color: '#ef4444',
-                border: '1px solid #fca5a5',
+                background: 'rgba(239, 68, 68, 0.1)',
+                color: '#f87171',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
                 borderRadius: '12px',
                 padding: '12px 16px',
                 fontSize: '0.8rem',
@@ -348,13 +610,13 @@ export default function BrandPortalPage() {
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <AlertCircle size={16} />
+                <AlertCircle size={16} style={{ flexShrink: 0 }} />
                 <span>{loginError}</span>
               </div>
             )}
 
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#333' }}>Kullanıcı Adı</label>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Kullanıcı Adı</label>
               <div style={{ position: 'relative' }}>
                 <input 
                   type="text" 
@@ -364,21 +626,24 @@ export default function BrandPortalPage() {
                   placeholder="vitra, kutahya, bien..." 
                   style={{
                     width: '100%',
-                    padding: '12px 16px 12px 40px',
+                    padding: '14px 16px 14px 44px',
                     borderRadius: '12px',
-                    border: '1px solid #ced4da',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
                     fontSize: '0.9rem',
-                    background: '#fff',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    color: '#fff',
                     outline: 'none',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s, box-shadow 0.2s'
                   }}
+                  className="login-input"
                 />
-                <User size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: '#888' }} />
+                <User size={16} style={{ position: 'absolute', left: '16px', top: '17px', color: '#94a3b8' }} />
               </div>
             </div>
 
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#333' }}>Şifre</label>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Şifre</label>
               <div style={{ position: 'relative' }}>
                 <input 
                   type="password" 
@@ -388,16 +653,19 @@ export default function BrandPortalPage() {
                   placeholder="••••••••" 
                   style={{
                     width: '100%',
-                    padding: '12px 16px 12px 40px',
+                    padding: '14px 16px 14px 44px',
                     borderRadius: '12px',
-                    border: '1px solid #ced4da',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
                     fontSize: '0.9rem',
-                    background: '#fff',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    color: '#fff',
                     outline: 'none',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s, box-shadow 0.2s'
                   }}
+                  className="login-input"
                 />
-                <Lock size={16} style={{ position: 'absolute', left: '14px', top: '15px', color: '#888' }} />
+                <Lock size={16} style={{ position: 'absolute', left: '16px', top: '17px', color: '#94a3b8' }} />
               </div>
             </div>
 
@@ -405,1161 +673,1706 @@ export default function BrandPortalPage() {
               type="submit" 
               disabled={loginLoading}
               style={{
-                background: 'linear-gradient(135deg, #111 0%, #333 100%)',
-                color: '#fff',
+                background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                color: '#111',
                 border: 'none',
                 borderRadius: '12px',
-                padding: '14px',
-                fontWeight: '700',
+                padding: '15px',
+                fontWeight: '800',
                 fontSize: '0.95rem',
                 cursor: 'pointer',
-                boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                boxShadow: '0 8px 24px rgba(212, 175, 55, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                marginTop: '8px',
+                marginTop: '10px',
                 transition: 'all 0.2s'
               }}
+              className="login-btn"
             >
               {loginLoading ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={18} className="animate-spin" />
                   <span>Bağlanılıyor...</span>
                 </>
               ) : (
                 <>
-                  <ShieldCheck size={16} />
-                  <span>Marka Girişi Yap</span>
+                  <ShieldCheck size={18} />
+                  <span>Marka Paneline Giriş Yap</span>
                 </>
               )}
             </button>
           </form>
 
-          <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.75rem', color: '#888' }}>
-            Fabrika giriş şifresi demo olarak markanın adı + 123 şeklinde tanımlıdır (Örn: vitra / vitra123).
+          <div style={{ textAlign: 'center', marginTop: '28px', fontSize: '0.75rem', color: '#64748b', lineHeight: '1.4' }}>
+            Demo Giriş Bilgileri:<br />
+            Kullanıcı Adı: <strong>vitra</strong> / Şifre: <strong>vitra123</strong><br />
+            Kullanıcı Adı: <strong>kutahya</strong> / Şifre: <strong>kutahya123</strong>
           </div>
         </div>
       </main>
     );
   }
 
+  const { linePath, areaPath, maxVal, points } = generateChartPaths();
+  const currentPlan = b2bStats?.saas?.plan || 'BASIC';
+
+  // 2. MAIN LOGGED-IN PORTAL LAYOUT (Sidebar Layout)
   return (
     <div style={{
       minHeight: '100vh',
       background: '#f8fafc',
       color: '#0f172a',
-      fontFamily: 'Inter, system-ui, sans-serif',
-      boxSizing: 'border-box'
+      fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
+      display: 'flex',
+      overflowX: 'hidden'
     }}>
-      {/* HEADER NAVBAR */}
-      <header style={{
-        background: '#fff',
-        borderBottom: '1px solid #e2e8f0',
+      {/* SOLID SIDEBAR */}
+      <aside style={{
+        width: isSidebarCollapsed ? '70px' : '260px',
+        background: '#090d16',
+        color: '#cbd5e1',
+        display: 'flex',
+        flexDirection: 'column',
+        flexShrink: 0,
+        transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+        borderRight: '1px solid rgba(255, 255, 255, 0.05)',
         position: 'sticky',
         top: 0,
-        zIndex: 100
+        height: '100vh',
+        zIndex: 200
       }}>
-        <div className="brand-header-container" style={{
-          maxWidth: '1280px',
-          margin: '0 auto',
-          padding: '14px 24px',
+        {/* Sidebar Header */}
+        <div style={{
+          padding: '24px 16px',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          gap: '12px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+          overflow: 'hidden'
         }}>
-          <div className="brand-header-brand" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '8px',
-              background: '#0f172a',
-              color: '#d4af37',
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '8px',
+            background: '#fff',
+            color: '#090d16',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: '900',
+            fontSize: '1.2rem',
+            flexShrink: 0,
+            boxShadow: '0 0 10px rgba(255,255,255,0.1)'
+          }}>SB</div>
+          {!isSidebarCollapsed && (
+            <div style={{ minWidth: 0 }}>
+              <h2 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {brandInfo.name}
+              </h2>
+              <span style={{ 
+                fontSize: '0.62rem', 
+                padding: '2px 6px', 
+                borderRadius: '8px', 
+                display: 'inline-block',
+                marginTop: '3px',
+                ...getPlanBadgeStyle(currentPlan)
+              }}>
+                {currentPlan} ÜYE
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar Nav Items */}
+        <nav style={{ flex: 1, padding: '16px 8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {[
+            { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
+            { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={18} /> },
+            { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={18} /> },
+            { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={18} /> },
+            { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={18} /> },
+            { id: 'saas', label: 'Lisans & Ödemeler', icon: <CreditCard size={18} /> }
+          ].map(item => {
+            const isActive = activePortalTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActivePortalTab(item.id)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: isActive ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+                  color: isActive ? '#d4af37' : '#94a3b8',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  fontWeight: isActive ? '700' : '500',
+                  textAlign: 'left',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box'
+                }}
+                title={isSidebarCollapsed ? item.label : undefined}
+                className="sidebar-link-btn"
+              >
+                {item.icon}
+                {!isSidebarCollapsed && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Sidebar Collapse Toggle & Logout */}
+        <div style={{
+          padding: '12px 8px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4px'
+        }}>
+          <button
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            style={{
+              width: '100%',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '900',
-              fontSize: '1.1rem'
-            }}>SB</div>
-            <div>
-              <h1 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {brandInfo.name} B2B Portal
-                {b2bStats?.saas && (
-                  <span style={{ 
-                    fontSize: '0.68rem', 
-                    padding: '2px 8px', 
-                    borderRadius: '10px', 
-                    background: b2bStats.saas.plan === 'ENTERPRISE' ? 'linear-gradient(135deg, #111 0%, #333 100%)' : '#d4af37', 
-                    color: b2bStats.saas.plan === 'ENTERPRISE' ? '#d4af37' : '#000', 
-                    fontWeight: '700' 
-                  }}>
-                    {b2bStats.saas.plan} Üyelik
-                  </span>
-                )}
-              </h1>
-              <p style={{ fontSize: '0.7rem', color: '#64748b', margin: 0 }}>Raporlama, Reklam Yönetimi ve Tüketici Analitiği</p>
-            </div>
-          </div>
-
-          <div className="brand-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {b2bStats?.saas?.expiresAt && (
-              <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Calendar size={12} />
-                <span>Paket Bitiş: {new Date(b2bStats.saas.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-              </div>
-            )}
-
-            {/* Tab Navigation Buttons */}
-            <div className="brand-tabs-nav" style={{ display: 'flex', gap: '4px', background: '#f1f3f5', borderRadius: '8px', padding: '3px', marginRight: '4px' }}>
-              <button 
-                onClick={() => setActivePortalTab('dashboard')}
-                style={{
-                  background: activePortalTab === 'dashboard' ? '#fff' : 'transparent',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '6px 12px',
-                  fontSize: '0.75rem',
-                  fontWeight: activePortalTab === 'dashboard' ? '700' : '500',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  color: activePortalTab === 'dashboard' ? '#111' : '#6c757d',
-                  boxShadow: activePortalTab === 'dashboard' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <Activity size={13} />
-                <span>Analiz & Reklam</span>
-              </button>
-              <button 
-                onClick={() => setActivePortalTab('b2b-projects')}
-                style={{
-                  background: activePortalTab === 'b2b-projects' ? '#fff' : 'transparent',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '6px 12px',
-                  fontSize: '0.75rem',
-                  fontWeight: activePortalTab === 'b2b-projects' ? '700' : '500',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  color: activePortalTab === 'b2b-projects' ? '#111' : '#6c757d',
-                  boxShadow: activePortalTab === 'b2b-projects' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <Building2 size={13} />
-                <span>Proje Talepleri (B2B)</span>
-              </button>
-            </div>
-
-            <button 
-              onClick={handleLogout} 
-              style={{
-                background: 'transparent',
-                border: '1px solid #fee2e2',
-                borderRadius: '8px',
-                padding: '8px 12px',
-                fontSize: '0.8rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                color: '#ef4444'
-              }}
-            >
-              <LogOut size={14} />
-              <span>Çıkış Yap</span>
-            </button>
-          </div>
+              gap: '12px',
+              padding: '10px',
+              borderRadius: '8px',
+              border: 'none',
+              background: 'transparent',
+              color: '#64748b',
+              cursor: 'pointer',
+              fontSize: '0.78rem',
+              textAlign: 'left',
+              transition: 'all 0.2s'
+            }}
+          >
+            <Menu size={16} />
+            {!isSidebarCollapsed && <span>Paneli Daralt</span>}
+          </button>
+          <button
+            onClick={handleLogout}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '10px',
+              borderRadius: '8px',
+              border: 'none',
+              background: 'rgba(239, 68, 68, 0.08)',
+              color: '#f87171',
+              cursor: 'pointer',
+              fontSize: '0.78rem',
+              fontWeight: '700',
+              textAlign: 'left',
+              transition: 'all 0.2s'
+            }}
+          >
+            <LogOut size={16} />
+            {!isSidebarCollapsed && <span>Çıkış Yap</span>}
+          </button>
         </div>
-      </header>
+      </aside>
 
-      {/* PORTAL MAIN CONTENT */}
-      <main className="brand-main-content" style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 24px' }}>
-        {activePortalTab === 'b2b-projects' ? (
-          /* B2B PROJECTS TAB */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Building2 size={22} style={{ color: '#d4af37' }} />
-                  B2B Proje & Toplu Seramik Talepleri
-                </h2>
-                <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
-                  İnşaat firmaları, müteahhitler ve mimarların projeleri için oluşturduğu toptan alım talepleri.
-                </p>
+      {/* PORTAL CONTENT WRAPPER */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        {/* UPPER HEADER BAR */}
+        <header style={{
+          background: '#fff',
+          borderBottom: '1px solid #e2e8f0',
+          padding: '16px 32px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100
+        }}>
+          <div>
+            <h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+              {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
+              {activePortalTab === 'products' && 'Ürün Kataloğumuz'}
+              {activePortalTab === 'b2b-projects' && 'B2B Proje ve Toptan Talepler'}
+              {activePortalTab === 'dealers' && 'Yetkili Bayi Ağı Kontrolü'}
+              {activePortalTab === 'campaigns' && 'Vitrin & Reklam Yönetimi'}
+              {activePortalTab === 'saas' && 'SaaS Abonelik & Ödeme Yönetimi'}
+            </h1>
+            <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '2px 0 0 0' }}>
+              {brandInfo.name} fabrikası için B2B2C yönetim merkezi.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {b2bStats?.saas?.expiresAt && (
+              <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px', background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px' }}>
+                <Calendar size={12} style={{ color: '#d4af37' }} />
+                <span>Lisans Bitiş: <strong>{new Date(b2bStats.saas.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</strong></span>
               </div>
-              
-              {b2bStats?.saas && (
+            )}
+            <span style={{
+              fontSize: '0.75rem',
+              padding: '6px 12px',
+              borderRadius: '20px',
+              fontWeight: '700',
+              ...getPlanBadgeStyle(currentPlan)
+            }}>
+              {currentPlan} PLAN
+            </span>
+          </div>
+        </header>
+
+        {/* PORTAL MAIN TAB CONTAINER */}
+        <main style={{ padding: '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
+          
+          {statsLoading && !b2bStats ? (
+            <div style={{ textAlign: 'center', padding: '120px 0', color: '#64748b' }}>
+              <Loader2 className="animate-spin" style={{ margin: '0 auto 16px auto', width: '40px', height: '40px', color: '#d4af37' }} />
+              <h4 style={{ fontWeight: '700', color: '#0f172a', margin: '0 0 4px 0' }}>Veriler Derleniyor</h4>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>Markanıza ait pazar istatistikleri ve analizler güncelleniyor...</p>
+            </div>
+          ) : !b2bStats ? (
+            <div style={{ textAlign: 'center', padding: '64px', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+              <AlertCircle size={32} style={{ color: '#ef4444', margin: '0 auto 12px auto' }} />
+              <h4>Veri Yükleme Hatası</h4>
+              <p style={{ color: '#64748b' }}>B2B istatistikleri yüklenemedi. Lütfen sayfayı yenileyip tekrar deneyin.</p>
+            </div>
+          ) : (
+            <>
+              {requestedPlan && (
                 <div style={{
-                  background: b2bStats.saas.plan === 'ENTERPRISE' ? 'linear-gradient(135deg, #111 0%, #333 100%)' : b2bStats.saas.plan === 'PRO' ? 'rgba(212, 175, 55, 0.1)' : '#fee2e2',
-                  color: b2bStats.saas.plan === 'ENTERPRISE' ? '#d4af37' : b2bStats.saas.plan === 'PRO' ? '#d4af37' : '#dc3545',
-                  border: '1px solid ' + (b2bStats.saas.plan === 'ENTERPRISE' ? '#d4af37' : b2bStats.saas.plan === 'PRO' ? 'rgba(212,175,55,0.2)' : '#fca5a5'),
-                  padding: '6px 12px',
-                  borderRadius: '20px',
-                  fontSize: '0.75rem',
-                  fontWeight: '700'
+                  background: '#fffbeb',
+                  border: '1px solid #fde047',
+                  borderRadius: '12px',
+                  padding: '16px 20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  color: '#b45309',
+                  fontSize: '0.85rem',
+                  fontWeight: '600',
+                  marginBottom: '24px'
                 }}>
-                  Mevcut Planınız: {b2bStats.saas.plan}
+                  <Loader2 size={18} className="animate-spin" style={{ color: '#d97706', flexShrink: 0 }} />
+                  <div>
+                    <strong>⏱️ Abonelik Yükseltme Onay Bekliyor:</strong> {requestedPlan} paket geçiş talebiniz alınmıştır. Gönderilen banka havaleniz doğrulandıktan sonra admin tarafından aktif edilecektir.
+                  </div>
                 </div>
               )}
-            </div>
 
-            {/* List of project requests */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              {projectsLoading ? (
-                <div style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
-                  <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
-                  <span>Proje talepleri yükleniyor...</span>
+              {isRejected && (
+                <div style={{
+                  background: '#fef2f2',
+                  border: '1px solid #fca5a5',
+                  borderRadius: '12px',
+                  padding: '16px 20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  color: '#991b1b',
+                  fontSize: '0.85rem',
+                  fontWeight: '600',
+                  marginBottom: '24px'
+                }}>
+                  <AlertCircle size={18} style={{ color: '#991b1b', flexShrink: 0 }} />
+                  <div>
+                    <strong>❌ Talebiniz Reddedildi:</strong> {b2bStats?.saas?.pendingPlan || b2bStats?.saas?.plan} abonelik talebiniz doğrulanırken bir sorun oluştu ve admin tarafından onaylanmadı.
+                  </div>
                 </div>
-              ) : projects.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '48px', color: '#64748b', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-                  <span>Şu anda aktif veya onaylanmış bir B2B proje talebi bulunmamaktadır.</span>
-                </div>
-              ) : (
-                projects.map(proj => {
-                  const isLocked = proj.isLocked;
-                  const isMasked = proj.isMasked;
-
-                  return (
-                    <div key={proj.id} style={{
-                      background: '#fff',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '16px',
-                      padding: '24px',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.01)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '16px'
-                    }}>
-                      {/* Top Row */}
-                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #f1f5f9', paddingBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                            <span style={{
-                              background: '#e0f2fe',
-                              color: '#0284c7',
-                              padding: '2px 8px',
-                              borderRadius: '6px',
-                              fontSize: '0.68rem',
-                              fontWeight: '700'
-                            }}>{proj.projectType}</span>
-                            <span style={{ fontSize: '0.72rem', color: '#64748b' }}>{proj.city} / {proj.district}</span>
-                            <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>•</span>
-                            <span style={{ fontSize: '0.72rem', color: '#64748b' }}>Aşama: {proj.constructionStep}</span>
-                          </div>
-                          <h4 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#111', margin: '8px 0 0 0' }}>
-                            {proj.projectName}
-                          </h4>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Talep Tarihi</div>
-                          <div style={{ fontSize: '0.8rem', fontWeight: '600' }}>
-                            {new Date(proj.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Main Details */}
-                      <div className="brand-project-details-split" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
-                        {/* Column 1: Material */}
-                        <div>
-                          <h5 style={{ fontSize: '0.78rem', fontWeight: '700', textTransform: 'uppercase', color: '#888', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Malzeme Tercihleri</h5>
-                          {isLocked ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', opacity: 0.5 }}>
-                              <div style={{ fontSize: '0.85rem' }}>Ebat: <strong>***</strong></div>
-                              <div style={{ fontSize: '0.85rem' }}>Tarz: <strong>***</strong></div>
-                              <div style={{ fontSize: '0.85rem' }}>Kullanım Alanı: <strong>***</strong></div>
-                            </div>
-                          ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.85rem', color: '#334155' }}>
-                              <div>Ebat: <strong>{proj.ceramicSizes}</strong></div>
-                              <div>Tarz: <strong>{proj.ceramicStyles}</strong></div>
-                              {proj.ceramicFinishes && <div>Yüzey: <strong>{proj.ceramicFinishes}</strong></div>}
-                              {proj.ceramicColors && <div>Renk: <strong>{proj.ceramicColors}</strong></div>}
-                              <div>Alan: <strong>{proj.usageAreas}</strong></div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Column 2: Volume */}
-                        <div>
-                          <h5 style={{ fontSize: '0.78rem', fontWeight: '700', textTransform: 'uppercase', color: '#888', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Miktar ve Bütçe</h5>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.85rem', color: '#334155' }}>
-                            <div>Toplam Metraj: <strong style={{ color: '#0f172a', fontSize: '1rem' }}>{proj.quantityM2.toLocaleString('tr-TR')} m²</strong></div>
-                            <div>Hedef Bütçe: <strong style={{ color: '#0284c7' }}>{proj.budgetM2}</strong></div>
-                            <div>Teslim Süresi: <strong>{proj.deliveryTimeline}</strong></div>
-                          </div>
-                        </div>
-
-                        {/* Column 3: Contact */}
-                        <div>
-                          <h5 style={{ fontSize: '0.78rem', fontWeight: '700', textTransform: 'uppercase', color: '#888', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Müteahhit / İletişim</h5>
-                          {isLocked ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', opacity: 0.5 }}>
-                              <div style={{ fontSize: '0.82rem' }}>Firma: <strong>***</strong></div>
-                              <div style={{ fontSize: '0.82rem' }}>Yetkili: <strong>***</strong></div>
-                              <div style={{ fontSize: '0.82rem' }}>Telefon: <strong>***</strong></div>
-                            </div>
-                          ) : isMasked ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.82rem', color: '#334155' }}>
-                              <div>Firma: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.companyName}</strong></div>
-                              <div>Yetkili: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.contactName}</strong></div>
-                              <div>Telefon: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.contactPhone}</strong></div>
-                              <div style={{ fontSize: '0.72rem', color: '#d4af37', fontWeight: '700', marginTop: '4px' }}>
-                                ⚠️ İletişim bilgilerini görmek için ENTERPRISE pakete geçin.
-                              </div>
-                            </div>
-                          ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.82rem', color: '#334155' }}>
-                              <div>Firma: <strong style={{ color: '#111' }}>{proj.companyName}</strong></div>
-                              <div>Yetkili: <strong>{proj.contactName}</strong></div>
-                              <div>Telefon: <a href={`tel:${proj.contactPhone}`} style={{ color: '#0284c7', textDecoration: 'none', fontWeight: '600' }}>{proj.contactPhone}</a></div>
-                              <div>E-posta: <a href={`mailto:${proj.contactEmail}`} style={{ color: '#64748b' }}>{proj.contactEmail}</a></div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Notes Section */}
-                      {!isLocked && proj.notes && (
-                        <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', fontSize: '0.78rem', color: '#475569', fontStyle: 'italic', borderLeft: '3px solid #cbd5e1' }}>
-                          Proje Notu: "{proj.notes}"
-                        </div>
-                      )}
-
-                      {/* Lock Overlays */}
-                      {isLocked && (
-                        <div style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          background: 'rgba(255, 255, 255, 0.9)',
-                          backdropFilter: 'blur(4px)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: '20px',
-                          textAlign: 'center'
-                        }}>
-                          <div style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '50%',
-                            background: '#fee2e2',
-                            color: '#dc3545',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginBottom: '12px'
-                          }}>
-                            <Lock size={18} />
-                          </div>
-                          <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#111', margin: '0 0 4px 0' }}>B2B Proje Detayları Kilitli</h4>
-                          <p style={{ fontSize: '0.75rem', color: '#6c757d', margin: '0 0 12px 0', maxWidth: '300px' }}>
-                            Toplu ihale metrajlarını ve malzeme ihtiyaçlarını görmek için markanızın B2B aboneliğini yükseltin.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
               )}
-            </div>
-          </div>
-        ) : statsLoading && !b2bStats ? (
-          <div style={{ textAlign: 'center', padding: '64px 0', color: '#64748b' }}>
-            <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto', width: '32px', height: '32px' }} />
-            <span>Marka verileri derleniyor...</span>
-          </div>
-        ) : b2bStats ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            
-            {requestedPlan && (
-              <div className="glass-panel" style={{
-                background: '#fff9db',
-                border: '1px solid #fde047',
-                borderRadius: '12px',
-                padding: '16px 20px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                color: '#b45309',
-                fontSize: '0.85rem',
-                fontWeight: '600'
-              }}>
-                <Loader2 size={18} className="animate-spin" style={{ color: '#d97706', flexShrink: 0 }} />
-                <div>
-                  <strong>⏱️ Abonelik Talebi Onay Bekliyor:</strong> {requestedPlan} paket talebiniz alındı. Ödemeniz doğrulandıktan sonra admin onayıyla en kısa sürede aktifleşecektir.
-                </div>
-              </div>
-            )}
 
-            {isRejected && (
-              <div className="glass-panel" style={{
-                background: '#fef2f2',
-                border: '1px solid #fca5a5',
-                borderRadius: '12px',
-                padding: '16px 20px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                color: '#991b1b',
-                fontSize: '0.85rem',
-                fontWeight: '600'
-              }}>
-                <AlertCircle size={18} style={{ color: '#991b1b', flexShrink: 0 }} />
-                <div>
-                  <strong>❌ Talep Reddedildi:</strong> {b2bStats?.saas?.pendingPlan || b2bStats?.saas?.plan} paket talebiniz admin tarafından onaylanmadı. Detaylar ve destek için admin ile iletişime geçebilirsiniz.
-                </div>
-              </div>
-            )}
-            
-            {/* METRICS SUMMARY */}
-            <div className="brand-stats-grid" style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: '20px'
-            }}>
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SaaS Planı</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                    <span style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--accent-gold, #d4af37)', textShadow: '0 2px 4px rgba(212,175,55,0.1)' }}>{b2bStats.saas?.plan || 'BASIC'}</span>
-                    <span style={{
-                      fontSize: '0.72rem',
-                      color: b2bStats.saas?.status === 'ACTIVE' ? '#10b981' : (b2bStats.saas?.status === 'PENDING_APPROVAL' ? '#f59e0b' : '#ef4444'),
-                      fontWeight: '700',
-                      background: b2bStats.saas?.status === 'ACTIVE' ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)',
-                      padding: '2px 8px',
-                      borderRadius: '12px'
-                    }}>
-                      {b2bStats.saas?.status === 'ACTIVE' ? 'Aktif' : b2bStats.saas?.status === 'PENDING_APPROVAL' ? 'Onay Bekliyor' : b2bStats.saas?.status === 'REJECTED' ? 'Reddedildi' : b2bStats.saas?.status || 'YOK'}
-                    </span>
-                  </div>
-                  {b2bStats.saas?.pendingStatus === 'PENDING_APPROVAL' && (
-                    <span style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: '600' }}>
-                      ⏱️ {b2bStats.saas.pendingPlan} Yükseltme Bekliyor
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Toplam Görüntülenme</h4>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                  <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#0f172a' }}>{b2bStats.summary?.totalViews}</span>
-                  <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>+12.4% (Bu Ay)</span>
-                </div>
-                <span style={{ fontSize: '0.7rem', color: '#64748b', display: 'block', marginTop: '4px' }}>Katalog & Detay Sayfası</span>
-              </div>
-
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tıklanma Oranı (CTR)</h4>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                  <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#2563eb' }}>%{b2bStats.summary?.ctr}</span>
-                  <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>Sektör Ort. Üstü</span>
-                </div>
-                <span style={{ fontSize: '0.7rem', color: '#64748b', display: 'block', marginTop: '4px' }}>Tıklama / Gösterim Dağılımı</span>
-              </div>
-
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-                <h4 style={{ fontSize: '0.78rem', fontWeight: '600', color: '#64748b', margin: '0 0 8px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bayi Yönlendirmeleri</h4>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                  <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#10b981' }}>{b2bStats.summary?.totalLeads}</span>
-                  <span style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: '700' }}>9 Aktif Bayi</span>
-                </div>
-                <span style={{ fontSize: '0.7rem', color: '#64748b', display: 'block', marginTop: '4px' }}>Bayilere İletilen Müşteri Formları</span>
-              </div>
-            </div>
-
-            {/* VISUAL ANALYTICS & MARKET BENCHMARKING ROW */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '2fr 1fr',
-              gap: '24px',
-              width: '100%'
-            }} className="brand-campaign-grid">
-              {/* Graphic Chart widget */}
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <TrendingUp size={18} style={{ color: '#2563eb' }} />
-                  Etkileşim & Erişim Trend Analizi
-                </h3>
-                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 24px 0' }}>Son 6 ayda markanıza ait ürünlerin aldığı tekil gösterim ve katalog görüntüleme eğrisi.</p>
-                
-                {/* Responsive SVG Chart */}
-                <div style={{ width: '100%', height: '220px', position: 'relative' }}>
-                  <svg viewBox="0 0 500 200" width="100%" height="100%" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25"/>
-                        <stop offset="100%" stopColor="#2563eb" stopOpacity="0.00"/>
-                      </linearGradient>
-                    </defs>
-                    {/* Grid lines */}
-                    <line x1="0" y1="40" x2="500" y2="40" stroke="#f1f5f9" strokeWidth="1"/>
-                    <line x1="0" y1="90" x2="500" y2="90" stroke="#f1f5f9" strokeWidth="1"/>
-                    <line x1="0" y1="140" x2="500" y2="140" stroke="#f1f5f9" strokeWidth="1"/>
-                    <line x1="0" y1="180" x2="500" y2="180" stroke="#e2e8f0" strokeWidth="2"/>
-
-                    {/* Chart Area Fill */}
-                    <path d="M 0 180 Q 80 120 160 140 T 320 60 T 420 40 L 500 20 L 500 180 Z" fill="url(#chartGrad)"/>
-
-                    {/* Chart Line */}
-                    <path d="M 0 180 Q 80 120 160 140 T 320 60 T 420 40 L 500 20" fill="none" stroke="#2563eb" strokeWidth="3" strokeLinecap="round"/>
-
-                    {/* Interactive dots */}
-                    <circle cx="160" cy="140" r="5" fill="#2563eb" stroke="#fff" strokeWidth="2"/>
-                    <circle cx="320" cy="60" r="5" fill="#2563eb" stroke="#fff" strokeWidth="2"/>
-                    <circle cx="500" cy="20" r="5" fill="#10b981" stroke="#fff" strokeWidth="2"/>
-                  </svg>
-                  
-                  {/* Labels */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '0.68rem', color: '#64748b', fontWeight: '600' }}>
-                    <span>Ocak</span>
-                    <span>Şubat</span>
-                    <span>Mart</span>
-                    <span>Nisan</span>
-                    <span>Mayıs</span>
-                    <span>Haziran (Aktif)</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Market Share circle gauge */}
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', justifyItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <ShieldCheck size={18} style={{ color: 'var(--accent-gold, #d4af37)' }} />
-                    Pazar Payı Endeksi
-                  </h3>
-                  <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>SeramikBak pazar yeri genelinde markanızın görüntülenme payı.</p>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                  {/* Circle SVG Progress */}
-                  <div style={{ position: 'relative', width: '110px', height: '110px' }}>
-                    <svg width="110" height="110" viewBox="0 0 36 36">
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="#f1f5f9"
-                        strokeWidth="3.5"
-                      />
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="var(--accent-gold, #d4af37)"
-                        strokeDasharray="24.8, 100"
-                        strokeWidth="3.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-                      <span style={{ fontSize: '1.25rem', fontWeight: '900', color: '#0f172a' }}>%24.8</span>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#0f172a' }}>2. En Büyük Marka</span>
-                    <span style={{ fontSize: '0.7rem', color: '#64748b', display: 'block', marginTop: '2px' }}>Qua Granite'in ardından</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 3D / AR SHOWROOM ENGAGEMENT SECTION */}
-            <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Sparkles size={18} style={{ color: '#8b5cf6' }} />
-                3D Sanal Stüdyo & AR (Artırılmış Gerçeklik) Etkileşim Raporu
-              </h3>
-              <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 24px 0' }}>Kullanıcıların sanal stüdyoda ürünlerinizle yaptığı banyo tasarımları ve artırılmış gerçeklik etkileşim istatistikleri.</p>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }} className="campaign-inputs-grid">
-                <div style={{ background: '#faf5ff', border: '1px solid #f3e8ff', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#7c3aed' }}>1.482 Kez</div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#5b21b6', marginTop: '4px' }}>3D Banyo Planlama</div>
-                  <div style={{ fontSize: '0.68rem', color: '#7c3aed', marginTop: '2px' }}>Ürünlerinizle oda tasarlandı</div>
-                </div>
-                <div style={{ background: '#eff6ff', border: '1px solid #dbeafe', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#2563eb' }}>492 Kez</div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#1e40af', marginTop: '4px' }}>AR Evde Görselleştirme</div>
-                  <div style={{ fontSize: '0.68rem', color: '#2563eb', marginTop: '2px' }}>Kamerayla zemin kaplama yapıldı</div>
-                </div>
-                <div style={{ background: '#ecfdf5', border: '1px solid #d1fae5', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#059669' }}>86 İstek</div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#065f46', marginTop: '4px' }}>Doku Numune Talebi</div>
-                  <div style={{ fontSize: '0.68rem', color: '#059669', marginTop: '2px' }}>Gönderilen kargo numuneleri</div>
-                </div>
-              </div>
-            </div>
-
-            {/* DEALER NETWORK PERFORMANCE LEADERBOARD */}
-            <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
-                <div>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <MapPin size={18} style={{ color: '#059669' }} />
-                    Yetkili Bayi Ağı Performans Liderlik Tablosu
-                  </h3>
-                  <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '4px 0 0 0' }}>Yönlendirilen müşteri taleplerini en hızlı karşılayan ve satışa dönüştüren bayi analizleri.</p>
-                </div>
-                <span style={{ fontSize: '0.72rem', background: '#ecfdf5', color: '#059669', fontWeight: '700', padding: '4px 10px', borderRadius: '12px' }}>
-                  Toplam 9 Yetkili Bayi
-                </span>
-              </div>
-
-              <div className="table-responsive" style={{ overflowX: 'auto' }}>
-                <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid #e2e8f0', textAlign: 'left', color: '#64748b' }}>
-                      <th style={{ padding: '12px 8px' }}>Bayi Adı</th>
-                      <th style={{ padding: '12px 8px' }}>Bölge / Şehir</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'center' }}>Yönlendirilen Lead</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'center' }}>Satışa Dönüşüm Oranı</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'center' }}>Ort. Yanıt Süresi</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'center' }}>Müşteri Skoru</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '12px 8px', fontWeight: '700', color: '#0f172a' }}>İstanbul Seramik Sarayı</td>
-                      <td style={{ padding: '12px 8px', color: '#475569' }}>İstanbul / Kadıköy</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>38</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                          <span style={{ fontWeight: '700', color: '#059669' }}>%42</span>
-                          <div style={{ width: '50px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: '42%', height: '100%', background: '#059669' }}></div>
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#475569' }}>12 dk</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#eab308', fontWeight: '700' }}>⭐ 4.9</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '12px 8px', fontWeight: '700', color: '#0f172a' }}>Ege Yapı Market</td>
-                      <td style={{ padding: '12px 8px', color: '#475569' }}>İzmir / Bornova</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>26</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                          <span style={{ fontWeight: '700', color: '#059669' }}>%38</span>
-                          <div style={{ width: '50px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: '38%', height: '100%', background: '#059669' }}></div>
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#475569' }}>18 dk</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#eab308', fontWeight: '700' }}>⭐ 4.8</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '12px 8px', fontWeight: '700', color: '#0f172a' }}>Ankara Yapı Tasarım</td>
-                      <td style={{ padding: '12px 8px', color: '#475569' }}>Ankara / Çankaya</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>19</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                          <span style={{ fontWeight: '700', color: '#2563eb' }}>%29</span>
-                          <div style={{ width: '50px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: '29%', height: '100%', background: '#2563eb' }}></div>
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#475569' }}>32 dk</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#eab308', fontWeight: '700' }}>⭐ 4.5</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={{ padding: '12px 8px', fontWeight: '700', color: '#0f172a' }}>Bursa Karo Dünyası</td>
-                      <td style={{ padding: '12px 8px', color: '#475569' }}>Bursa / Nilüfer</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>14</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                          <span style={{ fontWeight: '700', color: '#ca8a04' }}>%21</span>
-                          <div style={{ width: '50px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: '21%', height: '100%', background: '#ca8a04' }}></div>
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#475569' }}>55 dk</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center', color: '#eab308', fontWeight: '700' }}>⭐ 4.1</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* CAMPAIGNS & RECENT LEADS SPLIT */}
-            <div className="brand-campaign-grid" style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
-              gap: '24px'
-            }}>
-              {/* Premium Campaigns Management */}
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Sparkles size={18} style={{ color: '#d4af37' }} />
-                  Premium Vitrin & Reklam Yönetimi
-                </h3>
-                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Ürünlerinizi ana sayfada "Yeni Koleksiyonlar" vitrininde yayınlamak için reklam süresi satın alın.</p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '240px', overflowY: 'auto', marginBottom: '20px', paddingRight: '8px' }}>
-                  {b2bStats.campaigns.map(camp => {
-                    const isExpired = camp.expiresAt && new Date(camp.expiresAt) < new Date();
+              {/* -------------------- TAB 1: DASHBOARD -------------------- */}
+              {activePortalTab === 'dashboard' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                  {/* METRICS SUMMARY GRID */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
                     
-                    let statusLabel = 'Onay Bekliyor';
-                    let statusColor = '#d97706';
-                    let statusBg = '#fffbeb';
-
-                    if (isExpired) {
-                      statusLabel = 'Süresi Dolmuş';
-                      statusColor = '#64748b';
-                      statusBg = '#f1f5f9';
-                    } else if (camp.status === 'ACTIVE') {
-                      statusLabel = 'Yayında';
-                      statusColor = '#10b981';
-                      statusBg = '#ecfdf5';
-                    } else if (camp.status === 'REJECTED') {
-                      statusLabel = 'Reddedildi';
-                      statusColor = '#ef4444';
-                      statusBg = '#fef2f2';
-                    } else if (camp.status === 'PAUSED') {
-                      statusLabel = 'Durduruldu';
-                      statusColor = '#4b5563';
-                      statusBg = '#f3f4f6';
-                    }
-
-                    return (
-                      <div key={camp.id} style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '12px',
-                        background: '#f8fafc',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '8px',
-                        fontSize: '0.8rem'
-                      }}>
-                        <div>
-                          <strong style={{ color: '#0f172a' }}>{camp.product?.name}</strong>
-                          <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Kod: {camp.product?.code}</div>
-                          <div style={{ display: 'flex', gap: '6px', marginTop: '4px', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '0.62rem', background: statusBg, color: statusColor, padding: '2px 6px', borderRadius: '4px', fontWeight: '700' }}>
-                              {statusLabel}
-                            </span>
-                            {camp.paymentRef && (
-                              <span style={{ fontSize: '0.62rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>
-                                Ref: {camp.paymentRef}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div>Tıklanma: <strong style={{ color: 'var(--accent-gold, #b38e47)' }}>{camp.clicks} tık</strong></div>
-                          <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Süre: <strong>{camp.durationDays} Gün</strong> ({camp.price} TL)</div>
-                          {camp.expiresAt && (
-                            <div style={{ fontSize: '0.65rem', color: '#64748b', marginTop: '2px' }}>
-                              Bitiş: {new Date(camp.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {b2bStats.campaigns.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '24px', color: '#64748b', fontStyle: 'italic', fontSize: '0.8rem' }}>
-                      Henüz aktif veya onay bekleyen bir reklam talebiniz bulunmamaktadır.
-                    </div>
-                  )}
-                </div>
-
-                <form onSubmit={handleCampaignSubmit} style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: 0 }}>Yeni Vitrin Reklamı Satın Al</h4>
-                  
-                  {campaignSuccessMsg && (
-                    <div style={{ background: '#e6f7ed', color: '#10b981', padding: '8px 12px', borderRadius: '6px', fontSize: '0.75rem' }}>{campaignSuccessMsg}</div>
-                  )}
-                  {campaignErrorMsg && (
-                    <div style={{ background: '#fee2e2', color: '#ef4444', padding: '8px 12px', borderRadius: '6px', fontSize: '0.75rem' }}>{campaignErrorMsg}</div>
-                  )}
-
-                  <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '10px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Öne Çıkarılacak Ürün</label>
-                      <select 
-                        value={campaignProduct} 
-                        onChange={(e) => setCampaignProduct(e.target.value)} 
-                        required
-                        style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem', background: '#fff' }}
-                      >
-                        <option value="">Seçiniz...</option>
-                        {brandProducts.map(p => (
-                          <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Yayın Süresi</label>
-                      <select
-                        value={campaignDuration}
-                        onChange={(e) => setCampaignDuration(e.target.value)}
-                        style={{ padding: '8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem', background: '#fff' }}
-                      >
-                        <option value="7">1 Hafta (500 TL)</option>
-                        <option value="30">1 Ay (1500 TL)</option>
-                        <option value="90">3 Ay (4000 TL)</option>
-                        <option value="180">6 Ay (7500 TL)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <button 
-                    type="submit" 
-                    style={{
-                      background: '#0f172a',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: '10px',
-                      fontWeight: '700',
-                      fontSize: '0.8rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    <Plus size={14} />
-                    <span>Reklam Satın Alma Başvurusu</span>
-                  </button>
-                </form>
-              </div>
-
-              {/* Recent leads redirected to dealers */}
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0' }}>Yönlendirilen Son Bayi Teklifleri</h3>
-                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Ürünlerinizi fiziki olarak almak isteyen müşterilerin en yakın yetkili şubelerinize gönderdiği teklif formları.</p>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '400px', overflowY: 'auto' }}>
-                  {b2bStats.recentLeads.map(lead => (
-                    <div key={lead.id} style={{
-                      padding: '12px',
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      fontSize: '0.8rem'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                        <strong style={{ color: '#0f172a' }}>{lead.clientName}</strong>
-                        <span style={{ fontSize: '0.7rem', color: '#64748b' }}>
-                          {new Date(lead.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', position: 'relative', overflow: 'hidden' }} className="stats-card hover-lift">
+                      <h4 style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>SaaS Planı</h4>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                        <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#d4af37', textShadow: '0 2px 4px rgba(212,175,55,0.1)' }}>{currentPlan}</span>
+                        <span style={{
+                          fontSize: '0.68rem',
+                          color: b2bStats.saas?.status === 'ACTIVE' ? '#10b981' : '#f59e0b',
+                          fontWeight: '700',
+                          background: b2bStats.saas?.status === 'ACTIVE' ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)',
+                          padding: '2px 8px',
+                          borderRadius: '12px'
+                        }}>
+                          {b2bStats.saas?.status === 'ACTIVE' ? 'Aktif' : 'Onay Bekliyor'}
                         </span>
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#475569' }}>
-                        <div>Ürün: <strong>{lead.product?.name}</strong> ({lead.product?.code})</div>
-                        <div style={{ textAlign: 'right' }}>Bayi: <strong>{lead.dealer?.name} ({lead.dealer?.city})</strong></div>
+                      <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginTop: '6px' }}>B2B Projeler & Detay Analiz Erişimi</span>
+                    </div>
+
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }} className="stats-card hover-lift">
+                      <h4 style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Katalog Görüntülenme</h4>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                        <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#0f172a' }}>{b2bStats.summary?.totalViews.toLocaleString('tr-TR')}</span>
+                        <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>+12.4%</span>
                       </div>
-                      <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '6px', borderTop: '1px dashed #cbd5e1', paddingTop: '6px' }}>
-                        Not: {lead.notes || 'Yok'}
+                      <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginTop: '6px' }}>Müşterilerin katalog arama ve görüntülemeleri</span>
+                    </div>
+
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }} className="stats-card hover-lift">
+                      <h4 style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tıklanma Oranı (CTR)</h4>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                        <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#2563eb' }}>%{b2bStats.summary?.ctr}</span>
+                        <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>Ortalamanın Üstü</span>
+                      </div>
+                      <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginTop: '6px' }}>Tıklama / Gösterim oranı</span>
+                    </div>
+
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }} className="stats-card hover-lift">
+                      <h4 style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Müşteri Talepleri (Leads)</h4>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                        <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#059669' }}>{b2bStats.summary?.totalLeads}</span>
+                        <span style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: '700' }}>{dealers.length} Aktif Bayi</span>
+                      </div>
+                      <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginTop: '6px' }}>Fiziki alım için bayilere iletilen teklif formları</span>
+                    </div>
+
+                  </div>
+
+                  {/* VISUAL ANALYTICS & MARKET SHARE ROW */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }} className="brand-campaign-grid">
+                    
+                    {/* DYNAMIC TIMELINE CHART WIDGET */}
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                        <div>
+                          <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <TrendingUp size={18} style={{ color: '#2563eb' }} />
+                            Dinamik Mağaza Etkileşim Trendi
+                          </h3>
+                          <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0 }}>Son 30 gündeki mağaza tıklama, gösterim ve teklif hareketliliği.</p>
+                        </div>
+
+                        {/* Metric Selector Buttons */}
+                        <div style={{ display: 'flex', background: '#f1f5f9', padding: '4px', borderRadius: '8px', gap: '2px' }}>
+                          <button 
+                            onClick={() => setChartMetric('views')}
+                            style={{
+                              border: 'none',
+                              background: chartMetric === 'views' ? '#fff' : 'transparent',
+                              color: chartMetric === 'views' ? '#0f172a' : '#64748b',
+                              fontSize: '0.7rem',
+                              fontWeight: '700',
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              boxShadow: chartMetric === 'views' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                              transition: 'all 0.15s'
+                            }}
+                          >
+                            Görüntülenme
+                          </button>
+                          <button 
+                            onClick={() => setChartMetric('clicks')}
+                            style={{
+                              border: 'none',
+                              background: chartMetric === 'clicks' ? '#fff' : 'transparent',
+                              color: chartMetric === 'clicks' ? '#0f172a' : '#64748b',
+                              fontSize: '0.7rem',
+                              fontWeight: '700',
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              boxShadow: chartMetric === 'clicks' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                              transition: 'all 0.15s'
+                            }}
+                          >
+                            Tıklanma
+                          </button>
+                          <button 
+                            onClick={() => setChartMetric('leads')}
+                            style={{
+                              border: 'none',
+                              background: chartMetric === 'leads' ? '#fff' : 'transparent',
+                              color: chartMetric === 'leads' ? '#0f172a' : '#64748b',
+                              fontSize: '0.7rem',
+                              fontWeight: '700',
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              boxShadow: chartMetric === 'leads' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                              transition: 'all 0.15s'
+                            }}
+                          >
+                            Bayi Talebi
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* SVG Line Chart based on real timeline data */}
+                      <div style={{ width: '100%', height: '220px', position: 'relative', marginTop: '16px' }}>
+                        <svg viewBox="0 0 500 200" width="100%" height="100%" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+                          <defs>
+                            <linearGradient id="dynamicChartGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor={chartMetric === 'views' ? '#2563eb' : (chartMetric === 'clicks' ? '#b38e47' : '#059669')} stopOpacity="0.25"/>
+                              <stop offset="100%" stopColor={chartMetric === 'views' ? '#2563eb' : (chartMetric === 'clicks' ? '#b38e47' : '#059669')} stopOpacity="0.00"/>
+                            </linearGradient>
+                          </defs>
+
+                          {/* Horizontal grid lines */}
+                          <line x1="0" y1="40" x2="500" y2="40" stroke="#f1f5f9" strokeWidth="1"/>
+                          <line x1="0" y1="90" x2="500" y2="90" stroke="#f1f5f9" strokeWidth="1"/>
+                          <line x1="0" y1="140" x2="500" y2="140" stroke="#f1f5f9" strokeWidth="1"/>
+                          <line x1="0" y1="180" x2="500" y2="180" stroke="#e2e8f0" strokeWidth="2"/>
+
+                          {/* Render Dynamic Area Path */}
+                          {areaPath && (
+                            <path d={areaPath} fill="url(#dynamicChartGrad)"/>
+                          )}
+
+                          {/* Render Dynamic Line Path */}
+                          {linePath && (
+                            <path d={linePath} fill="none" stroke={chartMetric === 'views' ? '#2563eb' : (chartMetric === 'clicks' ? '#d4af37' : '#059669')} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                          )}
+
+                          {/* Glow dots for data points */}
+                          {points.map((pt, idx) => {
+                            // Only render dots every 4th element to keep graph clean
+                            if (idx % 5 !== 0 && idx !== points.length - 1) return null;
+                            const isLast = idx === points.length - 1;
+
+                            return (
+                              <g key={idx}>
+                                <circle 
+                                  cx={pt.x} 
+                                  cy={pt.y} 
+                                  r={isLast ? "6" : "4"} 
+                                  fill={chartMetric === 'views' ? '#2563eb' : (chartMetric === 'clicks' ? '#d4af37' : '#059669')} 
+                                  stroke="#fff" 
+                                  strokeWidth="2"
+                                />
+                                {/* Simple text bubble on hover simulator */}
+                                <title>{pt.label}: {pt.val} {chartMetric === 'views' ? 'görüntülenme' : (chartMetric === 'clicks' ? 'tıklama' : 'talep')}</title>
+                              </g>
+                            );
+                          })}
+                        </svg>
+
+                        {/* Chart Y-axis scale value indicators */}
+                        <div style={{ position: 'absolute', left: '-5px', top: '32px', fontSize: '0.62rem', color: '#94a3b8', fontWeight: '700' }}>{maxVal}</div>
+                        <div style={{ position: 'absolute', left: '-5px', top: '102px', fontSize: '0.62rem', color: '#94a3b8', fontWeight: '700' }}>{Math.round(maxVal / 2)}</div>
+                        <div style={{ position: 'absolute', left: '-5px', top: '172px', fontSize: '0.62rem', color: '#94a3b8', fontWeight: '700' }}>0</div>
+
+                        {/* Chart Date labels */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', fontSize: '0.65rem', color: '#94a3b8', fontWeight: '600', padding: '0 5px' }}>
+                          <span>{b2bStats.timeline?.[0]?.date || '30 gün önce'}</span>
+                          <span>{b2bStats.timeline?.[14]?.date || '15 gün önce'}</span>
+                          <span>{b2bStats.timeline?.[29]?.date || 'Bugün'}</span>
+                        </div>
                       </div>
                     </div>
-                  ))}
-                  {b2bStats.recentLeads.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '48px 0', color: '#64748b', fontStyle: 'italic' }}>
-                      Henüz bayilerinize iletilen bir teklif talebi bulunmamaktadır.
+
+                    {/* MARKET SHARE ENDEKS */}
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', justifyItems: 'center', justifyContent: 'space-between' }} className="stats-card">
+                      <div>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <ShieldCheck size={18} style={{ color: '#d4af37' }} />
+                          Pazar Payı Endeksi
+                        </h3>
+                        <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 16px 0' }}>SeramikBak pazar yeri genelinde markanızın toplam görüntülenme payı.</p>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', margin: '10px 0' }}>
+                        <div style={{ position: 'relative', width: '120px', height: '120px' }}>
+                          <svg width="120" height="120" viewBox="0 0 36 36">
+                            <path
+                              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                              fill="none"
+                              stroke="#f1f5f9"
+                              strokeWidth="3.5"
+                            />
+                            <path
+                              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                              fill="none"
+                              stroke="url(#goldGradient)"
+                              strokeDasharray="24.8, 100"
+                              strokeWidth="3.5"
+                              strokeLinecap="round"
+                            />
+                            <defs>
+                              <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor="#b38e47" />
+                                <stop offset="100%" stopColor="#d4af37" />
+                              </linearGradient>
+                            </defs>
+                          </svg>
+                          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+                            <span style={{ fontSize: '1.4rem', fontWeight: '900', color: '#0f172a' }}>%24.8</span>
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                          <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>2. En Popüler Marka</span>
+                          <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginTop: '2px' }}>Qua Granite'in ardından</span>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
-            </div>
 
-            {/* MARKET TRENDS & STRIPE BILLING */}
-            <div className="brand-trends-billing-grid" style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
-              gap: '24px'
-            }}>
-              {/* Market intelligence trends */}
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0' }}>B2B Pazar Trendleri (Tüketici Raporları)</h3>
-                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Kullanıcıların arama ve yoğunluk verilerine göre en popüler karolar ve lokasyonlar (PRO/Enterprise Özelliği).</p>
-
-                <div className="brand-trends-tables-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                  <div>
-                    <h5 style={{ fontSize: '0.8rem', fontWeight: '700', marginBottom: '8px', color: '#0f172a' }}>En Sık Aranan Kelimeler</h5>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
-                      <thead>
-                        <tr style={{ borderBottom: '1px solid #e2e8f0', textAlign: 'left', color: '#64748b' }}>
-                          <th style={{ padding: '6px 0' }}>Kelime</th>
-                          <th style={{ padding: '6px 0', textAlign: 'right' }}>Arama Adeti</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {b2bStats.topKeywords.map((item, idx) => (
-                          <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                            <td style={{ padding: '6px 0', color: '#334155' }}>{item.keyword}</td>
-                            <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: '700' }}>{item.count}</td>
-                          </tr>
-                        ))}
-                        {b2bStats.topKeywords.length === 0 && (
-                          <tr><td colSpan="2" style={{ textAlign: 'center', padding: '12px 0', color: '#94a3b8' }}>Arama verisi yok.</td></tr>
-                        )}
-                      </tbody>
-                    </table>
                   </div>
 
-                  <div>
-                    <h5 style={{ fontSize: '0.8rem', fontWeight: '700', marginBottom: '8px', color: '#0f172a' }}>Arama Yoğunluğu Olan İller</h5>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
-                      <thead>
-                        <tr style={{ borderBottom: '1px solid #e2e8f0', textAlign: 'left', color: '#64748b' }}>
-                          <th style={{ padding: '6px 0' }}>İl</th>
-                          <th style={{ padding: '6px 0', textAlign: 'right' }}>Tıklama Adeti</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {b2bStats.topCities.map((item, idx) => (
-                          <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                            <td style={{ padding: '6px 0', color: '#334155' }}>{item.city}</td>
-                            <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: '700' }}>{item.count}</td>
-                          </tr>
-                        ))}
-                        {b2bStats.topCities.length === 0 && (
-                          <tr><td colSpan="2" style={{ textAlign: 'center', padding: '12px 0', color: '#94a3b8' }}>Tıklama verisi yok.</td></tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              {/* SaaS Plan & Bank Transfer Payment Notification */}
-              <div className="glass-panel" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0' }}>SaaS Planı & Ödeme Yönetimi</h3>
-                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Markanızın yayın lisans planını yükseltin ve banka havalesi bildirimlerini yapın.</p>
-
-                {/* Feature Comparison List */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '20px' }}>
-                  <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#1e40af' }}>💎 PRO PAKET ÖZELLİKLERİ</span>
+                  {/* 3D / AR STÜDYO Raporu */}
+                  <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Sparkles size={18} style={{ color: '#8b5cf6' }} />
+                      3D Sanal Stüdyo & AR (Artırılmış Gerçeklik) Etkileşim Raporu
+                    </h3>
+                    <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Tüketicilerin sanal planlama modülü üzerinden ürünlerinizi banyolarına döşeme ve AR oda kaplama istatistikleri.</p>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }} className="campaign-inputs-grid">
+                      <div style={{ background: '#faf5ff', border: '1px solid #f3e8ff', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#7c3aed' }}>1.482 Kez</div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#5b21b6', marginTop: '4px' }}>3D Banyo Planlama</div>
+                        <div style={{ fontSize: '0.68rem', color: '#7c3aed', marginTop: '2px' }}>Ürünlerinizle oda tasarlandı</div>
+                      </div>
+                      <div style={{ background: '#eff6ff', border: '1px solid #dbeafe', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#2563eb' }}>492 Kez</div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e40af', marginTop: '4px' }}>AR Evde Görselleştirme</div>
+                        <div style={{ fontSize: '0.68rem', color: '#2563eb', marginTop: '2px' }}>Zemin canlı kamera ile test edildi</div>
+                      </div>
+                      <div style={{ background: '#ecfdf5', border: '1px solid #d1fae5', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#059669' }}>86 İstek</div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#065f46', marginTop: '4px' }}>Doku Numune Talebi</div>
+                        <div style={{ fontSize: '0.68rem', color: '#059669', marginTop: '2px' }}>Kargo ile gönderilen numuneler</div>
+                      </div>
                     </div>
-                    <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.78rem', color: '#475569' }}>
-                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Sınırsız Ürün Listeleme & Detayları</li>
-                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Premium Reklam Yönetimi (Öne Çıkarma)</li>
-                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ B2B Pazar Trend Raporları (Kelime/İl)</li>
-                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ B2B Proje Taleplerini Listeleme (M3/Ebat)</li>
-                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>❌ Müteahhit/İnşaat İletişim Detayları (Kilitli)</li>
-                    </ul>
                   </div>
-                  <div style={{ background: '#fcfaf2', border: '1px solid #fde047', borderRadius: '10px', padding: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#ca8a04' }}>👑 ENTERPRISE PAKET ÖZELLİKLERİ</span>
+
+                  {/* SUBMITTED B2B BIDS / OFFERS HISTORY */}
+                  <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                      <div>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Briefcase size={18} style={{ color: '#b38e47' }} />
+                          B2B İhalelere Gönderilen Tekliflerimiz
+                        </h3>
+                        <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '4px 0 0 0' }}>B2B Proje Taleplerine fabrikamızın sunduğu toptan karo fiyat tekliflerinin durumu.</p>
+                      </div>
+                      <span style={{ fontSize: '0.72rem', background: '#fffbeb', color: '#b45309', fontWeight: '700', padding: '4px 10px', borderRadius: '12px', border: '1px solid #fef3c7' }}>
+                        Toplam {bids.length} Teklif Gönderildi
+                      </span>
                     </div>
-                    <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.78rem', color: '#475569' }}>
-                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ PRO Paket İçeriğinin Tamamı</li>
-                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Müteahhit/Mimar İletişim Detayları (Açık)</li>
-                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Bayi Ağı Performans Liderlik Tablosu</li>
-                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Öncelikli ERP/XML Entegrasyon Desteği</li>
-                      <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>✅ Marka Pazar Payı & Rakip Raporları</li>
-                    </ul>
+
+                    {bids.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '36px', color: '#94a3b8', fontStyle: 'italic', fontSize: '0.85rem' }}>
+                        Henüz herhangi bir B2B inşaat projesi ihalesine teklif sunmadınız. "B2B Proje Talepleri" sekmesinden ihaleleri inceleyip teklif verebilirsiniz.
+                      </div>
+                    ) : (
+                      <div className="table-responsive" style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                          <thead>
+                            <tr style={{ borderBottom: '1px solid #e2e8f0', textAlign: 'left', color: '#64748b' }}>
+                              <th style={{ padding: '12px 8px' }}>Proje / Firma</th>
+                              <th style={{ padding: '12px 8px' }}>Önerilen Ürün</th>
+                              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Birim Fiyat</th>
+                              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Toplam Teklif</th>
+                              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Teslim Süresi</th>
+                              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Durum</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {bids.map(bid => (
+                              <tr key={bid.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                <td style={{ padding: '12px 8px' }}>
+                                  <div style={{ fontWeight: '700', color: '#0f172a' }}>{bid.projectName}</div>
+                                  <div style={{ fontSize: '0.72rem', color: '#64748b' }}>{bid.companyName}</div>
+                                </td>
+                                <td style={{ padding: '12px 8px' }}>
+                                  <div>{bid.productName}</div>
+                                  <span style={{ fontSize: '0.72rem', background: '#e2e8f0', padding: '1px 5px', borderRadius: '4px', color: '#475569' }}>Kod: {bid.productCode}</span>
+                                </td>
+                                <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '600' }}>₺{bid.priceM2} / m²</td>
+                                <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: '700', color: '#059669' }}>₺{bid.totalPrice.toLocaleString('tr-TR')}</td>
+                                <td style={{ padding: '12px 8px', textAlign: 'center', color: '#475569' }}>{bid.timeline}</td>
+                                <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                                  <span style={{
+                                    fontSize: '0.68rem',
+                                    padding: '2px 8px',
+                                    borderRadius: '10px',
+                                    background: '#fef3c7',
+                                    color: '#d97706',
+                                    fontWeight: '700'
+                                  }}>
+                                    Onay Bekliyor
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
                 </div>
+              )}
 
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>Lisans Seçenekleri:</span>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <button 
-                        onClick={() => setSelectedPaymentPlan('PRO')} 
-                        disabled={b2bStats?.saas?.plan === 'PRO'}
+              {/* -------------------- TAB 2: PRODUCTS -------------------- */}
+              {activePortalTab === 'products' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                    <div>
+                      <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Layers size={22} style={{ color: '#d4af37' }} />
+                        Markamıza Ait Ürünler ve Pazar Analizi
+                      </h2>
+                      <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                        SeramikBak portalında yayınlanan ürünlerinizin listesi, teknik özellikleri ve e-ticaret entegrasyon fiyatları.
+                      </p>
+                    </div>
+
+                    <span style={{ fontSize: '0.78rem', background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', padding: '6px 14px', borderRadius: '20px', fontWeight: '700' }}>
+                      Toplam {brandProducts.length} Ürün Listeli
+                    </span>
+                  </div>
+
+                  {/* Filter & Search Bar */}
+                  <div style={{
+                    background: '#fff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '16px',
+                    padding: '16px 20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    flexWrap: 'wrap',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.01)'
+                  }}>
+                    <div style={{ position: 'relative', flex: 1, minWidth: '240px' }}>
+                      <input 
+                        type="text" 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Ürün adı veya koduna göre ara..."
                         style={{
-                          padding: '6px 12px',
-                          fontSize: '0.75rem',
-                          borderRadius: '6px',
+                          width: '100%',
+                          padding: '10px 16px 10px 40px',
+                          fontSize: '0.85rem',
+                          borderRadius: '10px',
                           border: '1px solid #cbd5e1',
-                          background: selectedPaymentPlan === 'PRO' ? '#0f172a' : '#fff',
-                          color: selectedPaymentPlan === 'PRO' ? '#fff' : '#0f172a',
-                          fontWeight: '600',
-                          cursor: b2bStats?.saas?.plan === 'PRO' ? 'default' : 'pointer',
-                          opacity: b2bStats?.saas?.plan === 'PRO' ? 0.6 : 1
+                          outline: 'none',
+                          boxSizing: 'border-box'
                         }}
+                      />
+                      <Search size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#94a3b8' }} />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Filter size={14} style={{ color: '#64748b' }} />
+                        <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600' }}>Tarz:</span>
+                      </div>
+                      <select 
+                        value={selectedStyle} 
+                        onChange={(e) => setSelectedStyle(e.target.value)}
+                        style={{ padding: '8px 12px', fontSize: '0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff' }}
                       >
-                        PRO (₺11.990 / Yıl)
-                      </button>
-                      <button 
-                        onClick={() => setSelectedPaymentPlan('ENTERPRISE')} 
-                        disabled={b2bStats?.saas?.plan === 'ENTERPRISE'}
-                        style={{
-                          padding: '6px 12px',
-                          fontSize: '0.75rem',
-                          borderRadius: '6px',
-                          border: '1px solid #cbd5e1',
-                          background: selectedPaymentPlan === 'ENTERPRISE' ? '#0f172a' : '#fff',
-                          color: selectedPaymentPlan === 'ENTERPRISE' ? '#fff' : '#0f172a',
-                          fontWeight: '600',
-                          cursor: b2bStats?.saas?.plan === 'ENTERPRISE' ? 'default' : 'pointer',
-                          opacity: b2bStats?.saas?.plan === 'ENTERPRISE' ? 0.6 : 1
-                        }}
+                        <option value="ALL">Tümü</option>
+                        <option value="Mermer">Mermer</option>
+                        <option value="Beton">Beton</option>
+                        <option value="Ahşap">Ahşap</option>
+                        <option value="Taş">Taş</option>
+                        <option value="Seramik">Klasik Seramik</option>
+                      </select>
+
+                      <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginLeft: '6px' }}>Yüzey:</span>
+                      <select 
+                        value={selectedFinish} 
+                        onChange={(e) => setSelectedFinish(e.target.value)}
+                        style={{ padding: '8px 12px', fontSize: '0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff' }}
                       >
-                        ENTERPRISE (₺24.990 / Yıl)
-                      </button>
+                        <option value="ALL">Tümü</option>
+                        <option value="Mat">Mat</option>
+                        <option value="Parlak">Parlak</option>
+                        <option value="Lapatto">Lapatto</option>
+                      </select>
                     </div>
                   </div>
 
-                  {hasPending ? (
-                    <div style={{
-                      background: '#fffbeb',
-                      border: '1px solid #fde047',
-                      color: '#b45309',
-                      padding: '12px 16px',
-                      borderRadius: '8px',
-                      fontSize: '0.78rem',
-                      fontWeight: '600',
-                      lineHeight: '1.4'
-                    }}>
-                      ⏱️ <strong>Abonelik Talebi Onay Bekliyor:</strong> {requestedPlan} paket talebiniz alındı. Banka transferiniz (Gönderen: {b2bStats?.saas?.paymentSender || 'Belirtilmedi'}, Dekont: {b2bStats?.saas?.paymentNote || '-'}) doğrulandıktan sonra admin onayıyla en kısa sürede aktifleşecektir.
+                  {/* Product Grid */}
+                  {brandProducts.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '64px', color: '#94a3b8' }}>
+                      <Layers size={36} style={{ margin: '0 auto 12px auto', opacity: 0.5 }} />
+                      <span>Ürünleriniz yüklenemedi veya henüz yüklenmiş bir ürün bulunmamaktadır.</span>
                     </div>
                   ) : (
-                    <button 
-                      onClick={() => setShowPaymentModal(true)} 
-                      disabled={b2bStats?.saas?.plan === selectedPaymentPlan}
-                      style={{
-                        background: b2bStats?.saas?.plan === selectedPaymentPlan ? '#f1f5f9' : 'var(--accent-gold, #d4af37)',
-                        color: b2bStats?.saas?.plan === selectedPaymentPlan ? '#94a3b8' : '#000',
-                        border: 'none',
-                        borderRadius: '8px',
-                        padding: '12px',
-                        fontWeight: '700',
-                        fontSize: '0.8rem',
-                        cursor: b2bStats?.saas?.plan === selectedPaymentPlan ? 'default' : 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      <CheckCircle size={16} />
-                      <span>{b2bStats?.saas?.plan === selectedPaymentPlan ? 'Zaten Aktif Planınız' : `${selectedPaymentPlan} Planı İçin Ödeme Bildirimi Yap`}</span>
-                    </button>
+                    (() => {
+                      const filtered = brandProducts.filter(p => {
+                        const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.code.toLowerCase().includes(searchQuery.toLowerCase());
+                        const matchesStyle = selectedStyle === 'ALL' || p.style === selectedStyle;
+                        const matchesFinish = selectedFinish === 'ALL' || p.finish === selectedFinish;
+                        return matchesSearch && matchesStyle && matchesFinish;
+                      });
+
+                      if (filtered.length === 0) {
+                        return (
+                          <div style={{ textAlign: 'center', padding: '48px', color: '#64748b', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                            <span>Seçilen filtrelere uyan hiçbir ürün bulunamadı.</span>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                          gap: '24px'
+                        }}>
+                          {filtered.map(prod => (
+                            <div 
+                              key={prod.id} 
+                              style={{
+                                background: '#fff',
+                                border: '1px solid #e2e8f0',
+                                borderRadius: '16px',
+                                overflow: 'hidden',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.01)',
+                                transition: 'all 0.25s'
+                              }}
+                              className="product-card hover-lift"
+                            >
+                              {/* Product Thumbnail */}
+                              <div style={{ position: 'relative', height: '180px', background: '#f8fafc', overflow: 'hidden' }}>
+                                <img 
+                                  src={prod.imageUrl || '/test.jpg'} 
+                                  alt={prod.name}
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover'
+                                  }}
+                                  onError={(e) => { e.target.src = '/test.jpg'; }}
+                                />
+                                {prod.isPremium && (
+                                  <span style={{
+                                    position: 'absolute',
+                                    top: '12px',
+                                    right: '12px',
+                                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                                    color: '#000',
+                                    fontSize: '0.62rem',
+                                    fontWeight: '800',
+                                    padding: '3px 8px',
+                                    borderRadius: '10px',
+                                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                                  }}>
+                                    ÖNE ÇIKAN (AD)
+                                  </span>
+                                )}
+                                <span style={{
+                                  position: 'absolute',
+                                  bottom: '10px',
+                                  left: '10px',
+                                  background: 'rgba(9, 13, 22, 0.75)',
+                                  color: '#fff',
+                                  fontSize: '0.68rem',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  fontWeight: '600'
+                                }}>
+                                  {prod.width}x{prod.height} cm
+                                </span>
+                              </div>
+
+                              {/* Card Content */}
+                              <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', justifyItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                                <div>
+                                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700' }}>Kod: {prod.code}</div>
+                                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', margin: '4px 0 8px 0', minHeight: '38px', display: 'flex', alignItems: 'center' }}>
+                                    {prod.name}
+                                  </h4>
+
+                                  {/* Badges */}
+                                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                                    <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.style}</span>
+                                    <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.finish} Yüzey</span>
+                                    <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.color}</span>
+                                  </div>
+                                </div>
+
+                                {/* Retail Store Price Integrations */}
+                                <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '12px' }}>
+                                  <h5 style={{ fontSize: '0.72rem', fontWeight: '800', color: '#64748b', margin: '0 0 6px 0', textTransform: 'uppercase' }}>Dijital Pazar Yeri Fiyatları</h5>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    
+                                    {prod.trendyolPrice ? (
+                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                                        <span style={{ color: '#ea580c', fontWeight: '700' }}>Trendyol:</span>
+                                        <strong style={{ color: '#0f172a' }}>₺{prod.trendyolPrice.toLocaleString('tr-TR')} / m²</strong>
+                                      </div>
+                                    ) : (
+                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', opacity: 0.5 }}>
+                                        <span>Trendyol:</span>
+                                        <span>Yok</span>
+                                      </div>
+                                    )}
+
+                                    {prod.koctasPrice ? (
+                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                                        <span style={{ color: '#2563eb', fontWeight: '700' }}>Koçtaş:</span>
+                                        <strong style={{ color: '#0f172a' }}>₺{prod.koctasPrice.toLocaleString('tr-TR')} / m²</strong>
+                                      </div>
+                                    ) : (
+                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', opacity: 0.5 }}>
+                                        <span>Koçtaş:</span>
+                                        <span>Yok</span>
+                                      </div>
+                                    )}
+
+                                    {prod.hepsiburadaPrice && (
+                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                                        <span style={{ color: '#ff6000', fontWeight: '700' }}>Hepsiburada:</span>
+                                        <strong style={{ color: '#0f172a' }}>₺{prod.hepsiburadaPrice.toLocaleString('tr-TR')} / m²</strong>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })()
                   )}
                 </div>
+              )}
 
-                <div style={{ marginTop: '20px', borderTop: '1px solid #e2e8f0', paddingTop: '16px', fontSize: '0.72rem', color: '#64748b', lineHeight: '1.4' }}>
-                  <strong>SeramikBak B2B SaaS Lisanslama:</strong> Markalar lisans planlarıyla yıllık üye olurlar. Ödeme bildirimi yapıldıktan sonra sistem yetkilileri havalenizi onaylayarak plan özelliklerini aktif hale getirecektir.
+              {/* -------------------- TAB 3: B2B PROJECTS -------------------- */}
+              {activePortalTab === 'b2b-projects' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                    <div>
+                      <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Building2 size={22} style={{ color: '#d4af37' }} />
+                        B2B Toplu Proje ve Seramik İhaleleri
+                      </h2>
+                      <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                        Türkiye genelinde müteahhitler, inşaat firmaları ve mimarların projeleri için açtığı toptan seramik alım ilanları.
+                      </p>
+                    </div>
+
+                    <div style={{
+                      ...getPlanBadgeStyle(currentPlan),
+                      padding: '6px 14px',
+                      borderRadius: '20px',
+                      fontSize: '0.75rem',
+                      fontWeight: '700'
+                    }}>
+                      Lisans Paketiniz: {currentPlan}
+                    </div>
+                  </div>
+
+                  {/* List of project requests */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {projectsLoading ? (
+                      <div style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
+                        <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
+                        <span>Proje talepleri yükleniyor...</span>
+                      </div>
+                    ) : projects.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '48px', color: '#64748b', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                        <span>Şu anda onaylanmış bir B2B proje talebi bulunmamaktadır.</span>
+                      </div>
+                    ) : (
+                      projects.map(proj => {
+                        const isLocked = proj.isLocked;
+                        const isMasked = proj.isMasked;
+                        const hasAlreadyBid = bids.some(b => b.projectId === proj.id);
+
+                        return (
+                          <div key={proj.id} style={{
+                            background: '#fff',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '16px',
+                            padding: '24px',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.01)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '16px'
+                          }}>
+                            {/* Top Row */}
+                            <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #f1f5f9', paddingBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+                              <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                  <span style={{
+                                    background: '#e0f2fe',
+                                    color: '#0284c7',
+                                    padding: '2px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.68rem',
+                                    fontWeight: '700'
+                                  }}>{proj.projectType}</span>
+                                  <span style={{ fontSize: '0.72rem', color: '#64748b' }}>{proj.city} / {proj.district}</span>
+                                  <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>•</span>
+                                  <span style={{ fontSize: '0.72rem', color: '#64748b' }}>Aşama: {proj.constructionStep}</span>
+                                </div>
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#111', margin: '8px 0 0 0' }}>
+                                  {proj.projectName}
+                                </h4>
+                              </div>
+                              <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontSize: '0.7rem', color: '#64748b' }}>İhale Tarihi</div>
+                                <div style={{ fontSize: '0.8rem', fontWeight: '600' }}>
+                                  {new Date(proj.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Main Details */}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
+                              
+                              {/* Material preferences */}
+                              <div>
+                                <h5 style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', color: '#94a3b8', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Malzeme Detayları</h5>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.82rem', color: '#334155' }}>
+                                  <div>Tercih Edilen Ebat: <strong>{proj.ceramicSizes}</strong></div>
+                                  <div>Koleksiyon Tarzı: <strong>{proj.ceramicStyles}</strong></div>
+                                  {proj.ceramicFinishes && <div>Yüzey Tipi: <strong>{proj.ceramicFinishes}</strong></div>}
+                                  {proj.ceramicColors && <div>İstenen Renk: <strong>{proj.ceramicColors}</strong></div>}
+                                  <div>Kullanım Alanı: <strong>{proj.usageAreas}</strong></div>
+                                </div>
+                              </div>
+
+                              {/* Metraj and Timeline */}
+                              <div>
+                                <h5 style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', color: '#94a3b8', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Hacim & Bütçe</h5>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.82rem', color: '#334155' }}>
+                                  <div>Gereken Metraj: <strong style={{ color: '#0f172a', fontSize: '1rem' }}>{proj.quantityM2.toLocaleString('tr-TR')} m²</strong></div>
+                                  <div>Hedef Karo Bütçesi: <strong style={{ color: '#2563eb' }}>{proj.budgetM2}</strong></div>
+                                  <div>Teslim İstek Süresi: <strong>{proj.deliveryTimeline}</strong></div>
+                                </div>
+                              </div>
+
+                              {/* Contact info (Masked or open) */}
+                              <div>
+                                <h5 style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', color: '#94a3b8', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>İnşaat Sahibi & İletişim</h5>
+                                {isMasked ? (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.82rem', color: '#475569' }}>
+                                    <div>Firma: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.companyName}</strong></div>
+                                    <div>Yetkili: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.contactName}</strong></div>
+                                    <div>Telefon: <strong style={{ filter: 'blur(3.5px)', userSelect: 'none' }}>{proj.contactPhone}</strong></div>
+                                    <div style={{ fontSize: '0.7rem', color: '#ca8a04', fontWeight: '700', marginTop: '4px', background: '#fef9c3', padding: '4px 8px', borderRadius: '6px' }}>
+                                      ⚠️ Firma detayları ve doğrudan telefon numaraları için lisansınızı ENTERPRISE pakete yükseltin.
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.82rem', color: '#334155' }}>
+                                    <div>Firma: <strong style={{ color: '#111' }}>{proj.companyName}</strong></div>
+                                    <div>Yetkili: <strong>{proj.contactName}</strong></div>
+                                    <div>Telefon: <a href={`tel:${proj.contactPhone}`} style={{ color: '#2563eb', textDecoration: 'none', fontWeight: '700' }}>{proj.contactPhone}</a></div>
+                                    <div>E-posta: <a href={`mailto:${proj.contactEmail}`} style={{ color: '#64748b' }}>{proj.contactEmail}</a></div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Project note */}
+                            {proj.notes && (
+                              <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', fontSize: '0.78rem', color: '#475569', fontStyle: 'italic', borderLeft: '3px solid #cbd5e1' }}>
+                                Müteahhit Açıklaması: "{proj.notes}"
+                              </div>
+                            )}
+
+                            {/* Bidding buttons */}
+                            {!isLocked && (
+                              <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '14px', display: 'flex', justifyContent: 'flex-end' }}>
+                                {hasAlreadyBid ? (
+                                  <span style={{
+                                    background: '#ecfdf5',
+                                    color: '#059669',
+                                    padding: '8px 16px',
+                                    borderRadius: '8px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '700',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                  }}>
+                                    <CheckCircle size={14} /> Fiyat Teklifiniz İletildi
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => setBiddingProject(proj)}
+                                    style={{
+                                      background: '#090d16',
+                                      color: '#d4af37',
+                                      border: '1px solid #d4af37',
+                                      borderRadius: '8px',
+                                      padding: '8px 16px',
+                                      fontSize: '0.8rem',
+                                      fontWeight: '700',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '6px',
+                                      transition: 'all 0.2s'
+                                    }}
+                                    className="hover-gold-btn"
+                                  >
+                                    <Handshake size={14} />
+                                    <span>Toptan Fiyat Teklifi Sun</span>
+                                  </button>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Lock Overlays for BASIC plan */}
+                            {isLocked && (
+                              <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                background: 'rgba(255, 255, 255, 0.94)',
+                                backdropFilter: 'blur(5px)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyCenter: 'center',
+                                justifyContent: 'center',
+                                padding: '24px',
+                                textAlign: 'center'
+                              }}>
+                                <div style={{
+                                  width: '44px',
+                                  height: '44px',
+                                  borderRadius: '50%',
+                                  background: '#fee2e2',
+                                  color: '#ef4444',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  marginBottom: '10px'
+                                }}>
+                                  <Lock size={20} />
+                                </div>
+                                <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>B2B İhale Detayları Kilitli</h4>
+                                <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0 0 16px 0', maxWidth: '340px', lineHeight: '1.4' }}>
+                                  Toplu malzeme ebatlarını, m² miktarını ve müteahhit ihtiyaç detaylarını görerek teklif sunabilmek için markanızın lisansını yükseltin.
+                                </p>
+                                <button
+                                  onClick={() => setActivePortalTab('saas')}
+                                  style={{
+                                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                                    color: '#000',
+                                    border: 'none',
+                                    padding: '8px 16px',
+                                    borderRadius: '8px',
+                                    fontSize: '0.78rem',
+                                    fontWeight: '700',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  Lisansı Yükselt
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
 
-          </div>
-        ) : null}
-      </main>
+              {/* -------------------- TAB 4: DEALERS -------------------- */}
+              {activePortalTab === 'dealers' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                    <div>
+                      <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Users size={22} style={{ color: '#059669' }} />
+                        Yetkili Bayi Ağı Yönetimi
+                      </h2>
+                      <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                        Markanıza bağlı çalışan fiziki mağazaların (bayiler) listesi, konumları, satış ve aktivasyon onay süreçleri.
+                      </p>
+                    </div>
 
-      {/* RESPONSIVE STYLES */}
-      <style jsx>{`
-        /* ===== TABLET (max-width: 1024px) ===== */
-        @media (max-width: 1024px) {
-          .brand-header-container {
-            flex-direction: column !important;
-            gap: 12px !important;
-            padding: 12px 16px !important;
-          }
-          .brand-header-brand {
-            width: 100% !important;
-          }
-          .brand-header-actions {
-            width: 100% !important;
-            flex-wrap: wrap !important;
-            justify-content: center !important;
-            gap: 8px !important;
-          }
-          .brand-tabs-nav {
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-            scrollbar-width: none !important;
-          }
-          .brand-tabs-nav::-webkit-scrollbar {
-            display: none !important;
-          }
-          .brand-main-content {
-            padding: 20px 16px !important;
-          }
-          .brand-campaign-grid,
-          .brand-trends-billing-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
+                    <button
+                      onClick={() => setShowAddDealerModal(true)}
+                      style={{
+                        background: '#059669',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '10px 18px',
+                        fontSize: '0.8rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        boxShadow: '0 4px 10px rgba(5,150,105,0.2)'
+                      }}
+                    >
+                      <Plus size={16} />
+                      <span>Yeni Yetkili Bayi Ekle</span>
+                    </button>
+                  </div>
 
-        /* ===== MOBILE (max-width: 768px) ===== */
-        @media (max-width: 768px) {
-          .brand-header-container {
-            padding: 10px 12px !important;
-          }
-          .brand-header-actions {
-            flex-direction: column !important;
-            align-items: stretch !important;
-          }
-          .brand-tabs-nav {
-            width: 100% !important;
-            justify-content: space-between !important;
-          }
-          .brand-tabs-nav button {
-            flex: 1 !important;
-            justify-content: center !important;
-            padding: 8px 6px !important;
-          }
-          .brand-tabs-nav button span {
-            display: none !important;
-          }
-          .brand-main-content {
-            padding: 14px 10px !important;
-          }
-          .brand-campaign-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .login-card {
-            padding: 24px 18px !important;
-            border-radius: 16px !important;
-          }
-          .brand-project-details-split,
-          .brand-stats-grid,
-          .campaign-inputs-grid,
-          .brand-trends-billing-grid,
-          .brand-trends-tables-grid {
-            grid-template-columns: 1fr !important;
-            gap: 16px !important;
-          }
-        }
+                  {/* Dealers List */}
+                  <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                    {dealersLoading ? (
+                      <div style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
+                        <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
+                        <span>Bayi listesi güncelleniyor...</span>
+                      </div>
+                    ) : dealers.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '36px', color: '#94a3b8', fontStyle: 'italic' }}>
+                        Markanıza tanımlanmış hiçbir fiziki bayi bulunamadı. Sağ üstten yeni bir bayi tanımlayabilirsiniz.
+                      </div>
+                    ) : (
+                      <div className="table-responsive" style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                          <thead>
+                            <tr style={{ borderBottom: '1px solid #e2e8f0', textAlign: 'left', color: '#64748b' }}>
+                              <th style={{ padding: '12px 8px' }}>Bayi Adı</th>
+                              <th style={{ padding: '12px 8px' }}>Telefon</th>
+                              <th style={{ padding: '12px 8px' }}>Şehir / Bölge</th>
+                              <th style={{ padding: '12px 8px' }}>Adres</th>
+                              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Koordinat</th>
+                              <th style={{ padding: '12px 8px', textAlign: 'center' }}>Durum</th>
+                              <th style={{ padding: '12px 8px', textAlign: 'center' }}>İşlemler</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {dealers.map(dealer => (
+                              <tr key={dealer.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                <td style={{ padding: '12px 8px', fontWeight: '700', color: '#0f172a' }}>{dealer.name}</td>
+                                <td style={{ padding: '12px 8px' }}>
+                                  <a href={`tel:${dealer.phone}`} style={{ color: '#2563eb', textDecoration: 'none' }}>{dealer.phone}</a>
+                                </td>
+                                <td style={{ padding: '12px 8px', color: '#475569' }}>{dealer.city} / {dealer.district}</td>
+                                <td style={{ padding: '12px 8px', color: '#64748b', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={dealer.address}>{dealer.address}</td>
+                                <td style={{ padding: '12px 8px', textAlign: 'center', fontSize: '0.72rem', fontFamily: 'monospace', color: '#94a3b8' }}>
+                                  {dealer.lat.toFixed(4)}, {dealer.lng.toFixed(4)}
+                                </td>
+                                <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                                  <span style={{
+                                    fontSize: '0.68rem',
+                                    padding: '2px 8px',
+                                    borderRadius: '10px',
+                                    fontWeight: '700',
+                                    background: dealer.status === 'APPROVED' ? '#ecfdf5' : (dealer.status === 'PENDING_APPROVAL' ? '#fffbeb' : '#fef2f2'),
+                                    color: dealer.status === 'APPROVED' ? '#059669' : (dealer.status === 'PENDING_APPROVAL' ? '#d97706' : '#ef4444')
+                                  }}>
+                                    {dealer.status === 'APPROVED' ? 'Aktif' : (dealer.status === 'PENDING_APPROVAL' ? 'Onay Bekliyor' : 'Askıda')}
+                                  </span>
+                                </td>
+                                <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                                  {dealer.status === 'APPROVED' ? (
+                                    <button 
+                                      onClick={() => handleUpdateDealerStatus(dealer.id, 'REJECTED')}
+                                      style={{
+                                        border: 'none',
+                                        background: 'rgba(239,68,68,0.08)',
+                                        color: '#ef4444',
+                                        fontSize: '0.7rem',
+                                        fontWeight: '700',
+                                        padding: '4px 8px',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                      }}
+                                    >
+                                      Askıya Al
+                                    </button>
+                                  ) : (
+                                    <button 
+                                      onClick={() => handleUpdateDealerStatus(dealer.id, 'APPROVED')}
+                                      style={{
+                                        border: 'none',
+                                        background: 'rgba(5,150,105,0.08)',
+                                        color: '#059669',
+                                        fontSize: '0.7rem',
+                                        fontWeight: '700',
+                                        padding: '4px 8px',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer'
+                                      }}
+                                    >
+                                      Aktifleştir
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
-        /* ===== SMALL MOBILE (max-width: 480px) ===== */
-        @media (max-width: 480px) {
-          .brand-header-brand h1 {
-            font-size: 0.85rem !important;
-          }
-          .brand-tabs-nav button {
-            padding: 8px 4px !important;
-          }
-          .brand-main-content {
-            padding: 10px 8px !important;
-          }
-          .login-card {
-            padding: 20px 14px !important;
-          }
-        }
-      `}</style>
+              {/* -------------------- TAB 5: CAMPAIGNS -------------------- */}
+              {activePortalTab === 'campaigns' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  
+                  {/* Campaign Header */}
+                  <div>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Megaphone size={22} style={{ color: '#d4af37' }} />
+                      Premium Vitrin ve Reklam Kampanyaları
+                    </h2>
+                    <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                      Kataloğunuzdaki seramikleri SeramikBak ana sayfasında "Yeni Koleksiyonlar" vitrininde yayına sokarak erişiminizi katlayın.
+                    </p>
+                  </div>
 
-      {/* Bank Transfer Payment Modal */}
-      {showPaymentModal && (
+                  {/* Main Grid: Form/Mockup and Campaigns Table */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '28px' }} className="brand-campaign-grid">
+                    
+                    {/* Left: Purchase Form and LIVE Mockup */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      
+                      {/* Create campaign form */}
+                      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                        <h3 style={{ fontSize: '1rem', fontWeight: '850', margin: '0 0 16px 0', color: '#0f172a' }}>Yeni Vitrin İlanı Talep Et</h3>
+                        
+                        {campaignSuccessMsg && (
+                          <div style={{ background: '#ecfdf5', border: '1px solid #10b981', color: '#065f46', padding: '10px 14px', borderRadius: '8px', fontSize: '0.78rem', marginBottom: '14px' }}>{campaignSuccessMsg}</div>
+                        )}
+                        {campaignErrorMsg && (
+                          <div style={{ background: '#fef2f2', border: '1px solid #ef4444', color: '#991b1b', padding: '10px 14px', borderRadius: '8px', fontSize: '0.78rem', marginBottom: '14px' }}>{campaignErrorMsg}</div>
+                        )}
+
+                        <form onSubmit={handleCampaignSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Öne Çıkarılacak Ürün</label>
+                            <select 
+                              value={campaignProduct} 
+                              onChange={(e) => setCampaignProduct(e.target.value)} 
+                              required
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', background: '#fff' }}
+                            >
+                              <option value="">Seçiniz...</option>
+                              {brandProducts.map(p => (
+                                <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Yayın Süresi</label>
+                            <select
+                              value={campaignDuration}
+                              onChange={(e) => setCampaignDuration(e.target.value)}
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', background: '#fff' }}
+                            >
+                              <option value="7">1 Hafta (500 TL)</option>
+                              <option value="30">1 Ay (1500 TL)</option>
+                              <option value="90">3 Ay (4000 TL)</option>
+                              <option value="180">6 Ay (7500 TL)</option>
+                            </select>
+                          </div>
+
+                          <button 
+                            type="submit" 
+                            disabled={!campaignProduct}
+                            style={{
+                              background: '#090d16',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '12px',
+                              fontWeight: '700',
+                              fontSize: '0.82rem',
+                              cursor: campaignProduct ? 'pointer' : 'not-allowed',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              opacity: campaignProduct ? 1 : 0.6
+                            }}
+                          >
+                            <Plus size={16} />
+                            <span>Ödeme Adımına Geç</span>
+                          </button>
+                        </form>
+                      </div>
+
+                      {/* LIVE AD PREVIEW MOCKUP */}
+                      {campaignProduct && (
+                        (() => {
+                          const selectedProd = brandProducts.find(p => p.id === campaignProduct);
+                          if (!selectedProd) return null;
+
+                          return (
+                            <div style={{
+                              background: '#090d16',
+                              border: '1px solid #d4af37',
+                              borderRadius: '16px',
+                              padding: '20px',
+                              color: '#fff',
+                              boxShadow: '0 8px 24px rgba(212,175,55,0.1)'
+                            }}>
+                              <h4 style={{ fontSize: '0.75rem', color: '#d4af37', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px 0', borderBottom: '1px solid rgba(212,175,55,0.2)', paddingBottom: '6px' }}>
+                                Canlı Ana Sayfa Vitrin Önizlemesi (Görsel Taslak)
+                              </h4>
+                              
+                              <div style={{
+                                width: '100%',
+                                maxWidth: '240px',
+                                margin: '0 auto',
+                                background: '#fff',
+                                borderRadius: '12px',
+                                border: '2px solid #d4af37',
+                                overflow: 'hidden',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                boxShadow: '0 0 15px rgba(212,175,55,0.4)'
+                              }}>
+                                <div style={{ height: '140px', position: 'relative', background: '#f8fafc' }}>
+                                  <img 
+                                    src={selectedProd.imageUrl || '/test.jpg'} 
+                                    alt="Mockup" 
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                  />
+                                  <span style={{
+                                    position: 'absolute',
+                                    top: '8px',
+                                    right: '8px',
+                                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                                    color: '#000',
+                                    fontSize: '0.55rem',
+                                    fontWeight: '900',
+                                    padding: '2px 6px',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
+                                  }}>
+                                    YENİ KOLEKSİYON
+                                  </span>
+                                </div>
+                                <div style={{ padding: '10px', color: '#0f172a' }}>
+                                  <div style={{ fontSize: '0.62rem', color: '#94a3b8', fontWeight: '700' }}>{brandInfo.name.toUpperCase()}</div>
+                                  <div style={{ fontSize: '0.78rem', fontWeight: '800', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{selectedProd.name}</div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px', fontSize: '0.68rem', borderTop: '1px solid #f1f5f9', paddingTop: '6px' }}>
+                                    <span style={{ background: '#f1f5f9', color: '#475569', padding: '1px 4px', borderRadius: '2px', fontSize: '0.6rem' }}>{selectedProd.width}x{selectedProd.height}</span>
+                                    {selectedProd.trendyolPrice && <strong style={{ color: '#059669' }}>₺{selectedProd.trendyolPrice.toLocaleString('tr-TR')} / m²</strong>}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()
+                      )}
+
+                    </div>
+
+                    {/* Right: Campaigns History Table */}
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: '850', margin: '0 0 16px 0', color: '#0f172a' }}>Mevcut Kampanyalarımız</h3>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '450px', overflowY: 'auto' }}>
+                        {b2bStats.campaigns.map(camp => {
+                          const isExpired = camp.expiresAt && new Date(camp.expiresAt) < new Date();
+                          
+                          let statusLabel = 'Onay Bekliyor';
+                          let statusColor = '#d97706';
+                          let statusBg = '#fffbeb';
+                          let isPulsing = true;
+
+                          if (isExpired) {
+                            statusLabel = 'Süresi Dolmuş';
+                            statusColor = '#64748b';
+                            statusBg = '#f1f5f9';
+                            isPulsing = false;
+                          } else if (camp.status === 'ACTIVE') {
+                            statusLabel = 'Yayında';
+                            statusColor = '#10b981';
+                            statusBg = '#ecfdf5';
+                          } else if (camp.status === 'REJECTED') {
+                            statusLabel = 'Reddedildi';
+                            statusColor = '#ef4444';
+                            statusBg = '#fef2f2';
+                            isPulsing = false;
+                          }
+
+                          return (
+                            <div key={camp.id} style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              padding: '16px',
+                              background: '#f8fafc',
+                              border: '1px solid #e2e8f0',
+                              borderRadius: '12px',
+                              fontSize: '0.8rem'
+                            }}>
+                              <div>
+                                <strong style={{ color: '#0f172a', fontSize: '0.85rem' }}>{camp.product?.name}</strong>
+                                <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '2px' }}>Kod: {camp.product?.code}</div>
+                                <div style={{ display: 'flex', gap: '6px', marginTop: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                                  <span style={{ 
+                                    fontSize: '0.65rem', 
+                                    background: statusBg, 
+                                    color: statusColor, 
+                                    padding: '2px 8px', 
+                                    borderRadius: '12px', 
+                                    fontWeight: '700',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '5px'
+                                  }}>
+                                    {isPulsing && (
+                                      <span style={{
+                                        width: '6px',
+                                        height: '6px',
+                                        borderRadius: '50%',
+                                        background: statusColor,
+                                        display: 'inline-block'
+                                      }} className="pulse-dot"></span>
+                                    )}
+                                    {statusLabel}
+                                  </span>
+                                  {camp.paymentRef && (
+                                    <span style={{ fontSize: '0.62rem', background: '#e2e8f0', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>
+                                      Ref: {camp.paymentRef}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div style={{ textAlign: 'right' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end', fontWeight: '700', color: '#0f172a' }}>
+                                  <MousePointerClick size={12} />
+                                  <span>{camp.clicks} Tıklama</span>
+                                </div>
+                                <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '2px' }}><strong>{camp.durationDays} Gün</strong> / ₺{camp.price}</div>
+                                {camp.expiresAt && (
+                                  <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '4px' }}>
+                                    Bitiş: {new Date(camp.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                        {b2bStats.campaigns.length === 0 && (
+                          <div style={{ textAlign: 'center', padding: '36px', color: '#94a3b8', fontStyle: 'italic', fontSize: '0.85rem' }}>
+                            Henüz kayıtlı veya onay bekleyen hiçbir reklam ihaleniz bulunmamaktadır.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              )}
+
+              {/* -------------------- TAB 6: SAAS BILLING -------------------- */}
+              {activePortalTab === 'saas' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <div>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <CreditCard size={22} style={{ color: '#d4af37' }} />
+                      SaaS Lisans Planı ve Banka Havale Bildirimleri
+                    </h2>
+                    <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                      SeramikBak üretici portalı özellikleri, kilitli B2B proje ihalelerini açma, bayi ağ yönetimi ve lisans yükseltme ödemeleri.
+                    </p>
+                  </div>
+
+                  {/* Feature Comparison Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+                    
+                    {/* BASIC PLAN */}
+                    <div style={{ 
+                      background: '#fff', 
+                      border: currentPlan === 'BASIC' ? '2px solid #64748b' : '1px solid #e2e8f0', 
+                      borderRadius: '16px', 
+                      padding: '24px',
+                      position: 'relative'
+                    }}>
+                      {currentPlan === 'BASIC' && (
+                        <span style={{ position: 'absolute', top: '16px', right: '16px', background: '#64748b', color: '#fff', fontSize: '0.62rem', fontWeight: '700', padding: '2px 8px', borderRadius: '10px' }}>Aktif</span>
+                      )}
+                      <h4 style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase', margin: '0 0 8px 0' }}>Giriş Paketi</h4>
+                      <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: '#0f172a', margin: '0 0 16px 0' }}>BASIC PLAN</h3>
+                      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.8rem', color: '#475569' }}>
+                        <li>✅ 20 Adete Kadar Ürün Listeleme</li>
+                        <li>✅ Mağaza Ziyaretçi İstatistikleri</li>
+                        <li>❌ B2B İnşaat Proje Detayları (Kilitli)</li>
+                        <li>❌ Yetkili Bayi Ağı Yönetimi (Kilitli)</li>
+                        <li>❌ Pazar Payı & Trend Raporları (Kilitli)</li>
+                      </ul>
+                    </div>
+
+                    {/* PRO PLAN */}
+                    <div style={{ 
+                      background: '#fff', 
+                      border: currentPlan === 'PRO' ? '2px solid #d4af37' : '1px solid #e2e8f0', 
+                      borderRadius: '16px', 
+                      padding: '24px',
+                      position: 'relative',
+                      boxShadow: currentPlan === 'PRO' ? '0 8px 24px rgba(212,175,55,0.15)' : 'none'
+                    }}>
+                      {currentPlan === 'PRO' && (
+                        <span style={{ position: 'absolute', top: '16px', right: '16px', background: '#d4af37', color: '#000', fontSize: '0.62rem', fontWeight: '800', padding: '2px 8px', borderRadius: '10px' }}>Aktif</span>
+                      )}
+                      <h4 style={{ fontSize: '0.78rem', color: '#b38e47', fontWeight: '700', textTransform: 'uppercase', margin: '0 0 8px 0' }}>Gelişmiş Paket</h4>
+                      <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: '#b38e47', margin: '0 0 4px 0' }}>PRO PLAN</h3>
+                      <div style={{ fontSize: '0.75rem', color: '#059669', fontWeight: '700', marginBottom: '14px' }}>₺11.990 / Yıl</div>
+                      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.8rem', color: '#475569' }}>
+                        <li>✅ Sınırsız Ürün Listeleme</li>
+                        <li>✅ B2B İnşaat Proje Taleplerini Listeleme</li>
+                        <li>✅ Vitrin Reklam İhalelerine Katılım</li>
+                        <li>✅ B2B Pazar Trend Raporları (Kelime/İl)</li>
+                        <li>❌ Müteahhit Doğrudan İletişim Numaraları (Kilitli)</li>
+                      </ul>
+                    </div>
+
+                    {/* ENTERPRISE PLAN */}
+                    <div style={{ 
+                      background: '#fff', 
+                      border: currentPlan === 'ENTERPRISE' ? '2px solid #0f172a' : '1px solid #e2e8f0', 
+                      borderRadius: '16px', 
+                      padding: '24px',
+                      position: 'relative',
+                      boxShadow: currentPlan === 'ENTERPRISE' ? '0 8px 24px rgba(15,23,42,0.15)' : 'none'
+                    }}>
+                      {currentPlan === 'ENTERPRISE' && (
+                        <span style={{ position: 'absolute', top: '16px', right: '16px', background: '#0f172a', color: '#fff', fontSize: '0.62rem', fontWeight: '700', padding: '2px 8px', borderRadius: '10px' }}>Aktif</span>
+                      )}
+                      <h4 style={{ fontSize: '0.78rem', color: '#1e293b', fontWeight: '700', textTransform: 'uppercase', margin: '0 0 8px 0' }}>Kurumsal Paket</h4>
+                      <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: '#1e293b', margin: '0 0 4px 0' }}>ENTERPRISE</h3>
+                      <div style={{ fontSize: '0.75rem', color: '#059669', fontWeight: '700', marginBottom: '14px' }}>₺24.990 / Yıl</div>
+                      <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.8rem', color: '#475569' }}>
+                        <li>✅ PRO Paket Özelliklerinin Tamamı</li>
+                        <li>✅ Müteahhit/Mimar Doğrudan İletişim Numaraları</li>
+                        <li>✅ Yetkili Bayi Ağı Aktivasyon & Yönetimi</li>
+                        <li>✅ Rakip & Marka Pazar Payı Raporları</li>
+                        <li>✅ ERP / XML Entegrasyon Desteği</li>
+                      </ul>
+                    </div>
+
+                  </div>
+
+                  {/* Plan Upgrade Selector & Bank form */}
+                  <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 8px 0' }}>Paket Yükseltme Ödeme Bildirimi Formu</h3>
+                    <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Banka havalesi ile gerçekleştirdiğiniz lisans bedeli ödemelerini buradan yönetime bildirin.</p>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '28px' }} className="brand-campaign-grid">
+                      {/* Left: Input values */}
+                      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        
+                        <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.82rem', fontWeight: '700' }}>Lisans Tercihi:</span>
+                          <div style={{ display: 'flex', gap: '6px' }}>
+                            <button 
+                              onClick={() => setSelectedPaymentPlan('PRO')} 
+                              disabled={currentPlan === 'PRO'}
+                              style={{
+                                padding: '6px 12px',
+                                fontSize: '0.75rem',
+                                borderRadius: '6px',
+                                border: '1px solid #cbd5e1',
+                                background: selectedPaymentPlan === 'PRO' ? '#0f172a' : '#fff',
+                                color: selectedPaymentPlan === 'PRO' ? '#fff' : '#0f172a',
+                                fontWeight: '700',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              PRO
+                            </button>
+                            <button 
+                              onClick={() => setSelectedPaymentPlan('ENTERPRISE')} 
+                              disabled={currentPlan === 'ENTERPRISE'}
+                              style={{
+                                padding: '6px 12px',
+                                fontSize: '0.75rem',
+                                borderRadius: '6px',
+                                border: '1px solid #cbd5e1',
+                                background: selectedPaymentPlan === 'ENTERPRISE' ? '#0f172a' : '#fff',
+                                color: selectedPaymentPlan === 'ENTERPRISE' ? '#fff' : '#0f172a',
+                                fontWeight: '700',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              ENTERPRISE
+                            </button>
+                          </div>
+                        </div>
+
+                        {hasPending ? (
+                          <div style={{
+                            background: '#fff9db',
+                            border: '1px solid #fde047',
+                            color: '#b45309',
+                            padding: '12px 16px',
+                            borderRadius: '8px',
+                            fontSize: '0.8rem',
+                            fontWeight: '600'
+                          }}>
+                            ⏱️ <strong>İşlem Onayda:</strong> {requestedPlan} paketi geçiş talebiniz doğrulanıyor. (Tutar: {requestedPlan === 'PRO' ? '11.990' : '24.990'} TL).
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={() => setShowPaymentModal(true)} 
+                            disabled={currentPlan === selectedPaymentPlan}
+                            style={{
+                              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                              color: '#000',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '12px',
+                              fontWeight: '700',
+                              fontSize: '0.82rem',
+                              cursor: currentPlan === selectedPaymentPlan ? 'default' : 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              opacity: currentPlan === selectedPaymentPlan ? 0.5 : 1
+                            }}
+                          >
+                            <CheckCircle size={16} />
+                            <span>{currentPlan === selectedPaymentPlan ? 'Zaten Bu Plana Sahipsiniz' : `${selectedPaymentPlan} Planı Ödeme Bildirimi Yap`}</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Right: Bank wire guidelines */}
+                      <div style={{ background: '#fcfaf2', border: '1px solid #fde047', borderRadius: '12px', padding: '24px', fontSize: '0.82rem' }}>
+                        <h4 style={{ fontSize: '0.85rem', fontWeight: '850', color: '#854d0e', margin: '0 0 10px 0' }}>Banka Havalesi Bilgileri</h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', color: '#713f12' }}>
+                          <div><strong>Alıcı Şirket:</strong> {bankDetails.bank_recipient}</div>
+                          <div><strong>Banka:</strong> {bankDetails.bank_name}</div>
+                          <div><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban}</span></div>
+                          <div style={{ fontSize: '0.75rem', color: '#a16207', borderTop: '1px solid #fef08a', paddingTop: '8px', marginTop: '4px' }}>
+                            * Havale açıklama alanına <strong>{brandInfo.name} Lisans Ödemesi</strong> yazmayı unutmayınız.
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+              )}
+
+            </>
+          )}
+
+        </main>
+      </div>
+
+      {/* -------------------- MODAL: PROJEYE TEKLİF VERME -------------------- */}
+      {biddingProject && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1581,93 +2394,337 @@ export default function BrandPortalPage() {
             width: '100%',
             maxWidth: '520px',
             padding: '30px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            position: 'relative',
-            maxHeight: '90vh',
-            overflowY: 'auto'
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+            position: 'relative'
           }}>
             <button 
-              onClick={() => setShowPaymentModal(false)}
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: 'none',
-                border: 'none',
-                fontSize: '1.25rem',
-                cursor: 'pointer',
-                color: '#64748b',
-                fontWeight: '700'
-              }}
+              onClick={() => setBiddingProject(null)}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#64748b' }}
+            >
+              ×
+            </button>
+
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '4px', color: '#0f172a' }}>
+              B2B Toptan Fiyat Teklifi Sun
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '20px' }}>
+              <strong>{biddingProject.projectName}</strong> projesinin ihtiyacı olan <strong>{biddingProject.quantityM2.toLocaleString('tr-TR')} m²</strong> seramik için fabrika toptan fiyatınızı sunun.
+            </p>
+
+            <form onSubmit={handleB2bBidSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Önerdiğiniz Karo Modelimiz</label>
+                <select
+                  value={bidProduct}
+                  onChange={(e) => setBidProduct(e.target.value)}
+                  required
+                  style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                >
+                  <option value="">Seçiniz...</option>
+                  {brandProducts.map(p => (
+                    <option key={p.id} value={p.id}>{p.name} (Kod: {p.code})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Teklif Birim Fiyatı (₺ / m²)</label>
+                  <input 
+                    type="number" 
+                    value={bidPrice}
+                    onChange={(e) => setBidPrice(e.target.value)}
+                    required
+                    min="1"
+                    placeholder="M² fiyatı girin"
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Teslimat Süresi</label>
+                  <select
+                    value={bidTimeline}
+                    onChange={(e) => setBidTimeline(e.target.value)}
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', background: '#fff' }}
+                  >
+                    <option value="15 gün içinde">15 Gün içinde</option>
+                    <option value="30 gün içinde">30 Gün içinde</option>
+                    <option value="45 gün içinde">45 Gün içinde</option>
+                    <option value="60 gün içinde">60 Gün içinde</option>
+                  </select>
+                </div>
+              </div>
+
+              {bidPrice && (
+                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '12px', borderRadius: '8px', fontSize: '0.8rem', color: '#166534' }}>
+                  Toplam Teklif Bedeli: <strong>₺{(parseFloat(bidPrice) * biddingProject.quantityM2).toLocaleString('tr-TR')}</strong> + KDV
+                </div>
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Teklif Notu / Sevkiyat Bilgisi</label>
+                <textarea
+                  value={bidNote}
+                  onChange={(e) => setBidNote(e.target.value)}
+                  placeholder="Ek notlar, lojistik teslim detayları veya nakliye koşullarınız..."
+                  rows="3"
+                  style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', resize: 'none' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button 
+                  type="button"
+                  onClick={() => setBiddingProject(null)}
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '700', cursor: 'pointer' }}
+                >
+                  İptal
+                </button>
+                <button 
+                  type="submit"
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#000', fontWeight: '800', cursor: 'pointer' }}
+                >
+                  Teklifi Gönder
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* -------------------- MODAL: YENİ BAYİ TANIMLAMA -------------------- */}
+      {showAddDealerModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div className="glass-panel" style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            border: '1px solid #e2e8f0',
+            width: '100%',
+            maxWidth: '520px',
+            padding: '30px',
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+            position: 'relative'
+          }}>
+            <button 
+              onClick={() => setShowAddDealerModal(false)}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#64748b' }}
             >
               ×
             </button>
 
             <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px', color: '#0f172a' }}>
-              Banka Havalesi ile Ödeme Bildirimi
+              Yeni Yetkili Bayi Tanımla
             </h3>
             <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '20px' }}>
-              Seçtiğiniz <strong>{selectedPaymentPlan}</strong> paketini aktifleştirmek için lütfen aşağıdaki IBAN adresine havale yapın ve ödeme bildirim formunu doldurun.
+              Ürünlerinizi fiziki showroom'unda satan yetkili satıcınızı veri tabanına kaydedin.
             </p>
 
-            {/* Bank details box */}
+            {addDealerError && (
+              <div style={{ background: '#fef2f2', border: '1px solid #ef4444', color: '#991b1b', padding: '10px', borderRadius: '8px', fontSize: '0.78rem', marginBottom: '14px' }}>
+                {addDealerError}
+              </div>
+            )}
+
+            <form onSubmit={handleAddDealer} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Bayi / Mağaza Adı</label>
+                <input 
+                  type="text" 
+                  value={newDealerData.name} 
+                  onChange={(e) => setNewDealerData({ ...newDealerData, name: e.target.value })}
+                  placeholder="Örn: İstanbul Seramik Dünyası" 
+                  required
+                  style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Telefon Numarası</label>
+                  <input 
+                    type="tel" 
+                    value={newDealerData.phone} 
+                    onChange={(e) => setNewDealerData({ ...newDealerData, phone: e.target.value })}
+                    placeholder="Örn: 0216 123 45 67" 
+                    required
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Şehir</label>
+                  <input 
+                    type="text" 
+                    value={newDealerData.city} 
+                    onChange={(e) => setNewDealerData({ ...newDealerData, city: e.target.value })}
+                    placeholder="Örn: İstanbul" 
+                    required
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>İlçe</label>
+                  <input 
+                    type="text" 
+                    value={newDealerData.district} 
+                    onChange={(e) => setNewDealerData({ ...newDealerData, district: e.target.value })}
+                    placeholder="Örn: Kadıköy" 
+                    required
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Adres</label>
+                  <input 
+                    type="text" 
+                    value={newDealerData.address} 
+                    onChange={(e) => setNewDealerData({ ...newDealerData, address: e.target.value })}
+                    placeholder="Örn: Bağdat Cad. No:12" 
+                    required
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Harita Enlem (Latitude)</label>
+                  <input 
+                    type="text" 
+                    value={newDealerData.lat} 
+                    onChange={(e) => setNewDealerData({ ...newDealerData, lat: e.target.value })}
+                    required
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', fontFamily: 'monospace' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Harita Boylam (Longitude)</label>
+                  <input 
+                    type="text" 
+                    value={newDealerData.lng} 
+                    onChange={(e) => setNewDealerData({ ...newDealerData, lng: e.target.value })}
+                    required
+                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', fontFamily: 'monospace' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button 
+                  type="button"
+                  onClick={() => setShowAddDealerModal(false)}
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '700', cursor: 'pointer' }}
+                >
+                  İptal
+                </button>
+                <button 
+                  type="submit"
+                  disabled={addDealerLoading}
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#059669', color: '#fff', fontWeight: '700', cursor: 'pointer', opacity: addDealerLoading ? 0.7 : 1 }}
+                >
+                  {addDealerLoading ? 'Ekleniyor...' : 'Bayiyi Ekle'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* -------------------- MODAL: LİSANS HAVALE BİLDİRİMİ -------------------- */}
+      {showPaymentModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div className="glass-panel" style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            border: '1px solid #e2e8f0',
+            width: '100%',
+            maxWidth: '500px',
+            padding: '30px',
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+            position: 'relative'
+          }}>
+            <button 
+              onClick={() => setShowPaymentModal(false)}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#64748b' }}
+            >
+              ×
+            </button>
+
+            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px', color: '#0f172a' }}>
+              Banka Havalesi Ödeme Bildirimi
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '20px' }}>
+              Seçtiğiniz <strong>{selectedPaymentPlan}</strong> paketini aktifleştirmek için lütfen aşağıdaki IBAN adresine transfer yapıp bildirim formunu doldurun.
+            </p>
+
             <div style={{
               background: '#f8fafc',
               border: '1px solid #e2e8f0',
               borderRadius: '12px',
               padding: '16px',
-              marginBottom: '24px',
+              marginBottom: '20px',
               fontSize: '0.82rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '8px'
+              gap: '6px'
             }}>
-              <div><strong>Banka:</strong> {bankDetails.bank_name || 'Yükleniyor...'}</div>
-              <div><strong>Alıcı:</strong> {bankDetails.bank_recipient || 'Yükleniyor...'}</div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'space-between' }}>
-                <div><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban || 'Yükleniyor...'}</span></div>
+              <div><strong>Banka:</strong> {bankDetails.bank_name}</div>
+              <div><strong>Alıcı:</strong> {bankDetails.bank_recipient}</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban}</span></div>
                 <button 
                   type="button"
                   onClick={() => {
                     navigator.clipboard.writeText(bankDetails.bank_iban);
                     alert('IBAN panoya kopyalandı!');
                   }}
-                  style={{
-                    background: '#e2e8f0',
-                    border: 'none',
-                    borderRadius: '4px',
-                    padding: '2px 8px',
-                    fontSize: '0.7rem',
-                    cursor: 'pointer',
-                    fontWeight: '600'
-                  }}
+                  style={{ background: '#e2e8f0', border: 'none', borderRadius: '4px', padding: '2px 8px', fontSize: '0.7rem', cursor: 'pointer', fontWeight: '600' }}
                 >
                   Kopyala
                 </button>
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#64748b', borderTop: '1px solid #e2e8f0', paddingTop: '8px', marginTop: '4px' }}>
-                * Açıklama alanına markanızın adını (<strong>{brandInfo?.name}</strong>) yazmayı unutmayın.
+              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '8px', marginTop: '4px', fontWeight: '700' }}>
+                Ödenecek Tutar: <span style={{ color: '#059669', fontSize: '0.95rem' }}>{selectedPaymentPlan === 'PRO' ? '11.990' : '24.990'} TL</span>
               </div>
             </div>
 
-            {/* Notification Form */}
             <form onSubmit={handleSendPaymentNotification} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {paymentSuccess && (
-                <div style={{ background: '#ecfdf5', border: '1px solid #10b981', color: '#065f46', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <CheckCircle size={18} />
-                  <span>{paymentSuccess}</span>
-                </div>
-              )}
-
-              {paymentError && (
-                <div style={{ background: '#fef2f2', border: '1px solid #ef4444', color: '#991b1b', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <AlertCircle size={18} />
-                  <span>{paymentError}</span>
-                </div>
-              )}
+              
+              {paymentSuccess && <div style={{ background: '#ecfdf5', color: '#065f46', padding: '8px 12px', borderRadius: '6px', fontSize: '0.78rem' }}>{paymentSuccess}</div>}
+              {paymentError && <div style={{ background: '#fef2f2', color: '#991b1b', padding: '8px 12px', borderRadius: '6px', fontSize: '0.78rem' }}>{paymentError}</div>}
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.78rem', fontWeight: '600', color: '#334155' }}>Ödeme Yapan Ad Soyad</label>
+                <label style={{ fontSize: '0.75rem', fontWeight: '600' }}>Ödeme Yapan Ad Soyad</label>
                 <input 
                   type="text" 
                   value={paymentSenderName} 
@@ -1679,7 +2736,7 @@ export default function BrandPortalPage() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.78rem', fontWeight: '600', color: '#334155' }}>Ödeme Tarihi</label>
+                <label style={{ fontSize: '0.75rem', fontWeight: '600' }}>Ödeme Tarihi</label>
                 <input 
                   type="date" 
                   value={paymentDate} 
@@ -1690,7 +2747,7 @@ export default function BrandPortalPage() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.78rem', fontWeight: '600', color: '#334155' }}>Dekont No / Ek Açıklama</label>
+                <label style={{ fontSize: '0.75rem', fontWeight: '600' }}>Dekont No / Ek Notlar</label>
                 <input 
                   type="text" 
                   value={paymentNote} 
@@ -1704,45 +2761,25 @@ export default function BrandPortalPage() {
                 <button 
                   type="button"
                   onClick={() => setShowPaymentModal(false)}
-                  style={{
-                    flex: 1,
-                    background: '#f1f5f9',
-                    color: '#334155',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '12px',
-                    fontSize: '0.82rem',
-                    fontWeight: '700',
-                    cursor: 'pointer'
-                  }}
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '700', cursor: 'pointer' }}
                 >
                   İptal
                 </button>
                 <button 
                   type="submit"
                   disabled={paymentLoading}
-                  style={{
-                    flex: 1,
-                    background: 'var(--accent-gold, #d4af37)',
-                    color: '#000',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '12px',
-                    fontSize: '0.82rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    opacity: paymentLoading ? 0.7 : 1
-                  }}
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#000', fontWeight: '800', cursor: 'pointer', opacity: paymentLoading ? 0.7 : 1 }}
                 >
-                  {paymentLoading ? 'Gönderiliyor...' : 'Bildirimi Gönder'}
+                  {paymentLoading ? 'İletiliyor...' : 'Bildirimi Gönder'}
                 </button>
               </div>
+
             </form>
           </div>
         </div>
       )}
 
-      {/* Brand Campaign Payment Modal */}
+      {/* -------------------- MODAL: REKLAM HAVALE BİLDİRİMİ -------------------- */}
       {showCampaignPaymentModal && (
         <div style={{
           position: 'fixed',
@@ -1765,24 +2802,12 @@ export default function BrandPortalPage() {
             width: '100%',
             maxWidth: '500px',
             padding: '30px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            position: 'relative',
-            maxHeight: '90vh',
-            overflowY: 'auto'
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+            position: 'relative'
           }}>
             <button 
               onClick={() => setShowCampaignPaymentModal(false)}
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: 'none',
-                border: 'none',
-                fontSize: '1.25rem',
-                cursor: 'pointer',
-                color: '#64748b',
-                fontWeight: '700'
-              }}
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#64748b' }}
             >
               ×
             </button>
@@ -1791,7 +2816,7 @@ export default function BrandPortalPage() {
               Vitrin Reklamı Ödeme Bilgileri
             </h3>
             <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '20px' }}>
-              Seçtiğiniz reklam süresi: <strong>{campaignDuration === '7' ? '1 Hafta' : campaignDuration === '30' ? '1 Ay' : campaignDuration === '90' ? '3 Ay' : '6 Ay'}</strong>. Lütfen havaleyi gerçekleştirip dekont numarasını girin.
+              Reklam yayın süresi: <strong>{campaignDuration === '7' ? '1 Hafta' : campaignDuration === '30' ? '1 Ay' : campaignDuration === '90' ? '3 Ay' : '6 Ay'}</strong>. Havalenizi tamamlayıp dekont işlem numarasını girin.
             </p>
 
             <div style={{
@@ -1799,48 +2824,38 @@ export default function BrandPortalPage() {
               border: '1px solid #e2e8f0',
               borderRadius: '12px',
               padding: '16px',
-              marginBottom: '24px',
+              marginBottom: '20px',
               fontSize: '0.82rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '8px'
+              gap: '6px'
             }}>
-              <div><strong>Banka:</strong> {bankDetails.bank_name || 'Akbank'}</div>
-              <div><strong>Alıcı:</strong> {bankDetails.bank_recipient || 'KolayWebci SeramikBak Ltd. Şti.'}</div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'space-between' }}>
-                <div><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban || 'TR87 0004 6000 1234 5678 9012 34'}</span></div>
+              <div><strong>Banka:</strong> {bankDetails.bank_name}</div>
+              <div><strong>Alıcı:</strong> {bankDetails.bank_recipient}</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban}</span></div>
                 <button 
                   type="button"
                   onClick={() => {
-                    navigator.clipboard.writeText(bankDetails.bank_iban || 'TR87 0004 6000 1234 5678 9012 34');
+                    navigator.clipboard.writeText(bankDetails.bank_iban);
                     alert('IBAN panoya kopyalandı!');
                   }}
-                  style={{
-                    background: '#e2e8f0',
-                    border: 'none',
-                    borderRadius: '4px',
-                    padding: '2px 8px',
-                    fontSize: '0.7rem',
-                    cursor: 'pointer',
-                    fontWeight: '600'
-                  }}
+                  style={{ background: '#e2e8f0', border: 'none', borderRadius: '4px', padding: '2px 8px', fontSize: '0.7rem', cursor: 'pointer', fontWeight: '600' }}
                 >
                   Kopyala
                 </button>
               </div>
-              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '8px', marginTop: '4px' }}>
-                <strong>Ödenecek Tutar:</strong> <span style={{ color: '#10b981', fontWeight: '800', fontSize: '1rem' }}>
+              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '8px', marginTop: '4px', fontWeight: '700' }}>
+                Ödenecek Tutar: <span style={{ color: '#059669', fontSize: '0.95rem' }}>
                   {campaignDuration === '7' ? '500' : campaignDuration === '30' ? '1500' : campaignDuration === '90' ? '4000' : '7500'} TL
                 </span>
-              </div>
-              <div style={{ fontSize: '0.72rem', color: '#64748b' }}>
-                * Havale açıklama kısmına <strong>{brandInfo?.name} Reklam Ödemesi</strong> yazın.
               </div>
             </div>
 
             <form onSubmit={handleCampaignPaymentConfirm} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.78rem', fontWeight: '600', color: '#334155' }}>Havale Dekont No / İşlem Kodu</label>
+                <label style={{ fontSize: '0.75rem', fontWeight: '600' }}>Havale Dekont No / İşlem Kodu</label>
                 <input 
                   type="text" 
                   value={campaignPaymentRef} 
@@ -1855,43 +2870,24 @@ export default function BrandPortalPage() {
                 <button 
                   type="button"
                   onClick={() => setShowCampaignPaymentModal(false)}
-                  style={{
-                    flex: 1,
-                    background: '#f1f5f9',
-                    color: '#334155',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '12px',
-                    fontSize: '0.82rem',
-                    fontWeight: '700',
-                    cursor: 'pointer'
-                  }}
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '700', cursor: 'pointer' }}
                 >
-                  Vazgeç
+                  İptal
                 </button>
                 <button 
                   type="submit"
                   disabled={isStartingCampaign}
-                  style={{
-                    flex: 1,
-                    background: 'var(--accent-gold, #d4af37)',
-                    color: '#000',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '12px',
-                    fontSize: '0.82rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    opacity: isStartingCampaign ? 0.7 : 1
-                  }}
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#000', fontWeight: '800', cursor: 'pointer', opacity: isStartingCampaign ? 0.7 : 1 }}
                 >
                   {isStartingCampaign ? 'Gönderiliyor...' : 'Ödemeyi Bildir'}
                 </button>
               </div>
+
             </form>
           </div>
         </div>
       )}
+
     </div>
   );
 }
