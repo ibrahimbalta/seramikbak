@@ -198,7 +198,7 @@ export default function BrandPortalPage() {
 
   const fetchBrandProducts = async (brandId) => {
     try {
-      const res = await fetch(`/api/search?brandId=${brandId}&limit=all&selectSimple=true`);
+      const res = await fetch(`/api/search?brandId=${brandId}&limit=all&fullDetail=true`);
       if (res.ok) {
         const data = await res.json();
         setBrandProducts(data);
