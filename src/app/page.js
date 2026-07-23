@@ -3136,17 +3136,7 @@ export default function Home() {
             </div>
 
             {/* -------------------- AI MOODBOARD INTERIOR DESIGN ASSISTANT -------------------- */}
-            <div className="glass-panel" style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '24px',
-              marginBottom: '32px',
-              padding: '28px',
-              background: '#ffffff',
-              borderRadius: '16px',
-              border: '1px solid var(--border-color)',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
-            }}>
+            <div className="moodboard-container glass-panel">
               {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--border-color)', paddingBottom: '18px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -3185,7 +3175,7 @@ export default function Home() {
               </div>
 
               {/* Layout Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.8fr', gap: '28px' }} className="brand-campaign-grid">
+              <div className="moodboard-grid">
                 
                 {/* Left Side: Style Selector Controls */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -3248,7 +3238,7 @@ export default function Home() {
                   boxShadow: 'inset 0 0 80px rgba(0,0,0,0.1)'
                 }}>
                   {/* Backdrop glass elements mimicking real moodboard stack */}
-                  <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', zIndex: 1 }}>
+                  <div className="moodboard-cards-wrap">
                     
                     {/* Material 1: Ceramic Slab */}
                     <div style={{

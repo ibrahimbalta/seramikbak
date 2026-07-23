@@ -1192,3 +1192,44 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: bold;
 }
 
+/* AI Moodboard Section Responsive Layout */
+.moodboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding: 28px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
+
+.moodboard-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1.8fr;
+  gap: 28px;
+}
+
+.moodboard-cards-wrap {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .moodboard-container {
+    padding: 16px;
+    gap: 16px;
+  }
+  .moodboard-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+  .moodboard-cards-wrap {
+    justify-content: center;
+    gap: 12px;
+  }
+}
+
