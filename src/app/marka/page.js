@@ -36,6 +36,17 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+const TURKEY_CITIES = [
+  "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin",
+  "Aydın", "Balıkesir", "Bartın", "Batman", "Bayburt", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur",
+  "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Düzce", "Edirne", "Elazığ", "Erzincan",
+  "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Iğdır", "Isparta", "İstanbul",
+  "İzmir", "Kahramanmaraş", "Karabük", "Karaman", "Kars", "Kastamonu", "Kayseri", "Kilis", "Kırıkkale", "Kırklareli",
+  "Kırşehir", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Mardin", "Mersin", "Muğla", "Muş",
+  "Nevşehir", "Niğde", "Ordu", "Osmaniye", "Rize", "Sakarya", "Samsun", "Şanlıurfa", "Siirt", "Sinop",
+  "Sivas", "Şırnak", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Uşak", "Van", "Yalova", "Yozgat", "Zonguldak"
+];
+
 export default function BrandPortalPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
@@ -2466,12 +2477,9 @@ export default function BrandPortalPage() {
                             style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', fontWeight: '600', color: '#0f172a', background: '#fff', cursor: 'pointer' }}
                           >
                             <option value="Tüm Türkiye">Tüm Türkiye (Genel)</option>
-                            <option value="İstanbul">İstanbul</option>
-                            <option value="Ankara">Ankara</option>
-                            <option value="İzmir">İzmir</option>
-                            <option value="Bursa">Bursa</option>
-                            <option value="Antalya">Antalya</option>
-                            <option value="Bartın">Bartın</option>
+                            {TURKEY_CITIES.map(city => (
+                              <option key={city} value={city}>{city}</option>
+                            ))}
                           </select>
                         </div>
                         <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '600' }}>
