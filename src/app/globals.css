@@ -1093,6 +1093,13 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-secondary);
 }
 
+.card-badge-tag-new.gold {
+  background: linear-gradient(135deg, var(--accent-gold), #d4a843);
+  color: #1a1c24;
+  font-weight: 800;
+  box-shadow: 0 1px 4px rgba(179, 142, 71, 0.2);
+}
+
 .card-title-new {
   font-size: 0.85rem;
   font-weight: 700;

@@ -55,6 +55,11 @@ export default function BrandPortalPage() {
   const [statsLoading, setStatsLoading] = useState(false);
   const [brandProducts, setBrandProducts] = useState([]);
   
+  // Trends Analytics states
+  const [trendsData, setTrendsData] = useState(null);
+  const [trendsLoading, setTrendsLoading] = useState(false);
+  const [selectedTrendCity, setSelectedTrendCity] = useState('Tüm Türkiye');
+  
   // Chart toggle metric: 'views', 'clicks', 'leads'
   const [chartMetric, setChartMetric] = useState('views');
 
@@ -144,6 +149,7 @@ export default function BrandPortalPage() {
       loadBrandProjects(brandInfo.id);
       loadBankDetails();
       fetchDealers();
+      fetchB2bTrends(brandInfo.id);
     }
   }, [isLoggedIn, brandInfo]);
 
@@ -193,6 +199,21 @@ export default function BrandPortalPage() {
       console.error('Failed to load brand stats:', err);
     } finally {
       setStatsLoading(false);
+    }
+  };
+
+  const fetchB2bTrends = async (brandId) => {
+    setTrendsLoading(true);
+    try {
+      const res = await fetch(`/api/b2b/trends?brandId=${brandId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setTrendsData(data);
+      }
+    } catch (err) {
+      console.error('Failed to load brand trends:', err);
+    } finally {
+      setTrendsLoading(false);
     }
   };
 
@@ -791,6 +812,7 @@ export default function BrandPortalPage() {
             { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
             { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={18} /> },
             { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={18} /> },
+            { id: 'trends', label: 'Bölgesel Trendler', icon: <TrendingUp size={18} /> },
             { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={18} /> },
             { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={18} /> },
             { id: 'saas', label: 'Lisans & Ödemeler', icon: <CreditCard size={18} /> }
@@ -900,6 +922,7 @@ export default function BrandPortalPage() {
               {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
               {activePortalTab === 'products' && 'Ürün Kataloğumuz'}
               {activePortalTab === 'b2b-projects' && 'B2B Proje ve Toptan Talepler'}
+              {activePortalTab === 'trends' && 'Bölgesel Pazar Trendleri'}
               {activePortalTab === 'dealers' && 'Yetkili Bayi Ağı Kontrolü'}
               {activePortalTab === 'campaigns' && 'Vitrin & Reklam Yönetimi'}
               {activePortalTab === 'saas' && 'SaaS Abonelik & Ödeme Yönetimi'}
@@ -2359,8 +2382,246 @@ export default function BrandPortalPage() {
                         </div>
                       </div>
 
-                    </div>
                   </div>
+                  </div>
+
+                </div>
+              )}
+
+              {/* -------------------- TAB 7: REGIONAL TRENDS -------------------- */}
+              {activePortalTab === 'trends' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  {/* Tab header */}
+                  <div>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <TrendingUp size={22} style={{ color: '#d4af37' }} />
+                      Bölgesel Tüketici Arama & Trend Analitiği
+                    </h2>
+                    <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                      Kullanıcıların site genelinde yaptığı aramaların, filtrelerin ve ürün etkileşimlerinin bölgesel analizi.
+                    </p>
+                  </div>
+
+                  {currentPlan === 'BASIC' ? (
+                    /* Premium Paywall Screen for BASIC users */
+                    <div style={{
+                      background: '#fff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '16px',
+                      padding: '56px 24px',
+                      textAlign: 'center',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: '380px'
+                    }}>
+                      <div style={{
+                        width: '64px',
+                        height: '64px',
+                        borderRadius: '50%',
+                        background: 'rgba(212,175,55,0.08)',
+                        color: '#d4af37',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: '20px',
+                        border: '1px solid rgba(212,175,55,0.2)'
+                      }}>
+                        <Lock size={26} />
+                      </div>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: '850', color: '#0f172a', margin: '0 0 10px 0' }}>Bölgesel Trend Raporları Kilitli</h3>
+                      <p style={{ fontSize: '0.82rem', color: '#64748b', margin: '0 0 24px 0', maxWidth: '440px', lineHeight: '1.5' }}>
+                        Türkiye genelinde ve il bazında en çok aranan seramik ebatları, renk tercihleri, stil trendleri ve popüler arama kelimelerini görerek üretim planlamanızı optimize etmek için lisansınızı <strong>PRO PLAN</strong> pakete yükseltin.
+                      </p>
+                      <button
+                        onClick={() => setActivePortalTab('saas')}
+                        style={{
+                          background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                          color: '#000',
+                          border: 'none',
+                          padding: '10px 20px',
+                          borderRadius: '8px',
+                          fontSize: '0.8rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 12px rgba(212,175,55,0.2)'
+                        }}
+                      >
+                        Lisansı Yükselt
+                      </button>
+                    </div>
+                  ) : (
+                    /* Dashboard for PRO & ENTERPRISE users */
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                      {/* Filter by city Row */}
+                      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <MapPin size={18} style={{ color: '#2563eb' }} />
+                          <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#334155' }}>Analiz Edilen Bölge:</span>
+                          <select
+                            value={selectedTrendCity}
+                            onChange={(e) => setSelectedTrendCity(e.target.value)}
+                            style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', fontWeight: '600', color: '#0f172a', background: '#fff', cursor: 'pointer' }}
+                          >
+                            <option value="Tüm Türkiye">Tüm Türkiye (Genel)</option>
+                            <option value="İstanbul">İstanbul</option>
+                            <option value="Ankara">Ankara</option>
+                            <option value="İzmir">İzmir</option>
+                            <option value="Bursa">Bursa</option>
+                            <option value="Antalya">Antalya</option>
+                            <option value="Bartın">Bartın</option>
+                          </select>
+                        </div>
+                        <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '600' }}>
+                          📅 Son 30 günlük verileri kapsar
+                        </span>
+                      </div>
+
+                      {trendsLoading ? (
+                        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '80px 24px', textAlign: 'center', color: '#64748b' }}>
+                          <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
+                          <span>Trend verileri analiz ediliyor...</span>
+                        </div>
+                      ) : (
+                        (() => {
+                          const cityTrends = trendsData?.trendsByCity?.[selectedTrendCity] || {
+                            topColors: [],
+                            topSizes: [],
+                            topStyles: [],
+                            topKeywords: []
+                          };
+
+                          const getMaxCount = (list) => {
+                            if (!list || list.length === 0) return 1;
+                            return Math.max(...list.map(item => item.count));
+                          };
+
+                          return (
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }} className="brand-campaign-grid">
+                              
+                              {/* 1. TOP SIZES */}
+                              <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                                <h3 style={{ fontSize: '0.95rem', fontWeight: '850', margin: '0 0 16px 0', color: '#0f172a', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>
+                                  📐 En Çok Aranan Ebatlar
+                                </h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                  {cityTrends.topSizes.map((item, idx) => {
+                                    const percent = (item.count / getMaxCount(cityTrends.topSizes)) * 100;
+                                    return (
+                                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: '600' }}>
+                                          <span style={{ color: '#0f172a' }}>{item.val}</span>
+                                          <span style={{ color: '#2563eb' }}>{item.count} Arama</span>
+                                        </div>
+                                        <div style={{ height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                                          <div style={{ width: `${percent}%`, height: '100%', background: 'linear-gradient(90deg, #2563eb, #3b82f6)', borderRadius: '4px' }} />
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              {/* 2. TOP STYLES */}
+                              <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                                <h3 style={{ fontSize: '0.95rem', fontWeight: '850', margin: '0 0 16px 0', color: '#0f172a', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>
+                                  ✨ En Çok Tercih Edilen Stiller
+                                </h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                  {cityTrends.topStyles.map((item, idx) => {
+                                    const percent = (item.count / getMaxCount(cityTrends.topStyles)) * 100;
+                                    return (
+                                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: '600' }}>
+                                          <span style={{ color: '#0f172a' }}>{item.val} Görünümlü</span>
+                                          <span style={{ color: '#059669' }}>{item.count} İnceleme</span>
+                                        </div>
+                                        <div style={{ height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                                          <div style={{ width: `${percent}%`, height: '100%', background: 'linear-gradient(90deg, #059669, #10b981)', borderRadius: '4px' }} />
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              {/* 3. TOP COLORS */}
+                              <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                                <h3 style={{ fontSize: '0.95rem', fontWeight: '850', margin: '0 0 16px 0', color: '#0f172a', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>
+                                  🎨 Popüler Renkler
+                                </h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                  {cityTrends.topColors.map((item, idx) => {
+                                    const hexMap = {
+                                      'Gri': '#8e939f',
+                                      'Beyaz': '#ffffff',
+                                      'Antrasit': '#2e3035',
+                                      'Bej': '#f4ece1',
+                                      'Kahverengi': '#8b5a2b',
+                                      'Siyah': '#000000',
+                                      'Yeşil': '#2e7d32',
+                                      'Mavi': '#1565c0'
+                                    };
+                                    const dotBg = hexMap[item.val] || '#cbd5e1';
+                                    const percent = (item.count / getMaxCount(cityTrends.topColors)) * 100;
+
+                                    return (
+                                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: dotBg, border: '1px solid #cbd5e1', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', flexShrink: 0 }} />
+                                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: '600' }}>
+                                            <span style={{ color: '#0f172a' }}>{item.val}</span>
+                                            <span style={{ color: '#475569' }}>{item.count} Tercih</span>
+                                          </div>
+                                          <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                                            <div style={{ width: `${percent}%`, height: '100%', background: '#475569', borderRadius: '3px' }} />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              {/* 4. TOP KEYWORDS */}
+                              <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                                <h3 style={{ fontSize: '0.95rem', fontWeight: '850', margin: '0 0 16px 0', color: '#0f172a', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>
+                                  🔍 Popüler Arama Terimleri
+                                </h3>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '4px 0' }}>
+                                  {cityTrends.topKeywords.map((item, idx) => (
+                                    <div key={idx} style={{
+                                      background: '#f8fafc',
+                                      border: '1px solid #e2e8f0',
+                                      borderRadius: '20px',
+                                      padding: '8px 16px',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '8px',
+                                      fontSize: '0.78rem',
+                                      fontWeight: '600',
+                                      color: '#334155'
+                                    }}>
+                                      <span>#{item.val}</span>
+                                      <span style={{ fontSize: '0.7rem', background: 'rgba(212,175,55,0.12)', color: '#b38e47', padding: '1px 6px', borderRadius: '10px', fontWeight: '700' }}>
+                                        {item.count}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                                <p style={{ fontSize: '0.72rem', color: '#94a3b8', margin: '20px 0 0 0', lineHeight: '1.4' }}>
+                                  * Bu kelimeler kullanıcıların arama çubuğuna doğrudan yazdığı arama sorgularını ifade eder.
+                                </p>
+                              </div>
+
+                            </div>
+                          );
+                        })()
+                      )}
+                    </div>
+                  )}
 
                 </div>
               )}

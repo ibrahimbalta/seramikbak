@@ -84,6 +84,11 @@ export default function ProductCard({
       {/* Card Meta Content */}
       <div className="card-text-details-new">
         <div className="card-badges-row-new">
+          {hasAd && (
+            <span className="card-badge-tag-new gold animate-pulse" style={{ animationDuration: '1.2s' }}>
+              SPONSORLU
+            </span>
+          )}
           {(() => {
             const badge = getProductBadge(product, idx);
             return (
