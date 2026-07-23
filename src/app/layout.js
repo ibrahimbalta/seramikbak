@@ -7,6 +7,32 @@ export const metadata = {
   authors: [{ name: "SeramikBak Geliştirme Ekibi" }]
 };
 
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "SeramikBak",
+  "url": "https://seramikbak.vercel.app",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://seramikbak.vercel.app/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+};
+
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "SeramikBak",
+  "url": "https://seramikbak.vercel.app",
+  "logo": "https://seramikbak.vercel.app/favicon.ico",
+  "description": "Türkiye'nin lider seramik markalarını tek çatı altında toplayan, Web 3D Sanal Stüdyo ve AR (Artırılmış Gerçeklik) entegrasyonu sunan yeni nesil B2B2C seramik arama motoru ve pazar yeri.",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "müşteri desteği",
+    "email": "destek@seramikbak.com"
+  }
+};
+
 export const viewport = {
   width: "device-width",
   initialScale: 1
@@ -22,6 +48,14 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="SeramikBak" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
