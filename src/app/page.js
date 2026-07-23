@@ -439,6 +439,8 @@ export default function Home() {
   const [studioTileRotation, setStudioTileRotation] = useState(0); // 0 or 90
   const [studioLayPattern, setStudioLayPattern] = useState('flat'); // flat or diagonal
   const [studioTimeOfDay, setStudioTimeOfDay] = useState('day'); // day or night
+  const [studioCabinetColor, setStudioCabinetColor] = useState('#5c4033'); // default oak wood
+  const [studioFaucetColor, setStudioFaucetColor] = useState('chrome'); // chrome, gold, black
 
   // Geolocation & Dealer Locator State
   const [userLocationName, setUserLocationName] = useState('Kadıköy Merkez');
@@ -954,7 +956,20 @@ export default function Home() {
     }
   }, [isKioskMode]);
 
-  const handleTryMoodboard = async (tileQuery) => {
+  const handleTryMoodboard = async (combo) => {
+    const tileQuery = combo.tileName.split(' ')[0];
+    
+    // Dynamically apply furnishings color presets to 3D virtual studio
+    if (combo.id === 0) setStudioCabinetColor('#5c4033'); // oak wood
+    else if (combo.id === 1) setStudioCabinetColor('#1a1a1a'); // black matte
+    else if (combo.id === 2) setStudioCabinetColor('#ffffff'); // white matte
+    else if (combo.id === 3) setStudioCabinetColor('#4c6a5a'); // sage green
+    
+    if (combo.id === 0) setStudioFaucetColor('black');
+    else if (combo.id === 1) setStudioFaucetColor('gold');
+    else if (combo.id === 2) setStudioFaucetColor('chrome');
+    else if (combo.id === 3) setStudioFaucetColor('chrome');
+
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(tileQuery)}&limit=1`);
       if (res.ok) {
@@ -3236,7 +3251,7 @@ export default function Home() {
                     </div>
                     
                     <button
-                      onClick={() => handleTryMoodboard(MOODBOARD_COMBOS[selectedMoodIndex].tileName.split(' ')[0])}
+                      onClick={() => handleTryMoodboard(MOODBOARD_COMBOS[selectedMoodIndex])}
                       style={{
                         background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
                         color: '#fff',
@@ -4453,6 +4468,8 @@ export default function Home() {
                     tileRotation={studioTileRotation}
                     layPattern={studioLayPattern}
                     timeOfDay={studioTimeOfDay}
+                    cabinetColor={studioCabinetColor}
+                    faucetColor={studioFaucetColor}
                   />
                 ) : (
                   <div className="canvas-placeholder">

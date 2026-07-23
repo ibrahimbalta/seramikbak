@@ -15,7 +15,9 @@ export default function StudioCanvas({
   lightIntensity = 1.0,
   tileRotation = 0,
   layPattern = 'flat',
-  timeOfDay = 'day'
+  timeOfDay = 'day',
+  cabinetColor = '#5c4033',
+  faucetColor = 'chrome'
 }) {
   const containerRef = useRef(null);
   const rendererRef = useRef(null);
@@ -504,11 +506,22 @@ export default function StudioCanvas({
       roughness: 0.55
     });
 
+    let activeFaucetMat = chromeMat;
+    if (faucetColor === 'gold') {
+      activeFaucetMat = brassMat;
+    } else if (faucetColor === 'black') {
+      activeFaucetMat = new THREE.MeshStandardMaterial({
+        color: '#1a1a1a',
+        metalness: 0.1,
+        roughness: 0.85
+      });
+    }
+
     // Populate furnishings group depending on selected roomType
     if (roomType === 'bathroom') {
       // --- 1. SINK VANITY UNIT ---
       const cabGeo = new THREE.BoxGeometry(0.7, 0.6, 1.3);
-      const cabWoodMat = new THREE.MeshStandardMaterial({ color: '#5c4033', roughness: 0.65 });
+      const cabWoodMat = new THREE.MeshStandardMaterial({ color: cabinetColor || '#5c4033', roughness: 0.65 });
       const cabinet = new THREE.Mesh(cabGeo, cabWoodMat);
       cabinet.position.set(-ROOM_WIDTH / 2 + 0.35, 0.3, 0); 
       cabinet.castShadow = true;
@@ -528,13 +541,13 @@ export default function StudioCanvas({
       group.add(basin);
 
       const faucetBaseGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.22);
-      const faucetBase = new THREE.Mesh(faucetBaseGeo, chromeMat);
+      const faucetBase = new THREE.Mesh(faucetBaseGeo, activeFaucetMat);
       faucetBase.position.set(-ROOM_WIDTH / 2 + 0.16, 0.6 + 0.22, 0);
       faucetBase.castShadow = true;
       group.add(faucetBase);
 
       const spoutGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.14);
-      const spout = new THREE.Mesh(spoutGeo, chromeMat);
+      const spout = new THREE.Mesh(spoutGeo, activeFaucetMat);
       spout.rotation.z = Math.PI / 2.3;
       spout.position.set(-ROOM_WIDTH / 2 + 0.21, 0.6 + 0.31, 0);
       spout.castShadow = true;
@@ -569,17 +582,17 @@ export default function StudioCanvas({
       group.add(glassCab2);
 
       const frameGeo = new THREE.BoxGeometry(0.04, 2.0, 0.04);
-      const profileCorner = new THREE.Mesh(frameGeo, chromeMat);
+      const profileCorner = new THREE.Mesh(frameGeo, activeFaucetMat);
       profileCorner.position.set(-ROOM_WIDTH / 2 + 1.15, 1.0, -ROOM_DEPTH / 2 + 1.15);
       group.add(profileCorner);
 
       const colGeo = new THREE.CylinderGeometry(0.012, 0.012, 1.7);
-      const column = new THREE.Mesh(colGeo, chromeMat);
+      const column = new THREE.Mesh(colGeo, activeFaucetMat);
       column.position.set(-ROOM_WIDTH / 2 + 0.1, 1.25, -ROOM_DEPTH / 2 + 0.1);
       group.add(column);
 
       const showerHeadGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.015, 16);
-      const showerHead = new THREE.Mesh(showerHeadGeo, chromeMat);
+      const showerHead = new THREE.Mesh(showerHeadGeo, activeFaucetMat);
       showerHead.rotation.x = Math.PI / 2;
       showerHead.position.set(-ROOM_WIDTH / 2 + 0.28, 2.0, -ROOM_DEPTH / 2 + 0.1);
       showerHead.castShadow = true;
@@ -593,7 +606,7 @@ export default function StudioCanvas({
       group.add(toilet);
 
       const buttonPlateGeo = new THREE.BoxGeometry(0.25, 0.16, 0.015);
-      const plate = new THREE.Mesh(buttonPlateGeo, chromeMat);
+      const plate = new THREE.Mesh(buttonPlateGeo, activeFaucetMat);
       plate.position.set(0.9, 1.05, -ROOM_DEPTH / 2 + 0.01);
       group.add(plate);
 
@@ -1079,7 +1092,7 @@ export default function StudioCanvas({
       group.add(doorTrim);
     }
 
-  }, [roomType, isSceneReady]);
+  }, [roomType, isSceneReady, cabinetColor, faucetColor]);
 
   // Update lighting configurations reactively when controls change
   useEffect(() => {
