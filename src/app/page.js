@@ -120,6 +120,182 @@ function getProductBadge(product, idx) {
   return { text: "Mimarın Seçimi", className: "blue" };
 }
 
+function generateMoodboardFromProduct(product, index) {
+  const tileName = product.name || 'Premium Seramik';
+  const tileSize = product.dimensions || '60x120 cm';
+  const tileImg = product.imageUrl || '/textures/calacatta_gold.jpg';
+  
+  const lowerName = tileName.toLowerCase();
+  const style = (product.style || '').toLowerCase();
+  const color = (product.color || '').toLowerCase();
+  
+  let cabinet = "Ada Çayı Yeşili / Klasik Country Banyo Dolabı";
+  let paintName = "Jotun 12078 Kum Fırtınası Boya";
+  let paintColor = "#eae6df";
+  let fixture = "Klasik Parlak Krom Armatür Takımı";
+  let moodBg = "linear-gradient(135deg, #eae6df 0%, #cbd5e1 100%)";
+  let accentColor = "#1e3a8a";
+  let cabinetHex = "#4c6a5a";
+  let faucetVal = "chrome";
+  let styleName = "Klasik Elegans";
+  let tagline = "Zamansız ve Ferah Yaşam Alanları";
+  let desc = `Seçkin ${tileName} seramik kaplamasını, klasik sage dolap ve parlak krom armatürlerle birleştirerek zarif ve temiz görünümlü bir banyo tasarlayın.`;
+
+  if (lowerName.includes('calacatta') || lowerName.includes('altın') || lowerName.includes('gold') || color.includes('bej') || (style.includes('mermer') && lowerName.includes('gold'))) {
+    cabinet = "Doğal Budaklı Meşe Banyo Dolabı";
+    paintName = "Jotun 1024 Kum Beji Duvar Boyası";
+    paintColor = "#dfdcd3";
+    fixture = "Mat Siyah Batarya & Duş Seti";
+    moodBg = "linear-gradient(135deg, #dfdcd3 0%, #d4af37 100%)";
+    accentColor = "#d4af37";
+    cabinetHex = "#5c4033";
+    faucetVal = "black";
+    styleName = `Lüks ${product.brand?.name || 'Seramik'} & Gold`;
+    tagline = "Modern, Şık ve Zengin Banyolar";
+    desc = `${tileName} seramiği, meşe dolabın doğal sıcaklığı ile dengelerken, mat siyah armatürlerle modern ve keskin çizgiler sunar.`;
+  } 
+  else if (lowerName.includes('antrasit') || lowerName.includes('siyah') || lowerName.includes('beton') || color.includes('gri') || lowerName.includes('cement') || lowerName.includes('sement') || lowerName.includes('dark')) {
+    cabinet = "Mat Siyah & Metal Detaylı Endüstriyel Ünite";
+    paintName = "Jotun 1032 Sis Grisi Duvar Boyası";
+    paintColor = "#abb2b9";
+    fixture = "Fırçalanmış Gold Batarya Seti";
+    moodBg = "linear-gradient(135deg, #333333 0%, #b38e47 100%)";
+    accentColor = "#b38e47";
+    cabinetHex = "#1a1a1a";
+    faucetVal = "gold";
+    styleName = `Endüstriyel ${product.brand?.name || 'Loft'} & Antrasit`;
+    tagline = "Minimalist, Maskülen ve Güçlü Karakter";
+    desc = `Koyu renk beton veya taş dokulu ${tileName} seramiğinin soğuk duruşunu fırçalanmış altın (gold) bataryanın parlaklığı ile canlandırın.`;
+  }
+  else if (lowerName.includes('meşe') || lowerName.includes('ahşap') || lowerName.includes('oak') || lowerName.includes('wood') || style.includes('ahşap') || color.includes('kahve')) {
+    cabinet = "Mat Beyaz / Minimal Kulpsuz Dolaplar";
+    paintName = "Jotun 1622 Fildişi Beyazı Boya";
+    paintColor = "#f4f3ef";
+    fixture = "Krom veya Fırçalanmış Çelik Armatür";
+    moodBg = "linear-gradient(135deg, #f4f3ef 0%, #c2a688 100%)";
+    accentColor = "#c2a688";
+    cabinetHex = "#ffffff";
+    faucetVal = "chrome";
+    styleName = `Doğal İskandinav & Ahşap`;
+    tagline = "Huzurlu ve Dingin Yaşam Alanları";
+    desc = `Ahşap dokulu ${tileName} seramiğinin sıcaklığını mat beyaz düz yüzeylerle birleştirin. Dingin, minimalist ve aydınlık bir İskandinav atmosferi yaratır.`;
+  }
+
+  return {
+    id: index,
+    styleName,
+    tagline,
+    tileName,
+    tileSize,
+    tileImg,
+    cabinet,
+    fixture,
+    paintName,
+    paintColor,
+    moodBg,
+    accentColor,
+    cabinetHex,
+    faucetVal,
+    desc,
+    product
+  };
+}
+
+const heroSlides = [
+  {
+    title: "Türkiye'nin Seramik Arama Motoru",
+    subtitle: "100+ seçkin marka ve 25.000+ seramik ürününü saniyeler içinde karşılaştırın, en ucuz pazar yeri fiyatlarını ve yetkili bayileri bulun.",
+    bg: "/hero/luxury_bathroom.png",
+    tag: "TÜRKİYE'NİN EN KAPSAMLI SERAMİK DİZİNİ",
+    highlight: "Fiyatları Karşılaştırın"
+  },
+  {
+    title: "Seramikleri Evinizde Canlı Deneyin",
+    subtitle: "Seçtiğiniz fayans veya karoyu interaktif 3D Sanal Stüdyo'da döşeyin; derz genişliğini, rengini, döşeme desenini ve oda ışıklarını özelleştirin.",
+    bg: "/hero/scandinavian_kitchen.png",
+    tag: "3D DİJİTAL ODA SİMÜLASYONU",
+    highlight: "3D Sanal Stüdyo Modu"
+  },
+  {
+    title: "Kendi Odanızı AI ile Tasarlayın",
+    subtitle: "Banyonuzun veya mutfağınızın fotoğrafını yükleyin; Google Gemini yapay zekası zemin/duvar sınırlarını maskeleyip seçtiğiniz seramikleri giydirsin.",
+    bg: "/hero/modern_living.png",
+    tag: "YAPAY ZEKA FOTOĞRAF GİYDİRME",
+    highlight: "AI Tasarım Asistanı"
+  }
+];
+
+const DEFAULT_MOODBOARD_COMBOS = [
+  {
+    id: 0,
+    styleName: "Lüks Calacatta & Gold",
+    tagline: "Modern, Şık ve Zengin Banyolar",
+    tileName: "Calacatta Gold Parlak Seramik",
+    tileSize: "60x120 cm",
+    tileImg: "/textures/calacatta_gold.jpg",
+    cabinet: "Doğal Budaklı Meşe Banyo Dolabı",
+    fixture: "Mat Siyah Batarya & Duş Seti",
+    paintName: "Jotun 1024 Kum Beji Duvar Boyası",
+    paintColor: "#dfdcd3",
+    moodBg: "linear-gradient(135deg, #dfdcd3 0%, #d4af37 100%)",
+    accentColor: "#d4af37",
+    cabinetHex: "#5c4033",
+    faucetVal: "black",
+    desc: "Altın damarlı Calacatta seramiği, meşe dolabın doğal sıcaklığı ile dengelerken, mat siyah armatürlerle modern ve keskin çizgiler sunar."
+  },
+  {
+    id: 1,
+    styleName: "Endüstriyel Loft & Antrasit",
+    tagline: "Minimalist, Maskülen ve Güçlü Karakter",
+    tileName: "Sement Antrasit Beton Görünümlü",
+    tileSize: "60x60 cm",
+    tileImg: "/textures/cement_dark.jpg",
+    cabinet: "Mat Siyah & Metal Detaylı Endüstriyel Ünite",
+    fixture: "Fırçalanmış Gold Batarya Seti",
+    paintName: "Jotun 1032 Sis Grisi Duvar Boyası",
+    paintColor: "#abb2b9",
+    moodBg: "linear-gradient(135deg, #333333 0%, #b38e47 100%)",
+    accentColor: "#b38e47",
+    cabinetHex: "#1a1a1a",
+    faucetVal: "gold",
+    desc: "Koyu renk beton dokulu seramiğin soğuk duruşunu fırçalanmış altın (gold) bataryanın parlaklığı ile canlandırın. Mat siyah dolaplarla loft estetiğini tamamlayın."
+  },
+  {
+    id: 2,
+    styleName: "Sıcak İskandinav & Ahşap",
+    tagline: "Doğal, Dingin ve Huzurlu Yaşam Alanları",
+    tileName: "Nordic Meşe Ahşap Görünümlü Seramik",
+    tileSize: "20x120 cm",
+    tileImg: "/textures/oak_wood.jpg",
+    cabinet: "Mat Beyaz / Minimal Kulpsuz Dolaplar",
+    fixture: "Krom veya Fırçalanmış Çelik Armatür",
+    paintName: "Jotun 1622 Fildişi Beyazı Boya",
+    paintColor: "#f4f3ef",
+    moodBg: "linear-gradient(135deg, #f4f3ef 0%, #c2a688 100%)",
+    accentColor: "#c2a688",
+    cabinetHex: "#ffffff",
+    faucetVal: "chrome",
+    desc: "Ahşap dokulu parke seramiğin sıcaklığını mat beyaz düz yüzeylerle birleştirin. Dingin, minimalist ve aydınlık bir İskandinav atmosferi yaratır."
+  },
+  {
+    id: 3,
+    styleName: "Klasik Carrara & Krom",
+    tagline: "Zamansız Elegans ve Ferahlık",
+    tileName: "Carrara Beyaz Cilalı Mermer Seramik",
+    tileSize: "60x120 cm",
+    tileImg: "/textures/carrara_white.jpg",
+    cabinet: "Ada Çayı Yeşili / Klasik Country Banyo Dolabı",
+    fixture: "Klasik Parlak Krom Armatür Takımı",
+    paintName: "Jotun 12078 Kum Fırtınası Boya",
+    paintColor: "#eae6df",
+    moodBg: "linear-gradient(135deg, #eae6df 0%, #cbd5e1 100%)",
+    accentColor: "#1e3a8a",
+    cabinetHex: "#4c6a5a",
+    faucetVal: "chrome",
+    desc: "Kültleşmiş beyaz Carrara mermerinin ferahlığını pastel yeşil tonlarında country tarzı bir banyo dolabı ve klasik parlak krom bataryalar ile taçlandırın."
+  }
+];
+
 export default function Home() {
   // Page Preloader State
   const [pageLoading, setPageLoading] = useState(true);
@@ -170,6 +346,7 @@ export default function Home() {
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedMoodIndex, setSelectedMoodIndex] = useState(0);
+  const [moodboardCombos, setMoodboardCombos] = useState(DEFAULT_MOODBOARD_COMBOS);
 
   // Product Comparison Wizard States
   const [comparedProducts, setComparedProducts] = useState([]);
@@ -190,92 +367,6 @@ export default function Home() {
     });
   };
 
-  const heroSlides = [
-    {
-      title: "Türkiye'nin Seramik Arama Motoru",
-      subtitle: "100+ seçkin marka ve 25.000+ seramik ürününü saniyeler içinde karşılaştırın, en ucuz pazar yeri fiyatlarını ve yetkili bayileri bulun.",
-      bg: "/hero/luxury_bathroom.png",
-      tag: "TÜRKİYE'NİN EN KAPSAMLI SERAMİK DİZİNİ",
-      highlight: "Fiyatları Karşılaştırın"
-    },
-    {
-      title: "Seramikleri Evinizde Canlı Deneyin",
-      subtitle: "Seçtiğiniz fayans veya karoyu interaktif 3D Sanal Stüdyo'da döşeyin; derz genişliğini, rengini, döşeme desenini ve oda ışıklarını özelleştirin.",
-      bg: "/hero/scandinavian_kitchen.png",
-      tag: "3D DİJİTAL ODA SİMÜLASYONU",
-      highlight: "3D Sanal Stüdyo Modu"
-    },
-    {
-      title: "Kendi Odanızı AI ile Tasarlayın",
-      subtitle: "Banyonuzun veya mutfağınızın fotoğrafını yükleyin; Google Gemini yapay zekası zemin/duvar sınırlarını maskeleyip seçtiğiniz seramikleri giydirsin.",
-      bg: "/hero/modern_living.png",
-      tag: "YAPAY ZEKA FOTOĞRAF GİYDİRME",
-      highlight: "AI Tasarım Asistanı"
-    }
-  ];
-
-  const MOODBOARD_COMBOS = [
-    {
-      id: 0,
-      styleName: "Lüks Calacatta & Gold",
-      tagline: "Modern, Şık ve Zengin Banyolar",
-      tileName: "Calacatta Gold Parlak Seramik",
-      tileSize: "60x120 cm",
-      tileImg: "/textures/calacatta_gold.jpg",
-      cabinet: "Doğal Budaklı Meşe Banyo Dolabı",
-      fixture: "Mat Siyah Batarya & Duş Seti",
-      paintName: "Jotun 1024 Kum Beji Duvar Boyası",
-      paintColor: "#dfdcd3",
-      moodBg: "linear-gradient(135deg, #dfdcd3 0%, #d4af37 100%)",
-      accentColor: "#d4af37",
-      desc: "Altın damarlı Calacatta seramiği, meşe dolabın doğal sıcaklığı ile dengelerken, mat siyah armatürlerle modern ve keskin çizgiler sunar."
-    },
-    {
-      id: 1,
-      styleName: "Endüstriyel Loft & Antrasit",
-      tagline: "Minimalist, Maskülen ve Güçlü Karakter",
-      tileName: "Sement Antrasit Beton Görünümlü",
-      tileSize: "60x60 cm",
-      tileImg: "/textures/cement_dark.jpg",
-      cabinet: "Mat Siyah & Metal Detaylı Endüstriyel Ünite",
-      fixture: "Fırçalanmış Gold Batarya Seti",
-      paintName: "Jotun 1032 Sis Grisi Duvar Boyası",
-      paintColor: "#abb2b9",
-      moodBg: "linear-gradient(135deg, #333333 0%, #b38e47 100%)",
-      accentColor: "#b38e47",
-      desc: "Koyu renk beton dokulu seramiğin soğuk duruşunu fırçalanmış altın (gold) bataryanın parlaklığı ile canlandırın. Mat siyah dolaplarla loft estetiğini tamamlayın."
-    },
-    {
-      id: 2,
-      styleName: "Sıcak İskandinav & Ahşap",
-      tagline: "Doğal, Dingin ve Huzurlu Yaşam Alanları",
-      tileName: "Nordic Meşe Ahşap Görünümlü Seramik",
-      tileSize: "20x120 cm",
-      tileImg: "/textures/oak_wood.jpg",
-      cabinet: "Mat Beyaz / Minimal Kulpsuz Dolaplar",
-      fixture: "Krom veya Fırçalanmış Çelik Armatür",
-      paintName: "Jotun 1622 Fildişi Beyazı Boya",
-      paintColor: "#f4f3ef",
-      moodBg: "linear-gradient(135deg, #f4f3ef 0%, #c2a688 100%)",
-      accentColor: "#c2a688",
-      desc: "Ahşap dokulu parke seramiğin sıcaklığını mat beyaz düz yüzeylerle birleştirin. Dingin, minimalist ve aydınlık bir İskandinav atmosferi yaratır."
-    },
-    {
-      id: 3,
-      styleName: "Klasik Carrara & Krom",
-      tagline: "Zamansız Elegans ve Ferahlık",
-      tileName: "Carrara Beyaz Cilalı Mermer Seramik",
-      tileSize: "60x120 cm",
-      tileImg: "/textures/carrara_white.jpg",
-      cabinet: "Ada Çayı Yeşili / Klasik Country Banyo Dolabı",
-      fixture: "Klasik Parlak Krom Armatür Takımı",
-      paintName: "Jotun 12078 Kum Fırtınası Boya",
-      paintColor: "#eae6df",
-      moodBg: "linear-gradient(135deg, #eae6df 0%, #cbd5e1 100%)",
-      accentColor: "#1e3a8a",
-      desc: "Kültleşmiş beyaz Carrara mermerinin ferahlığını pastel yeşil tonlarında country tarzı bir banyo dolabı ve klasik parlak krom bataryalar ile taçlandırın."
-    }
-  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -283,6 +374,18 @@ export default function Home() {
     }, 6000);
     return () => clearInterval(timer);
   }, []);
+
+  // Auto-rotate moodboard selected index every 8 seconds to capture user attention
+  useEffect(() => {
+    if (activeTab !== 'search') return;
+    const timer = setInterval(() => {
+      setSelectedMoodIndex(prev => {
+        const count = moodboardCombos.length || 4;
+        return (prev + 1) % count;
+      });
+    }, 8000);
+    return () => clearInterval(timer);
+  }, [moodboardCombos, activeTab]);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -878,9 +981,16 @@ export default function Home() {
       .then(data => {
         const enriched = Array.isArray(data) ? data.map(enrichProductData) : [];
         setWeeklyProducts(enriched);
+        if (enriched.length >= 4) {
+          const generated = enriched.slice(0, 4).map((p, idx) => generateMoodboardFromProduct(p, idx));
+          setMoodboardCombos(generated);
+        } else {
+          setMoodboardCombos(DEFAULT_MOODBOARD_COMBOS);
+        }
       })
       .catch((err) => {
         console.error('Failed to load weekly products:', err);
+        setMoodboardCombos(DEFAULT_MOODBOARD_COMBOS);
       });
   }, []);
 
@@ -3084,7 +3194,7 @@ export default function Home() {
                   </span>
                   
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {MOODBOARD_COMBOS.map((combo) => {
+                    {moodboardCombos.map((combo) => {
                       const isActive = selectedMoodIndex === combo.id;
                       return (
                         <button
@@ -3105,11 +3215,11 @@ export default function Home() {
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
                             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: isActive ? 'var(--accent-gold)' : '#cbd5e1' }} />
-                            <span style={{ fontSize: '0.88rem', fontWeight: '800', color: isActive ? 'var(--accent-gold)' : 'var(--text-primary)' }}>
+                            <span style={{ fontSize: '0.88rem', fontWeight: '800', color: isActive ? 'var(--accent-gold)' : 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '240px' }}>
                               {combo.styleName}
                             </span>
                           </div>
-                          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px', paddingLeft: '16px' }}>
+                          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px', paddingLeft: '16px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '240px' }}>
                             {combo.tagline}
                           </span>
                         </button>
@@ -3120,13 +3230,13 @@ export default function Home() {
                   {/* Active Description Box */}
                   <div style={{ background: '#f8fafc', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '16px', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginTop: 'auto' }}>
                     <h5 style={{ fontSize: '0.82rem', fontWeight: '800', color: 'var(--text-primary)', margin: '0 0 6px 0' }}>İç Mimarın Önerisi</h5>
-                    {MOODBOARD_COMBOS[selectedMoodIndex].desc}
+                    {moodboardCombos[selectedMoodIndex]?.desc}
                   </div>
                 </div>
 
                 {/* Right Side: Virtual Collage Moodboard Display */}
                 <div style={{
-                  background: MOODBOARD_COMBOS[selectedMoodIndex].moodBg,
+                  background: moodboardCombos[selectedMoodIndex]?.moodBg || 'var(--bg-secondary)',
                   borderRadius: '16px',
                   padding: '24px',
                   display: 'flex',
@@ -3156,8 +3266,8 @@ export default function Home() {
                     }}>
                       <div style={{ height: '90px', borderRadius: '8px', overflow: 'hidden', background: '#e2e8f0', position: 'relative' }}>
                         <img 
-                          src={MOODBOARD_COMBOS[selectedMoodIndex].tileImg} 
-                          alt={MOODBOARD_COMBOS[selectedMoodIndex].tileName} 
+                          src={moodboardCombos[selectedMoodIndex]?.tileImg} 
+                          alt={moodboardCombos[selectedMoodIndex]?.tileName} 
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           onError={(e) => { e.target.src = '/textures/calacatta_gold.jpg'; }}
                         />
@@ -3167,10 +3277,10 @@ export default function Home() {
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {MOODBOARD_COMBOS[selectedMoodIndex].tileName}
+                          {moodboardCombos[selectedMoodIndex]?.tileName}
                         </span>
                         <span style={{ fontSize: '0.62rem', color: '#64748b', marginTop: '2px' }}>
-                          Ebat: {MOODBOARD_COMBOS[selectedMoodIndex].tileSize}
+                          Ebat: {moodboardCombos[selectedMoodIndex]?.tileSize}
                         </span>
                       </div>
                     </div>
@@ -3191,14 +3301,14 @@ export default function Home() {
                         width: '32px',
                         height: '32px',
                         borderRadius: '50%',
-                        background: MOODBOARD_COMBOS[selectedMoodIndex].paintColor,
+                        background: moodboardCombos[selectedMoodIndex]?.paintColor || '#fff',
                         border: '1px solid rgba(0,0,0,0.1)',
                         flexShrink: 0
                       }} />
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <span style={{ fontSize: '0.58rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>Duvar Boyası</span>
                         <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#0f172a', lineHeight: '1.2' }}>
-                          {MOODBOARD_COMBOS[selectedMoodIndex].paintName.split(' ')[1]}
+                          {moodboardCombos[selectedMoodIndex]?.paintName?.split(' ')[1] || 'Boya'}
                         </span>
                       </div>
                     </div>
@@ -3220,12 +3330,12 @@ export default function Home() {
                     }}>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         <span style={{ fontSize: '0.58rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase' }}>🚪 Banyo Mobilyası</span>
-                        <span style={{ fontSize: '0.72rem', fontWeight: '600' }}>{MOODBOARD_COMBOS[selectedMoodIndex].cabinet}</span>
+                        <span style={{ fontSize: '0.72rem', fontWeight: '600' }}>{moodboardCombos[selectedMoodIndex]?.cabinet}</span>
                       </div>
                       <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '6px' }} />
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         <span style={{ fontSize: '0.58rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase' }}>🚰 Armatür Kombini</span>
-                        <span style={{ fontSize: '0.72rem', fontWeight: '600', color: 'var(--accent-gold)' }}>{MOODBOARD_COMBOS[selectedMoodIndex].fixture}</span>
+                        <span style={{ fontSize: '0.72rem', fontWeight: '600', color: 'var(--accent-gold)' }}>{moodboardCombos[selectedMoodIndex]?.fixture}</span>
                       </div>
                     </div>
 
@@ -3245,13 +3355,15 @@ export default function Home() {
                     flexWrap: 'wrap',
                     gap: '12px'
                   }}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px' }}>
                       <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '600' }}>Seçili Konsept</span>
-                      <span style={{ fontSize: '0.85rem', fontWeight: '900', color: '#0f172a' }}>{MOODBOARD_COMBOS[selectedMoodIndex].tileName}</span>
+                      <span style={{ fontSize: '0.85rem', fontWeight: '900', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {moodboardCombos[selectedMoodIndex]?.tileName}
+                      </span>
                     </div>
                     
                     <button
-                      onClick={() => handleTryMoodboard(MOODBOARD_COMBOS[selectedMoodIndex])}
+                      onClick={() => handleTryMoodboard(moodboardCombos[selectedMoodIndex])}
                       style={{
                         background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
                         color: '#fff',
