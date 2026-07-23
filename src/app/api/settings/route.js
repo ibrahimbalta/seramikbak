@@ -157,27 +157,91 @@ export async function GET() {
     // 6. Default Legal Content
     const defaultLegal = {
       kvkk: `
-        <p>SeramikBak Teknoloji A.Ş. (“SeramikBak” veya “Şirket”) olarak, çevrimiçi ziyaretçilerimizin, bayilerimizin ve marka ortaklarımızın kişisel verilerinin korunmasına büyük önem veriyoruz. Bu metin, 6698 sayılı Kişisel Verilerin Korunması Kanunu (“Kanun”) kapsamında veri sorumlusu sıfatıyla tarafımızca toplanan verilerin işlenme şartlarını açıklamak amacıyla hazırlanmıştır.</p>
-        <h3>1. Hangi Kişisel Verileri İşliyoruz?</h3>
-        <p>SeramikBak platformunu kullanımınız sırasında aşağıdaki verileriniz işlenmektedir:</p>
+        <p><strong>SeramikBak Teknoloji A.Ş.</strong> (“SeramikBak” veya “Şirket”) olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) uyarınca veri sorumlusu sıfatıyla, ziyaretçilerimizin, bayilerimizin ve marka ortaklarımızın kişisel verilerinin korunmasına ve güvenliğine büyük önem veriyoruz. Bu metin, verilerinizin toplanma yöntemleri, işlenme amaçları, aktarıldığı taraflar ve yasal haklarınız hakkında sizleri bilgilendirmek amacıyla hazırlanmıştır.</p>
+
+        <h3>1. İşlenen Kişisel Veri Kategorileri</h3>
+        <p>Platformumuzu kullanımınız ve üyelik süreçleriniz kapsamında aşağıdaki kişisel verileriniz işlenmektedir:</p>
         <ul>
-          <li><strong>Kimlik ve İletişim Bilgileri:</strong> Adınız, soyadınız, telefon numaranız, e-posta adresiniz.</li>
-          <li><strong>Konum Bilgileri:</strong> Bayi bulucu için tarayıcı izninizle toplanan yaklaşık coğrafi koordinatlarınız.</li>
-          <li><strong>Kullanım ve İşlem Bilgileri:</strong> Arama geçmişiniz, tıkladığınız seramik modelleri.</li>
+          <li><strong>Kimlik Bilgileri:</strong> Adınız, soyadınız.</li>
+          <li><strong>İletişim Bilgileri:</strong> E-posta adresiniz, telefon numaranız, kayıtlı bayi adresiniz.</li>
+          <li><strong>Konum Bilgileri:</strong> Bayi Bulucu (Dealer Locator) özelliği aracılığıyla size en yakın yetkili bayiyi gösterebilmek için tarayıcınızın izniyle toplanan coğrafi koordinatlarınız.</li>
+          <li><strong>Görsel Veriler:</strong> 3D Sanal Stüdyo hizmetimizi kullanırken sisteme yüklediğiniz mekan ve oda fotoğraflarınız.</li>
+          <li><strong>İşlem ve Kullanım Güvenliği:</strong> IP adresiniz, tarayıcı log kayıtları, arama geçmişiniz ve favorilere eklediğiniz seramik ürünleri.</li>
         </ul>
+
+        <h3>2. Kişisel Verilerin İşlenme Amaçları</h3>
+        <p>Kişisel verileriniz, KVKK'nın 5. ve 6. maddelerinde belirtilen şartlara uygun olarak aşağıdaki amaçlarla işlenmektedir:</p>
+        <ul>
+          <li>Müşterilerin beğendiği seramik modellerine ilişkin bölgedeki en yakın bayilerden hızlı ve şeffaf fiyat teklifi (Lead) alabilmesini sağlamak.</li>
+          <li>3D Sanal Stüdyo (Three.js destekli görselleştirici) aracılığıyla kullanıcıların kendi odalarının fotoğraflarına seramik döşeyerek tasarım yapabilmesini sağlamak.</li>
+          <li>Bayi ve marka üyelik başvurularının değerlendirilmesi, SaaS aboneliklerinin kurulması ve faturalandırma süreçlerinin yönetilmesi.</li>
+          <li>Platform performansının ölçümlenmesi, arama algoritmasının iyileştirilmesi ve kullanıcılara özelleştirilmiş tasarım önerileri sunulması.</li>
+        </ul>
+
+        <h3>3. İşlenen Verilerin Aktarılması</h3>
+        <p>Toplanan kişisel verileriniz; işbu aydınlatma metnindeki amaçlarla sınırlı olmak üzere, kullanıcının teklif talebini ilettiği <strong>yetkili bayilere</strong>, platform altyapısını sağlayan teknik iş ortaklarımıza ve ilgili yasal mevzuat uyarınca talep edilmesi durumunda adli ve idari makamlara aktarılabilecektir. Verileriniz üçüncü şahıslara ticari amaçlarla asla satılmamaktadır.</p>
+
+        <h3>4. Toplama Yöntemi ve Hukuki Sebebi</h3>
+        <p>Kişisel verileriniz, web sitemiz üzerindeki üyelik formları, teklif talep formları, 3D stüdyo modülü ve otomatik log kayıt sistemleri aracılığıyla tamamen dijital ortamlarda toplanmaktadır. İşlemenin hukuki sebebi; bir sözleşmenin kurulması veya ifasıyla doğrudan doğruya ilgili olması (KVKK m. 5/2-c), veri sorumlusunun hukuki yükümlülüğünü yerine getirebilmesi (KVKK m. 5/2-ç) ve temel hak ve özgürlüklerinize zarar vermemek kaydıyla meşru menfaatlerimizdir (KVKK m. 5/2-f). Konum verileri ve yüklenen fotoğraflar tamamen sizin açık rızanıza dayanarak işlenmektedir.</p>
+
+        <h3>5. İlgili Kişi Olarak Haklarınız</h3>
+        <p>KVKK'nın 11. maddesi uyarınca, verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, işlenme amacını öğrenme, verilerin düzeltilmesini veya silinmesini isteme haklarına sahipsiniz. Haklarınızı kullanmak için <strong>kvkk@seramikbak.com</strong> e-posta adresinden veya adresimize yazılı başvuru yaparak bizimle her zaman iletişime geçebilirsiniz.</p>
       `,
       kullanim: `
-        <p>Lütfen SeramikBak internet sitesini (seramikbak.com) ve mobil uygulamasını kullanmadan önce bu kullanım koşullarını dikkatlice okuyunuz. Sitemizi kullanarak bu koşulları peşinen kabul etmiş sayılırsınız.</p>
-        <h3>1. Hizmetin Niteliği</h3>
-        <p>SeramikBak, seramik üreticisi markaları ve onların yetkili satıcılarını tüketicilerle buluşturan bağımsız bir arama motoru, karşılaştırma ve 3D görselleştirme portalıdır. SeramikBak, doğrudan seramik satışı yapmaz, ödeme tahsil etmez ve nakliye süreçlerini üstlenmez.</p>
+        <p>Bu web sitesini (<strong>seramikbak.com</strong>) veya mobil uygulamalarını ziyaret ederek ve kullanarak, aşağıda belirtilen kullanım koşullarını, yasal şartları ve kuralları peşinen kabul etmiş sayılırsınız. Bu koşulları kabul etmiyorsanız lütfen platformu kullanmayınız.</p>
+
+        <h3>1. Hizmetlerin Tanımı ve Sorumluluk Sınırı</h3>
+        <p>SeramikBak, Türkiye'nin önde gelen seramik üreticisi markaları ile onların yetkili satıcı bayilerini tüketicilerle bir araya getiren bağımsız bir dijital showroom, karşılaştırma ve 3D tasarım portalıdır. <strong>SeramikBak doğrudan seramik satışı yapmaz, ödeme tahsil etmez ve lojistik/nakliye süreçlerini üstlenmez.</strong></p>
+        <p>Sitede sergilenen ürünler, stok durumları ve fiyat teklifleri tamamen bağımsız bayiler tarafından sağlanmaktadır. Alıcı ile yetkili bayi arasında gerçekleşecek ticari alışverişlerden, sözleşmelerden, ürün teslimatlarından veya olası ayıplı mallardan kaynaklanan hukuki uyuşmazlıklardan SeramikBak sorumlu tutulamaz. Her türlü talep doğrudan muhatap bayiye yönlendirilmelidir.</p>
+
+        <h3>2. Fikri Mülkiyet Hakları</h3>
+        <p>Platformda yer alan tüm yazılımlar, tasarım kodları, arayüz elementleri, 3D stüdyo döşeme algoritmaları, SeramikBak markası, tescilli logolar ve sergilenen ürünlerin dijital dokuları (textures) SeramikBak'a veya ilgili üretici markalara aittir. Yazılı izin olmaksızın bu içeriklerin kopyalanması, kazınması (scraping), çoğaltılması veya ticari amaçlarla başka platformlarda kullanılması 5846 sayılı Fikir ve Sanat Eserleri Kanunu uyarınca yasaktır.</p>
+
+        <h3>3. Kullanıcıların Yükümlülükleri</h3>
+        <p>Kullanıcılar, platformu kullanırken yalnızca hukuka uygun amaçlarla işlem yapabilirler. 3D Sanal Stüdyo modülüne yüklenecek oda fotoğraflarının telif haklarının kullanıcıya ait olması veya kullanım izninin bulunması gerekmektedir. Sisteme virüs, zararlı kod yüklenmesi veya sunucuların işleyişini bozacak siber saldırı girişimlerinde bulunulması durumunda SeramikBak her türlü adli ve cezai takibat hakkını saklı tutar.</p>
+
+        <h3>4. Değişiklik ve Kesintiler</h3>
+        <p>SeramikBak, teknolojik gelişmeler ve yasal gereklilikler doğrultusunda web sitesinde sunduğu hizmetleri, arayüz tasarımlarını ve işbu kullanım koşullarını önceden bildirmeksizin tek taraflı olarak değiştirme, askıya alma veya sonlandırma hakkına sahiptir.</p>
       `,
       cerez: `
-        <p>SeramikBak internet sitesinde, ziyaretçilerimize daha iyi bir kullanıcı deneyimi sunabilmek ve platform trafiğini analiz edebilmek amacıyla çerezler (cookies) kullanılmaktadır.</p>
-        <h3>1. Kullandığımız Çerez Türleri</h3>
+        <p>SeramikBak olarak, platformumuzu (<strong>seramikbak.com</strong>) ziyaret eden kullanıcılarımızın deneyimini optimize etmek, site trafiğini analiz etmek ve sponsorlu reklam çalışmalarımızı kişiselleştirmek amacıyla çerezler (cookies) ve benzeri takip teknolojileri kullanmaktayız.</p>
+
+        <h3>1. Çerez Nedir?</h3>
+        <p>Çerezler, ziyaret ettiğiniz internet siteleri tarafından tarayıcınız aracılığıyla cihazınıza (bilgisayar, tablet veya telefon) kaydedilen küçük metin dosyalarıdır. Çerezler sitenin sizi hatırlamasına, tercihlerinizin kaydedilmesine ve daha hızlı bir internet deneyimi yaşamanıza yardımcı olur.</p>
+
+        <h3>2. Kullandığımız Çerez Türleri</h3>
         <ul>
-          <li><strong>Zorunlu Çerezler:</strong> Sitenin düzgün çalışması için zorunlu olan teknik çerezlerdir.</li>
-          <li><strong>Performans Çerezleri:</strong> Aramaları ölçümleyerek sitemizi optimize etmemize yarayan çerezlerdir.</li>
+          <li><strong>Zorunlu Çerezler:</strong> Web sitesinin temel fonksiyonlarının (üye girişi yapılması, güvenlik önlemleri, favori listenizin tarayıcıda saklanması) çalışması için zorunlu olan teknik çerezlerdir.</li>
+          <li><strong>Analitik ve Performans Çerezleri:</strong> Sitemizi kaç kişinin ziyaret ettiğini, hangi seramik modellerinin daha çok aratıldığını ölçümlememize yarayan ve platformumuzu optimize etmemizi sağlayan anonim çerezlerdir.</li>
+          <li><strong>İşlevsel Çerezler:</strong> İl ve ilçe seçiminizi veya bayi arama tercihlerini hatırlayarak sonraki ziyaretlerinizde size kolaylık sağlayan çerezlerdir.</li>
+          <li><strong>Hedefleme ve Reklam Çerezleri:</strong> B2B marka ortaklarımızın sponsorlu ürün kampanyalarını doğru kitlelere ulaştırmak ve ilgi alanlarınıza en uygun seramik tasarımlarını göstermek amacıyla kullanılan çerezlerdir.</li>
         </ul>
+
+        <h3>3. Çerezleri Nasıl Kontrol Edebilirsiniz?</h3>
+        <p>Tarayıcınızın ayarlarını değiştirerek çerezleri kabul etmeyebilir, mevcut çerezleri silebilir veya bir site çerez kaydetmek istediğinde uyarı alabilirsiniz. Çerezlerin engellenmesi durumunda, 3D Sanal Stüdyo tercihleriniz ve üyelik giriş fonksiyonlarınız gibi sitenin bazı dinamik özellikleri düzgün çalışmayabilir. Popüler tarayıcılarda çerez yönetim ayarları genellikle "Ayarlar -> Gizlilik ve Güvenlik" menüsü altında yer almaktadır.</p>
+      `,
+      'bayi-sozlesme': `
+        <p>İşbu Yetkili Bayi Üyelik Sözleşmesi (“Sözleşme”), <strong>SeramikBak Teknoloji A.Ş.</strong> (bundan böyle “SeramikBak” olarak anılacaktır) ile platforma yetkili bayi sıfatıyla kaydolan ticari işletme/şahıs şirketi (bundan böyle “Bayi” olarak anılacaktır) arasında, elektronik ortamda onaylandığı tarihte yürürlüğe girmiştir.</p>
+
+        <h3>1. Sözleşmenin Konusu ve Kapsamı</h3>
+        <p>Bu Sözleşme, Bayi'nin yetkili satıcısı olduğu seramik üretici markalarının ürünlerini, kendi stok ve fiyat bilgileriyle birlikte SeramikBak platformunda dijital olarak sergilemesini; tüketicilerden gelen satın alma ve bilgi taleplerine (Lead) erişmesini ve SeramikBak'ın sunduğu B2B SaaS panelini (LITE, STANDART veya PREMIUM üyelik planları kapsamında) kullanma şartlarını düzenler.</p>
+
+        <h3>2. Tarafların Hak ve Yükümlülükleri</h3>
+        <ul>
+          <li><strong>Veri ve Bilgi Doğruluğu:</strong> Bayi, platforma yüklediği veya XML/API entegrasyonu ile aktardığı ürün envanteri, stok miktarı, birim fiyat ve lojistik/teslimat bilgilerinin güncel ve doğru olduğunu taahhüt eder. Yanlış veya yanıltıcı bilgi sunulması sebebiyle tüketicilerin yaşayacağı mağduriyetlerden ve yasal yaptırımlardan doğrudan Bayi sorumludur.</li>
+          <li><strong>Teklif Taleplerine Geri Dönüş:</strong> Bayi, tüketiciler tarafından kendisine yönlendirilen teklim ve numune taleplerine (Leads) makul iş süreleri içerisinde, en geç 48 saat içinde yazılı veya telefonla geri dönüş yapmayı taahhüt eder. Müşteri memnuniyetini zedeleyici şekilde talepleri yanıtsız bırakan bayilerin üyelik statüleri gözden geçirilir.</li>
+          <li><strong>SaaS Abonelik ve Mali Hükümler:</strong> Bayi, seçtiği abonelik paketinin (LITE, STANDART, PREMIUM) ödeme koşullarına uymakla yükümlüdür. Ücretli paketlerdeki ödemelerin gecikmesi durumunda, SeramikBak bayi panelini ve ürün sergileme hizmetini askıya alma hakkına sahiptir.</li>
+          <li><strong>Tüketici Mevzuatına Uyum:</strong> Bayi, nihai tüketicilerle gerçekleştireceği tüm satış işlemlerinde 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve ilgili diğer mevzuat hükümlerine uymak zorundadır.</li>
+        </ul>
+
+        <h3>3. Gizlilik ve Veri Güvenliği</h3>
+        <p>Bayi, platform aracılığıyla kendisine iletilen tüketicilere ait kişisel verileri (ad, telefon, e-posta vb.) sadece ve sadece tekliflendirme ve satış işlemleri amacıyla işleyebilir. Bu verilerin KVKK düzenlemelerine aykırı olarak üçüncü şahıslarla paylaşılması, satılması veya başka pazarlama amaçlarıyla kullanılması kesinlikle yasaktır.</p>
+
+        <h3>4. Sözleşmenin Süresi ve Feshi</h3>
+        <p>İşbu Sözleşme onay tarihiyle başlar ve taraflardan biri feshedene kadar yürürlükte kalır. SeramikBak, Bayi'nin iş ahlakına uymaması, yanıltıcı fiyat vermesi, sahte stok beyan etmesi veya Sözleşme maddelerini ihlal etmesi durumunda, bayi üyeliğini tek taraflı olarak, tazminatsız ve derhal feshetme hakkına sahiptir.</p>
+
+        <h3>5. Yetkili Mahkeme</h3>
+        <p>Bu Sözleşme'nin uygulanmasından doğacak her türlü uyuşmazlığın çözümünde İstanbul (Anadolu) Mahkemeleri ve İcra Daireleri yetkilidir.</p>
       `
     };
 

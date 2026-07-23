@@ -144,6 +144,7 @@ export default function AdminPage() {
   const [pageYasalKvkk, setPageYasalKvkk] = useState('');
   const [pageYasalKullanim, setPageYasalKullanim] = useState('');
   const [pageYasalCerez, setPageYasalCerez] = useState('');
+  const [pageYasalBayiSozlesme, setPageYasalBayiSozlesme] = useState('');
 
   const [pageManagerSubTab, setPageManagerSubTab] = useState('about'); // 'about', 'contact', 'blog', 'legal'
   
@@ -480,10 +481,12 @@ export default function AdminPage() {
           setPageYasalKvkk(data.page_yasal_content.kvkk || '');
           setPageYasalKullanim(data.page_yasal_content.kullanim || '');
           setPageYasalCerez(data.page_yasal_content.cerez || '');
+          setPageYasalBayiSozlesme(data.page_yasal_content['bayi-sozlesme'] || '');
         } else {
           setPageYasalKvkk('<p>SeramikBak Teknoloji A.Ş. olarak kişisel verilerinizin korunmasına önem veriyoruz...</p>');
           setPageYasalKullanim('<p>SeramikBak internet sitesini kullanarak bu kullanım koşullarını kabul etmiş sayılırsınız...</p>');
           setPageYasalCerez('<p>Sitemizde kullanıcı deneyimini artırmak amacıyla çerezler kullanılmaktadır...</p>');
+          setPageYasalBayiSozlesme('<p>SeramikBak Yetkili Bayi Üyelik Sözleşmesi...</p>');
         }
       }
     } catch (err) {
@@ -1308,7 +1311,8 @@ export default function AdminPage() {
           page_yasal_content: {
             kvkk: pageYasalKvkk,
             kullanim: pageYasalKullanim,
-            cerez: pageYasalCerez
+            cerez: pageYasalCerez,
+            'bayi-sozlesme': pageYasalBayiSozlesme
           }
         })
       });
@@ -5043,6 +5047,15 @@ export default function AdminPage() {
                   <textarea 
                     value={pageYasalCerez} 
                     onChange={(e) => setPageYasalCerez(e.target.value)} 
+                    rows={6}
+                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.82rem', fontFamily: 'monospace', resize: 'none' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Bayi Üyelik Sözleşmesi Metni (HTML formatında)</label>
+                  <textarea 
+                    value={pageYasalBayiSozlesme} 
+                    onChange={(e) => setPageYasalBayiSozlesme(e.target.value)} 
                     rows={6}
                     style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.82rem', fontFamily: 'monospace', resize: 'none' }}
                   />
