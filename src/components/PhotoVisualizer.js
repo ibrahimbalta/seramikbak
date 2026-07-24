@@ -3,39 +3,39 @@
 import { useState, useEffect, useRef } from 'react';
 import { Camera, Image as ImageIcon, RotateCw, ZoomIn, Download, RefreshCw, Sparkles, HelpCircle } from 'lucide-react';
 
-// Room Presets with empty floors/walls and default perspective coordinates
+// Room Presets with empty floors/walls and pre-mapped perspective coordinates
 const ROOM_PRESETS = [
   {
     id: 'bathroom',
-    name: 'Modern Boş Banyo',
+    name: 'Modern Boş Banyo (Duvar)',
     url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80',
     pins: [
-      { x: 0.02, y: 0.76 }, // Top-Left (Zemin başlangıcı)
-      { x: 0.98, y: 0.76 }, // Top-Right
-      { x: 0.98, y: 0.98 }, // Bottom-Right
-      { x: 0.02, y: 0.98 }  // Bottom-Left
+      { x: 0.02, y: 0.35 }, // Top-Left (Duvarın sol üstü)
+      { x: 0.36, y: 0.31 }, // Top-Right (Duvarın sağ üstü - cam panel hizası)
+      { x: 0.36, y: 0.81 }, // Bottom-Right (Duvarın sağ altı)
+      { x: 0.02, y: 0.83 }  // Bottom-Left (Duvarın sol altı)
     ]
   },
   {
     id: 'livingroom',
-    name: 'Geniş Boş Salon zemin',
+    name: 'Geniş Boş Salon (Zemin)',
     url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     pins: [
-      { x: 0.10, y: 0.60 },
-      { x: 0.90, y: 0.60 },
-      { x: 0.98, y: 0.98 },
-      { x: 0.02, y: 0.98 }
+      { x: 0.12, y: 0.58 }, // Top-Left (Uzak zemin sol)
+      { x: 0.88, y: 0.58 }, // Top-Right (Uzak zemin sağ)
+      { x: 0.98, y: 0.98 }, // Bottom-Right (Yakın zemin sağ)
+      { x: 0.02, y: 0.98 }  // Bottom-Left (Yakın zemin sol)
     ]
   },
   {
     id: 'kitchen',
-    name: 'Minimal Mutfak Tezgahi',
+    name: 'Minimal Mutfak (Tezgah Üstü)',
     url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80',
     pins: [
-      { x: 0.02, y: 0.50 },
-      { x: 0.98, y: 0.50 },
-      { x: 0.98, y: 0.82 },
-      { x: 0.02, y: 0.82 }
+      { x: 0.02, y: 0.35 }, // Top-Left (Tezgah arası sol üst)
+      { x: 0.98, y: 0.35 }, // Top-Right (Tezgah arası sağ üst)
+      { x: 0.98, y: 0.62 }, // Bottom-Right (Tezgah hizası sağ)
+      { x: 0.02, y: 0.62 }  // Bottom-Left (Tezgah hizası sol)
     ]
   }
 ];
