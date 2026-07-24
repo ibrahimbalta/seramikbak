@@ -3307,7 +3307,7 @@ export default function DealerPortalPage() {
               </div>
             )}
 
-            <div className="inventory-dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '1.1fr 1.9fr', gap: '24px' }}>
+            <div className="inventory-dashboard-grid" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.1fr 1.9fr', gap: '24px' }}>
               
               {/* LEFT SIDE: UPLOAD & SYNC */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -4362,7 +4362,8 @@ export default function DealerPortalPage() {
           .dealer-project-details-split,
           .dealer-pricing-grid,
           .dealer-stats-grid,
-          .campaign-inputs-grid {
+          .campaign-inputs-grid,
+          .inventory-dashboard-grid {
             grid-template-columns: 1fr !important;
             gap: 16px !important;
           }
