@@ -32,7 +32,8 @@ import {
   Eye,
   MousePointerClick,
   Handshake,
-  DollarSign
+  DollarSign,
+  Package
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -60,6 +61,22 @@ export default function BrandPortalPage() {
   // Layout states
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [activePortalTab, setActivePortalTab] = useState('dashboard');
+  const [isMobile, setIsMobile] = useState(false);
+  const [showMobileMoreMenu, setShowMobileMoreMenu] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handleMobileTabChange = (tabId) => {
+    setActivePortalTab(tabId);
+    setShowMobileMoreMenu(false);
+  };
 
   // Dashboard Metrics & Campaign States
   const [b2bStats, setB2bStats] = useState(null);
@@ -758,161 +775,164 @@ export default function BrandPortalPage() {
       color: '#0f172a',
       fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
       display: 'flex',
+      flexDirection: isMobile ? 'column' : 'row',
       overflowX: 'hidden'
     }}>
       {/* SOLID SIDEBAR */}
-      <aside style={{
-        width: isSidebarCollapsed ? '70px' : '260px',
-        background: '#090d16',
-        color: '#cbd5e1',
-        display: 'flex',
-        flexDirection: 'column',
-        flexShrink: 0,
-        transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-        borderRight: '1px solid rgba(255, 255, 255, 0.05)',
-        position: 'sticky',
-        top: 0,
-        height: '100vh',
-        zIndex: 200
-      }}>
-        {/* Sidebar Header */}
-        <div style={{
-          padding: '24px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '8px',
-            background: '#fff',
-            color: '#090d16',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: '900',
-            fontSize: '1.2rem',
-            flexShrink: 0,
-            boxShadow: '0 0 10px rgba(255,255,255,0.1)'
-          }}>SB</div>
-          {!isSidebarCollapsed && (
-            <div style={{ minWidth: 0 }}>
-              <h2 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {brandInfo.name}
-              </h2>
-              <span style={{ 
-                fontSize: '0.62rem', 
-                padding: '2px 6px', 
-                borderRadius: '8px', 
-                display: 'inline-block',
-                marginTop: '3px',
-                ...getPlanBadgeStyle(currentPlan)
-              }}>
-                {currentPlan} ÜYE
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Sidebar Nav Items */}
-        <nav style={{ flex: 1, padding: '16px 8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          {[
-            { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
-            { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={18} /> },
-            { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={18} /> },
-            { id: 'trends', label: 'Bölgesel Trendler', icon: <TrendingUp size={18} /> },
-            { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={18} /> },
-            { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={18} /> },
-            { id: 'saas', label: 'Lisans & Ödemeler', icon: <CreditCard size={18} /> }
-          ].map(item => {
-            const isActive = activePortalTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActivePortalTab(item.id)}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: isActive ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
-                  color: isActive ? '#d4af37' : '#94a3b8',
-                  cursor: 'pointer',
-                  fontSize: '0.85rem',
-                  fontWeight: isActive ? '700' : '500',
-                  textAlign: 'left',
-                  transition: 'all 0.2s',
-                  boxSizing: 'border-box'
-                }}
-                title={isSidebarCollapsed ? item.label : undefined}
-                className="sidebar-link-btn"
-              >
-                {item.icon}
-                {!isSidebarCollapsed && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Sidebar Collapse Toggle & Logout */}
-        <div style={{
-          padding: '12px 8px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+      {!isMobile && (
+        <aside style={{
+          width: isSidebarCollapsed ? '70px' : '260px',
+          background: '#090d16',
+          color: '#cbd5e1',
           display: 'flex',
           flexDirection: 'column',
-          gap: '4px'
+          flexShrink: 0,
+          transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+          position: 'sticky',
+          top: 0,
+          height: '100vh',
+          zIndex: 200
         }}>
-          <button
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            style={{
-              width: '100%',
+          {/* Sidebar Header */}
+          <div style={{
+            padding: '24px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: '#fff',
+              color: '#090d16',
               display: 'flex',
               alignItems: 'center',
-              gap: '12px',
-              padding: '10px',
-              borderRadius: '8px',
-              border: 'none',
-              background: 'transparent',
-              color: '#64748b',
-              cursor: 'pointer',
-              fontSize: '0.78rem',
-              textAlign: 'left',
-              transition: 'all 0.2s'
-            }}
-          >
-            <Menu size={16} />
-            {!isSidebarCollapsed && <span>Paneli Daralt</span>}
-          </button>
-          <button
-            onClick={handleLogout}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '10px',
-              borderRadius: '8px',
-              border: 'none',
-              background: 'rgba(239, 68, 68, 0.08)',
-              color: '#f87171',
-              cursor: 'pointer',
-              fontSize: '0.78rem',
-              fontWeight: '700',
-              textAlign: 'left',
-              transition: 'all 0.2s'
-            }}
-          >
-            <LogOut size={16} />
-            {!isSidebarCollapsed && <span>Çıkış Yap</span>}
-          </button>
-        </div>
-      </aside>
+              justifyContent: 'center',
+              fontWeight: '900',
+              fontSize: '1.2rem',
+              flexShrink: 0,
+              boxShadow: '0 0 10px rgba(255,255,255,0.1)'
+            }}>SB</div>
+            {!isSidebarCollapsed && (
+              <div style={{ minWidth: 0 }}>
+                <h2 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {brandInfo.name}
+                </h2>
+                <span style={{ 
+                  fontSize: '0.62rem', 
+                  padding: '2px 6px', 
+                  borderRadius: '8px', 
+                  display: 'inline-block',
+                  marginTop: '3px',
+                  ...getPlanBadgeStyle(currentPlan)
+                }}>
+                  {currentPlan} ÜYE
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar Nav Items */}
+          <nav style={{ flex: 1, padding: '16px 8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {[
+              { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
+              { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={18} /> },
+              { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={18} /> },
+              { id: 'trends', label: 'Bölgesel Trendler', icon: <TrendingUp size={18} /> },
+              { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={18} /> },
+              { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={18} /> },
+              { id: 'saas', label: 'Lisans & Ödemeler', icon: <CreditCard size={18} /> }
+            ].map(item => {
+              const isActive = activePortalTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActivePortalTab(item.id)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: isActive ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+                    color: isActive ? '#d4af37' : '#94a3b8',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem',
+                    fontWeight: isActive ? '700' : '500',
+                    textAlign: 'left',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box'
+                  }}
+                  title={isSidebarCollapsed ? item.label : undefined}
+                  className="sidebar-link-btn"
+                >
+                  {item.icon}
+                  {!isSidebarCollapsed && <span style={{ whiteSpace: 'nowrap' }}>{item.label}</span>}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Sidebar Collapse Toggle & Logout */}
+          <div style={{
+            padding: '12px 8px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px'
+          }}>
+            <button
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px',
+                borderRadius: '8px',
+                border: 'none',
+                background: 'transparent',
+                color: '#64748b',
+                cursor: 'pointer',
+                fontSize: '0.78rem',
+                textAlign: 'left',
+                transition: 'all 0.2s'
+              }}
+            >
+              <Menu size={16} />
+              {!isSidebarCollapsed && <span>Paneli Daralt</span>}
+            </button>
+            <button
+              onClick={handleLogout}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '10px',
+                borderRadius: '8px',
+                border: 'none',
+                background: 'rgba(239, 68, 68, 0.08)',
+                color: '#f87171',
+                cursor: 'pointer',
+                fontSize: '0.78rem',
+                fontWeight: '700',
+                textAlign: 'left',
+                transition: 'all 0.2s'
+              }}
+            >
+              <LogOut size={16} />
+              {!isSidebarCollapsed && <span>Çıkış Yap</span>}
+            </button>
+          </div>
+        </aside>
+      )}
 
       {/* PORTAL CONTENT WRAPPER */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
@@ -920,50 +940,91 @@ export default function BrandPortalPage() {
         <header style={{
           background: '#fff',
           borderBottom: '1px solid #e2e8f0',
-          padding: '16px 32px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          padding: isMobile ? '12px 16px' : '16px 32px',
           position: 'sticky',
           top: 0,
           zIndex: 100
         }}>
-          <div>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
-              {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
-              {activePortalTab === 'products' && 'Ürün Kataloğumuz'}
-              {activePortalTab === 'b2b-projects' && 'B2B Proje ve Toptan Talepler'}
-              {activePortalTab === 'trends' && 'Bölgesel Pazar Trendleri'}
-              {activePortalTab === 'dealers' && 'Yetkili Bayi Ağı Kontrolü'}
-              {activePortalTab === 'campaigns' && 'Vitrin & Reklam Yönetimi'}
-              {activePortalTab === 'saas' && 'SaaS Abonelik & Ödeme Yönetimi'}
-            </h1>
-            <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '2px 0 0 0' }}>
-              {brandInfo.name} fabrikası için B2B2C yönetim merkezi.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            {b2bStats?.saas?.expiresAt && (
-              <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px', background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px' }}>
-                <Calendar size={12} style={{ color: '#d4af37' }} />
-                <span>Lisans Bitiş: <strong>{new Date(b2bStats.saas.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</strong></span>
+          {isMobile ? (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '6px',
+                  background: 'linear-gradient(135deg, #111 0%, #1e293b 100%)',
+                  color: '#d4af37',
+                  border: '1px solid #d4af37',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '900',
+                  fontSize: '0.85rem'
+                }}>SB</div>
+                <div>
+                  <h4 style={{ fontSize: '0.85rem', fontWeight: '800', color: '#0f172a', margin: 0 }}>{brandInfo.name}</h4>
+                  <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700' }}>
+                    {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
+                    {activePortalTab === 'products' && 'Ürün Kataloğu'}
+                    {activePortalTab === 'b2b-projects' && 'B2B Talepleri'}
+                    {activePortalTab === 'trends' && 'Pazar Trendleri'}
+                    {activePortalTab === 'dealers' && 'Bayi Ağı'}
+                    {activePortalTab === 'campaigns' && 'Reklam Yönetimi'}
+                    {activePortalTab === 'saas' && 'Lisans & Ödemeler'}
+                  </span>
+                </div>
               </div>
-            )}
-            <span style={{
-              fontSize: '0.75rem',
-              padding: '6px 12px',
-              borderRadius: '20px',
-              fontWeight: '700',
-              ...getPlanBadgeStyle(currentPlan)
-            }}>
-              {currentPlan} PLAN
-            </span>
-          </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                  fontSize: '0.6rem',
+                  padding: '3px 8px',
+                  borderRadius: '10px',
+                  ...getPlanBadgeStyle(currentPlan)
+                }}>
+                  {currentPlan} PLAN
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <div>
+                <h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                  {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
+                  {activePortalTab === 'products' && 'Ürün Kataloğumuz'}
+                  {activePortalTab === 'b2b-projects' && 'B2B Proje ve Toptan Talepler'}
+                  {activePortalTab === 'trends' && 'Bölgesel Pazar Trendleri'}
+                  {activePortalTab === 'dealers' && 'Yetkili Bayi Ağı Kontrolü'}
+                  {activePortalTab === 'campaigns' && 'Vitrin & Reklam Yönetimi'}
+                  {activePortalTab === 'saas' && 'SaaS Abonelik & Ödeme Yönetimi'}
+                </h1>
+                <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '2px 0 0 0' }}>
+                  {brandInfo.name} fabrikası için B2B2C yönetim merkezi.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {b2bStats?.saas?.expiresAt && (
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px', background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px' }}>
+                    <Calendar size={12} style={{ color: '#d4af37' }} />
+                    <span>Lisans Bitiş: <strong>{new Date(b2bStats.saas.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</strong></span>
+                  </div>
+                )}
+                <span style={{
+                  fontSize: '0.75rem',
+                  padding: '6px 12px',
+                  borderRadius: '20px',
+                  fontWeight: '700',
+                  ...getPlanBadgeStyle(currentPlan)
+                }}>
+                  {currentPlan} PLAN
+                </span>
+              </div>
+            </div>
+          )}
         </header>
 
         {/* PORTAL MAIN TAB CONTAINER */}
-        <main style={{ padding: '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
+        <main style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
           
           {statsLoading && !b2bStats ? (
             <div style={{ textAlign: 'center', padding: '120px 0', color: '#64748b' }}>
@@ -1299,6 +1360,57 @@ export default function BrandPortalPage() {
                     {bids.length === 0 ? (
                       <div style={{ textAlign: 'center', padding: '36px', color: '#94a3b8', fontStyle: 'italic', fontSize: '0.85rem' }}>
                         Henüz herhangi bir B2B inşaat projesi ihalesine teklif sunmadınız. "B2B Proje Talepleri" sekmesinden ihaleleri inceleyip teklif verebilirsiniz.
+                      </div>
+                    ) : isMobile ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+                        {bids.map(bid => (
+                          <div key={bid.id} style={{
+                            background: '#fff',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '12px',
+                            padding: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px'
+                          }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                              <div>
+                                <strong style={{ fontSize: '0.85rem', color: '#0f172a', display: 'block' }}>{bid.projectName}</strong>
+                                <span style={{ fontSize: '0.72rem', color: '#64748b' }}>{bid.companyName}</span>
+                              </div>
+                              <span style={{
+                                fontSize: '0.65rem',
+                                padding: '2px 8px',
+                                borderRadius: '10px',
+                                background: '#fef3c7',
+                                color: '#d97706',
+                                fontWeight: '700'
+                              }}>
+                                Onay Bekliyor
+                              </span>
+                            </div>
+                            
+                            <div style={{ background: '#f8fafc', padding: '8px 12px', borderRadius: '8px', fontSize: '0.78rem' }}>
+                              <div>Ürün: <strong>{bid.productName}</strong></div>
+                              <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '2px' }}>Kod: {bid.productCode}</div>
+                            </div>
+                            
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.75rem' }}>
+                              <div>
+                                <span style={{ color: '#64748b', display: 'block' }}>Birim Fiyat</span>
+                                <strong style={{ color: '#0f172a' }}>₺{bid.priceM2} / m²</strong>
+                              </div>
+                              <div>
+                                <span style={{ color: '#64748b', display: 'block' }}>Toplam Teklif</span>
+                                <strong style={{ color: '#059669' }}>₺{bid.totalPrice.toLocaleString('tr-TR')}</strong>
+                              </div>
+                            </div>
+                            
+                            <div style={{ fontSize: '0.72rem', color: '#475569', borderTop: '1px solid #f1f5f9', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
+                              <span>Teslim Süresi: <strong>{bid.timeline}</strong></span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     ) : (
                       <div className="table-responsive" style={{ overflowX: 'auto' }}>
@@ -1868,6 +1980,80 @@ export default function BrandPortalPage() {
                     ) : dealers.length === 0 ? (
                       <div style={{ textAlign: 'center', padding: '36px', color: '#94a3b8', fontStyle: 'italic' }}>
                         Markanıza tanımlanmış hiçbir fiziki bayi bulunamadı. Sağ üstten yeni bir bayi tanımlayabilirsiniz.
+                      </div>
+                    ) : isMobile ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+                        {dealers.map(dealer => (
+                          <div key={dealer.id} style={{
+                            background: '#fff',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '12px',
+                            padding: '16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px'
+                          }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                              <div>
+                                <strong style={{ fontSize: '0.88rem', color: '#0f172a', display: 'block' }}>{dealer.name}</strong>
+                                <span style={{ fontSize: '0.72rem', color: '#475569' }}>{dealer.city} / {dealer.district}</span>
+                              </div>
+                              <span style={{
+                                fontSize: '0.68rem',
+                                padding: '2px 8px',
+                                borderRadius: '10px',
+                                fontWeight: '700',
+                                background: dealer.status === 'APPROVED' ? '#ecfdf5' : (dealer.status === 'PENDING_APPROVAL' ? '#fffbeb' : '#fef2f2'),
+                                color: dealer.status === 'APPROVED' ? '#059669' : (dealer.status === 'PENDING_APPROVAL' ? '#d97706' : '#ef4444')
+                              }}>
+                                {dealer.status === 'APPROVED' ? 'Aktif' : (dealer.status === 'PENDING_APPROVAL' ? 'Onay Bekliyor' : 'Askıda')}
+                              </span>
+                            </div>
+                            
+                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                              <div>Adres: <strong style={{ color: '#475569' }}>{dealer.address}</strong></div>
+                              <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px' }}>Koordinat: {dealer.lat.toFixed(4)}, {dealer.lng.toFixed(4)}</div>
+                            </div>
+                            
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '8px', marginTop: '4px' }}>
+                              <a href={`tel:${dealer.phone}`} style={{ color: '#2563eb', textDecoration: 'none', fontSize: '0.8rem', fontWeight: '700' }}>📞 {dealer.phone}</a>
+                              
+                              {dealer.status === 'APPROVED' ? (
+                                <button 
+                                  onClick={() => handleUpdateDealerStatus(dealer.id, 'REJECTED')}
+                                  style={{
+                                    border: 'none',
+                                    background: 'rgba(239,68,68,0.08)',
+                                    color: '#ef4444',
+                                    fontSize: '0.7rem',
+                                    fontWeight: '700',
+                                    padding: '4px 8px',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  Askıya Al
+                                </button>
+                              ) : (
+                                <button 
+                                  onClick={() => handleUpdateDealerStatus(dealer.id, 'APPROVED')}
+                                  style={{
+                                    border: 'none',
+                                    background: 'rgba(5,150,105,0.08)',
+                                    color: '#059669',
+                                    fontSize: '0.7rem',
+                                    fontWeight: '700',
+                                    padding: '4px 8px',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  Aktifleştir
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     ) : (
                       <div className="table-responsive" style={{ overflowX: 'auto' }}>
@@ -3157,6 +3343,179 @@ export default function BrandPortalPage() {
         </div>
       )}
 
+      {/* Mobile Bottom Navigation Bar */}
+      {isMobile && (
+        <div style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '60px',
+          background: 'rgba(9, 13, 22, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderTop: '1px solid rgba(212, 175, 55, 0.2)',
+          display: 'flex',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+          zIndex: 1000,
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.5)'
+        }}>
+          {[
+            { id: 'dashboard', label: 'Panel', icon: <Activity size={20} /> },
+            { id: 'products', label: 'Ürünler', icon: <Layers size={20} /> },
+            { id: 'b2b-projects', label: 'B2B', icon: <Building2 size={20} /> },
+            { id: 'dealers', label: 'Bayiler', icon: <Users size={20} /> },
+            { id: 'more', label: 'Menü', icon: <Menu size={20} /> }
+          ].map(tab => {
+            const isActive = tab.id === 'more' ? showMobileMoreMenu : (activePortalTab === tab.id);
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  if (tab.id === 'more') {
+                    setShowMobileMoreMenu(!showMobileMoreMenu);
+                  } else {
+                    handleMobileTabChange(tab.id);
+                  }
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: isActive ? '#d4af37' : '#94a3b8',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.65rem',
+                  fontWeight: isActive ? '700' : '500',
+                  padding: '6px 12px',
+                  transition: 'color 0.2s'
+                }}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Mobile More Menu Drawer */}
+      {isMobile && showMobileMoreMenu && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(9, 13, 22, 0.6)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 999,
+          display: 'flex',
+          justifyContent: 'flex-end',
+          flexDirection: 'column'
+        }} onClick={() => setShowMobileMoreMenu(false)}>
+          <div style={{
+            background: '#111827',
+            borderTopLeftRadius: '24px',
+            borderTopRightRadius: '24px',
+            borderTop: '1px solid rgba(212, 175, 55, 0.2)',
+            padding: '24px 20px 40px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            boxShadow: '0 -10px 25px rgba(0,0,0,0.5)'
+          }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#fff', margin: 0 }}>Tüm İşlemler</h3>
+              <button 
+                onClick={() => setShowMobileMoreMenu(false)}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              {[
+                { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
+                { id: 'products', label: 'Ürün Kataloğu', icon: <Layers size={18} /> },
+                { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={18} /> },
+                { id: 'trends', label: 'Pazar Trendleri', icon: <TrendingUp size={18} /> },
+                { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={18} /> },
+                { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={18} /> },
+                { id: 'saas', label: 'Lisans & Ödemeler', icon: <CreditCard size={18} /> }
+              ].map(item => {
+                const isActive = activePortalTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleMobileTabChange(item.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '12px 14px',
+                      background: isActive ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'rgba(255, 255, 255, 0.03)',
+                      border: isActive ? 'none' : '1px solid rgba(255, 255, 255, 0.05)',
+                      borderRadius: '12px',
+                      color: isActive ? '#090d16' : '#cbd5e1',
+                      fontSize: '0.8rem',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      textAlign: 'left'
+                    }}
+                  >
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            
+            <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '16px', marginTop: '8px' }}>
+              <button
+                onClick={() => {
+                  setShowMobileMoreMenu(false);
+                  handleLogout();
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
+                  width: '100%',
+                  padding: '12px',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                  borderRadius: '12px',
+                  color: '#ef4444',
+                  fontSize: '0.85rem',
+                  fontWeight: '700',
+                  cursor: 'pointer'
+                }}
+              >
+                <LogOut size={16} />
+                <span>Güvenli Çıkış Yap</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Styles Override */}
+      <style jsx>{`
+        /* ===== MOBILE (max-width: 768px) ===== */
+        @media (max-width: 768px) {
+          .brand-campaign-grid,
+          .campaign-inputs-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
