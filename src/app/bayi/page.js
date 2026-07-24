@@ -3184,22 +3184,22 @@ export default function DealerPortalPage() {
 
             {/* Feature Comparison Table */}
             <div style={{
-              background: '#fff',
-              border: '1px solid #e9ecef',
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: '20px',
               padding: '32px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
             }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', color: '#111' }}>Paket Karşılaştırma Tablosu</h3>
-              <p style={{ fontSize: '0.8rem', color: '#6c757d', margin: '0 0 20px 0' }}>Tüm paketlerin detaylı özellik karşılaştırması</p>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 6px 0', color: '#ffffff' }}>Paket Karşılaştırma Tablosu</h3>
+              <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: '0 0 20px 0' }}>Tüm paketlerin detaylı özellik karşılaştırması</p>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
                   <thead>
-                    <tr style={{ borderBottom: '2px solid #e9ecef', textAlign: 'left' }}>
-                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#6c757d' }}>Özellik</th>
-                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#64748b', textAlign: 'center' }}>LITE</th>
-                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#b45309', textAlign: 'center', background: '#fffbeb' }}>STANDART</th>
-                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#111', textAlign: 'center' }}>PREMIUM</th>
+                    <tr style={{ borderBottom: '2px solid rgba(255, 255, 255, 0.12)', textAlign: 'left' }}>
+                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#cbd5e1' }}>Özellik</th>
+                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#cbd5e1', textAlign: 'center' }}>LITE</th>
+                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#f59e0b', textAlign: 'center', background: 'rgba(245, 158, 11, 0.08)', borderRadius: '8px 8px 0 0' }}>STANDART</th>
+                      <th style={{ padding: '12px 16px', fontWeight: '700', color: '#ffffff', textAlign: 'center' }}>PREMIUM</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -3213,13 +3213,13 @@ export default function DealerPortalPage() {
                       { feature: 'Reklam Kampanyaları', lite: false, standart: false, premium: true },
                       { feature: 'CRM Entegrasyonu', lite: false, standart: false, premium: true },
                     ].map((row, i) => (
-                      <tr key={i} style={{ borderBottom: '1px solid #f1f3f5' }}>
-                        <td style={{ padding: '13px 16px', fontWeight: '600', color: '#374151' }}>{row.feature}</td>
+                      <tr key={i} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                        <td style={{ padding: '13px 16px', fontWeight: '600', color: '#ffffff' }}>{row.feature}</td>
                         {[row.lite, row.standart, row.premium].map((val, ci) => (
-                          <td key={ci} style={{ padding: '13px 16px', textAlign: 'center', background: ci === 1 ? '#fffbf5' : 'transparent' }}>
+                          <td key={ci} style={{ padding: '13px 16px', textAlign: 'center', background: ci === 1 ? 'rgba(245, 158, 11, 0.03)' : 'transparent' }}>
                             {val === true ? <Check size={16} style={{ color: '#10b981', margin: '0 auto' }} /> 
-                              : val === false ? <X size={16} style={{ color: '#e2e8f0', margin: '0 auto' }} /> 
-                              : <span style={{ fontWeight: '600', color: ci === 2 ? '#7c3aed' : '#374151' }}>{val}</span>}
+                              : val === false ? <X size={16} style={{ color: 'rgba(255, 255, 255, 0.15)', margin: '0 auto' }} /> 
+                              : <span style={{ fontWeight: '600', color: ci === 2 ? '#a78bfa' : '#cbd5e1' }}>{val}</span>}
                           </td>
                         ))}
                       </tr>
@@ -3231,13 +3231,13 @@ export default function DealerPortalPage() {
 
             {/* FAQ Section */}
             <div style={{
-              background: '#fff',
-              border: '1px solid #e9ecef',
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: '20px',
               padding: '32px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
             }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 20px 0', color: '#111' }}>Sık Sorulan Sorular</h3>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 20px 0', color: '#ffffff' }}>Sık Sorulan Sorular</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {[
                   { q: 'Abonelik süresi dolunca ne olur?', a: 'Aboneliğiniz sona erdiğinde gelen müşteri talepleri görünmeye devam eder ancak müşteri iletişim bilgileri maskelenir. Yenileme yaparak erişiminizi geri kazanabilirsiniz.' },
@@ -3245,9 +3245,9 @@ export default function DealerPortalPage() {
                   { q: 'Ödeme nasıl yapılır?', a: 'Kredi kartı, banka havalesi/EFT ve sanal POS ile güvenli ödeme yapabilirsiniz. Fatura otomatik olarak e-posta adresinize gönderilir.' },
                   { q: 'İptal/iade politikası nedir?', a: 'İlk 14 gün içinde koşulsuz iade garantisi sunulmaktadır. 14 gün sonrası için kalan süre üzerinden orantılı iade yapılır.' },
                 ].map((faq, i) => (
-                  <div key={i} style={{ padding: '16px 20px', background: '#f8f9fa', borderRadius: '12px' }}>
-                    <h4 style={{ fontSize: '0.88rem', fontWeight: '700', margin: '0 0 6px 0', color: '#111' }}>{faq.q}</h4>
-                    <p style={{ fontSize: '0.8rem', color: '#6c757d', margin: 0, lineHeight: '1.5' }}>{faq.a}</p>
+                  <div key={i} style={{ padding: '16px 20px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px' }}>
+                    <h4 style={{ fontSize: '0.88rem', fontWeight: '700', margin: '0 0 6px 0', color: '#ffffff' }}>{faq.q}</h4>
+                    <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: 0, lineHeight: '1.5' }}>{faq.a}</p>
                   </div>
                 ))}
               </div>
@@ -3313,12 +3313,12 @@ export default function DealerPortalPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 
                 {/* Excel/CSV Card */}
-                <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 12px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 12px 0', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Upload size={16} style={{ color: 'var(--accent-gold)' }} />
                     Excel / CSV ile Yükleme
                   </h3>
-                  <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0 0 16px 0', lineHeight: '1.5' }}>
+                  <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: '0 0 16px 0', lineHeight: '1.5' }}>
                     Aşağıdaki alana Excel'den kopyaladığınız CSV formatındaki ürün kodları ve stok miktarlarını yapıştırarak toplu güncelleme yapabilirsiniz.
                   </p>
                   
@@ -3326,7 +3326,7 @@ export default function DealerPortalPage() {
                     <a 
                       href="data:text/csv;charset=utf-8,UrunKodu,StokMiktari,Fiyat,Durum%0ADECO-AGREGA-120X240,150,1250,IN_STOCK%0ADECO-TRAVERTEN-60X120,0,0,DISPLAY_ONLY" 
                       download="seramikbak_stok_sablonu.csv"
-                      style={{ fontSize: '0.75rem', color: '#b38e47', fontWeight: '700', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                      style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: '700', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                     >
                       📥 CSV Şablonu İndir
                     </a>
@@ -3336,21 +3336,21 @@ export default function DealerPortalPage() {
                     <textarea 
                       value={csvContentInput}
                       onChange={(e) => setCsvContentInput(e.target.value)}
-                      placeholder="UrunKodu,StokMiktari,Fiyat,Durum&#10;DECO-AGREGA-120X240,150,1250,IN_STOCK&#10;DECO-TRAVERTEN-60X120,0,0,DISPLAY_ONLY"
+                      placeholder={"UrunKodu,StokMiktari,Fiyat,Durum\nDECO-AGREGA-120X240,150,1250,IN_STOCK\nDECO-TRAVERTEN-60X120,0,0,DISPLAY_ONLY"}
                       rows={6}
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.78rem', fontFamily: 'monospace', resize: 'vertical' }}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', background: 'rgba(15, 23, 42, 0.6)', color: '#ffffff', fontSize: '0.78rem', fontFamily: 'monospace', resize: 'vertical' }}
                     />
                     <button 
                       type="submit" 
                       disabled={csvLoading || !csvContentInput.trim()}
                       style={{
-                        background: '#0f172a',
-                        color: '#fff',
+                        background: 'var(--accent-gold)',
+                        color: '#0f172a',
                         border: 'none',
                         borderRadius: '8px',
                         padding: '10px',
                         fontSize: '0.8rem',
-                        fontWeight: '700',
+                        fontWeight: '800',
                         cursor: csvLoading ? 'default' : 'pointer',
                         display: 'flex',
                         alignItems: 'center',
@@ -3365,12 +3365,12 @@ export default function DealerPortalPage() {
                 </div>
 
                 {/* XML Feed Card */}
-                <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 12px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 12px 0', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <RefreshCw size={16} style={{ color: 'var(--accent-gold)' }} />
                     XML Feed Canlı Entegrasyon
                   </h3>
-                  <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0 0 16px 0', lineHeight: '1.5' }}>
+                  <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: '0 0 16px 0', lineHeight: '1.5' }}>
                     Muhasebe veya ERP (Logo, Nebim vb.) sisteminizdeki seramik stok XML linkini kaydederek envanterin her gün otomatik güncellenmesini sağlayabilirsiniz.
                   </p>
 
@@ -3380,14 +3380,14 @@ export default function DealerPortalPage() {
                       value={xmlFeedUrlInput}
                       onChange={(e) => setXmlFeedUrlInput(e.target.value)}
                       placeholder="https://firmamiz.com/xml/stok-feed"
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', background: 'rgba(15, 23, 42, 0.6)', color: '#ffffff', fontSize: '0.8rem' }}
                     />
                     <button 
                       type="submit"
                       style={{
-                        background: '#f1f5f9',
-                        color: '#334155',
-                        border: '1px solid #cbd5e1',
+                        background: 'rgba(255, 255, 255, 0.06)',
+                        color: '#ffffff',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
                         borderRadius: '8px',
                         padding: '10px',
                         fontSize: '0.8rem',
@@ -3426,24 +3426,24 @@ export default function DealerPortalPage() {
               </div>
 
               {/* RIGHT SIDE: CURRENT INVENTORY TABLE */}
-              <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>Aktif Showroom Envanteri</h3>
-                  <span style={{ fontSize: '0.75rem', background: '#f1f5f9', color: '#475569', padding: '3px 10px', borderRadius: '20px', fontWeight: '700' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, color: '#ffffff' }}>Aktif Showroom Envanteri</h3>
+                  <span style={{ fontSize: '0.75rem', background: 'rgba(255, 255, 255, 0.06)', color: '#cbd5e1', padding: '3px 10px', borderRadius: '20px', fontWeight: '700' }}>
                     {inventoryList.length} Ürün Listeleniyor
                   </span>
                 </div>
 
                 {inventoryLoading ? (
-                  <div style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
+                  <div style={{ textAlign: 'center', padding: '48px', color: '#cbd5e1' }}>
                     <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
                     <span>Envanter yükleniyor...</span>
                   </div>
                 ) : inventoryList.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '48px', color: '#94a3b8', border: '1px dashed #cbd5e1', borderRadius: '12px' }}>
-                    <Package size={32} style={{ margin: '0 auto 10px auto', color: '#cbd5e1' }} />
-                    <span style={{ fontSize: '0.85rem', display: 'block', marginBottom: '8px' }}>Envanterinizde henüz ürün bulunmuyor.</span>
-                    <span style={{ fontSize: '0.75rem' }}>Sol taraftaki panelden CSV yükleyebilir veya üstteki butondan manuel ekleyebilirsiniz.</span>
+                  <div style={{ textAlign: 'center', padding: '48px', color: '#cbd5e1', border: '1px dashed rgba(255, 255, 255, 0.15)', borderRadius: '12px' }}>
+                    <Package size={32} style={{ margin: '0 auto 10px auto', color: 'var(--accent-gold)' }} />
+                    <span style={{ fontSize: '0.85rem', display: 'block', marginBottom: '8px', fontWeight: '700' }}>Envanterinizde henüz ürün bulunmuyor.</span>
+                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Sol taraftaki panelden CSV yükleyebilir veya üstteki butondan manuel ekleyebilirsiniz.</span>
                   </div>
                 ) : isMobile ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
@@ -3478,27 +3478,27 @@ export default function DealerPortalPage() {
                               type="number"
                               defaultValue={item.stock}
                               onBlur={(e) => handleUpdateInventoryItem(item.productId, e.target.value, item.price, item.status)}
-                              style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                              style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(15, 23, 42, 0.6)', color: '#ffffff', boxSizing: 'border-box' }}
                             />
                           </div>
                           <div>
-                            <span style={{ display: 'block', color: '#64748b', fontSize: '0.7rem', marginBottom: '4px' }}>Özel Fiyat (₺)</span>
+                            <span style={{ display: 'block', color: '#94a3b8', fontSize: '0.7rem', marginBottom: '4px' }}>Özel Fiyat (₺)</span>
                             <input 
                               type="number"
                               defaultValue={item.price || ''}
                               placeholder="Liste"
                               onBlur={(e) => handleUpdateInventoryItem(item.productId, item.stock, e.target.value, item.status)}
-                              style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                              style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(15, 23, 42, 0.6)', color: '#ffffff', boxSizing: 'border-box' }}
                             />
                           </div>
                         </div>
                         
                         <div>
-                          <span style={{ display: 'block', color: '#64748b', fontSize: '0.7rem', marginBottom: '4px' }}>Durum</span>
+                          <span style={{ display: 'block', color: '#94a3b8', fontSize: '0.7rem', marginBottom: '4px' }}>Durum</span>
                           <select
                             value={item.status}
                             onChange={(e) => handleUpdateInventoryItem(item.productId, item.stock, item.price, e.target.value)}
-                            style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem', background: '#fff', boxSizing: 'border-box' }}
+                            style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', fontSize: '0.75rem', background: 'rgba(15, 23, 42, 0.6)', color: '#ffffff', boxSizing: 'border-box' }}
                           >
                             <option value="IN_STOCK">🟢 Stokta Var</option>
                             <option value="DISPLAY_ONLY">🟡 Teşhir Ürünü</option>
@@ -3512,22 +3512,22 @@ export default function DealerPortalPage() {
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
                       <thead>
-                        <tr style={{ borderBottom: '2px solid #f1f5f9', textAlign: 'left' }}>
-                          <th style={{ padding: '10px', color: '#64748b' }}>Ürün</th>
-                          <th style={{ padding: '10px', color: '#64748b' }}>Stok (m²)</th>
-                          <th style={{ padding: '10px', color: '#64748b' }}>Özel Fiyat (₺)</th>
-                          <th style={{ padding: '10px', color: '#64748b' }}>Durum</th>
-                          <th style={{ padding: '10px', textAlign: 'right' }}>İşlem</th>
+                        <tr style={{ borderBottom: '2px solid rgba(255, 255, 255, 0.12)', textAlign: 'left' }}>
+                          <th style={{ padding: '10px', color: '#cbd5e1' }}>Ürün</th>
+                          <th style={{ padding: '10px', color: '#cbd5e1' }}>Stok (m²)</th>
+                          <th style={{ padding: '10px', color: '#cbd5e1' }}>Özel Fiyat (₺)</th>
+                          <th style={{ padding: '10px', color: '#cbd5e1' }}>Durum</th>
+                          <th style={{ padding: '10px', textAlign: 'right', color: '#cbd5e1' }}>İşlem</th>
                         </tr>
                       </thead>
                       <tbody>
                         {inventoryList.map(item => (
-                          <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <tr key={item.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
                             <td style={{ padding: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <img src={item.product?.imageUrl} alt={item.product?.name} style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover', background: '#f8fafc' }} />
+                              <img src={item.product?.imageUrl} alt={item.product?.name} style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover', background: 'rgba(255, 255, 255, 0.05)' }} />
                               <div>
-                                <span style={{ fontWeight: '700', color: '#0f172a', display: 'block' }}>{item.product?.name}</span>
-                                <span style={{ fontSize: '0.65rem', color: '#64748b' }}>Kod: {item.product?.code}</span>
+                                <span style={{ fontWeight: '700', color: '#ffffff', display: 'block' }}>{item.product?.name}</span>
+                                <span style={{ fontSize: '0.65rem', color: '#cbd5e1' }}>Kod: {item.product?.code}</span>
                               </div>
                             </td>
                             <td style={{ padding: '10px' }}>
@@ -3535,7 +3535,7 @@ export default function DealerPortalPage() {
                                 type="number"
                                 defaultValue={item.stock}
                                 onBlur={(e) => handleUpdateInventoryItem(item.productId, e.target.value, item.price, item.status)}
-                                style={{ width: '60px', padding: '4px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', textAlign: 'center' }}
+                                style={{ width: '60px', padding: '4px 6px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(15, 23, 42, 0.6)', color: '#ffffff', textAlign: 'center' }}
                               />
                             </td>
                             <td style={{ padding: '10px' }}>
@@ -3544,14 +3544,14 @@ export default function DealerPortalPage() {
                                 defaultValue={item.price || ''}
                                 placeholder="Liste"
                                 onBlur={(e) => handleUpdateInventoryItem(item.productId, item.stock, e.target.value, item.status)}
-                                style={{ width: '70px', padding: '4px 6px', borderRadius: '4px', border: '1px solid #cbd5e1', textAlign: 'center' }}
+                                style={{ width: '70px', padding: '4px 6px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(15, 23, 42, 0.6)', color: '#ffffff', textAlign: 'center' }}
                               />
                             </td>
                             <td style={{ padding: '10px' }}>
                               <select
                                 value={item.status}
                                 onChange={(e) => handleUpdateInventoryItem(item.productId, item.stock, item.price, e.target.value)}
-                                style={{ padding: '4px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.75rem', background: '#fff' }}
+                                style={{ padding: '4px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.15)', fontSize: '0.75rem', background: 'rgba(15, 23, 42, 0.6)', color: '#ffffff' }}
                               >
                                 <option value="IN_STOCK">🟢 Stokta Var</option>
                                 <option value="DISPLAY_ONLY">🟡 Teşhir Ürünü</option>
@@ -3628,8 +3628,8 @@ export default function DealerPortalPage() {
               gap: '20px'
             }}>
               <div className="glass-panel" style={{
-                background: '#fff',
-                border: '1px solid #e9ecef',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '16px',
                 padding: '24px',
                 display: 'flex',
@@ -3640,23 +3640,23 @@ export default function DealerPortalPage() {
                   width: '48px',
                   height: '48px',
                   borderRadius: '12px',
-                  background: '#f1f3f5',
+                  background: 'rgba(255, 255, 255, 0.06)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#495057'
+                  color: '#cbd5e1'
                 }}>
                   <FileText size={22} />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#6c757d', margin: '0 0 4px 0' }}>Toplam Teklif Talebi</h4>
-                  <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#111' }}>{stats.totalLeads} Adet</span>
+                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#94a3b8', margin: '0 0 4px 0' }}>Toplam Teklif Talebi</h4>
+                  <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#ffffff' }}>{stats.totalLeads} Adet</span>
                 </div>
               </div>
 
               <div className="glass-panel" style={{
-                background: '#fff',
-                border: '1px solid #e9ecef',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '16px',
                 padding: '24px',
                 display: 'flex',
@@ -3667,7 +3667,7 @@ export default function DealerPortalPage() {
                   width: '48px',
                   height: '48px',
                   borderRadius: '12px',
-                  background: '#fef3c7',
+                  background: 'rgba(217, 119, 6, 0.15)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -3676,14 +3676,14 @@ export default function DealerPortalPage() {
                   <Activity size={22} className="animate-pulse" />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#6c757d', margin: '0 0 4px 0' }}>Bekleyen Talepler</h4>
+                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#94a3b8', margin: '0 0 4px 0' }}>Bekleyen Talepler</h4>
                   <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#d97706' }}>{stats.pendingLeads} Adet</span>
                 </div>
               </div>
 
               <div className="glass-panel" style={{
-                background: '#fff',
-                border: '1px solid #e9ecef',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '16px',
                 padding: '24px',
                 display: 'flex',
@@ -3694,7 +3694,7 @@ export default function DealerPortalPage() {
                   width: '48px',
                   height: '48px',
                   borderRadius: '12px',
-                  background: '#e6f7ed',
+                  background: 'rgba(16, 185, 129, 0.15)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -3703,7 +3703,7 @@ export default function DealerPortalPage() {
                   <CheckCircle size={22} />
                 </div>
                 <div>
-                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#6c757d', margin: '0 0 4px 0' }}>Cevaplanan Talepler</h4>
+                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#94a3b8', margin: '0 0 4px 0' }}>Cevaplanan Talepler</h4>
                   <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#10b981' }}>{stats.respondedLeads} Adet</span>
                 </div>
               </div>
@@ -3718,8 +3718,8 @@ export default function DealerPortalPage() {
             }}>
               {/* Kiosk Mode tool */}
               <div className="glass-panel" style={{
-                background: '#fff',
-                border: '1px solid #e9ecef',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '16px',
                 padding: '24px',
                 display: 'flex',
@@ -3733,8 +3733,8 @@ export default function DealerPortalPage() {
                     <Activity size={18} />
                   </div>
                   <div>
-                    <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: '0 0 2px 0' }}>Kiosk Teşhir Modu</h4>
-                    <p style={{ fontSize: '0.75rem', color: '#6c757d', margin: 0 }}>Bu cihazı veya mağazadaki bir tableti dijital kiosk ekranına dönüştürün.</p>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: '0 0 2px 0', color: '#ffffff' }}>Kiosk Teşhir Modu</h4>
+                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>Bu cihazı veya mağazadaki bir tableti dijital kiosk ekranına dönüştürün.</p>
                   </div>
                 </div>
                 <button
@@ -3742,9 +3742,9 @@ export default function DealerPortalPage() {
                   onClick={() => window.open('/?kiosk=true', '_blank')}
                   style={{
                     width: '100%',
-                    background: '#0f172a',
+                    background: 'rgba(255, 255, 255, 0.06)',
                     color: '#ffffff',
-                    border: 'none',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
                     borderRadius: '8px',
                     padding: '10px',
                     fontSize: '0.8rem',
@@ -3763,8 +3763,8 @@ export default function DealerPortalPage() {
 
               {/* Analytics tool */}
               <div className="glass-panel" style={{
-                background: '#fff',
-                border: '1px solid #e9ecef',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '16px',
                 padding: '24px',
                 display: 'flex',
@@ -3778,8 +3778,8 @@ export default function DealerPortalPage() {
                     <TrendingUp size={18} />
                   </div>
                   <div>
-                    <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: '0 0 2px 0' }}>Bölgesel Arama Analizleri</h4>
-                    <p style={{ fontSize: '0.75rem', color: '#6c757d', margin: 0 }}>{dealerInfo?.city} şehrindeki tüketicilerin en çok aradığı modelleri analiz edin.</p>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: '0 0 2px 0', color: '#ffffff' }}>Bölgesel Arama Analizleri</h4>
+                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>{dealerInfo?.city} şehrindeki tüketicilerin en çok aradığı modelleri analiz edin.</p>
                   </div>
                 </div>
                 <button
@@ -3787,9 +3787,9 @@ export default function DealerPortalPage() {
                   onClick={() => setActivePortalTab('analytics')}
                   style={{
                     width: '100%',
-                    background: '#f1f5f9',
-                    color: '#0f172a',
-                    border: 'none',
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    color: '#ffffff',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
                     borderRadius: '8px',
                     padding: '10px',
                     fontSize: '0.8rem',
@@ -3809,27 +3809,28 @@ export default function DealerPortalPage() {
 
             {/* LEADS LIST PANEL */}
             <div className="glass-panel" style={{
-              background: '#fff',
-              border: '1px solid #e9ecef',
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: '16px',
               padding: '28px',
               boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 4px 0' }}>Bana Yönlendirilen Müşteri Teklifleri</h3>
-                  <p style={{ fontSize: '0.78rem', color: '#6c757d', margin: 0 }}>Ziyaretçilerin size en yakın konumda olmanız sebebiyle gönderdiği palet/metraj bazlı seramik talepleri.</p>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 4px 0', color: '#ffffff' }}>Bana Yönlendirilen Müşteri Teklifleri</h3>
+                  <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: 0 }}>Ziyaretçilerin size en yakın konumda olmanız sebebiyle gönderdiği palet/metraj bazlı seramik talepleri.</p>
                 </div>
                 <button 
                   onClick={loadDealerLeads} 
                   disabled={leadsLoading} 
                   style={{
-                    background: '#f8f9fa',
-                    border: '1px solid #dee2e6',
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
                     borderRadius: '8px',
                     padding: '6px 12px',
                     fontSize: '0.75rem',
                     fontWeight: '600',
+                    color: '#ffffff',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -3842,7 +3843,7 @@ export default function DealerPortalPage() {
               </div>
 
               {leadsLoading ? (
-                <div style={{ textAlign: 'center', padding: '48px 0', color: '#888' }}>
+                <div style={{ textAlign: 'center', padding: '48px 0', color: '#cbd5e1' }}>
                   <Loader2 className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
                   <span>Talepler yükleniyor...</span>
                 </div>
@@ -3850,8 +3851,8 @@ export default function DealerPortalPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px' }}>
                   {leads.map(lead => (
                     <div key={lead.id} style={{
-                      background: '#fff',
-                      border: '1px solid #e2e8f0',
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
                       borderRadius: '16px',
                       padding: '16px',
                       display: 'flex',
@@ -3861,12 +3862,12 @@ export default function DealerPortalPage() {
                     }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                          <strong style={{ fontSize: '0.9rem', color: '#111', display: 'block' }}>{lead.clientName}</strong>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '4px', fontSize: '0.75rem', color: '#495057' }}>
-                            <a href={`tel:${lead.clientPhone}`} style={{ display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: '#b38e47', fontWeight: '600' }}>
+                          <strong style={{ fontSize: '0.9rem', color: '#ffffff', display: 'block' }}>{lead.clientName}</strong>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '4px', fontSize: '0.75rem', color: '#cbd5e1' }}>
+                            <a href={`tel:${lead.clientPhone}`} style={{ display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: 'var(--accent-gold)', fontWeight: '600' }}>
                               <Phone size={11} /> {lead.clientPhone}
                             </a>
-                            <a href={`mailto:${lead.clientEmail}`} style={{ display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: '#475569' }}>
+                            <a href={`mailto:${lead.clientEmail}`} style={{ display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', color: '#cbd5e1' }}>
                               <Mail size={11} /> {lead.clientEmail}
                             </a>
                           </div>
@@ -3879,8 +3880,9 @@ export default function DealerPortalPage() {
                             padding: '4px 8px',
                             fontSize: '0.72rem',
                             borderRadius: '6px',
-                            border: '1px solid #cbd5e1',
-                            background: '#fff',
+                            border: '1px solid rgba(255, 255, 255, 0.15)',
+                            background: 'rgba(15, 23, 42, 0.6)',
+                            color: '#ffffff',
                             cursor: 'pointer',
                             fontWeight: '700'
                           }}
@@ -3894,19 +3896,19 @@ export default function DealerPortalPage() {
                       {(lead.requestedUsta || lead.requestedArchitect) && (
                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                           {lead.requestedUsta && (
-                            <span style={{ padding: '2px 6px', borderRadius: '4px', background: '#fff7ed', color: '#ea580c', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid #ffedd5' }}>
+                            <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(234, 88, 12, 0.15)', color: '#ea580c', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid rgba(234, 88, 12, 0.25)' }}>
                               🛠️ Usta Talebi
                             </span>
                           )}
                           {lead.requestedArchitect && (
-                            <span style={{ padding: '2px 6px', borderRadius: '4px', background: '#eff6ff', color: '#2563eb', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid #dbeafe' }}>
+                            <span style={{ padding: '2px 6px', borderRadius: '4px', background: 'rgba(37, 99, 235, 0.15)', color: '#2563eb', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid rgba(37, 99, 235, 0.25)' }}>
                               📐 Mimar Talebi
                             </span>
                           )}
                         </div>
                       )}
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255, 255, 255, 0.03)', padding: '10px', borderRadius: '8px' }}>
                         {lead.product?.imageUrl && (
                           <img 
                             src={lead.product.imageUrl} 
@@ -3915,19 +3917,19 @@ export default function DealerPortalPage() {
                           />
                         )}
                         <div>
-                          <strong style={{ fontSize: '0.8rem', color: '#111', display: 'block' }}>{lead.product?.name}</strong>
-                          <span style={{ fontSize: '0.68rem', color: '#888' }}>SKU: {lead.product?.code}</span>
+                          <strong style={{ fontSize: '0.8rem', color: '#ffffff', display: 'block' }}>{lead.product?.name}</strong>
+                          <span style={{ fontSize: '0.68rem', color: '#cbd5e1' }}>SKU: {lead.product?.code}</span>
                         </div>
                       </div>
 
                       {lead.notes && (
-                        <div style={{ fontSize: '0.78rem', color: '#495057', background: '#f1f5f9', padding: '8px 12px', borderRadius: '8px' }}>
+                        <div style={{ fontSize: '0.78rem', color: '#cbd5e1', background: 'rgba(255, 255, 255, 0.02)', padding: '8px 12px', borderRadius: '8px' }}>
                           {lead.notes}
                         </div>
                       )}
 
                       {lead.projectDimensions && (
-                        <div style={{ fontSize: '0.75rem', background: '#f8fafc', padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', color: '#334155' }}>
+                        <div style={{ fontSize: '0.75rem', background: 'rgba(255, 255, 255, 0.03)', padding: '6px 10px', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#cbd5e1' }}>
                           <strong>Ölçüler:</strong> {lead.projectDimensions}
                         </div>
                       )}
@@ -3938,14 +3940,14 @@ export default function DealerPortalPage() {
                             href={lead.projectPhotoUrl} 
                             target="_blank" 
                             rel="noopener noreferrer" 
-                            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: '#2563eb', fontWeight: 'bold', textDecoration: 'underline' }}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: 'var(--accent-gold)', fontWeight: 'bold', textDecoration: 'underline' }}
                           >
                             🖼️ Fotoğraf / Kroki Gör ↗
                           </a>
                         </div>
                       )}
 
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '10px', marginTop: '4px', fontSize: '0.72rem', color: '#64748b' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '10px', marginTop: '4px', fontSize: '0.72rem', color: '#94a3b8' }}>
                         <span>{new Date(lead.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                         <button 
                           onClick={() => handleDeleteLead(lead.id)}
@@ -3957,7 +3959,7 @@ export default function DealerPortalPage() {
                     </div>
                   ))}
                   {leads.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '36px', color: '#888', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                    <div style={{ textAlign: 'center', padding: '36px', color: '#94a3b8', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
                       Henüz size yönlendirilmiş bir müşteri teklif talebi bulunmamaktadır.
                     </div>
                   )}
@@ -3966,7 +3968,7 @@ export default function DealerPortalPage() {
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                     <thead>
-                      <tr style={{ borderBottom: '2px solid #e9ecef', textAlign: 'left', color: '#495057', fontWeight: '700' }}>
+                      <tr style={{ borderBottom: '2px solid rgba(255, 255, 255, 0.12)', textAlign: 'left', color: '#cbd5e1', fontWeight: '700' }}>
                         <th style={{ padding: '12px 16px' }}>Müşteri Bilgileri</th>
                         <th style={{ padding: '12px 16px' }}>Ürün Detayı</th>
                         <th style={{ padding: '12px 16px' }}>Müşteri Notu</th>
@@ -3977,25 +3979,25 @@ export default function DealerPortalPage() {
                     </thead>
                     <tbody>
                       {leads.map(lead => (
-                        <tr key={lead.id} style={{ borderBottom: '1px solid #e9ecef', transition: 'background 0.2s' }}>
+                        <tr key={lead.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)', transition: 'background 0.2s' }}>
                           <td style={{ padding: '16px' }}>
-                            <strong style={{ display: 'block', color: '#111' }}>{lead.clientName}</strong>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#495057', marginTop: '2px' }}>
+                            <strong style={{ display: 'block', color: '#ffffff' }}>{lead.clientName}</strong>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#cbd5e1', marginTop: '2px' }}>
                               <Phone size={10} /> {lead.clientPhone}
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#6c757d', marginTop: '2px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#cbd5e1', marginTop: '2px' }}>
                               <Mail size={10} /> {lead.clientEmail}
                             </div>
                             
                             {/* Badges for requested services */}
                             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '6px' }}>
                               {lead.requestedUsta && (
-                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '2px 6px', borderRadius: '4px', background: '#fff7ed', color: '#ea580c', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid #ffedd5' }}>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(234, 88, 12, 0.15)', color: '#ea580c', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid rgba(234, 88, 12, 0.25)' }}>
                                   🛠️ Usta Talebi
                                 </span>
                               )}
                               {lead.requestedArchitect && (
-                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '2px 6px', borderRadius: '4px', background: '#eff6ff', color: '#2563eb', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid #dbeafe' }}>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', padding: '2px 6px', borderRadius: '4px', background: 'rgba(37, 99, 235, 0.15)', color: '#2563eb', fontSize: '0.65rem', fontWeight: 'bold', border: '1px solid rgba(37, 99, 235, 0.25)' }}>
                                   📐 Mimar Talebi
                                 </span>
                               )}
@@ -4007,20 +4009,20 @@ export default function DealerPortalPage() {
                                 <img 
                                   src={lead.product.imageUrl} 
                                   alt={lead.product.name} 
-                                  style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', border: '1px solid #e9ecef' }} 
+                                  style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', border: '1px solid rgba(255, 255, 255, 0.08)' }} 
                                 />
                               )}
                               <div>
-                                <strong style={{ color: '#111' }}>{lead.product?.name}</strong>
-                                <span style={{ display: 'block', fontSize: '0.7rem', color: '#888' }}>SKU: {lead.product?.code}</span>
+                                <strong style={{ color: '#ffffff' }}>{lead.product?.name}</strong>
+                                <span style={{ display: 'block', fontSize: '0.7rem', color: '#cbd5e1' }}>SKU: {lead.product?.code}</span>
                               </div>
                             </div>
                           </td>
-                          <td style={{ padding: '16px', maxWidth: '240px', color: '#495057', lineHeight: '1.4' }}>
-                            {lead.notes || <span style={{ color: '#adb5bd', fontStyle: 'italic' }}>Not bırakılmadı</span>}
+                          <td style={{ padding: '16px', maxWidth: '240px', color: '#cbd5e1', lineHeight: '1.4' }}>
+                            {lead.notes || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Not bırakılmadı</span>}
                             
                             {lead.projectDimensions && (
-                              <div style={{ marginTop: '6px', fontSize: '0.75rem', background: '#f8fafc', padding: '4px 8px', borderRadius: '4px', border: '1px solid #e2e8f0', color: '#334155' }}>
+                              <div style={{ marginTop: '6px', fontSize: '0.75rem', background: 'rgba(255, 255, 255, 0.03)', padding: '4px 8px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#cbd5e1' }}>
                                 <strong>Ölçüler:</strong> {lead.projectDimensions}
                               </div>
                             )}
@@ -4031,14 +4033,14 @@ export default function DealerPortalPage() {
                                   href={lead.projectPhotoUrl} 
                                   target="_blank" 
                                   rel="noopener noreferrer" 
-                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: '#2563eb', fontWeight: 'bold', textDecoration: 'underline' }}
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: 'var(--accent-gold)', fontWeight: 'bold', textDecoration: 'underline' }}
                                 >
                                   🖼️ Fotoğraf / Kroki Gör ↗
                                 </a>
                               </div>
                             )}
                           </td>
-                          <td style={{ padding: '16px', color: '#6c757d', fontSize: '0.75rem' }}>
+                          <td style={{ padding: '16px', color: '#cbd5e1', fontSize: '0.75rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                               <Calendar size={12} />
                               {new Date(lead.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
@@ -4046,17 +4048,17 @@ export default function DealerPortalPage() {
                           </td>
                           <td style={{ padding: '16px' }}>
                             {lead.status === 'PENDING' && (
-                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: '#fffbeb', color: '#b45309', fontSize: '0.7rem', fontWeight: '700', border: '1px solid #fef3c7' }}>
+                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(217, 119, 6, 0.15)', color: '#d97706', fontSize: '0.7rem', fontWeight: '700', border: '1px solid rgba(217, 119, 6, 0.25)' }}>
                                 Bekliyor
                               </span>
                             )}
                             {lead.status === 'RESPONDED' && (
-                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: '#ecfdf5', color: '#047857', fontSize: '0.7rem', fontWeight: '700', border: '1px solid #d1fae5' }}>
+                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', fontSize: '0.7rem', fontWeight: '700', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
                                 Teklif Verildi
                               </span>
                             )}
                             {lead.status === 'COMPLETED' && (
-                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: '#eff6ff', color: '#1d4ed8', fontSize: '0.7rem', fontWeight: '700', border: '1px solid #dbeafe' }}>
+                              <span style={{ padding: '4px 10px', borderRadius: '12px', background: 'rgba(37, 99, 235, 0.15)', color: '#2563eb', fontSize: '0.7rem', fontWeight: '700', border: '1px solid rgba(37, 99, 235, 0.25)' }}>
                                 Satış Yapıldı
                               </span>
                             )}
@@ -4070,8 +4072,9 @@ export default function DealerPortalPage() {
                                   padding: '4px 8px',
                                   fontSize: '0.75rem',
                                   borderRadius: '6px',
-                                  border: '1px solid #ced4da',
-                                  background: '#fff',
+                                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                                  background: 'rgba(15, 23, 42, 0.6)',
+                                  color: '#ffffff',
                                   cursor: 'pointer',
                                   outline: 'none'
                                 }}
@@ -4085,7 +4088,7 @@ export default function DealerPortalPage() {
                                 style={{
                                   background: 'transparent',
                                   border: 'none',
-                                  color: '#dc3545',
+                                  color: '#ef4444',
                                   cursor: 'pointer',
                                   padding: '4px',
                                   display: 'flex',
@@ -4102,7 +4105,7 @@ export default function DealerPortalPage() {
                       ))}
                       {leads.length === 0 && (
                         <tr>
-                          <td colSpan="6" style={{ textAlign: 'center', padding: '36px', color: '#888' }}>
+                          <td colSpan="6" style={{ textAlign: 'center', padding: '36px', color: '#cbd5e1' }}>
                             Henüz size yönlendirilmiş bir müşteri teklif talebi bulunmamaktadır.
                           </td>
                         </tr>

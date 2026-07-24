@@ -80,8 +80,12 @@ export async function POST(request) {
         return NextResponse.json({ error: 'CSV dosyasında veri bulunamadı. Lütfen şablonu inceleyin.' }, { status: 400 });
       }
 
+      // Detect Delimiter: Check if semicolon is more prevalent in the header line (common in Excel exports)
+      const firstLine = lines[0];
+      const delimiter = (firstLine.includes(';') && (firstLine.split(';').length > firstLine.split(',').length)) ? ';' : ',';
+
       // Parse headers (case insensitive)
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const headers = firstLine.split(delimiter).map(h => h.trim().toLowerCase());
       const codeIdx = headers.findIndex(h => h.includes('kod') || h.includes('code'));
       const stockIdx = headers.findIndex(h => h.includes('stok') || h.includes('stock') || h.includes('miktar'));
       const priceIdx = headers.findIndex(h => h.includes('fiyat') || h.includes('price'));
@@ -96,7 +100,7 @@ export async function POST(request) {
       const errors = [];
 
       for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(',').map(c => c.trim());
+        const cols = lines[i].split(delimiter).map(c => c.trim());
         if (cols.length < headers.length) continue;
 
         const productCode = cols[codeIdx];
@@ -105,10 +109,34 @@ export async function POST(request) {
           continue;
         }
 
-        // Find product by code
-        const product = await prisma.product.findUnique({
+        // Find product by code (case-insensitive and trimmed search)
+        let product = await prisma.product.findUnique({
           where: { code: productCode }
         });
+
+        if (!product) {
+          product = await prisma.product.findUnique({
+            where: { code: productCode.toUpperCase() }
+          });
+        }
+
+        if (!product) {
+          product = await prisma.product.findUnique({
+            where: { code: productCode.trim().toUpperCase() }
+          });
+        }
+
+        if (!product) {
+          // Fallback to case-insensitive first match
+          product = await prisma.product.findFirst({
+            where: {
+              code: {
+                equals: productCode.trim(),
+                mode: 'insensitive'
+              }
+            }
+          });
+        }
 
         if (!product) {
           errorCount++;
