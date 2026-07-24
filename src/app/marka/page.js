@@ -585,25 +585,26 @@ export default function BrandPortalPage() {
   // 1. LOGIN LAYOUT (Premium Dark theme with gold highlight)
   if (!isLoggedIn) {
     return (
-      <main className="login-layout" style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #090d16 0%, #111827 50%, #1f2937 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '24px',
-        fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)'
-      }}>
-        <div className="login-card glass-panel" style={{
-          background: 'rgba(17, 24, 39, 0.75)',
-          backdropFilter: 'var(--glass-backdrop, blur(16px))',
-          border: '1px solid rgba(212, 175, 55, 0.2)',
-          borderRadius: 'var(--border-radius-lg, 24px)',
-          padding: '44px 36px',
-          width: '100%',
-          maxWidth: '450px',
-          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05)'
+      <>
+        <main className="login-layout" style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #090d16 0%, #111827 50%, #1f2937 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: isMobile ? '12px' : '24px',
+          fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)'
         }}>
+          <div className="login-card glass-panel" style={{
+            background: 'rgba(17, 24, 39, 0.75)',
+            backdropFilter: 'var(--glass-backdrop, blur(16px))',
+            border: '1px solid rgba(212, 175, 55, 0.2)',
+            borderRadius: 'var(--border-radius-lg, 24px)',
+            padding: isMobile ? '24px 18px' : '44px 36px',
+            width: '100%',
+            maxWidth: '450px',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05)'
+          }}>
           <div className="login-header" style={{ textAlign: 'center', marginBottom: '32px' }}>
             <Link href="/" style={{
               display: 'inline-flex',
@@ -761,8 +762,19 @@ export default function BrandPortalPage() {
           </div>
         </div>
       </main>
-    );
-  }
+
+      {/* Local styles for login */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .login-card {
+            padding: 24px 18px !important;
+            border-radius: 16px !important;
+          }
+        }
+      `}</style>
+    </>
+  );
+}
 
   const { linePath, areaPath, maxVal, points } = generateChartPaths();
   const currentPlan = b2bStats?.saas?.plan || 'BASIC';

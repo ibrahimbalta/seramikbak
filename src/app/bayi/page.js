@@ -991,27 +991,28 @@ export default function DealerPortalPage() {
 
   if (!isLoggedIn) {
     return (
-      <main className="login-layout" style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #090d16 0%, #111827 50%, #1f2937 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '24px',
-        fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)'
-      }}>
-        <div className="login-card glass-panel" style={{
-          background: 'rgba(17, 24, 39, 0.75)',
-          backdropFilter: 'var(--glass-backdrop, blur(16px))',
-          border: '1px solid rgba(212, 175, 55, 0.2)',
-          borderRadius: 'var(--border-radius-lg, 24px)',
-          padding: '40px',
-          width: '100%',
-          maxWidth: registerTab === 'login' ? '450px' : '700px',
-          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05)',
-          transition: 'max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          boxSizing: 'border-box'
+      <>
+        <main className="login-layout" style={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #090d16 0%, #111827 50%, #1f2937 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: isMobile ? '12px' : '24px',
+          fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)'
         }}>
+          <div className="login-card glass-panel" style={{
+            background: 'rgba(17, 24, 39, 0.75)',
+            backdropFilter: 'var(--glass-backdrop, blur(16px))',
+            border: '1px solid rgba(212, 175, 55, 0.2)',
+            borderRadius: 'var(--border-radius-lg, 24px)',
+            padding: isMobile ? '24px 16px' : '40px',
+            width: '100%',
+            maxWidth: registerTab === 'login' ? '450px' : '700px',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05)',
+            transition: 'max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxSizing: 'border-box'
+          }}>
           {/* Header */}
           <div className="login-header" style={{ textAlign: 'center', marginBottom: '28px' }}>
             <Link href="/" style={{
@@ -1437,8 +1438,14 @@ export default function DealerPortalPage() {
                   flexDirection: 'column',
                   gap: '10px'
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#cbd5e1' }}>Harita Koordinatları</span>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    justifyContent: 'space-between',
+                    alignItems: isMobile ? 'stretch' : 'center',
+                    gap: isMobile ? '8px' : '0px'
+                  }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#cbd5e1', textAlign: isMobile ? 'center' : 'left' }}>Harita Koordinatları</span>
                     <button
                       type="button"
                       onClick={handleGeocode}
@@ -1448,12 +1455,13 @@ export default function DealerPortalPage() {
                         color: '#d4af37',
                         border: '1px solid rgba(212, 175, 55, 0.3)',
                         borderRadius: '6px',
-                        padding: '4px 10px',
+                        padding: '6px 10px',
                         fontSize: '0.7rem',
                         fontWeight: '700',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         gap: '4px'
                       }}
                     >
@@ -1462,7 +1470,7 @@ export default function DealerPortalPage() {
                     </button>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px' }}>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <label style={{ fontSize: '0.65rem', fontWeight: '600', color: '#94a3b8' }}>Enlem (Lat)</label>
                       <input
@@ -1572,8 +1580,23 @@ export default function DealerPortalPage() {
 
         </div>
       </main>
-    );
-  }
+
+      {/* Local styles for login/registration */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .login-card {
+            padding: 24px 16px !important;
+            border-radius: 16px !important;
+          }
+          .campaign-inputs-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+        }
+      `}</style>
+    </>
+  );
+}
   return (
     <div style={{
       minHeight: '100vh',
