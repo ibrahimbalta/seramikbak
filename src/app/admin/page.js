@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Sparkles, 
   Terminal, 
@@ -18,7 +18,17 @@ import {
   CreditCard,
   Plus,
   Trash2,
-  Building2
+  Building2,
+  Menu,
+  X,
+  ChevronDown,
+  ChevronRight,
+  LogOut,
+  LayoutGrid,
+  Package,
+  Users,
+  Megaphone,
+  Globe
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -31,6 +41,45 @@ export default function AdminPage() {
 
   // Active Admin Tab: 'scraper', 'dealers', 'leads', 'saas', 'projects'
   const [activeTab, setActiveTab] = useState('scraper');
+
+  // Sidebar & Mobile State
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState({ data: true, sales: true, finance: true, settings: true });
+
+  const toggleGroup = useCallback((group) => {
+    setExpandedGroups(prev => ({ ...prev, [group]: !prev[group] }));
+  }, []);
+
+  const handleTabSelect = useCallback((tab) => {
+    setActiveTab(tab);
+    if (isMobile) setSidebarOpen(false);
+    if (tab === 'campaigns') loadCampaigns();
+  }, [isMobile]);
+
+  const tabLabels = {
+    scraper: 'Ürün Kazıma',
+    products: 'Ürün Yönetimi',
+    dealers: 'Bayi Teşkilatı',
+    leads: 'Teklif Talepleri',
+    projects: 'Proje Talepleri',
+    saas: 'SaaS Abonelikleri',
+    brands: 'Marka Hesapları',
+    campaigns: 'Sponsorlu Reklamlar',
+    pages: 'Kurumsal Sayfalar'
+  };
+
+  const tabIcons = {
+    scraper: Terminal,
+    products: Package,
+    dealers: MapPin,
+    leads: FileText,
+    projects: Building2,
+    saas: CreditCard,
+    brands: Building2,
+    campaigns: Sparkles,
+    pages: Globe
+  };
 
   // Database list states
   const [brands, setBrands] = useState([]);
@@ -829,6 +878,14 @@ export default function AdminPage() {
       loadCampaigns();
     }
   }, [isLoggedIn]);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (isLoggedIn && activeTab === 'products') {
@@ -1671,67 +1728,162 @@ export default function AdminPage() {
 
   return (
     <main className="admin-layout">
-      {/* Header */}
-      <header className="admin-header glass-panel">
-        <div className="header-brand">
-          <div className="logo-icon">SB</div>
-          <div>
-            <span className="logo-text">SeramikBak Yönetim Paneli</span>
-            <span className="system-badge">Admin Yetkisi</span>
+      {/* Mobile Overlay Backdrop */}
+      {isMobile && sidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar Navigation */}
+      <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <div className="logo-icon">SB</div>
+            <div>
+              <span className="logo-text">SeramikBak</span>
+              <span className="system-badge">Admin Yetkisi</span>
+            </div>
           </div>
+          {isMobile && (
+            <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>
+              <X size={20} />
+            </button>
+          )}
         </div>
 
-        {/* Inner Admin Navigation Tabs */}
-        <div className="admin-tabs-nav">
-          <button className={`admin-tab-link ${activeTab === 'scraper' ? 'active' : ''}`} onClick={() => setActiveTab('scraper')}>
-            <Terminal size={14} />
-            <span>Ürün Kazıma</span>
-          </button>
-          <button className={`admin-tab-link ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
-            <Settings size={14} />
-            <span>Ürün Yönetimi</span>
-          </button>
-          <button className={`admin-tab-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => setActiveTab('dealers')}>
-            <MapPin size={14} />
-            <span>Bayi Teşkilatı</span>
-          </button>
-          <button className={`admin-tab-link ${activeTab === 'leads' ? 'active' : ''}`} onClick={() => setActiveTab('leads')}>
-            <FileText size={14} />
-            <span>Teklif Talepleri ({leads.length})</span>
-          </button>
-          <button className={`admin-tab-link ${activeTab === 'projects' ? 'active' : ''}`} onClick={() => setActiveTab('projects')}>
-            <Building2 size={14} />
-            <span>Proje Talepleri ({projects.length})</span>
-          </button>
-          <button className={`admin-tab-link ${activeTab === 'saas' ? 'active' : ''}`} onClick={() => setActiveTab('saas')}>
-            <CreditCard size={14} />
-            <span>SaaS Abonelikleri</span>
-          </button>
-          <button className={`admin-tab-link ${activeTab === 'brands' ? 'active' : ''}`} onClick={() => setActiveTab('brands')}>
-            <Building2 size={14} />
-            <span>Marka Hesapları</span>
-          </button>
-          <button className={`admin-tab-link ${activeTab === 'campaigns' ? 'active' : ''}`} onClick={() => { setActiveTab('campaigns'); loadCampaigns(); }}>
-            <Sparkles size={14} style={{ color: '#d4af37' }} />
-            <span>Sponsorlu Reklamlar ({campaigns.filter(c => c.status === 'PENDING_APPROVAL').length})</span>
-          </button>
-          <button className={`admin-tab-link ${activeTab === 'pages' ? 'active' : ''}`} onClick={() => setActiveTab('pages')}>
-            <FileText size={14} />
-            <span>Kurumsal Sayfalar</span>
-          </button>
-        </div>
+        <nav className="sidebar-nav">
+          {/* Grup 1: Veri Yönetimi */}
+          <div className="nav-group">
+            <button className="nav-group-title" onClick={() => toggleGroup('data')}>
+              <LayoutGrid size={15} />
+              <span>Veri Yönetimi</span>
+              {expandedGroups.data ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            </button>
+            {expandedGroups.data && (
+              <div className="nav-group-items">
+                <button className={`nav-item ${activeTab === 'scraper' ? 'active' : ''}`} onClick={() => handleTabSelect('scraper')}>
+                  <Terminal size={16} />
+                  <span>Ürün Kazıma</span>
+                </button>
+                <button className={`nav-item ${activeTab === 'products' ? 'active' : ''}`} onClick={() => handleTabSelect('products')}>
+                  <Package size={16} />
+                  <span>Ürün Yönetimi</span>
+                </button>
+              </div>
+            )}
+          </div>
 
-        <div className="header-actions">
-          <Link href="/" className="btn-secondary flex-btn">
+          {/* Grup 2: Satış & CRM */}
+          <div className="nav-group">
+            <button className="nav-group-title" onClick={() => toggleGroup('sales')}>
+              <Users size={15} />
+              <span>Satış & CRM</span>
+              {expandedGroups.sales ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            </button>
+            {expandedGroups.sales && (
+              <div className="nav-group-items">
+                <button className={`nav-item ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => handleTabSelect('dealers')}>
+                  <MapPin size={16} />
+                  <span>Bayi Teşkilatı</span>
+                </button>
+                <button className={`nav-item ${activeTab === 'leads' ? 'active' : ''}`} onClick={() => handleTabSelect('leads')}>
+                  <FileText size={16} />
+                  <span>Teklif Talepleri</span>
+                  {leads.length > 0 && <span className="nav-badge">{leads.length}</span>}
+                </button>
+                <button className={`nav-item ${activeTab === 'projects' ? 'active' : ''}`} onClick={() => handleTabSelect('projects')}>
+                  <Building2 size={16} />
+                  <span>Proje Talepleri</span>
+                  {projects.length > 0 && <span className="nav-badge">{projects.length}</span>}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Grup 3: Finans & SaaS */}
+          <div className="nav-group">
+            <button className="nav-group-title" onClick={() => toggleGroup('finance')}>
+              <CreditCard size={15} />
+              <span>Finans & SaaS</span>
+              {expandedGroups.finance ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            </button>
+            {expandedGroups.finance && (
+              <div className="nav-group-items">
+                <button className={`nav-item ${activeTab === 'saas' ? 'active' : ''}`} onClick={() => handleTabSelect('saas')}>
+                  <CreditCard size={16} />
+                  <span>SaaS Abonelik</span>
+                </button>
+                <button className={`nav-item ${activeTab === 'campaigns' ? 'active' : ''}`} onClick={() => handleTabSelect('campaigns')}>
+                  <Sparkles size={16} />
+                  <span>Sponsorlu Reklam</span>
+                  {campaigns.filter(c => c.status === 'PENDING_APPROVAL').length > 0 && (
+                    <span className="nav-badge gold">{campaigns.filter(c => c.status === 'PENDING_APPROVAL').length}</span>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Grup 4: Ayarlar */}
+          <div className="nav-group">
+            <button className="nav-group-title" onClick={() => toggleGroup('settings')}>
+              <Settings size={15} />
+              <span>Ayarlar</span>
+              {expandedGroups.settings ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            </button>
+            {expandedGroups.settings && (
+              <div className="nav-group-items">
+                <button className={`nav-item ${activeTab === 'brands' ? 'active' : ''}`} onClick={() => handleTabSelect('brands')}>
+                  <Building2 size={16} />
+                  <span>Marka Hesapları</span>
+                </button>
+                <button className={`nav-item ${activeTab === 'pages' ? 'active' : ''}`} onClick={() => handleTabSelect('pages')}>
+                  <Globe size={16} />
+                  <span>Kurumsal Sayfalar</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </nav>
+
+        <div className="sidebar-footer">
+          <Link href="/" className="sidebar-footer-btn">
             <ArrowLeft size={16} />
-            <span>Arama Portalına Git</span>
+            <span>Portala Git</span>
           </Link>
-          <button onClick={() => setIsLoggedIn(false)} className="btn-logout">Çıkış Yap</button>
+          <button onClick={() => setIsLoggedIn(false)} className="sidebar-footer-btn logout">
+            <LogOut size={16} />
+            <span>Çıkış Yap</span>
+          </button>
         </div>
-      </header>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="admin-main">
+        {/* Top Bar */}
+        <header className="admin-topbar">
+          {isMobile && (
+            <button className="hamburger-btn" onClick={() => setSidebarOpen(true)}>
+              <Menu size={22} />
+            </button>
+          )}
+          <div className="topbar-title">
+            {(() => { const Icon = tabIcons[activeTab]; return Icon ? <Icon size={20} className="topbar-icon" /> : null; })()}
+            <h1>{tabLabels[activeTab]}</h1>
+          </div>
+          <div className="topbar-actions">
+            <span className="topbar-user">
+              <ShieldCheck size={16} />
+              <span>Admin</span>
+            </span>
+          </div>
+        </header>
+
+        {/* Content */}
+        <div className="admin-content">
 
       {/* TAB 1: DATA INGESTION & SCRAPER */}
       {activeTab === 'scraper' && (
+
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
           {/* Sub-tab Navigation */}
           <div className="glass-panel" style={{ display: 'flex', gap: '8px', padding: '10px 16px', borderRadius: 'var(--border-radius-sm)', background: '#ffffff', border: '1px solid var(--border-color)', flexWrap: 'wrap' }}>
@@ -5098,351 +5250,387 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Embedded CSS specific to this multi-tab console */}
+        </div>{/* end admin-content */}
+      </div>{/* end admin-main */}
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && (
+        <nav className="mobile-bottom-bar">
+          <button className={`bottom-btn ${activeTab === 'scraper' ? 'active' : ''}`} onClick={() => handleTabSelect('scraper')}>
+            <Terminal size={18} />
+            <span>Kazıma</span>
+          </button>
+          <button className={`bottom-btn ${activeTab === 'products' ? 'active' : ''}`} onClick={() => handleTabSelect('products')}>
+            <Package size={18} />
+            <span>Ürünler</span>
+          </button>
+          <button className={`bottom-btn ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => handleTabSelect('dealers')}>
+            <MapPin size={18} />
+            <span>Bayiler</span>
+          </button>
+          <button className={`bottom-btn ${activeTab === 'saas' ? 'active' : ''}`} onClick={() => handleTabSelect('saas')}>
+            <CreditCard size={18} />
+            <span>SaaS</span>
+          </button>
+          <button className="bottom-btn" onClick={() => setSidebarOpen(true)}>
+            <Menu size={18} />
+            <span>Menü</span>
+          </button>
+        </nav>
+      )}
+
+      {/* Embedded CSS */}
       <style jsx>{`
+        /* ===== LAYOUT ===== */
         .admin-layout {
-          max-width: var(--max-width);
-          margin: 0 auto;
-          padding: 24px;
-          min-height: 100vh;
           display: flex;
-          flex-direction: column;
-          gap: 24px;
+          min-height: 100vh;
+          position: relative;
           font-family: var(--font-body);
         }
 
-        .admin-header {
+        /* ===== SIDEBAR ===== */
+        .admin-sidebar {
+          width: 260px;
+          min-width: 260px;
+          height: 100vh;
+          position: sticky;
+          top: 0;
           display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 16px 28px;
-          border-radius: var(--border-radius-md);
+          flex-direction: column;
           background: #ffffff;
-          flex-wrap: wrap;
-          gap: 16px;
+          border-right: 1px solid var(--border-color);
+          z-index: 100;
+          overflow-y: auto;
+          overflow-x: hidden;
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .header-brand {
+        .sidebar-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 20px 20px 16px;
+          border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-logo {
           display: flex;
           align-items: center;
           gap: 12px;
         }
 
         .logo-icon {
-          width: 40px;
-          height: 40px;
-          background: var(--accent-gold);
+          width: 38px;
+          height: 38px;
+          background: linear-gradient(135deg, var(--accent-gold) 0%, #d4af37 100%);
           color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
           font-family: var(--font-title);
           font-weight: 700;
-          font-size: 1.2rem;
-          border-radius: var(--border-radius-sm);
+          font-size: 1rem;
+          border-radius: 10px;
+          box-shadow: 0 2px 8px rgba(179, 142, 71, 0.25);
         }
 
         .logo-text {
           font-family: var(--font-title);
-          font-size: 1.25rem;
+          font-size: 1.15rem;
           font-weight: 700;
           color: var(--text-primary);
           display: block;
+          line-height: 1.2;
         }
 
         .system-badge {
-          font-size: 0.65rem;
+          font-size: 0.62rem;
           color: var(--accent-gold);
           font-weight: 700;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.06em;
+          display: block;
         }
 
-        .admin-tabs-nav {
-          display: flex;
-          background: #f1f3f7;
-          border: 1px solid var(--border-color);
-          border-radius: 8px;
-          padding: 4px;
-          gap: 4px;
-        }
-
-        .admin-tab-link {
-          background: transparent;
+        .sidebar-close {
+          background: none;
           border: none;
           color: var(--text-secondary);
-          padding: 8px 14px;
-          border-radius: 6px;
           cursor: pointer;
-          font-family: var(--font-title);
-          font-weight: 600;
-          font-size: 0.8rem;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          transition: all 0.2s ease;
+          padding: 4px;
+          border-radius: 6px;
+          transition: all 0.2s;
         }
-
-        .admin-tab-link:hover {
+        .sidebar-close:hover {
+          background: var(--bg-input);
           color: var(--text-primary);
         }
 
-        .admin-tab-link.active {
-          background: #ffffff;
-          color: var(--accent-gold);
-          box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        /* ===== SIDEBAR NAV ===== */
+        .sidebar-nav {
+          flex: 1;
+          padding: 12px 12px;
+          overflow-y: auto;
         }
 
-        .header-actions {
+        .nav-group {
+          margin-bottom: 4px;
+        }
+
+        .nav-group-title {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          padding: 10px 12px;
+          border: none;
+          background: none;
+          color: var(--text-secondary);
+          font-family: var(--font-title);
+          font-weight: 700;
+          font-size: 0.7rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          cursor: pointer;
+          border-radius: 8px;
+          transition: all 0.2s;
+        }
+        .nav-group-title span {
+          flex: 1;
+          text-align: left;
+        }
+        .nav-group-title:hover {
+          background: var(--bg-input);
+          color: var(--text-primary);
+        }
+
+        .nav-group-items {
+          padding: 2px 0 6px 0;
+        }
+
+        .nav-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          padding: 9px 12px 9px 22px;
+          border: none;
+          background: none;
+          color: var(--text-secondary);
+          font-family: var(--font-body);
+          font-weight: 500;
+          font-size: 0.82rem;
+          cursor: pointer;
+          border-radius: 8px;
+          transition: all 0.2s;
+          position: relative;
+        }
+        .nav-item span {
+          flex: 1;
+          text-align: left;
+        }
+        .nav-item:hover {
+          background: var(--bg-input);
+          color: var(--text-primary);
+        }
+        .nav-item.active {
+          background: rgba(var(--accent-gold-rgb), 0.08);
+          color: var(--accent-gold-hover);
+          font-weight: 600;
+        }
+        .nav-item.active::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 3px;
+          height: 20px;
+          background: var(--accent-gold);
+          border-radius: 0 3px 3px 0;
+        }
+
+        .nav-badge {
+          background: rgba(37, 99, 235, 0.1);
+          color: var(--accent-blue);
+          font-size: 0.65rem;
+          font-weight: 700;
+          padding: 2px 7px;
+          border-radius: 10px;
+          min-width: 20px;
+          text-align: center;
+        }
+        .nav-badge.gold {
+          background: rgba(var(--accent-gold-rgb), 0.12);
+          color: var(--accent-gold);
+        }
+
+        /* ===== SIDEBAR FOOTER ===== */
+        .sidebar-footer {
+          padding: 12px;
+          border-top: 1px solid var(--border-color);
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .sidebar-footer-btn {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px;
+          border: none;
+          background: none;
+          color: var(--text-secondary);
+          font-family: var(--font-body);
+          font-size: 0.82rem;
+          font-weight: 500;
+          cursor: pointer;
+          border-radius: 8px;
+          text-decoration: none;
+          transition: all 0.2s;
+        }
+        .sidebar-footer-btn:hover {
+          background: var(--bg-input);
+          color: var(--text-primary);
+        }
+        .sidebar-footer-btn.logout {
+          color: #ef4444;
+        }
+        .sidebar-footer-btn.logout:hover {
+          background: rgba(239, 68, 68, 0.06);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .admin-main {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          background: var(--bg-dark);
+        }
+
+        /* ===== TOP BAR ===== */
+        .admin-topbar {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 16px 28px;
+          background: #ffffff;
+          border-bottom: 1px solid var(--border-color);
+          position: sticky;
+          top: 0;
+          z-index: 50;
+        }
+
+        .hamburger-btn {
+          background: none;
+          border: 1px solid var(--border-color);
+          color: var(--text-primary);
+          padding: 8px;
+          border-radius: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+        }
+        .hamburger-btn:hover {
+          background: var(--bg-input);
+        }
+
+        .topbar-title {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex: 1;
+        }
+        .topbar-title h1 {
+          font-family: var(--font-title);
+          font-size: 1.15rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          margin: 0;
+        }
+        .topbar-icon {
+          color: var(--accent-gold);
+        }
+
+        .topbar-actions {
           display: flex;
           align-items: center;
           gap: 12px;
         }
-
-        .btn-logout {
-          background: rgba(239, 68, 68, 0.06);
-          color: #ef4444;
-          border: 1px solid rgba(239, 68, 68, 0.15);
-          font-family: var(--font-title);
+        .topbar-user {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 14px;
+          background: rgba(5, 150, 105, 0.06);
+          color: var(--accent-green);
+          border-radius: 20px;
+          font-size: 0.78rem;
           font-weight: 600;
-          font-size: 0.8rem;
-          padding: 8px 18px;
-          border-radius: var(--border-radius-sm);
-          cursor: pointer;
-          transition: all 0.2s ease;
         }
 
-        .btn-logout:hover {
-          background: #ef4444;
-          color: #ffffff;
-        }
-
-        /* Content Grid */
-        .admin-grid {
-          display: grid;
-          grid-template-columns: 1.15fr 1.85fr;
+        /* ===== ADMIN CONTENT ===== */
+        .admin-content {
+          flex: 1;
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
           gap: 24px;
-          align-items: start;
         }
 
-        @media (max-width: 1024px) {
-          .admin-grid {
-            grid-template-columns: 1fr;
-          }
-          .admin-header {
-            flex-direction: column;
-            align-items: stretch;
-            padding: 14px 16px;
-            gap: 12px;
-          }
-          .admin-tabs-nav {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-          }
-          .admin-tabs-nav::-webkit-scrollbar {
-            display: none;
-          }
-          .header-actions {
-            justify-content: flex-end;
-          }
+        /* ===== MOBILE BOTTOM BAR ===== */
+        .mobile-bottom-bar {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          display: flex;
+          background: #ffffff;
+          border-top: 1px solid var(--border-color);
+          padding: 6px 8px;
+          padding-bottom: max(6px, env(safe-area-inset-bottom));
+          z-index: 200;
+          box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
         }
 
-        @media (max-width: 768px) {
-          .admin-layout {
-            padding: 12px 8px;
-            gap: 14px;
-          }
-          .admin-header {
-            padding: 12px;
-            gap: 10px;
-            border-radius: 10px;
-          }
-          .header-brand {
-            gap: 10px;
-          }
-          .logo-icon {
-            width: 34px;
-            height: 34px;
-            font-size: 1rem;
-            border-radius: 6px;
-          }
-          .logo-text {
-            font-size: 1rem;
-          }
-          .system-badge {
-            font-size: 0.58rem;
-          }
-          .admin-tabs-nav {
-            padding: 3px;
-            gap: 2px;
-            border-radius: 6px;
-          }
-          .admin-tab-link {
-            padding: 7px 10px;
-            font-size: 0.72rem;
-            white-space: nowrap;
-            flex-shrink: 0;
-          }
-          .admin-tab-link span {
-            display: inline;
-          }
-          .header-actions {
-            flex-wrap: wrap;
-            gap: 8px;
-          }
-          .header-actions a,
-          .btn-logout {
-            font-size: 0.72rem;
-            padding: 7px 12px;
-          }
-          .admin-card {
-            padding: 14px;
-            border-radius: 10px;
-            gap: 14px;
-          }
-          .card-header {
-            padding-bottom: 12px;
-            gap: 10px;
-          }
-          .card-header h3 {
-            font-size: 0.95rem;
-          }
-          .card-header p {
-            font-size: 0.68rem;
-          }
-          .form-group-row {
-            grid-template-columns: 1fr;
-            gap: 12px;
-          }
-          .form-group label {
-            font-size: 0.7rem;
-          }
-          .form-select, .form-input {
-            padding: 9px 12px;
-            font-size: 0.78rem;
-          }
-          .ingest-form {
-            gap: 12px;
-          }
-          .segmented-control {
-            flex-wrap: wrap;
-          }
-          .segmented-control button {
-            font-size: 0.72rem;
-            padding: 7px 6px;
-            min-width: 0;
-          }
-          .admin-grid {
-            gap: 14px;
-          }
-          .admin-filters-grid {
-            grid-template-columns: 1fr 1fr !important;
-            gap: 10px !important;
-          }
-          .table-responsive {
-            max-height: 400px;
-            border-radius: 6px;
-          }
-          .admin-table {
-            font-size: 0.7rem;
-          }
-          .admin-table th,
-          .admin-table td {
-            padding: 8px 10px;
-          }
-          .console-terminal {
-            min-height: 200px;
-            max-height: 360px;
-            padding: 12px;
-            border-radius: 6px;
-          }
-          .console-empty {
-            height: 180px;
-            font-size: 0.72rem;
-          }
-          .console-line {
-            font-size: 0.68rem;
-            gap: 8px;
-          }
-          .flex-btn {
-            font-size: 0.72rem;
-            padding: 7px 14px;
-          }
-          .flex-center-btn {
-            gap: 6px;
-          }
-          .success-alert, .error-alert {
-            font-size: 0.72rem;
-            padding: 10px;
-          }
-          .badge-brand {
-            font-size: 0.6rem;
-          }
-          .badge-saas-plan {
-            font-size: 0.6rem;
-            padding: 2px 6px;
-          }
-          .badge-saas-status {
-            font-size: 0.6rem;
-          }
-          .status-select {
-            font-size: 0.68rem;
-            padding: 3px 6px;
-          }
-          .btn-action-delete {
-            width: 26px;
-            height: 26px;
-          }
+        .bottom-btn {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2px;
+          padding: 6px 4px;
+          border: none;
+          background: none;
+          color: var(--text-secondary);
+          font-size: 0.62rem;
+          font-weight: 600;
+          cursor: pointer;
+          border-radius: 8px;
+          transition: all 0.2s;
+        }
+        .bottom-btn.active {
+          color: var(--accent-gold);
+        }
+        .bottom-btn:hover {
+          background: var(--bg-input);
         }
 
-        @media (max-width: 480px) {
-          .admin-layout {
-            padding: 8px 6px;
-            gap: 10px;
-          }
-          .admin-header {
-            padding: 10px;
-          }
-          .logo-text {
-            font-size: 0.88rem;
-          }
-          .admin-tab-link {
-            padding: 6px 8px;
-            font-size: 0.68rem;
-            gap: 4px;
-          }
-          .admin-card {
-            padding: 12px;
-            gap: 12px;
-          }
-          .card-header h3 {
-            font-size: 0.88rem;
-          }
-          .admin-filters-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .admin-table th,
-          .admin-table td {
-            padding: 6px 8px;
-            font-size: 0.66rem;
-          }
-          .header-actions {
-            width: 100%;
-          }
-          .header-actions a {
-            flex: 1;
-            text-align: center;
-            justify-content: center;
-          }
-          .btn-logout {
-            flex: 1;
-            text-align: center;
-          }
+        /* ===== MOBILE SIDEBAR OVERLAY ===== */
+        .sidebar-backdrop {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.4);
+          z-index: 99;
+          backdrop-filter: blur(2px);
         }
 
+        /* ===== CARDS ===== */
         .admin-card {
           padding: 24px;
           background: #ffffff;
@@ -5450,6 +5638,9 @@ export default function AdminPage() {
           flex-direction: column;
           gap: 20px;
           border-radius: var(--border-radius-md);
+          border: 1px solid var(--border-color);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+          transition: box-shadow 0.2s;
         }
 
         .card-header {
@@ -5464,7 +5655,7 @@ export default function AdminPage() {
         .icon-blue { color: var(--accent-blue); }
 
         .card-header h3 {
-          font-size: 1.1rem;
+          font-size: 1.05rem;
           font-weight: 700;
           color: var(--text-primary);
         }
@@ -5476,35 +5667,11 @@ export default function AdminPage() {
           line-height: 1.3;
         }
 
+        /* ===== FORMS ===== */
         .ingest-form {
           display: flex;
           flex-direction: column;
           gap: 16px;
-        }
-
-        .success-alert {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          background: rgba(5, 150, 105, 0.05);
-          border: 1px solid rgba(5, 150, 105, 0.2);
-          color: var(--accent-green);
-          padding: 12px;
-          border-radius: var(--border-radius-sm);
-          font-size: 0.78rem;
-          font-weight: 500;
-        }
-
-        .error-alert {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          background: rgba(239, 68, 68, 0.05);
-          border: 1px solid rgba(239, 68, 68, 0.2);
-          color: #ef4444;
-          padding: 12px;
-          border-radius: var(--border-radius-sm);
-          font-size: 0.78rem;
         }
 
         .form-group {
@@ -5516,7 +5683,7 @@ export default function AdminPage() {
         .form-group-row {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 12px;
+          gap: 16px;
         }
 
         .form-group label {
@@ -5527,23 +5694,26 @@ export default function AdminPage() {
         }
 
         .form-select, .form-input {
-          background-color: #f1f3f7;
+          background-color: var(--bg-input);
           border: 1px solid var(--border-color);
           border-radius: var(--border-radius-sm);
           padding: 10px 14px;
-          font-size: 0.8rem;
+          font-size: 0.82rem;
           color: var(--text-primary);
           outline: none;
           font-family: var(--font-body);
+          transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .form-input:focus {
+        .form-input:focus, .form-select:focus {
           border-color: var(--accent-gold);
+          box-shadow: 0 0 0 3px rgba(var(--accent-gold-rgb), 0.08);
         }
 
+        /* ===== SEGMENTED CONTROLS ===== */
         .segmented-control {
           display: flex;
-          background-color: #f1f3f7;
+          background-color: var(--bg-input);
           padding: 3px;
           border-radius: var(--border-radius-sm);
           border: 1px solid var(--border-color);
@@ -5558,150 +5728,148 @@ export default function AdminPage() {
           font-family: var(--font-title);
           font-weight: 600;
           font-size: 0.78rem;
-          border-radius: var(--border-radius-sm);
+          border-radius: 6px;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.2s;
         }
 
         .segmented-control button.active {
-          background-color: var(--accent-gold);
-          color: #ffffff;
+          background: #ffffff;
+          color: var(--accent-gold);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
 
-        .flex-center-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-        }
-
-        /* Console Terminal Styles */
-        .console-card {
-          flex-grow: 1;
-        }
-
+        /* ===== CONSOLE ===== */
         .console-terminal {
           background: #0f172a;
-          border-radius: 8px;
-          padding: 16px;
-          min-height: 290px;
+          border-radius: var(--border-radius-sm);
+          min-height: 280px;
           max-height: 480px;
           overflow-y: auto;
-          box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
-          font-family: 'Courier New', Courier, monospace;
+          padding: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .console-empty {
+          height: 260px;
           display: flex;
-          flex-direction: column;
           align-items: center;
           justify-content: center;
-          height: 250px;
-          color: #475569;
-          text-align: center;
-          gap: 12px;
-          font-size: 0.8rem;
-        }
-
-        .console-logs-list {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
+          color: rgba(255, 255, 255, 0.25);
+          font-family: var(--font-title);
+          font-size: 0.78rem;
+          letter-spacing: 0.03em;
         }
 
         .console-line {
-          font-size: 0.75rem;
-          line-height: 1.4;
-          color: #cbd5e1;
           display: flex;
-          gap: 12px;
+          gap: 10px;
+          padding: 3px 0;
+          font-family: 'Courier New', monospace;
+          font-size: 0.72rem;
+          line-height: 1.5;
         }
-
-        .console-line.err { color: #f87171; }
-        .console-line.sys { color: #34d399; }
-        .console-line.scr { color: #60a5fa; }
-
-        .line-num {
-          color: #475569;
-          min-width: 20px;
-          user-select: none;
-          text-align: right;
+        .console-line .timestamp {
+          color: rgba(255, 255, 255, 0.25);
+          flex-shrink: 0;
         }
-
-        .line-text {
-          white-space: pre-wrap;
+        .console-line .message {
+          color: rgba(255, 255, 255, 0.7);
           word-break: break-all;
         }
+        .console-line .message.success { color: #4ade80; }
+        .console-line .message.error { color: #f87171; }
+        .console-line .message.warning { color: #fbbf24; }
 
-        .console-typing-loader {
-          padding-left: 32px;
-          display: flex;
-          gap: 4px;
-          margin-top: 4px;
-        }
-
-        .typing-dot {
-          width: 5px;
-          height: 5px;
-          background-color: #60a5fa;
-          border-radius: 50%;
-          animation: typingBlink 1.4s infinite both;
-        }
-
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typingBlink {
-          0% { opacity: 0.2; }
-          20% { opacity: 1; }
-          100% { opacity: 0.2; }
-        }
-
+        /* ===== BUTTONS ===== */
         .flex-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .flex-center-btn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .success-alert {
+          background: rgba(5, 150, 105, 0.06);
+          color: var(--accent-green);
+          padding: 12px 16px;
+          border-radius: var(--border-radius-sm);
+          font-size: 0.78rem;
+          font-weight: 600;
           display: flex;
           align-items: center;
           gap: 8px;
-          font-size: 0.8rem;
-          padding: 8px 18px;
+          border: 1px solid rgba(5, 150, 105, 0.15);
+        }
+        .error-alert {
+          background: rgba(239, 68, 68, 0.06);
+          color: #ef4444;
+          padding: 12px 16px;
+          border-radius: var(--border-radius-sm);
+          font-size: 0.78rem;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          border: 1px solid rgba(239, 68, 68, 0.15);
         }
 
-        /* Admin Table Styles */
+        /* ===== GRID ===== */
+        .admin-grid {
+          display: grid;
+          grid-template-columns: 1.15fr 1.85fr;
+          gap: 24px;
+          align-items: start;
+        }
+
+        /* ===== TABLE ===== */
         .table-responsive {
           overflow-x: auto;
-          max-height: 480px;
+          overflow-y: auto;
+          max-height: 520px;
           border: 1px solid var(--border-color);
-          border-radius: 8px;
+          border-radius: var(--border-radius-sm);
         }
 
         .admin-table {
           width: 100%;
           border-collapse: collapse;
           font-size: 0.78rem;
-          text-align: left;
         }
 
         .admin-table th {
-          background: #f8f9fc;
-          padding: 12px 16px;
+          background: linear-gradient(135deg, rgba(var(--accent-gold-rgb), 0.06) 0%, rgba(var(--accent-gold-rgb), 0.02) 100%);
           color: var(--text-secondary);
-          font-weight: 600;
+          font-family: var(--font-title);
+          font-weight: 700;
+          font-size: 0.7rem;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          padding: 12px 16px;
+          text-align: left;
           border-bottom: 1px solid var(--border-color);
           position: sticky;
           top: 0;
-          z-index: 10;
+          z-index: 2;
         }
 
         .admin-table td {
-          padding: 12px 16px;
-          border-bottom: 1px solid var(--border-color);
+          padding: 10px 16px;
+          border-bottom: 1px solid rgba(0,0,0,0.03);
           color: var(--text-primary);
           vertical-align: middle;
         }
 
         .admin-table tr:hover td {
-          background: rgba(0,0,0,0.01);
+          background: rgba(0,0,0,0.015);
         }
 
+        /* ===== BADGES ===== */
         .badge-brand {
           background: rgba(37, 99, 235, 0.06);
           color: var(--accent-blue-hover);
