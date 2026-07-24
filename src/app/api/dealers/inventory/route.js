@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const dealerId = searchParams.get('dealerId');
-
-    if (!dealerId) {
-      return NextResponse.json({ error: 'Missing dealerId query parameter.' }, { status: 400 });
+    const auth = await verifyAuth(request, 'dealer');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
     }
+    const dealerId = auth.id;
 
     const inventory = await prisma.dealerInventory.findMany({
       where: { dealerId },
@@ -48,12 +48,13 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { action, dealerId } = body;
-
-    if (!dealerId) {
-      return NextResponse.json({ error: 'Missing dealerId.' }, { status: 400 });
+    const auth = await verifyAuth(request, 'dealer');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
     }
+    const body = await request.json();
+    const { action } = body;
+    const dealerId = auth.id;
 
     // Check SaaS subscription active status
     const saas = await prisma.dealerSaaSConfig.findFirst({

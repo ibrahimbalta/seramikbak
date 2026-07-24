@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
+import { verifyAuth } from '@/lib/auth-check';
 
-export async function GET() {
+export async function GET(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const brands = await prisma.brand.findMany({
       select: {
         id: true,
         name: true,
-        username: true,
-        password: true,
         logoUrl: true
       },
       orderBy: {
@@ -19,12 +23,17 @@ export async function GET() {
     return NextResponse.json(brands);
   } catch (error) {
     console.error('Admin Brands API Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch brands' }, { status: 500 });
+    return NextResponse.json({ error: 'Markalar alınırken bir hata oluştu.' }, { status: 500 });
   }
 }
 
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { id, username, password } = body;
 
@@ -53,7 +62,7 @@ export async function POST(request) {
       }
     });
 
-    return NextResponse.json({ success: true, brand: updated });
+    return NextResponse.json({ success: true, brand: { id: updated.id, name: updated.name } });
   } catch (error) {
     console.error('Admin Brands Update Error:', error);
     return NextResponse.json({ error: 'Sistem hatası.' }, { status: 500 });

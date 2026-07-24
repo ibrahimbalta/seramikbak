@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyPassword } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { encryptSession } from '@/lib/session';
 
 export async function POST(request) {
   try {
@@ -40,6 +42,24 @@ export async function POST(request) {
       }, { status: 403 });
     }
 
+    // Generate secure session token
+    const token = encryptSession({
+      id: dealer.id,
+      name: dealer.name,
+      email: dealer.email,
+      role: 'dealer'
+    });
+
+    // Set HTTP-Only Cookie
+    const cookieStore = await cookies();
+    cookieStore.set('sb_session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 // 7 days
+    });
+
     // Successful login
     return NextResponse.json({
       success: true,
@@ -59,7 +79,8 @@ export async function POST(request) {
         showroomImages: dealer.showroomImages,
         virtualTourUrl: dealer.virtualTourUrl,
         specialConcepts: dealer.specialConcepts
-      }
+      },
+      token
     });
 
   } catch (error) {

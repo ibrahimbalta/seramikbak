@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyPassword } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { encryptSession } from '@/lib/session';
 
 export async function POST(request) {
   try {
@@ -20,6 +22,23 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Hatalı kullanıcı adı veya şifre.' }, { status: 401 });
     }
 
+    // Generate secure session token
+    const token = encryptSession({
+      id: brand.id,
+      name: brand.name,
+      role: 'brand'
+    });
+
+    // Set HTTP-Only Cookie
+    const cookieStore = await cookies();
+    cookieStore.set('sb_session', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 // 7 days
+    });
+
     // Successful login
     return NextResponse.json({
       success: true,
@@ -27,7 +46,8 @@ export async function POST(request) {
         id: brand.id,
         name: brand.name,
         logoUrl: brand.logoUrl
-      }
+      },
+      token
     });
 
   } catch (error) {

@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { uploadImage } from '@/lib/cloudinary';
+import { verifyAuth } from '@/lib/auth-check';
 
 // Helper to save base64 image (tries Cloudinary first, falls back to local storage)
 async function saveBase64Image(base64Data, filename) {
@@ -123,6 +124,10 @@ export async function GET(request) {
 // POST: Create a product manually
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const body = await request.json();
     const {
       name,
@@ -231,6 +236,10 @@ export async function POST(request) {
 // PUT: Update a product manually
 export async function PUT(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const body = await request.json();
     const {
       id,
@@ -340,6 +349,10 @@ export async function PUT(request) {
 // DELETE: Remove product by ID
 export async function DELETE(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
