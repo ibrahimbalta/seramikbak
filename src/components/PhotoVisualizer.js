@@ -3,39 +3,39 @@
 import { useState, useEffect, useRef } from 'react';
 import { Camera, Image as ImageIcon, RotateCw, ZoomIn, Download, RefreshCw, Sparkles, HelpCircle } from 'lucide-react';
 
-// Room Presets with default floor/wall perspective coordinate ratios
+// Room Presets with empty floors/walls and default perspective coordinates
 const ROOM_PRESETS = [
   {
     id: 'bathroom',
-    name: 'Lüks Modern Banyo',
-    url: 'https://images.unsplash.com/photo-1620626011761-996317b69763?auto=format&fit=crop&w=1200&q=80',
+    name: 'Modern Boş Banyo',
+    url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80',
     pins: [
-      { x: 0.18, y: 0.72 }, // Top-Left
-      { x: 0.82, y: 0.72 }, // Top-Right
-      { x: 0.94, y: 0.95 }, // Bottom-Right
-      { x: 0.06, y: 0.95 }  // Bottom-Left
+      { x: 0.02, y: 0.76 }, // Top-Left (Zemin başlangıcı)
+      { x: 0.98, y: 0.76 }, // Top-Right
+      { x: 0.98, y: 0.98 }, // Bottom-Right
+      { x: 0.02, y: 0.98 }  // Bottom-Left
     ]
   },
   {
     id: 'livingroom',
-    name: 'Modern Geniş Salon',
-    url: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80',
+    name: 'Geniş Boş Salon zemin',
+    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     pins: [
-      { x: 0.22, y: 0.65 },
-      { x: 0.78, y: 0.65 },
+      { x: 0.10, y: 0.60 },
+      { x: 0.90, y: 0.60 },
       { x: 0.98, y: 0.98 },
       { x: 0.02, y: 0.98 }
     ]
   },
   {
     id: 'kitchen',
-    name: 'Minimalist Mutfak',
+    name: 'Minimal Mutfak Tezgahi',
     url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80',
     pins: [
-      { x: 0.28, y: 0.48 },
-      { x: 0.72, y: 0.48 },
-      { x: 0.85, y: 0.82 },
-      { x: 0.15, y: 0.82 }
+      { x: 0.02, y: 0.50 },
+      { x: 0.98, y: 0.50 },
+      { x: 0.98, y: 0.82 },
+      { x: 0.02, y: 0.82 }
     ]
   }
 ];
@@ -179,6 +179,20 @@ export default function PhotoVisualizer({ activeProduct }) {
       drawTriangleTexture(ctx, offscreen, p0.x, p0.y, p1.x, p1.y, p3.x, p3.y, 0, 1800, 0, 0, 0, 1800);
       // Triangle 2: Source (1800,0)-(1800,1800)-(0,1800) -> Target p1-p2-p3
       drawTriangleTexture(ctx, offscreen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, 1800, 1800, 0, 0, 1800, 1800);
+
+      // 3.1 Overlay original shadows and lighting using multiply blend operation
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.lineTo(p3.x, p3.y);
+      ctx.closePath();
+      ctx.clip();
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.globalAlpha = 0.7; // Sweet spot for shadow blending
+      ctx.drawImage(backgroundImage, 0, 0, width, height);
+      ctx.restore();
     }
 
     // 4. Draw Helper Polygon Border and Draggable Anchor Pins
@@ -369,6 +383,20 @@ export default function PhotoVisualizer({ activeProduct }) {
 
       drawTriangleTexture(cleanCtx, offscreen, p0.x, p0.y, p1.x, p1.y, p3.x, p3.y, 0, 1800, 0, 0, 0, 1800);
       drawTriangleTexture(cleanCtx, offscreen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, 1800, 1800, 0, 0, 1800, 1800);
+
+      // Overlay original shadows and lighting for clean download
+      cleanCtx.save();
+      cleanCtx.beginPath();
+      cleanCtx.moveTo(p0.x, p0.y);
+      cleanCtx.lineTo(p1.x, p1.y);
+      cleanCtx.lineTo(p2.x, p2.y);
+      cleanCtx.lineTo(p3.x, p3.y);
+      cleanCtx.closePath();
+      cleanCtx.clip();
+      cleanCtx.globalCompositeOperation = 'multiply';
+      cleanCtx.globalAlpha = 0.7;
+      cleanCtx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+      cleanCtx.restore();
     }
 
     const dataUrl = cleanCanvas.toDataURL('image/jpeg', 0.95);
