@@ -1143,7 +1143,8 @@ export default function Home() {
   }, [isKioskMode]);
 
   const handleTryMoodboard = async (combo) => {
-    const tileQuery = combo.tileName.split(' ')[0];
+    if (!combo || !combo.tileName) return;
+    const tileQuery = combo.tileName.split(' ')[0] || 'seramik';
     
     // Dynamically apply furnishings color presets to 3D virtual studio
     if (combo.id === 0) setStudioCabinetColor('#5c4033'); // oak wood
@@ -3305,8 +3306,11 @@ export default function Home() {
 
               {/* Main 4-Column Material Composition Board */}
               {(() => {
-                const activeCombo = moodboardCombos.find(c => c.id === selectedMoodIndex) || moodboardCombos[0];
-                const currentFaucet = customFaucetFinish || activeCombo.fixtureBadge;
+                const activeCombo = (moodboardCombos && moodboardCombos.length > 0)
+                  ? (moodboardCombos.find(c => c && c.id === selectedMoodIndex) || moodboardCombos[0])
+                  : (DEFAULT_MOODBOARD_COMBOS[0] || {});
+                
+                const currentFaucet = String(customFaucetFinish || activeCombo?.fixtureBadge || '');
 
                 return (
                   <div className="studio-board-wrapper">
@@ -3315,13 +3319,13 @@ export default function Home() {
                     <div className="studio-board-header">
                       <div className="board-active-info">
                         <span className="board-badge">✨ SEÇİLİ KONSEPT</span>
-                        <h4 className="board-title">{activeCombo.styleName} — {activeCombo.tagline}</h4>
+                        <h4 className="board-title">{activeCombo?.styleName || 'Konsept'} — {activeCombo?.tagline || ''}</h4>
                       </div>
 
                       <div className="board-palette-swatches">
                         <span className="swatch-label">Harmonize Palet:</span>
                         <div className="swatch-dots-row">
-                          {activeCombo.colorPalette?.map((hex, idx) => (
+                          {activeCombo?.colorPalette?.map((hex, idx) => (
                             <div 
                               key={idx} 
                               className="studio-swatch-circle" 
@@ -3340,18 +3344,18 @@ export default function Home() {
                       <div className="studio-material-card">
                         <div className="card-header-tag">
                           <span>01 / SERAMİK KROKİSİ</span>
-                          <span className="card-tag-mini">{activeCombo.tileFinish}</span>
+                          <span className="card-tag-mini">{activeCombo?.tileFinish || 'Parlak'}</span>
                         </div>
                         <div className="studio-tile-img-box">
                           <img 
-                            src={activeCombo.tileImg} 
-                            alt={activeCombo.tileName}
+                            src={activeCombo?.tileImg || '/textures/calacatta_gold.jpg'} 
+                            alt={activeCombo?.tileName || 'Seramik'}
                             onError={(e) => { e.target.src = '/textures/calacatta_gold.jpg'; }}
                           />
                         </div>
                         <div className="material-details">
-                          <h5 className="material-name">{activeCombo.tileName}</h5>
-                          <p className="material-sub">Ebat: {activeCombo.tileSize}</p>
+                          <h5 className="material-name">{activeCombo?.tileName || 'Seramik'}</h5>
+                          <p className="material-sub">Ebat: {activeCombo?.tileSize || '60x120 cm'}</p>
                         </div>
                       </div>
 
@@ -3359,17 +3363,17 @@ export default function Home() {
                       <div className="studio-material-card">
                         <div className="card-header-tag">
                           <span>02 / DUVAR BOYASI</span>
-                          <span className="card-tag-mini">{activeCombo.paintSheen}</span>
+                          <span className="card-tag-mini">{activeCombo?.paintSheen || 'Mat'}</span>
                         </div>
                         <div className="studio-paint-box">
                           <div 
                             className="studio-paint-swatch"
-                            style={{ background: activeCombo.paintColor }}
+                            style={{ background: activeCombo?.paintColor || '#dfdcd3' }}
                           />
                         </div>
                         <div className="material-details">
-                          <h5 className="material-name">{activeCombo.paintName}</h5>
-                          <p className="material-sub">Ton Kodu: {activeCombo.paintColor}</p>
+                          <h5 className="material-name">{activeCombo?.paintName || 'Duvar Boyası'}</h5>
+                          <p className="material-sub">Ton Kodu: {activeCombo?.paintColor || '#dfdcd3'}</p>
                         </div>
                       </div>
 
@@ -3380,11 +3384,11 @@ export default function Home() {
                           <span className="card-tag-mini">Entegre Ray</span>
                         </div>
                         <div className="studio-icon-box">
-                          <div className="wood-texture-icon" style={{ background: activeCombo.cabinetHex || '#5c4033' }} />
+                          <div className="wood-texture-icon" style={{ background: activeCombo?.cabinetHex || '#5c4033' }} />
                         </div>
                         <div className="material-details">
-                          <h5 className="material-name">{activeCombo.cabinet}</h5>
-                          <p className="material-sub">{activeCombo.cabinetDetail}</p>
+                          <h5 className="material-name">{activeCombo?.cabinet || 'Banyo Dolabı'}</h5>
+                          <p className="material-sub">{activeCombo?.cabinetDetail || ''}</p>
                         </div>
                       </div>
 
@@ -3411,7 +3415,7 @@ export default function Home() {
                           <span style={{ fontSize: '1.4rem' }}>🚰</span>
                         </div>
                         <div className="material-details">
-                          <h5 className="material-name">{activeCombo.fixture}</h5>
+                          <h5 className="material-name">{activeCombo?.fixture || 'Armatür Takımı'}</h5>
                           <p className="material-sub">Kaplama: {currentFaucet}</p>
                         </div>
                       </div>
