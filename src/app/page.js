@@ -3194,34 +3194,34 @@ export default function Home() {
               </div>
             </div>
 
-            {/* -------------------- AI MOODBOARD INTERIOR DESIGN ASSISTANT (ULTRA-SLEEK) -------------------- */}
+            {/* -------------------- AI MOODBOARD INTERIOR ARCHITECT STUDIO v3.0 (LIGHT ELEGANT) -------------------- */}
             <div className="moodboard-container glass-panel">
               
-              {/* Top Bar: Header & Interactive AI Prompt Bar */}
-              <div className="moodboard-header-wrapper">
-                <div className="moodboard-header-left">
-                  <div className="moodboard-sparkle-icon">
-                    <Sparkles size={18} className="badge-icon-gold" />
+              {/* Top Studio Bar: Brand Title, AI Search & Category Pills */}
+              <div className="moodboard-studio-topbar">
+                <div className="studio-brand-group">
+                  <div className="studio-sparkle-badge">
+                    <Sparkles size={16} />
                   </div>
                   <div>
-                    <h3 className="moodboard-heading-title">
-                      AI İç Mimari Kombin Asistanı
+                    <h3 className="studio-title">
+                      AI İç Mimari Kombin Stüdyosu
                     </h3>
-                    <p className="moodboard-heading-sub">
-                      Yapay zeka mimarlık algoritması ile seramik, mobilya ve armatür uyumunu gerçek zamanlı analiz edin.
+                    <p className="studio-subtitle">
+                      Yapay zeka mimarlık algoritması ile seramik, mobilya, duvar boyası ve armatür paletlerini anında eşleştirin.
                     </p>
                   </div>
                 </div>
 
-                {/* AI Prompt Input & Presets Bar */}
-                <div className="moodboard-prompt-bar">
+                {/* AI Search & Presets */}
+                <div className="studio-controls-right">
                   <div className="prompt-input-wrapper">
                     <SearchIcon size={14} className="prompt-search-icon" />
                     <input 
                       type="text"
                       value={aiPromptInput}
                       onChange={(e) => setAiPromptInput(e.target.value)}
-                      placeholder="İç Mimara Sor (Örn: 'Minimalist 60x120 mermer banyo')..."
+                      placeholder="İç Mimara Sor (Örn: 'Minimalist mermer banyo')..."
                       className="prompt-input"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && aiPromptInput.trim()) {
@@ -3235,7 +3235,7 @@ export default function Home() {
                             );
                             if (matched) setSelectedMoodIndex(matched.id);
                             setAiGeneratingCombo(false);
-                          }, 400);
+                          }, 350);
                         }
                       }}
                     />
@@ -3250,7 +3250,7 @@ export default function Home() {
                           const nextItem = available[(currentIdx + 1) % available.length] || available[0];
                           if (nextItem) setSelectedMoodIndex(nextItem.id);
                           setAiGeneratingCombo(false);
-                        }, 350);
+                        }, 300);
                       }}
                       className="prompt-submit-btn"
                       disabled={aiGeneratingCombo}
@@ -3260,10 +3260,10 @@ export default function Home() {
                     </button>
                   </div>
 
-                  {/* Category Pills */}
-                  <div className="moodboard-category-tabs">
+                  {/* Room Category Tabs */}
+                  <div className="studio-category-pills">
                     {[
-                      { key: 'all', label: 'Tümü' },
+                      { key: 'all', label: 'Tüm Alanlar' },
                       { key: 'banyo', label: '🛁 Banyo' },
                       { key: 'mutfak', label: '🍳 Mutfak' },
                       { key: 'salon', label: '🛋️ Salon' }
@@ -3271,7 +3271,7 @@ export default function Home() {
                       <button
                         key={cat.key}
                         onClick={() => setMoodboardCategory(cat.key)}
-                        className={`mood-cat-tab ${moodboardCategory === cat.key ? 'active' : ''}`}
+                        className={`studio-cat-pill ${moodboardCategory === cat.key ? 'active' : ''}`}
                       >
                         {cat.label}
                       </button>
@@ -3280,183 +3280,171 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Layout Grid */}
-              <div className="moodboard-grid">
-                
-                {/* Left Side: Style Selector List & Architectural Spec Sheet */}
-                <div className="moodboard-left-panel">
-                  <span className="moodboard-panel-label">
-                    Konsept Kataloğu ({moodboardCombos.filter(c => moodboardCategory === 'all' || c.category === moodboardCategory).length})
-                  </span>
-                  
-                  <div className="moodboard-selector-list scrollbar-hidden">
-                    {moodboardCombos
-                      .filter(c => moodboardCategory === 'all' || c.category === moodboardCategory)
-                      .map((combo) => {
-                        const isActive = selectedMoodIndex === combo.id;
-                        return (
-                          <button
-                            key={combo.id}
-                            onClick={() => setSelectedMoodIndex(combo.id)}
-                            className={`mood-select-card ${isActive ? 'active' : ''}`}
-                          >
-                            <div className="mood-select-card-header">
-                              <span className="mood-style-badge">{combo.styleBadge || '✨ Lüks'}</span>
-                              <span className="mood-score-badge">%{combo.matchScore || 98} AI Uyum</span>
-                            </div>
-                            <h4 className="mood-style-title">{combo.styleName}</h4>
-                          </button>
-                        );
-                      })}
-                  </div>
-
-                  {/* Architectural Spec Sheet (Mimarlık Cetveli) */}
-                  {(() => {
-                    const activeCombo = moodboardCombos.find(c => c.id === selectedMoodIndex) || moodboardCombos[0];
-                    return (
-                      <div className="moodboard-spec-sheet">
-                        <div className="spec-sheet-header">
-                          <FileText size={13} style={{ color: 'var(--accent-gold)' }} />
-                          <span>Mimarlık Cetveli & Metraj</span>
-                        </div>
-                        <div className="spec-sheet-grid">
-                          <div className="spec-item">
-                            <span className="spec-lbl">💡 Aydınlatma:</span>
-                            <span className="spec-val">{activeCombo.lighting || '3000K Sıcak LED'}</span>
-                          </div>
-                          <div className="spec-item">
-                            <span className="spec-lbl">📐 Derz Dolgusu:</span>
-                            <span className="spec-val">{activeCombo.groutColor || 'Fildişi (1.5mm)'}</span>
-                          </div>
-                          <div className="spec-item">
-                            <span className="spec-lbl">💎 Segment:</span>
-                            <span className="spec-val">{activeCombo.budgetLevel || 'Lüks Premium'}</span>
-                          </div>
-                        </div>
-                        <p className="spec-note">{activeCombo.desc}</p>
-                      </div>
-                    );
-                  })()}
+              {/* Horizontal Design Concept Switcher Ribbon */}
+              <div className="studio-concept-ribbon scrollbar-hidden">
+                <span className="ribbon-label">Konsept Seçimi:</span>
+                <div className="ribbon-items-group">
+                  {moodboardCombos
+                    .filter(c => moodboardCategory === 'all' || c.category === moodboardCategory)
+                    .map((combo) => {
+                      const isActive = selectedMoodIndex === combo.id;
+                      return (
+                        <button
+                          key={combo.id}
+                          onClick={() => setSelectedMoodIndex(combo.id)}
+                          className={`concept-pill-btn ${isActive ? 'active' : ''}`}
+                        >
+                          <span className="pill-badge">{combo.styleBadge}</span>
+                          <span className="pill-name">{combo.styleName}</span>
+                          <span className="pill-score">%{combo.matchScore} Uyum</span>
+                        </button>
+                      );
+                    })}
                 </div>
+              </div>
 
-                {/* Right Side: Sleek Studio Canvas */}
-                {(() => {
-                  const activeCombo = moodboardCombos.find(c => c.id === selectedMoodIndex) || moodboardCombos[0];
-                  const currentFaucet = customFaucetFinish || activeCombo.fixtureBadge;
+              {/* Main 4-Column Material Composition Board */}
+              {(() => {
+                const activeCombo = moodboardCombos.find(c => c.id === selectedMoodIndex) || moodboardCombos[0];
+                const currentFaucet = customFaucetFinish || activeCombo.fixtureBadge;
 
-                  return (
-                    <div className="moodboard-bento-canvas">
-                      {/* Top Bar inside Canvas */}
-                      <div className="bento-canvas-topbar">
-                        <div className="ai-match-pill">
-                          <Sparkles size={13} style={{ color: '#fbbf24' }} />
-                          <span>%{activeCombo.matchScore || 98} AI İÇ MİMARİ UYUM SKORU</span>
-                        </div>
-                        
-                        <div className="color-palette-bar">
-                          <span className="palette-label">Palet:</span>
-                          <div className="palette-swatches">
-                            {activeCombo.colorPalette?.map((hex, idx) => (
-                              <div 
-                                key={idx} 
-                                className="swatch-dot" 
-                                style={{ background: hex }} 
-                                title={`Renk ${idx+1}: ${hex}`}
-                              />
-                            ))}
-                          </div>
-                        </div>
+                return (
+                  <div className="studio-board-wrapper">
+                    
+                    {/* Board Header Bar */}
+                    <div className="studio-board-header">
+                      <div className="board-active-info">
+                        <span className="board-badge">✨ SEÇİLİ KONSEPT</span>
+                        <h4 className="board-title">{activeCombo.styleName} — {activeCombo.tagline}</h4>
                       </div>
 
-                      {/* Compact 4-Material Bento Grid */}
-                      <div className="bento-materials-grid">
-                        
-                        {/* 1. Ceramic Slab Card */}
-                        <div className="bento-card bento-ceramic">
-                          <div className="ceramic-img-wrapper">
-                            <img 
-                              src={activeCombo.tileImg} 
-                              alt={activeCombo.tileName}
-                              onError={(e) => { e.target.src = '/textures/calacatta_gold.jpg'; }}
-                            />
-                            <span className="tag-overlay">Seramik Dokusu</span>
-                          </div>
-                          <div className="bento-card-content">
-                            <span className="bento-card-title">{activeCombo.tileName}</span>
-                            <span className="bento-card-sub">{activeCombo.tileSize} • {activeCombo.tileFinish}</span>
-                          </div>
-                        </div>
-
-                        {/* 2. Paint Swatch Card */}
-                        <div className="bento-card bento-paint">
-                          <div className="paint-swatch-row">
+                      <div className="board-palette-swatches">
+                        <span className="swatch-label">Harmonize Palet:</span>
+                        <div className="swatch-dots-row">
+                          {activeCombo.colorPalette?.map((hex, idx) => (
                             <div 
-                              className="paint-circle-swatch"
-                              style={{ background: activeCombo.paintColor }}
+                              key={idx} 
+                              className="studio-swatch-circle" 
+                              style={{ background: hex }} 
+                              title={`Renk ${idx+1}: ${hex}`}
                             />
-                            <div className="paint-info">
-                              <span className="bento-card-label">Duvar Boyası</span>
-                              <span className="bento-card-title">{activeCombo.paintName}</span>
-                              <span className="bento-card-sub">{activeCombo.paintSheen}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* 3. Furniture Card */}
-                        <div className="bento-card bento-furniture">
-                          <div className="bento-card-header">
-                            <span>🚪 Mobilya & Ahşap Doku</span>
-                          </div>
-                          <span className="bento-card-title">{activeCombo.cabinet}</span>
-                          <span className="bento-card-sub">{activeCombo.cabinetDetail}</span>
-                        </div>
-
-                        {/* 4. Fixture Card */}
-                        <div className="bento-card bento-fixture">
-                          <div className="bento-card-header">
-                            <span>🚰 Armatür Kombini</span>
-                            <div className="fixture-finish-toggles">
-                              {['Mat Siyah', 'Fırçalanmış Gold', 'Parlak Krom'].map(f => (
-                                <button
-                                  key={f}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setCustomFaucetFinish(f);
-                                  }}
-                                  className={`finish-chip ${currentFaucet === f ? 'active' : ''}`}
-                                >
-                                  {f}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                          <span className="bento-card-title">{activeCombo.fixture} ({currentFaucet})</span>
-                        </div>
-                      </div>
-
-                      {/* Bottom Action Footer */}
-                      <div className="bento-canvas-footer">
-                        <div className="footer-combo-info">
-                          <span className="footer-label">Seçili Konsept</span>
-                          <span className="footer-title">{activeCombo.styleName}</span>
-                        </div>
-                        
-                        <div className="footer-btns-group">
-                          <button
-                            onClick={() => handleTryMoodboard(activeCombo)}
-                            className="bento-action-btn-primary"
-                          >
-                            <Palette size={15} />
-                            <span>3D Stüdyoda Görselleştir</span>
-                            <ArrowRight size={13} />
-                          </button>
+                          ))}
                         </div>
                       </div>
                     </div>
-                  );
-                })()}
 
-              </div>
+                    {/* 4 Equal-Width Clean Light Material Cards */}
+                    <div className="studio-materials-grid">
+                      
+                      {/* Card 1: Ceramic Slab */}
+                      <div className="studio-material-card">
+                        <div className="card-header-tag">
+                          <span>01 / SERAMİK KROKİSİ</span>
+                          <span className="card-tag-mini">{activeCombo.tileFinish}</span>
+                        </div>
+                        <div className="studio-tile-img-box">
+                          <img 
+                            src={activeCombo.tileImg} 
+                            alt={activeCombo.tileName}
+                            onError={(e) => { e.target.src = '/textures/calacatta_gold.jpg'; }}
+                          />
+                        </div>
+                        <div className="material-details">
+                          <h5 className="material-name">{activeCombo.tileName}</h5>
+                          <p className="material-sub">Ebat: {activeCombo.tileSize}</p>
+                        </div>
+                      </div>
+
+                      {/* Card 2: Paint Swatch */}
+                      <div className="studio-material-card">
+                        <div className="card-header-tag">
+                          <span>02 / DUVAR BOYASI</span>
+                          <span className="card-tag-mini">{activeCombo.paintSheen}</span>
+                        </div>
+                        <div className="studio-paint-box">
+                          <div 
+                            className="studio-paint-swatch"
+                            style={{ background: activeCombo.paintColor }}
+                          />
+                        </div>
+                        <div className="material-details">
+                          <h5 className="material-name">{activeCombo.paintName}</h5>
+                          <p className="material-sub">Ton Kodu: {activeCombo.paintColor}</p>
+                        </div>
+                      </div>
+
+                      {/* Card 3: Furniture & Wood */}
+                      <div className="studio-material-card">
+                        <div className="card-header-tag">
+                          <span>03 / MOBİLYA DOKUSU</span>
+                          <span className="card-tag-mini">Entegre Ray</span>
+                        </div>
+                        <div className="studio-icon-box">
+                          <div className="wood-texture-icon" style={{ background: activeCombo.cabinetHex || '#5c4033' }} />
+                        </div>
+                        <div className="material-details">
+                          <h5 className="material-name">{activeCombo.cabinet}</h5>
+                          <p className="material-sub">{activeCombo.cabinetDetail}</p>
+                        </div>
+                      </div>
+
+                      {/* Card 4: Fixture Set */}
+                      <div className="studio-material-card">
+                        <div className="card-header-tag">
+                          <span>04 / ARMATÜR SETİ</span>
+                          <div className="fixture-chips-row">
+                            {['Mat Siyah', 'Gold', 'Krom'].map(f => (
+                              <button
+                                key={f}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setCustomFaucetFinish(f);
+                                }}
+                                className={`fixture-mini-chip ${currentFaucet.includes(f) ? 'active' : ''}`}
+                              >
+                                {f}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="studio-icon-box">
+                          <span style={{ fontSize: '1.4rem' }}>🚰</span>
+                        </div>
+                        <div className="material-details">
+                          <h5 className="material-name">{activeCombo.fixture}</h5>
+                          <p className="material-sub">Kaplama: {currentFaucet}</p>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* Bottom Architectural Specification & 3D Action Footer */}
+                    <div className="studio-board-footer">
+                      <div className="studio-spec-notes">
+                        <div className="spec-pill-group">
+                          <span className="spec-pill gold">✨ %{activeCombo.matchScore} Uyum Skoru</span>
+                          <span className="spec-pill">💡 Aydınlatma: {activeCombo.lighting || '3000K LED'}</span>
+                          <span className="spec-pill">📐 Derz: {activeCombo.groutColor || '1.5mm Fildişi'}</span>
+                        </div>
+                        <p className="architect-tip-text">
+                          <strong>İç Mimar Notu:</strong> {activeCombo.desc}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => handleTryMoodboard(activeCombo)}
+                        className="studio-3d-action-btn"
+                      >
+                        <Palette size={16} />
+                        <span>3D Stüdyoda Görselleştir</span>
+                        <ArrowRight size={14} />
+                      </button>
+                    </div>
+
+                  </div>
+                );
+              })()}
+
             </div>
 
             {/* Haftanın Ürünleri Section */}
