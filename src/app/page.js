@@ -40,7 +40,8 @@ import {
   Flame,
   Building2,
   Wrench,
-  Palette
+  Palette,
+  Shuffle
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -245,10 +246,10 @@ const DEFAULT_MOODBOARD_COMBOS = [
       slip: "R9 İç Mekan Parlak"
     },
     wallTile: {
-      name: "VitrA Calacatta Rölief 30x90 Dekor",
+      name: "VitrA Vista Bej 30x90 Rölief Dekor",
       size: "30x90 cm",
-      finish: "3D Rölief Çizgili Dokulu",
-      img: "/textures/calacatta_gold.jpg",
+      finish: "3D Rölief Çizgili İpek Dokulu",
+      img: "/textures/vista_bej.jpg",
       badge: "✨ UYUMLU DUVAR DEKORU",
       brand: "VitrA",
       price: "₺620 / m²"
@@ -278,22 +279,22 @@ const DEFAULT_MOODBOARD_COMBOS = [
         price: "₺740 / m²"
       },
       {
-        name: "VitrA Marmori Calacatta 80x160",
-        size: "80x160 cm",
-        finish: "Parlak Cilalı Porselen Plaka",
-        img: "/textures/calacatta_gold.jpg",
-        badge: "✨ YENİ SEZON",
-        brand: "VitrA",
-        price: "₺890 / m²"
-      },
-      {
-        name: "Bien Seramik Royal Calacatta 60x120",
+        name: "Bien Seramik Travertino Bej 60x120",
         size: "60x120 cm",
         finish: "İpek Mat Lappato",
-        img: "/textures/vista_bej.jpg",
-        badge: "🔥 SPONSORLU TREND",
+        img: "/textures/travertino_classico.jpg",
+        badge: "✨ YENİ SEZON",
         brand: "BIEN SERAMİK",
-        price: "₺650 / m²"
+        price: "₺680 / m²"
+      },
+      {
+        name: "Graniser Concrete Grey 80x80",
+        size: "80x80 cm",
+        finish: "Mat Beton Dokulu Porselen",
+        img: "/textures/concrete_light_grey.jpg",
+        badge: "🔥 SPONSORLU TREND",
+        brand: "GRANİSER",
+        price: "₺610 / m²"
       }
     ],
     tileName: "NG Kütahya Calacatta Gold 60x120",
@@ -3462,6 +3463,26 @@ export default function Home() {
                     >
                       <Sparkles size={13} />
                       <span>{aiGeneratingCombo ? 'Üretiliyor...' : 'AI Analiz Et'}</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setAiGeneratingCombo(true);
+                        setTimeout(() => {
+                          const count = moodboardCombos.length || 4;
+                          let nextRandom = Math.floor(Math.random() * count);
+                          if (nextRandom === selectedMoodIndex) nextRandom = (selectedMoodIndex + 1) % count;
+                          setSelectedMoodIndex(nextRandom);
+                          setActiveTileIndex(Math.floor(Math.random() * 3));
+                          setAiGeneratingCombo(false);
+                        }, 250);
+                      }}
+                      className="prompt-submit-btn"
+                      style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: '#ffffff' }}
+                      disabled={aiGeneratingCombo}
+                      title="Farklı rastgele bir seramik kombinasyonu seç"
+                    >
+                      <Shuffle size={13} />
+                      <span>Rastgele Kombin Seç</span>
                     </button>
                   </div>
 
