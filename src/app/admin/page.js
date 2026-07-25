@@ -893,14 +893,24 @@ export default function AdminPage() {
     }
   }, [adminProductsFilterBrand, adminProductsFilterStyle, adminProductsFilterFinish]);
 
-  // Login handler
-  const handleLogin = (e) => {
+  // Login handler - calls real API to set HTTP-only session cookie
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
-    if (username === 'admin' && password === 'admin123') {
-      setIsLoggedIn(true);
-    } else {
-      setLoginError('Hatalı kullanıcı adı veya şifre.');
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, role: 'admin' })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsLoggedIn(true);
+      } else {
+        setLoginError(data.error || 'Hatalı kullanıcı adı veya şifre.');
+      }
+    } catch (err) {
+      setLoginError('Sunucu bağlantı hatası.');
     }
   };
 
