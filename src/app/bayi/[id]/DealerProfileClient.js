@@ -47,6 +47,7 @@ export default function DealerProfileClient({ dealer, products }) {
 
   const images = dealer.showroomImages ? dealer.showroomImages.split(',').filter(Boolean) : [];
   const concepts = dealer.specialConcepts ? dealer.specialConcepts.split(',').filter(Boolean) : [];
+  const bannerBgImage = dealer.bannerUrl || (images.length > 0 ? images[0] : '/images/dealer-banner-default.jpg');
 
   const safeParseJSON = (str, fallback) => {
     if (!str) return fallback;
@@ -183,8 +184,15 @@ export default function DealerProfileClient({ dealer, products }) {
       {/* Main Container */}
       <div className="profile-main-container">
         
-        {/* Profile Card & Info Header — PREMIUM HERO */}
-        <div className="profile-banner-card animate-fade-in">
+        {/* Profile Card & Info Header — PREMIUM CINEMATIC HERO */}
+        <div 
+          className="profile-banner-card animate-fade-in"
+          style={{
+            backgroundImage: `linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.85) 60%, rgba(15, 23, 42, 0.95) 100%), url('${bannerBgImage}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
           <div className="profile-banner-info">
             <div className="profile-logo-box">
               {dealer.logoUrl ? (
@@ -194,12 +202,12 @@ export default function DealerProfileClient({ dealer, products }) {
               )}
             </div>
             <div className="profile-text-group">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <div className="profile-badges-row">
                 <span className="profile-badge">
                   {dealer.brand?.name || 'QUA Granite'} YETKİLİ SATICISI
                 </span>
                 <span className="verified-badge">
-                  <ShieldCheck size={12} />
+                  <ShieldCheck size={14} />
                   Onaylı Bayi
                 </span>
               </div>
@@ -231,19 +239,27 @@ export default function DealerProfileClient({ dealer, products }) {
           {/* Stats Row */}
           <div className="hero-stats">
             <div className="hero-stat-item">
-              <Award size={20} />
-              <span className="stat-number">10+</span>
-              <span className="stat-label">Yıllık Deneyim</span>
+              <Award size={20} className="stat-icon" />
+              <div className="hero-stat-content">
+                <span className="stat-number">10+ Yıl</span>
+                <span className="stat-label">Deneyim</span>
+              </div>
             </div>
+            <div className="hero-stat-divider" />
             <div className="hero-stat-item">
-              <TrendingUp size={20} />
-              <span className="stat-number">500+</span>
-              <span className="stat-label">Mutlu Müşteri</span>
+              <TrendingUp size={20} className="stat-icon" />
+              <div className="hero-stat-content">
+                <span className="stat-number">500+</span>
+                <span className="stat-label">Mutlu Müşteri</span>
+              </div>
             </div>
+            <div className="hero-stat-divider" />
             <div className="hero-stat-item">
-              <Building2 size={20} />
-              <span className="stat-number">200m²</span>
-              <span className="stat-label">Showroom</span>
+              <Building2 size={20} className="stat-icon" />
+              <div className="hero-stat-content">
+                <span className="stat-number">200 m²</span>
+                <span className="stat-label">Showroom</span>
+              </div>
             </div>
           </div>
           

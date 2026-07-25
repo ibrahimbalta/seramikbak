@@ -90,6 +90,7 @@ model Dealer {
 
   // Showroom & Profile Customizations
   logoUrl         String?
+  bannerUrl       String? // Custom hero banner background image URL
   showroomImages  String? // Comma-separated string of image URLs
   virtualTourUrl  String? // 3D Showroom / Virtual Tour Link (Matterport, 360 etc.)
   specialConcepts String? // Special concepts showcased in showroom
