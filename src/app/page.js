@@ -3632,14 +3632,20 @@ export default function Home() {
                       <div className="studio-material-card">
                         <div className="card-header-tag">
                           <span>03 / DERZ & YAPI KİMYASALI</span>
-                          <span className="card-tag-mini">{activeCombo?.grout?.width || '1.5mm Derz'}</span>
+                          <span className="tile-badge-overlay">{activeCombo?.grout?.width || '1.5mm Derz'}</span>
                         </div>
                         <div className="studio-grout-box">
-                          <div 
-                            className="studio-grout-swatch-circle"
-                            style={{ background: activeCombo?.grout?.hex || '#eae6df' }}
-                          />
-                          <span className="grout-color-name">{activeCombo?.grout?.color}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div 
+                              className="studio-grout-swatch-circle"
+                              style={{ background: activeCombo?.grout?.hex || '#eae6df' }}
+                              title={`Derz Rengi: ${activeCombo?.grout?.color}`}
+                            />
+                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                              <span className="grout-color-name">{activeCombo?.grout?.color || 'Derz Renk Tonu'}</span>
+                              <span style={{ fontSize: '0.6rem', color: '#94a3b8' }}>Uyumlu Derz Çizgisi</span>
+                            </div>
+                          </div>
                         </div>
                         <div className="material-details">
                           <h5 className="material-name">{activeCombo?.grout?.name}</h5>
@@ -3667,8 +3673,13 @@ export default function Home() {
                           </div>
                         </div>
                         <div className="studio-complement-box">
-                          <div className="wood-texture-icon" style={{ background: activeCombo?.complement?.cabinetHex || '#5c4033' }} />
-                          <div className="fixture-finish-badge">🚰 {currentFaucet}</div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div className="wood-texture-icon" style={{ background: activeCombo?.complement?.cabinetHex || '#5c4033' }} title="Mobilya Dokusu" />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                              <div className="fixture-finish-badge">🚰 {currentFaucet}</div>
+                              <span style={{ fontSize: '0.6rem', color: '#94a3b8' }}>Seçili Armatür Stili</span>
+                            </div>
+                          </div>
                         </div>
                         <div className="material-details">
                           <h5 className="material-name">{activeCombo?.complement?.cabinet}</h5>
