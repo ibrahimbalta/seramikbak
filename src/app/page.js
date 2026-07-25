@@ -125,34 +125,59 @@ function generateMoodboardFromProduct(product, index) {
   const tileName = product.name || 'Premium Seramik';
   const tileSize = product.dimensions || '60x120 cm';
   const tileImg = product.imageUrl || '/textures/calacatta_gold.jpg';
+  const brandName = product.brand?.name || 'SeramikBak';
+  const priceVal = product.price ? `₺${product.price} / m²` : `₺${480 + (index * 65)} / m²`;
   
   const lowerName = tileName.toLowerCase();
   const style = (product.style || '').toLowerCase();
   const color = (product.color || '').toLowerCase();
+
+  // Complementary wall texture choices (guaranteed distinct from floor tileImg!)
+  const wallTextures = [
+    '/textures/vista_bej.jpg',
+    '/textures/albatros_antrasit.jpg',
+    '/textures/travertino_classico.jpg',
+    '/textures/natural_oak.jpg',
+    '/textures/concrete_light_grey.jpg'
+  ];
+  let wallImg = wallTextures[(index + 1) % wallTextures.length];
+  if (wallImg === tileImg) wallImg = wallTextures[(index + 2) % wallTextures.length];
   
   let cabinet = "Ada Çayı Yeşili / Klasik Country Banyo Dolabı";
   let paintName = "Jotun 12078 Kum Fırtınası Boya";
   let paintColor = "#eae6df";
   let fixture = "Klasik Parlak Krom Armatür Takımı";
+  let fixtureBadge = "Parlak Krom";
   let moodBg = "linear-gradient(135deg, #eae6df 0%, #cbd5e1 100%)";
   let accentColor = "#1e3a8a";
   let cabinetHex = "#4c6a5a";
   let faucetVal = "chrome";
-  let styleName = "Klasik Elegans";
+  let styleName = `${brandName} ${product.name?.split(' ')[0] || 'Klasik'} Elegans`;
   let tagline = "Zamansız ve Ferah Yaşam Alanları";
-  let desc = `Seçkin ${tileName} seramik kaplamasını, klasik sage dolap ve parlak krom armatürlerle birleştirerek zarif ve temiz görünümlü bir banyo tasarlayın.`;
+  let styleBadge = "✨ ÖZEL KONSEPT";
+  let category = "banyo";
+  let groutName = "Weber Flex Fildişi Esnek Derz Dolgusu";
+  let groutColor = "Fildişi Bej (#EAE6DF)";
+  let groutHex = "#eae6df";
+  let desc = `Seçkin ${tileName} seramik kaplamasını, uyumlu duvar dekoru ve parlak krom armatürlerle birleştirerek zarif ve temiz görünümlü bir banyo tasarlayın.`;
 
   if (lowerName.includes('calacatta') || lowerName.includes('altın') || lowerName.includes('gold') || color.includes('bej') || (style.includes('mermer') && lowerName.includes('gold'))) {
     cabinet = "Doğal Budaklı Meşe Banyo Dolabı";
     paintName = "Jotun 1024 Kum Beji Duvar Boyası";
     paintColor = "#dfdcd3";
     fixture = "Mat Siyah Batarya & Duş Seti";
+    fixtureBadge = "Mat Siyah";
     moodBg = "linear-gradient(135deg, #dfdcd3 0%, #d4af37 100%)";
     accentColor = "#d4af37";
     cabinetHex = "#5c4033";
     faucetVal = "black";
-    styleName = `Lüks ${product.brand?.name || 'Seramik'} & Gold`;
-    tagline = "Modern, Şık ve Zengin Banyolar";
+    styleName = `Lüks ${brandName} & Gold`;
+    tagline = "Modern, Şık ve Zengin Mimariler";
+    styleBadge = "👑 PREMİUM MARBLE";
+    category = "banyo";
+    groutName = "Weber Flex Fildişi Esnek Derz Dolgusu";
+    groutColor = "Fildişi Bej (#EAE6DF)";
+    groutHex = "#eae6df";
     desc = `${tileName} seramiği, meşe dolabın doğal sıcaklığı ile dengelerken, mat siyah armatürlerle modern ve keskin çizgiler sunar.`;
   } 
   else if (lowerName.includes('antrasit') || lowerName.includes('siyah') || lowerName.includes('beton') || color.includes('gri') || lowerName.includes('cement') || lowerName.includes('sement') || lowerName.includes('dark')) {
@@ -160,12 +185,18 @@ function generateMoodboardFromProduct(product, index) {
     paintName = "Jotun 1032 Sis Grisi Duvar Boyası";
     paintColor = "#abb2b9";
     fixture = "Fırçalanmış Gold Batarya Seti";
+    fixtureBadge = "Gold";
     moodBg = "linear-gradient(135deg, #333333 0%, #b38e47 100%)";
     accentColor = "#b38e47";
     cabinetHex = "#1a1a1a";
     faucetVal = "gold";
-    styleName = `Endüstriyel ${product.brand?.name || 'Loft'} & Antrasit`;
+    styleName = `Endüstriyel ${brandName} & Antrasit`;
     tagline = "Minimalist, Maskülen ve Güçlü Karakter";
+    styleBadge = "🏙️ LOFT BETON";
+    category = "banyo";
+    groutName = "Ceresit Koyu Antrasit Derz Dolgusu";
+    groutColor = "Koyu Antrasit (#292524)";
+    groutHex = "#292524";
     desc = `Koyu renk beton veya taş dokulu ${tileName} seramiğinin soğuk duruşunu fırçalanmış altın (gold) bataryanın parlaklığı ile canlandırın.`;
   }
   else if (lowerName.includes('meşe') || lowerName.includes('ahşap') || lowerName.includes('oak') || lowerName.includes('wood') || style.includes('ahşap') || color.includes('kahve')) {
@@ -173,24 +204,99 @@ function generateMoodboardFromProduct(product, index) {
     paintName = "Jotun 1622 Fildişi Beyazı Boya";
     paintColor = "#f4f3ef";
     fixture = "Krom veya Fırçalanmış Çelik Armatür";
+    fixtureBadge = "Krom";
     moodBg = "linear-gradient(135deg, #f4f3ef 0%, #c2a688 100%)";
     accentColor = "#c2a688";
     cabinetHex = "#ffffff";
     faucetVal = "chrome";
-    styleName = `Doğal İskandinav & Ahşap`;
+    styleName = `Doğal ${brandName} & Ahşap`;
     tagline = "Huzurlu ve Dingin Yaşam Alanları";
-    desc = `Ahşap dokulu ${tileName} seramiğinin sıcaklığını mat beyaz düz yüzeylerle birleştirin. Dingin, minimalist ve aydınlık bir İskandinav atmosferi yaratır.`;
+    styleBadge = "🍃 JAPANDİ AHŞAP";
+    category = "salon";
+    groutName = "Kalekim Açık Meşe Rengi Derz Dolgusu";
+    groutColor = "Açık Meşe (#C2A688)";
+    groutHex = "#c2a688";
+    desc = `Ahşap dokulu ${tileName} seramiğinin sıcaklığını mat beyaz düz yüzeylerle birleştirin. Dingin, minimalist ve aydınlık bir atmosfer yaratır.`;
   }
+
+  const floorTile = {
+    name: tileName,
+    size: tileSize,
+    finish: product.finish || "Full Lappato Parlak Cilalı",
+    img: tileImg,
+    badge: index % 2 === 0 ? "👑 PREMİUM KOLEKSİYON" : "🔥 SPONSORLU TREND",
+    brand: brandName,
+    price: priceVal,
+    pei: product.peiRating || "PEI 4 (Yüksek Yoğunluk)",
+    slip: product.slipRating || "R10 Kaymaz Yüzey"
+  };
+
+  const wallTile = {
+    name: `${brandName} ${product.name?.split(' ')[0] || 'Moda'} 3D Rölief Dekor`,
+    size: "30x90 cm",
+    finish: "3D Rölief Çizgili İpek Dokulu",
+    img: wallImg,
+    badge: "✨ UYUMLU DUVAR DEKORU",
+    brand: brandName,
+    price: `₺${Math.max(340, parseInt(priceVal.replace(/[^0-9]/g, '') || '500') - 110)} / m²`
+  };
+
+  const grout = {
+    name: groutName,
+    color: groutColor,
+    width: "1.5 mm Derz Aralığı",
+    type: "Küf & Su İtici Derz",
+    hex: groutHex
+  };
+
+  const complement = {
+    name: `${cabinet.split(' ')[0]} & ${fixtureBadge}`,
+    cabinet,
+    cabinetHex,
+    fixture,
+    fixtureBadge
+  };
+
+  const tiles = [
+    floorTile,
+    {
+      name: `${brandName} Vista ${product.name?.split(' ')[0] || 'Plaka'} 80x160`,
+      size: "80x160 cm",
+      finish: "İpek Mat Lappato Porselen",
+      img: wallImg,
+      badge: "✨ YENİ SEZON",
+      brand: brandName,
+      price: priceVal
+    },
+    {
+      name: `${brandName} Travertino Romano 60x120`,
+      size: "60x120 cm",
+      finish: "Doğal Dokulu Porselen",
+      img: "/textures/travertino_classico.jpg",
+      badge: "🔥 TREND",
+      brand: brandName,
+      price: "₺510 / m²"
+    }
+  ];
 
   return {
     id: index,
+    category,
     styleName,
     tagline,
+    styleBadge,
+    matchScore: 95 + (index % 5),
+    floorTile,
+    wallTile,
+    grout,
+    complement,
+    tiles,
     tileName,
     tileSize,
     tileImg,
     cabinet,
     fixture,
+    fixtureBadge,
     paintName,
     paintColor,
     moodBg,
@@ -198,6 +304,9 @@ function generateMoodboardFromProduct(product, index) {
     cabinetHex,
     faucetVal,
     desc,
+    colorPalette: [cabinetHex, groutHex, accentColor, "#ffffff", "#0f172a"],
+    lighting: "3000K Sıcak Beyaz LED Spot",
+    groutColor,
     product
   };
 }
@@ -1430,6 +1539,10 @@ export default function Home() {
           setActiveProduct(sortedData[0]);
           setStudioFloorProduct(sortedData[0]);
           setStudioWallProduct(sortedData[0]);
+        }
+        if (sortedData.length >= 2) {
+          const generated = sortedData.slice(0, 8).map((p, idx) => generateMoodboardFromProduct(p, idx));
+          setMoodboardCombos(generated);
         }
       }
 
@@ -3468,21 +3581,29 @@ export default function Home() {
                       onClick={() => {
                         setAiGeneratingCombo(true);
                         setTimeout(() => {
-                          const count = moodboardCombos.length || 4;
-                          let nextRandom = Math.floor(Math.random() * count);
-                          if (nextRandom === selectedMoodIndex) nextRandom = (selectedMoodIndex + 1) % count;
-                          setSelectedMoodIndex(nextRandom);
-                          setActiveTileIndex(Math.floor(Math.random() * 3));
+                          if (products && products.length >= 2) {
+                            const shuffled = [...products].sort(() => 0.5 - Math.random());
+                            const generated = shuffled.slice(0, 8).map((p, idx) => generateMoodboardFromProduct(p, idx));
+                            setMoodboardCombos(generated);
+                            setSelectedMoodIndex(0);
+                            setActiveTileIndex(0);
+                          } else {
+                            const count = moodboardCombos.length || 4;
+                            let nextRandom = Math.floor(Math.random() * count);
+                            if (nextRandom === selectedMoodIndex) nextRandom = (selectedMoodIndex + 1) % count;
+                            setSelectedMoodIndex(nextRandom);
+                            setActiveTileIndex(Math.floor(Math.random() * 3));
+                          }
                           setAiGeneratingCombo(false);
                         }, 250);
                       }}
                       className="prompt-submit-btn"
                       style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: '#ffffff' }}
                       disabled={aiGeneratingCombo}
-                      title="Farklı rastgele bir seramik kombinasyonu seç"
+                      title="Tüm veritabanından rastgele yeni seramik kombinasyonları üret"
                     >
                       <Shuffle size={13} />
-                      <span>Rastgele Kombin Seç</span>
+                      <span>🎲 Rastgele Kombin Üret</span>
                     </button>
                   </div>
 
