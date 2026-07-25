@@ -228,71 +228,128 @@ const heroSlides = [
 const DEFAULT_MOODBOARD_COMBOS = [
   {
     id: 0,
+    category: "banyo",
     styleName: "Lüks Calacatta & Gold",
     tagline: "Modern, Şık ve Zengin Banyolar",
+    styleBadge: "✨ Lüks Mermer",
+    matchScore: 98,
     tileName: "Calacatta Gold Parlak Seramik",
     tileSize: "60x120 cm",
+    tileFinish: "Parlak Cilalı (Full Lappato)",
     tileImg: "/textures/calacatta_gold.jpg",
     cabinet: "Doğal Budaklı Meşe Banyo Dolabı",
+    cabinetDetail: "Gizli Kulpsuz & Yavaş Kapanır Sürgü",
     fixture: "Mat Siyah Batarya & Duş Seti",
+    fixtureBadge: "Mat Siyah",
     paintName: "Jotun 1024 Kum Beji Duvar Boyası",
     paintColor: "#dfdcd3",
-    moodBg: "linear-gradient(135deg, #dfdcd3 0%, #d4af37 100%)",
+    paintSheen: "Mat İpek Dokulu",
+    moodBg: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
     accentColor: "#d4af37",
     cabinetHex: "#5c4033",
     faucetVal: "black",
+    colorPalette: ["#dfdcd3", "#5c4033", "#1e293b", "#d4af37", "#ffffff"],
     desc: "Altın damarlı Calacatta seramiği, meşe dolabın doğal sıcaklığı ile dengelerken, mat siyah armatürlerle modern ve keskin çizgiler sunar."
   },
   {
     id: 1,
+    category: "banyo",
     styleName: "Endüstriyel Loft & Antrasit",
     tagline: "Minimalist, Maskülen ve Güçlü Karakter",
+    styleBadge: "🏙️ Loft & Beton",
+    matchScore: 96,
     tileName: "Sement Antrasit Beton Görünümlü",
     tileSize: "60x60 cm",
-    tileImg: "/textures/cement_dark.jpg",
-    cabinet: "Mat Siyah & Metal Detaylı Endüstriyel Ünite",
+    tileFinish: "Mat R10 Anti-slip",
+    tileImg: "/textures/loft_beton.jpg",
+    cabinet: "Mat Siyah & Metal Detaylı Ünite",
+    cabinetDetail: "Statik Toz Boyalı Çelik Çerçeve",
     fixture: "Fırçalanmış Gold Batarya Seti",
+    fixtureBadge: "Fırçalanmış Gold",
     paintName: "Jotun 1032 Sis Grisi Duvar Boyası",
     paintColor: "#abb2b9",
-    moodBg: "linear-gradient(135deg, #333333 0%, #b38e47 100%)",
+    paintSheen: "Yarı Mat Yıkanabilir",
+    moodBg: "linear-gradient(135deg, #1e1e24 0%, #2b2d42 100%)",
     accentColor: "#b38e47",
     cabinetHex: "#1a1a1a",
     faucetVal: "gold",
+    colorPalette: ["#abb2b9", "#1a1a1a", "#b38e47", "#333333", "#f8fafc"],
     desc: "Koyu renk beton dokulu seramiğin soğuk duruşunu fırçalanmış altın (gold) bataryanın parlaklığı ile canlandırın. Mat siyah dolaplarla loft estetiğini tamamlayın."
   },
   {
     id: 2,
+    category: "salon",
     styleName: "Sıcak İskandinav & Ahşap",
     tagline: "Doğal, Dingin ve Huzurlu Yaşam Alanları",
+    styleBadge: "🍃 Japandi & Ahşap",
+    matchScore: 99,
     tileName: "Nordic Meşe Ahşap Görünümlü Seramik",
     tileSize: "20x120 cm",
-    tileImg: "/textures/oak_wood.jpg",
+    tileFinish: "Doğal Ahşap Dokulu Mat",
+    tileImg: "/textures/natural_oak.jpg",
     cabinet: "Mat Beyaz / Minimal Kulpsuz Dolaplar",
+    cabinetDetail: "Lake Kaplama & Dokunmatik Açılır",
     fixture: "Krom veya Fırçalanmış Çelik Armatür",
+    fixtureBadge: "Fırçalanmış Çelik",
     paintName: "Jotun 1622 Fildişi Beyazı Boya",
     paintColor: "#f4f3ef",
-    moodBg: "linear-gradient(135deg, #f4f3ef 0%, #c2a688 100%)",
+    paintSheen: "Ekstra Mat Su Bazlı",
+    moodBg: "linear-gradient(135deg, #2d3748 0%, #1a202c 100%)",
     accentColor: "#c2a688",
     cabinetHex: "#ffffff",
     faucetVal: "chrome",
+    colorPalette: ["#f4f3ef", "#c2a688", "#5c4033", "#cbd5e1", "#ffffff"],
     desc: "Ahşap dokulu parke seramiğin sıcaklığını mat beyaz düz yüzeylerle birleştirin. Dingin, minimalist ve aydınlık bir İskandinav atmosferi yaratır."
   },
   {
     id: 3,
+    category: "banyo",
     styleName: "Klasik Carrara & Krom",
     tagline: "Zamansız Elegans ve Ferahlık",
+    styleBadge: "🏛️ Neo-Klasik",
+    matchScore: 97,
     tileName: "Carrara Beyaz Cilalı Mermer Seramik",
     tileSize: "60x120 cm",
-    tileImg: "/textures/carrara_white.jpg",
-    cabinet: "Ada Çayı Yeşili / Klasik Country Banyo Dolabı",
+    tileFinish: "Parlak Mermer Dokulu",
+    tileImg: "/textures/calacatta_gold.jpg",
+    cabinet: "Ada Çayı Yeşili Country Dolap",
+    cabinetDetail: "Pirinç Çerçeveli Cam Kapaklar",
     fixture: "Klasik Parlak Krom Armatür Takımı",
+    fixtureBadge: "Parlak Krom",
     paintName: "Jotun 12078 Kum Fırtınası Boya",
     paintColor: "#eae6df",
-    moodBg: "linear-gradient(135deg, #eae6df 0%, #cbd5e1 100%)",
-    accentColor: "#1e3a8a",
+    paintSheen: "İpek Mat Nem Dayanımlı",
+    moodBg: "linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)",
+    accentColor: "#38bdf8",
     cabinetHex: "#4c6a5a",
     faucetVal: "chrome",
+    colorPalette: ["#eae6df", "#4c6a5a", "#38bdf8", "#1e293b", "#ffffff"],
     desc: "Kültleşmiş beyaz Carrara mermerinin ferahlığını pastel yeşil tonlarında country tarzı bir banyo dolabı ve klasik parlak krom bataryalar ile taçlandırın."
+  },
+  {
+    id: 4,
+    category: "mutfak",
+    styleName: "Organik Traverten Mutfak",
+    tagline: "Huzurlu, Sıcak ve Modern Mutfaklar",
+    styleBadge: "🍳 Modern Mutfak",
+    matchScore: 99,
+    tileName: "Travertino Bej Doğal Taş Seramik",
+    tileSize: "60x120 cm",
+    tileFinish: "Doğal Taş Dokulu Mat Yüzey",
+    tileImg: "/textures/travertino_classico.jpg",
+    cabinet: "Ceviz Ağacı Varaklı Mutfak Ünitesi",
+    cabinetDetail: "Entegre LED Aydınlatmalı Raflar",
+    fixture: "Fırçalanmış Pirinç Tezgah Armatürü",
+    fixtureBadge: "Fırçalanmış Pirinç",
+    paintName: "Jotun 12125 Susam Beyazı Boya",
+    paintColor: "#ede8dd",
+    paintSheen: "Yıkanabilir Mutfak Boyası",
+    moodBg: "linear-gradient(135deg, #1c1917 0%, #292524 100%)",
+    accentColor: "#eab308",
+    cabinetHex: "#4a3525",
+    faucetVal: "gold",
+    colorPalette: ["#ede8dd", "#4a3525", "#eab308", "#1c1917", "#ffffff"],
+    desc: "Traverten seramiğin huzur veren dokusunu koyu ceviz mobilya ve fırçalanmış pirinç tezgah bataryası ile buluşturarak gurme bir mutfak alanı tasarlayın."
   }
 ];
 
@@ -347,6 +404,8 @@ export default function Home() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedMoodIndex, setSelectedMoodIndex] = useState(0);
   const [moodboardCombos, setMoodboardCombos] = useState(DEFAULT_MOODBOARD_COMBOS);
+  const [moodboardCategory, setMoodboardCategory] = useState('all');
+  const [aiGeneratingCombo, setAiGeneratingCombo] = useState(false);
 
   // Product Comparison Wizard States
   const [comparedProducts, setComparedProducts] = useState([]);
@@ -3106,7 +3165,6 @@ export default function Home() {
             <div className="brand-marquee-section">
               <div className="brand-marquee-container">
                 <div className="brand-marquee-track">
-                  {/* First set of brands */}
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>NG KÜTAHYA SERAMİK</div>
                   <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)', letterSpacing: '0.1em' }}>BIEN SERAMİK</div>
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>EGE SERAMİK</div>
@@ -3115,267 +3173,216 @@ export default function Home() {
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.08em', fontWeight: '800' }}>QUA GRANITE</div>
                   <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)' }}>YURTBAY SERAMİK</div>
                   <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>ÇANAKKALE SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ fontWeight: '800', letterSpacing: '0.12em' }}>HİTİT SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--text-muted)' }}>TERMAL SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>UŞAK SERAMİK</div>
-
-                  {/* Duplicate set for infinite loop */}
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>NG KÜTAHYA SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)', letterSpacing: '0.1em' }}>BIEN SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>EGE SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ fontWeight: '900', fontStyle: 'italic' }}>VitrA</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em', color: '#0f172a' }}>GÜRAL SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.08em', fontWeight: '800' }}>QUA GRANITE</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--accent-gold)' }}>YURTBAY SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>ÇANAKKALE SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ fontWeight: '800', letterSpacing: '0.12em' }}>HİTİT SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ color: 'var(--text-muted)' }}>TERMAL SERAMİK</div>
-                  <div className="brand-marquee-item" style={{ letterSpacing: '0.05em' }}>UŞAK SERAMİK</div>
                 </div>
               </div>
             </div>
 
             {/* -------------------- AI MOODBOARD INTERIOR DESIGN ASSISTANT -------------------- */}
             <div className="moodboard-container glass-panel">
-              {/* Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--border-color)', paddingBottom: '18px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{
-                    background: 'rgba(179, 142, 71, 0.1)',
-                    color: 'var(--accent-gold)',
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <Sparkles size={20} className="badge-icon-gold" />
+              {/* Header Bar with Category Filters */}
+              <div className="moodboard-header-wrapper">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div className="moodboard-sparkle-icon">
+                    <Sparkles size={22} className="badge-icon-gold" />
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: '850', color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <h3 className="moodboard-heading-title">
                       AI İç Mimari Kombin Asistanı & Moodboard
                     </h3>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px', margin: 0 }}>
-                      Seçtiğiniz seramik modellerine en uygun banyo dolabı, boya ve armatür kombinasyonlarını inceleyin.
+                    <p className="moodboard-heading-sub">
+                      Yapay zeka desteğiyle seramiklerinize kusursuz uyum sağlayan banyo mobilyası, duvar boyası ve armatür paletlerini keşfedin.
                     </p>
                   </div>
                 </div>
-                <span style={{
-                  fontSize: '0.65rem',
-                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                  color: '#000',
-                  padding: '4px 10px',
-                  borderRadius: '12px',
-                  fontWeight: '700',
-                  letterSpacing: '0.05em'
-                }}>
-                  ✨ AI TASARIM
-                </span>
+
+                {/* Category Pills & AI Generate Button */}
+                <div className="moodboard-category-tabs">
+                  {[
+                    { key: 'all', label: 'Tüm Alanlar' },
+                    { key: 'banyo', label: '🛁 Banyo' },
+                    { key: 'mutfak', label: '🍳 Mutfak' },
+                    { key: 'salon', label: '🛋️ Salon' }
+                  ].map(cat => (
+                    <button
+                      key={cat.key}
+                      onClick={() => setMoodboardCategory(cat.key)}
+                      className={`mood-cat-tab ${moodboardCategory === cat.key ? 'active' : ''}`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                  
+                  <button 
+                    onClick={() => {
+                      setAiGeneratingCombo(true);
+                      setTimeout(() => {
+                        const available = moodboardCategory === 'all' 
+                          ? moodboardCombos 
+                          : moodboardCombos.filter(c => c.category === moodboardCategory);
+                        const currentIdx = available.findIndex(c => c.id === selectedMoodIndex);
+                        const nextItem = available[(currentIdx + 1) % available.length] || available[0];
+                        if (nextItem) setSelectedMoodIndex(nextItem.id);
+                        setAiGeneratingCombo(false);
+                      }, 400);
+                    }}
+                    className="mood-generate-btn"
+                    disabled={aiGeneratingCombo}
+                  >
+                    <Sparkles size={14} />
+                    <span>{aiGeneratingCombo ? 'Kombin Üretiliyor...' : '✨ AI Rastgele Kombin'}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Layout Grid */}
               <div className="moodboard-grid">
                 
-                {/* Left Side: Style Selector Controls */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Tasarım Konsepti Seçin
+                {/* Left Side: Style Selector List */}
+                <div className="moodboard-left-panel">
+                  <span className="moodboard-panel-label">
+                    Tasarım Konsepti Seçin ({moodboardCombos.filter(c => moodboardCategory === 'all' || c.category === moodboardCategory).length})
                   </span>
                   
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {moodboardCombos.map((combo) => {
-                      const isActive = selectedMoodIndex === combo.id;
-                      return (
-                        <button
-                          key={combo.id}
-                          onClick={() => setSelectedMoodIndex(combo.id)}
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'flex-start',
-                            padding: '16px',
-                            borderRadius: '12px',
-                            border: isActive ? '1px solid var(--accent-gold)' : '1px solid var(--border-color)',
-                            background: isActive ? 'rgba(179, 142, 71, 0.04)' : '#f8fafc',
-                            cursor: 'pointer',
-                            textAlign: 'left',
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
-                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: isActive ? 'var(--accent-gold)' : '#cbd5e1' }} />
-                            <span style={{ fontSize: '0.88rem', fontWeight: '800', color: isActive ? 'var(--accent-gold)' : 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '240px' }}>
-                              {combo.styleName}
-                            </span>
-                          </div>
-                          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px', paddingLeft: '16px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '240px' }}>
-                            {combo.tagline}
-                          </span>
-                        </button>
-                      );
-                    })}
+                  <div className="moodboard-selector-list scrollbar-hidden">
+                    {moodboardCombos
+                      .filter(c => moodboardCategory === 'all' || c.category === moodboardCategory)
+                      .map((combo) => {
+                        const isActive = selectedMoodIndex === combo.id;
+                        return (
+                          <button
+                            key={combo.id}
+                            onClick={() => setSelectedMoodIndex(combo.id)}
+                            className={`mood-select-card ${isActive ? 'active' : ''}`}
+                          >
+                            <div className="mood-select-card-header">
+                              <span className="mood-style-badge">{combo.styleBadge || '✨ Lüks'}</span>
+                              <span className="mood-score-badge">%{combo.matchScore || 98} AI Uyum</span>
+                            </div>
+                            <h4 className="mood-style-title">{combo.styleName}</h4>
+                            <p className="mood-style-tagline">{combo.tagline}</p>
+                          </button>
+                        );
+                      })}
                   </div>
 
-                  {/* Active Description Box */}
-                  <div style={{ background: '#f8fafc', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '16px', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginTop: 'auto' }}>
-                    <h5 style={{ fontSize: '0.82rem', fontWeight: '800', color: 'var(--text-primary)', margin: '0 0 6px 0' }}>İç Mimarın Önerisi</h5>
-                    {moodboardCombos[selectedMoodIndex]?.desc}
-                  </div>
+                  {/* Active Interior Design Tip Box */}
+                  {moodboardCombos.find(c => c.id === selectedMoodIndex) && (
+                    <div className="moodboard-designer-tip-box">
+                      <div className="tip-header">
+                        <Sparkles size={14} style={{ color: 'var(--accent-gold)' }} />
+                        <span>İç Mimarın Önerisi</span>
+                      </div>
+                      <p>{moodboardCombos.find(c => c.id === selectedMoodIndex)?.desc}</p>
+                    </div>
+                  )}
                 </div>
 
-                {/* Right Side: Virtual Collage Moodboard Display */}
-                <div style={{
-                  background: moodboardCombos[selectedMoodIndex]?.moodBg || 'var(--bg-secondary)',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  minHeight: '340px',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  boxShadow: 'inset 0 0 80px rgba(0,0,0,0.1)'
-                }}>
-                  {/* Backdrop glass elements mimicking real moodboard stack */}
-                  <div className="moodboard-cards-wrap">
-                    
-                    {/* Material 1: Ceramic Slab */}
-                    <div style={{
-                      background: '#ffffff',
-                      border: '1px solid rgba(255,255,255,0.2)',
-                      borderRadius: '12px',
-                      padding: '12px',
-                      width: '160px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '8px',
-                      boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-                      backdropFilter: 'blur(10px)',
-                      transform: 'rotate(-2deg)'
-                    }}>
-                      <div style={{ height: '90px', borderRadius: '8px', overflow: 'hidden', background: '#e2e8f0', position: 'relative' }}>
-                        <img 
-                          src={moodboardCombos[selectedMoodIndex]?.tileImg} 
-                          alt={moodboardCombos[selectedMoodIndex]?.tileName} 
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          onError={(e) => { e.target.src = '/textures/calacatta_gold.jpg'; }}
-                        />
-                        <span style={{ position: 'absolute', bottom: '6px', right: '6px', fontSize: '0.58rem', background: 'rgba(0,0,0,0.6)', color: '#fff', padding: '2px 6px', borderRadius: '4px' }}>
-                          Seramik Dokusu
-                        </span>
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {moodboardCombos[selectedMoodIndex]?.tileName}
-                        </span>
-                        <span style={{ fontSize: '0.62rem', color: '#64748b', marginTop: '2px' }}>
-                          Ebat: {moodboardCombos[selectedMoodIndex]?.tileSize}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Material 2: Paint Palette Dot */}
-                    <div style={{
-                      background: '#ffffff',
-                      borderRadius: '12px',
-                      padding: '12px',
-                      width: '130px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-                      transform: 'rotate(3deg)'
-                    }}>
-                      <div style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        background: moodboardCombos[selectedMoodIndex]?.paintColor || '#fff',
-                        border: '1px solid rgba(0,0,0,0.1)',
-                        flexShrink: 0
-                      }} />
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '0.58rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>Duvar Boyası</span>
-                        <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#0f172a', lineHeight: '1.2' }}>
-                          {moodboardCombos[selectedMoodIndex]?.paintName?.split(' ')[1] || 'Boya'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Material 3: Cabinet & Fixture specs */}
-                    <div style={{
-                      background: 'rgba(15, 23, 42, 0.75)',
-                      backdropFilter: 'blur(12px)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '12px',
-                      padding: '14px',
-                      color: '#ffffff',
-                      maxWidth: '220px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '10px',
-                      boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-                      transform: 'rotate(-1deg)'
-                    }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ fontSize: '0.58rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase' }}>🚪 Banyo Mobilyası</span>
-                        <span style={{ fontSize: '0.72rem', fontWeight: '600' }}>{moodboardCombos[selectedMoodIndex]?.cabinet}</span>
-                      </div>
-                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '6px' }} />
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ fontSize: '0.58rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase' }}>🚰 Armatür Kombini</span>
-                        <span style={{ fontSize: '0.72rem', fontWeight: '600', color: 'var(--accent-gold)' }}>{moodboardCombos[selectedMoodIndex]?.fixture}</span>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* Action Banner */}
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    background: 'rgba(255,255,255,0.95)',
-                    padding: '12px 18px',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
-                    zIndex: 2,
-                    marginTop: '20px',
-                    flexWrap: 'wrap',
-                    gap: '12px'
-                  }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '300px' }}>
-                      <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '600' }}>Seçili Konsept</span>
-                      <span style={{ fontSize: '0.85rem', fontWeight: '900', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {moodboardCombos[selectedMoodIndex]?.tileName}
-                      </span>
-                    </div>
-                    
-                    <button
-                      onClick={() => handleTryMoodboard(moodboardCombos[selectedMoodIndex])}
+                {/* Right Side: Bento Showcase Board Display */}
+                {(() => {
+                  const activeCombo = moodboardCombos.find(c => c.id === selectedMoodIndex) || moodboardCombos[0];
+                  return (
+                    <div 
+                      className="moodboard-bento-canvas"
                       style={{
-                        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '10px 18px',
-                        borderRadius: '8px',
-                        fontSize: '0.78rem',
-                        fontWeight: '700',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        transition: 'transform 0.2s'
+                        background: activeCombo.moodBg || 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
                       }}
-                      className="moodboard-action-btn-hover"
                     >
-                      <Palette size={14} style={{ color: 'var(--accent-gold)' }} />
-                      <span>Bu Kombini 3D Stüdyoda Aç</span>
-                    </button>
-                  </div>
+                      {/* Top Bar inside Canvas */}
+                      <div className="bento-canvas-topbar">
+                        <div className="ai-match-pill">
+                          <Sparkles size={14} style={{ color: '#fbbf24' }} />
+                          <span>%{activeCombo.matchScore || 98} AI İÇ MİMARİ UYUM SKORU</span>
+                        </div>
+                        
+                        <div className="color-palette-bar">
+                          <span className="palette-label">Renk Paleti:</span>
+                          <div className="palette-swatches">
+                            {activeCombo.colorPalette?.map((hex, idx) => (
+                              <div 
+                                key={idx} 
+                                className="swatch-dot" 
+                                style={{ background: hex }} 
+                                title={`Tone #${idx+1}: ${hex}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
 
-                </div>
+                      {/* Staggered 4-Material Bento Grid */}
+                      <div className="bento-materials-grid">
+                        
+                        {/* 1. Ceramic Slab Card */}
+                        <div className="bento-card bento-ceramic">
+                          <div className="ceramic-img-wrapper">
+                            <img 
+                              src={activeCombo.tileImg} 
+                              alt={activeCombo.tileName}
+                              onError={(e) => { e.target.src = '/textures/calacatta_gold.jpg'; }}
+                            />
+                            <span className="tag-overlay">Seramik Dokusu</span>
+                          </div>
+                          <div className="bento-card-content">
+                            <span className="bento-card-title">{activeCombo.tileName}</span>
+                            <span className="bento-card-sub">Ebat: {activeCombo.tileSize} • {activeCombo.tileFinish}</span>
+                          </div>
+                        </div>
+
+                        {/* 2. Paint Swatch Card */}
+                        <div className="bento-card bento-paint">
+                          <div className="paint-swatch-row">
+                            <div 
+                              className="paint-circle-swatch"
+                              style={{ background: activeCombo.paintColor }}
+                            />
+                            <div className="paint-info">
+                              <span className="bento-card-label">Duvar Boyası</span>
+                              <span className="bento-card-title">{activeCombo.paintName}</span>
+                              <span className="bento-card-sub">{activeCombo.paintSheen}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 3. Furniture Card */}
+                        <div className="bento-card bento-furniture">
+                          <div className="bento-card-header">
+                            <span>🚪 Mobilya & Ahşap Doku</span>
+                          </div>
+                          <span className="bento-card-title">{activeCombo.cabinet}</span>
+                          <span className="bento-card-sub">{activeCombo.cabinetDetail}</span>
+                        </div>
+
+                        {/* 4. Fixture Card */}
+                        <div className="bento-card bento-fixture">
+                          <div className="bento-card-header">
+                            <span>🚰 Armatür Kombini</span>
+                            <span className="fixture-badge-pill">{activeCombo.fixtureBadge}</span>
+                          </div>
+                          <span className="bento-card-title">{activeCombo.fixture}</span>
+                        </div>
+                      </div>
+
+                      {/* Bottom Action Footer */}
+                      <div className="bento-canvas-footer">
+                        <div className="footer-combo-info">
+                          <span className="footer-label">Seçili Konsept</span>
+                          <span className="footer-title">{activeCombo.styleName} — {activeCombo.tileName}</span>
+                        </div>
+                        
+                        <div className="footer-btns-group">
+                          <button
+                            onClick={() => handleTryMoodboard(activeCombo)}
+                            className="bento-action-btn-primary"
+                          >
+                            <Palette size={16} />
+                            <span>Bu Kombini 3D Stüdyoda Aç</span>
+                            <ArrowRight size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
 
               </div>
             </div>
