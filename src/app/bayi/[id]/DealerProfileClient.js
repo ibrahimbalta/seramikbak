@@ -15,7 +15,11 @@ import {
   Clock, 
   Mail, 
   ArrowRight,
-  MessageSquare
+  MessageSquare,
+  Star,
+  Award,
+  TrendingUp,
+  ShieldCheck
 } from 'lucide-react';
 import './dealer-profile.css';
 
@@ -179,7 +183,7 @@ export default function DealerProfileClient({ dealer, products }) {
       {/* Main Container */}
       <div className="profile-main-container">
         
-        {/* Profile Card & Info Header */}
+        {/* Profile Card & Info Header — PREMIUM HERO */}
         <div className="profile-banner-card animate-fade-in">
           <div className="profile-banner-info">
             <div className="profile-logo-box">
@@ -190,16 +194,22 @@ export default function DealerProfileClient({ dealer, products }) {
               )}
             </div>
             <div className="profile-text-group">
-              <span className="profile-badge">
-                {dealer.brand?.name || 'QUA Granite'} YETKİLİ SATICISI
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span className="profile-badge">
+                  {dealer.brand?.name || 'QUA Granite'} YETKİLİ SATICISI
+                </span>
+                <span className="verified-badge">
+                  <ShieldCheck size={12} />
+                  Onaylı Bayi
+                </span>
+              </div>
               <h1 className="profile-name">{dealer.name}</h1>
               <div className="profile-location">
                 <MapPin size={14} style={{ color: 'var(--accent-gold)', flexShrink: 0 }} />
                 <span>{dealer.district}, {dealer.city}</span>
               </div>
               {servicesList.length > 0 && (
-                <div className="header-services-badges" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '10px' }}>
+                <div className="header-services-badges">
                   {servicesList.map(s => {
                     const labelMap = {
                       shipping: '🚚 Nakliye Desteği',
@@ -208,13 +218,32 @@ export default function DealerProfileClient({ dealer, products }) {
                       install_support: '🛠️ Usta Desteği'
                     };
                     return labelMap[s] ? (
-                      <span key={s} className="service-badge" style={{ fontSize: '0.65rem', background: 'rgba(255,255,255,0.1)', color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.15)', padding: '3px 8px', borderRadius: '6px', fontWeight: '700', fontFamily: 'var(--font-title)' }}>
+                      <span key={s} className="service-badge">
                         {labelMap[s]}
                       </span>
                     ) : null;
                   })}
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Stats Row */}
+          <div className="hero-stats">
+            <div className="hero-stat-item">
+              <Award size={20} />
+              <span className="stat-number">10+</span>
+              <span className="stat-label">Yıllık Deneyim</span>
+            </div>
+            <div className="hero-stat-item">
+              <TrendingUp size={20} />
+              <span className="stat-number">500+</span>
+              <span className="stat-label">Mutlu Müşteri</span>
+            </div>
+            <div className="hero-stat-item">
+              <Building2 size={20} />
+              <span className="stat-number">200m²</span>
+              <span className="stat-label">Showroom</span>
             </div>
           </div>
           
@@ -228,6 +257,13 @@ export default function DealerProfileClient({ dealer, products }) {
             >
               <MessageSquare size={16} />
               WhatsApp Destek
+            </a>
+            <a 
+              href={`tel:${dealer.phone}`}
+              className="btn-call"
+            >
+              <Phone size={16} />
+              Hemen Ara
             </a>
             <a 
               href={`https://www.google.com/maps/dir/?api=1&destination=${dealer.lat},${dealer.lng}`} 
@@ -730,15 +766,22 @@ export default function DealerProfileClient({ dealer, products }) {
 
       </div>
 
-      {/* Mobile Sticky Action Bar */}
+      {/* Mobile Sticky Action Bar — 4 Button Premium */}
       <div className="mobile-sticky-actions">
+        <a 
+          href={`tel:${dealer.phone}`}
+          className="btn-call-mobile"
+        >
+          <Phone size={18} />
+          <span>Ara</span>
+        </a>
         <a 
           href={`https://wa.me/${dealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20profil%20sayfan%C4%B1zdan%20ula%C5%9F%C4%B1yorum.%20Showroom%27daki%20seramikleriniz%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`} 
           target="_blank" 
           rel="noopener noreferrer"
           className="btn-whatsapp-mobile"
         >
-          <MessageSquare size={16} />
+          <MessageSquare size={18} />
           <span>WhatsApp</span>
         </a>
         <a 
@@ -747,10 +790,22 @@ export default function DealerProfileClient({ dealer, products }) {
           rel="noopener noreferrer"
           className="btn-maps-mobile"
         >
-          <Compass size={16} />
+          <Compass size={18} />
           <span>Yol Tarifi</span>
         </a>
+        <button 
+          type="button"
+          onClick={() => {
+            const el = document.getElementById('quote-form-section');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="btn-quote-mobile"
+        >
+          <Send size={18} />
+          <span>Teklif Al</span>
+        </button>
       </div>
     </div>
   );
 }
+
