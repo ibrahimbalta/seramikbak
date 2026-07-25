@@ -3643,7 +3643,7 @@ export default function Home() {
                             />
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                               <span className="grout-color-name">{activeCombo?.grout?.color || 'Derz Renk Tonu'}</span>
-                              <span style={{ fontSize: '0.6rem', color: '#94a3b8' }}>Uyumlu Derz Çizgisi</span>
+                              <span style={{ fontSize: '0.6rem', color: '#64748b' }}>Uyumlu Derz Çizgisi</span>
                             </div>
                           </div>
                         </div>
@@ -3677,7 +3677,7 @@ export default function Home() {
                             <div className="wood-texture-icon" style={{ background: activeCombo?.complement?.cabinetHex || '#5c4033' }} title="Mobilya Dokusu" />
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                               <div className="fixture-finish-badge">🚰 {currentFaucet}</div>
-                              <span style={{ fontSize: '0.6rem', color: '#94a3b8' }}>Seçili Armatür Stili</span>
+                              <span style={{ fontSize: '0.6rem', color: '#64748b' }}>Seçili Armatür Stili</span>
                             </div>
                           </div>
                         </div>
