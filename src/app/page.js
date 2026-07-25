@@ -1463,13 +1463,20 @@ export default function Home() {
     else if (combo.complement?.fixtureBadge?.toLowerCase().includes('gold')) setStudioFaucetColor('gold');
     else setStudioFaucetColor('chrome');
 
+    // Turn ON floor and wall rendering toggles
+    setStudioApplyFloor(true);
+    setStudioApplyWalls(true);
+
     const floorTileObj = combo.floorTile || {};
     const wallTileObj = combo.wallTile || {};
 
-    const floorProdRaw = floorTileObj.product || {
-      id: floorTileObj.id || 'floor-tile-' + (combo.id || 0) + '-' + Date.now(),
+    const floorImgUrl = floorTileObj.img || combo.tileImg || '/textures/calacatta_gold.jpg';
+    const wallImgUrl = wallTileObj.img || '/textures/vista_bej.jpg';
+
+    const floorProdRaw = {
+      id: 'floor-' + (combo.id || 0) + '-' + Date.now(),
       name: floorTileObj.name || combo.tileName || 'Zemin Seramiği 60x120',
-      code: 'ZEMIN-' + ((combo.id || 0) + 1) * 102,
+      code: (floorTileObj.brand || 'NG') + '-ZEMIN-' + ((combo.id || 0) + 1) * 102,
       brandId: 'brand-floor',
       brand: { name: floorTileObj.brand || 'NG Kütahya' },
       dimensions: floorTileObj.size || '60x120 cm',
@@ -1477,15 +1484,16 @@ export default function Home() {
       height: 120,
       finish: floorTileObj.finish?.includes('Parlak') ? 'Parlak' : 'Mat',
       style: 'Mermer',
-      imageUrl: floorTileObj.img || combo.tileImg || '/textures/calacatta_gold.jpg',
-      textureUrl: floorTileObj.img || combo.tileImg || '/textures/calacatta_gold.jpg',
+      color: 'Beyaz',
+      imageUrl: floorImgUrl,
+      textureUrl: floorImgUrl,
       cheapestOffer: { price: parseInt(floorTileObj.price?.replace(/[^0-9]/g, '') || '500') }
     };
 
-    const wallProdRaw = wallTileObj.product || {
-      id: wallTileObj.id || 'wall-decor-' + (combo.id || 0) + '-' + Date.now(),
+    const wallProdRaw = {
+      id: 'wall-' + (combo.id || 0) + '-' + Date.now(),
       name: wallTileObj.name || 'Duvar & Dekor Seramiği 30x90',
-      code: 'DEKOR-' + ((combo.id || 0) + 1) * 305,
+      code: (wallTileObj.brand || 'VitrA') + '-DEKOR-' + ((combo.id || 0) + 1) * 305,
       brandId: 'brand-wall',
       brand: { name: wallTileObj.brand || 'VitrA' },
       dimensions: wallTileObj.size || '30x90 cm',
@@ -1493,53 +1501,19 @@ export default function Home() {
       height: 90,
       finish: wallTileObj.finish?.includes('Parlak') ? 'Parlak' : 'Mat',
       style: 'Mermer',
-      imageUrl: wallTileObj.img || '/textures/vista_bej.jpg',
-      textureUrl: wallTileObj.img || '/textures/vista_bej.jpg',
+      color: 'Bej',
+      imageUrl: wallImgUrl,
+      textureUrl: wallImgUrl,
       cheapestOffer: { price: parseInt(wallTileObj.price?.replace(/[^0-9]/g, '') || '420') }
     };
 
     const floorProd = enrichProductData(floorProdRaw);
     const wallProd = enrichProductData(wallProdRaw);
 
-    const floorQuery = (floorTileObj.name || combo.tileName || '').split(' ')[0] || 'seramik';
-    const wallQuery = (wallTileObj.name || '').split(' ')[0] || 'dekor';
+    setActiveProduct(floorProd);
+    setStudioFloorProduct(floorProd);
+    setStudioWallProduct(wallProd);
 
-    try {
-      const [floorRes, wallRes] = await Promise.all([
-        fetch(`/api/search?q=${encodeURIComponent(floorQuery)}&limit=4`).then(r => r.ok ? r.json() : []),
-        fetch(`/api/search?q=${encodeURIComponent(wallQuery)}&limit=4`).then(r => r.ok ? r.json() : [])
-      ]);
-
-      let realFloor = floorProd;
-      if (floorRes && floorRes.length > 0) {
-        realFloor = enrichProductData(floorRes[0]);
-      }
-
-      let realWall = wallProd;
-      if (wallRes && wallRes.length > 0) {
-        const distinct = wallRes.find(p => p.id !== realFloor.id);
-        if (distinct) realWall = enrichProductData(distinct);
-      }
-
-      if (!realWall.width) realWall.width = 30;
-      if (!realWall.height) realWall.height = 90;
-      if (!realWall.code) realWall.code = 'WALL-DEKOR-3D';
-      if (!realWall.textureUrl) realWall.textureUrl = realWall.imageUrl || '/textures/vista_bej.jpg';
-
-      if (!realFloor.width) realFloor.width = 60;
-      if (!realFloor.height) realFloor.height = 120;
-      if (!realFloor.code) realFloor.code = 'FLOOR-TILE-60';
-      if (!realFloor.textureUrl) realFloor.textureUrl = realFloor.imageUrl || '/textures/calacatta_gold.jpg';
-
-      setActiveProduct(realFloor);
-      setStudioFloorProduct(realFloor);
-      setStudioWallProduct(realWall);
-    } catch (err) {
-      console.error('Failed to load products for 3D moodboard:', err);
-      setActiveProduct(floorProd);
-      setStudioFloorProduct(floorProd);
-      setStudioWallProduct(wallProd);
-    }
     setActiveTab('studio');
   };
 

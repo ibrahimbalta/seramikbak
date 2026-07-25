@@ -153,8 +153,14 @@ export default function StudioCanvas({
       }
     } 
     else {
-      ctx.fillStyle = '#6b7280';
+      ctx.fillStyle = '#f1f3f7';
       ctx.fillRect(0, 0, 512, 512);
+      ctx.strokeStyle = 'rgba(180, 185, 195, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(100, 0); ctx.lineTo(400, 512);
+      ctx.moveTo(300, 0); ctx.lineTo(100, 512);
+      ctx.stroke();
     }
 
     return canvas;
