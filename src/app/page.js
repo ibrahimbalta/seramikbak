@@ -1452,34 +1452,66 @@ export default function Home() {
   }, [isKioskMode]);
 
   const handleTryMoodboard = async (combo) => {
-    if (!combo || !combo.tileName) return;
-    const tileQuery = combo.tileName.split(' ')[0] || 'seramik';
+    if (!combo) return;
     
     // Dynamically apply furnishings color presets to 3D virtual studio
-    if (combo.id === 0) setStudioCabinetColor('#5c4033'); // oak wood
-    else if (combo.id === 1) setStudioCabinetColor('#1a1a1a'); // black matte
-    else if (combo.id === 2) setStudioCabinetColor('#ffffff'); // white matte
-    else if (combo.id === 3) setStudioCabinetColor('#4c6a5a'); // sage green
-    
-    if (combo.id === 0) setStudioFaucetColor('black');
-    else if (combo.id === 1) setStudioFaucetColor('gold');
-    else if (combo.id === 2) setStudioFaucetColor('chrome');
-    else if (combo.id === 3) setStudioFaucetColor('chrome');
+    if (combo.cabinetHex) setStudioCabinetColor(combo.cabinetHex);
+    else if (combo.complement?.cabinetHex) setStudioCabinetColor(combo.complement.cabinetHex);
+
+    if (combo.faucetVal) setStudioFaucetColor(combo.faucetVal);
+    else if (combo.complement?.fixtureBadge?.toLowerCase().includes('siyah')) setStudioFaucetColor('black');
+    else if (combo.complement?.fixtureBadge?.toLowerCase().includes('gold')) setStudioFaucetColor('gold');
+    else setStudioFaucetColor('chrome');
+
+    // Build 3D Studio Floor product object
+    const floorTileObj = combo.floorTile || {};
+    const wallTileObj = combo.wallTile || {};
+
+    const floorProd = floorTileObj.product || {
+      id: floorTileObj.id || 'floor-' + (combo.id || 0),
+      name: floorTileObj.name || combo.tileName || 'Zemin Seramiği',
+      brandId: 'brand-floor',
+      brand: { name: floorTileObj.brand || 'Zemin Markası' },
+      dimensions: floorTileObj.size || '60x120 cm',
+      finish: floorTileObj.finish || 'Mat Porselen',
+      imageUrl: floorTileObj.img || combo.tileImg || '/textures/calacatta_gold.jpg',
+      textureUrl: floorTileObj.img || combo.tileImg || '/textures/calacatta_gold.jpg',
+      cheapestOffer: { price: parseInt(floorTileObj.price?.replace(/[^0-9]/g, '') || '500') }
+    };
+
+    // Build 3D Studio Wall product object (DISTINCT FROM FLOOR!)
+    const wallProd = wallTileObj.product || {
+      id: wallTileObj.id || 'wall-' + (combo.id || 0),
+      name: wallTileObj.name || 'Duvar Dekor Seramiği',
+      brandId: 'brand-wall',
+      brand: { name: wallTileObj.brand || 'Duvar Markası' },
+      dimensions: wallTileObj.size || '30x90 cm',
+      finish: wallTileObj.finish || '3D Rölief Dekor',
+      imageUrl: wallTileObj.img || '/textures/vista_bej.jpg',
+      textureUrl: wallTileObj.img || '/textures/vista_bej.jpg',
+      cheapestOffer: { price: parseInt(wallTileObj.price?.replace(/[^0-9]/g, '') || '420') }
+    };
+
+    const floorQuery = (floorTileObj.name || combo.tileName || '').split(' ')[0] || 'seramik';
+    const wallQuery = (wallTileObj.name || '').split(' ')[0] || 'dekor';
 
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(tileQuery)}&limit=1`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.length > 0) {
-          const prod = data[0];
-          setActiveProduct(prod);
-          setStudioWallProduct(prod);
-          setStudioFloorProduct(prod);
-          logInteraction('VIEW', prod.id, prod.brandId);
-        }
-      }
+      const [floorRes, wallRes] = await Promise.all([
+        fetch(`/api/search?q=${encodeURIComponent(floorQuery)}&limit=1`).then(r => r.ok ? r.json() : []),
+        fetch(`/api/search?q=${encodeURIComponent(wallQuery)}&limit=1`).then(r => r.ok ? r.json() : [])
+      ]);
+
+      const realFloor = (floorRes && floorRes.length > 0) ? enrichProductData(floorRes[0]) : floorProd;
+      const realWall = (wallRes && wallRes.length > 0 && wallRes[0].id !== realFloor.id) ? enrichProductData(wallRes[0]) : wallProd;
+
+      setActiveProduct(realFloor);
+      setStudioFloorProduct(realFloor);
+      setStudioWallProduct(realWall);
     } catch (err) {
-      console.error('Failed to load product for moodboard:', err);
+      console.error('Failed to load products for 3D moodboard:', err);
+      setActiveProduct(floorProd);
+      setStudioFloorProduct(floorProd);
+      setStudioWallProduct(wallProd);
     }
     setActiveTab('studio');
   };
