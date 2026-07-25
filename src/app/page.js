@@ -229,10 +229,44 @@ const DEFAULT_MOODBOARD_COMBOS = [
   {
     id: 0,
     category: "banyo",
-    styleName: "Lüks Calacatta & Gold Stüdyosu",
-    tagline: "Modern, Şık ve Zengin Banyo Koleksiyonu",
-    styleBadge: "👑 PREMİUM İÇ MİMARİ",
+    styleName: "Lüks Calacatta Mermer & Gold Kombini",
+    tagline: "Işıltılı, Zamansız ve Zengin Banyo Mimarisi",
+    styleBadge: "👑 PREMİUM MARBLE",
     matchScore: 98,
+    floorTile: {
+      name: "NG Kütahya Calacatta Gold 60x120",
+      size: "60x120 cm",
+      finish: "Full Lappato Parlak Cilalı",
+      img: "/textures/calacatta_gold.jpg",
+      badge: "👑 PREMİUM KOLEKSİYON",
+      brand: "NG KÜTAHYA",
+      price: "₺740 / m²",
+      pei: "PEI 4 (Yüksek Yoğunluk)",
+      slip: "R9 İç Mekan Parlak"
+    },
+    wallTile: {
+      name: "VitrA Calacatta Rölief 30x90 Dekor",
+      size: "30x90 cm",
+      finish: "3D Rölief Çizgili Dokulu",
+      img: "/textures/calacatta_gold.jpg",
+      badge: "✨ UYUMLU DUVAR DEKORU",
+      brand: "VitrA",
+      price: "₺620 / m²"
+    },
+    grout: {
+      name: "Weber Flex Fildişi Esnek Derz Dolgusu",
+      color: "Fildişi Bej (#EAE6DF)",
+      width: "1.5 mm Derz Aralığı",
+      type: "Küf & Su İtici Derz",
+      hex: "#eae6df"
+    },
+    complement: {
+      name: "Doğal Meşe Dolap & Mat Siyah Batarya",
+      cabinet: "Doğal Budaklı Meşe Banyo Ünitesi",
+      cabinetHex: "#5c4033",
+      fixture: "Mat Siyah Ankastre Duş & Batarya",
+      fixtureBadge: "Mat Siyah"
+    },
     tiles: [
       {
         name: "NG Kütahya Calacatta Gold 60x120",
@@ -240,7 +274,7 @@ const DEFAULT_MOODBOARD_COMBOS = [
         finish: "Full Lappato Parlak Cilalı",
         img: "/textures/calacatta_gold.jpg",
         badge: "👑 PREMİUM KOLEKSİYON",
-        brand: "NG KÜTAHYA SERAMİK",
+        brand: "NG KÜTAHYA",
         price: "₺740 / m²"
       },
       {
@@ -275,19 +309,53 @@ const DEFAULT_MOODBOARD_COMBOS = [
     paintSheen: "Mat İpek Dokulu Yıkanabilir",
     accentColor: "#d4af37",
     cabinetHex: "#5c4033",
-    colorPalette: ["#dfdcd3", "#5c4033", "#1e293b", "#d4af37", "#ffffff"],
+    colorPalette: ["#ffffff", "#eae6df", "#5c4033", "#d4af37", "#1e293b"],
     lighting: "3000K Sıcak Beyaz LED Spot",
     groutColor: "Fildişi Bej (1.5 mm)",
     budgetLevel: "Lüks Premium Segment",
-    desc: "Altın damarlı Calacatta mermeri, meşe dolabın doğal ahşap dokusu ve mat siyah armatürlerle zamansız ve zengin bir banyo atmosferi oluşturur."
+    desc: "Altın damarlı Calacatta zemin seramiği, 3D rölief duvar dekoru ve fildişi derz dolgusuyla kusursuz banyo mimarisi oluşturur. Meşe dolap ve mat siyah armatürle tamamlanır."
   },
   {
     id: 1,
     category: "banyo",
-    styleName: "Endüstriyel Loft & Antrasit",
+    styleName: "Endüstriyel Loft & Antrasit Beton",
     tagline: "Minimalist, Maskülen ve Güçlü Karakter",
     styleBadge: "🏙️ LOFT BETON",
     matchScore: 96,
+    floorTile: {
+      name: "Kalebodur Sement Antrasit 60x60",
+      size: "60x60 cm",
+      finish: "Mat Anti-slip Porselen",
+      img: "/textures/loft_beton.jpg",
+      badge: "🔥 SPONSORLU TREND",
+      brand: "KALEBODUR",
+      price: "₺520 / m²",
+      pei: "PEI 5 (Ağır Trafik)",
+      slip: "R10 Kaymaz Yüzey"
+    },
+    wallTile: {
+      name: "QUA Albatros Antrasit 60x120",
+      size: "60x120 cm",
+      finish: "Mat Beton Dokulu Porselen Plaka",
+      img: "/textures/albatros_antrasit.jpg",
+      badge: "✨ UYUMLU DUVAR PLAKASI",
+      brand: "QUA GRANITE",
+      price: "₺680 / m²"
+    },
+    grout: {
+      name: "Ceresit Koyu Antrasit Derz Dolgusu",
+      color: "Koyu Antrasit (#292524)",
+      width: "2.0 mm Derz Aralığı",
+      type: "Epoksi Esaslı Antibakteriyel",
+      hex: "#292524"
+    },
+    complement: {
+      name: "Siyah Metal Çerçeve & Gold Batarya",
+      cabinet: "Mat Siyah Metal Çerçeveli Ünite",
+      cabinetHex: "#1a1a1a",
+      fixture: "Fırçalanmış Gold Batarya Seti",
+      fixtureBadge: "Fırçalanmış Gold"
+    },
     tiles: [
       {
         name: "Kalebodur Sement Antrasit 60x60",
@@ -334,15 +402,49 @@ const DEFAULT_MOODBOARD_COMBOS = [
     lighting: "4000K Doğal Beyaz Lineer Işık",
     groutColor: "Koyu Antrasit (2.0 mm)",
     budgetLevel: "Modern Loft Segment",
-    desc: "Koyu beton dokulu porselen seramiğin soğuk duruşunu fırçalanmış altın (gold) armatürlerin ışıltısı ve mat siyah dolaplarla loft estetiğine dönüştürün."
+    desc: "Koyu beton dokulu porselen seramiğin soğuk duruşunu, epoksi derz dolgusu ve fırçalanmış altın bataryanın lüks ışıltısı ile loft estetiğine dönüştürün."
   },
   {
     id: 2,
     category: "salon",
-    styleName: "Sıcak İskandinav & Japandi Ahşap",
+    styleName: "Sıcak İskandinav & Japandi Ahşap Parke",
     tagline: "Doğal, Dingin ve Huzurlu Yaşam Alanları",
     styleBadge: "🍃 JAPANDİ AHŞAP",
     matchScore: 99,
+    floorTile: {
+      name: "Ege Seramik Nordic Meşe 20x120",
+      size: "20x120 cm",
+      finish: "Ahşap Relief Dokulu Parke Seramik",
+      img: "/textures/natural_oak.jpg",
+      badge: "✨ YENİ SEZON",
+      brand: "EGE SERAMİK",
+      price: "₺590 / m²",
+      pei: "PEI 4 (Zemin Parke)",
+      slip: "R10 Doğal Dokulu"
+    },
+    wallTile: {
+      name: "Yurtbay Teak Bordür & Süpürgelik",
+      size: "15x90 cm",
+      finish: "Ahşap Desenli Seramik Süpürgelik",
+      img: "/textures/teak_ahsap.jpg",
+      badge: "✨ UYUMLU SÜPÜRGELİK",
+      brand: "YURTBAY",
+      price: "₺340 / m²"
+    },
+    grout: {
+      name: "Kalekim Açık Meşe Rengi Derz Dolgusu",
+      color: "Açık Meşe (#C2A688)",
+      width: "1.0 mm Derz Aralığı",
+      type: "Sıcak Tone-on-Tone Derz",
+      hex: "#c2a688"
+    },
+    complement: {
+      name: "Mat Beyaz Lake Ünite & Çelik Armatür",
+      cabinet: "Mat Beyaz Kulpsuz Lake Mobilya",
+      cabinetHex: "#ffffff",
+      fixture: "Fırçalanmış Çelik Armatür",
+      fixtureBadge: "Fırçalanmış Çelik"
+    },
     tiles: [
       {
         name: "Ege Seramik Nordic Meşe 20x120",
@@ -385,10 +487,44 @@ const DEFAULT_MOODBOARD_COMBOS = [
   {
     id: 3,
     category: "mutfak",
-    styleName: "Organik Traverten & Mutfak",
-    tagline: "Huzurlu, Sıcak ve Modern Mutfaklar",
+    styleName: "Organik Traverten & Mutfak Taş Kombini",
+    tagline: "Huzurlu, Sıcak ve Modern Mutfak Mimarisi",
     styleBadge: "🍳 MODERN MUTFAK",
     matchScore: 99,
+    floorTile: {
+      name: "Çanakkale Seramik Travertino Bej 60x120",
+      size: "60x120 cm",
+      finish: "Doğal Traverten Dokulu Mat Porselen",
+      img: "/textures/travertino_classico.jpg",
+      badge: "🔥 SPONSORLU TREND",
+      brand: "ÇANAKKALE SERAMİK",
+      price: "₺720 / m²",
+      pei: "PEI 4 (Mutfak & Zemin)",
+      slip: "R10 Leffato Mat"
+    },
+    wallTile: {
+      name: "Güral Seramik Vista Bej Tezgah Arası",
+      size: "30x60 cm",
+      finish: "Mat Bej Mutfak Tezgah Arası Seramik",
+      img: "/textures/vista_bej.jpg",
+      badge: "✨ TEZGAH ARASI SERAMİK",
+      brand: "GÜRAL SERAMİK",
+      price: "₺540 / m²"
+    },
+    grout: {
+      name: "Weber Susam Beji Leke Tutmaz Derz",
+      color: "Susam Beji (#EDE8DD)",
+      width: "1.5 mm Derz Aralığı",
+      type: "Yağ & Leke İtici Mutfak Derzi",
+      hex: "#ede8dd"
+    },
+    complement: {
+      name: "Ceviz Mutfak Ünitesi & Pirinç Armatür",
+      cabinet: "Ceviz Kaplama Kulpsuz Mutfak Ünitesi",
+      cabinetHex: "#4a3525",
+      fixture: "Fırçalanmış Pirinç Tezgah Bataryası",
+      fixtureBadge: "Fırçalanmış Pirinç"
+    },
     tiles: [
       {
         name: "Çanakkale Seramik Travertino Bej 60x120",
@@ -3258,7 +3394,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* -------------------- AI MOODBOARD INTERIOR ARCHITECT STUDIO v4.0 (LUXE CAROUSEL) -------------------- */}
+            {/* -------------------- AI ARCHITECTURAL CERAMIC STUDIO v5.0 (100% CERAMIC MATCHING) -------------------- */}
             <div className="moodboard-container glass-panel">
               
               {/* Top Studio Bar: Brand Title, Purpose Explanation & AI Prompt Bar */}
@@ -3270,14 +3406,14 @@ export default function Home() {
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <h3 className="studio-title">
-                        AI Canlı İç Mimari Kombin Stüdyosu
+                        AI Mimarlık Kombin Stüdyosu
                       </h3>
                       <span className="live-pulse-badge">
-                        <span className="pulse-dot" /> CANLI DÖNEN KOLEKSİYON
+                        <span className="pulse-dot" /> CANLI MİMARİ SERAMİK EŞLEŞTİRİCİ
                       </span>
                     </div>
                     <p className="studio-subtitle">
-                      Seçtiğiniz seramiğe en uygun duvar boyasını, banyo mobilyasını ve armatür takımını yapay zeka algoritması ile anında eşleştirin.
+                      Seçtiğiniz zemin seramiğine en uygun duvar seramiğini, derz dolgusunu ve banyo ekipmanını iç mimar algoritması ile anında kombinleyin.
                     </p>
                   </div>
                 </div>
@@ -3290,7 +3426,7 @@ export default function Home() {
                       type="text"
                       value={aiPromptInput}
                       onChange={(e) => setAiPromptInput(e.target.value)}
-                      placeholder="İç Mimara Sor (Örn: 'Minimalist mermer banyo')..."
+                      placeholder="İç Mimara Sor (Örn: 'Lüks Calacatta banyo kombinasyonu')..."
                       className="prompt-input"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && aiPromptInput.trim()) {
@@ -3383,18 +3519,18 @@ export default function Home() {
                 
                 const tilesList = activeCombo?.tiles || [
                   {
-                    name: activeCombo?.tileName || 'Calacatta Gold 60x120',
-                    size: activeCombo?.tileSize || '60x120 cm',
-                    finish: activeCombo?.tileFinish || 'Full Lappato',
-                    img: activeCombo?.tileImg || '/textures/calacatta_gold.jpg',
+                    name: activeCombo?.floorTile?.name || 'Calacatta Gold 60x120',
+                    size: activeCombo?.floorTile?.size || '60x120 cm',
+                    finish: activeCombo?.floorTile?.finish || 'Full Lappato',
+                    img: activeCombo?.floorTile?.img || '/textures/calacatta_gold.jpg',
                     badge: '👑 PREMİUM KOLEKSİYON',
-                    brand: 'PREMİUM MARKA',
+                    brand: 'NG KÜTAHYA',
                     price: '₺740 / m²'
                   }
                 ];
 
                 const currentTile = tilesList[activeTileIndex % tilesList.length] || tilesList[0];
-                const currentFaucet = String(customFaucetFinish || activeCombo?.fixtureBadge || '');
+                const currentFaucet = String(customFaucetFinish || activeCombo?.complement?.fixtureBadge || 'Mat Siyah');
 
                 return (
                   <div className="studio-board-wrapper">
@@ -3402,19 +3538,19 @@ export default function Home() {
                     {/* Board Header Bar */}
                     <div className="studio-board-header">
                       <div className="board-active-info">
-                        <span className="board-badge">✨ SEÇİLİ KONSEPT & SPONSORLU SERİLER</span>
+                        <span className="board-badge">✨ SEÇİLİ MİMARİ KONSEPT & SERAMİK UYUMU</span>
                         <h4 className="board-title">{activeCombo?.styleName || 'Konsept'} — {activeCombo?.tagline || ''}</h4>
                       </div>
 
                       <div className="board-palette-swatches">
-                        <span className="swatch-label">Harmonize Renk Paleti:</span>
+                        <span className="swatch-label">Harmonize Malzeme Paleti:</span>
                         <div className="swatch-dots-row">
                           {activeCombo?.colorPalette?.map((hex, idx) => (
                             <div 
                               key={idx} 
                               className="studio-swatch-circle" 
                               style={{ background: hex }} 
-                              title={`Renk ${idx+1}: ${hex}`}
+                              title={`Doku / Ton ${idx+1}: ${hex}`}
                             />
                           ))}
                         </div>
@@ -3424,10 +3560,10 @@ export default function Home() {
                     {/* 4 Equal-Width Clean Light Material Cards */}
                     <div className="studio-materials-grid">
                       
-                      {/* Card 1: Interactive Rotating Ceramic Tile Showcase */}
+                      {/* Card 1: 🔲 ZEMİN SERAMİĞİ */}
                       <div className="studio-material-card studio-tile-showcase-card">
                         <div className="card-header-tag">
-                          <span>01 / PREMİUM & SPONSORLU SERAMİK</span>
+                          <span>01 / ZEMİN SERAMİĞİ</span>
                           <span className="tile-badge-overlay">{currentTile?.badge || '👑 PREMİUM'}</span>
                         </div>
                         
@@ -3435,17 +3571,17 @@ export default function Home() {
                         <div className="studio-tile-img-box">
                           <img 
                             src={currentTile?.img || '/textures/calacatta_gold.jpg'} 
-                            alt={currentTile?.name || 'Seramik'}
+                            alt={currentTile?.name || 'Zemin Seramiği'}
                             onError={(e) => { e.target.src = '/textures/calacatta_gold.jpg'; }}
                           />
-                          <div className="tile-brand-tag">{currentTile?.brand || 'MARKA'}</div>
-                          <div className="tile-price-tag">{currentTile?.price || '₺680/m²'}</div>
+                          <div className="tile-brand-tag">{currentTile?.brand || 'NG KÜTAHYA'}</div>
+                          <div className="tile-price-tag">{currentTile?.price || '₺740/m²'}</div>
                         </div>
 
                         {/* Interactive Carousel Selector Dots/Buttons */}
                         {tilesList.length > 1 && (
                           <div className="tile-carousel-nav">
-                            <span className="carousel-nav-label">Alternatif Modeller:</span>
+                            <span className="carousel-nav-label">Alternatif Zemin Seramikleri:</span>
                             <div className="carousel-dots-group">
                               {tilesList.map((t, idx) => (
                                 <button
@@ -3462,48 +3598,59 @@ export default function Home() {
                         )}
 
                         <div className="material-details">
-                          <h5 className="material-name">{currentTile?.name || 'Seramik'}</h5>
+                          <h5 className="material-name">{currentTile?.name || activeCombo?.floorTile?.name}</h5>
                           <p className="material-sub">{currentTile?.size} • {currentTile?.finish}</p>
+                          <div className="tech-spec-row">
+                            <span className="tech-badge">{activeCombo?.floorTile?.pei || 'PEI 4'}</span>
+                            <span className="tech-badge">{activeCombo?.floorTile?.slip || 'R10 Kaymaz'}</span>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Card 2: Paint Swatch */}
-                      <div className="studio-material-card">
+                      {/* Card 2: 🧱 DUVAR & DEKOR SERAMİĞİ */}
+                      <div className="studio-material-card studio-tile-showcase-card">
                         <div className="card-header-tag">
-                          <span>02 / DUVAR BOYASI</span>
-                          <span className="card-tag-mini">{activeCombo?.paintSheen || 'Mat'}</span>
+                          <span>02 / DUVAR & DEKOR SERAMİĞİ</span>
+                          <span className="tile-badge-overlay">{activeCombo?.wallTile?.badge || '✨ UYUMLU DEKOR'}</span>
                         </div>
-                        <div className="studio-paint-box">
-                          <div 
-                            className="studio-paint-swatch"
-                            style={{ background: activeCombo?.paintColor || '#dfdcd3' }}
+                        <div className="studio-tile-img-box">
+                          <img 
+                            src={activeCombo?.wallTile?.img || '/textures/calacatta_gold.jpg'} 
+                            alt={activeCombo?.wallTile?.name || 'Duvar Dekor Seramiği'}
+                            onError={(e) => { e.target.src = '/textures/calacatta_gold.jpg'; }}
                           />
+                          <div className="tile-brand-tag">{activeCombo?.wallTile?.brand || 'VitrA'}</div>
+                          <div className="tile-price-tag">{activeCombo?.wallTile?.price || '₺620/m²'}</div>
                         </div>
                         <div className="material-details">
-                          <h5 className="material-name">{activeCombo?.paintName || 'Duvar Boyası'}</h5>
-                          <p className="material-sub">Ton Kodu: {activeCombo?.paintColor || '#dfdcd3'}</p>
+                          <h5 className="material-name">{activeCombo?.wallTile?.name}</h5>
+                          <p className="material-sub">{activeCombo?.wallTile?.size} • {activeCombo?.wallTile?.finish}</p>
                         </div>
                       </div>
 
-                      {/* Card 3: Furniture & Wood */}
+                      {/* Card 3: 📐 DERZ & YAPI KİMYASALI */}
                       <div className="studio-material-card">
                         <div className="card-header-tag">
-                          <span>03 / MOBİLYA DOKUSU</span>
-                          <span className="card-tag-mini">Entegre Ray</span>
+                          <span>03 / DERZ & YAPI KİMYASALI</span>
+                          <span className="card-tag-mini">{activeCombo?.grout?.width || '1.5mm Derz'}</span>
                         </div>
-                        <div className="studio-icon-box">
-                          <div className="wood-texture-icon" style={{ background: activeCombo?.cabinetHex || '#5c4033' }} />
+                        <div className="studio-grout-box">
+                          <div 
+                            className="studio-grout-swatch-circle"
+                            style={{ background: activeCombo?.grout?.hex || '#eae6df' }}
+                          />
+                          <span className="grout-color-name">{activeCombo?.grout?.color}</span>
                         </div>
                         <div className="material-details">
-                          <h5 className="material-name">{activeCombo?.cabinet || 'Banyo Dolabı'}</h5>
-                          <p className="material-sub">{activeCombo?.cabinetDetail || ''}</p>
+                          <h5 className="material-name">{activeCombo?.grout?.name}</h5>
+                          <p className="material-sub">Teknik Özellik: {activeCombo?.grout?.type}</p>
                         </div>
                       </div>
 
-                      {/* Card 4: Fixture Set */}
+                      {/* Card 4: 🚪 BANYO & İÇ MEKAN TAMAMLAYICI */}
                       <div className="studio-material-card">
                         <div className="card-header-tag">
-                          <span>04 / ARMATÜR SETİ</span>
+                          <span>04 / TAMAMLAYICI EKİPMAN</span>
                           <div className="fixture-chips-row">
                             {['Mat Siyah', 'Gold', 'Krom'].map(f => (
                               <button
@@ -3519,12 +3666,13 @@ export default function Home() {
                             ))}
                           </div>
                         </div>
-                        <div className="studio-icon-box">
-                          <span style={{ fontSize: '1.4rem' }}>🚰</span>
+                        <div className="studio-complement-box">
+                          <div className="wood-texture-icon" style={{ background: activeCombo?.complement?.cabinetHex || '#5c4033' }} />
+                          <div className="fixture-finish-badge">🚰 {currentFaucet}</div>
                         </div>
                         <div className="material-details">
-                          <h5 className="material-name">{activeCombo?.fixture || 'Armatür Takımı'}</h5>
-                          <p className="material-sub">Kaplama: {currentFaucet}</p>
+                          <h5 className="material-name">{activeCombo?.complement?.cabinet}</h5>
+                          <p className="material-sub">Armatür: {activeCombo?.complement?.fixture}</p>
                         </div>
                       </div>
 
@@ -3539,12 +3687,12 @@ export default function Home() {
                           <span className="spec-pill">📐 Derz: {activeCombo.groutColor || '1.5mm Fildişi'}</span>
                         </div>
                         <p className="architect-tip-text">
-                          <strong>İç Mimar Notu:</strong> {activeCombo.desc}
+                          <strong>İç Mimar Tavsiyesi:</strong> {activeCombo.desc}
                         </p>
                       </div>
 
                       <button
-                        onClick={() => handleTryMoodboard({ ...activeCombo, tileName: currentTile?.name || activeCombo?.tileName })}
+                        onClick={() => handleTryMoodboard({ ...activeCombo, tileName: currentTile?.name || activeCombo?.floorTile?.name })}
                         className="studio-3d-action-btn"
                       >
                         <Palette size={16} />
