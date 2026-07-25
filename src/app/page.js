@@ -1517,6 +1517,49 @@ export default function Home() {
     setActiveTab('studio');
   };
 
+  const handleAiAnalyzePrompt = async (searchQueryText) => {
+    const query = (typeof searchQueryText === 'string' ? searchQueryText : aiPromptInput || '').trim();
+    setAiGeneratingCombo(true);
+    
+    try {
+      const fetchUrl = query 
+        ? `/api/search?q=${encodeURIComponent(query)}&limit=8`
+        : `/api/search?limit=12`;
+
+      const res = await fetch(fetchUrl);
+      if (res.ok) {
+        const data = await res.json();
+        const arrayData = Array.isArray(data) ? data : (data.products || []);
+        if (arrayData.length > 0) {
+          const enriched = arrayData.map(enrichProductData);
+          const generated = enriched.map((p, idx) => generateMoodboardFromProduct(p, idx));
+          setMoodboardCombos(generated);
+          setSelectedMoodIndex(0);
+          setActiveTileIndex(0);
+        } else {
+          // If no direct search match found in database, construct custom AI combo from prompt
+          const customProd = {
+            name: query || 'Özel Mimari Seramik',
+            dimensions: '60x120 cm',
+            imageUrl: query.toLowerCase().includes('ahşap') || query.toLowerCase().includes('ceviz') ? '/textures/natural_oak.jpg' : '/textures/calacatta_gold.jpg',
+            brand: { name: 'SeramikBak AI' },
+            price: 580,
+            style: query.toLowerCase().includes('ceviz') || query.toLowerCase().includes('ahşap') ? 'Ahşap' : 'Mermer',
+            color: query.toLowerCase().includes('ceviz') ? 'Kahve' : 'Bej'
+          };
+          const customCombo = generateMoodboardFromProduct(customProd, 0);
+          setMoodboardCombos(prev => [customCombo, ...prev.slice(0, 5)]);
+          setSelectedMoodIndex(0);
+          setActiveTileIndex(0);
+        }
+      }
+    } catch (err) {
+      console.error('AI Analiz error:', err);
+    } finally {
+      setAiGeneratingCombo(false);
+    }
+  };
+
   // General products fetch with filters (with pagination support)
   async function fetchProducts(customParams = '', targetPage = 1, append = false) {
     if (append) {
@@ -3573,63 +3616,26 @@ export default function Home() {
                       type="text"
                       value={aiPromptInput}
                       onChange={(e) => setAiPromptInput(e.target.value)}
-                      placeholder="İç Mimara Sor (Örn: 'Lüks Calacatta banyo kombinasyonu')..."
+                      placeholder="İç Mimara Sor (Örn: 'Woodline Mat Ceviz', 'Calacatta Gold')..."
                       className="prompt-input"
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter' && aiPromptInput.trim()) {
-                          setAiGeneratingCombo(true);
-                          setTimeout(() => {
-                            const query = aiPromptInput.toLowerCase();
-                            const matched = moodboardCombos.find(c => 
-                              c.styleName.toLowerCase().includes(query) || 
-                              c.tileName.toLowerCase().includes(query) ||
-                              c.tagline.toLowerCase().includes(query)
-                            );
-                            if (matched) setSelectedMoodIndex(matched.id);
-                            setAiGeneratingCombo(false);
-                          }, 350);
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAiAnalyzePrompt(aiPromptInput);
                         }
                       }}
                     />
                     <button 
-                      onClick={() => {
-                        setAiGeneratingCombo(true);
-                        setTimeout(() => {
-                          const available = moodboardCategory === 'all' 
-                            ? moodboardCombos 
-                            : moodboardCombos.filter(c => c.category === moodboardCategory);
-                          const currentIdx = available.findIndex(c => c.id === selectedMoodIndex);
-                          const nextItem = available[(currentIdx + 1) % available.length] || available[0];
-                          if (nextItem) setSelectedMoodIndex(nextItem.id);
-                          setAiGeneratingCombo(false);
-                        }, 300);
-                      }}
+                      onClick={() => handleAiAnalyzePrompt(aiPromptInput)}
                       className="prompt-submit-btn"
                       disabled={aiGeneratingCombo}
+                      title="Yazdığınız ürüne veya konsepte özel kombin üret"
                     >
                       <Sparkles size={13} />
-                      <span>{aiGeneratingCombo ? 'Üretiliyor...' : 'AI Analiz Et'}</span>
+                      <span>{aiGeneratingCombo ? 'Analiz Ediliyor...' : '✨ AI Analiz Et'}</span>
                     </button>
                     <button 
-                      onClick={() => {
-                        setAiGeneratingCombo(true);
-                        setTimeout(() => {
-                          if (products && products.length >= 2) {
-                            const shuffled = [...products].sort(() => 0.5 - Math.random());
-                            const generated = shuffled.slice(0, 8).map((p, idx) => generateMoodboardFromProduct(p, idx));
-                            setMoodboardCombos(generated);
-                            setSelectedMoodIndex(0);
-                            setActiveTileIndex(0);
-                          } else {
-                            const count = moodboardCombos.length || 4;
-                            let nextRandom = Math.floor(Math.random() * count);
-                            if (nextRandom === selectedMoodIndex) nextRandom = (selectedMoodIndex + 1) % count;
-                            setSelectedMoodIndex(nextRandom);
-                            setActiveTileIndex(Math.floor(Math.random() * 3));
-                          }
-                          setAiGeneratingCombo(false);
-                        }, 250);
-                      }}
+                      onClick={() => handleAiAnalyzePrompt('')}
                       className="prompt-submit-btn"
                       style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: '#ffffff' }}
                       disabled={aiGeneratingCombo}
