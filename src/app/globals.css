@@ -1536,17 +1536,62 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: 0.04em;
 }
 
-.card-tag-mini {
+.live-pulse-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  font-family: var(--font-title);
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulseGreen 1.8s infinite;
+}
+
+@keyframes pulseGreen {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.studio-tile-showcase-card {
+  border-color: rgba(179, 142, 71, 0.25);
+  box-shadow: 0 4px 20px rgba(179, 142, 71, 0.08);
+}
+
+.tile-badge-overlay {
   font-size: 0.58rem;
-  font-weight: 700;
-  color: #0f172a;
-  background: #f1f5f9;
-  padding: 2px 6px;
+  font-weight: 800;
+  color: var(--accent-gold, #b38e47);
+  background: rgba(179, 142, 71, 0.12);
+  border: 1px solid rgba(179, 142, 71, 0.3);
+  padding: 2px 7px;
   border-radius: 6px;
 }
 
 .studio-tile-img-box {
-  height: 100px;
+  height: 120px;
   border-radius: 12px;
   overflow: hidden;
   position: relative;
@@ -1557,11 +1602,87 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease;
 }
 
 .studio-material-card:hover .studio-tile-img-box img {
   transform: scale(1.08);
+}
+
+.tile-brand-tag {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  font-size: 0.58rem;
+  font-weight: 800;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  padding: 3px 7px;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.03em;
+}
+
+.tile-price-tag {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.6rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent-gold, #b38e47) 0%, #d4af37 100%);
+  color: #0f172a;
+  padding: 3px 8px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.tile-carousel-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.carousel-nav-label {
+  font-size: 0.6rem;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.carousel-dots-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tile-carousel-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 0.62rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.tile-carousel-dot:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.tile-carousel-dot.active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
 }
 
 .studio-paint-box {
