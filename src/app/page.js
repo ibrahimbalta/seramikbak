@@ -244,11 +244,14 @@ const DEFAULT_MOODBOARD_COMBOS = [
     paintName: "Jotun 1024 Kum Beji Duvar Boyası",
     paintColor: "#dfdcd3",
     paintSheen: "Mat İpek Dokulu",
-    moodBg: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+    moodBg: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
     accentColor: "#d4af37",
     cabinetHex: "#5c4033",
     faucetVal: "black",
     colorPalette: ["#dfdcd3", "#5c4033", "#1e293b", "#d4af37", "#ffffff"],
+    lighting: "3000K Sıcak Beyaz LED Spot",
+    groutColor: "Fildişi Bej (1.5 mm)",
+    budgetLevel: "Lüks Premium Segment",
     desc: "Altın damarlı Calacatta seramiği, meşe dolabın doğal sıcaklığı ile dengelerken, mat siyah armatürlerle modern ve keskin çizgiler sunar."
   },
   {
@@ -269,11 +272,14 @@ const DEFAULT_MOODBOARD_COMBOS = [
     paintName: "Jotun 1032 Sis Grisi Duvar Boyası",
     paintColor: "#abb2b9",
     paintSheen: "Yarı Mat Yıkanabilir",
-    moodBg: "linear-gradient(135deg, #1e1e24 0%, #2b2d42 100%)",
+    moodBg: "linear-gradient(135deg, #0f172a 0%, #1a1a24 100%)",
     accentColor: "#b38e47",
     cabinetHex: "#1a1a1a",
     faucetVal: "gold",
     colorPalette: ["#abb2b9", "#1a1a1a", "#b38e47", "#333333", "#f8fafc"],
+    lighting: "4000K Doğal Beyaz Lineer Işık",
+    groutColor: "Koyu Antrasit (2.0 mm)",
+    budgetLevel: "Modern Loft Segment",
     desc: "Koyu renk beton dokulu seramiğin soğuk duruşunu fırçalanmış altın (gold) bataryanın parlaklığı ile canlandırın. Mat siyah dolaplarla loft estetiğini tamamlayın."
   },
   {
@@ -294,11 +300,14 @@ const DEFAULT_MOODBOARD_COMBOS = [
     paintName: "Jotun 1622 Fildişi Beyazı Boya",
     paintColor: "#f4f3ef",
     paintSheen: "Ekstra Mat Su Bazlı",
-    moodBg: "linear-gradient(135deg, #2d3748 0%, #1a202c 100%)",
+    moodBg: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
     accentColor: "#c2a688",
     cabinetHex: "#ffffff",
     faucetVal: "chrome",
     colorPalette: ["#f4f3ef", "#c2a688", "#5c4033", "#cbd5e1", "#ffffff"],
+    lighting: "2700K Çok Sıcak Ambiyans Işığı",
+    groutColor: "Açık Meşe Derzi (1.0 mm)",
+    budgetLevel: "Doğal Organik Segment",
     desc: "Ahşap dokulu parke seramiğin sıcaklığını mat beyaz düz yüzeylerle birleştirin. Dingin, minimalist ve aydınlık bir İskandinav atmosferi yaratır."
   },
   {
@@ -324,6 +333,9 @@ const DEFAULT_MOODBOARD_COMBOS = [
     cabinetHex: "#4c6a5a",
     faucetVal: "chrome",
     colorPalette: ["#eae6df", "#4c6a5a", "#38bdf8", "#1e293b", "#ffffff"],
+    lighting: "3500K Gün Işığı Spotlar",
+    groutColor: "Kuvars Beyazı (1.5 mm)",
+    budgetLevel: "Klasik Elegans Segment",
     desc: "Kültleşmiş beyaz Carrara mermerinin ferahlığını pastel yeşil tonlarında country tarzı bir banyo dolabı ve klasik parlak krom bataryalar ile taçlandırın."
   },
   {
@@ -344,11 +356,14 @@ const DEFAULT_MOODBOARD_COMBOS = [
     paintName: "Jotun 12125 Susam Beyazı Boya",
     paintColor: "#ede8dd",
     paintSheen: "Yıkanabilir Mutfak Boyası",
-    moodBg: "linear-gradient(135deg, #1c1917 0%, #292524 100%)",
+    moodBg: "linear-gradient(135deg, #1c1917 0%, #0f172a 100%)",
     accentColor: "#eab308",
     cabinetHex: "#4a3525",
     faucetVal: "gold",
     colorPalette: ["#ede8dd", "#4a3525", "#eab308", "#1c1917", "#ffffff"],
+    lighting: "3000K Gizli Tezgah Altı LED",
+    groutColor: "Susam Beji Derzi (1.5 mm)",
+    budgetLevel: "Gurme Mutfak Segmenti",
     desc: "Traverten seramiğin huzur veren dokusunu koyu ceviz mobilya ve fırçalanmış pirinç tezgah bataryası ile buluşturarak gurme bir mutfak alanı tasarlayın."
   }
 ];
@@ -406,6 +421,8 @@ export default function Home() {
   const [moodboardCombos, setMoodboardCombos] = useState(DEFAULT_MOODBOARD_COMBOS);
   const [moodboardCategory, setMoodboardCategory] = useState('all');
   const [aiGeneratingCombo, setAiGeneratingCombo] = useState(false);
+  const [aiPromptInput, setAiPromptInput] = useState('');
+  const [customFaucetFinish, setCustomFaucetFinish] = useState(null);
 
   // Product Comparison Wizard States
   const [comparedProducts, setComparedProducts] = useState([]);
@@ -3177,70 +3194,99 @@ export default function Home() {
               </div>
             </div>
 
-            {/* -------------------- AI MOODBOARD INTERIOR DESIGN ASSISTANT -------------------- */}
+            {/* -------------------- AI MOODBOARD INTERIOR DESIGN ASSISTANT (ULTRA-SLEEK) -------------------- */}
             <div className="moodboard-container glass-panel">
-              {/* Header Bar with Category Filters */}
+              
+              {/* Top Bar: Header & Interactive AI Prompt Bar */}
               <div className="moodboard-header-wrapper">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div className="moodboard-header-left">
                   <div className="moodboard-sparkle-icon">
-                    <Sparkles size={22} className="badge-icon-gold" />
+                    <Sparkles size={18} className="badge-icon-gold" />
                   </div>
                   <div>
                     <h3 className="moodboard-heading-title">
-                      AI İç Mimari Kombin Asistanı & Moodboard
+                      AI İç Mimari Kombin Asistanı
                     </h3>
                     <p className="moodboard-heading-sub">
-                      Yapay zeka desteğiyle seramiklerinize kusursuz uyum sağlayan banyo mobilyası, duvar boyası ve armatür paletlerini keşfedin.
+                      Yapay zeka mimarlık algoritması ile seramik, mobilya ve armatür uyumunu gerçek zamanlı analiz edin.
                     </p>
                   </div>
                 </div>
 
-                {/* Category Pills & AI Generate Button */}
-                <div className="moodboard-category-tabs">
-                  {[
-                    { key: 'all', label: 'Tüm Alanlar' },
-                    { key: 'banyo', label: '🛁 Banyo' },
-                    { key: 'mutfak', label: '🍳 Mutfak' },
-                    { key: 'salon', label: '🛋️ Salon' }
-                  ].map(cat => (
-                    <button
-                      key={cat.key}
-                      onClick={() => setMoodboardCategory(cat.key)}
-                      className={`mood-cat-tab ${moodboardCategory === cat.key ? 'active' : ''}`}
+                {/* AI Prompt Input & Presets Bar */}
+                <div className="moodboard-prompt-bar">
+                  <div className="prompt-input-wrapper">
+                    <SearchIcon size={14} className="prompt-search-icon" />
+                    <input 
+                      type="text"
+                      value={aiPromptInput}
+                      onChange={(e) => setAiPromptInput(e.target.value)}
+                      placeholder="İç Mimara Sor (Örn: 'Minimalist 60x120 mermer banyo')..."
+                      className="prompt-input"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && aiPromptInput.trim()) {
+                          setAiGeneratingCombo(true);
+                          setTimeout(() => {
+                            const query = aiPromptInput.toLowerCase();
+                            const matched = moodboardCombos.find(c => 
+                              c.styleName.toLowerCase().includes(query) || 
+                              c.tileName.toLowerCase().includes(query) ||
+                              c.tagline.toLowerCase().includes(query)
+                            );
+                            if (matched) setSelectedMoodIndex(matched.id);
+                            setAiGeneratingCombo(false);
+                          }, 400);
+                        }
+                      }}
+                    />
+                    <button 
+                      onClick={() => {
+                        setAiGeneratingCombo(true);
+                        setTimeout(() => {
+                          const available = moodboardCategory === 'all' 
+                            ? moodboardCombos 
+                            : moodboardCombos.filter(c => c.category === moodboardCategory);
+                          const currentIdx = available.findIndex(c => c.id === selectedMoodIndex);
+                          const nextItem = available[(currentIdx + 1) % available.length] || available[0];
+                          if (nextItem) setSelectedMoodIndex(nextItem.id);
+                          setAiGeneratingCombo(false);
+                        }, 350);
+                      }}
+                      className="prompt-submit-btn"
+                      disabled={aiGeneratingCombo}
                     >
-                      {cat.label}
+                      <Sparkles size={13} />
+                      <span>{aiGeneratingCombo ? 'Üretiliyor...' : 'AI Analiz Et'}</span>
                     </button>
-                  ))}
-                  
-                  <button 
-                    onClick={() => {
-                      setAiGeneratingCombo(true);
-                      setTimeout(() => {
-                        const available = moodboardCategory === 'all' 
-                          ? moodboardCombos 
-                          : moodboardCombos.filter(c => c.category === moodboardCategory);
-                        const currentIdx = available.findIndex(c => c.id === selectedMoodIndex);
-                        const nextItem = available[(currentIdx + 1) % available.length] || available[0];
-                        if (nextItem) setSelectedMoodIndex(nextItem.id);
-                        setAiGeneratingCombo(false);
-                      }, 400);
-                    }}
-                    className="mood-generate-btn"
-                    disabled={aiGeneratingCombo}
-                  >
-                    <Sparkles size={14} />
-                    <span>{aiGeneratingCombo ? 'Kombin Üretiliyor...' : '✨ AI Rastgele Kombin'}</span>
-                  </button>
+                  </div>
+
+                  {/* Category Pills */}
+                  <div className="moodboard-category-tabs">
+                    {[
+                      { key: 'all', label: 'Tümü' },
+                      { key: 'banyo', label: '🛁 Banyo' },
+                      { key: 'mutfak', label: '🍳 Mutfak' },
+                      { key: 'salon', label: '🛋️ Salon' }
+                    ].map(cat => (
+                      <button
+                        key={cat.key}
+                        onClick={() => setMoodboardCategory(cat.key)}
+                        className={`mood-cat-tab ${moodboardCategory === cat.key ? 'active' : ''}`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               {/* Layout Grid */}
               <div className="moodboard-grid">
                 
-                {/* Left Side: Style Selector List */}
+                {/* Left Side: Style Selector List & Architectural Spec Sheet */}
                 <div className="moodboard-left-panel">
                   <span className="moodboard-panel-label">
-                    Tasarım Konsepti Seçin ({moodboardCombos.filter(c => moodboardCategory === 'all' || c.category === moodboardCategory).length})
+                    Konsept Kataloğu ({moodboardCombos.filter(c => moodboardCategory === 'all' || c.category === moodboardCategory).length})
                   </span>
                   
                   <div className="moodboard-selector-list scrollbar-hidden">
@@ -3259,57 +3305,70 @@ export default function Home() {
                               <span className="mood-score-badge">%{combo.matchScore || 98} AI Uyum</span>
                             </div>
                             <h4 className="mood-style-title">{combo.styleName}</h4>
-                            <p className="mood-style-tagline">{combo.tagline}</p>
                           </button>
                         );
                       })}
                   </div>
 
-                  {/* Active Interior Design Tip Box */}
-                  {moodboardCombos.find(c => c.id === selectedMoodIndex) && (
-                    <div className="moodboard-designer-tip-box">
-                      <div className="tip-header">
-                        <Sparkles size={14} style={{ color: 'var(--accent-gold)' }} />
-                        <span>İç Mimarın Önerisi</span>
+                  {/* Architectural Spec Sheet (Mimarlık Cetveli) */}
+                  {(() => {
+                    const activeCombo = moodboardCombos.find(c => c.id === selectedMoodIndex) || moodboardCombos[0];
+                    return (
+                      <div className="moodboard-spec-sheet">
+                        <div className="spec-sheet-header">
+                          <FileText size={13} style={{ color: 'var(--accent-gold)' }} />
+                          <span>Mimarlık Cetveli & Metraj</span>
+                        </div>
+                        <div className="spec-sheet-grid">
+                          <div className="spec-item">
+                            <span className="spec-lbl">💡 Aydınlatma:</span>
+                            <span className="spec-val">{activeCombo.lighting || '3000K Sıcak LED'}</span>
+                          </div>
+                          <div className="spec-item">
+                            <span className="spec-lbl">📐 Derz Dolgusu:</span>
+                            <span className="spec-val">{activeCombo.groutColor || 'Fildişi (1.5mm)'}</span>
+                          </div>
+                          <div className="spec-item">
+                            <span className="spec-lbl">💎 Segment:</span>
+                            <span className="spec-val">{activeCombo.budgetLevel || 'Lüks Premium'}</span>
+                          </div>
+                        </div>
+                        <p className="spec-note">{activeCombo.desc}</p>
                       </div>
-                      <p>{moodboardCombos.find(c => c.id === selectedMoodIndex)?.desc}</p>
-                    </div>
-                  )}
+                    );
+                  })()}
                 </div>
 
-                {/* Right Side: Bento Showcase Board Display */}
+                {/* Right Side: Sleek Studio Canvas */}
                 {(() => {
                   const activeCombo = moodboardCombos.find(c => c.id === selectedMoodIndex) || moodboardCombos[0];
+                  const currentFaucet = customFaucetFinish || activeCombo.fixtureBadge;
+
                   return (
-                    <div 
-                      className="moodboard-bento-canvas"
-                      style={{
-                        background: activeCombo.moodBg || 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
-                      }}
-                    >
+                    <div className="moodboard-bento-canvas">
                       {/* Top Bar inside Canvas */}
                       <div className="bento-canvas-topbar">
                         <div className="ai-match-pill">
-                          <Sparkles size={14} style={{ color: '#fbbf24' }} />
+                          <Sparkles size={13} style={{ color: '#fbbf24' }} />
                           <span>%{activeCombo.matchScore || 98} AI İÇ MİMARİ UYUM SKORU</span>
                         </div>
                         
                         <div className="color-palette-bar">
-                          <span className="palette-label">Renk Paleti:</span>
+                          <span className="palette-label">Palet:</span>
                           <div className="palette-swatches">
                             {activeCombo.colorPalette?.map((hex, idx) => (
                               <div 
                                 key={idx} 
                                 className="swatch-dot" 
                                 style={{ background: hex }} 
-                                title={`Tone #${idx+1}: ${hex}`}
+                                title={`Renk ${idx+1}: ${hex}`}
                               />
                             ))}
                           </div>
                         </div>
                       </div>
 
-                      {/* Staggered 4-Material Bento Grid */}
+                      {/* Compact 4-Material Bento Grid */}
                       <div className="bento-materials-grid">
                         
                         {/* 1. Ceramic Slab Card */}
@@ -3324,7 +3383,7 @@ export default function Home() {
                           </div>
                           <div className="bento-card-content">
                             <span className="bento-card-title">{activeCombo.tileName}</span>
-                            <span className="bento-card-sub">Ebat: {activeCombo.tileSize} • {activeCombo.tileFinish}</span>
+                            <span className="bento-card-sub">{activeCombo.tileSize} • {activeCombo.tileFinish}</span>
                           </div>
                         </div>
 
@@ -3356,9 +3415,22 @@ export default function Home() {
                         <div className="bento-card bento-fixture">
                           <div className="bento-card-header">
                             <span>🚰 Armatür Kombini</span>
-                            <span className="fixture-badge-pill">{activeCombo.fixtureBadge}</span>
+                            <div className="fixture-finish-toggles">
+                              {['Mat Siyah', 'Fırçalanmış Gold', 'Parlak Krom'].map(f => (
+                                <button
+                                  key={f}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCustomFaucetFinish(f);
+                                  }}
+                                  className={`finish-chip ${currentFaucet === f ? 'active' : ''}`}
+                                >
+                                  {f}
+                                </button>
+                              ))}
+                            </div>
                           </div>
-                          <span className="bento-card-title">{activeCombo.fixture}</span>
+                          <span className="bento-card-title">{activeCombo.fixture} ({currentFaucet})</span>
                         </div>
                       </div>
 
@@ -3366,7 +3438,7 @@ export default function Home() {
                       <div className="bento-canvas-footer">
                         <div className="footer-combo-info">
                           <span className="footer-label">Seçili Konsept</span>
-                          <span className="footer-title">{activeCombo.styleName} — {activeCombo.tileName}</span>
+                          <span className="footer-title">{activeCombo.styleName}</span>
                         </div>
                         
                         <div className="footer-btns-group">
@@ -3374,9 +3446,9 @@ export default function Home() {
                             onClick={() => handleTryMoodboard(activeCombo)}
                             className="bento-action-btn-primary"
                           >
-                            <Palette size={16} />
-                            <span>Bu Kombini 3D Stüdyoda Aç</span>
-                            <ArrowRight size={14} />
+                            <Palette size={15} />
+                            <span>3D Stüdyoda Görselleştir</span>
+                            <ArrowRight size={13} />
                           </button>
                         </div>
                       </div>
