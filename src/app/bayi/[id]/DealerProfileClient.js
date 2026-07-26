@@ -188,9 +188,10 @@ export default function DealerProfileClient({ dealer, products }) {
         <div 
           className="profile-banner-card animate-fade-in"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.85) 60%, rgba(15, 23, 42, 0.95) 100%), url('${bannerBgImage}')`,
+            backgroundImage: `url('${bannerBgImage}')`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center'
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat'
           }}
         >
           <div className="profile-banner-info">
