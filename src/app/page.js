@@ -3593,8 +3593,8 @@ export default function Home() {
                   <div className="studio-sparkle-badge">
                     <Sparkles size={18} />
                   </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div className="studio-brand-text">
+                    <div className="studio-title-row">
                       <h3 className="studio-title">
                         AI Mimarlık Kombin Stüdyosu
                       </h3>
@@ -3608,15 +3608,16 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* AI Search & Presets */}
+                {/* AI Search & Controls */}
                 <div className="studio-controls-right">
+                  {/* Clean Dedicated Search Input Bar */}
                   <div className="prompt-input-wrapper">
-                    <SearchIcon size={14} className="prompt-search-icon" />
+                    <SearchIcon size={15} className="prompt-search-icon" />
                     <input 
                       type="text"
                       value={aiPromptInput}
                       onChange={(e) => setAiPromptInput(e.target.value)}
-                      placeholder="İç Mimara Sor (Örn: 'Woodline Mat Ceviz', 'Calacatta Gold')..."
+                      placeholder="İç Mimara Sor (Örn: 'Woodline Mat', 'Calacatta Gold')..."
                       className="prompt-input"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
@@ -3632,36 +3633,38 @@ export default function Home() {
                       title="Yazdığınız ürüne veya konsepte özel kombin üret"
                     >
                       <Sparkles size={13} />
-                      <span>{aiGeneratingCombo ? 'Analiz Ediliyor...' : '✨ AI Analiz Et'}</span>
+                      <span>{aiGeneratingCombo ? 'Analiz Ediliyor...' : 'AI Analiz Et'}</span>
                     </button>
+                  </div>
+
+                  {/* Secondary Action & Room Category Filter Strip */}
+                  <div className="studio-toolbar-strip scrollbar-hidden">
                     <button 
                       onClick={() => handleAiAnalyzePrompt('')}
-                      className="prompt-submit-btn"
-                      style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: '#ffffff' }}
+                      className="random-combo-btn"
                       disabled={aiGeneratingCombo}
                       title="Tüm veritabanından rastgele yeni seramik kombinasyonları üret"
                     >
                       <Shuffle size={13} />
-                      <span>🎲 Rastgele Kombin Üret</span>
+                      <span>Rastgele Kombin</span>
                     </button>
-                  </div>
 
-                  {/* Room Category Tabs */}
-                  <div className="studio-category-pills">
-                    {[
-                      { key: 'all', label: 'Tüm Alanlar' },
-                      { key: 'banyo', label: '🛁 Banyo' },
-                      { key: 'mutfak', label: '🍳 Mutfak' },
-                      { key: 'salon', label: '🛋️ Salon' }
-                    ].map(cat => (
-                      <button
-                        key={cat.key}
-                        onClick={() => setMoodboardCategory(cat.key)}
-                        className={`studio-cat-pill ${moodboardCategory === cat.key ? 'active' : ''}`}
-                      >
-                        {cat.label}
-                      </button>
-                    ))}
+                    <div className="studio-category-pills">
+                      {[
+                        { key: 'all', label: 'Tüm Alanlar' },
+                        { key: 'banyo', label: '🛁 Banyo' },
+                        { key: 'mutfak', label: '🍳 Mutfak' },
+                        { key: 'salon', label: '🛋️ Salon' }
+                      ].map(cat => (
+                        <button
+                          key={cat.key}
+                          onClick={() => setMoodboardCategory(cat.key)}
+                          className={`studio-cat-pill ${moodboardCategory === cat.key ? 'active' : ''}`}
+                        >
+                          {cat.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
