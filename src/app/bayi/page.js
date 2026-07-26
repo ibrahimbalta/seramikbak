@@ -2982,21 +2982,21 @@ export default function DealerPortalPage() {
                               value={camp.title} 
                               onChange={(e) => updateCampaign(idx, 'title', e.target.value)} 
                               placeholder="Kampanya Başlığı (Örn: Lapatto Serisinde %10 İndirim)"
-                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none' }}
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', color: '#0f172a', background: '#ffffff', fontWeight: '600' }}
                             />
                             <textarea 
                               value={camp.desc} 
                               onChange={(e) => updateCampaign(idx, 'desc', e.target.value)} 
                               placeholder="Kampanya Açıklaması/Koşulları..."
                               rows={2}
-                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none', resize: 'vertical' }}
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', resize: 'vertical', color: '#0f172a', background: '#ffffff' }}
                             />
                             <input 
                               type="text" 
                               value={camp.expiresAt} 
                               onChange={(e) => updateCampaign(idx, 'expiresAt', e.target.value)} 
                               placeholder="Geçerlilik Tarihi (Örn: 31 Ağustos'a kadar)"
-                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none' }}
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', color: '#0f172a', background: '#ffffff' }}
                             />
                           </div>
                         ))}
@@ -3018,21 +3018,21 @@ export default function DealerPortalPage() {
                               value={proj.title} 
                               onChange={(e) => updateReferenceProject(idx, 'title', e.target.value)} 
                               placeholder="Proje Adı (Örn: Rixos Hotel Lobby Kaplaması)"
-                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none' }}
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', color: '#0f172a', background: '#ffffff', fontWeight: '600' }}
                             />
                             <input 
                               type="text" 
                               value={proj.imageUrl} 
                               onChange={(e) => updateReferenceProject(idx, 'imageUrl', e.target.value)} 
                               placeholder="Proje Görsel URL'si (http://... veya /textures/...)"
-                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none' }}
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', color: '#0f172a', background: '#ffffff' }}
                             />
                             <textarea 
                               value={proj.desc} 
                               onChange={(e) => updateReferenceProject(idx, 'desc', e.target.value)} 
                               placeholder="Kullanılan ürünler ve proje detayı..."
                               rows={2}
-                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none', resize: 'vertical' }}
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', resize: 'vertical', color: '#0f172a', background: '#ffffff' }}
                             />
                           </div>
                         ))}
@@ -3054,14 +3054,14 @@ export default function DealerPortalPage() {
                               value={faq.q} 
                               onChange={(e) => updateFaq(idx, 'q', e.target.value)} 
                               placeholder="Soru (Örn: Şehir dışı nakliye yapıyor musunuz?)"
-                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none' }}
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', color: '#0f172a', background: '#ffffff', fontWeight: '600' }}
                             />
                             <textarea 
                               value={faq.a} 
                               onChange={(e) => updateFaq(idx, 'a', e.target.value)} 
                               placeholder="Cevap..."
                               rows={2}
-                              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', outline: 'none', resize: 'vertical' }}
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', resize: 'vertical', color: '#0f172a', background: '#ffffff' }}
                             />
                           </div>
                         ))}
@@ -4774,15 +4774,16 @@ export default function DealerPortalPage() {
 
         .portal-input {
           transition: all 0.2s ease-in-out !important;
-          background-color: rgba(255, 255, 255, 0.04) !important;
-          border: 1px solid rgba(255, 255, 255, 0.08) !important;
-          color: #ffffff !important;
+          background-color: #ffffff !important;
+          border: 1px solid #cbd5e1 !important;
+          color: #0f172a !important;
         }
 
         .portal-input:focus {
           border-color: #d4af37 !important;
           box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15) !important;
-          background-color: rgba(255, 255, 255, 0.08) !important;
+          background-color: #ffffff !important;
+          color: #0f172a !important;
         }
 
         .hover-gold-btn {
