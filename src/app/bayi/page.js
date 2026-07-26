@@ -136,6 +136,7 @@ export default function DealerPortalPage() {
   const [profileDealerCampaigns, setProfileDealerCampaigns] = useState([]);
   const [profileReferenceProjects, setProfileReferenceProjects] = useState([]);
   const [profileDealerFaqs, setProfileDealerFaqs] = useState([]);
+  const [profileDealerStats, setProfileDealerStats] = useState({ experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' });
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -327,6 +328,7 @@ export default function DealerPortalPage() {
         setProfileDealerCampaigns(safeParseJSON(session.dealerCampaigns, []));
         setProfileReferenceProjects(safeParseJSON(session.referenceProjects, []));
         setProfileDealerFaqs(safeParseJSON(session.dealerFaqs, []));
+        setProfileDealerStats(safeParseJSON(session.dealerStats, { experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' }));
       } catch (err) {
         console.error('Session restore failed:', err);
       }
@@ -702,6 +704,7 @@ export default function DealerPortalPage() {
         setProfileDealerCampaigns(safeParseJSON(data.dealer.dealerCampaigns, []));
         setProfileReferenceProjects(safeParseJSON(data.dealer.referenceProjects, []));
         setProfileDealerFaqs(safeParseJSON(data.dealer.dealerFaqs, []));
+        setProfileDealerStats(safeParseJSON(data.dealer.dealerStats, { experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' }));
       } else {
         setLoginError(data.error || 'Giriş başarısız oldu.');
       }
@@ -989,6 +992,7 @@ export default function DealerPortalPage() {
           dealerCampaigns: JSON.stringify(profileDealerCampaigns),
           referenceProjects: JSON.stringify(profileReferenceProjects),
           dealerFaqs: JSON.stringify(profileDealerFaqs),
+          dealerStats: JSON.stringify(profileDealerStats),
           status: 'APPROVED' // Keep approved status
         })
       });
@@ -1013,7 +1017,8 @@ export default function DealerPortalPage() {
           featuredProducts: JSON.stringify(profileFeaturedProducts),
           dealerCampaigns: JSON.stringify(profileDealerCampaigns),
           referenceProjects: JSON.stringify(profileReferenceProjects),
-          dealerFaqs: JSON.stringify(profileDealerFaqs)
+          dealerFaqs: JSON.stringify(profileDealerFaqs),
+          dealerStats: JSON.stringify(profileDealerStats)
         };
         setDealerInfo(updatedSession);
         localStorage.setItem('sb_dealer_session', JSON.stringify(updatedSession));
@@ -2539,6 +2544,51 @@ export default function DealerPortalPage() {
                       style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', fontFamily: 'inherit', resize: 'vertical' }}
                       className="portal-input"
                     />
+                  </div>
+                </div>
+
+                {/* SECTION: SHOWROOM İSTATİSTİKLERİ */}
+                <div className="settings-section">
+                  <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#1e293b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'var(--font-title)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '4px', height: '14px', background: 'var(--accent-gold)', borderRadius: '2px' }}></span>
+                    Showroom Başlık İstatistikleri (Hero Kartı)
+                  </h3>
+                  <p style={{ fontSize: '0.72rem', color: '#cbd5e1', margin: '2px 0 12px 0' }}>Canlı bayi profilinizdeki üst kartta görünen 3 ana istatistiği özelleştirin.</p>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Deneyim İstatistiği</label>
+                      <input 
+                        type="text" 
+                        value={profileDealerStats.experience || ''} 
+                        onChange={(e) => setProfileDealerStats({ ...profileDealerStats, experience: e.target.value })} 
+                        placeholder="Örn: 10+ Yıl veya 15 Yıl"
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        className="portal-input"
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Mutlu Müşteri İstatistiği</label>
+                      <input 
+                        type="text" 
+                        value={profileDealerStats.happyClients || ''} 
+                        onChange={(e) => setProfileDealerStats({ ...profileDealerStats, happyClients: e.target.value })} 
+                        placeholder="Örn: 500+ veya 1000+"
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        className="portal-input"
+                      />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Showroom Alanı</label>
+                      <input 
+                        type="text" 
+                        value={profileDealerStats.showroomArea || ''} 
+                        onChange={(e) => setProfileDealerStats({ ...profileDealerStats, showroomArea: e.target.value })} 
+                        placeholder="Örn: 200 m² veya 350 m²"
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        className="portal-input"
+                      />
+                    </div>
                   </div>
                 </div>
 

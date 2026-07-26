@@ -100,6 +100,7 @@ model Dealer {
   dealerCampaigns   String?
   referenceProjects  String?
   dealerFaqs        String?
+  dealerStats       String?
 }
 
 model DealerSaaSConfig {

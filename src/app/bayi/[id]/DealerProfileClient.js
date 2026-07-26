@@ -62,6 +62,7 @@ export default function DealerProfileClient({ dealer, products }) {
   const campaigns = safeParseJSON(dealer.dealerCampaigns, []);
   const referenceProjects = safeParseJSON(dealer.referenceProjects, []);
   const faqs = safeParseJSON(dealer.dealerFaqs, []);
+  const dealerStats = safeParseJSON(dealer.dealerStats, { experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' });
   const servicesList = dealer.logisticsServices ? dealer.logisticsServices.split(',').filter(Boolean) : [];
 
   const featuredProductsList = products.filter(p => featuredProductIds.includes(p.id));
@@ -242,7 +243,7 @@ export default function DealerProfileClient({ dealer, products }) {
             <div className="hero-stat-item">
               <Award size={20} className="stat-icon" />
               <div className="hero-stat-content">
-                <span className="stat-number">10+ Yıl</span>
+                <span className="stat-number">{dealerStats.experience || '10+ Yıl'}</span>
                 <span className="stat-label">Deneyim</span>
               </div>
             </div>
@@ -250,7 +251,7 @@ export default function DealerProfileClient({ dealer, products }) {
             <div className="hero-stat-item">
               <TrendingUp size={20} className="stat-icon" />
               <div className="hero-stat-content">
-                <span className="stat-number">500+</span>
+                <span className="stat-number">{dealerStats.happyClients || '500+'}</span>
                 <span className="stat-label">Mutlu Müşteri</span>
               </div>
             </div>
@@ -258,7 +259,7 @@ export default function DealerProfileClient({ dealer, products }) {
             <div className="hero-stat-item">
               <Building2 size={20} className="stat-icon" />
               <div className="hero-stat-content">
-                <span className="stat-number">200 m²</span>
+                <span className="stat-number">{dealerStats.showroomArea || '200 m²'}</span>
                 <span className="stat-label">Showroom</span>
               </div>
             </div>
