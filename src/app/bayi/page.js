@@ -1704,6 +1704,34 @@ export default function DealerPortalPage() {
                     </span>
                   )}
                 </div>
+
+                {/* Showroom Public Page Link */}
+                <a
+                  href={`/bayi/${dealerInfo.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    width: '100%',
+                    padding: '7px 10px',
+                    borderRadius: '8px',
+                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    color: '#090d16',
+                    fontSize: '0.74rem',
+                    fontWeight: '800',
+                    textDecoration: 'none',
+                    marginTop: '4px',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 8px rgba(212, 175, 55, 0.2)'
+                  }}
+                  title="Showroom / Bayi Sayfanızı Müşteri Tarafında Görüntüleyin"
+                >
+                  <ExternalLink size={12} />
+                  <span>Showroom Sayfamı Gör</span>
+                </a>
               </div>
             )}
 
@@ -1826,6 +1854,30 @@ export default function DealerPortalPage() {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {dealerInfo?.id && (
+                  <a
+                    href={`/bayi/${dealerInfo.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      background: 'rgba(212, 175, 55, 0.15)',
+                      border: '1px solid rgba(212, 175, 55, 0.35)',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.62rem',
+                      color: '#d4af37',
+                      fontWeight: '700',
+                      textDecoration: 'none'
+                    }}
+                    title="Showroom Sayfası"
+                  >
+                    <ExternalLink size={10} />
+                    <span>Showroom</span>
+                  </a>
+                )}
                 {saasInfo && (
                   <span style={{
                     fontSize: '0.6rem',
@@ -1852,31 +1904,60 @@ export default function DealerPortalPage() {
                   {activePortalTab === 'settings' && 'Şube Ayarları & Görünüm'}
                 </h2>
                 {dealerInfo && (
-                  <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '4px 0 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <p style={{ fontSize: '0.75rem', color: '#cbd5e1', margin: '4px 0 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <MapPin size={11} style={{ color: '#d4af37' }} />
                     <span>{dealerInfo.district}, {dealerInfo.city}</span>
-                    <span style={{ color: 'rgba(255, 255, 255, 0.15)' }}>|</span>
+                    <span style={{ color: 'rgba(255, 255, 255, 0.25)' }}>|</span>
                     <span>{dealerInfo.brandName} Yetkili Bayisi</span>
                   </p>
                 )}
               </div>
 
-              {saasInfo?.expiresAt && (
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  padding: '6px 12px',
-                  borderRadius: '8px',
-                  fontSize: '0.72rem',
-                  color: '#cbd5e1',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}>
-                  <Calendar size={13} style={{ color: '#d4af37' }} />
-                  <span>Paket Bitiş: {new Date(saasInfo.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                </div>
-              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {dealerInfo?.id && (
+                  <a
+                    href={`/bayi/${dealerInfo.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      background: 'rgba(212, 175, 55, 0.15)',
+                      border: '1px solid rgba(212, 175, 55, 0.35)',
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      fontSize: '0.75rem',
+                      color: '#d4af37',
+                      fontWeight: '800',
+                      textDecoration: 'none',
+                      transition: 'all 0.2s ease'
+                    }}
+                    className="hover-gold-solid-btn"
+                    title="Canlı Showroom Sayfanızı Yeni Sekmede Açın"
+                  >
+                    <ExternalLink size={13} />
+                    <span>Showroom Sayfamı Gör</span>
+                  </a>
+                )}
+
+                {saasInfo?.expiresAt && (
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    fontSize: '0.72rem',
+                    color: '#cbd5e1',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <Calendar size={13} style={{ color: '#d4af37' }} />
+                    <span>Paket Bitiş: {new Date(saasInfo.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </header>
@@ -2657,7 +2738,6 @@ export default function DealerPortalPage() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '8px',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     boxShadow: '0 8px 24px rgba(179, 142, 71, 0.25)',
                     fontFamily: 'var(--font-title)'
@@ -2681,11 +2761,11 @@ export default function DealerPortalPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             <div className="analytics-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <TrendingUp size={22} style={{ color: '#b38e47' }} />
+                <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff' }}>
+                  <TrendingUp size={22} style={{ color: '#d4af37' }} />
                   Bölgesel Arama & Seramik Analitiği
                 </h2>
-                <p style={{ fontSize: '0.82rem', color: '#6c757d', margin: 0 }}>
+                <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: 0 }}>
                   {dealerInfo?.city} şehrindeki tüketicilerin seramik arama, marka ve ebat/tarz tercihlerini canlı analiz edin.
                 </p>
               </div>
@@ -2718,8 +2798,8 @@ export default function DealerPortalPage() {
                 }}>
                   <Lock size={24} />
                 </div>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0 }}>Detaylı Analiz Kilitli</h3>
-                <p style={{ fontSize: '0.82rem', color: '#6c757d', maxWidth: '450px', margin: 0 }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>Detaylı Analiz Kilitli</h3>
+                <p style={{ fontSize: '0.82rem', color: '#475569', maxWidth: '450px', margin: 0 }}>
                   Şehrinizdeki popüler seramik modellerini, arama terimlerini ve ebat taleplerini görebilmek için Standart veya Premium pakete yükseltin.
                 </p>
                 <button
@@ -2743,19 +2823,19 @@ export default function DealerPortalPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
                 
                 {/* Card 1: Popular Search Queries */}
-                <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
-                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div className="analytics-white-card" style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: '#0f172a' }}>
                     🔍 En Sık Aranan Kelimeler
                   </h4>
                   {regionalAnalytics.popularQueries.length === 0 ? (
-                    <div style={{ fontSize: '0.8rem', color: '#888', fontStyle: 'italic', padding: '12px 0' }}>Bölgenizde yeterli arama kaydı yok.</div>
+                    <div style={{ fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic', padding: '12px 0', fontWeight: '500' }}>Bölgenizde yeterli arama kaydı yok.</div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {regionalAnalytics.popularQueries.map((item, i) => (
                         <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                            <span style={{ fontWeight: '600' }}>"{item.query}"</span>
-                            <span style={{ color: '#6c757d' }}>{item.count} arama</span>
+                            <span style={{ fontWeight: '700', color: '#0f172a' }}>"{item.query}"</span>
+                            <span style={{ color: '#475569', fontWeight: '600' }}>{item.count} arama</span>
                           </div>
                           <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
                             <div style={{
@@ -2772,19 +2852,19 @@ export default function DealerPortalPage() {
                 </div>
 
                 {/* Card 2: Popular Ceramic Brands */}
-                <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
-                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div className="analytics-white-card" style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: '#0f172a' }}>
                     🏢 Popüler Marka İncelemeleri
                   </h4>
                   {regionalAnalytics.popularBrands.length === 0 ? (
-                    <div style={{ fontSize: '0.8rem', color: '#888', fontStyle: 'italic', padding: '12px 0' }}>Bölgenizde yeterli marka verisi yok.</div>
+                    <div style={{ fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic', padding: '12px 0', fontWeight: '500' }}>Bölgenizde yeterli marka verisi yok.</div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {regionalAnalytics.popularBrands.map((item, i) => (
                         <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                            <span style={{ fontWeight: '600' }}>{item.name}</span>
-                            <span style={{ color: '#6c757d' }}>{item.count} görüntülenme</span>
+                            <span style={{ fontWeight: '700', color: '#0f172a' }}>{item.name}</span>
+                            <span style={{ color: '#475569', fontWeight: '600' }}>{item.count} görüntülenme</span>
                           </div>
                           <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
                             <div style={{
@@ -2801,19 +2881,19 @@ export default function DealerPortalPage() {
                 </div>
 
                 {/* Card 3: Popular Sizes and Styles */}
-                <div style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
-                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div className="analytics-white-card" style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: '#0f172a' }}>
                     📐 Boyut & Tarz Tercihleri
                   </h4>
                   {regionalAnalytics.popularStyles.length === 0 ? (
-                    <div style={{ fontSize: '0.8rem', color: '#888', fontStyle: 'italic', padding: '12px 0' }}>Bölgenizde yeterli ebat verisi yok.</div>
+                    <div style={{ fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic', padding: '12px 0', fontWeight: '500' }}>Bölgenizde yeterli ebat verisi yok.</div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {regionalAnalytics.popularStyles.map((item, i) => (
                         <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                            <span style={{ fontWeight: '600' }}>{item.style}</span>
-                            <span style={{ color: '#6c757d' }}>{item.count} kez incelendi</span>
+                            <span style={{ fontWeight: '700', color: '#0f172a' }}>{item.style}</span>
+                            <span style={{ color: '#475569', fontWeight: '600' }}>{item.count} kez incelendi</span>
                           </div>
                           <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
                             <div style={{
@@ -4194,6 +4274,11 @@ export default function DealerPortalPage() {
           box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2) !important;
         }
 
+        .dealer-main-content label {
+          color: #cbd5e1 !important;
+          font-weight: 700 !important;
+        }
+
         /* Settings specific styles */
         .settings-container {
           max-width: 850px;
@@ -4203,23 +4288,48 @@ export default function DealerPortalPage() {
         }
 
         .settings-card {
-          background: rgba(17, 24, 39, 0.7) !important;
+          background: rgba(17, 24, 39, 0.85) !important;
           backdrop-filter: blur(16px) !important;
-          border: 1px solid rgba(212, 175, 55, 0.15) !important;
+          border: 1px solid rgba(212, 175, 55, 0.2) !important;
           border-radius: 24px;
           padding: 40px;
           box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
           transition: all 0.3s ease;
         }
 
+        .settings-card h2 {
+          color: #ffffff !important;
+        }
+
+        .settings-card h3 {
+          color: #d4af37 !important;
+        }
+
+        .settings-card p {
+          color: #cbd5e1 !important;
+        }
+
+        .settings-card label {
+          color: #cbd5e1 !important;
+        }
+
         .settings-section {
-          background: rgba(255, 255, 255, 0.01) !important;
-          border: 1px solid rgba(255, 255, 255, 0.04) !important;
+          background: rgba(255, 255, 255, 0.02) !important;
+          border: 1px solid rgba(255, 255, 255, 0.06) !important;
           border-radius: 16px;
           padding: 24px;
           display: flex;
           flex-direction: column;
           gap: 20px;
+        }
+
+        .analytics-white-card {
+          background: #ffffff !important;
+          color: #0f172a !important;
+        }
+
+        .analytics-white-card h4 {
+          color: #0f172a !important;
         }
 
         .settings-grid-2 {
