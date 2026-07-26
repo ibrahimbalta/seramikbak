@@ -2975,29 +2975,44 @@ export default function DealerPortalPage() {
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {profileDealerCampaigns.map((camp, idx) => (
-                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', position: 'relative' }}>
-                            <button type="button" onClick={() => removeCampaign(idx)} style={{ position: 'absolute', top: '10px', right: '12px', background: 'transparent', border: 'none', color: '#ef4444', fontWeight: '700', cursor: 'pointer', fontSize: '0.85rem' }}>✕</button>
-                            <input 
-                              type="text" 
-                              value={camp.title} 
-                              onChange={(e) => updateCampaign(idx, 'title', e.target.value)} 
-                              placeholder="Kampanya Başlığı (Örn: Lapatto Serisinde %10 İndirim)"
-                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', color: '#0f172a', background: '#ffffff', fontWeight: '600' }}
-                            />
-                            <textarea 
-                              value={camp.desc} 
-                              onChange={(e) => updateCampaign(idx, 'desc', e.target.value)} 
-                              placeholder="Kampanya Açıklaması/Koşulları..."
-                              rows={2}
-                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', resize: 'vertical', color: '#0f172a', background: '#ffffff' }}
-                            />
-                            <input 
-                              type="text" 
-                              value={camp.expiresAt} 
-                              onChange={(e) => updateCampaign(idx, 'expiresAt', e.target.value)} 
-                              placeholder="Geçerlilik Tarihi (Örn: 31 Ağustos'a kadar)"
-                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', color: '#0f172a', background: '#ffffff' }}
-                            />
+                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1.5px solid #cbd5e1', position: 'relative' }}>
+                            <button type="button" onClick={() => removeCampaign(idx)} style={{ position: 'absolute', top: '12px', right: '14px', background: '#fee2e2', border: 'none', color: '#dc2626', fontWeight: '800', cursor: 'pointer', fontSize: '0.78rem', padding: '4px 8px', borderRadius: '6px' }}>Kampanyayı Sil ✕</button>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#1e293b' }}>Kampanya Başlığı</label>
+                              <input 
+                                type="text" 
+                                value={camp.title} 
+                                onChange={(e) => updateCampaign(idx, 'title', e.target.value)} 
+                                placeholder="Örn: Lapatto Serisinde %10 İndirim"
+                                style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #94a3b8', fontSize: '0.85rem', outline: 'none', color: '#000000', background: '#ffffff', fontWeight: '600' }}
+                                className="dealer-card-input"
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#1e293b' }}>Kampanya Açıklaması / Koşulları</label>
+                              <textarea 
+                                value={camp.desc} 
+                                onChange={(e) => updateCampaign(idx, 'desc', e.target.value)} 
+                                placeholder="Kampanya koşulları ve detaylı bilgi..."
+                                rows={2}
+                                style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #94a3b8', fontSize: '0.85rem', outline: 'none', resize: 'vertical', color: '#000000', background: '#ffffff', fontWeight: '600' }}
+                                className="dealer-card-textarea"
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#1e293b' }}>Son Geçerlilik Tarihi</label>
+                              <input 
+                                type="text" 
+                                value={camp.expiresAt} 
+                                onChange={(e) => updateCampaign(idx, 'expiresAt', e.target.value)} 
+                                placeholder="Örn: 31 Ağustos'a kadar geçerli"
+                                style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #94a3b8', fontSize: '0.85rem', outline: 'none', color: '#000000', background: '#ffffff', fontWeight: '600' }}
+                                className="dealer-card-input"
+                              />
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -3011,29 +3026,44 @@ export default function DealerPortalPage() {
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {profileReferenceProjects.map((proj, idx) => (
-                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', position: 'relative' }}>
-                            <button type="button" onClick={() => removeReferenceProject(idx)} style={{ position: 'absolute', top: '10px', right: '12px', background: 'transparent', border: 'none', color: '#ef4444', fontWeight: '700', cursor: 'pointer', fontSize: '0.85rem' }}>✕</button>
-                            <input 
-                              type="text" 
-                              value={proj.title} 
-                              onChange={(e) => updateReferenceProject(idx, 'title', e.target.value)} 
-                              placeholder="Proje Adı (Örn: Rixos Hotel Lobby Kaplaması)"
-                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', color: '#0f172a', background: '#ffffff', fontWeight: '600' }}
-                            />
-                            <input 
-                              type="text" 
-                              value={proj.imageUrl} 
-                              onChange={(e) => updateReferenceProject(idx, 'imageUrl', e.target.value)} 
-                              placeholder="Proje Görsel URL'si (http://... veya /textures/...)"
-                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', color: '#0f172a', background: '#ffffff' }}
-                            />
-                            <textarea 
-                              value={proj.desc} 
-                              onChange={(e) => updateReferenceProject(idx, 'desc', e.target.value)} 
-                              placeholder="Kullanılan ürünler ve proje detayı..."
-                              rows={2}
-                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', resize: 'vertical', color: '#0f172a', background: '#ffffff' }}
-                            />
+                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1.5px solid #cbd5e1', position: 'relative' }}>
+                            <button type="button" onClick={() => removeReferenceProject(idx)} style={{ position: 'absolute', top: '12px', right: '14px', background: '#fee2e2', border: 'none', color: '#dc2626', fontWeight: '800', cursor: 'pointer', fontSize: '0.78rem', padding: '4px 8px', borderRadius: '6px' }}>Projeyi Sil ✕</button>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#1e293b' }}>Proje Adı / Başlığı</label>
+                              <input 
+                                type="text" 
+                                value={proj.title} 
+                                onChange={(e) => updateReferenceProject(idx, 'title', e.target.value)} 
+                                placeholder="Örn: Rixos Hotel Lobby Kaplaması"
+                                style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #94a3b8', fontSize: '0.85rem', outline: 'none', color: '#000000', background: '#ffffff', fontWeight: '600' }}
+                                className="dealer-card-input"
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#1e293b' }}>Proje Görsel URL'si</label>
+                              <input 
+                                type="text" 
+                                value={proj.imageUrl} 
+                                onChange={(e) => updateReferenceProject(idx, 'imageUrl', e.target.value)} 
+                                placeholder="Örn: https://... veya /textures/..."
+                                style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #94a3b8', fontSize: '0.85rem', outline: 'none', color: '#000000', background: '#ffffff', fontWeight: '600' }}
+                                className="dealer-card-input"
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#1e293b' }}>Kullanılan Ürünler ve Proje Detayı</label>
+                              <textarea 
+                                value={proj.desc} 
+                                onChange={(e) => updateReferenceProject(idx, 'desc', e.target.value)} 
+                                placeholder="Kullanılan seramik modelleri, metrekare ve proje açıklaması..."
+                                rows={2}
+                                style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #94a3b8', fontSize: '0.85rem', outline: 'none', resize: 'vertical', color: '#000000', background: '#ffffff', fontWeight: '600' }}
+                                className="dealer-card-textarea"
+                              />
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -3047,22 +3077,32 @@ export default function DealerPortalPage() {
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {profileDealerFaqs.map((faq, idx) => (
-                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #cbd5e1', position: 'relative' }}>
-                            <button type="button" onClick={() => removeFaq(idx)} style={{ position: 'absolute', top: '10px', right: '12px', background: 'transparent', border: 'none', color: '#ef4444', fontWeight: '700', cursor: 'pointer', fontSize: '0.85rem' }}>✕</button>
-                            <input 
-                              type="text" 
-                              value={faq.q} 
-                              onChange={(e) => updateFaq(idx, 'q', e.target.value)} 
-                              placeholder="Soru (Örn: Şehir dışı nakliye yapıyor musunuz?)"
-                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', color: '#0f172a', background: '#ffffff', fontWeight: '600' }}
-                            />
-                            <textarea 
-                              value={faq.a} 
-                              onChange={(e) => updateFaq(idx, 'a', e.target.value)} 
-                              placeholder="Cevap..."
-                              rows={2}
-                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', outline: 'none', resize: 'vertical', color: '#0f172a', background: '#ffffff' }}
-                            />
+                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1.5px solid #cbd5e1', position: 'relative' }}>
+                            <button type="button" onClick={() => removeFaq(idx)} style={{ position: 'absolute', top: '12px', right: '14px', background: '#fee2e2', border: 'none', color: '#dc2626', fontWeight: '800', cursor: 'pointer', fontSize: '0.78rem', padding: '4px 8px', borderRadius: '6px' }}>Soruyu Sil ✕</button>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#1e293b' }}>Soru</label>
+                              <input 
+                                type="text" 
+                                value={faq.q} 
+                                onChange={(e) => updateFaq(idx, 'q', e.target.value)} 
+                                placeholder="Örn: Şehir dışı nakliye hizmetiniz var mı?"
+                                style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #94a3b8', fontSize: '0.85rem', outline: 'none', color: '#000000', background: '#ffffff', fontWeight: '600' }}
+                                className="dealer-card-input"
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.74rem', fontWeight: '800', color: '#1e293b' }}>Cevap</label>
+                              <textarea 
+                                value={faq.a} 
+                                onChange={(e) => updateFaq(idx, 'a', e.target.value)} 
+                                placeholder="Cevap detayları..."
+                                rows={2}
+                                style={{ padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #94a3b8', fontSize: '0.85rem', outline: 'none', resize: 'vertical', color: '#000000', background: '#ffffff', fontWeight: '600' }}
+                                className="dealer-card-textarea"
+                              />
+                            </div>
                           </div>
                         ))}
                       </div>
