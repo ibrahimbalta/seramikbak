@@ -4717,12 +4717,13 @@ export default function DealerPortalPage() {
         }
 
         /* Inputs, textareas, selects */
+        /* Inputs, textareas, selects */
         .dealer-main-content input,
         .dealer-main-content select,
         .dealer-main-content textarea {
-          background: rgba(255, 255, 255, 0.04) !important;
-          border: 1px solid rgba(255, 255, 255, 0.08) !important;
-          color: #ffffff !important;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          color: #ffffff;
           border-radius: 8px;
           outline: none;
           transition: all 0.2s ease-in-out;
@@ -4731,17 +4732,17 @@ export default function DealerPortalPage() {
         .dealer-main-content input:focus,
         .dealer-main-content select:focus,
         .dealer-main-content textarea:focus {
-          background: rgba(255, 255, 255, 0.08) !important;
-          border-color: #d4af37 !important;
-          box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2) !important;
+          background: rgba(255, 255, 255, 0.08);
+          border-color: #d4af37;
+          box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
         }
 
         .dealer-main-content label {
-          color: #cbd5e1 !important;
-          font-weight: 700 !important;
+          color: #cbd5e1;
+          font-weight: 700;
         }
 
-        /* Settings specific styles */
+        /* Settings specific styles - High Contrast Light & Black Text Theme */
         .settings-container {
           max-width: 850px;
           width: 100%;
@@ -4750,39 +4751,44 @@ export default function DealerPortalPage() {
         }
 
         .settings-card {
-          background: rgba(17, 24, 39, 0.85) !important;
-          backdrop-filter: blur(16px) !important;
-          border: 1px solid rgba(212, 175, 55, 0.2) !important;
+          background: #ffffff !important;
+          border: 1px solid #e2e8f0 !important;
           border-radius: 24px;
           padding: 40px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
           transition: all 0.3s ease;
         }
 
         .settings-card h2 {
-          color: #ffffff !important;
+          color: #0f172a !important;
         }
 
         .settings-card h3 {
-          color: #d4af37 !important;
+          color: #0f172a !important;
         }
 
         .settings-card p {
-          color: #cbd5e1 !important;
+          color: #475569 !important;
         }
 
         .settings-card label {
-          color: #cbd5e1 !important;
+          color: #1e293b !important;
+          font-weight: 800 !important;
+        }
+
+        .settings-card span {
+          color: #334155 !important;
         }
 
         .settings-section {
-          background: rgba(255, 255, 255, 0.02) !important;
-          border: 1px solid rgba(255, 255, 255, 0.06) !important;
+          background: #ffffff !important;
+          border: 1px solid #cbd5e1 !important;
           border-radius: 16px;
           padding: 24px;
           display: flex;
           flex-direction: column;
           gap: 20px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
         }
 
         .analytics-white-card {
@@ -4812,18 +4818,42 @@ export default function DealerPortalPage() {
           align-items: center;
         }
 
-        .portal-input {
-          transition: all 0.2s ease-in-out !important;
+        /* 100% PURE BLACK TEXT FOR ALL SETTINGS INPUTS, TEXTAREAS & SELECTS */
+        .settings-card input,
+        .settings-card textarea,
+        .settings-card select,
+        .portal-input,
+        .dealer-card-input,
+        .dealer-card-textarea {
           background-color: #ffffff !important;
-          border: 1px solid #cbd5e1 !important;
-          color: #0f172a !important;
+          border: 1.5px solid #94a3b8 !important;
+          color: #000000 !important;
+          font-weight: 700 !important;
+          font-size: 0.88rem !important;
+          opacity: 1 !important;
+          caret-color: #000000 !important;
         }
 
-        .portal-input:focus {
-          border-color: #d4af37 !important;
-          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15) !important;
+        .settings-card input:focus,
+        .settings-card textarea:focus,
+        .settings-card select:focus,
+        .portal-input:focus,
+        .dealer-card-input:focus,
+        .dealer-card-textarea:focus {
           background-color: #ffffff !important;
-          color: #0f172a !important;
+          border-color: #d4af37 !important;
+          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25) !important;
+          color: #000000 !important;
+        }
+
+        .settings-card input::placeholder,
+        .settings-card textarea::placeholder,
+        .portal-input::placeholder,
+        .dealer-card-input::placeholder,
+        .dealer-card-textarea::placeholder {
+          color: #64748b !important;
+          opacity: 1 !important;
+          font-weight: 500 !important;
         }
 
         .hover-gold-btn {
