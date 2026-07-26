@@ -88,6 +88,7 @@ export async function PUT(request) {
       lat, 
       lng, 
       logoUrl, 
+      bannerUrl,
       showroomImages, 
       virtualTourUrl, 
       specialConcepts,
@@ -113,6 +114,7 @@ export async function PUT(request) {
     if (lat !== undefined) updateData.lat = parseFloat(lat);
     if (lng !== undefined) updateData.lng = parseFloat(lng);
     if (logoUrl !== undefined) updateData.logoUrl = logoUrl;
+    if (bannerUrl !== undefined) updateData.bannerUrl = bannerUrl;
     if (showroomImages !== undefined) updateData.showroomImages = showroomImages;
     if (virtualTourUrl !== undefined) updateData.virtualTourUrl = virtualTourUrl;
     if (specialConcepts !== undefined) updateData.specialConcepts = specialConcepts;

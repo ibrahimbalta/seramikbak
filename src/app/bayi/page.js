@@ -39,6 +39,7 @@ import {
   Menu
 } from 'lucide-react';
 import Link from 'next/link';
+import { slugify } from '@/lib/slugify';
 
 export default function DealerPortalPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -125,6 +126,7 @@ export default function DealerPortalPage() {
   const [profileLat, setProfileLat] = useState('');
   const [profileLng, setProfileLng] = useState('');
   const [profileLogoUrl, setProfileLogoUrl] = useState('');
+  const [profileBannerUrl, setProfileBannerUrl] = useState('');
   const [profileShowroomImages, setProfileShowroomImages] = useState('');
   const [profileVirtualTourUrl, setProfileVirtualTourUrl] = useState('');
   const [profileSpecialConcepts, setProfileSpecialConcepts] = useState('');
@@ -149,6 +151,7 @@ export default function DealerPortalPage() {
 
   // Upload States
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [isUploading360, setIsUploading360] = useState(false);
   const [upload360Success, setUpload360Success] = useState('');
@@ -314,6 +317,7 @@ export default function DealerPortalPage() {
         setProfileLat(session.lat ? String(session.lat) : '');
         setProfileLng(session.lng ? String(session.lng) : '');
         setProfileLogoUrl(session.logoUrl || '');
+        setProfileBannerUrl(session.bannerUrl || '');
         setProfileShowroomImages(session.showroomImages || '');
         setProfileVirtualTourUrl(session.virtualTourUrl || '');
         setProfileSpecialConcepts(session.specialConcepts || '');
@@ -688,6 +692,7 @@ export default function DealerPortalPage() {
         setProfileLat(data.dealer.lat ? String(data.dealer.lat) : '');
         setProfileLng(data.dealer.lng ? String(data.dealer.lng) : '');
         setProfileLogoUrl(data.dealer.logoUrl || '');
+        setProfileBannerUrl(data.dealer.bannerUrl || '');
         setProfileShowroomImages(data.dealer.showroomImages || '');
         setProfileVirtualTourUrl(data.dealer.virtualTourUrl || '');
         setProfileSpecialConcepts(data.dealer.specialConcepts || '');
@@ -786,6 +791,38 @@ export default function DealerPortalPage() {
         alert('Bağlantı hatası.');
       } finally {
         setIsUploadingLogo(false);
+      }
+    };
+  };
+
+  const handleBannerUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setIsUploadingBanner(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const res = await fetch('/api/dealers/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64Data: reader.result,
+            filename: file.name,
+            folder: 'seramikbak/banners'
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setProfileBannerUrl(data.url);
+        } else {
+          alert(data.error || 'Banner görseli yüklenemedi.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Bağlantı hatası.');
+      } finally {
+        setIsUploadingBanner(false);
       }
     };
   };
@@ -942,6 +979,7 @@ export default function DealerPortalPage() {
           lat: parseFloat(profileLat) || dealerInfo.lat,
           lng: parseFloat(profileLng) || dealerInfo.lng,
           logoUrl: profileLogoUrl,
+          bannerUrl: profileBannerUrl,
           showroomImages: profileShowroomImages,
           virtualTourUrl: profileVirtualTourUrl,
           specialConcepts: profileSpecialConcepts,
@@ -966,6 +1004,7 @@ export default function DealerPortalPage() {
           lat: parseFloat(profileLat) || dealerInfo.lat,
           lng: parseFloat(profileLng) || dealerInfo.lng,
           logoUrl: profileLogoUrl,
+          bannerUrl: profileBannerUrl,
           showroomImages: profileShowroomImages,
           virtualTourUrl: profileVirtualTourUrl,
           specialConcepts: profileSpecialConcepts,
@@ -1707,7 +1746,7 @@ export default function DealerPortalPage() {
 
                 {/* Showroom Public Page Link */}
                 <a
-                  href={`/bayi/${dealerInfo.id}`}
+                  href={`/bayi/${dealerInfo.name ? slugify(dealerInfo.name) : dealerInfo.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -1854,9 +1893,9 @@ export default function DealerPortalPage() {
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {dealerInfo?.id && (
+                {dealerInfo && (
                   <a
-                    href={`/bayi/${dealerInfo.id}`}
+                    href={`/bayi/${dealerInfo.name ? slugify(dealerInfo.name) : dealerInfo.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -1914,9 +1953,9 @@ export default function DealerPortalPage() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                {dealerInfo?.id && (
+                {dealerInfo && (
                   <a
-                    href={`/bayi/${dealerInfo.id}`}
+                    href={`/bayi/${dealerInfo.name ? slugify(dealerInfo.name) : dealerInfo.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -2367,6 +2406,54 @@ export default function DealerPortalPage() {
                           disabled={isUploadingLogo}
                         />
                         {isUploadingLogo ? 'Yükleniyor...' : 'Logo Yükle'}
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Banner Background Image Group */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Sayfa Hero Banner Arka Plan Görseli</label>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Showroom başlık kartı arka plan fotoğrafı</span>
+                    </div>
+                    <div className="settings-upload-row">
+                      {profileBannerUrl && (
+                        <div style={{ width: '80px', height: '50px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', background: '#111', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                          <img src={profileBannerUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                      )}
+                      <input 
+                        type="text" 
+                        value={profileBannerUrl} 
+                        onChange={(e) => setProfileBannerUrl(e.target.value)} 
+                        placeholder="/hero/hero_ceramics.jpg veya Cihazınızdan Banner Yükleyin"
+                        style={{ flex: 1, padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        className="portal-input"
+                      />
+                      <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        padding: '12px 18px',
+                        background: '#ffffff',
+                        border: '1.5px solid var(--accent-gold)',
+                        color: 'var(--accent-gold)',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        fontSize: '0.82rem',
+                        fontWeight: '700',
+                        userSelect: 'none',
+                        transition: 'all 0.2s'
+                      }} className="hover-gold-btn">
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={handleBannerUpload} 
+                          style={{ display: 'none' }} 
+                          disabled={isUploadingBanner}
+                        />
+                        {isUploadingBanner ? 'Yükleniyor...' : 'Banner Yükle'}
                       </label>
                     </div>
                   </div>
