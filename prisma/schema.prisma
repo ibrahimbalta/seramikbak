@@ -101,6 +101,9 @@ model Dealer {
   referenceProjects  String?
   dealerFaqs        String?
   dealerStats       String?
+  pdfCatalogUrl     String?
+  pdfCatalogName    String?
+  analytics         AnalyticsLog[]
 }
 
 model DealerSaaSConfig {
@@ -163,11 +166,13 @@ model AdCampaign {
 
 model AnalyticsLog {
   id        String   @id @default(uuid())
-  action    String   // SEARCH, VIEW, CLICK, LEAD
+  action    String   // SEARCH, VIEW, CLICK, LEAD, WHATSAPP, PHONE, DIRECTIONS, PDF_DOWNLOAD
   productId String?
   product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   brandId   String?
   brand     Brand?   @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  dealerId  String?
+  dealer    Dealer?  @relation(fields: [dealerId], references: [id], onDelete: SetNull)
   query     String?  // search queries if action is SEARCH
   city      String?  // user's city
   createdAt DateTime @default(now())

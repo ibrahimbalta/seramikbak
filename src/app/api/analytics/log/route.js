@@ -4,11 +4,11 @@ import prisma from '@/lib/prisma';
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { action, productId, brandId, city } = body;
+    const { action, productId, brandId, dealerId, city } = body;
 
     if (!action) {
       return NextResponse.json(
-        { error: 'Missing action parameter (action must be SEARCH, VIEW, CLICK, or LEAD)' },
+        { error: 'Missing action parameter' },
         { status: 400 }
       );
     }
@@ -19,6 +19,7 @@ export async function POST(request) {
         action,
         productId: productId || null,
         brandId: brandId || null,
+        dealerId: dealerId || null,
         city: city || 'İstanbul'
       }
     });

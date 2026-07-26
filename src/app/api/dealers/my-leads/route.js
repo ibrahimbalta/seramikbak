@@ -147,6 +147,34 @@ export async function GET(request) {
       }
     }
 
+    // Fetch action analytics for this specific dealer
+    let actionStats = {
+      views: 0,
+      whatsapp: 0,
+      phone: 0,
+      directions: 0,
+      pdfDownload: 0,
+      totalInteractions: 0
+    };
+
+    try {
+      const actionLogs = await prisma.analyticsLog.findMany({
+        where: { dealerId: dealerId },
+        select: { action: true }
+      });
+
+      actionLogs.forEach(l => {
+        if (l.action === 'VIEW') actionStats.views++;
+        else if (l.action === 'WHATSAPP') actionStats.whatsapp++;
+        else if (l.action === 'PHONE') actionStats.phone++;
+        else if (l.action === 'DIRECTIONS') actionStats.directions++;
+        else if (l.action === 'PDF_DOWNLOAD') actionStats.pdfDownload++;
+      });
+      actionStats.totalInteractions = actionStats.whatsapp + actionStats.phone + actionStats.directions + actionStats.pdfDownload;
+    } catch (e) {
+      console.error('Failed to compute actionStats:', e);
+    }
+
     return NextResponse.json({
       success: true,
       leads: processedLeads,
@@ -160,7 +188,8 @@ export async function GET(request) {
         pendingLeads,
         respondedLeads
       },
-      regionalAnalytics
+      regionalAnalytics,
+      actionStats
     });
 
   } catch (error) {

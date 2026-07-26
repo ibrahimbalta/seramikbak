@@ -137,6 +137,9 @@ export default function DealerPortalPage() {
   const [profileReferenceProjects, setProfileReferenceProjects] = useState([]);
   const [profileDealerFaqs, setProfileDealerFaqs] = useState([]);
   const [profileDealerStats, setProfileDealerStats] = useState({ experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' });
+  const [profilePdfCatalogUrl, setProfilePdfCatalogUrl] = useState('');
+  const [profilePdfCatalogName, setProfilePdfCatalogName] = useState('');
+  const [actionStats, setActionStats] = useState({ views: 0, whatsapp: 0, phone: 0, directions: 0, pdfDownload: 0, totalInteractions: 0 });
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -153,6 +156,7 @@ export default function DealerPortalPage() {
   // Upload States
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const [isUploadingPdf, setIsUploadingPdf] = useState(false);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [isUploading360, setIsUploading360] = useState(false);
   const [upload360Success, setUpload360Success] = useState('');
@@ -329,6 +333,8 @@ export default function DealerPortalPage() {
         setProfileReferenceProjects(safeParseJSON(session.referenceProjects, []));
         setProfileDealerFaqs(safeParseJSON(session.dealerFaqs, []));
         setProfileDealerStats(safeParseJSON(session.dealerStats, { experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' }));
+        setProfilePdfCatalogUrl(session.pdfCatalogUrl || '');
+        setProfilePdfCatalogName(session.pdfCatalogName || '');
       } catch (err) {
         console.error('Session restore failed:', err);
       }
@@ -390,6 +396,9 @@ export default function DealerPortalPage() {
           setSaasInfo(data.saas);
           if (data.regionalAnalytics) {
             setRegionalAnalytics(data.regionalAnalytics);
+          }
+          if (data.actionStats) {
+            setActionStats(data.actionStats);
           }
         }
       }
@@ -830,6 +839,45 @@ export default function DealerPortalPage() {
     };
   };
 
+  const handlePdfUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) {
+      alert('PDF dosyası maksimum 25MB olabilir.');
+      return;
+    }
+    setIsUploadingPdf(true);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      try {
+        const res = await fetch('/api/dealers/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64Data: reader.result,
+            filename: file.name,
+            folder: 'seramikbak/catalogs'
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setProfilePdfCatalogUrl(data.url);
+          if (!profilePdfCatalogName) {
+            setProfilePdfCatalogName(file.name.replace(/\.[^/.]+$/, ""));
+          }
+        } else {
+          alert(data.error || 'PDF kataloğu yüklenemedi.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Bağlantı hatası.');
+      } finally {
+        setIsUploadingPdf(false);
+      }
+    };
+  };
+
   const handlePhotoUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -993,6 +1041,8 @@ export default function DealerPortalPage() {
           referenceProjects: JSON.stringify(profileReferenceProjects),
           dealerFaqs: JSON.stringify(profileDealerFaqs),
           dealerStats: JSON.stringify(profileDealerStats),
+          pdfCatalogUrl: profilePdfCatalogUrl,
+          pdfCatalogName: profilePdfCatalogName,
           status: 'APPROVED' // Keep approved status
         })
       });
@@ -1018,7 +1068,9 @@ export default function DealerPortalPage() {
           dealerCampaigns: JSON.stringify(profileDealerCampaigns),
           referenceProjects: JSON.stringify(profileReferenceProjects),
           dealerFaqs: JSON.stringify(profileDealerFaqs),
-          dealerStats: JSON.stringify(profileDealerStats)
+          dealerStats: JSON.stringify(profileDealerStats),
+          pdfCatalogUrl: profilePdfCatalogUrl,
+          pdfCatalogName: profilePdfCatalogName
         };
         setDealerInfo(updatedSession);
         localStorage.setItem('sb_dealer_session', JSON.stringify(updatedSession));
@@ -2463,6 +2515,59 @@ export default function DealerPortalPage() {
                     </div>
                   </div>
 
+                  {/* PDF Catalog Group */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>İndirilebilir Ürün Kataloğu & Broşür (PDF)</label>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Müşterilerin indirebileceği PDF kataloğunuz</span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '10px', alignItems: 'center' }}>
+                      <input 
+                        type="text" 
+                        value={profilePdfCatalogName} 
+                        onChange={(e) => setProfilePdfCatalogName(e.target.value)} 
+                        placeholder="Katalog Başlığı (Örn: 2026 Seramik Kataloğu)"
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        className="portal-input"
+                      />
+                      <input 
+                        type="text" 
+                        value={profilePdfCatalogUrl} 
+                        onChange={(e) => setProfilePdfCatalogUrl(e.target.value)} 
+                        placeholder="PDF Linki veya Dosya Yükleyin"
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        className="portal-input"
+                      />
+                      <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        padding: '12px 18px',
+                        background: '#ffffff',
+                        border: '1.5px solid var(--accent-gold)',
+                        color: 'var(--accent-gold)',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        fontSize: '0.82rem',
+                        fontWeight: '700',
+                        userSelect: 'none',
+                        transition: 'all 0.2s',
+                        whiteSpace: 'nowrap'
+                      }} className="hover-gold-btn">
+                        <input 
+                          type="file" 
+                          accept="application/pdf" 
+                          onChange={handlePdfUpload} 
+                          style={{ display: 'none' }} 
+                          disabled={isUploadingPdf}
+                        />
+                        {isUploadingPdf ? 'Yükleniyor...' : 'PDF Yükle'}
+                      </label>
+                    </div>
+                  </div>
+
                   {/* Showroom Photos Group */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
@@ -2957,10 +3062,83 @@ export default function DealerPortalPage() {
               </div>
             ) : (
               /* ACTIVE SUBSCRIPTION - RENDER LIVE ANALYTICS */
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 
-                {/* Card 1: Popular Search Queries */}
-                <div className="analytics-white-card" style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
+                {/* ACTION & CONTACT ANALYTICS DASHBOARD CARD */}
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.9) 100%)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
+                  borderRadius: '20px',
+                  padding: '24px',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                  color: '#fff'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                    <div>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Activity size={20} style={{ color: '#d4af37' }} />
+                        Müşteri İletişim & Aksiyon Analitiği
+                      </h3>
+                      <p style={{ fontSize: '0.75rem', color: '#cbd5e1', margin: '4px 0 0 0' }}>
+                        Canlı showroom sayfanızdan gerçekleşen doğrudan müşteri iletişim tıklamaları ve aksiyonları.
+                      </p>
+                    </div>
+                    <div style={{ background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.3)', padding: '6px 14px', borderRadius: '12px', fontSize: '0.78rem', color: '#d4af37', fontWeight: '800' }}>
+                      Toplam Aksiyon: {actionStats.totalInteractions}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                    {/* Stat 1: WhatsApp */}
+                    <div style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#34d399', flexShrink: 0 }}>
+                        <MessageSquare size={20} />
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '1.3rem', fontWeight: '900', color: '#ffffff', display: 'block', lineHeight: 1 }}>{actionStats.whatsapp}</span>
+                        <span style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '700', marginTop: '4px', display: 'block' }}>WhatsApp Tıklamaları</span>
+                      </div>
+                    </div>
+
+                    {/* Stat 2: Phone */}
+                    <div style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#60a5fa', flexShrink: 0 }}>
+                        <Phone size={20} />
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '1.3rem', fontWeight: '900', color: '#ffffff', display: 'block', lineHeight: 1 }}>{actionStats.phone}</span>
+                        <span style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '700', marginTop: '4px', display: 'block' }}>Telefon Araması</span>
+                      </div>
+                    </div>
+
+                    {/* Stat 3: Directions */}
+                    <div style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fbbf24', flexShrink: 0 }}>
+                        <Compass size={20} />
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '1.3rem', fontWeight: '900', color: '#ffffff', display: 'block', lineHeight: 1 }}>{actionStats.directions}</span>
+                        <span style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '700', marginTop: '4px', display: 'block' }}>Yol Tarifi / Navigasyon</span>
+                      </div>
+                    </div>
+
+                    {/* Stat 4: PDF Downloads */}
+                    <div style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(236, 72, 153, 0.15)', border: '1px solid rgba(236, 72, 153, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f472b6', flexShrink: 0 }}>
+                        <FileText size={20} />
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '1.3rem', fontWeight: '900', color: '#ffffff', display: 'block', lineHeight: 1 }}>{actionStats.pdfDownload}</span>
+                        <span style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '700', marginTop: '4px', display: 'block' }}>Katalog İndirme (PDF)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+                  
+                  {/* Card 1: Popular Search Queries */}
+                  <div className="analytics-white-card" style={{ background: '#fff', border: '1px solid #e9ecef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
                   <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: '0 0 16px 0', borderBottom: '1px solid #f1f3f5', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: '#0f172a' }}>
                     🔍 En Sık Aranan Kelimeler
                   </h4>
@@ -3045,10 +3223,10 @@ export default function DealerPortalPage() {
                     </div>
                   )}
                 </div>
-
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
         ) : activePortalTab === 'subscription' ? (
           /* ===== SUBSCRIPTION TAB ===== */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>

@@ -98,7 +98,9 @@ export async function PUT(request) {
       dealerCampaigns,
       referenceProjects,
       dealerFaqs,
-      dealerStats
+      dealerStats,
+      pdfCatalogUrl,
+      pdfCatalogName
     } = body;
 
     if (!id) {
@@ -126,6 +128,8 @@ export async function PUT(request) {
     if (referenceProjects !== undefined) updateData.referenceProjects = referenceProjects;
     if (dealerFaqs !== undefined) updateData.dealerFaqs = dealerFaqs;
     if (dealerStats !== undefined) updateData.dealerStats = dealerStats;
+    if (pdfCatalogUrl !== undefined) updateData.pdfCatalogUrl = pdfCatalogUrl;
+    if (pdfCatalogName !== undefined) updateData.pdfCatalogName = pdfCatalogName;
 
     const updatedDealer = await prisma.dealer.update({
       where: { id },

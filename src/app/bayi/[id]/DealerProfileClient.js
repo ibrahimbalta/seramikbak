@@ -19,7 +19,9 @@ import {
   Star,
   Award,
   TrendingUp,
-  ShieldCheck
+  ShieldCheck,
+  FileText,
+  Download
 } from 'lucide-react';
 import './dealer-profile.css';
 
@@ -68,6 +70,23 @@ export default function DealerProfileClient({ dealer, products }) {
   const featuredProductsList = products.filter(p => featuredProductIds.includes(p.id));
 
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
+
+  const trackAction = (action) => {
+    if (!dealer?.id) return;
+    try {
+      fetch('/api/analytics/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, dealerId: dealer.id, city: dealer.city })
+      }).catch(() => {});
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    if (dealer?.id) {
+      trackAction('VIEW');
+    }
+  }, [dealer?.id]);
 
   const handleFeatureClick = (prodId) => {
     setSelectedProductId(prodId);
@@ -271,6 +290,7 @@ export default function DealerProfileClient({ dealer, products }) {
               href={`https://wa.me/${dealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20profil%20sayfan%C4%B1zdan%20ula%C5%9F%C4%B1yorum.%20Showroom%27daki%20seramikleriniz%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`} 
               target="_blank" 
               rel="noopener noreferrer"
+              onClick={() => trackAction('WHATSAPP')}
               className="btn-whatsapp"
             >
               <MessageSquare size={16} />
@@ -278,6 +298,7 @@ export default function DealerProfileClient({ dealer, products }) {
             </a>
             <a 
               href={`tel:${dealer.phone}`}
+              onClick={() => trackAction('PHONE')}
               className="btn-call"
             >
               <Phone size={16} />
@@ -287,6 +308,7 @@ export default function DealerProfileClient({ dealer, products }) {
               href={`https://www.google.com/maps/dir/?api=1&destination=${dealer.lat},${dealer.lng}`} 
               target="_blank" 
               rel="noopener noreferrer"
+              onClick={() => trackAction('DIRECTIONS')}
               className="btn-maps"
             >
               <Compass size={16} />
@@ -480,6 +502,68 @@ export default function DealerProfileClient({ dealer, products }) {
                 </div>
               </div>
             </div>
+
+            {/* PDF Catalog Card */}
+            {dealer.pdfCatalogUrl && (
+              <div className="section-glass-card animate-fade-in" style={{
+                background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.85) 100%)',
+                border: '1px solid rgba(212, 175, 55, 0.3)',
+                padding: '24px',
+                borderRadius: '20px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '12px',
+                      background: 'rgba(212, 175, 55, 0.15)',
+                      border: '1px solid rgba(212, 175, 55, 0.4)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#d4af37',
+                      flexShrink: 0
+                    }}>
+                      <FileText size={24} />
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: '800', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {dealer.pdfCatalogName || 'İndirilebilir Ürün Kataloğu & Broşür'}
+                      </h3>
+                      <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: '4px 0 0 0' }}>
+                        Bayimizin güncel seramik koleksiyonunu ve fiyat broşürünü PDF olarak indirin.
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href={dealer.pdfCatalogUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackAction('PDF_DOWNLOAD')}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 20px',
+                      borderRadius: '10px',
+                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                      color: '#000000',
+                      fontWeight: '800',
+                      fontSize: '0.85rem',
+                      textDecoration: 'none',
+                      boxShadow: '0 4px 14px rgba(212, 175, 55, 0.3)',
+                      transition: 'all 0.2s ease'
+                    }}
+                    className="hover-gold-solid-btn"
+                  >
+                    <Download size={16} />
+                    <span>Kataloğu İndir (PDF)</span>
+                  </a>
+                </div>
+              </div>
+            )}
 
             {/* Direct lead quote form */}
             <div className="section-glass-card" id="quote-form-section">
