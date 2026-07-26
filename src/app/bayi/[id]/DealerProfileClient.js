@@ -82,6 +82,24 @@ export default function DealerProfileClient({ dealer, products }) {
     } catch (e) {}
   };
 
+  const getTextureFallback = (prod) => {
+    if (!prod) return '/textures/calacatta_gold.jpg';
+    const str = `${prod.style || ''} ${prod.color || ''} ${prod.name || ''}`.toLowerCase();
+    if (str.includes('ahşap') || str.includes('wood') || str.includes('oak') || str.includes('teak')) {
+      return '/textures/natural_oak.jpg';
+    }
+    if (str.includes('beton') || str.includes('concrete') || str.includes('cement') || str.includes('stark')) {
+      return '/textures/concrete_light_grey.jpg';
+    }
+    if (str.includes('taş') || str.includes('stone') || str.includes('traver') || str.includes('bej') || str.includes('beige') || str.includes('roca')) {
+      return '/textures/vista_bej.jpg';
+    }
+    if (str.includes('antrasit') || str.includes('fume') || str.includes('charcoal') || str.includes('dark') || str.includes('grey') || str.includes('gray')) {
+      return '/textures/albatros_antrasit.jpg';
+    }
+    return '/textures/calacatta_gold.jpg';
+  };
+
   useEffect(() => {
     if (dealer?.id) {
       trackAction('VIEW');
@@ -736,7 +754,15 @@ export default function DealerProfileClient({ dealer, products }) {
                 return (
                   <div key={item.id} className="featured-product-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <div className="featured-product-image-container" style={{ position: 'relative' }}>
-                      <img src={prod.imageUrl} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img 
+                        src={prod.imageUrl || getTextureFallback(prod)} 
+                        alt={prod.name} 
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = getTextureFallback(prod);
+                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+                      />
                       <span style={{
                         position: 'absolute',
                         top: '12px',
@@ -801,7 +827,15 @@ export default function DealerProfileClient({ dealer, products }) {
               {featuredProductsList.map(prod => (
                 <div key={prod.id} className="featured-product-card">
                   <div className="featured-product-image-container">
-                    <img src={prod.imageUrl} alt={prod.name} />
+                    <img 
+                      src={prod.imageUrl || getTextureFallback(prod)} 
+                      alt={prod.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = getTextureFallback(prod);
+                      }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
                   </div>
                   <div className="featured-product-info">
                     <span className="featured-product-style">{prod.style} serisi</span>
@@ -833,7 +867,15 @@ export default function DealerProfileClient({ dealer, products }) {
                 <div key={idx} className="project-card">
                   {proj.imageUrl && (
                     <div className="project-card-image-container">
-                      <img src={proj.imageUrl} alt={proj.title} />
+                      <img 
+                        src={proj.imageUrl} 
+                        alt={proj.title}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/textures/calacatta_gold.jpg';
+                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
                     </div>
                   )}
                   <div className="project-card-body">

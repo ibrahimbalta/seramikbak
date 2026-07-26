@@ -958,9 +958,17 @@
 .featured-product-image-container {
   width: 100%;
   height: 220px;
-  background: var(--bg-input);
+  background: #f1f5f9;
   position: relative;
   overflow: hidden;
+}
+
+.featured-product-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
 }
 
 .featured-product-card:hover .featured-product-image-container img {
