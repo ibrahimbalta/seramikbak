@@ -103,6 +103,8 @@ model Dealer {
   dealerStats       String?
   pdfCatalogUrl     String?
   pdfCatalogName    String?
+  themePreset       String?  @default("GOLD")
+  themePrimary      String?  @default("#d4af37")
   analytics         AnalyticsLog[]
 }
 

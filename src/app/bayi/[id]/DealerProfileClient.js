@@ -186,8 +186,19 @@ export default function DealerProfileClient({ dealer, products }) {
     }
   };
 
+  const hexToRgb = (hex) => {
+    if (!hex) return '212, 175, 55';
+    let c = hex.replace('#', '');
+    if (c.length === 3) c = c.split('').map(x => x + x).join('');
+    const num = parseInt(c, 16);
+    return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+  };
+
+  const primaryColor = dealer.themePrimary || '#d4af37';
+  const primaryRgb = hexToRgb(primaryColor);
+
   return (
-    <div className="profile-page-wrapper">
+    <div className="profile-page-wrapper" style={{ '--accent-gold': primaryColor, '--accent-gold-rgb': primaryRgb }}>
       {/* Header Bar */}
       <div className="profile-header-bar">
         <Link href="/" className="back-link">

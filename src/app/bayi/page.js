@@ -139,6 +139,8 @@ export default function DealerPortalPage() {
   const [profileDealerStats, setProfileDealerStats] = useState({ experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' });
   const [profilePdfCatalogUrl, setProfilePdfCatalogUrl] = useState('');
   const [profilePdfCatalogName, setProfilePdfCatalogName] = useState('');
+  const [profileThemePreset, setProfileThemePreset] = useState('GOLD');
+  const [profileThemePrimary, setProfileThemePrimary] = useState('#d4af37');
   const [actionStats, setActionStats] = useState({ views: 0, whatsapp: 0, phone: 0, directions: 0, pdfDownload: 0, totalInteractions: 0 });
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
@@ -335,6 +337,8 @@ export default function DealerPortalPage() {
         setProfileDealerStats(safeParseJSON(session.dealerStats, { experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' }));
         setProfilePdfCatalogUrl(session.pdfCatalogUrl || '');
         setProfilePdfCatalogName(session.pdfCatalogName || '');
+        setProfileThemePreset(session.themePreset || 'GOLD');
+        setProfileThemePrimary(session.themePrimary || '#d4af37');
       } catch (err) {
         console.error('Session restore failed:', err);
       }
@@ -714,6 +718,8 @@ export default function DealerPortalPage() {
         setProfileReferenceProjects(safeParseJSON(data.dealer.referenceProjects, []));
         setProfileDealerFaqs(safeParseJSON(data.dealer.dealerFaqs, []));
         setProfileDealerStats(safeParseJSON(data.dealer.dealerStats, { experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' }));
+        setProfileThemePreset(data.dealer.themePreset || 'GOLD');
+        setProfileThemePrimary(data.dealer.themePrimary || '#d4af37');
       } else {
         setLoginError(data.error || 'Giriş başarısız oldu.');
       }
@@ -1043,6 +1049,8 @@ export default function DealerPortalPage() {
           dealerStats: JSON.stringify(profileDealerStats),
           pdfCatalogUrl: profilePdfCatalogUrl,
           pdfCatalogName: profilePdfCatalogName,
+          themePreset: profileThemePreset,
+          themePrimary: profileThemePrimary,
           status: 'APPROVED' // Keep approved status
         })
       });
@@ -1070,7 +1078,9 @@ export default function DealerPortalPage() {
           dealerFaqs: JSON.stringify(profileDealerFaqs),
           dealerStats: JSON.stringify(profileDealerStats),
           pdfCatalogUrl: profilePdfCatalogUrl,
-          pdfCatalogName: profilePdfCatalogName
+          pdfCatalogName: profilePdfCatalogName,
+          themePreset: profileThemePreset,
+          themePrimary: profileThemePrimary
         };
         setDealerInfo(updatedSession);
         localStorage.setItem('sb_dealer_session', JSON.stringify(updatedSession));
@@ -2411,6 +2421,103 @@ export default function DealerPortalPage() {
                           className="portal-input"
                         />
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SECTION: ŞUBE TEMA & RENK AYARLARI */}
+                <div className="settings-section" style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                  <h3 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ width: '4px', height: '14px', background: profileThemePrimary || 'var(--accent-gold)', borderRadius: '2px' }}></span>
+                    🎨 Şube Sayfası Tema & Vurgu Rengi Ayarları
+                  </h3>
+
+                  <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0 0 20px 0' }}>
+                    Showroom sayfanızın genel tema konseptini ve buton/vurgu renklerini kurumsal kimliğinize göre seçin.
+                  </p>
+
+                  {/* Preset Themes */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Hazır Tema Paletleri</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: '12px' }}>
+                      {[
+                        { id: 'GOLD', name: 'Gold Luxury', color: '#d4af37', icon: '👑' },
+                        { id: 'SAPPHIRE', name: 'Royal Sapphire', color: '#3b82f6', icon: '💎' },
+                        { id: 'EMERALD', name: 'Emerald Premium', color: '#10b981', icon: '🌿' },
+                        { id: 'RUBY', name: 'Ruby Elegance', color: '#f43f5e', icon: '🍷' },
+                        { id: 'VIOLET', name: 'Amethyst Violet', color: '#8b5cf6', icon: '⚡' }
+                      ].map((preset) => {
+                        const isSelected = profileThemePreset === preset.id;
+                        return (
+                          <div
+                            key={preset.id}
+                            onClick={() => {
+                              setProfileThemePreset(preset.id);
+                              setProfileThemePrimary(preset.color);
+                            }}
+                            style={{
+                              border: isSelected ? `2px solid ${preset.color}` : '1px solid #cbd5e1',
+                              background: isSelected ? 'rgba(248, 250, 252, 0.9)' : '#ffffff',
+                              borderRadius: '12px',
+                              padding: '14px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                              transition: 'all 0.2s ease',
+                              boxShadow: isSelected ? `0 4px 14px ${preset.color}25` : 'none'
+                            }}
+                          >
+                            <div style={{
+                              width: '28px',
+                              height: '28px',
+                              borderRadius: '50%',
+                              background: preset.color,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '0.85rem',
+                              flexShrink: 0,
+                              boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
+                            }}>
+                              {preset.icon}
+                            </div>
+                            <div>
+                              <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a', display: 'block', lineHeight: 1.2 }}>{preset.name}</span>
+                              <span style={{ fontSize: '0.68rem', color: preset.color, fontWeight: '700' }}>{preset.color}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Custom Color Input */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '20px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Özel Renk Kodu (Hex / Picker)</label>
+                      <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>Kurumsal markanıza özel hex renk kodunu manuel belirleyin</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+                      <input 
+                        type="color" 
+                        value={profileThemePrimary || '#d4af37'} 
+                        onChange={(e) => {
+                          setProfileThemePrimary(e.target.value);
+                          setProfileThemePreset('CUSTOM');
+                        }}
+                        style={{ width: '40px', height: '40px', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'transparent' }}
+                      />
+                      <input 
+                        type="text" 
+                        value={profileThemePrimary || '#d4af37'} 
+                        onChange={(e) => {
+                          setProfileThemePrimary(e.target.value);
+                          setProfileThemePreset('CUSTOM');
+                        }}
+                        placeholder="#d4af37"
+                        style={{ width: '100px', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase' }}
+                      />
                     </div>
                   </div>
                 </div>
