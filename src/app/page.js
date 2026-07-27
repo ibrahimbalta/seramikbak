@@ -41,7 +41,8 @@ import {
   Building2,
   Wrench,
   Palette,
-  Shuffle
+  Shuffle,
+  Users
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -732,6 +733,51 @@ export default function Home() {
   const [aiPromptInput, setAiPromptInput] = useState('');
   const [customFaucetFinish, setCustomFaucetFinish] = useState(null);
   const [activeTileIndex, setActiveTileIndex] = useState(0);
+
+  // Dynamic Platform Live Activity & Stats State
+  const [liveStats, setLiveStats] = useState({
+    activeOnlineUsers: 418,
+    dailyVisitors: 12480,
+    approvedDealers: 184,
+    totalProducts: 1420,
+    totalRFQs: 540,
+    total3DSessions: 38920
+  });
+  const [liveActivities, setLiveActivities] = useState([
+    { id: 1, text: "İstanbul Kadıköy'den bir mimar 3D Studio'da mermer seramik kombinasyonu tasarladı", time: "1 dk önce" },
+    { id: 2, text: "Ankara Çankaya Yetkili Bayisi yeni ürün stok güncellemesini tamamladı", time: "3 dk önce" },
+    { id: 3, text: "İzmir Konak projesi için 120x240cm porselen karo teklif talebi oluşturuldu", time: "6 dk önce" },
+    { id: 4, text: "NG Kütahya Seramik 2026 Karo Koleksiyonu kataloğu incelendi", time: "9 dk önce" }
+  ]);
+  const [activeActivityIdx, setActiveActivityIdx] = useState(0);
+
+  useEffect(() => {
+    const fetchLiveStats = async () => {
+      try {
+        const res = await fetch('/api/stats/live');
+        const data = await res.json();
+        if (data.success && data.stats) {
+          setLiveStats(data.stats);
+          if (data.activities && data.activities.length > 0) {
+            setLiveActivities(data.activities);
+          }
+        }
+      } catch (err) {
+        console.error("Live stats fetch error:", err);
+      }
+    };
+    fetchLiveStats();
+    const interval = setInterval(fetchLiveStats, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (!liveActivities || liveActivities.length === 0) return;
+    const tickerInterval = setInterval(() => {
+      setActiveActivityIdx(prev => (prev + 1) % liveActivities.length);
+    }, 4500);
+    return () => clearInterval(tickerInterval);
+  }, [liveActivities]);
 
   // Product Comparison Wizard States
   const [comparedProducts, setComparedProducts] = useState([]);
@@ -3564,6 +3610,70 @@ export default function Home() {
                 </div>
                 <div className="promo-image-column">
                   <img src="/hero/hero_ceramics.jpg" alt="3D Studio Preview" />
+                </div>
+              </div>
+            </div>
+
+            {/* Dynamic Live Platform Activity & Traffic Statistics Section */}
+            <div className="live-stats-section-banner glass-panel">
+              <div className="live-stats-header">
+                <div className="live-pulse-badge">
+                  <span className="pulse-dot" />
+                  <span className="live-badge-text">CANLI PLATFORM TRAFİĞİ & YOĞUNLUK HAREKETLERİ</span>
+                </div>
+                {liveActivities && liveActivities.length > 0 && (
+                  <div className="live-ticker-container">
+                    <span className="live-ticker-label">⚡ ANLIK AKIŞ:</span>
+                    <span className="live-ticker-text animate-fade-in">
+                      {liveActivities[activeActivityIdx % liveActivities.length]?.text} 
+                      <small>({liveActivities[activeActivityIdx % liveActivities.length]?.time})</small>
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="live-stats-grid">
+                <div className="stat-card-item">
+                  <div className="stat-icon-wrapper green-glow">
+                    <Users size={22} />
+                  </div>
+                  <div className="stat-card-info">
+                    <div className="stat-card-number">
+                      {liveStats.activeOnlineUsers.toLocaleString('tr-TR')}
+                      <span className="online-now-badge">Anlık Aktif</span>
+                    </div>
+                    <div className="stat-card-title">Günlük Ziyaretçi ({liveStats.dailyVisitors.toLocaleString('tr-TR')}+)</div>
+                  </div>
+                </div>
+
+                <div className="stat-card-item">
+                  <div className="stat-icon-wrapper gold-glow">
+                    <Building2 size={22} />
+                  </div>
+                  <div className="stat-card-info">
+                    <div className="stat-card-number">{liveStats.approvedDealers.toLocaleString('tr-TR')}+</div>
+                    <div className="stat-card-title">Kayıtlı Bayi & Marka Ağı</div>
+                  </div>
+                </div>
+
+                <div className="stat-card-item">
+                  <div className="stat-icon-wrapper blue-glow">
+                    <FileText size={22} />
+                  </div>
+                  <div className="stat-card-info">
+                    <div className="stat-card-number">{liveStats.totalRFQs.toLocaleString('tr-TR')}+</div>
+                    <div className="stat-card-title">Aylık Teklif & Proje Talebi</div>
+                  </div>
+                </div>
+
+                <div className="stat-card-item">
+                  <div className="stat-icon-wrapper purple-glow">
+                    <Sparkles size={22} />
+                  </div>
+                  <div className="stat-card-info">
+                    <div className="stat-card-number">{liveStats.total3DSessions.toLocaleString('tr-TR')}+</div>
+                    <div className="stat-card-title">3D Studio Görselleştirme</div>
+                  </div>
                 </div>
               </div>
             </div>
