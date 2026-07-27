@@ -4565,7 +4565,7 @@ export default function AdminPage() {
             <div>
               <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>Marka Kullanıcı Hesapları</h3>
               <p style={{ margin: '4px 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
-                Fabrika yetkililerinin B2B Marka Portalı'na giriş yaparken kullanacağı kullanıcı adı ve şifre bilgilerini yönetin.
+                Fabrika yetkililerinin B2B Marka Portalı&apos;na giriş yaparken kullanacağı kullanıcı adı ve şifre bilgilerini yönetin.
               </p>
             </div>
           </div>
@@ -4933,7 +4933,7 @@ export default function AdminPage() {
                     style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '0.85rem', resize: 'none' }}
                   />
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-group-row">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Vizyonumuz</label>
                     <textarea 
@@ -4985,7 +4985,7 @@ export default function AdminPage() {
             {/* Sub-tab 2: Contact & FAQs */}
             {pageManagerSubTab === 'contact' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-group-row">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Müşteri Hizmetleri Telefonu</label>
                     <input 
@@ -5005,7 +5005,7 @@ export default function AdminPage() {
                     />
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="form-group-row">
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.8rem', fontWeight: '750' }}>Destek E-Posta Adresi</label>
                     <input 
@@ -5115,7 +5115,7 @@ export default function AdminPage() {
                 {/* Add Blog Form */}
                 <div style={{ background: '#f1f5f9', padding: '24px', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#475569' }}>Yeni Blog Yazısı Ekle</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div className="form-group-row">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Yazı Başlığı</label>
                       <input 
@@ -5138,7 +5138,7 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div className="form-group-row">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Okuma Süresi</label>
                       <input 
@@ -5939,6 +5939,174 @@ export default function AdminPage() {
         .btn-action-delete:hover {
           background: #ef4444;
           color: #ffffff;
+        }
+
+        /* ===== RESPONSIVE MEDIA QUERIES ===== */
+        @media (max-width: 1024px) {
+          .admin-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            height: 100vh;
+            height: 100dvh;
+            z-index: 1000;
+            width: 280px;
+            max-width: 85vw;
+            min-width: 0 !important;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          .admin-sidebar.open {
+            transform: translateX(0);
+          }
+
+          .admin-main {
+            width: 100%;
+            min-width: 0;
+            flex: 1;
+          }
+
+          .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 999;
+          }
+
+          .admin-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+
+          .admin-content {
+            padding: 16px;
+            padding-bottom: 84px;
+            gap: 16px;
+          }
+
+          .admin-topbar {
+            padding: 12px 16px;
+          }
+
+          .form-group-row {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .admin-topbar {
+            padding: 10px 14px;
+            gap: 10px;
+          }
+
+          .topbar-title h1 {
+            font-size: 1rem;
+          }
+
+          .topbar-user {
+            padding: 4px 10px;
+            font-size: 0.72rem;
+          }
+
+          .admin-content {
+            padding: 12px;
+            padding-bottom: 88px;
+            gap: 14px;
+          }
+
+          .admin-card {
+            padding: 16px;
+            border-radius: var(--border-radius-sm);
+            gap: 16px;
+          }
+
+          .card-header {
+            padding-bottom: 12px;
+            gap: 10px;
+          }
+
+          .card-header h3 {
+            font-size: 0.95rem;
+          }
+
+          .segmented-control {
+            flex-wrap: wrap;
+            gap: 4px;
+          }
+
+          .segmented-control button {
+            padding: 6px 8px;
+            font-size: 0.72rem;
+            min-width: 70px;
+          }
+
+          .table-responsive {
+            max-height: none;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+          }
+
+          .admin-table th {
+            padding: 10px 12px;
+            font-size: 0.65rem;
+            white-space: nowrap;
+          }
+
+          .admin-table td {
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+          }
+
+          .form-input, .form-select {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+          }
+
+          .console-terminal {
+            min-height: 200px;
+            max-height: 350px;
+            padding: 12px;
+          }
+
+          .flex-btn, .flex-center-btn {
+            width: 100%;
+            justify-content: center;
+          }
+
+          /* Form grid fallback for inline styles on small screens */
+          .admin-filters-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .admin-content {
+            padding: 10px;
+            padding-bottom: 90px;
+          }
+
+          .admin-card {
+            padding: 14px;
+          }
+
+          .mobile-bottom-bar {
+            padding: 4px 6px;
+            padding-bottom: max(6px, env(safe-area-inset-bottom));
+          }
+
+          .bottom-btn {
+            font-size: 0.6rem;
+            padding: 4px 2px;
+          }
         }
       `}</style>
     </main>
