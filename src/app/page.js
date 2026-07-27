@@ -734,21 +734,17 @@ export default function Home() {
   const [customFaucetFinish, setCustomFaucetFinish] = useState(null);
   const [activeTileIndex, setActiveTileIndex] = useState(0);
 
-  // Dynamic Platform Live Activity & Stats State
+  // Real-time Platform Statistics State (Directly computed from Prisma DB)
   const [liveStats, setLiveStats] = useState({
-    activeOnlineUsers: 418,
-    dailyVisitors: 12480,
-    approvedDealers: 184,
-    totalProducts: 1420,
-    totalRFQs: 540,
-    total3DSessions: 38920
+    activeOnlineUsers: 0,
+    todayVisitors: 0,
+    approvedDealers: 0,
+    totalProducts: 0,
+    totalRFQs: 0,
+    userCount: 0,
+    analyticsCount: 0
   });
-  const [liveActivities, setLiveActivities] = useState([
-    { id: 1, text: "İstanbul Kadıköy'den bir mimar 3D Studio'da mermer seramik kombinasyonu tasarladı", time: "1 dk önce" },
-    { id: 2, text: "Ankara Çankaya Yetkili Bayisi yeni ürün stok güncellemesini tamamladı", time: "3 dk önce" },
-    { id: 3, text: "İzmir Konak projesi için 120x240cm porselen karo teklif talebi oluşturuldu", time: "6 dk önce" },
-    { id: 4, text: "NG Kütahya Seramik 2026 Karo Koleksiyonu kataloğu incelendi", time: "9 dk önce" }
-  ]);
+  const [liveActivities, setLiveActivities] = useState([]);
   const [activeActivityIdx, setActiveActivityIdx] = useState(0);
 
   useEffect(() => {
@@ -767,7 +763,7 @@ export default function Home() {
       }
     };
     fetchLiveStats();
-    const interval = setInterval(fetchLiveStats, 15000);
+    const interval = setInterval(fetchLiveStats, 5000); // Live poll every 5 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -3639,10 +3635,10 @@ export default function Home() {
                   </div>
                   <div className="stat-card-info">
                     <div className="stat-card-number">
-                      {liveStats.activeOnlineUsers.toLocaleString('tr-TR')}
-                      <span className="online-now-badge">Anlık Aktif</span>
+                      {(liveStats.todayVisitors || liveStats.activeOnlineUsers || 0).toLocaleString('tr-TR')}
+                      <span className="online-now-badge">Gerçek Zamanlı</span>
                     </div>
-                    <div className="stat-card-title">Günlük Ziyaretçi ({liveStats.dailyVisitors.toLocaleString('tr-TR')}+)</div>
+                    <div className="stat-card-title">Bugünkü Ziyaretçi & İnceleme</div>
                   </div>
                 </div>
 
@@ -3651,7 +3647,7 @@ export default function Home() {
                     <Building2 size={22} />
                   </div>
                   <div className="stat-card-info">
-                    <div className="stat-card-number">{liveStats.approvedDealers.toLocaleString('tr-TR')}+</div>
+                    <div className="stat-card-number">{liveStats.approvedDealers ? liveStats.approvedDealers.toLocaleString('tr-TR') : 0}</div>
                     <div className="stat-card-title">Kayıtlı Bayi & Marka Ağı</div>
                   </div>
                 </div>
@@ -3661,8 +3657,8 @@ export default function Home() {
                     <FileText size={22} />
                   </div>
                   <div className="stat-card-info">
-                    <div className="stat-card-number">{liveStats.totalRFQs.toLocaleString('tr-TR')}+</div>
-                    <div className="stat-card-title">Aylık Teklif & Proje Talebi</div>
+                    <div className="stat-card-number">{liveStats.totalRFQs ? liveStats.totalRFQs.toLocaleString('tr-TR') : 0}</div>
+                    <div className="stat-card-title">Gelen Teklif & Proje Talebi</div>
                   </div>
                 </div>
 
@@ -3671,8 +3667,8 @@ export default function Home() {
                     <Sparkles size={22} />
                   </div>
                   <div className="stat-card-info">
-                    <div className="stat-card-number">{liveStats.total3DSessions.toLocaleString('tr-TR')}+</div>
-                    <div className="stat-card-title">3D Studio Görselleştirme</div>
+                    <div className="stat-card-number">{liveStats.productCount ? liveStats.productCount.toLocaleString('tr-TR') : 0}</div>
+                    <div className="stat-card-title">Katalogdaki Ürün Modeli</div>
                   </div>
                 </div>
               </div>

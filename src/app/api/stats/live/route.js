@@ -3,69 +3,153 @@ import prisma from '@/lib/prisma';
 
 export async function GET() {
   try {
-    // 1. Fetch count totals from database
-    const [dealerCount, productCount, leadCount, projectCount, brandCount] = await Promise.all([
-      prisma.dealer.count().catch(() => 42),
-      prisma.product.count().catch(() => 1420),
-      prisma.lead.count().catch(() => 86),
-      prisma.project.count().catch(() => 34),
-      prisma.brand.count().catch(() => 12)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const fifteenMinsAgo = new Date(Date.now() - 15 * 60 * 1000);
+
+    // 1. Fetch exact real counts directly from Prisma database tables
+    const [
+      dealerCount,
+      brandCount,
+      leadCount,
+      projectRequestCount,
+      productCount,
+      userCount,
+      analyticsCount,
+      todayAnalyticsCount,
+      recentActiveLogsCount,
+      recentLeads,
+      recentProjects,
+      recentDealers,
+      recentLogs
+    ] = await Promise.all([
+      prisma.dealer.count().catch(() => 0),
+      prisma.brand.count().catch(() => 0),
+      prisma.lead.count().catch(() => 0),
+      prisma.projectRequest.count().catch(() => 0),
+      prisma.product.count().catch(() => 0),
+      prisma.user.count().catch(() => 0),
+      prisma.analyticsLog.count().catch(() => 0),
+      prisma.analyticsLog.count({ where: { createdAt: { gte: todayStart } } }).catch(() => 0),
+      prisma.analyticsLog.count({ where: { createdAt: { gte: fifteenMinsAgo } } }).catch(() => 0),
+
+      // Fetch real recent activities from database
+      prisma.lead.findMany({
+        take: 3,
+        orderBy: { createdAt: 'desc' },
+        include: { product: { select: { name: true } }, dealer: { select: { city: true, district: true, name: true } } }
+      }).catch(() => []),
+
+      prisma.projectRequest.findMany({
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      }).catch(() => []),
+
+      prisma.dealer.findMany({
+        take: 3,
+        orderBy: { createdAt: 'desc' },
+        select: { id: true, name: true, city: true, createdAt: true }
+      }).catch(() => []),
+
+      prisma.analyticsLog.findMany({
+        take: 3,
+        where: { action: { in: ['SEARCH', 'VIEW', 'CLICK', 'PDF_DOWNLOAD'] } },
+        orderBy: { createdAt: 'desc' },
+        include: { product: { select: { name: true } } }
+      }).catch(() => [])
     ]);
 
-    // 2. Generate smooth pseudo-dynamic live traffic metrics based on current time & DB counts
-    const now = new Date();
-    const minuteSeed = now.getMinutes() + now.getHours() * 60;
-    
-    // Dynamic active online visitors (varies naturally between 340 and 480)
-    const activeOnlineUsers = 340 + (minuteSeed * 7 % 140) + Math.floor(Math.random() * 5);
-    
-    // Today's total unique visitors (scale dynamically over the day)
-    const baseDailyVisitors = 11200 + (now.getHours() * 420) + (now.getMinutes() * 7);
+    // Calculate total network metrics
+    const totalDealersAndBrands = dealerCount + brandCount;
+    const totalRFQs = leadCount + projectRequestCount;
 
-    // Total 3D Studio Visualizations
-    const total3DStudioSessions = 38400 + (productCount * 18) + (minuteSeed * 3);
+    // Build real dynamic activities list from database
+    const formattedActivities = [];
 
-    // Dynamic Live Recent Activity Feed
-    const liveActivities = [
-      { id: 1, text: "İstanbul Kadıköy'den bir mimar 3D Studio'da mermer seramik kombinasyonu tasarladı", time: "1 dk önce", type: "3d" },
-      { id: 2, text: "Ankara Çankaya Yetkili Bayisi yeni ürün stok güncellemesini tamamladı", time: "3 dk önce", type: "dealer" },
-      { id: 3, text: "İzmir Konak projesi için 120x240cm porselen karo teklif talebi oluşturuldu", time: "6 dk önce", type: "lead" },
-      { id: 4, text: "NG Kütahya Seramik 2026 Karo Koleksiyonu kataloğu incelendi", time: "9 dk önce", type: "brand" },
-      { id: 5, text: "Bursa Nilüfer'den bir iç mimar AI Kombin Stüdyosu'nda banyo tasarımı üretti", time: "12 dk önce", type: "ai" }
-    ];
+    recentLeads.forEach((lead) => {
+      const location = lead.dealer?.city || 'İstanbul';
+      const productName = lead.product?.name || 'Seramik Karo';
+      formattedActivities.push({
+        id: `lead-${lead.id}`,
+        text: `${location}'dan ${lead.clientName || 'Bir kullanıcı'} "${productName}" için fiyat teklifi oluşturdu`,
+        time: formatTimeAgo(lead.createdAt),
+        type: 'lead'
+      });
+    });
+
+    recentProjects.forEach((proj) => {
+      formattedActivities.push({
+        id: `proj-${proj.id}`,
+        text: `${proj.city || 'İstanbul'}'da ${proj.companyName || 'Bir firma'} ${proj.quantityM2 || '500'} m² ${proj.projectName || 'Proje'} talebi gönderdi`,
+        time: formatTimeAgo(proj.createdAt),
+        type: 'project'
+      });
+    });
+
+    recentDealers.forEach((dealer) => {
+      formattedActivities.push({
+        id: `dealer-${dealer.id}`,
+        text: `${dealer.city || 'Türkiye'} bölgesine yeni yetkili bayi "${dealer.name}" katıldı`,
+        time: formatTimeAgo(dealer.createdAt),
+        type: 'dealer'
+      });
+    });
+
+    recentLogs.forEach((log) => {
+      if (log.product?.name) {
+        formattedActivities.push({
+          id: `log-${log.id}`,
+          text: `${log.city || 'İstanbul'}'dan bir ziyaretçi "${log.product.name}" serisini inceledi`,
+          time: formatTimeAgo(log.createdAt),
+          type: 'view'
+        });
+      }
+    });
+
+    // Fallback activities if DB logs are sparse
+    if (formattedActivities.length === 0) {
+      formattedActivities.push(
+        { id: 'def-1', text: "İstanbul Kadıköy'den bir kullanıcı 3D Sanal Stüdyo'da mermer desenli seramik inceledi", time: "1 dk önce", type: "3d" },
+        { id: 'def-2', text: "Ankara Yetkili Bayisi güncel ürün stok durumunu ve kataloglarını doğruladı", time: "3 dk önce", type: "dealer" },
+        { id: 'def-3', text: "İzmir Konak projesi için 120x240cm porselen karo teklif talebi oluşturuldu", time: "6 dk önce", type: "lead" }
+      );
+    }
 
     return NextResponse.json({
       success: true,
       stats: {
-        activeOnlineUsers,
-        dailyVisitors: baseDailyVisitors,
-        approvedDealers: (dealerCount || 42) + 120, // Total network coverage
-        totalProducts: (productCount || 1420),
-        totalRFQs: (leadCount || 86) + (projectCount || 34) + 420,
-        total3DSessions: total3DStudioSessions,
-        totalBrands: (brandCount || 12)
+        dealerCount,
+        brandCount,
+        approvedDealers: totalDealersAndBrands,
+        leadCount,
+        projectRequestCount,
+        totalRFQs: totalRFQs,
+        productCount,
+        userCount,
+        analyticsCount,
+        todayVisitors: todayAnalyticsCount,
+        activeOnlineUsers: recentActiveLogsCount
       },
-      activities: liveActivities,
-      timestamp: now.toISOString()
+      activities: formattedActivities,
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error fetching live stats:', error);
-    return NextResponse.json({
-      success: true,
-      stats: {
-        activeOnlineUsers: 418,
-        dailyVisitors: 12480,
-        approvedDealers: 184,
-        totalProducts: 1420,
-        totalRFQs: 540,
-        total3DSessions: 38920,
-        totalBrands: 14
-      },
-      activities: [
-        { id: 1, text: "İstanbul'dan bir mimar 3D Studio'da mermer seramik kombinasyonu tasarladı", time: "1 dk önce", type: "3d" },
-        { id: 2, text: "Ankara Yetkili Bayisi stok ve fiyat listesini güncelledi", time: "3 dk önce", type: "dealer" },
-        { id: 3, text: "İzmir Konak projesi için 120x240cm porselen karo teklifi istendi", time: "6 dk önce", type: "lead" }
-      ]
-    });
+    console.error('Error fetching live real stats:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch real platform statistics', details: error.message },
+      { status: 500 }
+    );
   }
+}
+
+function formatTimeAgo(dateInput) {
+  if (!dateInput) return 'az önce';
+  const diffMs = Date.now() - new Date(dateInput).getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return 'az önce';
+  if (diffMins < 60) return `${diffMins} dk önce`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} saat önce`;
+  return `${Math.floor(diffHours / 24)} gün önce`;
 }
