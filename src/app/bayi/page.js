@@ -36,10 +36,16 @@ import {
   RefreshCw,
   Plus,
   Layers,
-  Menu
+  Menu,
+  Share2,
+  Printer,
+  Calculator,
+  FileCheck
 } from 'lucide-react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
+import QuotePDFTemplate from '@/components/QuotePDFTemplate';
+import { calculateQuote } from '@/lib/quoteCalculator';
 
 export default function DealerPortalPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -89,11 +95,83 @@ export default function DealerPortalPage() {
   const [paymentSuccess, setPaymentSuccess] = useState('');
   const [paymentError, setPaymentError] = useState('');
 
-  // Portal navigation: 'dashboard', 'b2b-projects', 'subscription', 'settings'
+  // Portal navigation: 'dashboard', 'quick-quote', 'b2b-projects', 'subscription', 'settings'
   const [activePortalTab, setActivePortalTab] = useState('dashboard');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileMoreMenu, setShowMobileMoreMenu] = useState(false);
+
+  // 30-Second Quick Quote Builder States
+  const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [quoteCustomerName, setQuoteCustomerName] = useState('');
+  const [quoteCustomerPhone, setQuoteCustomerPhone] = useState('');
+  const [quoteCustomerEmail, setQuoteCustomerEmail] = useState('');
+  const [quoteProjectName, setQuoteProjectName] = useState('Banyo & Zemin Seramik Yenileme');
+  const [quoteProductName, setQuoteProductName] = useState('60x120 Calacatta Mermer Porselen');
+  const [quoteProductCode, setQuoteProductCode] = useState('SB-60120');
+  const [quoteProductImageUrl, setQuoteProductImageUrl] = useState('/hero/hero_ceramics.jpg');
+  const [quoteAreaM2, setQuoteAreaM2] = useState(45);
+  const [quoteWastePercent, setQuoteWastePercent] = useState(10);
+  const [quoteUnitPriceM2, setQuoteUnitPriceM2] = useState(480);
+  const [quoteDiscountPercent, setQuoteDiscountPercent] = useState(5);
+  const [quoteIncludeAdhesive, setQuoteIncludeAdhesive] = useState(true);
+  const [quoteAdhesiveUnitPriceBag, setQuoteAdhesiveUnitPriceBag] = useState(240);
+  const [quoteIncludeGrout, setQuoteIncludeGrout] = useState(true);
+  const [quoteGroutUnitPriceKg, setQuoteGroutUnitPriceKg] = useState(45);
+  const [quoteLaborCostTotal, setQuoteLaborCostTotal] = useState(2500);
+  const [quoteShippingCostTotal, setQuoteShippingCostTotal] = useState(750);
+  const [quoteNotes, setQuoteNotes] = useState('Teklif geçerlilik süresi 15 gündür. Malzemeler paletli sevk edilir.');
+  const [quoteCreating, setQuoteCreating] = useState(false);
+  const [generatedQuote, setGeneratedQuote] = useState(null);
+  const [savedQuotesList, setSavedQuotesList] = useState([]);
+
+  const handleGenerateQuote = async (e) => {
+    e.preventDefault();
+    if (!dealerInfo) return;
+    setQuoteCreating(true);
+
+    try {
+      const res = await fetch('/api/dealers/quotes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dealerId: dealerInfo.id,
+          customerName: quoteCustomerName,
+          customerPhone: quoteCustomerPhone,
+          customerEmail: quoteCustomerEmail,
+          projectName: quoteProjectName,
+          productName: quoteProductName,
+          productCode: quoteProductCode,
+          productImageUrl: quoteProductImageUrl,
+          areaM2: quoteAreaM2,
+          wastePercent: quoteWastePercent,
+          unitPriceM2: quoteUnitPriceM2,
+          discountPercent: quoteDiscountPercent,
+          includeAdhesive: quoteIncludeAdhesive,
+          adhesiveUnitPriceBag: quoteAdhesiveUnitPriceBag,
+          includeGrout: quoteIncludeGrout,
+          groutUnitPriceKg: quoteGroutUnitPriceKg,
+          laborCostTotal: quoteLaborCostTotal,
+          shippingCostTotal: quoteShippingCostTotal,
+          notes: quoteNotes
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setGeneratedQuote(data.quote);
+        setSavedQuotesList(prev => [data.quote, ...prev]);
+        setShowQuoteModal(false);
+      } else {
+        alert(data.error || 'Teklif oluşturulurken bir hata oluştu.');
+      }
+    } catch (err) {
+      console.error('Quote Generation Error:', err);
+      alert('Teklif oluşturulurken sistemsel bir hata oluştu.');
+    } finally {
+      setQuoteCreating(false);
+    }
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -1845,6 +1923,7 @@ export default function DealerPortalPage() {
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
+                { id: 'quick-quote', label: '30 Sn PDF Teklif Oluştur', icon: <Calculator size={18} /> },
                 { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
                 { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
                 { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
@@ -1951,6 +2030,7 @@ export default function DealerPortalPage() {
                   <h4 style={{ fontSize: '0.85rem', fontWeight: '800', color: '#fff', margin: 0 }}>{dealerInfo ? dealerInfo.name : 'SeramikBak'}</h4>
                   <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700' }}>
                     {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
+                    {activePortalTab === 'quick-quote' && 'PDF Teklif Oluştur'}
                     {activePortalTab === 'b2b-projects' && 'Proje Talepleri'}
                     {activePortalTab === 'analytics' && 'Arama Analitiği'}
                     {activePortalTab === 'inventory' && 'Envanter & Stok'}
@@ -2003,6 +2083,7 @@ export default function DealerPortalPage() {
               <div>
                 <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#fff', margin: 0 }}>
                   {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
+                  {activePortalTab === 'quick-quote' && '30 Sn PDF Teklif Oluştur'}
                   {activePortalTab === 'b2b-projects' && 'B2B Proje Talepleri'}
                   {activePortalTab === 'analytics' && 'Bölgesel Arama Analitiği'}
                   {activePortalTab === 'inventory' && 'Envanter & Stok Yönetimi'}
@@ -2070,7 +2151,334 @@ export default function DealerPortalPage() {
 
         {/* PORTAL MAIN CONTENT */}
         <main className="dealer-main-content" style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
-          {activePortalTab === 'b2b-projects' ? (
+          {activePortalTab === 'quick-quote' ? (
+            /* QUICK QUOTE BUILDER TAB */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Calculator size={24} style={{ color: '#d4af37' }} />
+                    30 Saniyede Kurumsal PDF Teklif Hazırlayıcı
+                  </h2>
+                  <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                    Müşterilerinize kendi logonuz, otomatik fire/derz hesabı ve WhatsApp paylaşım linkiyle 30 saniyede teklif hazırlayın.
+                  </p>
+                </div>
+              </div>
+
+              {/* Live Calculation Preview & Interactive Form Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.15fr 0.85fr', gap: '24px', alignItems: 'start' }}>
+                {/* Quick Quote Form Card */}
+                <div style={{ background: '#ffffff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FileText size={18} style={{ color: '#d4af37' }} />
+                    Teklif ve Müşteri Parametreleri
+                  </h3>
+
+                  <form onSubmit={handleGenerateQuote} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="form-group-row">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Müşteri Adı / Unvanı *</label>
+                        <input 
+                          type="text" 
+                          value={quoteCustomerName} 
+                          onChange={(e) => setQuoteCustomerName(e.target.value)} 
+                          placeholder="Örn: Ahmet Yılmaz" 
+                          required 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>WhatsApp / Telefon *</label>
+                        <input 
+                          type="text" 
+                          value={quoteCustomerPhone} 
+                          onChange={(e) => setQuoteCustomerPhone(e.target.value)} 
+                          placeholder="Örn: 0532 123 45 67" 
+                          required 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group-row">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Proje / Mekan Adı</label>
+                        <input 
+                          type="text" 
+                          value={quoteProjectName} 
+                          onChange={(e) => setQuoteProjectName(e.target.value)} 
+                          placeholder="Örn: Vadi Konutları Banyo Yenileme" 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Müşteri E-Posta (İsteğe Bağlı)</label>
+                        <input 
+                          type="email" 
+                          value={quoteCustomerEmail} 
+                          onChange={(e) => setQuoteCustomerEmail(e.target.value)} 
+                          placeholder="Örn: ahmet@mail.com" 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group-row">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Seçilen Seramik Modeli</label>
+                        <input 
+                          type="text" 
+                          value={quoteProductName} 
+                          onChange={(e) => setQuoteProductName(e.target.value)} 
+                          placeholder="Örn: 60x120 Calacatta Mermer Porselen" 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Stok / SKU Kodu</label>
+                        <input 
+                          type="text" 
+                          value={quoteProductCode} 
+                          onChange={(e) => setQuoteProductCode(e.target.value)} 
+                          placeholder="Örn: QUA-CAL-60120" 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group-row">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Net Uygulama Alanı (m²) *</label>
+                        <input 
+                          type="number" 
+                          value={quoteAreaM2} 
+                          onChange={(e) => setQuoteAreaM2(e.target.value)} 
+                          min={1} 
+                          required 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Kesim Firesi Oranı (%)</label>
+                        <select 
+                          value={quoteWastePercent} 
+                          onChange={(e) => setQuoteWastePercent(e.target.value)} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                        >
+                          <option value={5}>%5 Fire (Düz / Standart Döşeme)</option>
+                          <option value={10}>%10 Fire (Diyagonal / Balıksırtı)</option>
+                          <option value={15}>%15 Fire (Girintili Çıkıntılı Mimari Plan)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="form-group-row">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Seramik m² Liste Fiyatı (₺) *</label>
+                        <input 
+                          type="number" 
+                          value={quoteUnitPriceM2} 
+                          onChange={(e) => setQuoteUnitPriceM2(e.target.value)} 
+                          min={0} 
+                          required 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Müşteri İskonto İndirimi (%)</label>
+                        <input 
+                          type="number" 
+                          value={quoteDiscountPercent} 
+                          onChange={(e) => setQuoteDiscountPercent(e.target.value)} 
+                          min={0} 
+                          max={100} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                        />
+                      </div>
+                    </div>
+
+                    {/* Consumables Toggle Section */}
+                    <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: '800', color: '#475569' }}>Otomatik Yapıştırıcı Harç & Derz Sarfiyat Hesabı</div>
+                      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', cursor: 'pointer' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={quoteIncludeAdhesive} 
+                            onChange={(e) => setQuoteIncludeAdhesive(e.target.checked)} 
+                          />
+                          <span>Yapıştırıcı Harç (25kg Torba) Ekle</span>
+                        </label>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', cursor: 'pointer' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={quoteIncludeGrout} 
+                            onChange={(e) => setQuoteIncludeGrout(e.target.checked)} 
+                          />
+                          <span>Derz Dolgusu (kg) Ekle</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="form-group-row">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>İşçilik & Uygulama Tutarı (₺)</label>
+                        <input 
+                          type="number" 
+                          value={quoteLaborCostTotal} 
+                          onChange={(e) => setQuoteLaborCostTotal(e.target.value)} 
+                          min={0} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Lojistik & Sevk Tutarı (₺)</label>
+                        <input 
+                          type="number" 
+                          value={quoteShippingCostTotal} 
+                          onChange={(e) => setQuoteShippingCostTotal(e.target.value)} 
+                          min={0} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                        />
+                      </div>
+                    </div>
+
+                    <button 
+                      type="submit" 
+                      disabled={quoteCreating} 
+                      style={{
+                        background: '#0f172a',
+                        color: '#ffffff',
+                        border: 'none',
+                        padding: '14px 20px',
+                        borderRadius: '10px',
+                        fontWeight: '800',
+                        fontSize: '0.9rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        cursor: 'pointer',
+                        marginTop: '10px',
+                        boxShadow: '0 4px 14px rgba(0,0,0,0.15)'
+                      }}
+                    >
+                      {quoteCreating ? (
+                        <>
+                          <Loader2 size={18} className="animate-spin" />
+                          <span>PDF Teklif Hazırlanıyor...</span>
+                        </>
+                      ) : (
+                        <>
+                          <FileCheck size={18} style={{ color: '#d4af37' }} />
+                          <span>30 Sn PDF Teklif Üret & Onayla</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Live Calculation Preview Card */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  {(() => {
+                    const calc = calculateQuote({
+                      areaM2: quoteAreaM2,
+                      wastePercent: quoteWastePercent,
+                      unitPriceM2: quoteUnitPriceM2,
+                      discountPercent: quoteDiscountPercent,
+                      includeAdhesive: quoteIncludeAdhesive,
+                      adhesiveUnitPriceBag: quoteAdhesiveUnitPriceBag,
+                      includeGrout: quoteIncludeGrout,
+                      groutUnitPriceKg: quoteGroutUnitPriceKg,
+                      laborCostTotal: quoteLaborCostTotal,
+                      shippingCostTotal: quoteShippingCostTotal
+                    });
+
+                    return (
+                      <div style={{ background: '#ffffff', padding: '24px', borderRadius: '16px', border: '1px solid #d4af37', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 8px 30px rgba(212,175,55,0.12)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '14px' }}>
+                          <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CANLI HESAPLAMA ÖNİZLEME</span>
+                          <span style={{ fontSize: '0.7rem', background: 'rgba(5,150,105,0.1)', color: '#059669', padding: '3px 10px', borderRadius: '12px', fontWeight: '800' }}>Canlı Metraj</span>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.83rem', color: '#475569' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>Net Kaplama Alanı:</span>
+                            <strong>{calc.netAreaM2} m²</strong>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>Kesim Firesi (+%{calc.wastePercent}):</span>
+                            <strong>+{calc.wasteM2} m²</strong>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#0f172a', fontWeight: '800', background: '#f8fafc', padding: '8px 12px', borderRadius: '8px' }}>
+                            <span>Sipariş Seramik Miktarı:</span>
+                            <strong style={{ color: '#d4af37' }}>{calc.totalTileM2} m²</strong>
+                          </div>
+
+                          {calc.includeAdhesive && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#2563eb' }}>
+                              <span>Gerekli Yapıştırıcı Harç:</span>
+                              <strong>{calc.adhesiveBagsCount} Torba ({calc.totalAdhesiveKg} kg)</strong>
+                            </div>
+                          )}
+
+                          {calc.includeGrout && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#2563eb' }}>
+                              <span>Gerekli Derz Dolgusu:</span>
+                              <strong>{calc.totalGroutKg} kg</strong>
+                            </div>
+                          )}
+                        </div>
+
+                        <div style={{ borderTop: '2px dashed #e2e8f0', paddingTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem' }}>
+                            <span>Ara Toplam (KDV Hariç):</span>
+                            <span>₺{calc.subtotalBeforeVat.toLocaleString('tr-TR')}</span>
+                          </div>
+                          {calc.tileDiscountAmount > 0 && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem', color: '#dc2626' }}>
+                              <span>İskonto İndirimi (%{calc.discountPercent}):</span>
+                              <span>-₺{calc.tileDiscountAmount.toLocaleString('tr-TR')}</span>
+                            </div>
+                          )}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem' }}>
+                            <span>KDV Tutarı (%20):</span>
+                            <span>₺{calc.vatAmount.toLocaleString('tr-TR')}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.25rem', fontWeight: '900', color: '#0f172a', marginTop: '6px', background: 'rgba(212,175,55,0.08)', padding: '12px', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.3)' }}>
+                            <span>GENEL TOPLAM:</span>
+                            <span style={{ color: '#b38e47' }}>₺{calc.grandTotal.toLocaleString('tr-TR')}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* List of Recent Quotes */}
+                  {savedQuotesList.length > 0 && (
+                    <div style={{ background: '#ffffff', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: '800', color: '#0f172a' }}>Hazırlanan Son Teklifler</h4>
+                      {savedQuotesList.map(q => (
+                        <div key={q.id} style={{ background: '#f8fafc', padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#0f172a' }}>{q.customerName}</div>
+                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{q.projectName} • ₺{q.calculations.grandTotal.toLocaleString('tr-TR')}</div>
+                          </div>
+                          <button 
+                            onClick={() => setGeneratedQuote(q)}
+                            style={{ background: '#0f172a', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
+                          >
+                            PDF Göster
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : activePortalTab === 'b2b-projects' ? (
           /* B2B PROJECTS TAB */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div className="b2b-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -5470,6 +5878,14 @@ export default function DealerPortalPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Generated Corporate PDF Quote Template Modal */}
+      {generatedQuote && (
+        <QuotePDFTemplate 
+          quote={generatedQuote} 
+          onClose={() => setGeneratedQuote(null)} 
+        />
       )}
       </div>
     </div>
