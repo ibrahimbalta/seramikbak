@@ -1,10 +1,23 @@
 export default function robots() {
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/admin/', '/api/']
-    },
-    sitemap: 'https://seramikbak.vercel.app/sitemap.xml'
+    rules: [
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
+      {
+        userAgent: 'Bingbot',
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/admin/', '/api/'],
+      },
+    ],
+    sitemap: 'https://www.seramikbak.com/sitemap.xml',
+    host: 'https://www.seramikbak.com',
   };
 }

@@ -37,16 +37,38 @@ export async function generateMetadata({ params }) {
     const title = `${dealer.name} | ${brandName} Yetkili Bayi & Showroom`;
     const description = `${dealer.city || ''} ${dealer.district || ''} bölgesindeki yetkili ${brandName} bayisi ${dealer.name}. Güncel stok durumunu inceleyin, yol tarifi alın ve fiyat teklifi isteyin.`;
 
+    const dealerSlug = slugify(dealer.name);
+    const canonicalUrl = `https://www.seramikbak.com/bayi/${dealerSlug}`;
+
     return {
       title,
       description,
-      keywords: `${dealer.name}, ${brandName} bayi, ${dealer.city || ''} seramik, ${dealer.district || ''} fayans, seramik showroom, stok sorgulama`,
+      keywords: [
+        dealer.name, `${brandName} bayi`, `${dealer.city || ''} seramik`,
+        `${dealer.district || ''} fayans`, 'seramik showroom', 'stok sorgulama',
+        `${dealer.city || ''} seramik bayi`, `${brandName} yetkili bayi`,
+        'seramik fiyat teklifi', 'seramik mağaza'
+      ],
+      alternates: {
+        canonical: canonicalUrl,
+      },
       openGraph: {
         title,
         description,
+        url: canonicalUrl,
         type: 'profile',
-        locale: 'tr_TR'
-      }
+        locale: 'tr_TR',
+        siteName: 'SeramikBak',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+      },
+      robots: {
+        index: true,
+        follow: true,
+      },
     };
   } catch (error) {
     console.error('generateMetadata Dealer Error:', error);

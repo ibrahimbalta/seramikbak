@@ -3302,7 +3302,7 @@ export default function Home() {
                   <span>{heroSlides[heroSlideIndex].tag}</span>
                 </div>
                 
-                <h2 style={{ minHeight: '84px' }}>{heroSlides[heroSlideIndex].title} <br /><span className="highlight-text">{heroSlides[heroSlideIndex].highlight}</span></h2>
+                <h1 style={{ minHeight: '84px' }}>{heroSlides[heroSlideIndex].title} <br /><span className="highlight-text">{heroSlides[heroSlideIndex].highlight}</span></h1>
                 
                 <p className="hero-banner-subtitle">
                   {heroSlides[heroSlideIndex].subtitle}

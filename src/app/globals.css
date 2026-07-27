@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+/* Fonts are loaded via next/font/google in layout.js for optimal performance */
 
 :root {
   /* Color Palette (Clean Light Mode - Whites & Greys) */
@@ -34,8 +34,8 @@
   --glass-backdrop: blur(12px);
   
   /* Fonts */
-  --font-title: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-title: var(--font-outfit, 'Outfit'), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: var(--font-plus-jakarta, 'Plus Jakarta Sans'), -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 * {

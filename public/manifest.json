@@ -1,12 +1,16 @@
 {
-  "name": "SeramikBak | Akıllı Seramik Arama Engine",
+  "name": "SeramikBak | Akıllı Seramik Arama Motoru",
   "short_name": "SeramikBak",
   "description": "Türkiye'nin lider seramik markalarını tek çatı altında toplayan, Web 3D Sanal Stüdyo ve AR portalı.",
   "start_url": "/",
+  "id": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0f172a",
   "orientation": "portrait",
+  "lang": "tr",
+  "dir": "ltr",
+  "categories": ["shopping", "business", "lifestyle"],
   "icons": [
     {
       "src": "/icon-192.png",
