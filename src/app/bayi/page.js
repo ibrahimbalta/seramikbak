@@ -1923,7 +1923,7 @@ export default function DealerPortalPage() {
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
-                { id: 'quick-quote', label: '30 Sn PDF Teklif Oluştur', icon: <Calculator size={18} /> },
+                { id: 'quick-quote', label: 'PDF Teklif Oluştur', icon: <Calculator size={18} /> },
                 { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
                 { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
                 { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
@@ -2030,7 +2030,7 @@ export default function DealerPortalPage() {
                   <h4 style={{ fontSize: '0.85rem', fontWeight: '800', color: '#fff', margin: 0 }}>{dealerInfo ? dealerInfo.name : 'SeramikBak'}</h4>
                   <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700' }}>
                     {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
-                    {activePortalTab === 'quick-quote' && 'PDF Teklif Oluştur'}
+                    {activePortalTab === 'quick-quote' && 'PDF Teklif'}
                     {activePortalTab === 'b2b-projects' && 'Proje Talepleri'}
                     {activePortalTab === 'analytics' && 'Arama Analitiği'}
                     {activePortalTab === 'inventory' && 'Envanter & Stok'}
@@ -2083,7 +2083,7 @@ export default function DealerPortalPage() {
               <div>
                 <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#fff', margin: 0 }}>
                   {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
-                  {activePortalTab === 'quick-quote' && '30 Sn PDF Teklif Oluştur'}
+                  {activePortalTab === 'quick-quote' && 'PDF Teklif Oluştur'}
                   {activePortalTab === 'b2b-projects' && 'B2B Proje Talepleri'}
                   {activePortalTab === 'analytics' && 'Bölgesel Arama Analitiği'}
                   {activePortalTab === 'inventory' && 'Envanter & Stok Yönetimi'}
@@ -2158,10 +2158,10 @@ export default function DealerPortalPage() {
                 <div>
                   <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Calculator size={24} style={{ color: '#d4af37' }} />
-                    30 Saniyede Kurumsal PDF Teklif Hazırlayıcı
+                    Kurumsal PDF Teklif Hazırlayıcı
                   </h2>
-                  <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
-                    Müşterilerinize kendi logonuz, otomatik fire/derz hesabı ve WhatsApp paylaşım linkiyle 30 saniyede teklif hazırlayın.
+                  <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
+                    Müşterilerinize kendi logonuz, otomatik fire/derz hesabı ve WhatsApp paylaşım linkiyle profesyonel teklif hazırlayın.
                   </p>
                 </div>
               </div>
@@ -2169,7 +2169,7 @@ export default function DealerPortalPage() {
               {/* Live Calculation Preview & Interactive Form Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.15fr 0.85fr', gap: '24px', alignItems: 'start' }}>
                 {/* Quick Quote Form Card */}
-                <div style={{ background: '#ffffff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                <div className="quote-form-card" style={{ background: '#ffffff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <FileText size={18} style={{ color: '#d4af37' }} />
                     Teklif ve Müşteri Parametreleri
@@ -2372,7 +2372,7 @@ export default function DealerPortalPage() {
                       ) : (
                         <>
                           <FileCheck size={18} style={{ color: '#d4af37' }} />
-                          <span>30 Sn PDF Teklif Üret & Onayla</span>
+                          <span>PDF Teklif Üret & Onayla</span>
                         </>
                       )}
                     </button>
@@ -5208,6 +5208,60 @@ export default function DealerPortalPage() {
           color: #0f172a !important;
         }
 
+        /* ===== QUOTE FORM CARD — White card dark text overrides ===== */
+        .quote-form-card {
+          background: #ffffff !important;
+          color: #1e293b !important;
+        }
+
+        .quote-form-card h3,
+        .quote-form-card h4 {
+          color: #0f172a !important;
+        }
+
+        .quote-form-card label {
+          color: #334155 !important;
+          font-weight: 700 !important;
+        }
+
+        .quote-form-card span {
+          color: #334155 !important;
+        }
+
+        .quote-form-card input,
+        .quote-form-card select,
+        .quote-form-card textarea {
+          background-color: #ffffff !important;
+          border: 1.5px solid #94a3b8 !important;
+          color: #0f172a !important;
+          font-weight: 600 !important;
+          font-size: 0.85rem !important;
+          opacity: 1 !important;
+          caret-color: #0f172a !important;
+        }
+
+        .quote-form-card input:focus,
+        .quote-form-card select:focus,
+        .quote-form-card textarea:focus {
+          background-color: #ffffff !important;
+          border-color: #d4af37 !important;
+          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25) !important;
+          color: #0f172a !important;
+        }
+
+        .quote-form-card input::placeholder,
+        .quote-form-card select::placeholder,
+        .quote-form-card textarea::placeholder {
+          color: #94a3b8 !important;
+          opacity: 1 !important;
+        }
+
+        .quote-form-card .form-group-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+
         .settings-grid-2 {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -5817,6 +5871,7 @@ export default function DealerPortalPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
+                { id: 'quick-quote', label: 'PDF Teklif Oluştur', icon: <Calculator size={18} /> },
                 { id: 'b2b-projects', label: 'Proje Talepleri', icon: <Building2 size={18} /> },
                 { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
                 { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
