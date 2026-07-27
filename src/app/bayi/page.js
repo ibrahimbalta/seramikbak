@@ -116,8 +116,10 @@ export default function DealerPortalPage() {
   const [quoteDiscountPercent, setQuoteDiscountPercent] = useState(5);
   const [quoteIncludeAdhesive, setQuoteIncludeAdhesive] = useState(true);
   const [quoteAdhesiveUnitPriceBag, setQuoteAdhesiveUnitPriceBag] = useState(240);
+  const [quoteAdhesiveManualBags, setQuoteAdhesiveManualBags] = useState('');
   const [quoteIncludeGrout, setQuoteIncludeGrout] = useState(true);
   const [quoteGroutUnitPriceKg, setQuoteGroutUnitPriceKg] = useState(45);
+  const [quoteGroutManualKg, setQuoteGroutManualKg] = useState('');
   const [quoteLaborCostTotal, setQuoteLaborCostTotal] = useState(2500);
   const [quoteShippingCostTotal, setQuoteShippingCostTotal] = useState(750);
   const [quoteNotes, setQuoteNotes] = useState('Teklif geçerlilik süresi 15 gündür. Malzemeler paletli sevk edilir.');
@@ -149,8 +151,10 @@ export default function DealerPortalPage() {
           discountPercent: quoteDiscountPercent,
           includeAdhesive: quoteIncludeAdhesive,
           adhesiveUnitPriceBag: quoteAdhesiveUnitPriceBag,
+          adhesiveManualBags: quoteAdhesiveManualBags || null,
           includeGrout: quoteIncludeGrout,
           groutUnitPriceKg: quoteGroutUnitPriceKg,
+          groutManualKg: quoteGroutManualKg || null,
           laborCostTotal: quoteLaborCostTotal,
           shippingCostTotal: quoteShippingCostTotal,
           notes: quoteNotes
@@ -2298,10 +2302,12 @@ export default function DealerPortalPage() {
                       </div>
                     </div>
 
-                    {/* Consumables Toggle Section */}
-                    <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <div style={{ fontSize: '0.8rem', fontWeight: '800', color: '#475569' }}>Otomatik Yapıştırıcı Harç & Derz Sarfiyat Hesabı</div>
-                      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                    {/* Consumables Toggle & Manual Input Section */}
+                    <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: '800', color: '#475569' }}>Yapıştırıcı Harç & Derz Sarfiyat</div>
+
+                      {/* Adhesive Row */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', cursor: 'pointer' }}>
                           <input 
                             type="checkbox" 
@@ -2310,6 +2316,35 @@ export default function DealerPortalPage() {
                           />
                           <span>Yapıştırıcı Harç (25kg Torba) Ekle</span>
                         </label>
+                        {quoteIncludeAdhesive && (
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', paddingLeft: '26px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Torba Adedi (Boş = otomatik)</label>
+                              <input 
+                                type="number" 
+                                value={quoteAdhesiveManualBags} 
+                                onChange={(e) => setQuoteAdhesiveManualBags(e.target.value)} 
+                                placeholder="Otomatik" 
+                                min={0} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }} 
+                              />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Torba Birim Fiyatı (₺)</label>
+                              <input 
+                                type="number" 
+                                value={quoteAdhesiveUnitPriceBag} 
+                                onChange={(e) => setQuoteAdhesiveUnitPriceBag(e.target.value)} 
+                                min={0} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }} 
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Grout Row */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', cursor: 'pointer' }}>
                           <input 
                             type="checkbox" 
@@ -2318,6 +2353,31 @@ export default function DealerPortalPage() {
                           />
                           <span>Derz Dolgusu (kg) Ekle</span>
                         </label>
+                        {quoteIncludeGrout && (
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', paddingLeft: '26px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Derz Miktarı kg (Boş = otomatik)</label>
+                              <input 
+                                type="number" 
+                                value={quoteGroutManualKg} 
+                                onChange={(e) => setQuoteGroutManualKg(e.target.value)} 
+                                placeholder="Otomatik" 
+                                min={0} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }} 
+                              />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Derz Birim Fiyatı (₺/kg)</label>
+                              <input 
+                                type="number" 
+                                value={quoteGroutUnitPriceKg} 
+                                onChange={(e) => setQuoteGroutUnitPriceKg(e.target.value)} 
+                                min={0} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }} 
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -2389,14 +2449,16 @@ export default function DealerPortalPage() {
                       discountPercent: quoteDiscountPercent,
                       includeAdhesive: quoteIncludeAdhesive,
                       adhesiveUnitPriceBag: quoteAdhesiveUnitPriceBag,
+                      adhesiveManualBags: quoteAdhesiveManualBags || null,
                       includeGrout: quoteIncludeGrout,
                       groutUnitPriceKg: quoteGroutUnitPriceKg,
+                      groutManualKg: quoteGroutManualKg || null,
                       laborCostTotal: quoteLaborCostTotal,
                       shippingCostTotal: quoteShippingCostTotal
                     });
 
                     return (
-                      <div style={{ background: '#ffffff', padding: '24px', borderRadius: '16px', border: '1px solid #d4af37', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 8px 30px rgba(212,175,55,0.12)' }}>
+                      <div className="quote-calc-card" style={{ background: '#ffffff', padding: '24px', borderRadius: '16px', border: '1px solid #d4af37', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 8px 30px rgba(212,175,55,0.12)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '14px' }}>
                           <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CANLI HESAPLAMA ÖNİZLEME</span>
                           <span style={{ fontSize: '0.7rem', background: 'rgba(5,150,105,0.1)', color: '#059669', padding: '3px 10px', borderRadius: '12px', fontWeight: '800' }}>Canlı Metraj</span>
@@ -5260,6 +5322,20 @@ export default function DealerPortalPage() {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 16px;
+        }
+
+        /* ===== QUOTE CALC PREVIEW CARD — White card dark text ===== */
+        .quote-calc-card {
+          background: #ffffff !important;
+          color: #475569 !important;
+        }
+
+        .quote-calc-card span {
+          color: #475569 !important;
+        }
+
+        .quote-calc-card strong {
+          color: #0f172a !important;
         }
 
         .settings-grid-2 {

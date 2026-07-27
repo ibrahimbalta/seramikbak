@@ -21,8 +21,10 @@ export async function POST(request) {
       discountPercent,
       includeAdhesive,
       adhesiveUnitPriceBag,
+      adhesiveManualBags,
       includeGrout,
       groutUnitPriceKg,
+      groutManualKg,
       laborCostTotal,
       shippingCostTotal,
       notes,
@@ -44,8 +46,10 @@ export async function POST(request) {
       discountPercent,
       includeAdhesive,
       adhesiveUnitPriceBag,
+      adhesiveManualBags,
       includeGrout,
       groutUnitPriceKg,
+      groutManualKg,
       laborCostTotal,
       shippingCostTotal
     });

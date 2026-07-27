@@ -2,6 +2,8 @@
  * SeramikBak Smart Ceramic & Tile Quote Calculation Engine
  * Calculates net area, waste allowance, adhesive bag count (25kg), grout weight (kg),
  * subtotal, discount, VAT (20%), and grand total.
+ * 
+ * Supports manual override for adhesive bags and grout kg.
  */
 export function calculateQuote({
   areaM2 = 0,
@@ -10,8 +12,10 @@ export function calculateQuote({
   discountPercent = 0,
   includeAdhesive = true,
   adhesiveUnitPriceBag = 240, // TRY per 25kg bag
+  adhesiveManualBags = null,  // null = auto-calculate, number = manual override
   includeGrout = true,
   groutUnitPriceKg = 45, // TRY per kg
+  groutManualKg = null,       // null = auto-calculate, number = manual override
   laborCostTotal = 0,
   shippingCostTotal = 0,
   vatRate = 20 // 20% KDV
@@ -30,14 +34,33 @@ export function calculateQuote({
   const tileDiscountAmount = (grossTileCost * discountP) / 100;
   const netTileCost = grossTileCost - tileDiscountAmount;
 
-  // 3. Adhesive Consumable Calculation (Avg 4.5 kg per m² -> 25kg bags)
-  const totalAdhesiveKg = totalTileM2 * 4.5;
-  const adhesiveBagsCount = includeAdhesive ? Math.ceil(totalAdhesiveKg / 25) : 0;
-  const totalAdhesiveCost = includeAdhesive ? adhesiveBagsCount * parseFloat(adhesiveUnitPriceBag || 0) : 0;
+  // 3. Adhesive Consumable — manual or auto
+  const autoAdhesiveKg = totalTileM2 * 4.5;
+  const autoAdhesiveBags = Math.ceil(autoAdhesiveKg / 25);
 
-  // 4. Grout Consumable Calculation (Avg 0.45 kg per m²)
-  const totalGroutKg = includeGrout ? Math.ceil((totalTileM2 * 0.45) * 10) / 10 : 0;
-  const totalGroutCost = includeGrout ? Math.ceil(totalGroutKg * parseFloat(groutUnitPriceKg || 0)) : 0;
+  const manualBags = adhesiveManualBags !== null && adhesiveManualBags !== '' 
+    ? Math.max(0, parseInt(adhesiveManualBags) || 0) 
+    : null;
+  const adhesiveBagsCount = includeAdhesive 
+    ? (manualBags !== null ? manualBags : autoAdhesiveBags) 
+    : 0;
+  const totalAdhesiveKg = adhesiveBagsCount * 25;
+  const totalAdhesiveCost = includeAdhesive 
+    ? adhesiveBagsCount * Math.max(0, parseFloat(adhesiveUnitPriceBag) || 0) 
+    : 0;
+
+  // 4. Grout Consumable — manual or auto
+  const autoGroutKg = Math.ceil((totalTileM2 * 0.45) * 10) / 10;
+
+  const manualGrout = groutManualKg !== null && groutManualKg !== '' 
+    ? Math.max(0, parseFloat(groutManualKg) || 0) 
+    : null;
+  const totalGroutKg = includeGrout 
+    ? (manualGrout !== null ? manualGrout : autoGroutKg) 
+    : 0;
+  const totalGroutCost = includeGrout 
+    ? Math.ceil(totalGroutKg * Math.max(0, parseFloat(groutUnitPriceKg) || 0)) 
+    : 0;
 
   // 5. Labor & Shipping
   const laborCost = Math.max(0, parseFloat(laborCostTotal) || 0);
@@ -63,13 +86,15 @@ export function calculateQuote({
     includeAdhesive,
     totalAdhesiveKg: Math.round(totalAdhesiveKg * 10) / 10,
     adhesiveBagsCount,
-    adhesiveUnitPriceBag,
+    adhesiveUnitPriceBag: parseFloat(adhesiveUnitPriceBag) || 0,
     totalAdhesiveCost: Math.round(totalAdhesiveCost * 100) / 100,
+    autoAdhesiveBags,
 
     includeGrout,
     totalGroutKg,
-    groutUnitPriceKg,
+    groutUnitPriceKg: parseFloat(groutUnitPriceKg) || 0,
     totalGroutCost: Math.round(totalGroutCost * 100) / 100,
+    autoGroutKg,
 
     // Services
     laborCost,
