@@ -765,14 +765,14 @@ export default function DealerProfileClient({ dealer, products }) {
                       />
                       <span style={{
                         position: 'absolute',
-                        top: '12px',
-                        left: '12px',
-                        fontSize: '0.68rem',
+                        top: '8px',
+                        left: '8px',
+                        fontSize: '0.6rem',
                         fontWeight: '800',
                         color: statusColor,
                         background: statusBg,
-                        padding: '4px 10px',
-                        borderRadius: '20px',
+                        padding: '3px 8px',
+                        borderRadius: '16px',
                         border: `1px solid ${statusColor}33`,
                         boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                       }}>
@@ -784,19 +784,19 @@ export default function DealerProfileClient({ dealer, products }) {
                       <h3 className="featured-product-name">{prod.name}</h3>
                       <span className="featured-product-meta" style={{ flex: 1 }}>Kod: {prod.code} • Ebat: {prod.width}x{prod.height} cm • Yüzey: {prod.finish}</span>
                       
-                      <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                      <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '6px' }}>
                         <div>
-                          <span style={{ fontSize: '0.68rem', color: '#64748b', display: 'block' }}>Mevcut Stok</span>
-                          <span style={{ fontSize: '0.9rem', fontWeight: '800', color: '#1e293b' }}>
+                          <span style={{ fontSize: '0.6rem', color: '#64748b', display: 'block' }}>Mevcut Stok</span>
+                          <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
                             {item.status === 'IN_STOCK' ? `${item.stock.toLocaleString('tr-TR')} m²` : (item.status === 'DISPLAY_ONLY' ? 'Teşhir / Numune' : 'Siparişle (3-7 Gün)')}
                           </span>
                         </div>
                         {item.price && (
                           <div style={{ textAlign: 'right' }}>
-                            <span style={{ fontSize: '0.68rem', color: '#64748b', display: 'block' }}>Bayi Özel Fiyatı</span>
-                            <span style={{ fontSize: '0.95rem', fontWeight: '900', color: 'var(--accent-gold, #b38e47)' }}>
+                            <span style={{ fontSize: '0.6rem', color: '#64748b', display: 'block' }}>Bayi Özel Fiyatı</span>
+                            <span style={{ fontSize: '0.82rem', fontWeight: '900', color: 'var(--accent-gold, #b38e47)' }}>
                               ₺{item.price.toLocaleString('tr-TR')} 
-                              <span style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: '500' }}> / m²</span>
+                              <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: '500' }}> / m²</span>
                             </span>
                           </div>
                         )}
