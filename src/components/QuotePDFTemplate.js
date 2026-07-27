@@ -7,31 +7,57 @@ export default function QuotePDFTemplate({ quote, onClose }) {
   if (!quote) return null;
 
   const {
-    id,
-    dealerName,
-    dealerPhone,
-    dealerAddress,
-    dealerCity,
-    dealerLogoUrl,
-    brandName,
-    customerName,
-    customerPhone,
-    customerEmail,
-    projectName,
-    productName,
-    productCode,
-    productImageUrl,
-    calculations,
-    notes,
+    id = '',
+    dealerName = 'Yetkili Bayi',
+    dealerPhone = '',
+    dealerAddress = '',
+    dealerCity = '',
+    dealerLogoUrl = null,
+    brandName = 'SeramikBak',
+    customerName = 'Müşteri',
+    customerPhone = '',
+    customerEmail = '',
+    projectName = 'Seramik Projesi',
+    productName = 'Seramik Karo',
+    productCode = 'SB-PRODUCT',
+    productImageUrl = '/hero/hero_ceramics.jpg',
+    calculations = {},
+    notes = '',
     createdAt,
     expiresAt
   } = quote;
+
+  const calc = {
+    unitPriceM2: Number(calculations?.unitPriceM2) || 0,
+    totalTileM2: Number(calculations?.totalTileM2) || 0,
+    netAreaM2: Number(calculations?.netAreaM2) || 0,
+    wastePercent: Number(calculations?.wastePercent) || 0,
+    netTileCost: Number(calculations?.netTileCost) || 0,
+    includeAdhesive: Boolean(calculations?.includeAdhesive),
+    adhesiveUnitPriceBag: Number(calculations?.adhesiveUnitPriceBag) || 0,
+    adhesiveBagsCount: Number(calculations?.adhesiveBagsCount) || 0,
+    totalAdhesiveKg: Number(calculations?.totalAdhesiveKg) || 0,
+    totalAdhesiveCost: Number(calculations?.totalAdhesiveCost) || 0,
+    includeGrout: Boolean(calculations?.includeGrout),
+    groutUnitPriceKg: Number(calculations?.groutUnitPriceKg) || 0,
+    totalGroutKg: Number(calculations?.totalGroutKg) || 0,
+    totalGroutCost: Number(calculations?.totalGroutCost) || 0,
+    laborCost: Number(calculations?.laborCost) || 0,
+    shippingCost: Number(calculations?.shippingCost) || 0,
+    subtotalBeforeVat: Number(calculations?.subtotalBeforeVat) || 0,
+    discountPercent: Number(calculations?.discountPercent) || 0,
+    tileDiscountAmount: Number(calculations?.tileDiscountAmount) || 0,
+    vatRate: Number(calculations?.vatRate) || 20,
+    vatAmount: Number(calculations?.vatAmount) || 0,
+    grandTotal: Number(calculations?.grandTotal) || 0
+  };
 
   const handlePrint = () => {
     window.print();
   };
 
-  const whatsappUrl = `https://wa.me/${customerPhone.replace(/[^0-9]/g, '')}?text=${quote.whatsappMessage || ''}`;
+  const phoneDigits = (customerPhone || '').replace(/[^0-9]/g, '');
+  const whatsappUrl = `https://wa.me/${phoneDigits}?text=${quote.whatsappMessage || ''}`;
 
   return (
     <div className="quote-pdf-modal-backdrop">
@@ -76,8 +102,8 @@ export default function QuotePDFTemplate({ quote, onClose }) {
           <div className="quote-meta-col">
             <div className="quote-title">RESMİ FİYAT TEKLİFİ</div>
             <div className="meta-row"><strong>Teklif No:</strong> {id}</div>
-            <div className="meta-row"><strong>Tarih:</strong> {new Date(createdAt).toLocaleDateString('tr-TR')}</div>
-            <div className="meta-row"><strong>Geçerlilik:</strong> {new Date(expiresAt).toLocaleDateString('tr-TR')} (15 Gün)</div>
+            <div className="meta-row"><strong>Tarih:</strong> {createdAt ? new Date(createdAt).toLocaleDateString('tr-TR') : new Date().toLocaleDateString('tr-TR')}</div>
+            <div className="meta-row"><strong>Geçerlilik:</strong> {expiresAt ? new Date(expiresAt).toLocaleDateString('tr-TR') : new Date(Date.now() + 15 * 86400000).toLocaleDateString('tr-TR')} (15 Gün)</div>
           </div>
         </header>
 
@@ -120,15 +146,15 @@ export default function QuotePDFTemplate({ quote, onClose }) {
                 <div className="sub-text">1. Kalite Seramik Karo / Porselen Kaplama</div>
               </td>
               <td>{productCode}</td>
-              <td>₺{calculations.unitPriceM2.toLocaleString('tr-TR')} / m²</td>
+              <td>₺{calc.unitPriceM2.toLocaleString('tr-TR')} / m²</td>
               <td>
-                {calculations.totalTileM2} m² 
-                <div className="sub-text">Net: {calculations.netAreaM2} m² + %{calculations.wastePercent} Fire</div>
+                {calc.totalTileM2} m² 
+                <div className="sub-text">Net: {calc.netAreaM2} m² + %{calc.wastePercent} Fire</div>
               </td>
-              <td className="text-right">₺{calculations.netTileCost.toLocaleString('tr-TR')}</td>
+              <td className="text-right">₺{calc.netTileCost.toLocaleString('tr-TR')}</td>
             </tr>
 
-            {calculations.includeAdhesive && (
+            {calc.includeAdhesive && (
               <tr>
                 <td>📦</td>
                 <td>
@@ -136,13 +162,13 @@ export default function QuotePDFTemplate({ quote, onClose }) {
                   <div className="sub-text">Yüksek yapışma mukavemetli C2TE sınıfı seramik harcı</div>
                 </td>
                 <td>25 KG / Torba</td>
-                <td>₺{calculations.adhesiveUnitPriceBag} / Torba</td>
-                <td>{calculations.adhesiveBagsCount} Torba ({calculations.totalAdhesiveKg} kg)</td>
-                <td className="text-right">₺{calculations.totalAdhesiveCost.toLocaleString('tr-TR')}</td>
+                <td>₺{calc.adhesiveUnitPriceBag} / Torba</td>
+                <td>{calc.adhesiveBagsCount} Torba ({calc.totalAdhesiveKg} kg)</td>
+                <td className="text-right">₺{calc.totalAdhesiveCost.toLocaleString('tr-TR')}</td>
               </tr>
             )}
 
-            {calculations.includeGrout && (
+            {calc.includeGrout && (
               <tr>
                 <td>💧</td>
                 <td>
@@ -150,31 +176,31 @@ export default function QuotePDFTemplate({ quote, onClose }) {
                   <div className="sub-text">Esnek, leke tutmaz antibakteriyel derz</div>
                 </td>
                 <td>Derz Dolgusu</td>
-                <td>₺{calculations.groutUnitPriceKg} / kg</td>
-                <td>{calculations.totalGroutKg} kg</td>
-                <td className="text-right">₺{calculations.totalGroutCost.toLocaleString('tr-TR')}</td>
+                <td>₺{calc.groutUnitPriceKg} / kg</td>
+                <td>{calc.totalGroutKg} kg</td>
+                <td className="text-right">₺{calc.totalGroutCost.toLocaleString('tr-TR')}</td>
               </tr>
             )}
 
-            {calculations.laborCost > 0 && (
+            {calc.laborCost > 0 && (
               <tr>
                 <td>🔨</td>
                 <td><strong>Seramik Ustalık & Döşeme İşçiliği</strong></td>
                 <td>Ustalık Metrajı</td>
                 <td>-</td>
                 <td>1 Paket Hizmet</td>
-                <td className="text-right">₺{calculations.laborCost.toLocaleString('tr-TR')}</td>
+                <td className="text-right">₺{calc.laborCost.toLocaleString('tr-TR')}</td>
               </tr>
             )}
 
-            {calculations.shippingCost > 0 && (
+            {calc.shippingCost > 0 && (
               <tr>
                 <td>🚚</td>
                 <td><strong>Güvenli Lojistik & Şantiye Teslimat</strong></td>
                 <td>Nakliye / Kat Çıkarma</td>
                 <td>-</td>
                 <td>Sevk Hizmeti</td>
-                <td className="text-right">₺{calculations.shippingCost.toLocaleString('tr-TR')}</td>
+                <td className="text-right">₺{calc.shippingCost.toLocaleString('tr-TR')}</td>
               </tr>
             )}
           </tbody>
@@ -195,21 +221,21 @@ export default function QuotePDFTemplate({ quote, onClose }) {
           <div className="totals-box">
             <div className="total-line">
               <span>Ara Toplam:</span>
-              <strong>₺{calculations.subtotalBeforeVat.toLocaleString('tr-TR')}</strong>
+              <strong>₺{calc.subtotalBeforeVat.toLocaleString('tr-TR')}</strong>
             </div>
-            {calculations.tileDiscountAmount > 0 && (
+            {calc.tileDiscountAmount > 0 && (
               <div className="total-line discount">
-                <span>İskonto İndirimi (%{calculations.discountPercent}):</span>
-                <strong>-₺{calculations.tileDiscountAmount.toLocaleString('tr-TR')}</strong>
+                <span>İskonto İndirimi (%{calc.discountPercent}):</span>
+                <strong>-₺{calc.tileDiscountAmount.toLocaleString('tr-TR')}</strong>
               </div>
             )}
             <div className="total-line">
-              <span>KDV (%{calculations.vatRate}):</span>
-              <strong>₺{calculations.vatAmount.toLocaleString('tr-TR')}</strong>
+              <span>KDV (%{calc.vatRate}):</span>
+              <strong>₺{calc.vatAmount.toLocaleString('tr-TR')}</strong>
             </div>
             <div className="grand-total-line">
               <span>GENEL TOPLAM:</span>
-              <strong>₺{calculations.grandTotal.toLocaleString('tr-TR')}</strong>
+              <strong>₺{calc.grandTotal.toLocaleString('tr-TR')}</strong>
             </div>
           </div>
         </div>

@@ -2525,7 +2525,7 @@ export default function DealerPortalPage() {
                         <div key={q.id} style={{ background: '#f8fafc', padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
                             <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#0f172a' }}>{q.customerName}</div>
-                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{q.projectName} • ₺{q.calculations.grandTotal.toLocaleString('tr-TR')}</div>
+                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{q.projectName} • ₺{(q?.calculations?.grandTotal || 0).toLocaleString('tr-TR')}</div>
                           </div>
                           <button 
                             onClick={() => setGeneratedQuote(q)}
@@ -2647,7 +2647,7 @@ export default function DealerPortalPage() {
                         <div>
                           <h5 style={{ fontSize: '0.78rem', fontWeight: '700', textTransform: 'uppercase', color: '#888', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Miktar ve Bütçe</h5>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.85rem' }}>
-                            <div>Toplam Metraj: <strong style={{ color: '#0f172a', fontSize: '1rem' }}>{proj.quantityM2.toLocaleString('tr-TR')} m²</strong></div>
+                            <div>Toplam Metraj: <strong style={{ color: '#0f172a', fontSize: '1rem' }}>{(proj?.quantityM2 || 0).toLocaleString('tr-TR')} m²</strong></div>
                             <div>Hedef Bütçe: <strong style={{ color: '#0284c7' }}>{proj.budgetM2}</strong></div>
                             <div>Teslim Süresi: <strong>{proj.deliveryTimeline}</strong></div>
                           </div>
