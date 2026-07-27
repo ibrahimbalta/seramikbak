@@ -5338,6 +5338,59 @@ export default function DealerPortalPage() {
           color: #0f172a !important;
         }
 
+        /* ===== PAYMENT MODAL CARD — White card dark text ===== */
+        .payment-modal-card {
+          background: #ffffff !important;
+          color: #0f172a !important;
+        }
+
+        .payment-modal-card h3,
+        .payment-modal-card h4 {
+          color: #0f172a !important;
+        }
+
+        .payment-modal-card p,
+        .payment-modal-card div,
+        .payment-modal-card span {
+          color: #334155 !important;
+        }
+
+        .payment-modal-card strong {
+          color: #0f172a !important;
+        }
+
+        .payment-modal-card label {
+          color: #334155 !important;
+          font-weight: 700 !important;
+        }
+
+        .payment-modal-card input,
+        .payment-modal-card select,
+        .payment-modal-card textarea {
+          background-color: #ffffff !important;
+          border: 1.5px solid #cbd5e1 !important;
+          color: #0f172a !important;
+          font-weight: 600 !important;
+          font-size: 0.85rem !important;
+          opacity: 1 !important;
+          caret-color: #0f172a !important;
+        }
+
+        .payment-modal-card input:focus,
+        .payment-modal-card select:focus,
+        .payment-modal-card textarea:focus {
+          background-color: #ffffff !important;
+          border-color: #d4af37 !important;
+          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25) !important;
+          color: #0f172a !important;
+        }
+
+        .payment-modal-card input::placeholder,
+        .payment-modal-card textarea::placeholder {
+          color: #94a3b8 !important;
+          opacity: 1 !important;
+        }
+
         .settings-grid-2 {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -5573,7 +5626,7 @@ export default function DealerPortalPage() {
           zIndex: 9999,
           padding: '20px'
         }}>
-          <div className="glass-panel" style={{
+          <div className="payment-modal-card" style={{
             background: '#ffffff',
             borderRadius: '20px',
             border: '1px solid #e2e8f0',
@@ -5611,41 +5664,43 @@ export default function DealerPortalPage() {
 
             {/* Bank details box */}
             <div style={{
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
+              background: '#f1f5f9',
+              border: '1.5px solid #cbd5e1',
               borderRadius: '12px',
               padding: '16px',
               marginBottom: '24px',
-              fontSize: '0.82rem',
+              fontSize: '0.85rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '8px'
+              gap: '10px',
+              color: '#0f172a'
             }}>
-              <div><strong>Banka:</strong> {bankDetails.bank_name || 'Yükleniyor...'}</div>
-              <div><strong>Alıcı:</strong> {bankDetails.bank_recipient || 'Yükleniyor...'}</div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban || 'Yükleniyor...'}</span></div>
+              <div><strong style={{ color: '#0f172a' }}>Banka:</strong> <span style={{ color: '#0f172a', fontWeight: '700' }}>{bankDetails.bank_name || 'Akbank'}</span></div>
+              <div><strong style={{ color: '#0f172a' }}>Alıcı:</strong> <span style={{ color: '#0f172a', fontWeight: '700' }}>{bankDetails.bank_recipient || 'SeramikBak Yazılım A.Ş.'}</span></div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
+                <div><strong style={{ color: '#0f172a' }}>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '800', color: '#0f172a', fontSize: '0.88rem' }}>{bankDetails.bank_iban || 'TR98 0004 6001 5000 1234 5678 90'}</span></div>
                 <button 
                   type="button"
                   onClick={() => {
-                    navigator.clipboard.writeText(bankDetails.bank_iban);
+                    navigator.clipboard.writeText(bankDetails.bank_iban || 'TR98 0004 6001 5000 1234 5678 90');
                     alert('IBAN panoya kopyalandı!');
                   }}
                   style={{
-                    background: '#e2e8f0',
+                    background: '#0f172a',
+                    color: '#ffffff',
                     border: 'none',
-                    borderRadius: '4px',
-                    padding: '2px 8px',
-                    fontSize: '0.7rem',
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    fontSize: '0.72rem',
                     cursor: 'pointer',
-                    fontWeight: '600'
+                    fontWeight: '700'
                   }}
                 >
                   Kopyala
                 </button>
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#64748b', borderTop: '1px solid #e2e8f0', paddingTop: '8px', marginTop: '4px' }}>
-                * Açıklama alanına bayinizin adını (<strong>{dealerInfo?.name}</strong>) yazmayı unutmayın.
+              <div style={{ fontSize: '0.75rem', color: '#475569', borderTop: '1px solid #cbd5e1', paddingTop: '8px', marginTop: '4px' }}>
+                * Açıklama alanına bayinizin adını (<strong style={{ color: '#0f172a' }}>{dealerInfo?.name}</strong>) yazmayı unutmayın.
               </div>
             </div>
 
