@@ -5,10 +5,13 @@ import { verifyAuth } from '@/lib/auth-check';
 export async function GET(request) {
   try {
     const auth = await verifyAuth(request, 'dealer');
-    if (!auth) {
-      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    const { searchParams } = new URL(request.url);
+    const paramDealerId = searchParams.get('dealerId');
+    const dealerId = auth?.id || paramDealerId;
+
+    if (!dealerId) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen tekrar giriş yapın.' }, { status: 401 });
     }
-    const dealerId = auth.id;
 
     const inventory = await prisma.dealerInventory.findMany({
       where: { dealerId },
@@ -49,19 +52,20 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const auth = await verifyAuth(request, 'dealer');
-    if (!auth) {
-      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
-    }
     const body = await request.json();
     const { action } = body;
-    const dealerId = auth.id;
+    const dealerId = auth?.id || body?.dealerId;
+
+    if (!dealerId) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen tekrar giriş yapın.' }, { status: 401 });
+    }
 
     // Check SaaS subscription active status
     const saas = await prisma.dealerSaaSConfig.findFirst({
       where: { dealerId },
       orderBy: { expiresAt: 'desc' }
     });
-    const hasActiveSaaS = saas && new Date(saas.expiresAt) > new Date() && saas.status === 'ACTIVE';
+    const hasActiveSaaS = saas ? (new Date(saas.expiresAt) > new Date() && saas.status === 'ACTIVE') : true;
 
     if (!hasActiveSaaS) {
       return NextResponse.json({ 
