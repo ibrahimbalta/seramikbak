@@ -41,7 +41,8 @@ import {
   Printer,
   Calculator,
   FileCheck,
-  MessageSquare
+  MessageSquare,
+  Compass
 } from 'lucide-react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
