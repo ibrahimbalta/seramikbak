@@ -8469,13 +8469,14 @@ export default function Home() {
           color: var(--accent-gold);
         }
 
+        .showroom-hero-banner h1,
         .showroom-hero-banner h2 {
           font-size: 2.5rem;
           font-weight: 700;
-          color: #ffffff;
+          color: #ffffff !important;
           line-height: 1.2;
           letter-spacing: -0.025em;
-          text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+          text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
         }
 
         .highlight-text {
@@ -12366,8 +12367,10 @@ export default function Home() {
             flex-direction: column;
             justify-content: center;
           }
+          .showroom-hero-banner h1,
           .showroom-hero-banner h2 {
             font-size: 1.8rem;
+            color: #ffffff !important;
             min-height: auto;
           }
           .hero-banner-subtitle {
@@ -12529,8 +12532,10 @@ export default function Home() {
             padding: 20px 15px !important;
             min-height: auto !important;
           }
+          .showroom-hero-banner h1,
           .showroom-hero-banner h2 {
             font-size: 1.35rem !important;
+            color: #ffffff !important;
             line-height: 1.35 !important;
           }
           .hero-banner-subtitle {
