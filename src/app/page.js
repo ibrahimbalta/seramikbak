@@ -3251,6 +3251,11 @@ export default function Home() {
                 <Building2 size={16} />
                 <span>Proje Talebi (B2B)</span>
               </Link>
+              <Link href="/outlet" className="mobile-nav-link outlet-link" onClick={() => setShowMobileMenu(false)}>
+                <Sparkles size={16} />
+                <span>Outlet & Stoklar</span>
+                <span className="outlet-small-badge">Fırsat</span>
+              </Link>
               <Link href="/bayi" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
                 <UserIcon size={16} />
                 <span>Bayi Portalı</span>
@@ -8319,6 +8324,31 @@ export default function Home() {
 
         :global(.mobile-nav-link.b2b-link:hover) {
           background: rgba(37, 99, 235, 0.1);
+        }
+
+        :global(.mobile-nav-link.outlet-link) {
+          color: #ef4444 !important;
+          background: rgba(239, 68, 68, 0.05);
+        }
+
+        :global(.mobile-nav-link.outlet-link svg) {
+          color: #ef4444 !important;
+        }
+
+        :global(.mobile-nav-link.outlet-link:hover) {
+          background: rgba(239, 68, 68, 0.12);
+        }
+
+        :global(.outlet-small-badge) {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+          color: #ffffff !important;
+          font-size: 0.58rem;
+          font-weight: 800;
+          padding: 2px 6px;
+          border-radius: 4px;
+          line-height: 1;
+          margin-left: auto;
+          letter-spacing: 0.04em;
         }
 
         :global(.mobile-nav-link.fav-link) {
