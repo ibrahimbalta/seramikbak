@@ -1,0 +1,721 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import {
+  Sparkles,
+  Search,
+  Filter,
+  MapPin,
+  MessageSquare,
+  Building2,
+  ExternalLink,
+  ChevronLeft,
+  Tag,
+  ShieldCheck,
+  Send,
+  Phone,
+  CheckCircle2,
+  X,
+  ArrowRight
+} from 'lucide-react';
+import { slugify } from '@/lib/slugify';
+
+export default function OutletMarketplacePage() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Filter States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCity, setSelectedCity] = useState('ALL');
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
+
+  // Contact Modal State
+  const [selectedItemForContact, setSelectedItemForContact] = useState(null);
+  const [contactName, setContactName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactNotes, setContactNotes] = useState('');
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState('');
+  const [contactError, setContactError] = useState('');
+
+  const fetchOutletItems = async () => {
+    setLoading(true);
+    try {
+      let url = '/api/outlet?limit=100';
+      if (selectedCity && selectedCity !== 'ALL') url += `&city=${encodeURIComponent(selectedCity)}`;
+      if (selectedCategory && selectedCategory !== 'ALL') url += `&category=${encodeURIComponent(selectedCategory)}`;
+      if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
+
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setItems(data.data || []);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch outlet items:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOutletItems();
+  }, [selectedCity, selectedCategory]);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    fetchOutletItems();
+  };
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedItemForContact || !contactName || !contactPhone || !contactEmail) {
+      setContactError('Lütfen ad, telefon ve e-posta alanlarını doldurun.');
+      return;
+    }
+    setContactLoading(true);
+    setContactError('');
+    setContactSuccess('');
+
+    try {
+      const res = await fetch('/api/leads/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: selectedItemForContact.productId || selectedItemForContact.id,
+          dealerId: selectedItemForContact.dealerId,
+          clientName: contactName,
+          clientPhone: contactPhone,
+          clientEmail: contactEmail,
+          notes: `[Outlet / Proje Fazlası Talebi] Ürün: ${selectedItemForContact.title} (${selectedItemForContact.quantityM2} m², ₺${selectedItemForContact.unitPrice}/m²). ${contactNotes}`
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setContactSuccess('Talebiniz ilgili bayiye iletildi! Bayimiz en kısa sürede sizinle iletişime geçecektir.');
+        setContactName('');
+        setContactPhone('');
+        setContactEmail('');
+        setContactNotes('');
+      } else {
+        setContactError(data.error || 'Talep gönderilemedi.');
+      }
+    } catch (err) {
+      console.error(err);
+      setContactError('Sistemsel hata oluştu.');
+    } finally {
+      setContactLoading(false);
+    }
+  };
+
+  const getTextureFallback = (item) => {
+    const str = `${item?.dimensions || ''} ${item?.colorFinish || ''} ${item?.title || ''}`.toLowerCase();
+    if (str.includes('ahşap') || str.includes('wood') || str.includes('oak')) return '/textures/natural_oak.jpg';
+    if (str.includes('beton') || str.includes('concrete') || str.includes('grey') || str.includes('gri')) return '/textures/concrete_light_grey.jpg';
+    if (str.includes('traver') || str.includes('bej') || str.includes('beige')) return '/textures/travertino_classico.jpg';
+    return '/textures/calacatta_gold.jpg';
+  };
+
+  const categoryLabelMap = {
+    PROJE_FAZLASI: 'Proje Fazlası (Şantiye Artığı)',
+    SERI_SONU: 'Seri Sonu (Kapatıyoruz)',
+    IKINCI_KALITE: '2. Kalite Palet',
+    OUTLET: 'Depo Outlet'
+  };
+
+  return (
+    <div style={{ background: '#090d16', color: '#ffffff', minHeight: '100vh', fontFamily: 'var(--font-sans, system-ui, sans-serif)' }}>
+      {/* Header Navigation */}
+      <header style={{
+        background: 'rgba(15, 23, 42, 0.85)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(239, 68, 68, 0.25)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 90,
+        padding: '16px 24px'
+      }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: '900',
+              fontSize: '1rem',
+              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+            }}>SB</div>
+            <span style={{ fontSize: '1.2rem', fontWeight: '900', color: '#ffffff' }}>SeramikBak <span style={{ color: '#ef4444', fontSize: '0.85rem' }}>OUTLET</span></span>
+          </Link>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Link href="/bayi" style={{
+              fontSize: '0.8rem',
+              fontWeight: '700',
+              color: '#d4af37',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(212, 175, 55, 0.1)',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              padding: '8px 14px',
+              borderRadius: '10px'
+            }}>
+              <Building2 size={14} />
+              <span>Bayi Girişi & İlan Ver</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* HERO BANNER */}
+      <section style={{
+        background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(9, 13, 22, 1) 100%), url("/hero/hero_ceramics.jpg")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+        padding: '60px 24px 40px 24px',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        textAlign: 'center'
+      }}>
+        <div style={{ maxWidth: '840px', margin: '0 auto' }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(239, 68, 68, 0.2)',
+            border: '1px solid rgba(239, 68, 68, 0.4)',
+            color: '#f87171',
+            padding: '6px 16px',
+            borderRadius: '20px',
+            fontSize: '0.8rem',
+            fontWeight: '800',
+            marginBottom: '16px'
+          }}>
+            <Sparkles size={14} />
+            BAYİLERDEN CANLI OUTLET & ŞANTİYE FAZLASI BORSASI
+          </div>
+
+          <h1 style={{ fontSize: '2.4rem', fontWeight: '900', color: '#ffffff', margin: '0 0 16px 0', lineHeight: '1.25' }}>
+            Depo Seri Sonları & Proje Fazlası Paletlerde %60'a Varan İndirimler
+          </h1>
+
+          <p style={{ fontSize: '0.98rem', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 32px 0' }}>
+            Bayilerin elinde kalan son 30 m², 50 m² şantiye artığı ve 2. kalite stoklar uygun fiyata satışta!
+            Kiralık evinizi, balkonunuzu veya ufak alan tadilatınızı bütçe dostu paletlerle tamamlayın.
+          </p>
+
+          {/* Search & Filter Bar */}
+          <form onSubmit={handleSearchSubmit} style={{
+            background: 'rgba(15, 23, 42, 0.9)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '20px',
+            padding: '12px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr)) auto',
+            gap: '12px',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
+          }}>
+            <div style={{ position: 'relative' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+              <input
+                type="text"
+                placeholder="Desen, ebat veya ürün adı ara..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px 10px 36px',
+                  borderRadius: '12px',
+                  background: 'rgba(30, 41, 59, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#ffffff',
+                  fontSize: '0.85rem',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+
+            <div>
+              <select
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '12px',
+                  background: 'rgba(30, 41, 59, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#ffffff',
+                  fontSize: '0.85rem',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <option value="ALL">Tüm Şehirler</option>
+                <option value="İstanbul">İstanbul</option>
+                <option value="Ankara">Ankara</option>
+                <option value="İzmir">İzmir</option>
+                <option value="Bursa">Bursa</option>
+                <option value="Antalya">Antalya</option>
+              </select>
+            </div>
+
+            <div>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '12px',
+                  background: 'rgba(30, 41, 59, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#ffffff',
+                  fontSize: '0.85rem',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <option value="ALL">Tüm Kategoriler</option>
+                <option value="PROJE_FAZLASI">Proje Fazlası (Şantiye Artığı)</option>
+                <option value="SERI_SONU">Seri Sonu (Kapatıyoruz)</option>
+                <option value="IKINCI_KALITE">2. Kalite Paletler</option>
+                <option value="OUTLET">Depo Outlet</option>
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              style={{
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                color: '#ffffff',
+                border: 'none',
+                padding: '10px 24px',
+                borderRadius: '12px',
+                fontWeight: '800',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(239, 68, 68, 0.4)'
+              }}
+            >
+              Fırsatları Filtrele
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* MARKETPLACE LISTINGS GRID */}
+      <main style={{ maxWidth: '1280px', margin: '40px auto', padding: '0 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#ffffff' }}>
+              Depolarda Teslimata Hazır Fırsat Ürünleri
+            </h2>
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+              Toplam {items.length} adet kelepir seramik paleti bulundu
+            </span>
+          </div>
+        </div>
+
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '80px 0', color: '#94a3b8' }}>
+            <Sparkles size={32} className="animate-spin" style={{ margin: '0 auto 12px auto', color: '#ef4444' }} />
+            <span>Fırsat paletleri yükleniyor...</span>
+          </div>
+        ) : items.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px', background: 'rgba(30, 41, 59, 0.4)', borderRadius: '20px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+            <Tag size={40} style={{ color: '#ef4444', margin: '0 auto 16px auto' }} />
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 8px 0' }}>Aradığınız Kriterlerde Outlet Ürünü Bulunamadı</h3>
+            <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: 0 }}>
+              Filtreleri sıfırlayarak tüm bayilerin proje fazlası stoklarını görüntüleyebilirsiniz.
+            </p>
+          </div>
+        ) : (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+            gap: '24px'
+          }}>
+            {items.map((item) => {
+              const d = item.dealer;
+              const prod = item.product;
+              const discountPercent = item.originalPrice && item.originalPrice > item.unitPrice
+                ? Math.round(((item.originalPrice - item.unitPrice) / item.originalPrice) * 100)
+                : null;
+              const totalPalletValue = Math.round(item.unitPrice * item.quantityM2);
+
+              return (
+                <div key={item.id} style={{
+                  background: 'rgba(30, 41, 59, 0.6)',
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                  transition: 'all 0.2s ease'
+                }}>
+                  {/* Image Header */}
+                  <div style={{ position: 'relative', height: '200px', width: '100%', overflow: 'hidden' }}>
+                    <img
+                      src={item.imageUrl || (prod ? prod.imageUrl || getTextureFallback(item) : getTextureFallback(item))}
+                      alt={item.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = getTextureFallback(item);
+                      }}
+                    />
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, transparent 60%)'
+                    }} />
+
+                    {/* Top Left Badges */}
+                    <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <span style={{
+                        background: '#ef4444',
+                        color: '#ffffff',
+                        fontSize: '0.68rem',
+                        fontWeight: '800',
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 10px rgba(239, 68, 68, 0.4)'
+                      }}>
+                        {item.badgeTag || 'Proje Fazlası'}
+                      </span>
+                      <span style={{
+                        background: 'rgba(15, 23, 42, 0.85)',
+                        color: '#cbd5e1',
+                        fontSize: '0.62rem',
+                        fontWeight: '700',
+                        padding: '3px 8px',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        backdropFilter: 'blur(4px)'
+                      }}>
+                        🏷️ {categoryLabelMap[item.category] || item.category}
+                      </span>
+                    </div>
+
+                    {/* Discount Pill */}
+                    {discountPercent && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '12px',
+                        right: '12px',
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        color: '#ffffff',
+                        fontWeight: '900',
+                        fontSize: '0.75rem',
+                        padding: '4px 10px',
+                        borderRadius: '14px',
+                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)'
+                      }}>
+                        %{discountPercent} İNDİRİM
+                      </div>
+                    )}
+
+                    {/* Stock m² Pill */}
+                    <div style={{ position: 'absolute', bottom: '12px', left: '12px' }}>
+                      <span style={{
+                        background: 'rgba(212, 175, 55, 0.9)',
+                        color: '#000000',
+                        fontWeight: '900',
+                        fontSize: '0.72rem',
+                        padding: '4px 10px',
+                        borderRadius: '10px'
+                      }}>
+                        📦 Mevcut Stok: {item.quantityM2} m²
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Body Info */}
+                  <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {/* Dealer info banner */}
+                    {d && (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)', pb: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Building2 size={14} style={{ color: '#d4af37' }} />
+                          <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#ffffff' }}>{d.name}</span>
+                        </div>
+                        <span style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <MapPin size={10} />
+                          {d.district}, {d.city}
+                        </span>
+                      </div>
+                    )}
+
+                    <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#ffffff', margin: 0, lineHeight: '1.4' }}>
+                      {item.title}
+                    </h3>
+
+                    {(item.dimensions || item.colorFinish) && (
+                      <div style={{ display: 'flex', gap: '12px', fontSize: '0.75rem', color: '#cbd5e1' }}>
+                        {item.dimensions && <span>📏 {item.dimensions}</span>}
+                        {item.colorFinish && <span>🎨 {item.colorFinish}</span>}
+                      </div>
+                    )}
+
+                    {item.notes && (
+                      <p style={{
+                        fontSize: '0.76rem',
+                        color: '#94a3b8',
+                        background: 'rgba(15, 23, 42, 0.5)',
+                        padding: '10px 12px',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(255, 255, 255, 0.05)',
+                        margin: 0,
+                        lineHeight: '1.5'
+                      }}>
+                        "{item.notes}"
+                      </p>
+                    )}
+
+                    {/* Price Block */}
+                    <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                      <div>
+                        {item.originalPrice && (
+                          <span style={{ fontSize: '0.72rem', color: '#94a3b8', textDecoration: 'line-through', display: 'block' }}>
+                            ₺{item.originalPrice.toLocaleString('tr-TR')} / m²
+                          </span>
+                        )}
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                          <span style={{ fontSize: '1.4rem', fontWeight: '900', color: '#ef4444' }}>
+                            ₺{item.unitPrice.toLocaleString('tr-TR')}
+                          </span>
+                          <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>/ m²</span>
+                        </div>
+                      </div>
+
+                      <div style={{ textAlign: 'right' }}>
+                        <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block' }}>Palet Toplam Tutarı</span>
+                        <span style={{ fontSize: '0.9rem', fontWeight: '800', color: '#ffffff' }}>
+                          ₺{totalPalletValue.toLocaleString('tr-TR')}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '6px' }}>
+                      {d?.phone ? (
+                        <a
+                          href={`https://wa.me/${d.phone.replace(/[\s\-\(\)\+]/g, '')}?text=${encodeURIComponent(`Merhaba, SeramikBak Outlet Borsası'nda yer alan "${item.title}" (${item.quantityM2} m², ₺${item.unitPrice}/m²) ilanınız için bilgi almak / satın almak istiyorum.`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px',
+                            padding: '10px',
+                            borderRadius: '10px',
+                            background: '#22c55e',
+                            color: '#ffffff',
+                            fontWeight: '800',
+                            fontSize: '0.78rem',
+                            textDecoration: 'none',
+                            textAlign: 'center'
+                          }}
+                        >
+                          <MessageSquare size={14} />
+                          <span>WhatsApp Sor</span>
+                        </a>
+                      ) : null}
+
+                      <button
+                        onClick={() => setSelectedItemForContact(item)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          padding: '10px',
+                          borderRadius: '10px',
+                          background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                          color: '#000000',
+                          fontWeight: '800',
+                          fontSize: '0.78rem',
+                          border: 'none',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <Send size={14} />
+                        <span>Teklif Al</span>
+                      </button>
+                    </div>
+
+                    {d && (
+                      <Link
+                        href={`/bayi/${slugify(d.name)}`}
+                        style={{
+                          fontSize: '0.72rem',
+                          color: '#94a3b8',
+                          textDecoration: 'none',
+                          textAlign: 'center',
+                          marginTop: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '4px'
+                        }}
+                        className="hover:text-white"
+                      >
+                        <span>Bayi Showroom Profilini İncele</span>
+                        <ChevronLeft size={12} style={{ transform: 'rotate(180deg)' }} />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
+
+      {/* LEAD CONTACT MODAL */}
+      {selectedItemForContact && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.75)',
+          backdropFilter: 'blur(6px)',
+          zIndex: 999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#0f172a',
+            border: '1px solid rgba(212, 175, 55, 0.4)',
+            borderRadius: '24px',
+            maxWidth: '500px',
+            width: '100%',
+            padding: '24px',
+            color: '#ffffff',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', pb: '12px' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: '#d4af37' }}>
+                <Send size={18} />
+                Bayiden Fiyat Teklifi / Stok Rezerve Et
+              </h3>
+              <button onClick={() => setSelectedItemForContact(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: '12px 14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <span style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: '800', display: 'block' }}>
+                {selectedItemForContact.badgeTag || 'Proje Fazlası'}
+              </span>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#ffffff', margin: '4px 0' }}>{selectedItemForContact.title}</h4>
+              <span style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
+                Mevcut Stok: {selectedItemForContact.quantityM2} m² • Birim Fiyat: ₺{selectedItemForContact.unitPrice}/m²
+              </span>
+            </div>
+
+            {contactSuccess && (
+              <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#34d399', padding: '12px', borderRadius: '10px', fontSize: '0.82rem' }}>
+                <CheckCircle2 size={16} style={{ display: 'inline', marginRight: '6px' }} />
+                {contactSuccess}
+              </div>
+            )}
+
+            {contactError && (
+              <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#f87171', padding: '12px', borderRadius: '10px', fontSize: '0.82rem' }}>
+                ⚠️ {contactError}
+              </div>
+            )}
+
+            <form onSubmit={handleContactSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <label style={{ fontSize: '0.75rem', color: '#cbd5e1', display: 'block', marginBottom: '4px' }}>Adınız Soyadınız *</label>
+                <input
+                  type="text"
+                  placeholder="Örn: Ahmet Yılmaz"
+                  value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ fontSize: '0.75rem', color: '#cbd5e1', display: 'block', marginBottom: '4px' }}>Telefon Numaranız *</label>
+                  <input
+                    type="tel"
+                    placeholder="0532 123 45 67"
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value)}
+                    required
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '0.75rem', color: '#cbd5e1', display: 'block', marginBottom: '4px' }}>E-Posta Adresiniz *</label>
+                  <input
+                    type="email"
+                    placeholder="ahmet@gmail.com"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    required
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.75rem', color: '#cbd5e1', display: 'block', marginBottom: '4px' }}>Ek Not / Mesajınız</label>
+                <textarea
+                  rows={2}
+                  placeholder="İstediğiniz m² miktarı veya nakliye adresi gibi ek sorularınızı yazabilirsiniz..."
+                  value={contactNotes}
+                  onChange={(e) => setContactNotes(e.target.value)}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={contactLoading}
+                style={{
+                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                  color: '#000000',
+                  border: 'none',
+                  padding: '12px',
+                  borderRadius: '10px',
+                  fontWeight: '800',
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  marginTop: '6px'
+                }}
+              >
+                {contactLoading ? 'Gönderiliyor...' : 'Teklif Talebi Gönder'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -85,6 +85,24 @@ export default function DealerPortalPage() {
   const [addInventoryPrice, setAddInventoryPrice] = useState('');
   const [addInventoryStatus, setAddInventoryStatus] = useState('IN_STOCK');
 
+  // Outlet & Proje Fazlası Borsası State
+  const [outletListings, setOutletListings] = useState([]);
+  const [outletLoading, setOutletLoading] = useState(false);
+  const [showAddOutletModal, setShowAddOutletModal] = useState(false);
+  const [outletTitle, setOutletTitle] = useState('');
+  const [outletCategory, setOutletCategory] = useState('PROJE_FAZLASI');
+  const [outletBadgeTag, setOutletBadgeTag] = useState('Kapatıyoruz / Proje Fazlası');
+  const [outletQuantityM2, setOutletQuantityM2] = useState('');
+  const [outletUnitPrice, setOutletUnitPrice] = useState('');
+  const [outletOriginalPrice, setOutletOriginalPrice] = useState('');
+  const [outletDimensions, setOutletDimensions] = useState('60x120 cm');
+  const [outletColorFinish, setOutletColorFinish] = useState('');
+  const [outletImageUrl, setOutletImageUrl] = useState('');
+  const [outletNotes, setOutletNotes] = useState('');
+  const [outletProductId, setOutletProductId] = useState('');
+  const [outletSuccess, setOutletSuccess] = useState('');
+  const [outletError, setOutletError] = useState('');
+
   // Dealer SaaS State
   const [saasInfo, setSaasInfo] = useState(null);
   const [bankDetails, setBankDetails] = useState({ bank_name: '', bank_recipient: '', bank_iban: '' });
@@ -437,6 +455,7 @@ export default function DealerPortalPage() {
       loadBankDetails();
       loadBrandProducts();
       loadDealerInventory();
+      loadDealerOutletListings();
     }
   }, [isLoggedIn, dealerInfo]);
 
@@ -515,6 +534,109 @@ export default function DealerPortalPage() {
       setInventoryLoading(false);
     }
   };
+
+  const loadDealerOutletListings = async () => {
+    if (!dealerInfo) return;
+    setOutletLoading(true);
+    try {
+      const res = await fetch(`/api/dealers/outlet?dealerId=${dealerInfo.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setOutletListings(data.data || []);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load outlet listings:', err);
+    } finally {
+      setOutletLoading(false);
+    }
+  };
+
+  const handleAddOutletListing = async (e) => {
+    e.preventDefault();
+    if (!dealerInfo || !outletTitle || !outletQuantityM2 || !outletUnitPrice) {
+      setOutletError('Lütfen tüm zorunlu alanları (İlan Başlığı, Metraj, Birim İndirimli Fiyat) doldurun.');
+      return;
+    }
+    setOutletError('');
+    setOutletSuccess('');
+
+    try {
+      const res = await fetch('/api/dealers/outlet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dealerId: dealerInfo.id,
+          productId: outletProductId || null,
+          title: outletTitle,
+          category: outletCategory,
+          badgeTag: outletBadgeTag,
+          quantityM2: outletQuantityM2,
+          unitPrice: outletUnitPrice,
+          originalPrice: outletOriginalPrice || null,
+          dimensions: outletDimensions,
+          colorFinish: outletColorFinish,
+          imageUrl: outletImageUrl || null,
+          notes: outletNotes
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setOutletSuccess('Outlet/Proje Fazlası ilanınız başarıyla eklendi!');
+        setShowAddOutletModal(false);
+        setOutletTitle('');
+        setOutletQuantityM2('');
+        setOutletUnitPrice('');
+        setOutletOriginalPrice('');
+        setOutletNotes('');
+        setOutletImageUrl('');
+        setOutletProductId('');
+        loadDealerOutletListings();
+      } else {
+        setOutletError(data.error || 'İlan eklenirken hata oluştu.');
+      }
+    } catch (err) {
+      console.error(err);
+      setOutletError('Sistemsel hata oluştu.');
+    }
+  };
+
+  const handleToggleOutletStatus = async (item) => {
+    if (!dealerInfo) return;
+    const newStatus = item.status === 'ACTIVE' ? 'SOLD' : 'ACTIVE';
+    try {
+      const res = await fetch('/api/dealers/outlet', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: item.id,
+          dealerId: dealerInfo.id,
+          status: newStatus
+        })
+      });
+      if (res.ok) {
+        loadDealerOutletListings();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteOutletListing = async (id) => {
+    if (!dealerInfo || !confirm('Bu outlet/proje fazlası ilanını silmek istediğinize emin misiniz?')) return;
+    try {
+      const res = await fetch(`/api/dealers/outlet?id=${id}&dealerId=${dealerInfo.id}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        loadDealerOutletListings();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
 
   const handleCsvUpload = async (e) => {
     e.preventDefault();
@@ -1933,6 +2055,7 @@ export default function DealerPortalPage() {
                 { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
                 { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
                 { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
+                { id: 'outlet-exchange', label: 'Outlet & Proje Fazlası', icon: <Sparkles size={18} /> },
                 { id: 'subscription', label: 'Abonelik Yönetimi', icon: <CreditCard size={18} /> },
                 { id: 'settings', label: 'Şube Ayarları', icon: <Settings size={18} /> },
               ].map(link => {
@@ -2040,6 +2163,7 @@ export default function DealerPortalPage() {
                     {activePortalTab === 'b2b-projects' && 'Proje Talepleri'}
                     {activePortalTab === 'analytics' && 'Arama Analitiği'}
                     {activePortalTab === 'inventory' && 'Envanter & Stok'}
+                    {activePortalTab === 'outlet-exchange' && 'Outlet & Proje Fazlası'}
                     {activePortalTab === 'subscription' && 'Abonelik & SaaS'}
                     {activePortalTab === 'settings' && 'Şube Ayarları'}
                   </span>
@@ -2093,6 +2217,7 @@ export default function DealerPortalPage() {
                   {activePortalTab === 'b2b-projects' && 'B2B Proje Talepleri'}
                   {activePortalTab === 'analytics' && 'Bölgesel Arama Analitiği'}
                   {activePortalTab === 'inventory' && 'Envanter & Stok Yönetimi'}
+                  {activePortalTab === 'outlet-exchange' && 'Bayiden Outlet & Proje Fazlası Borsası'}
                   {activePortalTab === 'subscription' && 'Abonelik & SaaS Yönetimi'}
                   {activePortalTab === 'settings' && 'Şube Ayarları & Görünüm'}
                 </h2>
@@ -4589,6 +4714,481 @@ export default function DealerPortalPage() {
               </div>
 
             </div>
+          </div>
+        ) : activePortalTab === 'outlet-exchange' ? (
+          /* ===== OUTLET & PROJE FAZLASI BORSASI TAB ===== */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+              <div>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Sparkles size={22} style={{ color: '#ef4444' }} />
+                  Bayiden Outlet & Proje Fazlası Borsası
+                </h2>
+                <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                  Deponuzda kalan son 30-50 m² şantiye fazlası, seri sonu veya 2. kalite paletlerinizi ilan vererek nakde çevirin.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  if (brandProducts.length === 0) loadBrandProducts();
+                  setShowAddOutletModal(true);
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '10px 18px',
+                  fontWeight: '700',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+                }}
+              >
+                <Plus size={14} />
+                <span>Yeni Outlet / Proje Fazlası İlanı Ekle</span>
+              </button>
+            </div>
+
+            {outletSuccess && (
+              <div style={{ background: '#ecfdf5', border: '1px solid #10b981', color: '#047857', padding: '12px 16px', borderRadius: '10px', fontSize: '0.85rem' }}>
+                ✅ {outletSuccess}
+              </div>
+            )}
+
+            {/* Quick Stats Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+              <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>Aktif İlan Sayısı</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#0f172a' }}>
+                  {outletListings.filter(i => i.status === 'ACTIVE').length} Adet İlan
+                </span>
+              </div>
+
+              <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>Toplam Fırsat Stok</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#ef4444' }}>
+                  {outletListings.reduce((acc, curr) => acc + (curr.quantityM2 || 0), 0).toLocaleString('tr-TR')} m²
+                </span>
+              </div>
+
+              <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>Tahmini Stok Değeri</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#10b981' }}>
+                  ₺{outletListings.reduce((acc, curr) => acc + ((curr.unitPrice || 0) * (curr.quantityM2 || 0)), 0).toLocaleString('tr-TR')}
+                </span>
+              </div>
+            </div>
+
+            {/* Outlet Listings Grid */}
+            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>
+                  Yayınlanan Outlet & Proje Fazlası İlanlarınız
+                </h3>
+                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                  {outletListings.length} kayıt gösteriliyor
+                </span>
+              </div>
+
+              {outletLoading ? (
+                <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
+                  <Loader2 size={24} className="animate-spin" style={{ margin: '0 auto 10px auto' }} />
+                  <span>Outlet ilanları yükleniyor...</span>
+                </div>
+              ) : outletListings.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '48px 20px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                  <Sparkles size={36} style={{ color: '#ef4444', margin: '0 auto 12px auto' }} />
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a', margin: '0 0 6px 0' }}>Deponuzda Henüz İlan Verilmiş Stok Bulunmuyor</h4>
+                  <p style={{ fontSize: '0.8rem', color: '#64748b', maxWidth: '440px', margin: '0 auto 16px auto' }}>
+                    Deponuzdaki 30-50 m² şantiye fazlası veya 2. kalite paletleri ekleyerek hemen showroom sayfanızda fırsat etiketiyle sergileyin.
+                  </p>
+                  <button
+                    onClick={() => {
+                      if (brandProducts.length === 0) loadBrandProducts();
+                      setShowAddOutletModal(true);
+                    }}
+                    style={{
+                      background: '#ef4444',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      fontWeight: '700',
+                      fontSize: '0.8rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    + İlk İlanı Ekle
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+                  {outletListings.map((item) => {
+                    const discountPercent = item.originalPrice && item.originalPrice > item.unitPrice
+                      ? Math.round(((item.originalPrice - item.unitPrice) / item.originalPrice) * 100)
+                      : null;
+
+                    return (
+                      <div key={item.id} style={{
+                        border: item.status === 'ACTIVE' ? '1px solid #e2e8f0' : '1px solid #f1f5f9',
+                        borderRadius: '16px',
+                        overflow: 'hidden',
+                        background: item.status === 'ACTIVE' ? '#ffffff' : '#f8fafc',
+                        opacity: item.status === 'ACTIVE' ? 1 : 0.65,
+                        display: 'flex',
+                        flexDirection: 'column'
+                      }}>
+                        <div style={{ position: 'relative', height: '150px', background: '#f1f5f9' }}>
+                          <img
+                            src={item.imageUrl || item.product?.imageUrl || '/textures/calacatta_gold.jpg'}
+                            alt={item.title}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                          <span style={{
+                            position: 'absolute',
+                            top: '10px',
+                            left: '10px',
+                            background: '#ef4444',
+                            color: '#fff',
+                            fontSize: '0.65rem',
+                            fontWeight: '800',
+                            padding: '3px 8px',
+                            borderRadius: '10px'
+                          }}>
+                            {item.badgeTag || 'Proje Fazlası'}
+                          </span>
+
+                          {item.status === 'SOLD' && (
+                            <div style={{
+                              position: 'absolute',
+                              inset: 0,
+                              background: 'rgba(15, 23, 42, 0.75)',
+                              color: '#fff',
+                              fontWeight: '900',
+                              fontSize: '1rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              letterSpacing: '1px'
+                            }}>
+                              SATILDI / PASİF
+                            </div>
+                          )}
+                        </div>
+
+                        <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                            <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', margin: 0, lineHeight: '1.3' }}>
+                              {item.title}
+                            </h4>
+                          </div>
+
+                          <div style={{ fontSize: '0.74rem', color: '#64748b', display: 'flex', gap: '10px' }}>
+                            {item.dimensions && <span>📏 {item.dimensions}</span>}
+                            {item.colorFinish && <span>🎨 {item.colorFinish}</span>}
+                          </div>
+
+                          {item.notes && (
+                            <p style={{ fontSize: '0.75rem', color: '#475569', background: '#f1f5f9', padding: '8px 10px', borderRadius: '8px', margin: 0, lineHeight: '1.4' }}>
+                              {item.notes}
+                            </p>
+                          )}
+
+                          <div style={{ marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                            <div>
+                              <span style={{ fontSize: '0.65rem', color: '#64748b', display: 'block' }}>Kalan Stok</span>
+                              <span style={{ fontSize: '0.85rem', fontWeight: '800', color: '#0f172a' }}>📦 {item.quantityM2} m²</span>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              {discountPercent && (
+                                <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: '800', display: 'block' }}>%{discountPercent} İndirimli</span>
+                              )}
+                              <span style={{ fontSize: '1rem', fontWeight: '900', color: '#ef4444' }}>
+                                ₺{item.unitPrice.toLocaleString('tr-TR')} <span style={{ fontSize: '0.65rem', color: '#64748b' }}>/m²</span>
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Card Action Buttons */}
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px', marginTop: '6px' }}>
+                            <button
+                              onClick={() => handleToggleOutletStatus(item)}
+                              style={{
+                                background: item.status === 'ACTIVE' ? '#f1f5f9' : '#ecfdf5',
+                                color: item.status === 'ACTIVE' ? '#475569' : '#047857',
+                                border: '1px solid #cbd5e1',
+                                padding: '6px 10px',
+                                borderRadius: '8px',
+                                fontSize: '0.72rem',
+                                fontWeight: '700',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {item.status === 'ACTIVE' ? 'Satıldı İşaretle' : 'Yeniden Aktif Et'}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteOutletListing(item.id)}
+                              style={{
+                                background: '#fef2f2',
+                                color: '#ef4444',
+                                border: '1px solid #fecaca',
+                                padding: '6px 10px',
+                                borderRadius: '8px',
+                                fontSize: '0.72rem',
+                                cursor: 'pointer'
+                              }}
+                              title="Sil"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* ADD OUTLET LISTING MODAL */}
+            {showAddOutletModal && (
+              <div style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.6)',
+                backdropFilter: 'blur(4px)',
+                zIndex: 999,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '20px'
+              }}>
+                <div style={{
+                  background: '#ffffff',
+                  borderRadius: '20px',
+                  maxWidth: '560px',
+                  width: '100%',
+                  maxHeight: '90vh',
+                  overflowY: 'auto',
+                  padding: '24px',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', pb: '12px' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Sparkles size={18} style={{ color: '#ef4444' }} />
+                      Yeni Outlet / Proje Fazlası İlanı
+                    </h3>
+                    <button onClick={() => setShowAddOutletModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  {outletError && (
+                    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem' }}>
+                      ⚠️ {outletError}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleAddOutletListing} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
+                        Markanızın Mevcut Ürününden Seçin (İsteğe Bağlı)
+                      </label>
+                      <select
+                        value={outletProductId}
+                        onChange={(e) => {
+                          const pId = e.target.value;
+                          setOutletProductId(pId);
+                          const found = brandProducts.find(p => p.id === pId);
+                          if (found) {
+                            setOutletTitle(`${found.width}x${found.height} ${found.name} (${found.style} Karo)`);
+                            setOutletDimensions(`${found.width}x${found.height} cm`);
+                            setOutletColorFinish(`${found.finish || ''} ${found.color || ''}`.trim());
+                            if (found.imageUrl) setOutletImageUrl(found.imageUrl);
+                          }
+                        }}
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                      >
+                        <option value="">-- Kataloğunuzdan ürün seçin veya aşağıya yazın --</option>
+                        {brandProducts.map(p => (
+                          <option key={p.id} value={p.id}>{p.name} ({p.code}) - {p.width}x{p.height} cm</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
+                        İlan / Ürün Başlığı *
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Örn: 60x120 Calacatta Gold Parlak Porselen - Şantiye Fazlası Palet"
+                        value={outletTitle}
+                        onChange={(e) => setOutletTitle(e.target.value)}
+                        required
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
+                          Kategori *
+                        </label>
+                        <select
+                          value={outletCategory}
+                          onChange={(e) => setOutletCategory(e.target.value)}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                        >
+                          <option value="PROJE_FAZLASI">Proje Fazlası (Şantiye Artığı)</option>
+                          <option value="SERI_SONU">Seri Sonu (Kapatıyoruz)</option>
+                          <option value="IKINCI_KALITE">2. Kalite Palet</option>
+                          <option value="OUTLET">Depo Outlet</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
+                          Fırsat Etiketi / Rozeti
+                        </label>
+                        <select
+                          value={outletBadgeTag}
+                          onChange={(e) => setOutletBadgeTag(e.target.value)}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                        >
+                          <option value="Kapatıyoruz / Proje Fazlası">Kapatıyoruz / Proje Fazlası</option>
+                          <option value="2. Kalite Fırsat Palet">2. Kalite Fırsat Palet</option>
+                          <option value="Seri Sonu Kapatıyoruz">Seri Sonu Kapatıyoruz</option>
+                          <option value="Son Paletler Şok Fiyat">Son Paletler Şok Fiyat</option>
+                          <option value="Şantiye Artığı Kelepir">Şantiye Artığı Kelepir</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
+                          Mevcut Stok (m²) *
+                        </label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          placeholder="Örn: 45"
+                          value={outletQuantityM2}
+                          onChange={(e) => setOutletQuantityM2(e.target.value)}
+                          required
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
+                          Outlet Fiyatı (₺/m²) *
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="Örn: 285"
+                          value={outletUnitPrice}
+                          onChange={(e) => setOutletUnitPrice(e.target.value)}
+                          required
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
+                          Orijinal Liste Fiyatı (₺/m²)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="Örn: 580"
+                          value={outletOriginalPrice}
+                          onChange={(e) => setOutletOriginalPrice(e.target.value)}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
+                          Ebat Bilgisi
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Örn: 60x120 cm"
+                          value={outletDimensions}
+                          onChange={(e) => setOutletDimensions(e.target.value)}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
+                          Renk / Yüzey Tipi
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Örn: Parlak Beyaz Mermer"
+                          value={outletColorFinish}
+                          onChange={(e) => setOutletColorFinish(e.target.value)}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
+                        Ürün Fotoğrafı URL
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="https://... veya /textures/calacatta_gold.jpg"
+                        value={outletImageUrl}
+                        onChange={(e) => setOutletImageUrl(e.target.value)}
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
+                        Depo Notu / Durum Açıklaması
+                      </label>
+                      <textarea
+                        rows={2}
+                        placeholder="Örn: Kadıköy lüks konut projesinden kalan paketli sıfır ürünler. Banyo yenilemek için ideal."
+                        value={outletNotes}
+                        onChange={(e) => setOutletNotes(e.target.value)}
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowAddOutletModal(false)}
+                        style={{ background: '#f1f5f9', color: '#475569', border: 'none', padding: '10px 18px', borderRadius: '8px', fontWeight: '700', cursor: 'pointer' }}
+                      >
+                        Vazgeç
+                      </button>
+                      <button
+                        type="submit"
+                        style={{ background: '#ef4444', color: '#ffffff', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)' }}
+                      >
+                        İlanı Yayınla
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           /* ===== DASHBOARD VIEW ===== */

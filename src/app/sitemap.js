@@ -15,6 +15,7 @@ export default async function sitemap() {
     { path: '/yasal', priority: 0.3, changeFrequency: 'yearly' },
     { path: '/marka', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/bayi', priority: 0.9, changeFrequency: 'weekly' },
+    { path: '/outlet', priority: 0.9, changeFrequency: 'daily' },
   ].map(route => ({
     url: `${baseUrl}${route.path}`,
     lastModified: new Date(),

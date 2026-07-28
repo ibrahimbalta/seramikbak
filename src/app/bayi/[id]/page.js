@@ -101,6 +101,12 @@ export default async function Page({ params }) {
             include: {
               product: true
             }
+          },
+          outletListings: {
+            include: {
+              product: true
+            },
+            orderBy: { createdAt: 'desc' }
           }
         }
       });
@@ -115,6 +121,12 @@ export default async function Page({ params }) {
             include: {
               product: true
             }
+          },
+          outletListings: {
+            include: {
+              product: true
+            },
+            orderBy: { createdAt: 'desc' }
           }
         }
       });

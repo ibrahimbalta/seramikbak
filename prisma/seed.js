@@ -2,21 +2,12 @@ const { PrismaClient } = require('@prisma/client');
 const { createClient } = require('@libsql/client');
 const { PrismaLibSQL } = require('@prisma/adapter-libsql');
 
-let prisma;
+const prisma = new PrismaClient();
 
-if (process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN) {
-  const libsql = createClient({
-    url: process.env.TURSO_DATABASE_URL,
-    authToken: process.env.TURSO_AUTH_TOKEN,
-  });
-  const adapter = new PrismaLibSQL(libsql);
-  prisma = new PrismaClient({ adapter });
-} else {
-  prisma = new PrismaClient();
-}
 
 async function main() {
   console.log('Clearing existing database...');
+  await prisma.outletListing.deleteMany();
   await prisma.lead.deleteMany();
   await prisma.analyticsLog.deleteMany();
   await prisma.adCampaign.deleteMany();
@@ -494,6 +485,87 @@ async function main() {
         brandId: randomProduct.brandId,
         city: cities[Math.floor(Math.random() * cities.length)],
         createdAt: date
+      }
+    });
+  }
+
+  // Seed Outlet & Proje Fazlası Listings
+  console.log('Seeding Outlet & Proje Fazlası listings...');
+  const allDealersList = await prisma.dealer.findMany();
+  if (allDealersList.length > 0) {
+    const d1 = allDealersList[0]; // Kadıköy
+    const d2 = allDealersList[2] || d1; // Ümraniye
+    const d3 = allDealersList[1] || d1; // Beşiktaş
+
+    await prisma.outletListing.create({
+      data: {
+        dealerId: d1.id,
+        productId: prod1.id,
+        title: '60x120 Calacatta Gold Parlak Porselen - Şantiye Fazlası Palet',
+        category: 'PROJE_FAZLASI',
+        badgeTag: 'Kapatıyoruz / Proje Fazlası',
+        quantityM2: 45.0,
+        unitPrice: 285.0,
+        originalPrice: 580.0,
+        dimensions: '60x120 cm',
+        colorFinish: 'Parlak Beyaz Mermer',
+        imageUrl: '/textures/calacatta_gold.jpg',
+        notes: 'Kadıköy lüks konut projesinden kalan son 45 m² sıfır kutulu palet. Banyo veya mutfak yenilemek için kaçırılmayacak fırsat.',
+        status: 'ACTIVE'
+      }
+    });
+
+    await prisma.outletListing.create({
+      data: {
+        dealerId: d2.id,
+        productId: prod4.id,
+        title: '20x120 Natural Oak Ahşap Görünümlü Seramik (2. Kalite)',
+        category: 'IKINCI_KALITE',
+        badgeTag: '2. Kalite Fırsat Palet',
+        quantityM2: 38.5,
+        unitPrice: 195.0,
+        originalPrice: 420.0,
+        dimensions: '20x120 cm',
+        colorFinish: 'Mat Meşe Ahşap',
+        imageUrl: '/textures/natural_oak.jpg',
+        notes: 'Depo stok temizliği. Ton farkı çok az, balkon ve kiralık daire yer döşemeleri için idealdır.',
+        status: 'ACTIVE'
+      }
+    });
+
+    await prisma.outletListing.create({
+      data: {
+        dealerId: d3.id,
+        productId: prod5.id,
+        title: '30x60 Concrete Light Grey Beton Görünümlü Karo - Seri Sonu',
+        category: 'SERI_SONU',
+        badgeTag: 'Seri Sonu Kapatıyoruz',
+        quantityM2: 62.0,
+        unitPrice: 160.0,
+        originalPrice: 350.0,
+        dimensions: '31.5x61.5 cm',
+        colorFinish: 'Mat Gri Beton',
+        imageUrl: '/textures/concrete_light_grey.jpg',
+        notes: 'Seri üretimi biten ürünlerin depomuzdaki son 62 m² stoğu. Toplu alımda ek indirim yapılır.',
+        status: 'ACTIVE'
+      }
+    });
+
+    await prisma.outletListing.create({
+      data: {
+        dealerId: d1.id,
+        productId: prod3.id,
+        title: '60x120 Travertino Classico Bej - Proje Artığı 30 m²',
+        category: 'PROJE_FAZLASI',
+        badgeTag: 'Son 30 m² Palet',
+        quantityM2: 30.0,
+        unitPrice: 220.0,
+        originalPrice: 490.0,
+        dimensions: '60x120 cm',
+        colorFinish: 'Mat Bej Traverten',
+        imageUrl: '/textures/travertino_classico.jpg',
+        notes: 'Villa projesinden kalan tam 30 m² paketli sıfır ürün.',
+        status: 'ACTIVE'
       }
     });
   }

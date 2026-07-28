@@ -3085,6 +3085,11 @@ export default function Home() {
               <span className="b2b-small-badge">B2B</span>
             </Link>
             <span className="utility-divider">|</span>
+            <Link href="/outlet" className="utility-item outlet-btn-link">
+              <Sparkles size={12} style={{ color: '#ef4444' }} />
+              <span style={{ color: '#ef4444', fontWeight: '800' }}>Outlet & Proje Fazlası</span>
+            </Link>
+            <span className="utility-divider">|</span>
             <Link href="/bayi" className="utility-item portal-link">
               <UserIcon size={12} />
               <span>Bayi Portalı</span>

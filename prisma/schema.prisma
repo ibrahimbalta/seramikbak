@@ -55,6 +55,7 @@ model Product {
   analytics  AnalyticsLog[]
   favorites  Favorite[]
   dealerInventories DealerInventory[]
+  outletListings OutletListing[]
   
   // Technical Specifications
   peiRating        Int?           // Wear resistance rating (1-5)
@@ -106,6 +107,7 @@ model Dealer {
   themePreset       String?  @default("GOLD")
   themePrimary      String?  @default("#d4af37")
   analytics         AnalyticsLog[]
+  outletListings    OutletListing[]
 }
 
 model DealerSaaSConfig {
@@ -263,5 +265,26 @@ model DealerInventory {
   updatedAt DateTime @updatedAt
 
   @@unique([dealerId, productId])
+}
+
+model OutletListing {
+  id            String   @id @default(uuid())
+  dealerId      String
+  dealer        Dealer   @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  productId     String?
+  product       Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  title         String
+  category      String   @default("PROJE_FAZLASI") // PROJE_FAZLASI, SERI_SONU, IKINCI_KALITE, OUTLET
+  badgeTag      String?  @default("Kapatıyoruz / Proje Fazlası") // e.g. "Kapatıyoruz / Proje Fazlası", "Şok Fiyat", "Son Paletler"
+  quantityM2    Float    @default(0) // Quantity in m²
+  unitPrice     Float    // Outlet price per m²
+  originalPrice Float?   // Original reference price per m²
+  dimensions    String?  // e.g., "60x120 cm"
+  colorFinish   String?  // e.g., "Mat Antrasit"
+  imageUrl      String?
+  notes         String?  // Condition description or batch details
+  status        String   @default("ACTIVE") // ACTIVE, RESERVED, SOLD
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 

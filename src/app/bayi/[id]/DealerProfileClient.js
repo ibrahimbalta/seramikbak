@@ -699,7 +699,260 @@ export default function DealerProfileClient({ dealer, products }) {
 
         </div>
 
-        {/* SECTION: CAMPAIGNS */}
+        {/* SECTION: OUTLET & PROJE FAZLASI BORSASI */}
+        {dealer.outletListings && dealer.outletListings.length > 0 && (
+          <div className="showroom-outlet-section" style={{ marginTop: '48px' }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+              borderRadius: '24px',
+              padding: '32px 24px',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.25)'
+            }}>
+              <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(239, 68, 68, 0.15)',
+                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                  color: '#f87171',
+                  padding: '6px 16px',
+                  borderRadius: '20px',
+                  fontSize: '0.78rem',
+                  fontWeight: '800',
+                  letterSpacing: '0.5px',
+                  marginBottom: '12px'
+                }}>
+                  <Sparkles size={14} />
+                  BAYİDEN OUTLET & PROJE FAZLASI BORSASI
+                </div>
+                <h2 style={{ fontSize: '1.75rem', fontWeight: '900', color: '#ffffff', margin: '0 0 8px 0' }}>
+                  🔥 Kapatıyoruz / Proje Fazlası Fırsat Paletleri
+                </h2>
+                <p style={{ fontSize: '0.88rem', color: '#94a3b8', maxWidth: '680px', margin: '0 auto', lineHeight: '1.6' }}>
+                  Bayimizin deposunda kalan son 30-50 m² şantiye fazlası, seri sonu ve 2. kalite paletler uygun fiyata satışta! Kiralık daire yenileyecekler ve ufak tadilat yapacaklar için büyük fırsat.
+                </p>
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
+                gap: '24px'
+              }}>
+                {dealer.outletListings.map((item) => {
+                  const prod = item.product;
+                  const discountPercent = item.originalPrice && item.originalPrice > item.unitPrice
+                    ? Math.round(((item.originalPrice - item.unitPrice) / item.originalPrice) * 100)
+                    : null;
+                  const totalPalletValue = Math.round(item.unitPrice * item.quantityM2);
+
+                  const categoryLabelMap = {
+                    PROJE_FAZLASI: 'Proje Fazlası',
+                    SERI_SONU: 'Seri Sonu',
+                    IKINCI_KALITE: '2. Kalite',
+                    OUTLET: 'Outlet'
+                  };
+
+                  return (
+                    <div key={item.id} style={{
+                      background: 'rgba(30, 41, 59, 0.7)',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: '20px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                    }} className="hover:transform hover:-translate-y-1">
+                      {/* Image Header */}
+                      <div style={{ position: 'relative', height: '190px', width: '100%', overflow: 'hidden' }}>
+                        <img
+                          src={item.imageUrl || (prod ? prod.imageUrl || getTextureFallback(prod) : '/textures/calacatta_gold.jpg')}
+                          alt={item.title}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = getTextureFallback(prod);
+                          }}
+                        />
+                        <div style={{
+                          position: 'absolute',
+                          inset: 0,
+                          background: 'linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, transparent 60%)'
+                        }} />
+
+                        {/* Top Left Badges */}
+                        <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <span style={{
+                            background: '#ef4444',
+                            color: '#ffffff',
+                            fontSize: '0.68rem',
+                            fontWeight: '800',
+                            padding: '4px 10px',
+                            borderRadius: '12px',
+                            boxShadow: '0 4px 10px rgba(239, 68, 68, 0.4)'
+                          }}>
+                            {item.badgeTag || 'Kapatıyoruz / Proje Fazlası'}
+                          </span>
+                          <span style={{
+                            background: 'rgba(15, 23, 42, 0.85)',
+                            color: '#cbd5e1',
+                            fontSize: '0.62rem',
+                            fontWeight: '700',
+                            padding: '3px 8px',
+                            borderRadius: '10px',
+                            border: '1px solid rgba(255, 255, 255, 0.15)',
+                            backdropFilter: 'blur(4px)'
+                          }}>
+                            🏷️ {categoryLabelMap[item.category] || item.category}
+                          </span>
+                        </div>
+
+                        {/* Discount Pill Top Right */}
+                        {discountPercent && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '12px',
+                            right: '12px',
+                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            color: '#ffffff',
+                            fontWeight: '900',
+                            fontSize: '0.75rem',
+                            padding: '4px 10px',
+                            borderRadius: '14px',
+                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)'
+                          }}>
+                            %{discountPercent} İNDİRİM
+                          </div>
+                        )}
+
+                        {/* Quantity Bottom Left */}
+                        <div style={{ position: 'absolute', bottom: '12px', left: '12px' }}>
+                          <span style={{
+                            background: 'rgba(212, 175, 55, 0.9)',
+                            color: '#000000',
+                            fontWeight: '900',
+                            fontSize: '0.72rem',
+                            padding: '4px 10px',
+                            borderRadius: '10px'
+                          }}>
+                            📦 Mevcut Stok: {item.quantityM2} m²
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Content Body */}
+                      <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#ffffff', margin: 0, lineHeight: '1.4' }}>
+                          {item.title}
+                        </h3>
+
+                        {(item.dimensions || item.colorFinish) && (
+                          <div style={{ display: 'flex', gap: '12px', fontSize: '0.75rem', color: '#cbd5e1' }}>
+                            {item.dimensions && <span>📏 {item.dimensions}</span>}
+                            {item.colorFinish && <span>🎨 {item.colorFinish}</span>}
+                          </div>
+                        )}
+
+                        {item.notes && (
+                          <p style={{
+                            fontSize: '0.78rem',
+                            color: '#94a3b8',
+                            background: 'rgba(15, 23, 42, 0.5)',
+                            padding: '10px 12px',
+                            borderRadius: '10px',
+                            border: '1px solid rgba(255, 255, 255, 0.05)',
+                            margin: 0,
+                            lineHeight: '1.5'
+                          }}>
+                            "{item.notes}"
+                          </p>
+                        )}
+
+                        {/* Pricing Row */}
+                        <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                          <div>
+                            {item.originalPrice && (
+                              <span style={{ fontSize: '0.75rem', color: '#94a3b8', textDecoration: 'line-through', display: 'block' }}>
+                                ₺{item.originalPrice.toLocaleString('tr-TR')} / m²
+                              </span>
+                            )}
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                              <span style={{ fontSize: '1.35rem', fontWeight: '900', color: '#f87171' }}>
+                                ₺{item.unitPrice.toLocaleString('tr-TR')}
+                              </span>
+                              <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>/ m²</span>
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block' }}>Palet Toplam Tutarı</span>
+                            <span style={{ fontSize: '0.9rem', fontWeight: '800', color: '#ffffff' }}>
+                              ₺{totalPalletValue.toLocaleString('tr-TR')}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Buttons */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '6px' }}>
+                          <a
+                            href={`https://wa.me/${dealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=${encodeURIComponent(`Merhaba, ${dealer.name} showroom sayfanızdaki "${item.title}" (${item.quantityM2} m², ₺${item.unitPrice}/m²) outlet stoğunuzu satın almak / bilgi almak istiyorum.`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => trackAction('WHATSAPP')}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              padding: '10px',
+                              borderRadius: '10px',
+                              background: '#22c55e',
+                              color: '#ffffff',
+                              fontWeight: '800',
+                              fontSize: '0.78rem',
+                              textDecoration: 'none',
+                              textAlign: 'center'
+                            }}
+                          >
+                            <MessageSquare size={14} />
+                            <span>WhatsApp Sor</span>
+                          </a>
+
+                          <button
+                            onClick={() => {
+                              setNotes(`İlgilenilen Outlet Ürün: ${item.title} - ${item.quantityM2} m² (Birim Fiyat: ₺${item.unitPrice}/m²)`);
+                              const el = document.getElementById('quote-form-section');
+                              if (el) el.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              padding: '10px',
+                              borderRadius: '10px',
+                              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                              color: '#000000',
+                              fontWeight: '800',
+                              fontSize: '0.78rem',
+                              border: 'none',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <Send size={14} />
+                            <span>Teklif / Rezerve</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
         {campaigns.length > 0 && (
           <div className="showroom-campaigns-section" style={{ marginTop: '48px' }}>
             <h2 className="section-main-heading">
