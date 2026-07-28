@@ -3055,19 +3055,19 @@ export default function Home() {
         <div className="top-utility-bar glass-panel-dark">
           <div className="utility-left">
             <span className="utility-message">
-              <Sparkles size={11} className="spin-icon-slow text-gold" />
-              Premium Dijital Showroom & B2B Çözüm Ortaklığı
+              <Sparkles size={12} className="spin-icon-slow text-gold" />
+              <span>Premium Dijital Showroom & B2B Platformu</span>
             </span>
           </div>
           <div className="utility-right">
             <Link href="/hakkimizda" className="utility-item portal-link">
-              <Info size={12} />
+              <Info size={13} />
               <span>Hakkımızda</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/ilham" className="utility-item portal-link">
-              <Sparkles size={12} />
-              <span>İlham Galerisi & Trendler</span>
+              <Sparkles size={13} />
+              <span>İlham & Trendler</span>
             </Link>
             <span className="utility-divider">|</span>
             <button 
@@ -3080,23 +3080,23 @@ export default function Home() {
             </button>
             <span className="utility-divider">|</span>
             <Link href="/proje-talep" className="utility-item b2b-btn-link">
-              <Building2 size={12} />
+              <Building2 size={13} />
               <span>Proje Talebi</span>
               <span className="b2b-small-badge">B2B</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/outlet" className="utility-item outlet-btn-link">
-              <Sparkles size={12} style={{ color: '#ef4444' }} />
-              <span style={{ color: '#ef4444', fontWeight: '800' }}>Outlet & Proje Fazlası</span>
+              <Sparkles size={13} style={{ color: '#ef4444' }} />
+              <span style={{ color: '#ef4444', fontWeight: '700' }}>Outlet & Stoklar</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/bayi" className="utility-item portal-link">
-              <UserIcon size={12} />
+              <UserIcon size={13} />
               <span>Bayi Portalı</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/marka" className="utility-item portal-link">
-              <TrendingUp size={12} />
+              <TrendingUp size={13} />
               <span>Marka Girişi</span>
             </Link>
           </div>
@@ -7502,27 +7502,37 @@ export default function Home() {
            ========================================================================== */
 
         /* Top Utility Bar - Light Luxury Version */
+        /* Top Utility Bar - Modern Single-Line Professional Version */
         :global(.top-utility-bar) {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 8px 28px;
-          background: #ffffff; /* pure white background */
-          border: 1px solid rgba(0, 0, 0, 0.06);
+          padding: 6px 24px;
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.07);
           border-bottom: none;
           border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
           font-family: var(--font-title);
-          font-size: 0.74rem;
+          font-size: 0.76rem;
           color: #475569;
           margin-bottom: 0px;
           z-index: 1001;
           position: relative;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+          overflow-x: auto;
+          white-space: nowrap !important;
+          scrollbar-width: none;
+        }
+
+        :global(.top-utility-bar::-webkit-scrollbar) {
+          display: none;
         }
 
         :global(.utility-left) {
           display: flex;
           align-items: center;
+          flex-shrink: 0;
+          white-space: nowrap !important;
         }
 
         :global(.utility-message) {
@@ -7530,43 +7540,59 @@ export default function Home() {
           align-items: center;
           gap: 6px;
           font-weight: 600;
-          letter-spacing: 0.03em;
+          letter-spacing: 0.01em;
+          white-space: nowrap !important;
+          color: #334155;
         }
 
         :global(.text-gold) {
-          color: #8c6b30;
+          color: #b38e47;
           font-weight: 700;
         }
 
         :global(.utility-right) {
           display: flex;
           align-items: center;
-          gap: 14px;
+          gap: 6px;
+          flex-shrink: 0;
+          white-space: nowrap !important;
         }
 
         :global(.utility-item) {
-          display: flex;
+          display: inline-flex;
           align-items: center;
           gap: 6px;
           color: #475569 !important;
           text-decoration: none !important;
           font-weight: 600;
-          transition: all 0.25s ease;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           background: transparent;
-          border: none;
+          border: 1px solid transparent;
           cursor: pointer;
-          padding: 4px 8px;
-          border-radius: 6px;
+          padding: 5px 10px;
+          border-radius: 8px;
+          white-space: nowrap !important;
+          line-height: 1 !important;
+          font-size: 0.75rem;
+        }
+
+        :global(.utility-item span) {
+          white-space: nowrap !important;
+          display: inline-block;
+          line-height: 1 !important;
         }
 
         :global(.utility-item:hover) {
           color: #0f172a !important;
-          background: rgba(0, 0, 0, 0.03);
+          background: #f8fafc;
+          border-color: rgba(0, 0, 0, 0.05);
+          transform: translateY(-1px);
         }
 
         :global(.utility-item) svg {
           color: #64748b !important;
-          transition: color 0.25s ease;
+          transition: color 0.2s ease;
+          flex-shrink: 0;
         }
 
         :global(.utility-item:hover) svg {
@@ -7574,51 +7600,79 @@ export default function Home() {
         }
 
         :global(.utility-divider) {
-          color: rgba(0, 0, 0, 0.08);
+          color: #cbd5e1;
           user-select: none;
+          font-size: 0.7rem;
+          opacity: 0.5;
+          margin: 0 1px;
         }
 
         :global(.kiosk-btn-link) {
           position: relative;
+          background: rgba(16, 185, 129, 0.05) !important;
+          border: 1px solid rgba(16, 185, 129, 0.2) !important;
+          color: #059669 !important;
+        }
+
+        :global(.kiosk-btn-link:hover) {
+          background: rgba(16, 185, 129, 0.12) !important;
+          border-color: rgba(16, 185, 129, 0.35) !important;
         }
 
         :global(.pulse-indicator-green) {
-          width: 7px;
-          height: 7px;
+          width: 6px;
+          height: 6px;
           background-color: #10b981;
           border-radius: 50%;
-          box-shadow: 0 0 8px #10b981;
+          box-shadow: 0 0 6px #10b981;
           animation: pulseGreen 2.5s infinite;
+          flex-shrink: 0;
         }
 
         @keyframes pulseGreen {
           0% { transform: scale(0.95); opacity: 0.8; }
-          50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 10px #10b981; }
+          50% { transform: scale(1.25); opacity: 1; box-shadow: 0 0 9px #10b981; }
           100% { transform: scale(0.95); opacity: 0.8; }
         }
 
         :global(.b2b-btn-link) {
-          background: rgba(179, 142, 71, 0.06) !important;
-          border: 1px solid rgba(179, 142, 71, 0.25) !important;
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(179, 142, 71, 0.12) 100%) !important;
+          border: 1px solid rgba(179, 142, 71, 0.3) !important;
           color: #8c6b30 !important;
-          padding: 4px 10px !important;
-          border-radius: 12px !important;
+          padding: 5px 11px !important;
+          border-radius: 20px !important;
+          font-weight: 700 !important;
         }
 
         :global(.b2b-btn-link:hover) {
-          background: rgba(179, 142, 71, 0.12) !important;
-          border-color: rgba(179, 142, 71, 0.45) !important;
-          color: #8c6b30 !important;
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(179, 142, 71, 0.22) 100%) !important;
+          border-color: rgba(179, 142, 71, 0.5) !important;
+          color: #715523 !important;
+          box-shadow: 0 2px 8px rgba(179, 142, 71, 0.15);
+        }
+
+        :global(.outlet-btn-link) {
+          background: rgba(239, 68, 68, 0.05) !important;
+          border: 1px solid rgba(239, 68, 68, 0.2) !important;
+          border-radius: 20px !important;
+          padding: 5px 11px !important;
+        }
+
+        :global(.outlet-btn-link:hover) {
+          background: rgba(239, 68, 68, 0.12) !important;
+          border-color: rgba(239, 68, 68, 0.4) !important;
         }
 
         :global(.b2b-small-badge) {
-          background: linear-gradient(135deg, #ecd099 0%, #b38e47 100%);
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
           color: #ffffff !important;
-          font-size: 0.58rem;
+          font-size: 0.56rem;
           font-weight: 800;
           padding: 2px 5px;
-          border-radius: 3px;
+          border-radius: 4px;
           line-height: 1;
+          letter-spacing: 0.04em;
+          margin-left: 2px;
         }
 
         .kiosk-status-text {
