@@ -51,6 +51,48 @@ export default function OutletMarketplacePage() {
   const [contactSuccess, setContactSuccess] = useState('');
   const [contactError, setContactError] = useState('');
 
+  // WhatsApp Alert Subscription Modal State
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertName, setAlertName] = useState('');
+  const [alertPhone, setAlertPhone] = useState('');
+  const [alertCity, setAlertCity] = useState('ALL');
+  const [alertCategory, setAlertCategory] = useState('ALL');
+  const [alertLoading, setAlertLoading] = useState(false);
+  const [alertSuccess, setAlertSuccess] = useState('');
+  const [alertError, setAlertError] = useState('');
+
+  const handleSubscribeAlert = async (e) => {
+    e.preventDefault();
+    setAlertError('');
+    setAlertSuccess('');
+    setAlertLoading(true);
+
+    try {
+      const res = await fetch('/api/outlet/subscribe-alert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: alertName,
+          phone: alertPhone,
+          city: alertCity,
+          category: alertCategory
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setAlertSuccess(data.message || 'WhatsApp Fırsat Bildirimi kuruldu!');
+        setAlertPhone('');
+        setAlertName('');
+      } else {
+        setAlertError(data.error || 'Abonelik oluşturulamadı.');
+      }
+    } catch (err) {
+      setAlertError('Sunucu bağlantı hatası.');
+    } finally {
+      setAlertLoading(false);
+    }
+  };
+
   const fetchOutletItems = async () => {
     setLoading(true);
     try {
@@ -169,7 +211,29 @@ export default function OutletMarketplacePage() {
             <span style={{ fontSize: '1.2rem', fontWeight: '900', color: '#ffffff' }}>SeramikBak <span style={{ color: '#ef4444', fontSize: '0.85rem' }}>OUTLET</span></span>
           </Link>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button
+              onClick={() => { setShowAlertModal(true); setAlertCity(selectedCity || 'ALL'); }}
+              style={{
+                fontSize: '0.8rem',
+                fontWeight: '800',
+                color: '#ffffff',
+                background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 4px 14px rgba(37, 211, 102, 0.35)',
+                transition: 'transform 0.2s ease'
+              }}
+            >
+              <MessageSquare size={14} />
+              <span>WhatsApp Fırsat Alarmı</span>
+            </button>
+
             <Link href="/bayi" style={{
               fontSize: '0.8rem',
               fontWeight: '700',
@@ -221,10 +285,35 @@ export default function OutletMarketplacePage() {
             Depo Seri Sonları & Proje Fazlası Paletlerde %60'a Varan İndirimler
           </h1>
 
-          <p style={{ fontSize: '0.98rem', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 32px 0' }}>
+          <p style={{ fontSize: '0.98rem', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 20px 0' }}>
             Bayilerin elinde kalan son 30 m², 50 m² şantiye artığı ve 2. kalite stoklar uygun fiyata satışta!
             Kiralık evinizi, balkonunuzu veya ufak alan tadilatınızı bütçe dostu paletlerle tamamlayın.
           </p>
+
+          <div style={{ marginBottom: '28px' }}>
+            <button
+              type="button"
+              onClick={() => { setShowAlertModal(true); setAlertCity(selectedCity || 'ALL'); }}
+              style={{
+                background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
+                color: '#ffffff',
+                fontWeight: '800',
+                fontSize: '0.9rem',
+                padding: '12px 24px',
+                borderRadius: '12px',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 6px 20px rgba(37, 211, 102, 0.35)',
+                transition: 'transform 0.2s ease'
+              }}
+            >
+              <MessageSquare size={18} />
+              <span>{selectedCity !== 'ALL' ? `${selectedCity} İçin WhatsApp Fırsat Alarmı Kur 🔔` : 'WhatsApp Fırsat Alarmı Kur (Tüm İller) 🔔'}</span>
+            </button>
+          </div>
 
           {/* Search & Filter Bar */}
           <form onSubmit={handleSearchSubmit} style={{
@@ -722,6 +811,191 @@ export default function OutletMarketplacePage() {
                 {contactLoading ? 'Gönderiliyor...' : 'Teklif Talebi Gönder'}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* WHATSAPP ALERT SUBSCRIPTION MODAL */}
+      {showAlertModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }} onClick={() => setShowAlertModal(false)}>
+          <div style={{
+            background: '#0f172a',
+            border: '1px solid rgba(37, 211, 102, 0.4)',
+            borderRadius: '24px',
+            maxWidth: '480px',
+            width: '100%',
+            padding: '28px',
+            position: 'relative',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
+          }} onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowAlertModal(false)}
+              style={{
+                position: 'absolute',
+                right: '20px',
+                top: '20px',
+                background: 'rgba(255,255,255,0.08)',
+                border: 'none',
+                color: '#94a3b8',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <X size={16} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ffffff',
+                boxShadow: '0 4px 14px rgba(37, 211, 102, 0.3)'
+              }}>
+                <MessageSquare size={22} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#ffffff', margin: 0 }}>WhatsApp Fırsat Alarmı</h3>
+                <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: '700' }}>Canlı Outlet & Şantiye Fazlası Bildirimi</span>
+              </div>
+            </div>
+
+            <p style={{ fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5', marginBottom: '20px' }}>
+              Seçtiğiniz şehirdeki seramik bayileri <strong>yeni bir kelepir palet, seri sonu veya 2. kalite stok</strong> yüklediğinde doğrudan WhatsApp hesabınıza bildirim gelsin!
+            </p>
+
+            {alertSuccess ? (
+              <div style={{
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                borderRadius: '14px',
+                padding: '20px',
+                textAlign: 'center'
+              }}>
+                <CheckCircle2 size={36} style={{ color: '#10b981', marginBottom: '10px' }} />
+                <h4 style={{ fontSize: '1.05rem', color: '#ffffff', fontWeight: '800', marginBottom: '6px' }}>Alarm Başarıyla Kuruldu!</h4>
+                <p style={{ fontSize: '0.84rem', color: '#cbd5e1', margin: '0 0 16px 0' }}>{alertSuccess}</p>
+                <button
+                  onClick={() => { setShowAlertModal(false); setAlertSuccess(''); }}
+                  style={{
+                    background: '#10b981',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem'
+                  }}
+                >
+                  Tamam
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubscribeAlert} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {alertError && (
+                  <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#f87171', padding: '10px 14px', borderRadius: '10px', fontSize: '0.82rem' }}>
+                    ⚠️ {alertError}
+                  </div>
+                )}
+
+                <div>
+                  <label style={{ fontSize: '0.76rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: '700' }}>Adınız Soyadınız *</label>
+                  <input
+                    type="text"
+                    placeholder="Örn: Ahmet Yılmaz"
+                    value={alertName}
+                    onChange={(e) => setAlertName(e.target.value)}
+                    required
+                    style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.88rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '0.76rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: '700' }}>WhatsApp Telefon Numaranız *</label>
+                  <input
+                    type="tel"
+                    placeholder="Örn: 0532 123 45 67"
+                    value={alertPhone}
+                    onChange={(e) => setAlertPhone(e.target.value)}
+                    required
+                    style={{ width: '100%', padding: '11px 14px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.88rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ fontSize: '0.76rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: '700' }}>Takip Edilecek Şehir</label>
+                    <select
+                      value={alertCity}
+                      onChange={(e) => setAlertCity(e.target.value)}
+                      style={{ width: '100%', padding: '11px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.84rem', boxSizing: 'border-box' }}
+                    >
+                      <option value="ALL">Tüm İller</option>
+                      {TURKEY_CITIES.map(city => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '0.76rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: '700' }}>Stok Kapsamı</label>
+                    <select
+                      value={alertCategory}
+                      onChange={(e) => setAlertCategory(e.target.value)}
+                      style={{ width: '100%', padding: '11px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.84rem', boxSizing: 'border-box' }}
+                    >
+                      <option value="ALL">Tüm Fırsatlar</option>
+                      <option value="PROJE_FAZLASI">Proje Fazlası</option>
+                      <option value="SERI_SONU">Seri Sonu</option>
+                      <option value="IKINCI_KALITE">2. Kalite Palet</option>
+                      <option value="OUTLET">Depo Outlet</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={alertLoading}
+                  style={{
+                    background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '13px',
+                    borderRadius: '12px',
+                    fontWeight: '800',
+                    fontSize: '0.92rem',
+                    cursor: 'pointer',
+                    marginTop: '8px',
+                    boxShadow: '0 6px 18px rgba(37, 211, 102, 0.35)'
+                  }}
+                >
+                  {alertLoading ? 'Kaydediliyor...' : '📲 WhatsApp Fırsat Alarmını Başlat'}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}

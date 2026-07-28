@@ -288,3 +288,15 @@ model OutletListing {
   updatedAt     DateTime @updatedAt
 }
 
+model OutletAlert {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  city      String   @default("ALL") // e.g., "İstanbul", "Ankara" or "ALL"
+  category  String   @default("ALL") // e.g., "PROJE_FAZLASI", "SERI_SONU", "IKINCI_KALITE", "OUTLET", "ALL"
+  status    String   @default("ACTIVE") // ACTIVE, PAUSED, CANCELLED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+

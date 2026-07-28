@@ -57,6 +57,11 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Lütfen zorunlu alanları (Bayi, Başlık, Metraj, Outlet Fiyatı) doldurun.' }, { status: 400 });
     }
 
+    const dealer = await prisma.dealer.findUnique({
+      where: { id: dealerId },
+      select: { city: true, name: true, phone: true }
+    });
+
     const listing = await prisma.outletListing.create({
       data: {
         dealerId,
@@ -75,7 +80,27 @@ export async function POST(request) {
       }
     });
 
-    return NextResponse.json({ success: true, data: listing });
+    // Match active WhatsApp alert subscribers for dealer's city or ALL
+    const dealerCity = dealer?.city || 'ALL';
+    const matchingAlerts = await prisma.outletAlert.findMany({
+      where: {
+        status: 'ACTIVE',
+        OR: [
+          { city: dealerCity },
+          { city: 'ALL' }
+        ]
+      },
+      select: { id: true, name: true, phone: true, city: true }
+    });
+
+    console.log(`[OUTLET ALERT] New Listing Created by ${dealer?.name || 'Dealer'} in ${dealerCity}. Matched ${matchingAlerts.length} WhatsApp subscribers!`);
+
+    return NextResponse.json({
+      success: true,
+      data: listing,
+      matchedAlertsCount: matchingAlerts.length,
+      alertCity: dealerCity
+    });
   } catch (error) {
     console.error('POST /api/dealers/outlet Error:', error);
     return NextResponse.json({ success: false, error: 'İlan kaydedilirken hata oluştu.' }, { status: 500 });

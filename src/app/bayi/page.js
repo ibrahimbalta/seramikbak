@@ -4996,6 +4996,22 @@ export default function DealerPortalPage() {
                     </div>
                   )}
 
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(37, 211, 102, 0.08) 0%, rgba(16, 185, 129, 0.12) 100%)',
+                    border: '1px solid rgba(37, 211, 102, 0.3)',
+                    borderRadius: '12px',
+                    padding: '10px 14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    marginBottom: '10px'
+                  }}>
+                    <MessageSquare size={18} style={{ color: '#059669', flexShrink: 0 }} />
+                    <div style={{ fontSize: '0.78rem', color: '#166534', lineHeight: '1.4' }}>
+                      <strong>Otomatik WhatsApp Bildirimi:</strong> İlanınız yayınlandığında <strong>{dealerInfo?.city || 'bölgenizdeki'}</strong> WhatsApp fırsat takipçilerine anında bildirim eşleşmesi yapılacaktır.
+                    </div>
+                  </div>
+
                   <form onSubmit={handleAddOutletListing} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                     <div>
                       <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '4px' }}>
