@@ -5014,11 +5014,11 @@ export default function DealerPortalPage() {
                             if (found.imageUrl) setOutletImageUrl(found.imageUrl);
                           }
                         }}
-                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', color: '#0f172a', backgroundColor: '#ffffff' }}
                       >
-                        <option value="">-- Kataloğunuzdan ürün seçin veya aşağıya yazın --</option>
+                        <option value="" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>-- Kataloğunuzdan ürün seçin veya aşağıya yazın --</option>
                         {brandProducts.map(p => (
-                          <option key={p.id} value={p.id}>{p.name} ({p.code}) - {p.width}x{p.height} cm</option>
+                          <option key={p.id} value={p.id} style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>{p.name} ({p.code}) - {p.width}x{p.height} cm</option>
                         ))}
                       </select>
                     </div>
@@ -5045,12 +5045,12 @@ export default function DealerPortalPage() {
                         <select
                           value={outletCategory}
                           onChange={(e) => setOutletCategory(e.target.value)}
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', color: '#0f172a', backgroundColor: '#ffffff' }}
                         >
-                          <option value="PROJE_FAZLASI">Proje Fazlası (Şantiye Artığı)</option>
-                          <option value="SERI_SONU">Seri Sonu (Kapatıyoruz)</option>
-                          <option value="IKINCI_KALITE">2. Kalite Palet</option>
-                          <option value="OUTLET">Depo Outlet</option>
+                          <option value="PROJE_FAZLASI" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Proje Fazlası (Şantiye Artığı)</option>
+                          <option value="SERI_SONU" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Seri Sonu (Kapatıyoruz)</option>
+                          <option value="IKINCI_KALITE" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>2. Kalite Palet</option>
+                          <option value="OUTLET" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Depo Outlet</option>
                         </select>
                       </div>
 
@@ -5061,13 +5061,13 @@ export default function DealerPortalPage() {
                         <select
                           value={outletBadgeTag}
                           onChange={(e) => setOutletBadgeTag(e.target.value)}
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', color: '#0f172a', backgroundColor: '#ffffff' }}
                         >
-                          <option value="Kapatıyoruz / Proje Fazlası">Kapatıyoruz / Proje Fazlası</option>
-                          <option value="2. Kalite Fırsat Palet">2. Kalite Fırsat Palet</option>
-                          <option value="Seri Sonu Kapatıyoruz">Seri Sonu Kapatıyoruz</option>
-                          <option value="Son Paletler Şok Fiyat">Son Paletler Şok Fiyat</option>
-                          <option value="Şantiye Artığı Kelepir">Şantiye Artığı Kelepir</option>
+                          <option value="Kapatıyoruz / Proje Fazlası" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Kapatıyoruz / Proje Fazlası</option>
+                          <option value="2. Kalite Fırsat Palet" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>2. Kalite Fırsat Palet</option>
+                          <option value="Seri Sonu Kapatıyoruz" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Seri Sonu Kapatıyoruz</option>
+                          <option value="Son Paletler Şok Fiyat" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Son Paletler Şok Fiyat</option>
+                          <option value="Şantiye Artığı Kelepir" style={{ color: '#0f172a', backgroundColor: '#ffffff' }}>Şantiye Artığı Kelepir</option>
                         </select>
                       </div>
                     </div>

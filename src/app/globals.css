@@ -2281,3 +2281,21 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* Universal Fix for Dropdown Select & Option Text Contrast */
+select option {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  font-weight: 600 !important;
+  padding: 8px 12px !important;
+}
+
+select option:checked {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+select option:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
