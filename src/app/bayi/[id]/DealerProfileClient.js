@@ -386,8 +386,8 @@ export default function DealerProfileClient({ dealer, products }) {
                     {iframeLoading && (
                       <div className="iframe-skeleton-loader">
                         <div className="ceramic-tile-spinner mini">
-                          <div className="tile-face face-front"></div>
-                          <div className="tile-face face-back"></div>
+                          <div className="tile-face face-front">SB</div>
+                          <div className="tile-face face-back">SB</div>
                         </div>
                         <span>Sanal Tur Hazırlanıyor...</span>
                       </div>

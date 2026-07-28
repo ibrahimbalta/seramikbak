@@ -8,8 +8,8 @@ export default function Loading() {
       <div className="loader-container">
         {/* Shimmering 3D Ceramic Tile Spinner */}
         <div className="ceramic-tile-spinner">
-          <div className="tile-face face-front"></div>
-          <div className="tile-face face-back"></div>
+          <div className="tile-face face-front">SB</div>
+          <div className="tile-face face-back">SB</div>
         </div>
 
         {/* Brand Name with Gold Text */}
@@ -58,15 +58,25 @@ export default function Loading() {
           border-radius: 12px;
           border: 2px solid #b38e47;
           box-shadow: 0 0 25px rgba(179, 142, 71, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Outfit', system-ui, sans-serif;
+          font-weight: 900;
+          font-size: 1.4rem;
+          color: #ffffff;
+          letter-spacing: -0.03em;
+          text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+          backface-visibility: hidden;
         }
 
         .face-front {
-          background: linear-gradient(135deg, rgba(179, 142, 71, 0.2) 0%, rgba(30, 41, 59, 0.9) 100%);
+          background: linear-gradient(135deg, rgba(179, 142, 71, 0.35) 0%, rgba(30, 41, 59, 0.95) 100%);
           transform: translateZ(2px);
         }
 
         .face-back {
-          background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(179, 142, 71, 0.2) 100%);
+          background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(179, 142, 71, 0.35) 100%);
           transform: rotateY(180deg) translateZ(2px);
         }
 

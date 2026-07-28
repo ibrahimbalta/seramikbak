@@ -918,13 +918,23 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 12px;
   border: 2px solid var(--accent-gold);
   box-shadow: 0 0 25px rgba(197, 160, 89, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title, system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 1.4rem;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  backface-visibility: hidden;
 }
 .face-front {
-  background: linear-gradient(135deg, rgba(197, 160, 89, 0.2) 0%, rgba(30, 41, 59, 0.9) 100%);
+  background: linear-gradient(135deg, rgba(197, 160, 89, 0.35) 0%, rgba(30, 41, 59, 0.95) 100%);
   transform: translateZ(2px);
 }
 .face-back {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(197, 160, 89, 0.2) 100%);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(197, 160, 89, 0.35) 100%);
   transform: rotateY(180deg) translateZ(2px);
 }
 @keyframes spin3DTile {

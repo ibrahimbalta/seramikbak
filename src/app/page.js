@@ -2906,8 +2906,8 @@ export default function Home() {
         <div className="page-loader-overlay">
           <div className="loader-container">
             <div className="ceramic-tile-spinner">
-              <div className="tile-face face-front"></div>
-              <div className="tile-face face-back"></div>
+              <div className="tile-face face-front">SB</div>
+              <div className="tile-face face-back">SB</div>
             </div>
             <h2 className="loader-brand-name">
               <span>Seramik</span><span className="gold-text">Bak</span>

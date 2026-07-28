@@ -500,16 +500,31 @@
   inset: 0;
   border-radius: 8px;
   border: 2px solid var(--accent-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title, system-ui, sans-serif);
+  font-weight: 900;
+  font-size: 1rem;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  backface-visibility: hidden;
+}
+
+.ceramic-tile-spinner.mini .tile-face {
+  font-size: 0.7rem;
+  border-radius: 6px;
 }
 
 .face-front {
-  background: rgba(var(--accent-gold-rgb, 179,142,71), 0.2);
+  background: linear-gradient(135deg, rgba(var(--accent-gold-rgb, 179,142,71), 0.35) 0%, rgba(30, 41, 59, 0.95) 100%);
   transform: translateZ(2px);
   backdrop-filter: blur(4px);
 }
 
 .face-back {
-  background: var(--accent-gold);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(var(--accent-gold-rgb, 179,142,71), 0.35) 100%);
   transform: rotateY(180deg) translateZ(2px);
 }
 
