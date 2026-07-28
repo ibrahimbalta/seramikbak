@@ -40,7 +40,8 @@ import {
   Share2,
   Printer,
   Calculator,
-  FileCheck
+  FileCheck,
+  MessageSquare
 } from 'lucide-react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
@@ -3099,7 +3100,7 @@ export default function DealerPortalPage() {
                       <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Müşterilerin indirebileceği PDF kataloğunuz</span>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '10px', alignItems: 'center' }}>
+                    <div className="catalog-inputs-grid" style={{ display: 'grid', gap: '10px', alignItems: 'center' }}>
                       <input 
                         type="text" 
                         value={profilePdfCatalogName} 
@@ -5391,6 +5392,13 @@ export default function DealerPortalPage() {
           opacity: 1 !important;
         }
 
+        .catalog-inputs-grid {
+          display: grid;
+          grid-template-columns: 1fr 2fr auto;
+          gap: 10px;
+          align-items: center;
+        }
+
         .settings-grid-2 {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -5423,6 +5431,8 @@ export default function DealerPortalPage() {
           font-size: 0.88rem !important;
           opacity: 1 !important;
           caret-color: #000000 !important;
+          box-sizing: border-box !important;
+          max-width: 100% !important;
         }
 
         .settings-card input:focus,
@@ -5560,9 +5570,21 @@ export default function DealerPortalPage() {
           .dealer-pricing-grid,
           .dealer-stats-grid,
           .campaign-inputs-grid,
-          .inventory-dashboard-grid {
+          .inventory-dashboard-grid,
+          .quote-form-card .form-group-row,
+          .catalog-inputs-grid,
+          .settings-grid-2,
+          .settings-grid-address {
             grid-template-columns: 1fr !important;
-            gap: 16px !important;
+            gap: 12px !important;
+          }
+          .settings-card {
+            padding: 16px !important;
+            border-radius: 16px !important;
+          }
+          .settings-section {
+            padding: 14px !important;
+            gap: 14px !important;
           }
         }
 
@@ -5576,29 +5598,21 @@ export default function DealerPortalPage() {
             min-width: 0 !important;
           }
           .dealer-main-content {
-            padding: 10px 8px !important;
+            padding: 10px 6px !important;
           }
           .login-card {
             padding: 20px 14px !important;
           }
+          .modal-form-row {
+            flex-direction: column !important;
+            gap: 12px !important;
+          }
+          .payment-modal-card {
+            padding: 18px 14px !important;
+            max-width: 95vw !important;
+          }
         }
 
-        /* Mobile overrides for settings layout */
-        @media (max-width: 768px) {
-          .settings-card {
-            padding: 20px !important;
-            border-radius: 16px !important;
-          }
-          .settings-section {
-            padding: 16px !important;
-            gap: 16px !important;
-          }
-          .settings-grid-2,
-          .settings-grid-address {
-            grid-template-columns: 1fr !important;
-            gap: 16px !important;
-          }
-        }
         @media (max-width: 580px) {
           .settings-upload-row {
             flex-direction: column !important;
@@ -5606,6 +5620,10 @@ export default function DealerPortalPage() {
           }
           .settings-upload-row > div {
             align-self: center !important;
+          }
+          .modal-form-row {
+            flex-direction: column !important;
+            gap: 12px !important;
           }
         }
       `}</style>
@@ -5847,7 +5865,7 @@ export default function DealerPortalPage() {
                 </select>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px' }}>
+              <div className="modal-form-row" style={{ display: 'flex', gap: '12px' }}>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Stok Miktarı (m²)</label>
                   <input 
