@@ -311,7 +311,9 @@ async function main() {
     { 
       name: 'NG Kütahya Seramik Kadıköy Bayi', 
       brandId: kutahya.id, 
+      email: 'kutahya.kadikoy@seramikbak.com',
       phone: '0216 123 45 67', 
+      password: 'bayi123',
       address: 'Bağdat Cad. No:45 Kadıköy', 
       city: 'İstanbul', 
       district: 'Kadıköy', 
@@ -325,7 +327,9 @@ async function main() {
     { 
       name: 'NG Kütahya Seramik Beşiktaş Showroom', 
       brandId: kutahya.id, 
+      email: 'kutahya.besiktas@seramikbak.com',
       phone: '0212 987 65 43', 
+      password: 'bayi123',
       address: 'Barbaros Bulvarı No:12 Beşiktaş', 
       city: 'İstanbul', 
       district: 'Beşiktaş', 
@@ -341,7 +345,9 @@ async function main() {
     { 
       name: 'Bien Seramik Ümraniye Yetkili Satıcı', 
       brandId: bien.id, 
+      email: 'bien.umraniye@seramikbak.com',
       phone: '0216 333 44 55', 
+      password: 'bayi123',
       address: 'Alemdağ Cad. No:190 Ümraniye', 
       city: 'İstanbul', 
       district: 'Ümraniye', 
@@ -355,7 +361,9 @@ async function main() {
     { 
       name: 'Bien Seramik Şişli Concept Store', 
       brandId: bien.id, 
+      email: 'bien.sisli@seramikbak.com',
       phone: '0212 222 33 44', 
+      password: 'bayi123',
       address: 'Büyükdere Cad. No:88 Şişli', 
       city: 'İstanbul', 
       district: 'Şişli', 
@@ -371,7 +379,9 @@ async function main() {
     { 
       name: 'Ege Seramik Ataşehir Merkez Bayi', 
       brandId: ege.id, 
+      email: 'ege.atasehir@seramikbak.com',
       phone: '0216 555 66 77', 
+      password: 'bayi123',
       address: 'Atatürk Mah. No:3 Ataşehir', 
       city: 'İstanbul', 
       district: 'Ataşehir', 
@@ -385,7 +395,9 @@ async function main() {
     { 
       name: 'Ege Seramik Kağıthane Showroom', 
       brandId: ege.id, 
+      email: 'ege.kagithane@seramikbak.com',
       phone: '0212 444 55 66', 
+      password: 'bayi123',
       address: 'Cendere Cad. No:54 Kağıthane', 
       city: 'İstanbul', 
       district: 'Kağıthane', 
@@ -401,7 +413,9 @@ async function main() {
     { 
       name: 'Güral Seramik Kartal Depo & Showroom', 
       brandId: gural.id, 
+      email: 'gural.kartal@seramikbak.com',
       phone: '0216 777 88 99', 
+      password: 'bayi123',
       address: 'E-5 Yan Yol No:10 Kartal', 
       city: 'İstanbul', 
       district: 'Kartal', 
@@ -417,7 +431,9 @@ async function main() {
     { 
       name: 'VitrA Nişantaşı Concept Store', 
       brandId: vitra.id, 
+      email: 'vitra.nisantasi@seramikbak.com',
       phone: '0212 345 67 89', 
+      password: 'bayi123',
       address: 'Valikonağı Cad. No:101 Şişli', 
       city: 'İstanbul', 
       district: 'Şişli', 
