@@ -3053,31 +3053,27 @@ export default function Home() {
       {/* Top Utility Bar (B2B and Corporate Portal Links) */}
       {!isKioskMode && (
         <div className="top-utility-bar glass-panel-dark">
-          <div className="utility-left">
-            <span className="utility-message">
-              <Sparkles size={12} className="spin-icon-slow text-gold" />
-              <span>Premium Dijital Showroom & B2B Platformu</span>
-            </span>
-          </div>
-          <div className="utility-right">
-            <Link href="/hakkimizda" className="utility-item portal-link">
-              <Info size={13} />
-              <span>Hakkımızda</span>
+          <div className="utility-right" style={{ marginLeft: 'auto' }}>
+            <Link href="/outlet" className="utility-item outlet-btn-link">
+              <Sparkles size={13} style={{ color: '#ef4444' }} />
+              <span style={{ color: '#ef4444', fontWeight: '800' }}>Outlet & Stoklar</span>
+              <span className="outlet-small-badge">Fırsat</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/ustalar" className="utility-item portal-link">
+              <Wrench size={13} style={{ color: '#d4af37' }} />
+              <span style={{ color: '#d4af37', fontWeight: '800' }}>Seramik Ustaları</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/proje-talep" className="utility-item b2b-btn-link">
+              <Building2 size={13} />
+              <span>Proje Talebi</span>
+              <span className="b2b-small-badge">B2B</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/ilham" className="utility-item portal-link">
               <Sparkles size={13} />
               <span>İlham & Trendler</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/outlet" className="utility-item outlet-btn-link">
-              <Sparkles size={13} style={{ color: '#ef4444' }} />
-              <span style={{ color: '#ef4444', fontWeight: '700' }}>Outlet & Stoklar</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/ustalar" className="utility-item portal-link">
-              <Wrench size={13} style={{ color: '#d4af37' }} />
-              <span style={{ color: '#d4af37', fontWeight: '700' }}>Seramik Ustaları</span>
             </Link>
             <span className="utility-divider">|</span>
             <button 
@@ -3089,17 +3085,6 @@ export default function Home() {
               <span>Teşhir Kiosk</span>
             </button>
             <span className="utility-divider">|</span>
-            <Link href="/proje-talep" className="utility-item b2b-btn-link">
-              <Building2 size={13} />
-              <span>Proje Talebi</span>
-              <span className="b2b-small-badge">B2B</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/outlet" className="utility-item outlet-btn-link">
-              <Sparkles size={13} style={{ color: '#ef4444' }} />
-              <span style={{ color: '#ef4444', fontWeight: '700' }}>Outlet & Stoklar</span>
-            </Link>
-            <span className="utility-divider">|</span>
             <Link href="/bayi" className="utility-item portal-link">
               <UserIcon size={13} />
               <span>Bayi Portalı</span>
@@ -3108,6 +3093,11 @@ export default function Home() {
             <Link href="/marka" className="utility-item portal-link">
               <TrendingUp size={13} />
               <span>Marka Girişi</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/hakkimizda" className="utility-item portal-link">
+              <Info size={13} />
+              <span>Hakkımızda</span>
             </Link>
           </div>
         </div>
