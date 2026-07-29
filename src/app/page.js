@@ -29,6 +29,7 @@ import {
   UploadCloud,
   ChevronDown,
   Info,
+  Home as HomeIcon,
   Heart as HeartIcon,
   User as UserIcon,
   Menu as MenuIcon,
@@ -3054,6 +3055,11 @@ export default function Home() {
       {!isKioskMode && (
         <div className="top-utility-bar glass-panel-dark">
           <div className="utility-right" style={{ marginLeft: 'auto' }}>
+            <Link href="/" className="utility-item portal-link" onClick={() => setActiveTab('search')}>
+              <HomeIcon size={13} />
+              <span style={{ fontWeight: '800' }}>Anasayfa</span>
+            </Link>
+            <span className="utility-divider">|</span>
             <Link href="/hakkimizda" className="utility-item portal-link">
               <Info size={13} />
               <span>Hakkımızda</span>
@@ -3213,6 +3219,10 @@ export default function Home() {
               <button className="mobile-menu-close" onClick={() => setShowMobileMenu(false)} aria-label="Kapat">✕</button>
             </div>
             <div className="mobile-menu-nav">
+              <Link href="/" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => { setActiveTab('search'); setShowMobileMenu(false); }}>
+                <HomeIcon size={16} />
+                <span style={{ fontWeight: '800' }}>Anasayfa</span>
+              </Link>
               <button 
                 className={`mobile-nav-link ${activeTab === 'search' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('search'); setShowMobileMenu(false); }}
