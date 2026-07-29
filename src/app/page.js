@@ -3070,6 +3070,16 @@ export default function Home() {
               <span>İlham & Trendler</span>
             </Link>
             <span className="utility-divider">|</span>
+            <Link href="/outlet" className="utility-item outlet-btn-link">
+              <Sparkles size={13} style={{ color: '#ef4444' }} />
+              <span style={{ color: '#ef4444', fontWeight: '700' }}>Outlet & Stoklar</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/ustalar" className="utility-item portal-link">
+              <Wrench size={13} style={{ color: '#d4af37' }} />
+              <span style={{ color: '#d4af37', fontWeight: '700' }}>Seramik Ustaları</span>
+            </Link>
+            <span className="utility-divider">|</span>
             <button 
               onClick={() => setIsKioskMode(true)} 
               className="utility-item kiosk-btn-link"
@@ -3255,6 +3265,10 @@ export default function Home() {
                 <Sparkles size={16} />
                 <span>Outlet & Stoklar</span>
                 <span className="outlet-small-badge">Fırsat</span>
+              </Link>
+              <Link href="/ustalar" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
+                <Wrench size={16} style={{ color: '#d4af37' }} />
+                <span style={{ color: '#d4af37', fontWeight: '800' }}>Seramik Ustaları</span>
               </Link>
               <Link href="/bayi" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
                 <UserIcon size={16} />

@@ -414,6 +414,61 @@ export default function OutletMarketplacePage() {
 
       {/* MARKETPLACE LISTINGS GRID */}
       <main style={{ maxWidth: '1280px', margin: '40px auto', padding: '0 24px' }}>
+        {/* CRAFTSMAN CALLOUT BANNER */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(179, 142, 71, 0.2) 100%)',
+          border: '1px solid rgba(212, 175, 55, 0.35)',
+          borderRadius: '16px',
+          padding: '16px 24px',
+          marginBottom: '32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{
+              width: '42px',
+              height: '42px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#000',
+              flexShrink: 0
+            }}>
+              <Wrench size={22} />
+            </div>
+            <div>
+              <h4 style={{ fontSize: '0.98rem', fontWeight: '800', color: '#ffffff', margin: '0 0 2px 0' }}>
+                Bu Seramikleri Döşetecek Tecrübeli Usta mı Arıyorsunuz?
+              </h4>
+              <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: 0 }}>
+                81 ilde lazer terazili ve sertifikalı onaylı seramik ustalarıyla tek tıkla WhatsApp üzerinden iletişim kurun.
+              </p>
+            </div>
+          </div>
+
+          <Link href="/ustalar" style={{
+            background: 'linear-gradient(135deg, #d4af37 0%, #fef08a 100%)',
+            color: '#000000',
+            textDecoration: 'none',
+            padding: '9px 18px',
+            borderRadius: '10px',
+            fontWeight: '800',
+            fontSize: '0.82rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            boxShadow: '0 4px 14px rgba(212, 175, 55, 0.3)'
+          }}>
+            <span>Bölgenizdeki Ustaları Görün</span>
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <div>
             <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#ffffff' }}>
