@@ -102,6 +102,8 @@ export default function DealerPortalPage() {
   const [outletProductId, setOutletProductId] = useState('');
   const [outletSuccess, setOutletSuccess] = useState('');
   const [outletError, setOutletError] = useState('');
+  const [outletSubscribers, setOutletSubscribers] = useState([]);
+  const [outletSubscribersLoading, setOutletSubscribersLoading] = useState(false);
 
   // Dealer SaaS State
   const [saasInfo, setSaasInfo] = useState(null);
@@ -456,6 +458,7 @@ export default function DealerPortalPage() {
       loadBrandProducts();
       loadDealerInventory();
       loadDealerOutletListings();
+      loadDealerOutletSubscribers();
     }
   }, [isLoggedIn, dealerInfo]);
 
@@ -550,6 +553,24 @@ export default function DealerPortalPage() {
       console.error('Failed to load outlet listings:', err);
     } finally {
       setOutletLoading(false);
+    }
+  };
+
+  const loadDealerOutletSubscribers = async () => {
+    if (!dealerInfo) return;
+    setOutletSubscribersLoading(true);
+    try {
+      const res = await fetch(`/api/dealers/outlet/subscribers?dealerId=${dealerInfo.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setOutletSubscribers(data.subscribers || []);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load outlet subscribers:', err);
+    } finally {
+      setOutletSubscribersLoading(false);
     }
   };
 
@@ -4760,7 +4781,7 @@ export default function DealerPortalPage() {
             )}
 
             {/* Quick Stats Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
               <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>Aktif İlan Sayısı</span>
                 <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#0f172a' }}>
@@ -4781,6 +4802,102 @@ export default function DealerPortalPage() {
                   ₺{outletListings.reduce((acc, curr) => acc + ((curr.unitPrice || 0) * (curr.quantityM2 || 0)), 0).toLocaleString('tr-TR')}
                 </span>
               </div>
+
+              <div style={{ background: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)', border: '1px solid #a7f3d0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#047857', display: 'block', marginBottom: '4px' }}>📲 Bölgesel WhatsApp Alıcıları</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: '900', color: '#059669' }}>
+                  {outletSubscribers.length} Bildirim Takipçisi
+                </span>
+              </div>
+            </div>
+
+            {/* Regional WhatsApp Outlet Subscribers Section */}
+            <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '1px solid rgba(37, 211, 102, 0.3)', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', color: '#ffffff' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff' }}>
+                    <MessageSquare size={20} style={{ color: '#25d366' }} />
+                    <span>Bölgenizdeki WhatsApp Fırsat Takipçileri</span>
+                    <span style={{ background: 'rgba(37, 211, 102, 0.2)', border: '1px solid rgba(37, 211, 102, 0.4)', color: '#25d366', fontSize: '0.72rem', fontWeight: '800', padding: '2px 10px', borderRadius: '12px' }}>
+                      {dealerInfo?.city || 'Tüm İller'} ({outletSubscribers.length} Alıcı)
+                    </span>
+                  </h3>
+                  <p style={{ fontSize: '0.8rem', color: '#cbd5e1', margin: 0 }}>
+                    {dealerInfo?.city || 'Şehriniz'} için WhatsApp kelepir seramik alarmı kurmuş olan müşterilerin canlı listesi. Tek tıkla stok fırsatınızı gönderin!
+                  </p>
+                </div>
+              </div>
+
+              {outletSubscribersLoading ? (
+                <div style={{ textAlign: 'center', padding: '20px 0', color: '#94a3b8' }}>
+                  <Loader2 size={20} className="animate-spin" style={{ margin: '0 auto 6px auto' }} />
+                  <span style={{ fontSize: '0.8rem' }}>Bölgesel alıcılar yükleniyor...</span>
+                </div>
+              ) : outletSubscribers.length === 0 ? (
+                <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '12px', padding: '20px', textAlign: 'center', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                  <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
+                    Henüz {dealerInfo?.city || 'bölgenizde'} WhatsApp alarmı kurmuş kayıtlı alıcı bulunmuyor. Yeni kullanıcılar katıldıkça burada görüntülenecektir.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                  {outletSubscribers.map(sub => {
+                    const latestListing = outletListings[0];
+                    const listingTitle = latestListing ? latestListing.title : 'Seramik Outlet & Proje Fazlası Stoklarımız';
+                    const listingPrice = latestListing ? `₺${latestListing.unitPrice}/m²` : 'Özel Fırsat Fiyatı';
+                    const listingM2 = latestListing ? `${latestListing.quantityM2} m²` : 'Sınırlı Stok';
+
+                    const waText = encodeURIComponent(
+                      `Merhaba ${sub.name}, SeramikBak platformunda ${sub.city === 'ALL' ? 'Tüm İller' : sub.city} için oluşturduğunuz WhatsApp seramik fırsat alarmına istinaden yazıyoruz. ` +
+                      `${dealerInfo?.name || 'Bayimiz'} deposunda yeni "${listingTitle}" (${listingM2}, ${listingPrice}) stoklarımıza girmiştir. ` +
+                      `Detaylı bilgi ve hızlı sipariş için ulaşabilirsiniz.`
+                    );
+                    const waLink = `https://wa.me/${sub.phone.replace(/[^\d]/g, '')}?text=${waText}`;
+
+                    return (
+                      <div key={sub.id} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '12px' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                            <span style={{ fontSize: '0.9rem', fontWeight: '800', color: '#ffffff' }}>{sub.name}</span>
+                            <span style={{ fontSize: '0.68rem', background: 'rgba(212, 175, 55, 0.2)', color: '#d4af37', padding: '2px 8px', borderRadius: '8px', fontWeight: '700' }}>
+                              {sub.city === 'ALL' ? 'Tüm Türkiye' : sub.city}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '0.76rem', color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span>📞 {sub.phone}</span>
+                            <span>📦 İlgilendiği: {sub.category === 'ALL' ? 'Tüm Fırsat Stoklar' : sub.category}</span>
+                            <span>📅 Kayıt: {new Date(sub.createdAt).toLocaleDateString('tr-TR')}</span>
+                          </div>
+                        </div>
+
+                        <a
+                          href={waLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
+                            color: '#ffffff',
+                            textDecoration: 'none',
+                            padding: '9px 12px',
+                            borderRadius: '10px',
+                            fontSize: '0.78rem',
+                            fontWeight: '800',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px',
+                            boxShadow: '0 4px 12px rgba(37, 211, 102, 0.25)',
+                            transition: 'transform 0.2s ease'
+                          }}
+                        >
+                          <MessageSquare size={14} />
+                          <span>💬 WhatsApp'tan Fırsat Gönder</span>
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Outlet Listings Grid */}
