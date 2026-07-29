@@ -3054,26 +3054,9 @@ export default function Home() {
       {!isKioskMode && (
         <div className="top-utility-bar glass-panel-dark">
           <div className="utility-right" style={{ marginLeft: 'auto' }}>
-            <Link href="/outlet" className="utility-item outlet-btn-link">
-              <Sparkles size={13} style={{ color: '#ef4444' }} />
-              <span style={{ color: '#ef4444', fontWeight: '800' }}>Outlet & Stoklar</span>
-              <span className="outlet-small-badge">Fırsat</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/ustalar" className="utility-item portal-link">
-              <Wrench size={13} style={{ color: '#d4af37' }} />
-              <span style={{ color: '#d4af37', fontWeight: '800' }}>Seramik Ustaları</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/proje-talep" className="utility-item b2b-btn-link">
-              <Building2 size={13} />
-              <span>Proje Talebi</span>
-              <span className="b2b-small-badge">B2B</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/ilham" className="utility-item portal-link">
-              <Sparkles size={13} />
-              <span>İlham & Trendler</span>
+            <Link href="/hakkimizda" className="utility-item portal-link">
+              <Info size={13} />
+              <span>Hakkımızda</span>
             </Link>
             <span className="utility-divider">|</span>
             <button 
@@ -3095,9 +3078,25 @@ export default function Home() {
               <span>Marka Girişi</span>
             </Link>
             <span className="utility-divider">|</span>
-            <Link href="/hakkimizda" className="utility-item portal-link">
-              <Info size={13} />
-              <span>Hakkımızda</span>
+            <Link href="/proje-talep" className="utility-item b2b-btn-link">
+              <Building2 size={13} />
+              <span>Proje Talebi (B2B)</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/outlet" className="utility-item outlet-btn-link">
+              <Sparkles size={13} style={{ color: '#ef4444' }} />
+              <span style={{ color: '#ef4444', fontWeight: '800' }}>Outlet & Stoklar</span>
+              <span className="outlet-small-badge">Fırsat</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/ustalar" className="utility-item portal-link">
+              <Wrench size={13} style={{ color: '#d4af37' }} />
+              <span style={{ color: '#d4af37', fontWeight: '800' }}>Seramik Ustaları</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/ilham" className="utility-item portal-link">
+              <Sparkles size={13} />
+              <span>İlham & Trendler</span>
             </Link>
           </div>
         </div>
