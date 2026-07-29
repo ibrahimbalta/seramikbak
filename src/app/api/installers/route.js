@@ -75,7 +75,7 @@ export async function POST(request) {
         experienceYears: experienceYears ? parseInt(experienceYears, 10) : 10,
         specialties: specialties ? specialties.trim() : 'Seramik, Granit, Banyo & Zemin Döşeme',
         notes: notes ? notes.trim() : null,
-        verified: true, // Default verified for demo
+        verified: false, // Pending admin approval
         rating: 5.0,
         reviewCount: 1,
         status: 'ACTIVE'
@@ -85,7 +85,7 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       installer,
-      message: 'Seramik ustası profiliniz başarıyla oluşturuldu ve rehbere eklendi!'
+      message: 'Seramik ustası başvurunuz başarıyla alındı! Yönetici onayından sonra profiliniz rehberde yayınlanacaktır.'
     });
   } catch (error) {
     console.error('POST /api/installers Error:', error);

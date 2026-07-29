@@ -28,7 +28,9 @@ import {
   Package,
   Users,
   Megaphone,
-  Globe
+  Globe,
+  Wrench,
+  Star
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -55,6 +57,7 @@ export default function AdminPage() {
     setActiveTab(tab);
     if (isMobile) setSidebarOpen(false);
     if (tab === 'campaigns') loadCampaigns();
+    if (tab === 'installers') loadAdminInstallers();
   }, [isMobile]);
 
   const tabLabels = {
@@ -66,7 +69,8 @@ export default function AdminPage() {
     saas: 'SaaS Abonelikleri',
     brands: 'Marka Hesapları',
     campaigns: 'Sponsorlu Reklamlar',
-    pages: 'Kurumsal Sayfalar'
+    pages: 'Kurumsal Sayfalar',
+    installers: 'Seramik Ustaları'
   };
 
   const tabIcons = {
@@ -78,7 +82,8 @@ export default function AdminPage() {
     saas: CreditCard,
     brands: Building2,
     campaigns: Sparkles,
-    pages: Globe
+    pages: Globe,
+    installers: Wrench
   };
 
   // Database list states
@@ -876,8 +881,132 @@ export default function AdminPage() {
       loadBankSettings();
       loadAdminBrands();
       loadCampaigns();
+      loadAdminInstallers();
     }
   }, [isLoggedIn]);
+
+  // Installers Management State
+  const [adminInstallers, setAdminInstallers] = useState([]);
+  const [adminInstallersLoading, setAdminInstallersLoading] = useState(false);
+  const [adminInstallerFilter, setAdminInstallerFilter] = useState('ALL'); // ALL, PENDING, VERIFIED
+  const [adminInstallerSearch, setAdminInstallerSearch] = useState('');
+  const [installerStats, setInstallerStats] = useState({ total: 0, pending: 0, verified: 0 });
+
+  // Edit Installer Modal State
+  const [editingInstaller, setEditingInstaller] = useState(null);
+  const [editInstName, setEditInstName] = useState('');
+  const [editInstCompany, setEditInstCompany] = useState('');
+  const [editInstPhone, setEditInstPhone] = useState('');
+  const [editInstCity, setEditInstCity] = useState('');
+  const [editInstDistrict, setEditInstDistrict] = useState('');
+  const [editInstExp, setEditInstExp] = useState(10);
+  const [editInstSpecialties, setEditInstSpecialties] = useState('');
+  const [editInstRating, setEditInstRating] = useState(5.0);
+  const [editInstVerified, setEditInstVerified] = useState(true);
+  const [editInstNotes, setEditInstNotes] = useState('');
+  const [editInstLoading, setEditInstLoading] = useState(false);
+
+  const loadAdminInstallers = async () => {
+    setAdminInstallersLoading(true);
+    try {
+      let url = `/api/admin/installers?filter=${adminInstallerFilter}`;
+      if (adminInstallerSearch) url += `&search=${encodeURIComponent(adminInstallerSearch)}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setAdminInstallers(data.installers || []);
+          setInstallerStats(data.stats || { total: 0, pending: 0, verified: 0 });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load admin installers:', err);
+    } finally {
+      setAdminInstallersLoading(false);
+    }
+  };
+
+  const handleToggleInstallerVerify = async (installerId, currentVerified) => {
+    try {
+      const res = await fetch('/api/admin/installers', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: installerId,
+          verified: !currentVerified
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        loadAdminInstallers();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteInstaller = async (installerId) => {
+    if (!confirm('Bu usta kaydını silmek istediğinize emin misiniz?')) return;
+    try {
+      const res = await fetch(`/api/admin/installers?id=${installerId}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success) {
+        loadAdminInstallers();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const openEditInstallerModal = (inst) => {
+    setEditingInstaller(inst);
+    setEditInstName(inst.name || '');
+    setEditInstCompany(inst.companyName || '');
+    setEditInstPhone(inst.phone || '');
+    setEditInstCity(inst.city || '');
+    setEditInstDistrict(inst.district || '');
+    setEditInstExp(inst.experienceYears || 10);
+    setEditInstSpecialties(inst.specialties || '');
+    setEditInstRating(inst.rating || 5.0);
+    setEditInstVerified(inst.verified !== undefined ? inst.verified : true);
+    setEditInstNotes(inst.notes || '');
+  };
+
+  const handleSaveInstallerEdit = async (e) => {
+    e.preventDefault();
+    if (!editingInstaller) return;
+    setEditInstLoading(true);
+    try {
+      const res = await fetch('/api/admin/installers', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingInstaller.id,
+          name: editInstName,
+          companyName: editInstCompany,
+          phone: editInstPhone,
+          city: editInstCity,
+          district: editInstDistrict,
+          experienceYears: editInstExp,
+          specialties: editInstSpecialties,
+          rating: editInstRating,
+          verified: editInstVerified,
+          notes: editInstNotes
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEditingInstaller(null);
+        loadAdminInstallers();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setEditInstLoading(false);
+    }
+  };
 
   // Mobile detection
   useEffect(() => {
@@ -1804,6 +1933,11 @@ export default function AdminPage() {
                   <Building2 size={16} />
                   <span>Proje Talepleri</span>
                   {projects.length > 0 && <span className="nav-badge">{projects.length}</span>}
+                </button>
+                <button className={`nav-item ${activeTab === 'installers' ? 'active' : ''}`} onClick={() => handleTabSelect('installers')}>
+                  <Wrench size={16} />
+                  <span>Seramik Ustaları</span>
+                  {installerStats.pending > 0 && <span className="nav-badge" style={{ background: '#ef4444' }}>{installerStats.pending}</span>}
                 </button>
               </div>
             )}
@@ -5257,6 +5391,345 @@ export default function AdminPage() {
               )}
             </button>
           </form>
+        </div>
+      )}
+
+      {/* Tab: Installers Management & Approval */}
+      {activeTab === 'installers' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* Header & Filter Controls */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 4px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Wrench size={22} style={{ color: '#d4af37' }} />
+                <span>Seramik Ustaları Yönetimi & Onay Paneli</span>
+              </h2>
+              <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                Kullanıcıların başvurduğu seramik ustası ve uygulayıcı ekipleri onaylayın, bilgileri güncelleyin veya silin.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <select
+                value={adminInstallerFilter}
+                onChange={(e) => {
+                  setAdminInstallerFilter(e.target.value);
+                  setTimeout(() => loadAdminInstallers(), 50);
+                }}
+                style={{ padding: '8px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.82rem', fontWeight: '600' }}
+              >
+                <option value="ALL">Tüm Ustalar ({installerStats.total})</option>
+                <option value="PENDING">Onay Bekleyenler ({installerStats.pending})</option>
+                <option value="VERIFIED">Onaylı Ustalar ({installerStats.verified})</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Stats Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>Toplam Kayıtlı Usta</span>
+              <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#0f172a' }}>{installerStats.total} Usta</span>
+            </div>
+
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#dc2626', display: 'block', marginBottom: '4px' }}>⏳ Onay Bekleyen Başvurular</span>
+              <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#ef4444' }}>{installerStats.pending} Başvuru</span>
+            </div>
+
+            <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#047857', display: 'block', marginBottom: '4px' }}>✅ Onaylı Rehber Ustaları</span>
+              <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#059669' }}>{installerStats.verified} Usta</span>
+            </div>
+          </div>
+
+          {/* Table Container */}
+          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>
+                Kayıtlı Seramik Ustaları Listesi
+              </h3>
+              <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                {adminInstallers.length} kayıt listeleniyor
+              </span>
+            </div>
+
+            {adminInstallersLoading ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
+                <Loader2 size={24} className="animate-spin" style={{ margin: '0 auto 10px auto' }} />
+                <span>Ustalar yükleniyor...</span>
+              </div>
+            ) : adminInstallers.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                <Wrench size={32} style={{ margin: '0 auto 8px auto', color: '#cbd5e1' }} />
+                <span>Seçili filtrede henüz kayıtlı usta bulunmuyor.</span>
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.83rem', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b' }}>
+                      <th style={{ padding: '12px 10px', fontWeight: '700' }}>Usta / Firma</th>
+                      <th style={{ padding: '12px 10px', fontWeight: '700' }}>İletişim</th>
+                      <th style={{ padding: '12px 10px', fontWeight: '700' }}>Konum (Şehir/İlçe)</th>
+                      <th style={{ padding: '12px 10px', fontWeight: '700' }}>Tecrübe & Puan</th>
+                      <th style={{ padding: '12px 10px', fontWeight: '700' }}>Uzmanlık</th>
+                      <th style={{ padding: '12px 10px', fontWeight: '700' }}>Durum</th>
+                      <th style={{ padding: '12px 10px', fontWeight: '700', textAlign: 'right' }}>İşlemler</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {adminInstallers.map(inst => (
+                      <tr key={inst.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        <td style={{ padding: '14px 10px' }}>
+                          <div style={{ fontWeight: '800', color: '#0f172a' }}>{inst.name}</div>
+                          {inst.companyName && <div style={{ fontSize: '0.74rem', color: '#64748b' }}>{inst.companyName}</div>}
+                        </td>
+                        <td style={{ padding: '14px 10px' }}>
+                          <a
+                            href={`https://wa.me/${inst.phone.replace(/[^\d]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: '#059669', fontWeight: '700', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                          >
+                            <span>📞 {inst.phone}</span>
+                          </a>
+                        </td>
+                        <td style={{ padding: '14px 10px' }}>
+                          <span style={{ fontWeight: '700', color: '#334155' }}>{inst.city}</span>
+                          {inst.district && <span style={{ fontSize: '0.74rem', color: '#64748b', display: 'block' }}>{inst.district}</span>}
+                        </td>
+                        <td style={{ padding: '14px 10px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ background: '#fef08a', color: '#854d0e', fontWeight: '800', padding: '2px 6px', borderRadius: '6px', fontSize: '0.72rem' }}>
+                              ★ {inst.rating || 5.0}
+                            </span>
+                            <span style={{ fontSize: '0.74rem', color: '#64748b' }}>{inst.experienceYears} Yıl</span>
+                          </div>
+                        </td>
+                        <td style={{ padding: '14px 10px', maxWidth: '200px' }}>
+                          <span style={{ fontSize: '0.74rem', color: '#475569', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                            {inst.specialties}
+                          </span>
+                        </td>
+                        <td style={{ padding: '14px 10px' }}>
+                          {inst.verified ? (
+                            <span style={{ background: '#dcfce7', color: '#15803d', fontWeight: '800', padding: '4px 10px', borderRadius: '12px', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                              <CheckCircle size={12} />
+                              Onaylı Usta
+                            </span>
+                          ) : (
+                            <span style={{ background: '#fef2f2', color: '#b91c1c', fontWeight: '800', padding: '4px 10px', borderRadius: '12px', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                              ⏳ Onay Bekliyor
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: '14px 10px', textAlign: 'right' }}>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                            <button
+                              onClick={() => handleToggleInstallerVerify(inst.id, inst.verified)}
+                              title={inst.verified ? 'Onayı Kaldır' : 'Ustayı Onayla ve Yayınla'}
+                              style={{
+                                background: inst.verified ? '#f1f5f9' : '#10b981',
+                                color: inst.verified ? '#475569' : '#ffffff',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '8px',
+                                fontSize: '0.74rem',
+                                fontWeight: '700',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {inst.verified ? 'Onayı Kaldır' : '✅ Onayla'}
+                            </button>
+
+                            <button
+                              onClick={() => openEditInstallerModal(inst)}
+                              style={{ background: '#f1f5f9', color: '#334155', border: 'none', padding: '6px 10px', borderRadius: '8px', fontSize: '0.74rem', fontWeight: '700', cursor: 'pointer' }}
+                            >
+                              ✏️ Düzenle
+                            </button>
+
+                            <button
+                              onClick={() => handleDeleteInstaller(inst.id)}
+                              style={{ background: '#fef2f2', color: '#dc2626', border: 'none', padding: '6px 10px', borderRadius: '8px', fontSize: '0.74rem', fontWeight: '700', cursor: 'pointer' }}
+                            >
+                              🗑️ Sil
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* EDIT INSTALLER MODAL */}
+          {editingInstaller && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0,0,0,0.7)',
+              backdropFilter: 'blur(6px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+              padding: '20px'
+            }} onClick={() => setEditingInstaller(null)}>
+              <div style={{
+                background: '#ffffff',
+                borderRadius: '20px',
+                maxWidth: '500px',
+                width: '100%',
+                padding: '24px',
+                position: 'relative',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                maxHeight: '90vh',
+                overflowY: 'auto'
+              }} onClick={(e) => e.stopPropagation()}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', margin: 0 }}>Usta Bilgilerini Düzenle</h3>
+                  <button onClick={() => setEditingInstaller(null)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '28px', height: '28px', cursor: 'pointer' }}>✕</button>
+                </div>
+
+                <form onSubmit={handleSaveInstallerEdit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '4px' }}>Adı Soyadı</label>
+                    <input
+                      type="text"
+                      value={editInstName}
+                      onChange={(e) => setEditInstName(e.target.value)}
+                      required
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '4px' }}>Firma Adı</label>
+                      <input
+                        type="text"
+                        value={editInstCompany}
+                        onChange={(e) => setEditInstCompany(e.target.value)}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '4px' }}>Telefon</label>
+                      <input
+                        type="text"
+                        value={editInstPhone}
+                        onChange={(e) => setEditInstPhone(e.target.value)}
+                        required
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '4px' }}>Şehir</label>
+                      <input
+                        type="text"
+                        value={editInstCity}
+                        onChange={(e) => setEditInstCity(e.target.value)}
+                        required
+                        style={{ width: '100%', padding: '9px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '4px' }}>İlçe</label>
+                      <input
+                        type="text"
+                        value={editInstDistrict}
+                        onChange={(e) => setEditInstDistrict(e.target.value)}
+                        style={{ width: '100%', padding: '9px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '4px' }}>Tecrübe (Yıl)</label>
+                      <input
+                        type="number"
+                        value={editInstExp}
+                        onChange={(e) => setEditInstExp(e.target.value)}
+                        style={{ width: '100%', padding: '9px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '4px' }}>Uzmanlık Alanları</label>
+                    <input
+                      type="text"
+                      value={editInstSpecialties}
+                      onChange={(e) => setEditInstSpecialties(e.target.value)}
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '4px' }}>Değerlendirme Puanı</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="1"
+                        max="5"
+                        value={editInstRating}
+                        onChange={(e) => setEditInstRating(e.target.value)}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '4px' }}>Onay Durumu</label>
+                      <select
+                        value={editInstVerified ? 'true' : 'false'}
+                        onChange={(e) => setEditInstVerified(e.target.value === 'true')}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                      >
+                        <option value="true">✅ Onaylı Usta</option>
+                        <option value="false">⏳ Onay Bekliyor</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '4px' }}>Tanıtım Notu</label>
+                    <textarea
+                      rows={2}
+                      value={editInstNotes}
+                      onChange={(e) => setEditInstNotes(e.target.value)}
+                      style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={editInstLoading}
+                    style={{
+                      background: '#0f172a',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '12px',
+                      borderRadius: '10px',
+                      fontWeight: '800',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      marginTop: '6px'
+                    }}
+                  >
+                    {editInstLoading ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

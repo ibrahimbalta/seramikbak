@@ -105,9 +105,8 @@ export default function InstallersDirectoryPage() {
           notes: regNotes
         })
       });
-      const data = await res.json();
       if (res.ok && data.success) {
-        setRegSuccess('Tebrikler! Seramik ustası profiliniz başarıyla onaylandı ve rehbere eklendi.');
+        setRegSuccess(data.message || 'Tebrikler! Seramik ustası başvurunuz başarıyla alındı. Yönetici onayından sonra rehberde yayınlanacaktır.');
         setRegName('');
         setRegPhone('');
         setRegCompany('');
