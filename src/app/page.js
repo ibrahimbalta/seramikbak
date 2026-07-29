@@ -3065,6 +3065,11 @@ export default function Home() {
               <span>Hakkımızda</span>
             </Link>
             <span className="utility-divider">|</span>
+            <Link href="/ilham" className="utility-item portal-link">
+              <Sparkles size={13} />
+              <span>İlham & Trendler</span>
+            </Link>
+            <span className="utility-divider">|</span>
             <button 
               onClick={() => setIsKioskMode(true)} 
               className="utility-item kiosk-btn-link"
@@ -3098,11 +3103,6 @@ export default function Home() {
             <Link href="/ustalar" className="utility-item portal-link">
               <Wrench size={13} style={{ color: '#d4af37' }} />
               <span style={{ color: '#d4af37', fontWeight: '800' }}>Seramik Ustaları</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/ilham" className="utility-item portal-link">
-              <Sparkles size={13} />
-              <span>İlham & Trendler</span>
             </Link>
           </div>
         </div>
