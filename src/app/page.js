@@ -3101,8 +3101,8 @@ export default function Home() {
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/ustalar" className="utility-item portal-link">
-              <Wrench size={13} style={{ color: '#d4af37' }} />
-              <span style={{ color: '#d4af37', fontWeight: '800' }}>Seramik Ustaları</span>
+              <Wrench size={13} style={{ color: '#b45309' }} />
+              <span style={{ color: '#b45309', fontWeight: '800' }}>Seramik Ustaları</span>
             </Link>
           </div>
         </div>
@@ -3266,8 +3266,8 @@ export default function Home() {
                 <span className="outlet-small-badge">Fırsat</span>
               </Link>
               <Link href="/ustalar" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
-                <Wrench size={16} style={{ color: '#d4af37' }} />
-                <span style={{ color: '#d4af37', fontWeight: '800' }}>Seramik Ustaları</span>
+                <Wrench size={16} style={{ color: '#b45309' }} />
+                <span style={{ color: '#b45309', fontWeight: '800' }}>Seramik Ustaları</span>
               </Link>
               <Link href="/bayi" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
                 <UserIcon size={16} />
