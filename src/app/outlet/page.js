@@ -5,16 +5,12 @@ import Link from 'next/link';
 import {
   Sparkles,
   Search,
-  Filter,
   MapPin,
   MessageSquare,
   Building2,
-  ExternalLink,
   ChevronLeft,
   Tag,
-  ShieldCheck,
   Send,
-  Phone,
   CheckCircle2,
   X,
   ArrowRight,
@@ -183,81 +179,180 @@ export default function OutletMarketplacePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-white font-sans">
+    <div style={{ background: '#090d16', color: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>
       {/* Header Navigation */}
-      <header className="bg-slate-900/90 backdrop-blur-xl border-b border-red-500/25 sticky top-0 z-[90]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 sm:py-4 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
-          <Link href="/" className="flex items-center gap-2.5 shrink-0 no-underline">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 text-white flex items-center justify-center font-black text-sm sm:text-base shadow-md shadow-red-500/30">
-              SB
-            </div>
-            <span className="text-base sm:text-xl font-black text-white tracking-tight">
-              SeramikBak <span className="text-red-500 text-xs sm:text-sm ml-1 font-bold">OUTLET</span>
+      <header style={{
+        background: 'rgba(15, 23, 42, 0.85)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(239, 68, 68, 0.25)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 90,
+        padding: '12px 16px'
+      }}>
+        <div style={{
+          maxWidth: '1280px',
+          margin: '0 auto',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: '900',
+              fontSize: '1rem',
+              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+            }}>SB</div>
+            <span style={{ fontSize: '1.1rem', fontWeight: '900', color: '#ffffff' }}>
+              SeramikBak <span style={{ color: '#ef4444', fontSize: '0.8rem' }}>OUTLET</span>
             </span>
           </Link>
 
-          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <button
               onClick={() => { setShowAlertModal(true); setAlertCity(selectedCity || 'ALL'); }}
-              className="text-[0.75rem] sm:text-xs font-extrabold text-white bg-gradient-to-r from-emerald-500 to-emerald-600 border-0 py-2 px-3 sm:px-4 rounded-xl cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/30 active:scale-95 transition-transform flex-1 sm:flex-initial"
+              style={{
+                fontSize: '0.78rem',
+                fontWeight: '800',
+                color: '#ffffff',
+                background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
+                border: 'none',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 4px 14px rgba(37, 211, 102, 0.35)',
+                transition: 'transform 0.2s ease'
+              }}
             >
-              <MessageSquare size={14} className="shrink-0" />
+              <MessageSquare size={14} />
               <span>WhatsApp Fırsat Alarmı</span>
             </button>
 
-            <Link href="/bayi" className="text-[0.75rem] sm:text-xs font-bold text-amber-400 no-underline flex items-center justify-center gap-1.5 bg-amber-400/10 border border-amber-400/30 py-2 px-3 sm:px-3.5 rounded-xl hover:bg-amber-400/20 transition-colors shrink-0">
-              <Building2 size={14} className="shrink-0" />
-              <span className="hidden xs:inline">Bayi Girişi & İlan Ver</span>
-              <span className="xs:hidden">Bayi Girişi</span>
+            <Link href="/bayi" style={{
+              fontSize: '0.78rem',
+              fontWeight: '700',
+              color: '#d4af37',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(212, 175, 55, 0.1)',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              padding: '8px 12px',
+              borderRadius: '10px'
+            }}>
+              <Building2 size={14} />
+              <span>Bayi Girişi & İlan Ver</span>
             </Link>
           </div>
         </div>
       </header>
 
       {/* HERO BANNER */}
-      <section className="bg-gradient-to-b from-slate-800/80 to-slate-950 border-b border-white/10 px-4 sm:px-6 py-8 sm:py-14 text-center relative overflow-hidden"
-        style={{
-          backgroundImage: 'linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(9, 13, 22, 1) 100%), url("/hero/hero_ceramics.jpg")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center center'
-        }}
-      >
-        <div className="max-w-4xl mx-auto relative z-10">
-          <div className="inline-flex items-center gap-2 bg-red-500/20 border border-red-500/40 text-red-400 px-3 sm:px-4 py-1.5 rounded-full text-[0.72rem] sm:text-xs font-extrabold mb-3 sm:mb-4 max-w-full">
-            <Sparkles size={14} className="shrink-0" />
-            <span className="truncate">BAYİLERDEN CANLI OUTLET & ŞANTİYE FAZLASI BORSASI</span>
+      <section style={{
+        background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(9, 13, 22, 1) 100%), url("/hero/hero_ceramics.jpg")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+        padding: '40px 16px 30px 16px',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        textAlign: 'center'
+      }}>
+        <div style={{ maxWidth: '840px', margin: '0 auto' }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(239, 68, 68, 0.2)',
+            border: '1px solid rgba(239, 68, 68, 0.4)',
+            color: '#f87171',
+            padding: '6px 14px',
+            borderRadius: '20px',
+            fontSize: '0.75rem',
+            fontWeight: '800',
+            marginBottom: '14px',
+            maxWidth: '100%'
+          }}>
+            <Sparkles size={14} style={{ flexShrink: 0 }} />
+            <span>BAYİLERDEN CANLI OUTLET & ŞANTİYE FAZLASI BORSASI</span>
           </div>
 
-          <h1 className="text-xl sm:text-3xl md:text-4xl font-black text-white mb-3 sm:mb-4 leading-tight">
+          <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 2.4rem)', fontWeight: '900', color: '#ffffff', margin: '0 0 14px 0', lineHeight: '1.25' }}>
             Depo Seri Sonları & Proje Fazlası Paletlerde %60'a Varan İndirimler
           </h1>
 
-          <p className="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed mb-5 max-w-2xl mx-auto">
+          <p style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 20px 0' }}>
             Bayilerin elinde kalan son 30 m², 50 m² şantiye artığı ve 2. kalite stoklar uygun fiyata satışta!
             Kiralık evinizi, balkonunuzu veya ufak alan tadilatınızı bütçe dostu paletlerle tamamlayın.
           </p>
 
-          <div className="mb-6 sm:mb-8">
+          <div style={{ marginBottom: '24px' }}>
             <button
               type="button"
               onClick={() => { setShowAlertModal(true); setAlertCity(selectedCity || 'ALL'); }}
-              className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-extrabold text-xs sm:text-sm py-3 px-5 sm:px-6 rounded-xl border-0 cursor-pointer inline-flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/35 active:scale-95 transition-transform"
+              style={{
+                background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
+                color: '#ffffff',
+                fontWeight: '800',
+                fontSize: '0.85rem',
+                padding: '12px 20px',
+                borderRadius: '12px',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 6px 20px rgba(37, 211, 102, 0.35)',
+                transition: 'transform 0.2s ease',
+                maxWidth: '100%'
+              }}
             >
-              <MessageSquare size={18} className="shrink-0" />
+              <MessageSquare size={16} />
               <span>{selectedCity !== 'ALL' ? `${selectedCity} İçin WhatsApp Fırsat Alarmı Kur 🔔` : 'WhatsApp Fırsat Alarmı Kur (Tüm İller) 🔔'}</span>
             </button>
           </div>
 
           {/* Search & Filter Bar */}
-          <form onSubmit={handleSearchSubmit} className="bg-slate-900/90 backdrop-blur-md border border-red-500/30 rounded-2xl p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 shadow-2xl">
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <form onSubmit={handleSearchSubmit} style={{
+            background: 'rgba(15, 23, 42, 0.9)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '20px',
+            padding: '12px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+            gap: '10px',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
+          }}>
+            <div style={{ position: 'relative' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
               <input
                 type="text"
                 placeholder="Desen, ebat veya ürün adı ara..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-800/80 border border-white/10 text-white text-xs sm:text-sm placeholder-slate-400 outline-none focus:border-red-500 transition-colors box-border"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px 10px 36px',
+                  borderRadius: '12px',
+                  background: 'rgba(30, 41, 59, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#ffffff',
+                  fontSize: '0.85rem',
+                  boxSizing: 'border-box'
+                }}
               />
             </div>
 
@@ -265,7 +360,16 @@ export default function OutletMarketplacePage() {
               <select
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-800/80 border border-white/10 text-white text-xs sm:text-sm outline-none focus:border-red-500 transition-colors box-border"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '12px',
+                  background: 'rgba(30, 41, 59, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#ffffff',
+                  fontSize: '0.85rem',
+                  boxSizing: 'border-box'
+                }}
               >
                 <option value="ALL">Tüm Şehirler</option>
                 {TURKEY_CITIES.map(city => (
@@ -278,7 +382,16 @@ export default function OutletMarketplacePage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-slate-800/80 border border-white/10 text-white text-xs sm:text-sm outline-none focus:border-red-500 transition-colors box-border"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  borderRadius: '12px',
+                  background: 'rgba(30, 41, 59, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#ffffff',
+                  fontSize: '0.85rem',
+                  boxSizing: 'border-box'
+                }}
               >
                 <option value="ALL">Tüm Kategoriler</option>
                 <option value="PROJE_FAZLASI">Proje Fazlası (Şantiye Artığı)</option>
@@ -290,64 +403,112 @@ export default function OutletMarketplacePage() {
 
             <button
               type="submit"
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-0 py-2.5 px-5 rounded-xl font-extrabold text-xs sm:text-sm cursor-pointer shadow-md shadow-red-500/40 transition-all flex items-center justify-center gap-2"
+              style={{
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                color: '#ffffff',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '12px',
+                fontWeight: '800',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(239, 68, 68, 0.4)',
+                width: '100%'
+              }}
             >
-              <span>Fırsatları Filtrele</span>
+              Fırsatları Filtrele
             </button>
           </form>
         </div>
       </section>
 
       {/* MARKETPLACE LISTINGS GRID */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+      <main style={{ maxWidth: '1280px', margin: '30px auto', padding: '0 16px' }}>
         {/* CRAFTSMAN CALLOUT BANNER */}
-        <div className="bg-gradient-to-r from-amber-500/15 to-amber-700/20 border border-amber-500/35 rounded-2xl p-4 sm:p-5 mb-6 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-black shrink-0 shadow-md">
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(179, 142, 71, 0.2) 100%)',
+          border: '1px solid rgba(212, 175, 55, 0.35)',
+          borderRadius: '16px',
+          padding: '16px',
+          marginBottom: '28px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '14px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#000',
+              flexShrink: 0
+            }}>
               <Wrench size={20} />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-extrabold text-white mb-0.5 leading-snug">
+              <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#ffffff', margin: '0 0 2px 0' }}>
                 Bu Seramikleri Döşetecek Tecrübeli Usta mı Arıyorsunuz?
               </h4>
-              <p className="text-[0.76rem] sm:text-xs text-slate-300 leading-normal">
+              <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: 0 }}>
                 81 ilde lazer terazili ve sertifikalı onaylı seramik ustalarıyla tek tıkla WhatsApp üzerinden iletişim kurun.
               </p>
             </div>
           </div>
 
-          <Link href="/ustalar" className="w-full sm:w-auto shrink-0 bg-gradient-to-r from-amber-400 to-yellow-300 text-black no-underline py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-transform">
+          <Link href="/ustalar" style={{
+            background: 'linear-gradient(135deg, #d4af37 0%, #fef08a 100%)',
+            color: '#000000',
+            textDecoration: 'none',
+            padding: '9px 16px',
+            borderRadius: '10px',
+            fontWeight: '800',
+            fontSize: '0.8rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            boxShadow: '0 4px 14px rgba(212, 175, 55, 0.3)'
+          }}>
             <span>Bölgenizdeki Ustaları Görün</span>
             <ArrowRight size={14} />
           </Link>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-0 mb-6">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <div>
-            <h2 className="text-base sm:text-xl font-extrabold text-white mb-0.5">
+            <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0, color: '#ffffff' }}>
               Depolarda Teslimata Hazır Fırsat Ürünleri
             </h2>
-            <span className="text-xs text-slate-400">
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
               Toplam {items.length} adet kelepir seramik paleti bulundu
             </span>
           </div>
         </div>
 
         {loading ? (
-          <div className="text-center py-16 sm:py-24 text-slate-400">
-            <Sparkles size={32} className="animate-spin mx-auto mb-3 text-red-500" />
-            <span className="text-xs sm:text-sm">Fırsat paletleri yükleniyor...</span>
+          <div style={{ textAlign: 'center', padding: '60px 0', color: '#94a3b8' }}>
+            <Sparkles size={32} className="animate-spin" style={{ margin: '0 auto 12px auto', color: '#ef4444' }} />
+            <span>Fırsat paletleri yükleniyor...</span>
           </div>
         ) : items.length === 0 ? (
-          <div className="text-center py-12 sm:py-16 px-4 bg-slate-800/40 rounded-2xl border border-dashed border-white/10">
-            <Tag size={40} className="text-red-500 mx-auto mb-4" />
-            <h3 className="text-sm sm:text-base font-extrabold text-white mb-2">Aradığınız Kriterlerde Outlet Ürünü Bulunamadı</h3>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+          <div style={{ textAlign: 'center', padding: '50px 20px', background: 'rgba(30, 41, 59, 0.4)', borderRadius: '20px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+            <Tag size={40} style={{ color: '#ef4444', margin: '0 auto 16px auto' }} />
+            <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: '0 0 8px 0' }}>Aradığınız Kriterlerde Outlet Ürünü Bulunamadı</h3>
+            <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: 0 }}>
               Filtreleri sıfırlayarak tüm bayilerin proje fazlası stoklarını görüntüleyebilirsiniz.
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '20px'
+          }}>
             {items.map((item) => {
               const d = item.dealer;
               const prod = item.product;
@@ -357,121 +518,205 @@ export default function OutletMarketplacePage() {
               const totalPalletValue = Math.round(item.unitPrice * item.quantityM2);
 
               return (
-                <div key={item.id} className="bg-slate-800/60 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden flex flex-col shadow-xl hover:border-white/20 transition-all">
+                <div key={item.id} style={{
+                  background: 'rgba(30, 41, 59, 0.6)',
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                  transition: 'all 0.2s ease'
+                }}>
                   {/* Image Header */}
-                  <div className="relative h-44 sm:h-52 w-full overflow-hidden shrink-0">
+                  <div style={{ position: 'relative', height: '190px', width: '100%', overflow: 'hidden' }}>
                     <img
                       src={item.imageUrl || (prod ? prod.imageUrl || getTextureFallback(item) : getTextureFallback(item))}
                       alt={item.title}
-                      className="w-full h-full object-cover"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = getTextureFallback(item);
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-transparent to-transparent" />
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, transparent 60%)'
+                    }} />
 
                     {/* Top Left Badges */}
-                    <div className="absolute top-3 left-3 flex flex-col gap-1.5 max-w-[70%]">
-                      <span className="bg-red-500 text-white text-[0.65rem] sm:text-xs font-extrabold px-2.5 py-1 rounded-xl shadow-md shadow-red-500/40 w-fit truncate">
+                    <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', flexDirection: 'column', gap: '4px', maxWidth: '70%' }}>
+                      <span style={{
+                        background: '#ef4444',
+                        color: '#ffffff',
+                        fontSize: '0.65rem',
+                        fontWeight: '800',
+                        padding: '3px 8px',
+                        borderRadius: '10px',
+                        boxShadow: '0 4px 10px rgba(239, 68, 68, 0.4)'
+                      }}>
                         {item.badgeTag || 'Proje Fazlası'}
                       </span>
-                      <span className="bg-slate-900/85 text-slate-300 text-[0.6rem] sm:text-[0.65rem] font-bold px-2 py-0.5 rounded-lg border border-white/15 backdrop-blur-sm w-fit truncate">
+                      <span style={{
+                        background: 'rgba(15, 23, 42, 0.85)',
+                        color: '#cbd5e1',
+                        fontSize: '0.6rem',
+                        fontWeight: '700',
+                        padding: '2px 6px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        backdropFilter: 'blur(4px)'
+                      }}>
                         🏷️ {categoryLabelMap[item.category] || item.category}
                       </span>
                     </div>
 
                     {/* Discount Pill */}
                     {discountPercent && (
-                      <div className="absolute top-3 right-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black text-[0.7rem] sm:text-xs px-2.5 py-1 rounded-xl shadow-md shadow-emerald-500/40">
+                      <div style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        color: '#ffffff',
+                        fontWeight: '900',
+                        fontSize: '0.72rem',
+                        padding: '3px 8px',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)'
+                      }}>
                         %{discountPercent} İNDİRİM
                       </div>
                     )}
 
                     {/* Stock m² Pill */}
-                    <div className="absolute bottom-3 left-3">
-                      <span className="bg-amber-400 text-black font-black text-[0.68rem] sm:text-xs px-2.5 py-1 rounded-lg shadow-sm">
+                    <div style={{ position: 'absolute', bottom: '10px', left: '10px' }}>
+                      <span style={{
+                        background: 'rgba(212, 175, 55, 0.9)',
+                        color: '#000000',
+                        fontWeight: '900',
+                        fontSize: '0.7rem',
+                        padding: '3px 8px',
+                        borderRadius: '8px'
+                      }}>
                         📦 Mevcut Stok: {item.quantityM2} m²
                       </span>
                     </div>
                   </div>
 
                   {/* Body Info */}
-                  <div className="p-4 sm:p-5 flex-1 flex flex-col gap-3">
+                  <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {/* Dealer info banner */}
                     {d && (
-                      <div className="flex items-center justify-between border-b border-white/10 pb-2.5 gap-2">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <Building2 size={14} className="text-amber-400 shrink-0" />
-                          <span className="text-xs font-extrabold text-white truncate">{d.name}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '8px', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                          <Building2 size={13} style={{ color: '#d4af37', flexShrink: 0 }} />
+                          <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.name}</span>
                         </div>
-                        <span className="text-[0.68rem] text-slate-400 flex items-center gap-1 shrink-0">
-                          <MapPin size={10} className="shrink-0" />
-                          <span className="truncate max-w-[120px]">{d.district}, {d.city}</span>
+                        <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '3px', flexShrink: 0 }}>
+                          <MapPin size={10} />
+                          {d.district}, {d.city}
                         </span>
                       </div>
                     )}
 
-                    <h3 className="text-sm sm:text-base font-extrabold text-white m-0 leading-snug line-clamp-2">
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#ffffff', margin: 0, lineHeight: '1.4' }}>
                       {item.title}
                     </h3>
 
                     {(item.dimensions || item.colorFinish) && (
-                      <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-                        {item.dimensions && <span className="bg-slate-900/50 px-2 py-0.5 rounded border border-white/5">📏 {item.dimensions}</span>}
-                        {item.colorFinish && <span className="bg-slate-900/50 px-2 py-0.5 rounded border border-white/5">🎨 {item.colorFinish}</span>}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', fontSize: '0.72rem', color: '#cbd5e1' }}>
+                        {item.dimensions && <span>📏 {item.dimensions}</span>}
+                        {item.colorFinish && <span>🎨 {item.colorFinish}</span>}
                       </div>
                     )}
 
                     {item.notes && (
-                      <p className="text-[0.75rem] text-slate-400 bg-slate-900/50 p-2.5 rounded-xl border border-white/5 m-0 leading-relaxed italic line-clamp-2">
+                      <p style={{
+                        fontSize: '0.74rem',
+                        color: '#94a3b8',
+                        background: 'rgba(15, 23, 42, 0.5)',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255, 255, 255, 0.05)',
+                        margin: 0,
+                        lineHeight: '1.4'
+                      }}>
                         "{item.notes}"
                       </p>
                     )}
 
                     {/* Price Block */}
-                    <div className="mt-auto pt-3 border-t border-white/10 flex items-end justify-between gap-2">
+                    <div style={{ marginTop: 'auto', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '8px' }}>
                       <div>
                         {item.originalPrice && (
-                          <span className="text-[0.68rem] text-slate-400 line-through block">
+                          <span style={{ fontSize: '0.7rem', color: '#94a3b8', textDecoration: 'line-through', display: 'block' }}>
                             ₺{item.originalPrice.toLocaleString('tr-TR')} / m²
                           </span>
                         )}
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-base sm:text-xl font-black text-red-500">
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                          <span style={{ fontSize: '1.3rem', fontWeight: '900', color: '#ef4444' }}>
                             ₺{item.unitPrice.toLocaleString('tr-TR')}
                           </span>
-                          <span className="text-[0.7rem] text-slate-300">/ m²</span>
+                          <span style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>/ m²</span>
                         </div>
                       </div>
 
-                      <div className="text-right shrink-0">
-                        <span className="text-[0.65rem] text-slate-400 block">Palet Toplam Tutarı</span>
-                        <span className="text-xs sm:text-sm font-extrabold text-white">
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block' }}>Palet Toplam Tutarı</span>
+                        <span style={{ fontSize: '0.88rem', fontWeight: '800', color: '#ffffff' }}>
                           ₺{totalPalletValue.toLocaleString('tr-TR')}
                         </span>
                       </div>
                     </div>
 
                     {/* Actions */}
-                    <div className="grid grid-cols-2 gap-2 mt-1">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '8px', marginTop: '4px' }}>
                       {d?.phone ? (
                         <a
                           href={`https://wa.me/${d.phone.replace(/[\s\-\(\)\+]/g, '')}?text=${encodeURIComponent(`Merhaba, SeramikBak Outlet Borsası'nda yer alan "${item.title}" (${item.quantityM2} m², ₺${item.unitPrice}/m²) ilanınız için bilgi almak / satın almak istiyorum.`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-emerald-500 text-white font-extrabold text-xs no-underline text-center shadow-md active:scale-95 transition-transform"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px',
+                            padding: '9px',
+                            borderRadius: '10px',
+                            background: '#22c55e',
+                            color: '#ffffff',
+                            fontWeight: '800',
+                            fontSize: '0.76rem',
+                            textDecoration: 'none',
+                            textAlign: 'center'
+                          }}
                         >
-                          <MessageSquare size={14} className="shrink-0" />
-                          <span className="truncate">WhatsApp Sor</span>
+                          <MessageSquare size={14} />
+                          <span>WhatsApp Sor</span>
                         </a>
                       ) : null}
 
                       <button
                         onClick={() => setSelectedItemForContact(item)}
-                        className={`flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 text-black font-extrabold text-xs border-0 cursor-pointer shadow-md active:scale-95 transition-transform ${!d?.phone ? 'col-span-2' : ''}`}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          padding: '9px',
+                          borderRadius: '10px',
+                          background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                          color: '#000000',
+                          fontWeight: '800',
+                          fontSize: '0.76rem',
+                          border: 'none',
+                          cursor: 'pointer'
+                        }}
                       >
-                        <Send size={14} className="shrink-0" />
+                        <Send size={14} />
                         <span>Teklif Al</span>
                       </button>
                     </div>
@@ -479,10 +724,21 @@ export default function OutletMarketplacePage() {
                     {d && (
                       <Link
                         href={`/bayi/${slugify(d.name)}`}
-                        className="text-[0.72rem] text-slate-400 no-underline text-center mt-1 flex items-center justify-center gap-1 hover:text-white transition-colors"
+                        style={{
+                          fontSize: '0.7rem',
+                          color: '#94a3b8',
+                          textDecoration: 'none',
+                          textAlign: 'center',
+                          marginTop: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '4px'
+                        }}
+                        className="hover:text-white"
                       >
                         <span>Bayi Showroom Profilini İncele</span>
-                        <ChevronLeft size={12} className="rotate-180 shrink-0" />
+                        <ChevronLeft size={12} style={{ transform: 'rotate(180deg)' }} />
                       </Link>
                     )}
                   </div>
@@ -495,95 +751,129 @@ export default function OutletMarketplacePage() {
 
       {/* LEAD CONTACT MODAL */}
       {selectedItemForContact && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-          <div className="bg-slate-900 border border-amber-500/40 rounded-2xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-6 text-white shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto flex flex-col gap-4">
-            <div className="flex justify-between items-center border-b border-white/10 pb-3">
-              <h3 className="text-sm sm:text-base font-extrabold m-0 flex items-center gap-2 text-amber-400">
-                <Send size={18} className="shrink-0" />
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.75)',
+          backdropFilter: 'blur(6px)',
+          zIndex: 999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '16px'
+        }}>
+          <div style={{
+            background: '#0f172a',
+            border: '1px solid rgba(212, 175, 55, 0.4)',
+            borderRadius: '24px',
+            maxWidth: '500px',
+            width: '100%',
+            padding: '20px',
+            color: '#ffffff',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: '#d4af37' }}>
+                <Send size={16} />
                 Bayiden Fiyat Teklifi / Stok Rezerve Et
               </h3>
-              <button onClick={() => setSelectedItemForContact(null)} className="bg-transparent border-0 text-slate-400 cursor-pointer hover:text-white p-1">
+              <button onClick={() => setSelectedItemForContact(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
                 <X size={20} />
               </button>
             </div>
 
-            <div className="bg-slate-800/80 p-3 rounded-xl border border-white/10">
-              <span className="text-[0.7rem] text-red-400 font-extrabold block">
+            <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: '10px 12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <span style={{ fontSize: '0.68rem', color: '#ef4444', fontWeight: '800', display: 'block' }}>
                 {selectedItemForContact.badgeTag || 'Proje Fazlası'}
               </span>
-              <h4 className="text-xs sm:text-sm font-extrabold text-white my-1">{selectedItemForContact.title}</h4>
-              <span className="text-xs text-slate-300">
+              <h4 style={{ fontSize: '0.88rem', fontWeight: '800', color: '#ffffff', margin: '4px 0' }}>{selectedItemForContact.title}</h4>
+              <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>
                 Mevcut Stok: {selectedItemForContact.quantityM2} m² • Birim Fiyat: ₺{selectedItemForContact.unitPrice}/m²
               </span>
             </div>
 
             {contactSuccess && (
-              <div className="bg-emerald-500/15 border border-emerald-500 text-emerald-400 p-3 rounded-xl text-xs sm:text-sm">
-                <CheckCircle2 size={16} className="inline mr-1.5" />
+              <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#34d399', padding: '10px', borderRadius: '10px', fontSize: '0.8rem' }}>
+                <CheckCircle2 size={16} style={{ display: 'inline', marginRight: '6px' }} />
                 {contactSuccess}
               </div>
             )}
 
             {contactError && (
-              <div className="bg-red-500/15 border border-red-500 text-red-400 p-3 rounded-xl text-xs sm:text-sm">
+              <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#f87171', padding: '10px', borderRadius: '10px', fontSize: '0.8rem' }}>
                 ⚠️ {contactError}
               </div>
             )}
 
-            <form onSubmit={handleContactSubmit} className="flex flex-col gap-3">
+            <form onSubmit={handleContactSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
-                <label className="text-xs text-slate-300 block mb-1 font-bold">Adınız Soyadınız *</label>
+                <label style={{ fontSize: '0.75rem', color: '#cbd5e1', display: 'block', marginBottom: '4px' }}>Adınız Soyadınız *</label>
                 <input
                   type="text"
                   placeholder="Örn: Ahmet Yılmaz"
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
                   required
-                  className="w-full p-2.5 rounded-xl bg-slate-800 border border-white/15 text-white text-xs sm:text-sm outline-none focus:border-amber-400 transition-colors box-border"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.85rem', boxSizing: 'border-box' }}
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
                 <div>
-                  <label className="text-xs text-slate-300 block mb-1 font-bold">Telefon Numaranız *</label>
+                  <label style={{ fontSize: '0.75rem', color: '#cbd5e1', display: 'block', marginBottom: '4px' }}>Telefon Numaranız *</label>
                   <input
                     type="tel"
                     placeholder="0532 123 45 67"
                     value={contactPhone}
                     onChange={(e) => setContactPhone(e.target.value)}
                     required
-                    className="w-full p-2.5 rounded-xl bg-slate-800 border border-white/15 text-white text-xs sm:text-sm outline-none focus:border-amber-400 transition-colors box-border"
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.85rem', boxSizing: 'border-box' }}
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs text-slate-300 block mb-1 font-bold">E-Posta Adresiniz *</label>
+                  <label style={{ fontSize: '0.75rem', color: '#cbd5e1', display: 'block', marginBottom: '4px' }}>E-Posta Adresiniz *</label>
                   <input
                     type="email"
                     placeholder="ahmet@gmail.com"
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
                     required
-                    className="w-full p-2.5 rounded-xl bg-slate-800 border border-white/15 text-white text-xs sm:text-sm outline-none focus:border-amber-400 transition-colors box-border"
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.85rem', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs text-slate-300 block mb-1 font-bold">Ek Not / Mesajınız</label>
+                <label style={{ fontSize: '0.75rem', color: '#cbd5e1', display: 'block', marginBottom: '4px' }}>Ek Not / Mesajınız</label>
                 <textarea
                   rows={2}
                   placeholder="İstediğiniz m² miktarı veya nakliye adresi gibi ek sorularınızı yazabilirsiniz..."
                   value={contactNotes}
                   onChange={(e) => setContactNotes(e.target.value)}
-                  className="w-full p-2.5 rounded-xl bg-slate-800 border border-white/15 text-white text-xs sm:text-sm outline-none focus:border-amber-400 transition-colors box-border"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.82rem', boxSizing: 'border-box' }}
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={contactLoading}
-                className="bg-gradient-to-r from-amber-500 to-amber-400 text-black border-0 p-3 rounded-xl font-extrabold text-xs sm:text-sm cursor-pointer mt-1 shadow-md active:scale-95 transition-all"
+                style={{
+                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                  color: '#000000',
+                  border: 'none',
+                  padding: '12px',
+                  borderRadius: '10px',
+                  fontWeight: '800',
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  marginTop: '4px'
+                }}
               >
                 {contactLoading ? 'Gönderiliyor...' : 'Teklif Talebi Gönder'}
               </button>
@@ -594,80 +884,144 @@ export default function OutletMarketplacePage() {
 
       {/* WHATSAPP ALERT SUBSCRIPTION MODAL */}
       {showAlertModal && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-[9999] p-3 sm:p-5 overflow-y-auto" onClick={() => setShowAlertModal(false)}>
-          <div className="bg-slate-900 border border-emerald-500/40 rounded-2xl sm:rounded-3xl max-w-md w-full p-5 sm:p-7 relative shadow-2xl my-auto max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '16px'
+        }} onClick={() => setShowAlertModal(false)}>
+          <div style={{
+            background: '#0f172a',
+            border: '1px solid rgba(37, 211, 102, 0.4)',
+            borderRadius: '24px',
+            maxWidth: '480px',
+            width: '100%',
+            padding: '24px',
+            position: 'relative',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }} onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setShowAlertModal(false)}
-              className="absolute right-4 top-4 bg-white/10 border-0 text-slate-400 w-8 h-8 rounded-full cursor-pointer flex items-center justify-center hover:text-white"
+              style={{
+                position: 'absolute',
+                right: '16px',
+                top: '16px',
+                background: 'rgba(255,255,255,0.08)',
+                border: 'none',
+                color: '#94a3b8',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
             >
               <X size={16} />
             </button>
 
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-emerald-500/30">
-                <MessageSquare size={22} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ffffff',
+                boxShadow: '0 4px 14px rgba(37, 211, 102, 0.3)',
+                flexShrink: 0
+              }}>
+                <MessageSquare size={20} />
               </div>
               <div>
-                <h3 className="text-base sm:text-lg font-black text-white m-0">WhatsApp Fırsat Alarmı</h3>
-                <span className="text-xs text-emerald-400 font-bold">Canlı Outlet & Şantiye Fazlası Bildirimi</span>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: '900', color: '#ffffff', margin: 0 }}>WhatsApp Fırsat Alarmı</h3>
+                <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: '700' }}>Canlı Outlet & Şantiye Fazlası Bildirimi</span>
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-5">
+            <p style={{ fontSize: '0.84rem', color: '#cbd5e1', lineHeight: '1.5', marginBottom: '16px' }}>
               Seçtiğiniz şehirdeki seramik bayileri <strong>yeni bir kelepir palet, seri sonu veya 2. kalite stok</strong> yüklediğinde doğrudan WhatsApp hesabınıza bildirim gelsin!
             </p>
 
             {alertSuccess ? (
-              <div className="bg-emerald-500/15 border border-emerald-500/40 rounded-2xl p-5 text-center">
-                <CheckCircle2 size={36} className="text-emerald-400 mx-auto mb-2" />
-                <h4 className="text-base text-white font-extrabold mb-1">Alarm Başarıyla Kuruldu!</h4>
-                <p className="text-xs sm:text-sm text-slate-300 mb-4">{alertSuccess}</p>
+              <div style={{
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                borderRadius: '14px',
+                padding: '20px',
+                textAlign: 'center'
+              }}>
+                <CheckCircle2 size={36} style={{ color: '#10b981', marginBottom: '10px' }} />
+                <h4 style={{ fontSize: '1.05rem', color: '#ffffff', fontWeight: '800', marginBottom: '6px' }}>Alarm Başarıyla Kuruldu!</h4>
+                <p style={{ fontSize: '0.84rem', color: '#cbd5e1', margin: '0 0 16px 0' }}>{alertSuccess}</p>
                 <button
                   onClick={() => { setShowAlertModal(false); setAlertSuccess(''); }}
-                  className="bg-emerald-500 text-white border-0 py-2.5 px-5 rounded-xl font-extrabold cursor-pointer text-xs sm:text-sm"
+                  style={{
+                    background: '#10b981',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem'
+                  }}
                 >
                   Tamam
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubscribeAlert} className="flex flex-col gap-3.5">
+              <form onSubmit={handleSubscribeAlert} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {alertError && (
-                  <div className="bg-red-500/15 border border-red-500/40 text-red-400 p-2.5 rounded-xl text-xs">
+                  <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#f87171', padding: '10px 14px', borderRadius: '10px', fontSize: '0.82rem' }}>
                     ⚠️ {alertError}
                   </div>
                 )}
 
                 <div>
-                  <label className="text-xs text-slate-300 block mb-1 font-bold">Adınız Soyadınız *</label>
+                  <label style={{ fontSize: '0.76rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: '700' }}>Adınız Soyadınız *</label>
                   <input
                     type="text"
                     placeholder="Örn: Ahmet Yılmaz"
                     value={alertName}
                     onChange={(e) => setAlertName(e.target.value)}
                     required
-                    className="w-full p-2.5 rounded-xl bg-slate-800 border border-white/15 text-white text-xs sm:text-sm outline-none focus:border-emerald-400 transition-colors box-border"
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs text-slate-300 block mb-1 font-bold">WhatsApp Telefon Numaranız *</label>
+                  <label style={{ fontSize: '0.76rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: '700' }}>WhatsApp Telefon Numaranız *</label>
                   <input
                     type="tel"
                     placeholder="Örn: 0532 123 45 67"
                     value={alertPhone}
                     onChange={(e) => setAlertPhone(e.target.value)}
                     required
-                    className="w-full p-2.5 rounded-xl bg-slate-800 border border-white/15 text-white text-xs sm:text-sm outline-none focus:border-emerald-400 transition-colors box-border"
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
                   <div>
-                    <label className="text-xs text-slate-300 block mb-1 font-bold">Takip Edilecek Şehir</label>
+                    <label style={{ fontSize: '0.76rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: '700' }}>Takip Edilecek Şehir</label>
                     <select
                       value={alertCity}
                       onChange={(e) => setAlertCity(e.target.value)}
-                      className="w-full p-2.5 rounded-xl bg-slate-800 border border-white/15 text-white text-xs sm:text-sm outline-none focus:border-emerald-400 transition-colors box-border"
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.84rem', boxSizing: 'border-box' }}
                     >
                       <option value="ALL">Tüm İller</option>
                       {TURKEY_CITIES.map(city => (
@@ -677,11 +1031,11 @@ export default function OutletMarketplacePage() {
                   </div>
 
                   <div>
-                    <label className="text-xs text-slate-300 block mb-1 font-bold">Stok Kapsamı</label>
+                    <label style={{ fontSize: '0.76rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: '700' }}>Stok Kapsamı</label>
                     <select
                       value={alertCategory}
                       onChange={(e) => setAlertCategory(e.target.value)}
-                      className="w-full p-2.5 rounded-xl bg-slate-800 border border-white/15 text-white text-xs sm:text-sm outline-none focus:border-emerald-400 transition-colors box-border"
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.84rem', boxSizing: 'border-box' }}
                     >
                       <option value="ALL">Tüm Fırsatlar</option>
                       <option value="PROJE_FAZLASI">Proje Fazlası</option>
@@ -695,7 +1049,18 @@ export default function OutletMarketplacePage() {
                 <button
                   type="submit"
                   disabled={alertLoading}
-                  className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 p-3 rounded-xl font-extrabold text-xs sm:text-sm cursor-pointer mt-2 shadow-lg shadow-emerald-500/35 active:scale-95 transition-transform"
+                  style={{
+                    background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    fontWeight: '800',
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    marginTop: '6px',
+                    boxShadow: '0 6px 18px rgba(37, 211, 102, 0.35)'
+                  }}
                 >
                   {alertLoading ? 'Kaydediliyor...' : '📲 WhatsApp Fırsat Alarmını Başlat'}
                 </button>
@@ -707,4 +1072,3 @@ export default function OutletMarketplacePage() {
     </div>
   );
 }
-
