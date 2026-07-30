@@ -839,12 +839,12 @@ export default function InstallersDirectoryPage() {
 
             {/* Document Header */}
             <div style={{ textAlign: 'center', borderBottom: '2px solid #e2e8f0', paddingBottom: '16px', marginBottom: '20px' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#b38e47', letterSpacing: '1px', marginBottom: '4px' }}>SERAMİKBAK ONAYLI STANDART UYGULAMA REHBERİ</div>
+              <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#b38e47', letterSpacing: '1px', marginBottom: '4px' }}>KURUMSAL SERAMİK UYGULAMA VE KALİTE STANDARTLARI</div>
               <h2 style={{ fontSize: '1.25rem', fontWeight: '900', color: '#0f172a', margin: '0 0 6px 0' }}>
-                T.C. STANDART SERAMİK VE KARO UYGULAMA İŞ SÖZLEŞMESİ
+                STANDART SERAMİK VE KARO UYGULAMA İŞ SÖZLEŞMESİ
               </h2>
               <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                Ev Sahibi (İşveren) ile Seramik Ustası (Yüklenici) Arasında Bağlayıcı İş Teslim Belgesi
+                İşveren (Müşteri) ile Uzman Seramik Ustası (Yüklenici) Arasında Uygulama ve İş Teslim Belgesi
               </span>
             </div>
 
