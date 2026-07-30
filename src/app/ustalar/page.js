@@ -411,8 +411,8 @@ export default function InstallersDirectoryPage() {
         ) : (
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '20px'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gap: '16px'
           }}>
             {installers.map(inst => {
               const portfolioList = parsePortfolio(inst.portfolioBeforeAfter);
@@ -424,102 +424,86 @@ export default function InstallersDirectoryPage() {
 
               return (
                 <div key={inst.id} style={{
-                  background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '20px',
-                  padding: '20px',
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '16px',
+                  padding: '16px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  gap: '14px',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
-                  transition: 'transform 0.2s ease, border-color 0.2s ease'
+                  gap: '12px',
+                  boxShadow: '0 8px 20px rgba(0,0,0,0.3)',
+                  transition: 'all 0.2s ease'
                 }}>
                   <div>
-                    {/* Header & Badges */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
-                          <h3 style={{ fontSize: '1.1rem', fontWeight: '900', color: '#ffffff', margin: 0 }}>{inst.name}</h3>
+                    {/* Top Row: Name + Verified + Rating */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                      <div style={{ flex: 1, minWidth: 0, paddingRight: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <h3 style={{ fontSize: '1.05rem', fontWeight: '900', color: '#ffffff', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                            {inst.name}
+                          </h3>
                           {inst.verified && (
-                            <span title="Onaylı Seramik Ustası" style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)', color: '#10b981', padding: '2px 8px', borderRadius: '12px', fontSize: '0.68rem', fontWeight: '800', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                              <ShieldCheck size={12} />
+                            <span title="Onaylı Seramik Ustası" style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)', color: '#10b981', padding: '1px 6px', borderRadius: '10px', fontSize: '0.65rem', fontWeight: '800', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                              <ShieldCheck size={11} />
                               Onaylı
                             </span>
                           )}
                         </div>
-                        {inst.companyName && (
-                          <div style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>{inst.companyName}</div>
-                        )}
+                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          {inst.companyName && <span>🏢 {inst.companyName}</span>}
+                          <span>📍 {inst.city} {inst.district ? `/ ${inst.district}` : ''}</span>
+                        </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.3)', padding: '4px 8px', borderRadius: '8px' }}>
-                        <Star size={13} style={{ color: '#d4af37', fill: '#d4af37' }} />
-                        <span style={{ fontSize: '0.8rem', fontWeight: '900', color: '#fef08a' }}>{inst.rating || '5.0'}</span>
-                        <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>({inst.reviewCount || 12})</span>
+                      {/* Rating Badge */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.3)', padding: '3px 8px', borderRadius: '8px', flexShrink: 0 }}>
+                        <Star size={12} style={{ color: '#d4af37', fill: '#d4af37' }} />
+                        <span style={{ fontSize: '0.78rem', fontWeight: '900', color: '#fef08a' }}>{inst.rating || '5.0'}</span>
+                        <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>({inst.reviewCount || 12})</span>
                       </div>
                     </div>
 
-                    {/* QUALITY GUARANTEE BADGE */}
-                    {inst.guaranteeBadge !== false && (
-                      <div style={{
-                        background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%)',
-                        border: '1px solid rgba(212, 175, 55, 0.35)',
-                        borderRadius: '10px',
-                        padding: '6px 10px',
-                        marginBottom: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}>
-                        <ShieldCheck size={14} style={{ color: '#d4af37', flexShrink: 0 }} />
-                        <span style={{ fontSize: '0.72rem', color: '#fef08a', fontWeight: '800' }}>
-                          📐 Terazi & Derz Uyumu Standartlarına Uygun İş Teslimi
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Location & Experience Badges */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '0.75rem', background: 'rgba(255, 255, 255, 0.06)', color: '#cbd5e1', padding: '4px 10px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <MapPin size={12} style={{ color: '#ef4444' }} />
-                        {inst.city} {inst.district ? `/ ${inst.district}` : ''}
-                      </span>
-
-                      <span style={{ fontSize: '0.75rem', background: 'rgba(212, 175, 55, 0.1)', color: '#d4af37', padding: '4px 10px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '700' }}>
-                        <Award size={12} />
-                        {inst.experienceYears} Yıl Usta Tecrübesi
+                    {/* Inline Info Badge Bar (Single Row!) */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '0.7rem', background: 'rgba(212, 175, 55, 0.1)', color: '#d4af37', padding: '3px 8px', borderRadius: '6px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <Award size={11} />
+                        {inst.experienceYears} Yıl Tecrübe
                       </span>
 
                       {inst.contractRateM2 && (
-                        <span style={{ fontSize: '0.75rem', background: 'rgba(59, 130, 246, 0.12)', color: '#60a5fa', padding: '4px 10px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '700' }}>
-                          <Ruler size={12} />
-                          Yaklaşık: {inst.contractRateM2}
+                        <span style={{ fontSize: '0.7rem', background: 'rgba(59, 130, 246, 0.12)', color: '#60a5fa', padding: '3px 8px', borderRadius: '6px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <Ruler size={11} />
+                          {inst.contractRateM2}
+                        </span>
+                      )}
+
+                      {inst.guaranteeBadge !== false && (
+                        <span style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.12)', color: '#34d399', padding: '3px 8px', borderRadius: '6px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <ShieldCheck size={11} />
+                          Terazi & Derz Uyumlu
                         </span>
                       )}
                     </div>
 
-                    {/* Specialties */}
-                    <div style={{ marginBottom: '12px' }}>
-                      <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '700', display: 'block', marginBottom: '4px' }}>UZMANLIK ALANLARI:</span>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                        {inst.specialties.split(',').map((spec, idx) => (
-                          <span key={idx} style={{ fontSize: '0.7rem', background: 'rgba(51, 65, 85, 0.6)', border: '1px solid rgba(255,255,255,0.08)', color: '#e2e8f0', padding: '3px 8px', borderRadius: '6px' }}>
-                            {spec.trim()}
-                          </span>
-                        ))}
-                      </div>
+                    {/* Specialties Tags (Compact) */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '8px' }}>
+                      {inst.specialties.split(',').slice(0, 3).map((spec, idx) => (
+                        <span key={idx} style={{ fontSize: '0.68rem', background: 'rgba(51, 65, 85, 0.5)', color: '#cbd5e1', padding: '2px 6px', borderRadius: '4px' }}>
+                          {spec.trim()}
+                        </span>
+                      ))}
                     </div>
 
-                    {/* Bio Notes */}
+                    {/* Bio Note (Truncated to 1 line) */}
                     {inst.notes && (
-                      <p style={{ fontSize: '0.78rem', color: '#94a3b8', lineHeight: '1.4', margin: '0 0 12px 0', background: 'rgba(0,0,0,0.2)', padding: '8px 10px', borderRadius: '10px' }}>
+                      <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0 0 6px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontStyle: 'italic' }}>
                         "{inst.notes}"
                       </p>
                     )}
 
-                    {/* PORTFOLIO & CONTRACT ACTION BUTTONS */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+                    {/* Quick Modal Trigger Buttons */}
+                    <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
                       <button
                         onClick={() => {
                           setSelectedPortfolioInstaller(inst);
@@ -527,48 +511,48 @@ export default function InstallersDirectoryPage() {
                         }}
                         style={{
                           background: portfolioList.length > 0 ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                          border: portfolioList.length > 0 ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
-                          color: portfolioList.length > 0 ? '#60a5fa' : '#cbd5e1',
-                          padding: '7px 10px',
-                          borderRadius: '8px',
-                          fontSize: '0.72rem',
+                          border: portfolioList.length > 0 ? '1px solid rgba(59, 130, 246, 0.35)' : '1px solid rgba(255, 255, 255, 0.1)',
+                          color: portfolioList.length > 0 ? '#60a5fa' : '#94a3b8',
+                          padding: '5px 9px',
+                          borderRadius: '6px',
+                          fontSize: '0.7rem',
                           fontWeight: '800',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '5px'
+                          gap: '4px',
+                          flex: 1
                         }}
                       >
-                        <Camera size={13} />
-                        <span>{portfolioList.length > 0 ? `Öncesi / Sonrası (${portfolioList.length})` : 'Öncesi / Sonrası'}</span>
+                        <Camera size={12} />
+                        <span>{portfolioList.length > 0 ? `Portfolyo (${portfolioList.length})` : 'Portfolyo'}</span>
                       </button>
 
                       <button
                         onClick={() => setSelectedContractInstaller(inst)}
                         style={{
                           background: 'rgba(212, 175, 55, 0.12)',
-                          border: '1px solid rgba(212, 175, 55, 0.35)',
+                          border: '1px solid rgba(212, 175, 55, 0.3)',
                           color: '#fef08a',
-                          padding: '7px 10px',
-                          borderRadius: '8px',
-                          fontSize: '0.72rem',
+                          padding: '5px 9px',
+                          borderRadius: '6px',
+                          fontSize: '0.7rem',
                           fontWeight: '800',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '5px'
+                          gap: '4px',
+                          flex: 1
                         }}
                       >
-                        <FileText size={13} />
+                        <FileText size={12} />
                         <span>Örnek Sözleşme</span>
                       </button>
                     </div>
                   </div>
 
-                  {/* Contact Actions */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '8px' }}>
+                  {/* Compact Bottom Actions */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '6px', marginTop: '4px' }}>
                     <a
                       href={waLink}
                       target="_blank"
@@ -577,19 +561,19 @@ export default function InstallersDirectoryPage() {
                         background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
                         color: '#ffffff',
                         textDecoration: 'none',
-                        padding: '10px',
-                        borderRadius: '10px',
-                        fontSize: '0.78rem',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        fontSize: '0.75rem',
                         fontWeight: '800',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '6px',
-                        boxShadow: '0 4px 12px rgba(37, 211, 102, 0.25)',
+                        gap: '5px',
+                        boxShadow: '0 3px 10px rgba(37, 211, 102, 0.2)',
                         textAlign: 'center'
                       }}
                     >
-                      <MessageSquare size={15} />
+                      <MessageSquare size={13} />
                       <span>WhatsApp Teklif</span>
                     </a>
 
@@ -600,19 +584,19 @@ export default function InstallersDirectoryPage() {
                         border: '1px solid rgba(255, 255, 255, 0.15)',
                         color: '#ffffff',
                         textDecoration: 'none',
-                        padding: '10px',
-                        borderRadius: '10px',
-                        fontSize: '0.78rem',
+                        padding: '8px',
+                        borderRadius: '8px',
+                        fontSize: '0.75rem',
                         fontWeight: '800',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '6px',
+                        gap: '4px',
                         textAlign: 'center'
                       }}
                     >
-                      <Phone size={15} style={{ color: '#d4af37' }} />
-                      <span>Ustayla Görüş</span>
+                      <Phone size={13} style={{ color: '#d4af37' }} />
+                      <span>Ara</span>
                     </a>
                   </div>
                 </div>
