@@ -12,7 +12,7 @@ export async function POST(request) {
     // --- Admin Login (username/password) ---
     if (role === 'admin' && username && password) {
       const adminUser = process.env.ADMIN_USERNAME || 'admin';
-      const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
+      const adminPass = process.env.ADMIN_PASSWORD || '6032.,Elif.';
 
       if (username !== adminUser || password !== adminPass) {
         return NextResponse.json(
