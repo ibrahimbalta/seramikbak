@@ -8,6 +8,7 @@ export default function InspirationGalleryPage() {
   const [selectedArticle, setSelectedArticle] = useState(null);
 
   // Dynamic States
+  const [loadingSettings, setLoadingSettings] = useState(true);
   const [galleryItems, setGalleryItems] = useState([
     {
       title: 'İskandinav Ahşap Zarafeti',
@@ -31,6 +32,21 @@ export default function InspirationGalleryPage() {
       img: '/hero/modern_living.png'
     }
   ]);
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.page_ilham_list && Array.isArray(data.page_ilham_list) && data.page_ilham_list.length > 0) {
+          setGalleryItems(data.page_ilham_list);
+        }
+        if (data.page_blog_list && Array.isArray(data.page_blog_list) && data.page_blog_list.length > 0) {
+          setArticles(data.page_blog_list);
+        }
+      })
+      .catch(err => console.error('Failed to load ilham settings:', err))
+      .finally(() => setLoadingSettings(false));
+  }, []);
 
   const [articles, setArticles] = useState([
     {

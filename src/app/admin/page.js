@@ -204,6 +204,14 @@ export default function AdminPage() {
   
   const [newFaqQ, setNewFaqQ] = useState('');
   const [newFaqA, setNewFaqA] = useState('');
+  
+  const [newIlhamTitle, setNewIlhamTitle] = useState('');
+  const [newIlhamDesc, setNewIlhamDesc] = useState('');
+  const [newIlhamStyle, setNewIlhamStyle] = useState('Ahşap');
+  const [newIlhamTag, setNewIlhamTag] = useState('Minimalist');
+  const [newIlhamImg, setNewIlhamImg] = useState('');
+  const [uploadingIlhamImg, setUploadingIlhamImg] = useState(false);
+
   const [newBlogTitle, setNewBlogTitle] = useState('');
   const [newBlogSummary, setNewBlogSummary] = useState('');
   const [newBlogCategory, setNewBlogCategory] = useState('Genel');
@@ -1560,6 +1568,68 @@ export default function AdminPage() {
 
   const handleDeleteBlog = (idToDelete) => {
     setPageBlogList(prev => prev.filter(b => b.id !== idToDelete));
+  };
+
+  const handleAddIlham = () => {
+    if (!newIlhamTitle || !newIlhamImg) {
+      alert('Lütfen başlık ve görsel alanlarını doldurun.');
+      return;
+    }
+    setPageIlhamList(prev => [
+      ...prev,
+      {
+        title: newIlhamTitle,
+        desc: newIlhamDesc,
+        style: newIlhamStyle || 'Ahşap',
+        tag: newIlhamTag || 'Minimalist',
+        img: newIlhamImg
+      }
+    ]);
+    setNewIlhamTitle('');
+    setNewIlhamDesc('');
+    setNewIlhamImg('');
+  };
+
+  const handleDeleteIlham = (indexToDelete) => {
+    setPageIlhamList(prev => prev.filter((_, idx) => idx !== indexToDelete));
+  };
+
+  const handleIlhamImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingIlhamImg(true);
+    try {
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve) => {
+        reader.onload = (event) => resolve(event.target.result);
+        reader.readAsDataURL(file);
+      });
+      const base64Data = await base64Promise;
+
+      const res = await fetch('/api/dealers/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          base64Data,
+          filename: file.name,
+          folder: 'seramikbak/ilham'
+        })
+      });
+
+      const data = await res.json();
+      const uploadedUrl = data.url || data.fileUrl;
+      if (res.ok && uploadedUrl) {
+        setNewIlhamImg(uploadedUrl);
+      } else {
+        setNewIlhamImg(base64Data);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Görsel yüklenirken hata oluştu.');
+    } finally {
+      setUploadingIlhamImg(false);
+    }
   };
 
   const handleUpdateStat = (idx, field, value) => {
@@ -5219,8 +5289,134 @@ export default function AdminPage() {
 
             {/* Sub-tab 3: Inspiration & Blogs */}
             {pageManagerSubTab === 'blog' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <h4 style={{ margin: '0 0 12px 0', fontSize: '0.9rem', fontWeight: '800' }}>Blog Yazıları Yönetimi</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                {/* 1. ILHAM GALLERY MANAGEMENT */}
+                <div style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '24px' }}>
+                  <h4 style={{ margin: '0 0 6px 0', fontSize: '1rem', fontWeight: '800', color: '#0f172a' }}>
+                    🎨 İlham Galerisi & Stil Kombinasyonları Yönetimi
+                  </h4>
+                  <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 16px 0' }}>
+                    /ilham sayfasının üst kısmında görüntülenen ilham görsellerini, stillerini ve açıklamalarını buradan yönetin.
+                  </p>
+
+                  {/* List of İlham Cards */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+                    {pageIlhamList && pageIlhamList.map((item, idx) => (
+                      <div key={idx} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ height: '130px', background: '#e2e8f0', position: 'relative' }}>
+                          <img src={item.img} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <span style={{ position: 'absolute', top: '8px', left: '8px', background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: '0.65rem', padding: '2px 8px', borderRadius: '4px', fontWeight: '700' }}>
+                            {item.tag || 'Stil'}
+                          </span>
+                        </div>
+                        <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '6px', flex: 1, justifyContent: 'space-between' }}>
+                          <div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#0f172a' }}>{item.title}</div>
+                            <div style={{ fontSize: '0.76rem', color: '#64748b', marginTop: '2px' }}>{item.desc}</div>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+                            <span style={{ fontSize: '0.7rem', color: '#b38e47', fontWeight: '700' }}>Stil: {item.style}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteIlham(idx)}
+                              style={{ background: '#fee2e2', border: 'none', color: '#ef4444', padding: '4px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer' }}
+                            >
+                              Sil
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {(!pageIlhamList || pageIlhamList.length === 0) && (
+                      <p style={{ fontSize: '0.8rem', color: '#94a3b8', gridColumn: '1/-1' }}>Kayıtlı ilham görseli bulunmuyor.</p>
+                    )}
+                  </div>
+
+                  {/* Add New İlham Card Form */}
+                  <div style={{ background: '#f1f5f9', padding: '20px', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#475569' }}>✨ Yeni İlham Kartı Ekle</div>
+                    
+                    <div className="form-group-row">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Başlık</label>
+                        <input
+                          type="text"
+                          value={newIlhamTitle}
+                          placeholder="Örn: İskandinav Ahşap Zarafeti"
+                          onChange={(e) => setNewIlhamTitle(e.target.value)}
+                          style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Açıklama</label>
+                        <input
+                          type="text"
+                          value={newIlhamDesc}
+                          placeholder="Örn: Banyo ve mutfaklarda doğal doku."
+                          onChange={(e) => setNewIlhamDesc(e.target.value)}
+                          style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group-row">
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Stil Filtresi</label>
+                        <input
+                          type="text"
+                          value={newIlhamStyle}
+                          placeholder="Örn: Ahşap, Mermer, Beton"
+                          onChange={(e) => setNewIlhamStyle(e.target.value)}
+                          style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Rozet Etiketi (Tag)</label>
+                        <input
+                          type="text"
+                          value={newIlhamTag}
+                          placeholder="Örn: Minimalist, Premium Luxury, Modern"
+                          onChange={(e) => setNewIlhamTag(e.target.value)}
+                          style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Görsel (Cihazdan Yükleyin veya URL Girin)</label>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <input
+                          type="text"
+                          value={newIlhamImg}
+                          placeholder="Görsel URL (veya aşağıdaki butonla cihazınızdan seçin)"
+                          onChange={(e) => setNewIlhamImg(e.target.value)}
+                          style={{ flex: 1, padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                        />
+                        <label style={{ background: '#3b82f6', color: '#fff', padding: '8px 14px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                          {uploadingIlhamImg ? 'Yükleniyor...' : '📁 Görsel Yükle'}
+                          <input type="file" accept="image/*" onChange={handleIlhamImageUpload} disabled={uploadingIlhamImg} style={{ display: 'none' }} />
+                        </label>
+                      </div>
+                      {newIlhamImg && (
+                        <div style={{ marginTop: '6px', height: '60px', width: '100px', borderRadius: '6px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
+                          <img src={newIlhamImg} alt="Önizleme" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleAddIlham}
+                      style={{ background: '#0f172a', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '700', alignSelf: 'flex-start', cursor: 'pointer', marginTop: '4px' }}
+                    >
+                      ➕ İlham Kartını Listeye Ekle
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. BLOG ARTICLES MANAGEMENT */}
+                <div>
+                  <h4 style={{ margin: '0 0 12px 0', fontSize: '1rem', fontWeight: '800', color: '#0f172a' }}>📖 Blog & Teknik Rehber Yazıları Yönetimi</h4>
                 
                 {/* List of articles */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
@@ -5315,7 +5511,8 @@ export default function AdminPage() {
                   </button>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
             {/* Sub-tab 4: Legal documents */}
             {pageManagerSubTab === 'legal' && (
