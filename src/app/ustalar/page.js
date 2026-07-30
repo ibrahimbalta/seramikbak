@@ -21,7 +21,8 @@ import {
   Sparkles,
   Clock,
   Ruler,
-  CheckSquare
+  CheckSquare,
+  Upload
 } from 'lucide-react';
 
 const TURKEY_CITIES = [
@@ -53,12 +54,67 @@ export default function InstallersDirectoryPage() {
   const [regExpYears, setRegExpYears] = useState('12');
   const [regSpecialties, setRegSpecialties] = useState('');
   const [regContractRate, setRegContractRate] = useState('280 ₺/m²');
-  const [regBeforeUrl, setRegBeforeUrl] = useState('');
-  const [regAfterUrl, setRegAfterUrl] = useState('');
   const [regNotes, setRegNotes] = useState('');
   const [regLoading, setRegLoading] = useState(false);
   const [regSuccess, setRegSuccess] = useState('');
   const [regError, setRegError] = useState('');
+
+  // Local Device Photo Upload State (Max 3 Photos)
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [uploadedPhotos, setUploadedPhotos] = useState([]);
+
+  const handleFileUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    if (uploadedPhotos.length + files.length > 3) {
+      alert('En fazla 3 adet şantiye fotoğrafı yükleyebilirsiniz!');
+      return;
+    }
+
+    setUploadingPhotos(true);
+    try {
+      const newUrls = [...uploadedPhotos];
+      for (const file of files) {
+        if (newUrls.length >= 3) break;
+
+        // Convert file to Base64
+        const reader = new FileReader();
+        const base64Promise = new Promise((resolve) => {
+          reader.onload = (event) => resolve(event.target.result);
+          reader.readAsDataURL(file);
+        });
+        const base64Data = await base64Promise;
+
+        // Upload to server API
+        const res = await fetch('/api/dealers/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64Data,
+            filename: file.name,
+            folder: 'seramikbak/installers'
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.fileUrl) {
+          newUrls.push(data.fileUrl);
+        }
+      }
+      setUploadedPhotos(newUrls);
+    } catch (err) {
+      console.error('File upload error:', err);
+      alert('Fotoğraf yüklenirken hata oluştu.');
+    } finally {
+      setUploadingPhotos(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemovePhoto = (index) => {
+    setUploadedPhotos(prev => prev.filter((_, i) => i !== index));
+  };
 
   // Before & After Portfolio Modal State
   const [selectedPortfolioInstaller, setSelectedPortfolioInstaller] = useState(null);
@@ -105,15 +161,15 @@ export default function InstallersDirectoryPage() {
 
     try {
       let portfolioData = null;
-      if (regBeforeUrl && regAfterUrl) {
-        portfolioData = [{
-          title: `${regName} - Tamamlanan Banyo Yenileme Projesi`,
+      if (uploadedPhotos.length > 0) {
+        portfolioData = uploadedPhotos.map((url, idx) => ({
+          title: `${regName} - Tamamlanan Şantiye Projesi #${idx + 1}`,
           areaM2: '30 m²',
           duration: '3 Gün',
           ceramicUsed: regSpecialties || '60x120 Porselen Granit',
-          beforeUrl: regBeforeUrl,
-          afterUrl: regAfterUrl
-        }];
+          beforeUrl: url,
+          afterUrl: url
+        }));
       }
 
       const res = await fetch('/api/installers', {
@@ -140,8 +196,7 @@ export default function InstallersDirectoryPage() {
         setRegPhone('');
         setRegCompany('');
         setRegSpecialties('');
-        setRegBeforeUrl('');
-        setRegAfterUrl('');
+        setUploadedPhotos([]);
         setRegNotes('');
         fetchInstallers();
       } else {
@@ -1111,27 +1166,78 @@ export default function InstallersDirectoryPage() {
                   />
                 </div>
 
-                {/* Portfolio Image Inputs */}
-                <div style={{ background: 'rgba(255,255,255,0.04)', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <span style={{ fontSize: '0.74rem', color: '#d4af37', fontWeight: '800', display: 'block', marginBottom: '6px' }}>
-                    📸 Örnek Şantiye Fotoğraflarınız (Opsiyonel):
-                  </span>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                    <input
-                      type="url"
-                      placeholder="Eski Hal (Öncesi) Fotoğraf Görsel URL"
-                      value={regBeforeUrl}
-                      onChange={(e) => setRegBeforeUrl(e.target.value)}
-                      style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.78rem', boxSizing: 'border-box' }}
-                    />
-                    <input
-                      type="url"
-                      placeholder="Yeni Hal (Sonrası) Fotoğraf Görsel URL"
-                      value={regAfterUrl}
-                      onChange={(e) => setRegAfterUrl(e.target.value)}
-                      style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.78rem', boxSizing: 'border-box' }}
-                    />
+                {/* Local Device Photo Upload Section (Max 3 Photos) */}
+                <div style={{ background: 'rgba(255,255,255,0.04)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(212,175,55,0.3)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '0.76rem', color: '#fef08a', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Camera size={14} />
+                      📸 Örnek Şantiye Fotoğrafları (En Fazla 3 Adet):
+                    </span>
+                    <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{uploadedPhotos.length}/3 Yüklendi</span>
                   </div>
+
+                  {/* File Input Box */}
+                  {uploadedPhotos.length < 3 && (
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '12px',
+                      borderRadius: '10px',
+                      border: '2px dashed rgba(212,175,55,0.4)',
+                      background: 'rgba(30, 41, 59, 0.6)',
+                      color: '#d4af37',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem',
+                      fontWeight: '700',
+                      marginBottom: '10px',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      <Upload size={16} />
+                      <span>{uploadingPhotos ? 'Fotoğraflar Yükleniyor...' : '📁 Cihazından En Fazla 3 Adet Fotoğraf Seç'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        disabled={uploadingPhotos}
+                        onChange={handleFileUpload}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                  )}
+
+                  {/* Thumbnail Previews */}
+                  {uploadedPhotos.length > 0 && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                      {uploadedPhotos.map((url, idx) => (
+                        <div key={idx} style={{ position: 'relative', height: '70px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)' }}>
+                          <img src={url} alt={`Şantiye Görsel ${idx+1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <button
+                            type="button"
+                            onClick={() => handleRemovePhoto(idx)}
+                            style={{
+                              position: 'absolute',
+                              top: '4px',
+                              right: '4px',
+                              background: 'rgba(239, 68, 68, 0.9)',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '20px',
+                              height: '20px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div>
