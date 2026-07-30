@@ -269,7 +269,7 @@ export default function InstallersDirectoryPage() {
           <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '24px' }}>
             <span style={{ fontSize: '0.78rem', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.35)', color: '#34d399', padding: '6px 12px', borderRadius: '12px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               <CheckSquare size={14} />
-              Lazer Terazili & Derz Artılı Garanti
+              Terazi & Derz Uyum İlkeli Uygulama
             </span>
             <span style={{ fontSize: '0.78rem', background: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.35)', color: '#60a5fa', padding: '6px 12px', borderRadius: '12px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               <Camera size={14} />
@@ -474,7 +474,7 @@ export default function InstallersDirectoryPage() {
                       }}>
                         <ShieldCheck size={14} style={{ color: '#d4af37', flexShrink: 0 }} />
                         <span style={{ fontSize: '0.72rem', color: '#fef08a', fontWeight: '800' }}>
-                          🎯 Lazer Terazili & Derz Artılı İş Teslim Garantili
+                          📐 Terazi & Derz Uyumu Standartlarına Uygun İş Teslimi
                         </span>
                       </div>
                     )}
@@ -884,15 +884,15 @@ export default function InstallersDirectoryPage() {
                 </div>
               </div>
 
-              {/* Part 3: Quality & Laser Warranty Articles */}
+              {/* Part 3: Realistic Uygulama Esasları & Teslim Koşulları */}
               <div style={{ background: '#f8fafc', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                <h4 style={{ fontSize: '0.9rem', color: '#0f172a', margin: '0 0 8px 0', fontWeight: '800' }}>3. TAAHHÜT EDİLEN KALİTE VE LAZER TERAZİ GARANTİSİ MADDELERİ</h4>
+                <h4 style={{ fontSize: '0.9rem', color: '#0f172a', margin: '0 0 8px 0', fontWeight: '800' }}>3. UYGULAMA ESASLARI VE TESLİMAT KOŞULLARI</h4>
                 <ul style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <li><strong>🎯 Lazer Su Terazisi Uyumu:</strong> Tüm zemin ve duvar seramikleri lazer terazisi kurulup kot sapması (meyil hariç) sıfır olacak şekilde döşenecektir.</li>
-                  <li><strong>📐 Derz Artısı ve Klemens Kullanımı:</strong> Köşe diş yapmalarını önlemek için minimum 1.5mm / 2mm plastik derz artısı ve klemens takoz sistemi kullanılacaktır.</li>
-                  <li><strong>💧 Su İzolasyonu (Banyo/Teras):</strong> Islak hacimlerde seramik öncesi en az 2 kat sıvı su yalıtım şapı uygulanması esas alınır.</li>
-                  <li><strong>🧹 Temiz Şantiye Teslimi:</strong> İş bitiminde derz kalıntıları yıkanarak şantiye temiz biçimde teslim edilir.</li>
-                  <li><strong>🛡️ 2 Yıl İşçilik Garantisi:</strong> İşçilik kaynaklı dökülme, kalkma ve derz çatlamalarına karşı usta 24 ay ücretsiz onarım garantisi verir.</li>
+                  <li><strong>📏 Su Terazisi ve Eğim Kontrolü:</strong> Zemin ve duvar seramikleri su terazisine alınarak döşenecek, banyo ve balkon zeminlerinde gider süzgecine doğru gerekli su akış eğimi verilecektir.</li>
+                  <li><strong>📐 Derz Aralığı ve Derz Artısı Kullanımı:</strong> Seramik cinsine ve ebadına uygun plastik derz artısı kullanılacak, yüzey kot ve hizalamaları özenle yapılacaktır.</li>
+                  <li><strong>💧 Islak Hacim Zemin Hazırlığı:</strong> Seramik kaplaması öncesinde zemin ve duvar yüzeyi toz, harç kalıntısı ve oynak parçalardan temizlenerek harç yatağı oluşturulacaktır.</li>
+                  <li><strong>🧹 Kaba Şantiye Temizliği:</strong> Uygulama bitiminde seramik yüzeylerindeki derz ve yapıştırıcı harç artıklarının kaba temizliği yapılarak alan teslim edilecektir.</li>
+                  <li><strong>🤝 Müşteri Ortak Kontrolü ve Teslimat:</strong> İş tamamlandığında İşveren ve Yüklenici Usta alanı birlikte gezer; kırık, çatlak veya belirgin işçilik eksikleri teslimat sırasında tespit edilip düzeltilir.</li>
                 </ul>
               </div>
 
