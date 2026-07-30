@@ -300,22 +300,25 @@ model OutletAlert {
 }
 
 model Installer {
-  id              String   @id @default(uuid())
-  name            String
-  companyName     String?
-  phone           String
-  city            String   // e.g. "İstanbul", "Ankara"
-  district        String?  // e.g. "Kadıköy", "Çankaya"
-  experienceYears Int      @default(10)
-  specialties     String   // e.g. "60x120 Ebat Karo, Banyo Yenileme, Teras Su İzolasyonu"
-  rating          Float    @default(4.9)
-  reviewCount     Int      @default(12)
-  verified        Boolean  @default(true)
-  imageUrl        String?
-  notes           String?  // Short bio or work portfolio notes
-  status          String   @default("ACTIVE") // ACTIVE, INACTIVE
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                   String   @id @default(uuid())
+  name                 String
+  companyName          String?
+  phone                String
+  city                 String   // e.g. "İstanbul", "Ankara"
+  district             String?  // e.g. "Kadıköy", "Çankaya"
+  experienceYears      Int      @default(10)
+  specialties          String   // e.g. "60x120 Ebat Karo, Banyo Yenileme, Teras Su İzolasyonu"
+  rating               Float    @default(4.9)
+  reviewCount          Int      @default(12)
+  verified             Boolean  @default(true)
+  guaranteeBadge       Boolean  @default(true) // Lazer Terazili & Derz Artılı İş Teslim Garantili
+  contractRateM2       String?  @default("250 ₺/m²") // Sample m² labor contract rate
+  portfolioBeforeAfter String?  // JSON string containing array of { beforeUrl, afterUrl, title, areaM2 }
+  imageUrl             String?
+  notes                String?  // Short bio or work portfolio notes
+  status               String   @default("ACTIVE") // ACTIVE, INACTIVE
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }
 
 

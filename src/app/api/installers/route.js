@@ -55,7 +55,10 @@ export async function POST(request) {
       district,
       experienceYears,
       specialties,
-      notes
+      notes,
+      guaranteeBadge,
+      contractRateM2,
+      portfolioBeforeAfter
     } = body;
 
     if (!name || !phone || !city) {
@@ -75,6 +78,9 @@ export async function POST(request) {
         experienceYears: experienceYears ? parseInt(experienceYears, 10) : 10,
         specialties: specialties ? specialties.trim() : 'Seramik, Granit, Banyo & Zemin Döşeme',
         notes: notes ? notes.trim() : null,
+        guaranteeBadge: guaranteeBadge !== undefined ? Boolean(guaranteeBadge) : true,
+        contractRateM2: contractRateM2 ? contractRateM2.trim() : '250 ₺/m²',
+        portfolioBeforeAfter: portfolioBeforeAfter ? (typeof portfolioBeforeAfter === 'string' ? portfolioBeforeAfter : JSON.stringify(portfolioBeforeAfter)) : null,
         verified: false, // Pending admin approval
         rating: 5.0,
         reviewCount: 1,

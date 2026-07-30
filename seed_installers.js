@@ -13,7 +13,27 @@ const SEED_INSTALLERS = [
     rating: 4.9,
     reviewCount: 38,
     verified: true,
-    notes: "18 yıllık usta tecrübesiyle lazerli terazi ile sıfır kod sapmasıyla granit ve seramik kaplama yapıyoruz."
+    guaranteeBadge: true,
+    contractRateM2: "280 ₺/m²",
+    notes: "18 yıllık usta tecrübesiyle lazerli terazi ile sıfır kod sapmasıyla granit ve seramik kaplama yapıyoruz.",
+    portfolioBeforeAfter: JSON.stringify([
+      {
+        title: "Kadıköy Ethemefendi Villa Banyo Yenileme",
+        areaM2: "35 m²",
+        duration: "4 Gün",
+        ceramicUsed: "60x120 Calacatta Gold Porselen Granit",
+        beforeUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop&q=80",
+        afterUrl: "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=600&auto=format&fit=crop&q=80"
+      },
+      {
+        title: "Ataşehir Residence Mutfak Zemin Döşeme",
+        areaM2: "22 m²",
+        duration: "2 Gün",
+        ceramicUsed: "80x80 Lapatto Beton Efekt Karo",
+        beforeUrl: "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=600&auto=format&fit=crop&q=80",
+        afterUrl: "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=600&auto=format&fit=crop&q=80"
+      }
+    ])
   },
   {
     name: "Mustafa Demir",
@@ -26,7 +46,19 @@ const SEED_INSTALLERS = [
     rating: 5.0,
     reviewCount: 29,
     verified: true,
-    notes: "VitrA ve Kalebodur yetkili sertifikalı uygulama ustası. Temiz ve garantili işçilik."
+    guaranteeBadge: true,
+    contractRateM2: "320 ₺/m²",
+    notes: "VitrA ve Kalebodur yetkili sertifikalı uygulama ustası. Temiz ve garantili işçilik.",
+    portfolioBeforeAfter: JSON.stringify([
+      {
+        title: "Bebek Yalı Dairesi Ebeveyn Banyosu",
+        areaM2: "28 m²",
+        duration: "3 Gün",
+        ceramicUsed: "120x240 Onyx Bej Porselen Karo",
+        beforeUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop&q=80",
+        afterUrl: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&auto=format&fit=crop&q=80"
+      }
+    ])
   },
   {
     name: "Kemal & Hasan Usta Ekibi",
@@ -39,7 +71,19 @@ const SEED_INSTALLERS = [
     rating: 4.8,
     reviewCount: 42,
     verified: true,
-    notes: "Müteahhitlik projelerinde ve konut yenilemelerinde hızlı, lazer terazili ve eksiksiz teslimat."
+    guaranteeBadge: true,
+    contractRateM2: "250 ₺/m²",
+    notes: "Müteahhitlik projelerinde ve konut yenilemelerinde hızlı, lazer terazili ve eksiksiz teslimat.",
+    portfolioBeforeAfter: JSON.stringify([
+      {
+        title: "Ümitköy Müstakil Ev Teras & Su İzolasyonu",
+        areaM2: "65 m²",
+        duration: "5 Gün",
+        ceramicUsed: "60x60 Antrasit Kaydırmaz R11 Seramik",
+        beforeUrl: "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=600&auto=format&fit=crop&q=80",
+        afterUrl: "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=600&auto=format&fit=crop&q=80"
+      }
+    ])
   },
   {
     name: "Orhan Şahin Usta",
@@ -52,7 +96,19 @@ const SEED_INSTALLERS = [
     rating: 4.9,
     reviewCount: 21,
     verified: true,
-    notes: "Ege ve Bien seramik sertifikalı ustası. Havuz ve ıslak mekan su izolasyonlu kaplama."
+    guaranteeBadge: true,
+    contractRateM2: "270 ₺/m²",
+    notes: "Ege ve Bien seramik sertifikalı ustası. Havuz ve ıslak mekan su izolasyonlu kaplama.",
+    portfolioBeforeAfter: JSON.stringify([
+      {
+        title: "Karşıyaka Daire Banyo & Balkon Karo Yenileme",
+        areaM2: "40 m²",
+        duration: "4 Gün",
+        ceramicUsed: "60x120 Statuario Mermer Dokulu Seramik",
+        beforeUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop&q=80",
+        afterUrl: "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=600&auto=format&fit=crop&q=80"
+      }
+    ])
   },
   {
     name: "Recep Yıldız",
@@ -65,6 +121,8 @@ const SEED_INSTALLERS = [
     rating: 4.9,
     reviewCount: 19,
     verified: true,
+    guaranteeBadge: true,
+    contractRateM2: "260 ₺/m²",
     notes: "Sıfır fire ve temiz şantiye prensibiyle seramik döşeme ve fayans yenileme hizmeti."
   },
   {
@@ -78,26 +136,38 @@ const SEED_INSTALLERS = [
     rating: 5.0,
     reviewCount: 31,
     verified: true,
+    guaranteeBadge: true,
+    contractRateM2: "300 ₺/m²",
     notes: "Otel ve müstakil villa projelerinde mimari seramik kaplama uzmanı."
   }
 ];
 
 async function seedInstallers() {
-  console.log("Seeding installers...");
+  console.log("Seeding / updating installers with portfolio and guarantee fields...");
   for (const inst of SEED_INSTALLERS) {
     const existing = await prisma.installer.findFirst({
       where: { phone: inst.phone }
     });
-    if (!existing) {
+    if (existing) {
+      await prisma.installer.update({
+        where: { id: existing.id },
+        data: {
+          guaranteeBadge: inst.guaranteeBadge,
+          contractRateM2: inst.contractRateM2,
+          portfolioBeforeAfter: inst.portfolioBeforeAfter
+        }
+      });
+      console.log(`Updated installer portfolio: ${inst.name}`);
+    } else {
       await prisma.installer.create({ data: inst });
       console.log(`Created installer: ${inst.name} (${inst.city})`);
     }
   }
-  console.log("Done seeding installers!");
+  console.log("Done seeding / updating installers!");
   await prisma.$disconnect();
 }
 
 seedInstallers().catch(err => {
   console.error(err);
-  prisma.$disconnect();
+  process.exit(1);
 });

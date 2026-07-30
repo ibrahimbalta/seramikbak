@@ -14,7 +14,14 @@ import {
   Plus,
   X,
   ShieldCheck,
-  Loader2
+  Loader2,
+  Camera,
+  FileText,
+  Printer,
+  Sparkles,
+  Clock,
+  Ruler,
+  CheckSquare
 } from 'lucide-react';
 
 const TURKEY_CITIES = [
@@ -45,10 +52,20 @@ export default function InstallersDirectoryPage() {
   const [regDistrict, setRegDistrict] = useState('');
   const [regExpYears, setRegExpYears] = useState('12');
   const [regSpecialties, setRegSpecialties] = useState('');
+  const [regContractRate, setRegContractRate] = useState('280 ₺/m²');
+  const [regBeforeUrl, setRegBeforeUrl] = useState('');
+  const [regAfterUrl, setRegAfterUrl] = useState('');
   const [regNotes, setRegNotes] = useState('');
   const [regLoading, setRegLoading] = useState(false);
   const [regSuccess, setRegSuccess] = useState('');
   const [regError, setRegError] = useState('');
+
+  // Before & After Portfolio Modal State
+  const [selectedPortfolioInstaller, setSelectedPortfolioInstaller] = useState(null);
+  const [activePortfolioIndex, setActivePortfolioIndex] = useState(0);
+
+  // Standard Contract Modal State
+  const [selectedContractInstaller, setSelectedContractInstaller] = useState(null);
 
   const fetchInstallers = async () => {
     setLoading(true);
@@ -87,6 +104,18 @@ export default function InstallersDirectoryPage() {
     setRegLoading(true);
 
     try {
+      let portfolioData = null;
+      if (regBeforeUrl && regAfterUrl) {
+        portfolioData = [{
+          title: `${regName} - Tamamlanan Banyo Yenileme Projesi`,
+          areaM2: '30 m²',
+          duration: '3 Gün',
+          ceramicUsed: regSpecialties || '60x120 Porselen Granit',
+          beforeUrl: regBeforeUrl,
+          afterUrl: regAfterUrl
+        }];
+      }
+
       const res = await fetch('/api/installers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -98,6 +127,9 @@ export default function InstallersDirectoryPage() {
           district: regDistrict,
           experienceYears: regExpYears,
           specialties: regSpecialties,
+          contractRateM2: regContractRate,
+          guaranteeBadge: true,
+          portfolioBeforeAfter: portfolioData ? JSON.stringify(portfolioData) : null,
           notes: regNotes
         })
       });
@@ -108,6 +140,8 @@ export default function InstallersDirectoryPage() {
         setRegPhone('');
         setRegCompany('');
         setRegSpecialties('');
+        setRegBeforeUrl('');
+        setRegAfterUrl('');
         setRegNotes('');
         fetchInstallers();
       } else {
@@ -117,6 +151,16 @@ export default function InstallersDirectoryPage() {
       setRegError('Sunucu bağlantı hatası.');
     } finally {
       setRegLoading(false);
+    }
+  };
+
+  const parsePortfolio = (jsonString) => {
+    if (!jsonString) return [];
+    try {
+      if (typeof jsonString === 'object') return jsonString;
+      return JSON.parse(jsonString);
+    } catch (e) {
+      return [];
     }
   };
 
@@ -218,8 +262,24 @@ export default function InstallersDirectoryPage() {
           </h1>
 
           <p style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 24px 0' }}>
-            Seramiği aldınız ancak kime döşeteceğinizi bilmiyor musunuz? Lazer terazili tecrübeli seramik ustalarıyla tek tıkla WhatsApp veya telefonla görüşün.
+            Seramiği aldınız ancak kime döşeteceğinizi bilmiyor musunuz? Lazer terazili ve garanti sertifikalı seramik ustalarıyla canlı projelerini görün, hazır sözleşmeyle güvenle çalışın.
           </p>
+
+          {/* Feature Highlights Badges */}
+          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '24px' }}>
+            <span style={{ fontSize: '0.78rem', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.35)', color: '#34d399', padding: '6px 12px', borderRadius: '12px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <CheckSquare size={14} />
+              Lazer Terazili & Derz Artılı Garanti
+            </span>
+            <span style={{ fontSize: '0.78rem', background: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.35)', color: '#60a5fa', padding: '6px 12px', borderRadius: '12px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Camera size={14} />
+              Öncesi / Sonrası Canlı Şantiye Portfolyosu
+            </span>
+            <span style={{ fontSize: '0.78rem', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.35)', color: '#fef08a', padding: '6px 12px', borderRadius: '12px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <FileText size={14} />
+              Hazır Standart Uygulama Sözleşmesi
+            </span>
+          </div>
 
           {/* Search & Filter Bar */}
           <form onSubmit={handleSearchSubmit} style={{
@@ -355,6 +415,7 @@ export default function InstallersDirectoryPage() {
             gap: '20px'
           }}>
             {installers.map(inst => {
+              const portfolioList = parsePortfolio(inst.portfolioBeforeAfter);
               const waText = encodeURIComponent(
                 `Merhaba ${inst.name}, SeramikBak platformundaki Usta Rehberi profiliniz üzerinden ulaşıyorum. ` +
                 `${inst.city} bölgesinde seramik kaplama / yenileme işimiz için bilgi ve teklif almak istiyoruz.`
@@ -370,13 +431,13 @@ export default function InstallersDirectoryPage() {
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
-                  gap: '16px',
+                  gap: '14px',
                   boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
                   transition: 'transform 0.2s ease, border-color 0.2s ease'
                 }}>
                   <div>
-                    {/* Header */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                    {/* Header & Badges */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px', flexWrap: 'wrap', gap: '8px' }}>
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' }}>
                           <h3 style={{ fontSize: '1.1rem', fontWeight: '900', color: '#ffffff', margin: 0 }}>{inst.name}</h3>
@@ -399,8 +460,27 @@ export default function InstallersDirectoryPage() {
                       </div>
                     </div>
 
+                    {/* QUALITY GUARANTEE BADGE */}
+                    {inst.guaranteeBadge !== false && (
+                      <div style={{
+                        background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%)',
+                        border: '1px solid rgba(212, 175, 55, 0.35)',
+                        borderRadius: '10px',
+                        padding: '6px 10px',
+                        marginBottom: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}>
+                        <ShieldCheck size={14} style={{ color: '#d4af37', flexShrink: 0 }} />
+                        <span style={{ fontSize: '0.72rem', color: '#fef08a', fontWeight: '800' }}>
+                          🎯 Lazer Terazili & Derz Artılı İş Teslim Garantili
+                        </span>
+                      </div>
+                    )}
+
                     {/* Location & Experience Badges */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '14px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
                       <span style={{ fontSize: '0.75rem', background: 'rgba(255, 255, 255, 0.06)', color: '#cbd5e1', padding: '4px 10px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <MapPin size={12} style={{ color: '#ef4444' }} />
                         {inst.city} {inst.district ? `/ ${inst.district}` : ''}
@@ -410,14 +490,21 @@ export default function InstallersDirectoryPage() {
                         <Award size={12} />
                         {inst.experienceYears} Yıl Usta Tecrübesi
                       </span>
+
+                      {inst.contractRateM2 && (
+                        <span style={{ fontSize: '0.75rem', background: 'rgba(59, 130, 246, 0.12)', color: '#60a5fa', padding: '4px 10px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '700' }}>
+                          <Ruler size={12} />
+                          Yaklaşık: {inst.contractRateM2}
+                        </span>
+                      )}
                     </div>
 
                     {/* Specialties */}
-                    <div style={{ marginBottom: '14px' }}>
-                      <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', display: 'block', marginBottom: '6px' }}>UZMANLIK ALANLARI:</span>
+                    <div style={{ marginBottom: '12px' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '700', display: 'block', marginBottom: '4px' }}>UZMANLIK ALANLARI:</span>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                         {inst.specialties.split(',').map((spec, idx) => (
-                          <span key={idx} style={{ fontSize: '0.72rem', background: 'rgba(51, 65, 85, 0.6)', border: '1px solid rgba(255,255,255,0.08)', color: '#e2e8f0', padding: '3px 8px', borderRadius: '6px' }}>
+                          <span key={idx} style={{ fontSize: '0.7rem', background: 'rgba(51, 65, 85, 0.6)', border: '1px solid rgba(255,255,255,0.08)', color: '#e2e8f0', padding: '3px 8px', borderRadius: '6px' }}>
                             {spec.trim()}
                           </span>
                         ))}
@@ -426,14 +513,62 @@ export default function InstallersDirectoryPage() {
 
                     {/* Bio Notes */}
                     {inst.notes && (
-                      <p style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5', margin: 0, background: 'rgba(0,0,0,0.2)', padding: '10px 12px', borderRadius: '10px' }}>
+                      <p style={{ fontSize: '0.78rem', color: '#94a3b8', lineHeight: '1.4', margin: '0 0 12px 0', background: 'rgba(0,0,0,0.2)', padding: '8px 10px', borderRadius: '10px' }}>
                         "{inst.notes}"
                       </p>
                     )}
+
+                    {/* PORTFOLIO & CONTRACT ACTION BUTTONS */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+                      <button
+                        onClick={() => {
+                          setSelectedPortfolioInstaller(inst);
+                          setActivePortfolioIndex(0);
+                        }}
+                        style={{
+                          background: portfolioList.length > 0 ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                          border: portfolioList.length > 0 ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)',
+                          color: portfolioList.length > 0 ? '#60a5fa' : '#cbd5e1',
+                          padding: '7px 10px',
+                          borderRadius: '8px',
+                          fontSize: '0.72rem',
+                          fontWeight: '800',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '5px'
+                        }}
+                      >
+                        <Camera size={13} />
+                        <span>{portfolioList.length > 0 ? `Öncesi / Sonrası (${portfolioList.length})` : 'Öncesi / Sonrası'}</span>
+                      </button>
+
+                      <button
+                        onClick={() => setSelectedContractInstaller(inst)}
+                        style={{
+                          background: 'rgba(212, 175, 55, 0.12)',
+                          border: '1px solid rgba(212, 175, 55, 0.35)',
+                          color: '#fef08a',
+                          padding: '7px 10px',
+                          borderRadius: '8px',
+                          fontSize: '0.72rem',
+                          fontWeight: '800',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '5px'
+                        }}
+                      >
+                        <FileText size={13} />
+                        <span>Örnek Sözleşme</span>
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Actions */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '8px', marginTop: '12px' }}>
+                  {/* Contact Actions */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '8px' }}>
                     <a
                       href={waLink}
                       target="_blank"
@@ -487,6 +622,321 @@ export default function InstallersDirectoryPage() {
         )}
       </main>
 
+      {/* 1. BEFORE & AFTER PORTFOLIO GALLERY MODAL */}
+      {selectedPortfolioInstaller && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.88)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '16px'
+        }} onClick={() => setSelectedPortfolioInstaller(null)}>
+          <div style={{
+            background: '#0f172a',
+            border: '1px solid rgba(59, 130, 246, 0.4)',
+            borderRadius: '24px',
+            maxWidth: '850px',
+            width: '100%',
+            padding: '24px',
+            position: 'relative',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }} onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setSelectedPortfolioInstaller(null)}
+              style={{
+                position: 'absolute',
+                right: '16px',
+                top: '16px',
+                background: 'rgba(255,255,255,0.08)',
+                border: 'none',
+                color: '#94a3b8',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <X size={16} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ffffff',
+                flexShrink: 0
+              }}>
+                <Camera size={20} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#ffffff', margin: 0 }}>
+                  {selectedPortfolioInstaller.name} — Canlı Proje Portfolyosu
+                </h3>
+                <span style={{ fontSize: '0.78rem', color: '#60a5fa', fontWeight: '700' }}>
+                  Öncesi (Eski Şantiye / Banyo) vs. Sonrası (Tamamlanan Seramik Kaplama)
+                </span>
+              </div>
+            </div>
+
+            {(() => {
+              const pList = parsePortfolio(selectedPortfolioInstaller.portfolioBeforeAfter);
+              if (!pList || pList.length === 0) {
+                return (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', background: 'rgba(30, 41, 59, 0.4)', borderRadius: '16px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                    <Camera size={36} style={{ color: '#64748b', marginBottom: '12px' }} />
+                    <h4 style={{ fontSize: '1rem', color: '#fff', margin: '0 0 6px 0' }}>Henüz Yüklenmiş Öncesi/Sonrası Fotoğrafı Yok</h4>
+                    <p style={{ fontSize: '0.84rem', color: '#94a3b8', margin: 0 }}>
+                      Bu usta ile WhatsApp veya telefon üzerinden iletişime geçerek referans şantiye fotoğraflarını isteyebilirsiniz.
+                    </p>
+                  </div>
+                );
+              }
+
+              const currentProject = pList[activePortfolioIndex] || pList[0];
+
+              return (
+                <div>
+                  {/* Project Selector Tabs */}
+                  {pList.length > 1 && (
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', overflowX: 'auto', paddingBottom: '4px' }}>
+                      {pList.map((proj, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setActivePortfolioIndex(idx)}
+                          style={{
+                            background: activePortfolioIndex === idx ? '#3b82f6' : 'rgba(30, 41, 59, 0.8)',
+                            color: '#ffffff',
+                            border: activePortfolioIndex === idx ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                            padding: '6px 14px',
+                            borderRadius: '10px',
+                            fontSize: '0.78rem',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          Proje #{idx + 1}: {proj.title || 'Şantiye Yenileme'}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Project Detail Header */}
+                  <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: '14px 16px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.08)', marginBottom: '16px' }}>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: '800', color: '#ffffff', margin: '0 0 6px 0' }}>
+                      {currentProject.title || 'Banyo / Zemin Seramik Yenileme'}
+                    </h4>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', fontSize: '0.78rem', color: '#cbd5e1' }}>
+                      {currentProject.areaM2 && <span>📐 <strong>Uygulama Alanı:</strong> {currentProject.areaM2}</span>}
+                      {currentProject.duration && <span>⏱️ <strong>Teslimat Süresi:</strong> {currentProject.duration}</span>}
+                      {currentProject.ceramicUsed && <span>🧱 <strong>Kullanılan Seramik:</strong> {currentProject.ceramicUsed}</span>}
+                    </div>
+                  </div>
+
+                  {/* BEFORE & AFTER SIDE BY SIDE IMAGE COMPARISON */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                    {/* BEFORE CARD */}
+                    <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '16px', overflow: 'hidden' }}>
+                      <div style={{ padding: '10px 14px', background: 'rgba(239, 68, 68, 0.2)', borderBottom: '1px solid rgba(239, 68, 68, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.78rem', fontWeight: '900', color: '#f87171' }}>🔴 ÖNCESİ (Eski Banyo / Şantiye)</span>
+                      </div>
+                      <div style={{ height: '240px', overflow: 'hidden', position: 'relative' }}>
+                        <img
+                          src={currentProject.beforeUrl || 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop&q=80'}
+                          alt="Öncesi"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* AFTER CARD */}
+                    <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '16px', overflow: 'hidden' }}>
+                      <div style={{ padding: '10px 14px', background: 'rgba(16, 185, 129, 0.2)', borderBottom: '1px solid rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.78rem', fontWeight: '900', color: '#34d399' }}>🟢 SONRASI (Yeni Seramik Kaplama)</span>
+                      </div>
+                      <div style={{ height: '240px', overflow: 'hidden', position: 'relative' }}>
+                        <img
+                          src={currentProject.afterUrl || 'https://images.unsplash.com/photo-1620626011761-996317b8d101?w=600&auto=format&fit=crop&q=80'}
+                          alt="Sonrası"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
+
+      {/* 2. STANDARD CONTRACT TEMPLATE MODAL */}
+      {selectedContractInstaller && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.88)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '16px'
+        }} onClick={() => setSelectedContractInstaller(null)}>
+          <div style={{
+            background: '#ffffff',
+            color: '#0f172a',
+            borderRadius: '24px',
+            maxWidth: '750px',
+            width: '100%',
+            padding: '30px',
+            position: 'relative',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            fontFamily: 'Arial, sans-serif'
+          }} onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setSelectedContractInstaller(null)}
+              style={{
+                position: 'absolute',
+                right: '20px',
+                top: '20px',
+                background: '#f1f5f9',
+                border: 'none',
+                color: '#64748b',
+                width: '34px',
+                height: '34px',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            {/* Document Header */}
+            <div style={{ textAlign: 'center', borderBottom: '2px solid #e2e8f0', paddingBottom: '16px', marginBottom: '20px' }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#b38e47', letterSpacing: '1px', marginBottom: '4px' }}>SERAMİKBAK ONAYLI STANDART UYGULAMA REHBERİ</div>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '900', color: '#0f172a', margin: '0 0 6px 0' }}>
+                T.C. STANDART SERAMİK VE KARO UYGULAMA İŞ SÖZLEŞMESİ
+              </h2>
+              <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                Ev Sahibi (İşveren) ile Seramik Ustası (Yüklenici) Arasında Bağlayıcı İş Teslim Belgesi
+              </span>
+            </div>
+
+            {/* Contract Sections */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '0.84rem', lineHeight: '1.6', color: '#334155' }}>
+              {/* Part 1: Parties */}
+              <div style={{ background: '#f8fafc', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ fontSize: '0.9rem', color: '#0f172a', margin: '0 0 8px 0', fontWeight: '800' }}>1. TARAFLAR VE İLETİŞİM</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+                  <div>
+                    <strong>YÜKLENİCİ USTA / FİRMA:</strong><br />
+                    <span>Ad Soyad: {selectedContractInstaller.name}</span><br />
+                    <span>Firma: {selectedContractInstaller.companyName || 'Bireysel Usta Uygulayıcı'}</span><br />
+                    <span>Telefon: {selectedContractInstaller.phone}</span><br />
+                    <span>Hizmet Bölgesi: {selectedContractInstaller.city} / {selectedContractInstaller.district || ''}</span>
+                  </div>
+
+                  <div>
+                    <strong>İŞVEREN (MÜŞTERİ):</strong><br />
+                    <span>Ad Soyad: ___________________________</span><br />
+                    <span>Telefon: ___________________________</span><br />
+                    <span>Uygulama Adresi: ___________________________</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Part 2: Subject & Pricing */}
+              <div style={{ background: '#f8fafc', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ fontSize: '0.9rem', color: '#0f172a', margin: '0 0 8px 0', fontWeight: '800' }}>2. İŞİN KONUSU VE BİRİM FİYAT</h4>
+                <p style={{ margin: '0 0 8px 0' }}>
+                  Bu sözleşme; İşveren tarafın belirlediği ıslak hacim (banyo/mutfak/balkon/teras) alanlarında seramik/porselen karo kaplama, derz dolgusu ve tesviye işçiliğinin yapılmasıdır.
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px', background: '#fff', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                  <div><strong>Tahmini m² Alanı:</strong> _____ m²</div>
+                  <div><strong>m² İşçilik Fiyatı:</strong> {selectedContractInstaller.contractRateM2 || '280 ₺/m²'}</div>
+                  <div><strong>Tahmini Teslim Süresi:</strong> _____ Gün</div>
+                </div>
+              </div>
+
+              {/* Part 3: Quality & Laser Warranty Articles */}
+              <div style={{ background: '#f8fafc', padding: '14px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ fontSize: '0.9rem', color: '#0f172a', margin: '0 0 8px 0', fontWeight: '800' }}>3. TAAHHÜT EDİLEN KALİTE VE LAZER TERAZİ GARANTİSİ MADDELERİ</h4>
+                <ul style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <li><strong>🎯 Lazer Su Terazisi Uyumu:</strong> Tüm zemin ve duvar seramikleri lazer terazisi kurulup kot sapması (meyil hariç) sıfır olacak şekilde döşenecektir.</li>
+                  <li><strong>📐 Derz Artısı ve Klemens Kullanımı:</strong> Köşe diş yapmalarını önlemek için minimum 1.5mm / 2mm plastik derz artısı ve klemens takoz sistemi kullanılacaktır.</li>
+                  <li><strong>💧 Su İzolasyonu (Banyo/Teras):</strong> Islak hacimlerde seramik öncesi en az 2 kat sıvı su yalıtım şapı uygulanması esas alınır.</li>
+                  <li><strong>🧹 Temiz Şantiye Teslimi:</strong> İş bitiminde derz kalıntıları yıkanarak şantiye temiz biçimde teslim edilir.</li>
+                  <li><strong>🛡️ 2 Yıl İşçilik Garantisi:</strong> İşçilik kaynaklı dökülme, kalkma ve derz çatlamalarına karşı usta 24 ay ücretsiz onarım garantisi verir.</li>
+                </ul>
+              </div>
+
+              {/* Signatures Footer */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '10px', textAlign: 'center' }}>
+                <div style={{ borderTop: '1px solid #cbd5e1', paddingTop: '10px' }}>
+                  <strong>Yüklenici Usta İmza</strong><br />
+                  <span style={{ fontSize: '0.78rem', color: '#64748b' }}>{selectedContractInstaller.name}</span>
+                </div>
+
+                <div style={{ borderTop: '1px solid #cbd5e1', paddingTop: '10px' }}>
+                  <strong>İşveren Müşteri İmza</strong><br />
+                  <span style={{ fontSize: '0.78rem', color: '#64748b' }}>Ad Soyad</span>
+                </div>
+              </div>
+
+              {/* Print / Download Button */}
+              <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                <button
+                  onClick={() => window.print()}
+                  style={{
+                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '12px 24px',
+                    borderRadius: '12px',
+                    fontWeight: '800',
+                    fontSize: '0.88rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 14px rgba(15, 23, 42, 0.3)'
+                  }}
+                >
+                  <Printer size={16} />
+                  <span>Sözleşmeyi Yazdır / PDF İndir</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* REGISTER INSTALLER MODAL */}
       {showRegisterModal && (
         <div style={{
@@ -507,7 +957,7 @@ export default function InstallersDirectoryPage() {
             background: '#0f172a',
             border: '1px solid rgba(212, 175, 55, 0.4)',
             borderRadius: '24px',
-            maxWidth: '520px',
+            maxWidth: '540px',
             width: '100%',
             padding: '24px',
             position: 'relative',
@@ -655,12 +1105,12 @@ export default function InstallersDirectoryPage() {
                   </div>
 
                   <div>
-                    <label style={{ fontSize: '0.76rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: '700' }}>Tecrübe Yılı</label>
+                    <label style={{ fontSize: '0.76rem', color: '#cbd5e1', display: 'block', marginBottom: '4px', fontWeight: '700' }}>Tahmini m² İşçilik Fiyatı</label>
                     <input
-                      type="number"
-                      placeholder="15"
-                      value={regExpYears}
-                      onChange={(e) => setRegExpYears(e.target.value)}
+                      type="text"
+                      placeholder="280 ₺/m²"
+                      value={regContractRate}
+                      onChange={(e) => setRegContractRate(e.target.value)}
                       style={{ width: '100%', padding: '10px 10px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.84rem', boxSizing: 'border-box' }}
                     />
                   </div>
@@ -675,6 +1125,29 @@ export default function InstallersDirectoryPage() {
                     onChange={(e) => setRegSpecialties(e.target.value)}
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.86rem', boxSizing: 'border-box' }}
                   />
+                </div>
+
+                {/* Portfolio Image Inputs */}
+                <div style={{ background: 'rgba(255,255,255,0.04)', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <span style={{ fontSize: '0.74rem', color: '#d4af37', fontWeight: '800', display: 'block', marginBottom: '6px' }}>
+                    📸 Örnek Şantiye Fotoğraflarınız (Opsiyonel):
+                  </span>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <input
+                      type="url"
+                      placeholder="Eski Hal (Öncesi) Fotoğraf Görsel URL"
+                      value={regBeforeUrl}
+                      onChange={(e) => setRegBeforeUrl(e.target.value)}
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.78rem', boxSizing: 'border-box' }}
+                    />
+                    <input
+                      type="url"
+                      placeholder="Yeni Hal (Sonrası) Fotoğraf Görsel URL"
+                      value={regAfterUrl}
+                      onChange={(e) => setRegAfterUrl(e.target.value)}
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.78rem', boxSizing: 'border-box' }}
+                    />
+                  </div>
                 </div>
 
                 <div>
