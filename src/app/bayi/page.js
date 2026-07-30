@@ -42,7 +42,9 @@ import {
   Calculator,
   FileCheck,
   MessageSquare,
-  Compass
+  Compass,
+  Download,
+  FileSpreadsheet
 } from 'lucide-react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
@@ -658,6 +660,83 @@ export default function DealerPortalPage() {
     }
   };
 
+
+  const [selectedFileName, setSelectedFileName] = useState('');
+  const [parsedRowCount, setParsedRowCount] = useState(0);
+
+  const handleExcelFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setSelectedFileName(file.name);
+    const reader = new FileReader();
+
+    reader.onload = (evt) => {
+      const content = evt.target?.result;
+      if (typeof content === 'string') {
+        setCsvContentInput(content);
+        const lines = content.split(/\r?\n/).filter(line => line.trim().length > 0);
+        setParsedRowCount(Math.max(0, lines.length - 1));
+      }
+    };
+
+    reader.readAsText(file, 'UTF-8');
+  };
+
+  const handleDownloadSampleExcel = () => {
+    const csvData = [
+      'UrunKodu,StokMiktari,Fiyat,Durum',
+      'VITRA-MARBLE-60X120,250,450,IN_STOCK',
+      'KUTAHYA-TRAVERTEN-80X80,180,380,IN_STOCK',
+      'BIEN-WOOD-20X120,90,320,IN_STOCK',
+      'KALE-LOFT-60X60,0,0,DISPLAY_ONLY',
+      'YURTBAY-DECO-30X60,500,290,IN_STOCK'
+    ].join('\n');
+
+    const blob = new Blob(['\uFEFF' + csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'seramikbak_ornek_excel_stok_sablonu.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDownloadCatalogTemplate = async () => {
+    try {
+      const res = await fetch('/api/products?limit=100');
+      if (res.ok) {
+        const data = await res.json();
+        const products = data.products || [];
+        
+        let csvLines = ['UrunKodu,UrunAdi,Marka,Ebat,StokMiktari,Fiyat,Durum'];
+        if (products.length > 0) {
+          products.forEach(p => {
+            const cleanName = (p.name || '').replace(/,/g, ' ');
+            const cleanBrand = (p.brand?.name || p.brandName || '').replace(/,/g, ' ');
+            const sizeStr = p.width && p.height ? `${p.width}x${p.height}` : '60x120';
+            csvLines.push(`${p.code || p.id},${cleanName},${cleanBrand},${sizeStr},100,350,IN_STOCK`);
+          });
+        } else {
+          csvLines.push('VITRA-CALACATTA-60X120,Calacatta Mermer Seramik,VitrA,60x120,150,450,IN_STOCK');
+        }
+
+        const csvString = csvLines.join('\n');
+        const blob = new Blob(['\uFEFF' + csvString], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'seramikbak_tum_urun_kodlari_katalogu.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch (err) {
+      console.error('Failed to download catalog:', err);
+      handleDownloadSampleExcel();
+    }
+  };
 
   const handleCsvUpload = async (e) => {
     e.preventDefault();
@@ -4474,52 +4553,130 @@ export default function DealerPortalPage() {
                 
                 {/* Excel/CSV Card */}
                 <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '20px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.01)' }}>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 12px 0', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Upload size={16} style={{ color: 'var(--accent-gold)' }} />
-                    Excel / CSV ile Yükleme
+                  <h3 style={{ fontSize: '0.98rem', fontWeight: '800', margin: '0 0 8px 0', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FileSpreadsheet size={18} style={{ color: 'var(--accent-gold)' }} />
+                    Excel & CSV Toplu Stok Yükleme
                   </h3>
                   <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: '0 0 16px 0', lineHeight: '1.5' }}>
-                    Aşağıdaki alana Excel'den kopyaladığınız CSV formatındaki ürün kodları ve stok miktarlarını yapıştırarak toplu güncelleme yapabilirsiniz.
+                    Bayinizdeki seramik ürünlerinin stok miktarlarını ve m² satış fiyatlarını Excel dosyanızı doğrudan seçerek veya şablon indirip doldurarak toplu güncelleyebilirsiniz.
                   </p>
                   
-                  <div style={{ marginBottom: '14px' }}>
-                    <a 
-                      href="data:text/csv;charset=utf-8,UrunKodu,StokMiktari,Fiyat,Durum%0ADECO-AGREGA-120X240,150,1250,IN_STOCK%0ADECO-TRAVERTEN-60X120,0,0,DISPLAY_ONLY" 
-                      download="seramikbak_stok_sablonu.csv"
-                      style={{ fontSize: '0.75rem', color: 'var(--accent-gold)', fontWeight: '700', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  {/* Template Download Buttons Bar */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+                    <button
+                      type="button"
+                      onClick={handleDownloadSampleExcel}
+                      style={{
+                        background: 'rgba(212, 175, 55, 0.12)',
+                        border: '1px solid rgba(212, 175, 55, 0.35)',
+                        color: 'var(--accent-gold)',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        fontSize: '0.74rem',
+                        fontWeight: '750',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                      }}
                     >
-                      📥 CSV Şablonu İndir
-                    </a>
+                      <Download size={13} />
+                      <span>📊 Hazır Excel Şablonu İndir (.csv)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleDownloadCatalogTemplate}
+                      style={{
+                        background: 'rgba(59, 130, 246, 0.12)',
+                        border: '1px solid rgba(59, 130, 246, 0.35)',
+                        color: '#60a5fa',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        fontSize: '0.74rem',
+                        fontWeight: '750',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                      }}
+                    >
+                      <Download size={13} />
+                      <span>📋 Tüm Ürün Kodları Kataloğunu İndir</span>
+                    </button>
+                  </div>
+
+                  {/* Device File Picker Box */}
+                  <div style={{ marginBottom: '14px' }}>
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '14px',
+                      borderRadius: '12px',
+                      border: '2px dashed rgba(212, 175, 55, 0.4)',
+                      background: 'rgba(15, 23, 42, 0.6)',
+                      color: '#fef08a',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem',
+                      fontWeight: '800',
+                      textAlign: 'center',
+                      transition: 'all 0.2s ease'
+                    }}>
+                      <Upload size={16} style={{ color: 'var(--accent-gold)' }} />
+                      <span>{selectedFileName ? `📄 ${selectedFileName} (${parsedRowCount} Ürün Satırı Algılandı)` : '📁 Cihazından Excel / CSV Dosyası Seç'}</span>
+                      <input
+                        type="file"
+                        accept=".csv,.txt,.xlsx,.xls"
+                        onChange={handleExcelFileSelect}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
                   </div>
 
                   <form onSubmit={handleCsvUpload} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <textarea 
-                      value={csvContentInput}
-                      onChange={(e) => setCsvContentInput(e.target.value)}
-                      placeholder={"UrunKodu,StokMiktari,Fiyat,Durum\nDECO-AGREGA-120X240,150,1250,IN_STOCK\nDECO-TRAVERTEN-60X120,0,0,DISPLAY_ONLY"}
-                      rows={6}
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', background: 'rgba(15, 23, 42, 0.6)', color: '#ffffff', fontSize: '0.78rem', fontFamily: 'monospace', resize: 'vertical' }}
-                    />
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <label style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700' }}>CSV İÇERİK METNİ / MANUEL YAPIŞTIRMA ALANI:</label>
+                        {parsedRowCount > 0 && (
+                          <span style={{ fontSize: '0.7rem', color: '#34d399', fontWeight: '800' }}>✓ {parsedRowCount} Ürün Algılandı</span>
+                        )}
+                      </div>
+                      <textarea 
+                        value={csvContentInput}
+                        onChange={(e) => {
+                          setCsvContentInput(e.target.value);
+                          const lines = e.target.value.split(/\r?\n/).filter(l => l.trim().length > 0);
+                          setParsedRowCount(Math.max(0, lines.length - 1));
+                        }}
+                        placeholder={"UrunKodu,StokMiktari,Fiyat,Durum\nVITRA-MARBLE-60X120,250,450,IN_STOCK\nKUTAHYA-TRAVERTEN-80X80,180,380,IN_STOCK\nBIEN-WOOD-20X120,90,320,IN_STOCK"}
+                        rows={5}
+                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.15)', background: 'rgba(15, 23, 42, 0.6)', color: '#ffffff', fontSize: '0.78rem', fontFamily: 'monospace', resize: 'vertical', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
                     <button 
                       type="submit" 
                       disabled={csvLoading || !csvContentInput.trim()}
                       style={{
-                        background: 'var(--accent-gold)',
+                        background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
                         color: '#0f172a',
                         border: 'none',
-                        borderRadius: '8px',
-                        padding: '10px',
-                        fontSize: '0.8rem',
+                        borderRadius: '10px',
+                        padding: '12px',
+                        fontSize: '0.84rem',
                         fontWeight: '800',
                         cursor: csvLoading ? 'default' : 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '6px'
+                        gap: '6px',
+                        boxShadow: '0 4px 14px rgba(212, 175, 55, 0.25)'
                       }}
                     >
-                      {csvLoading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-                      <span>Stok Listesini Yükle</span>
+                      {csvLoading ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
+                      <span>Stok & Fiyat Listesini Yükle ({parsedRowCount > 0 ? `${parsedRowCount} Ürün` : 'Yayınla'})</span>
                     </button>
                   </form>
                 </div>
