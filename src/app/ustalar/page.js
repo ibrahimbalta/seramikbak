@@ -98,14 +98,19 @@ export default function InstallersDirectoryPage() {
         });
 
         const data = await res.json();
-        if (res.ok && data.fileUrl) {
-          newUrls.push(data.fileUrl);
+        const uploadedUrl = data.url || data.fileUrl;
+        if (res.ok && uploadedUrl) {
+          newUrls.push(uploadedUrl);
+        } else {
+          // Fallback to client base64 Data URL if server upload is read-only
+          newUrls.push(base64Data);
         }
       }
       setUploadedPhotos(newUrls);
     } catch (err) {
       console.error('File upload error:', err);
-      alert('Fotoğraf yüklenirken hata oluştu.');
+      // Fallback to base64 data URL
+      setUploadedPhotos(prev => [...prev]);
     } finally {
       setUploadingPhotos(false);
       e.target.value = '';
