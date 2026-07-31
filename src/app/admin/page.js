@@ -33,6 +33,7 @@ import {
   Star
 } from 'lucide-react';
 import Link from 'next/link';
+import SecurityBackupTab from '@/components/admin/SecurityBackupTab';
 
 export default function AdminPage() {
   // Authentication State
@@ -70,7 +71,8 @@ export default function AdminPage() {
     brands: 'Marka Hesapları',
     campaigns: 'Sponsorlu Reklamlar',
     pages: 'Kurumsal Sayfalar',
-    installers: 'Seramik Ustaları'
+    installers: 'Seramik Ustaları',
+    security: 'Güvenlik & Yedekleme'
   };
 
   const tabIcons = {
@@ -83,7 +85,8 @@ export default function AdminPage() {
     brands: Building2,
     campaigns: Sparkles,
     pages: Globe,
-    installers: Wrench
+    installers: Wrench,
+    security: ShieldCheck
   };
 
   // Database list states
@@ -2053,6 +2056,10 @@ export default function AdminPage() {
                 <button className={`nav-item ${activeTab === 'pages' ? 'active' : ''}`} onClick={() => handleTabSelect('pages')}>
                   <Globe size={16} />
                   <span>Kurumsal Sayfalar</span>
+                </button>
+                <button className={`nav-item ${activeTab === 'security' ? 'active' : ''}`} onClick={() => handleTabSelect('security')}>
+                  <ShieldCheck size={16} />
+                  <span>Güvenlik & Yedekleme</span>
                 </button>
               </div>
             )}
@@ -5928,6 +5935,11 @@ export default function AdminPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* TAB: SECURITY & BACKUP CENTER */}
+      {activeTab === 'security' && (
+        <SecurityBackupTab />
       )}
 
         </div>{/* end admin-content */}

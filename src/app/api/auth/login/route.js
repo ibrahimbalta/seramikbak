@@ -12,7 +12,15 @@ export async function POST(request) {
     // --- Admin Login (username/password) ---
     if (role === 'admin' && username && password) {
       const adminUser = process.env.ADMIN_USERNAME || 'admin';
-      const adminPass = process.env.ADMIN_PASSWORD || '6032.,Elif.';
+      const adminPass = process.env.ADMIN_PASSWORD;
+
+      if (!adminPass) {
+        console.error('CRITICAL: ADMIN_PASSWORD environment variable is not defined.');
+        return NextResponse.json(
+          { error: 'Sunucu yapılandırma hatası: Admin şifresi ayarlanmamış.' },
+          { status: 500 }
+        );
+      }
 
       if (username !== adminUser || password !== adminPass) {
         return NextResponse.json(
@@ -69,7 +77,7 @@ export async function POST(request) {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: 'admin'
+      role: user.role || 'user'
     });
 
     // Set HTTP-Only Cookie

@@ -66,6 +66,10 @@ model Product {
 
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
+
+  @@index([brandId])
+  @@index([code])
+  @@index([isPremium])
 }
 
 model Dealer {
@@ -108,6 +112,10 @@ model Dealer {
   themePrimary      String?  @default("#d4af37")
   analytics         AnalyticsLog[]
   outletListings    OutletListing[]
+
+  @@index([city, district])
+  @@index([brandId])
+  @@index([status])
 }
 
 model DealerSaaSConfig {
@@ -180,6 +188,9 @@ model AnalyticsLog {
   query     String?  // search queries if action is SEARCH
   city      String?  // user's city
   createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([createdAt])
 }
 
 model SaaSConfig {
