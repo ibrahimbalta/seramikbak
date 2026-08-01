@@ -50,13 +50,21 @@ export async function GET(request) {
       take: 5
     });
 
-    // 4. Fetch general analytics stats (Views, Clicks)
+    // 4. Fetch general analytics stats (Views, Clicks, 3D Studio Tries, AR Tries)
     const totalViews = await prisma.analyticsLog.count({
       where: { brandId, action: 'VIEW' }
     });
 
     const totalClicks = await prisma.analyticsLog.count({
       where: { brandId, action: 'CLICK' }
+    });
+
+    const totalStudioTries = await prisma.analyticsLog.count({
+      where: { brandId, action: 'STUDIO_TRY' }
+    });
+
+    const totalArTries = await prisma.analyticsLog.count({
+      where: { brandId, action: 'AR_TRY' }
     });
 
     // 5. Fetch Ad Campaigns performance
@@ -166,6 +174,8 @@ export async function GET(request) {
       summary: {
         totalViews,
         totalClicks,
+        totalStudioTries,
+        totalArTries,
         totalLeads: leadsCount,
         ctr: totalViews > 0 ? parseFloat(((totalClicks / totalViews) * 100).toFixed(2)) : 0
       },

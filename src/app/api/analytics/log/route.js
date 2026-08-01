@@ -4,13 +4,46 @@ import prisma from '@/lib/prisma';
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { action, productId, brandId, dealerId, city } = body;
+    let action = body.action || body.type;
+    
+    // Normalize type to action
+    if (action === 'AD_CLICK') {
+      action = 'CLICK';
+    }
 
     if (!action) {
       return NextResponse.json(
         { error: 'Missing action parameter' },
         { status: 400 }
       );
+    }
+
+    let productId = body.productId || null;
+    let brandId = body.brandId || null;
+    const dealerId = body.dealerId || null;
+    const city = body.city || 'İstanbul';
+    const campaignId = body.campaignId || null;
+
+    // If campaignId is provided, fetch campaign to fill missing productId/brandId
+    let campaign = null;
+    if (campaignId) {
+      campaign = await prisma.adCampaign.findUnique({
+        where: { id: campaignId }
+      });
+      if (campaign) {
+        if (!productId) productId = campaign.productId;
+        if (!brandId) brandId = campaign.brandId;
+      }
+    }
+
+    // If campaign wasn't found by campaignId, but productId exists, look up active campaign
+    if (!campaign && productId) {
+      campaign = await prisma.adCampaign.findFirst({
+        where: {
+          productId: productId,
+          status: 'ACTIVE'
+        }
+      });
     }
 
     // 1. Create the general analytics log record
@@ -20,55 +53,51 @@ export async function POST(request) {
         productId: productId || null,
         brandId: brandId || null,
         dealerId: dealerId || null,
-        city: city || 'İstanbul'
+        city: city
       }
     });
 
-    // 2. Pay-Per-Click budget subtraction logic
-    if (action === 'CLICK' && productId) {
-      // Find if there is an active advertising campaign for this product
-      const campaign = await prisma.adCampaign.findFirst({
-        where: {
-          productId: productId,
-          status: 'ACTIVE',
-          budget: { gt: 0 }
+    // 2. Click counting & Pay-Per-Click budget subtraction logic
+    if (action === 'CLICK' && campaign) {
+      const updateData = {
+        clicks: { increment: 1 }
+      };
+
+      if (campaign.bidAmount && campaign.bidAmount > 0 && campaign.budget > 0) {
+        const newBudget = Math.max(0, campaign.budget - campaign.bidAmount);
+        updateData.budget = newBudget;
+        if (newBudget <= 0) {
+          updateData.status = 'COMPLETED';
         }
+      }
+
+      await prisma.adCampaign.update({
+        where: { id: campaign.id },
+        data: updateData
       });
 
-      if (campaign) {
-        const newBudget = Math.max(0, campaign.budget - campaign.bidAmount);
-        const newStatus = newBudget <= 0 ? 'COMPLETED' : 'ACTIVE';
-
-        await prisma.adCampaign.update({
-          where: { id: campaign.id },
-          data: {
-            clicks: { increment: 1 },
-            budget: newBudget,
-            status: newStatus
-          }
-        });
-        
-        console.log(`[PPC Charge] Charged ${campaign.bidAmount} TRY for Product ${productId}. New budget: ${newBudget} TRY.`);
-      }
+      console.log(`[Campaign Click] Incremented clicks for campaign ${campaign.id}.`);
     } 
     
     // 3. Impression counting logic
-    if (action === 'VIEW' && productId) {
-      const campaign = await prisma.adCampaign.findFirst({
-        where: {
-          productId: productId,
-          status: 'ACTIVE'
+    if (action === 'VIEW' && campaign) {
+      await prisma.adCampaign.update({
+        where: { id: campaign.id },
+        data: {
+          impressions: { increment: 1 }
         }
       });
+    }
 
-      if (campaign) {
-        await prisma.adCampaign.update({
-          where: { id: campaign.id },
-          data: {
-            impressions: { increment: 1 }
-          }
-        });
-      }
+    // 4. 3D Virtual Studio & AR Try-on counting logic
+    if ((action === 'STUDIO_TRY' || action === 'AR_TRY') && campaign) {
+      await prisma.adCampaign.update({
+        where: { id: campaign.id },
+        data: {
+          studioTries: { increment: 1 }
+        }
+      });
+      console.log(`[Campaign Studio Try] Incremented studioTries for campaign ${campaign.id}.`);
     }
 
     return NextResponse.json({ success: true, logId: log.id });
@@ -80,3 +109,4 @@ export async function POST(request) {
     );
   }
 }
+

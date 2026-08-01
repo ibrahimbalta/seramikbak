@@ -2828,7 +2828,7 @@ export default function Home() {
     setStudioApplyFloor(true);
     setStudioApplyWalls(true);
     setActiveTab('studio');
-    logInteraction('VIEW', product.id, product.brandId);
+    logInteraction('STUDIO_TRY', product.id, product.brandId);
     
     // Smoothly scroll to the 3D studio canvas panel to center it in view
     setTimeout(() => {
@@ -2939,11 +2939,16 @@ export default function Home() {
           <div className="banner-ad-showcase" onClick={() => {
             const camp = activeAdCampaigns[currentAdIndex];
             const prod = camp.product;
-            // Record analytics click
+            // Record analytics click for sponsored ad
             fetch('/api/analytics/log', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ type: 'AD_CLICK', campaignId: camp.id })
+              body: JSON.stringify({ 
+                action: 'CLICK', 
+                campaignId: camp.id,
+                productId: prod.id,
+                brandId: prod.brandId
+              })
             }).catch(console.error);
             
             // Enrich and open details
@@ -4860,6 +4865,7 @@ export default function Home() {
                         } else {
                           setStudioFloorProduct(activeProduct);
                           setStudioApplyFloor(true);
+                          if (activeProduct) logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
                         }
                         if (uploadedRoomImage) {
                           reprocessTiling('floor');
@@ -4876,6 +4882,7 @@ export default function Home() {
                         } else {
                           setStudioWallProduct(activeProduct);
                           setStudioApplyWalls(true);
+                          if (activeProduct) logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
                         }
                         if (uploadedRoomImage) {
                           reprocessTiling('walls');
@@ -5045,7 +5052,10 @@ export default function Home() {
                     <h5>Artırılmış Gerçeklik (AR) Modu</h5>
                     <p>Kameranızı kullanarak yerdeki gerçek zemine karo döşeyin.</p>
                   </div>
-                  <button onClick={() => alert('WebXR AR başlatılıyor... Kamera izinleri istenecek.')} className="btn-primary ar-btn">AR Kamerasını Aç</button>
+                  <button onClick={() => {
+                    if (activeProduct) logInteraction('AR_TRY', activeProduct.id, activeProduct.brandId);
+                    alert('WebXR AR başlatılıyor... Kamera izinleri istenecek.');
+                  }} className="btn-primary ar-btn">AR Kamerasını Aç</button>
                 </div>
               </div>
 

@@ -1337,19 +1337,19 @@ export default function BrandPortalPage() {
                     
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }} className="campaign-inputs-grid">
                       <div style={{ background: '#faf5ff', border: '1px solid #f3e8ff', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
-                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#7c3aed' }}>1.482 Kez</div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#7c3aed' }}>{b2bStats?.summary?.totalStudioTries || 0} Kez</div>
                         <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#5b21b6', marginTop: '4px' }}>3D Banyo Planlama</div>
                         <div style={{ fontSize: '0.68rem', color: '#7c3aed', marginTop: '2px' }}>Ürünlerinizle oda tasarlandı</div>
                       </div>
                       <div style={{ background: '#eff6ff', border: '1px solid #dbeafe', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
-                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#2563eb' }}>492 Kez</div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#2563eb' }}>{b2bStats?.summary?.totalArTries || 0} Kez</div>
                         <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1e40af', marginTop: '4px' }}>AR Evde Görselleştirme</div>
                         <div style={{ fontSize: '0.68rem', color: '#2563eb', marginTop: '2px' }}>Zemin canlı kamera ile test edildi</div>
                       </div>
                       <div style={{ background: '#ecfdf5', border: '1px solid #d1fae5', borderRadius: '12px', padding: '20px', textAlign: 'center' }}>
-                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#059669' }}>86 İstek</div>
-                        <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#065f46', marginTop: '4px' }}>Doku Numune Talebi</div>
-                        <div style={{ fontSize: '0.68rem', color: '#059669', marginTop: '2px' }}>Kargo ile gönderilen numuneler</div>
+                        <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#059669' }}>{b2bStats?.summary?.totalLeads || 0} İstek</div>
+                        <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#065f46', marginTop: '4px' }}>Teklif & İhale Talebi</div>
+                        <div style={{ fontSize: '0.68rem', color: '#059669', marginTop: '2px' }}>Tüketici ve mimar talepleri</div>
                       </div>
                     </div>
                   </div>
@@ -2378,14 +2378,18 @@ export default function BrandPortalPage() {
                                   )}
                                 </div>
                               </div>
-                              <div style={{ textAlign: 'right' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end', fontWeight: '700', color: '#0f172a' }}>
-                                  <MousePointerClick size={12} />
-                                  <span>{camp.clicks} Tıklama</span>
+                              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '3px', alignItems: 'flex-end' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '800', color: '#2563eb', fontSize: '0.82rem' }}>
+                                  <MousePointerClick size={13} />
+                                  <span>{camp.clicks || 0} Tıklama</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '700', color: '#7c3aed', fontSize: '0.72rem' }}>
+                                  <Sparkles size={12} />
+                                  <span>{camp.studioTries || 0} 3D Denenme</span>
                                 </div>
                                 <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '2px' }}><strong>{camp.durationDays} Gün</strong> / ₺{camp.price}</div>
                                 {camp.expiresAt && (
-                                  <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '4px' }}>
+                                  <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>
                                     Bitiş: {new Date(camp.expiresAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
                                   </div>
                                 )}
