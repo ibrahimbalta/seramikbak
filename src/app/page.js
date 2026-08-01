@@ -17,6 +17,7 @@ import {
   DollarSign, 
   CreditCard, 
   Sparkles, 
+  X,
   Phone, 
   Map, 
   Settings, 
