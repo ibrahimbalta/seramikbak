@@ -14,8 +14,8 @@ export async function GET() {
   try {
     const { weekNumber, year } = getISOWeekDetails();
 
-    // 1. Try to find the approved WINNER_ACTIVE bid for this week
-    let activeBid = await prisma.podiumBid.findFirst({
+    // 1. ONLY fetch the approved WINNER_ACTIVE bid for this week
+    const activeBid = await prisma.podiumBid.findFirst({
       where: {
         weekNumber,
         year,
@@ -44,42 +44,6 @@ export async function GET() {
         }
       }
     });
-
-    // 2. If no winner active for this week, check highest PENDING_APPROVAL bid
-    if (!activeBid) {
-      activeBid = await prisma.podiumBid.findFirst({
-        where: {
-          weekNumber,
-          year,
-          status: 'PENDING_APPROVAL'
-        },
-        orderBy: {
-          bidAmount: 'desc'
-        },
-        include: {
-          brand: {
-            select: { id: true, name: true, logoUrl: true }
-          },
-          product: {
-            select: {
-              id: true,
-              name: true,
-              code: true,
-              width: true,
-              height: true,
-              color: true,
-              finish: true,
-              style: true,
-              imageUrl: true,
-              textureUrl: true,
-              peiRating: true,
-              slipResistance: true,
-              thickness: true
-            }
-          }
-        }
-      });
-    }
 
     // 3. Fallback to a featured premium product if no bids exist yet
     if (!activeBid) {
