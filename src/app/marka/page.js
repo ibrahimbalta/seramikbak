@@ -131,6 +131,18 @@ export default function BrandPortalPage() {
   const [campaignErrorMsg, setCampaignErrorMsg] = useState('');
   const [isStartingCampaign, setIsStartingCampaign] = useState(false);
 
+  // Podium Auction States
+  const [podiumAuctionInfo, setPodiumAuctionInfo] = useState(null);
+  const [podiumBrandBids, setPodiumBrandBids] = useState([]);
+  const [podiumProduct, setPodiumProduct] = useState('');
+  const [podiumBidAmount, setPodiumBidAmount] = useState('');
+  const [podiumPaymentRef, setPodiumPaymentRef] = useState('');
+  const [podiumTitle, setPodiumTitle] = useState('');
+  const [podiumDescription, setPodiumDescription] = useState('');
+  const [podiumSubmitMsg, setPodiumSubmitMsg] = useState('');
+  const [podiumErrorMsg, setPodiumErrorMsg] = useState('');
+  const [isSubmittingPodium, setIsSubmittingPodium] = useState(false);
+
   // SaaS Payment States
   const [bankDetails, setBankDetails] = useState({ bank_name: '', bank_recipient: '', bank_iban: '' });
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -178,6 +190,7 @@ export default function BrandPortalPage() {
       loadBankDetails();
       fetchDealers();
       fetchB2bTrends(brandInfo.id);
+      fetchPodiumAuctionInfo(brandInfo.id);
     }
   }, [isLoggedIn, brandInfo]);
 
@@ -423,6 +436,60 @@ export default function BrandPortalPage() {
       console.error(err);
     } finally {
       setIsStartingCampaign(false);
+    }
+  };
+
+  const fetchPodiumAuctionInfo = async (bId) => {
+    try {
+      const res = await fetch(`/api/b2b/podium?brandId=${bId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setPodiumAuctionInfo(data);
+        if (data.brandBids) setPodiumBrandBids(data.brandBids);
+        if (data.minNextBid) setPodiumBidAmount(data.minNextBid.toString());
+      }
+    } catch (err) {
+      console.error('Failed to load podium auction info:', err);
+    }
+  };
+
+  const handlePodiumBidSubmit = async (e) => {
+    e.preventDefault();
+    if (!brandInfo || !podiumProduct || !podiumBidAmount) return;
+    setIsSubmittingPodium(true);
+    setPodiumSubmitMsg('');
+    setPodiumErrorMsg('');
+
+    try {
+      const res = await fetch('/api/b2b/podium', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brandId: brandInfo.id,
+          productId: podiumProduct,
+          bidAmount: parseFloat(podiumBidAmount),
+          paymentRef: podiumPaymentRef,
+          title: podiumTitle,
+          description: podiumDescription
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPodiumSubmitMsg(data.message || 'Podyum reklam teklifiniz alındı!');
+        setPodiumProduct('');
+        setPodiumPaymentRef('');
+        setPodiumTitle('');
+        setPodiumDescription('');
+        fetchPodiumAuctionInfo(brandInfo.id);
+      } else {
+        setPodiumErrorMsg(data.error || 'Teklif gönderilemedi.');
+      }
+    } catch (err) {
+      setPodiumErrorMsg('Bağlantı hatası.');
+      console.error(err);
+    } finally {
+      setIsSubmittingPodium(false);
     }
   };
 
@@ -2410,6 +2477,204 @@ export default function BrandPortalPage() {
                           </div>
                         )}
                       </div>
+                    </div>
+
+                    {/* 🏆 HAFTALIK PODYUM REKLAM İHALESİ SECTION */}
+                    <div style={{
+                      background: 'linear-gradient(145deg, #090d16 0%, #1e293b 100%)',
+                      borderRadius: '20px',
+                      padding: '28px',
+                      color: '#ffffff',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                      border: '1px solid rgba(212, 175, 55, 0.4)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '24px'
+                    }}>
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                          <h3 style={{ fontSize: '1.2rem', fontWeight: '900', color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <Sparkles size={24} style={{ color: '#d4af37' }} />
+                            Haftalık Podyum Vitrini (Pop-up Spotlight) İhalesi
+                          </h3>
+                          <span style={{
+                            background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                            color: '#000',
+                            fontWeight: '900',
+                            fontSize: '0.7rem',
+                            padding: '4px 12px',
+                            borderRadius: '20px',
+                            letterSpacing: '0.05em'
+                          }}>
+                            {podiumAuctionInfo?.currentWeek ? `HAFTA ${podiumAuctionInfo.currentWeek} / ${podiumAuctionInfo.currentYear}` : 'CANLI İHALE'}
+                          </span>
+                        </div>
+                        <p style={{ fontSize: '0.84rem', color: '#94a3b8', margin: '8px 0 0 0', lineHeight: '1.5' }}>
+                          Ana sayfa açıldığında 3D podyum ve sahne ışıklarıyla tüm ziyaretçilere açılır pencere olarak sergilenen en prestijli 1 haftalık reklam alanı.
+                        </p>
+                      </div>
+
+                      {/* Live Auction Metrics Stats Bar */}
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: '16px',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '14px',
+                        padding: '16px'
+                      }}>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700' }}>ŞU ANKİ EN YÜKSEK TEKLİF</div>
+                          <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#d4af37', marginTop: '2px' }}>
+                            ₺{podiumAuctionInfo?.highestBidAmount ? podiumAuctionInfo.highestBidAmount.toLocaleString('tr-TR') : '1.500'}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700' }}>LİDER MARKA</div>
+                          <div style={{ fontSize: '1rem', fontWeight: '800', color: '#f8fafc', marginTop: '4px' }}>
+                            {podiumAuctionInfo?.highestBidBrand || 'Henüz teklif yok'}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700' }}>MİNİMUM GEREKLİ TEKLİF</div>
+                          <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#38bdf8', marginTop: '2px' }}>
+                            ₺{podiumAuctionInfo?.minNextBid ? podiumAuctionInfo.minNextBid.toLocaleString('tr-TR') : '1.500'}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Bid Submission Form */}
+                      <form onSubmit={handlePodiumBidSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {podiumSubmitMsg && (
+                          <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#34d399', padding: '12px', borderRadius: '10px', fontSize: '0.8rem' }}>
+                            {podiumSubmitMsg}
+                          </div>
+                        )}
+                        {podiumErrorMsg && (
+                          <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#f87171', padding: '12px', borderRadius: '10px', fontSize: '0.8rem' }}>
+                            {podiumErrorMsg}
+                          </div>
+                        )}
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Podyuma Çıkarılacak Ürün *</label>
+                            <select 
+                              value={podiumProduct}
+                              onChange={(e) => setPodiumProduct(e.target.value)}
+                              required
+                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff' }}
+                            >
+                              <option value="">Ürün Seçiniz...</option>
+                              {brandProducts.map(p => (
+                                <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Haftalık Reklam Teklif Tutarı (₺) *</label>
+                            <input 
+                              type="number"
+                              value={podiumBidAmount}
+                              onChange={(e) => setPodiumBidAmount(e.target.value)}
+                              required
+                              min={podiumAuctionInfo?.minNextBid || 1500}
+                              placeholder="Örn: 5000"
+                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff' }}
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Podyum Başlığı / Slogan</label>
+                            <input 
+                              type="text"
+                              value={podiumTitle}
+                              onChange={(e) => setPodiumTitle(e.target.value)}
+                              placeholder="Örn: Yeni Lüks Calacatta Mermer Serisi"
+                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff' }}
+                            />
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Banka Dekont / Referans No</label>
+                            <input 
+                              type="text"
+                              value={podiumPaymentRef}
+                              onChange={(e) => setPodiumPaymentRef(e.target.value)}
+                              placeholder="Örn: TR87-AKB-987654"
+                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff' }}
+                            />
+                          </div>
+                        </div>
+
+                        <button 
+                          type="submit"
+                          disabled={isSubmittingPodium || !podiumProduct}
+                          style={{
+                            background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                            color: '#000',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '14px',
+                            fontWeight: '900',
+                            fontSize: '0.9rem',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            boxShadow: '0 8px 20px rgba(212,175,55,0.3)',
+                            marginTop: '8px'
+                          }}
+                        >
+                          <Sparkles size={18} />
+                          <span>{isSubmittingPodium ? 'Gönderiliyor...' : 'Podyum İhalesine Teklif Ver & Katıl'}</span>
+                        </button>
+                      </form>
+
+                      {/* Brand's Podium Bids History Table */}
+                      {podiumBrandBids.length > 0 && (
+                        <div style={{ marginTop: '12px' }}>
+                          <h4 style={{ fontSize: '0.9rem', fontWeight: '800', margin: '0 0 12px 0', color: '#d4af37' }}>Geçmiş & Aktif Podyum Teklifleriniz</h4>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            {podiumBrandBids.map(bid => {
+                              let statusBadge = { label: 'Admin Onayı Bekliyor', bg: 'rgba(234, 179, 8, 0.2)', color: '#facc15' };
+                              if (bid.status === 'WINNER_ACTIVE') statusBadge = { label: '🏆 Kazanan (Aktif Podyumda)', bg: 'rgba(16, 185, 129, 0.25)', color: '#34d399' };
+                              if (bid.status === 'OUTBID') statusBadge = { label: '⚠️ Geçildi (Daha yüksek teklif verildi)', bg: 'rgba(249, 115, 22, 0.2)', color: '#fb923c' };
+                              if (bid.status === 'REJECTED') statusBadge = { label: '❌ Reddedildi', bg: 'rgba(239, 68, 68, 0.2)', color: '#f87171' };
+
+                              return (
+                                <div key={bid.id} style={{
+                                  background: 'rgba(255,255,255,0.04)',
+                                  border: '1px solid rgba(255,255,255,0.08)',
+                                  borderRadius: '12px',
+                                  padding: '12px 16px',
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  flexWrap: 'wrap',
+                                  gap: '10px'
+                                }}>
+                                  <div>
+                                    <strong style={{ color: '#fff', fontSize: '0.88rem' }}>{bid.product?.name}</strong>
+                                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>Hafta {bid.weekNumber} ({bid.year}) • Slogan: {bid.title || 'Varsayılan'}</div>
+                                  </div>
+                                  <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontWeight: '900', color: '#d4af37', fontSize: '0.95rem' }}>₺{bid.bidAmount.toLocaleString('tr-TR')}</div>
+                                    <span style={{ fontSize: '0.65rem', background: statusBadge.bg, color: statusBadge.color, padding: '2px 8px', borderRadius: '10px', fontWeight: '700', marginTop: '2px', display: 'inline-block' }}>
+                                      {statusBadge.label}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                   </div>

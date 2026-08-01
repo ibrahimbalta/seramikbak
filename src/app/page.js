@@ -1038,6 +1038,31 @@ export default function Home() {
   const [showFavoritesPanel, setShowFavoritesPanel] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
+  // Podium Spotlight Modal State
+  const [podiumData, setPodiumData] = useState(null);
+  const [showPodiumModal, setShowPodiumModal] = useState(false);
+
+  useEffect(() => {
+    const fetchActivePodium = async () => {
+      try {
+        const res = await fetch('/api/podium/active');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.active && data.bid) {
+            const hasSeen = sessionStorage.getItem(`sb_podium_seen_w${data.weekNumber}`);
+            if (!hasSeen) {
+              setPodiumData(data.bid);
+              setShowPodiumModal(true);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load active podium spotlight:', err);
+      }
+    };
+    fetchActivePodium();
+  }, []);
+
   // AI Assistant Chatbot State
   const [showAiChatbot, setShowAiChatbot] = useState(false);
   const [aiChatMessages, setAiChatMessages] = useState([
@@ -7296,6 +7321,235 @@ export default function Home() {
           <span>Menü</span>
         </button>
       </div>
+
+      {/* 🏆 WEEKLY PODIUM SPOTLIGHT SHOWCASE MODAL */}
+      {showPodiumModal && podiumData && (
+        <div 
+          className="podium-modal-overlay"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 10000,
+            background: 'rgba(5, 8, 15, 0.88)',
+            backdropFilter: 'blur(16px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={() => {
+            setShowPodiumModal(false);
+            if (podiumData.weekNumber) {
+              sessionStorage.setItem(`sb_podium_seen_w${podiumData.weekNumber}`, 'true');
+            }
+          }}
+        >
+          <div 
+            className="podium-card glass-panel"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '620px',
+              background: 'linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.98) 100%)',
+              border: '2px solid rgba(212, 175, 55, 0.5)',
+              borderRadius: '28px',
+              overflow: 'hidden',
+              boxShadow: '0 25px 70px -15px rgba(0,0,0,0.8), 0 0 50px rgba(212, 175, 55, 0.3)',
+              position: 'relative',
+              color: '#ffffff'
+            }}
+          >
+            {/* Header Badge & Close Button */}
+            <div style={{
+              padding: '20px 24px 12px 24px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderBottom: '1px solid rgba(255,255,255,0.08)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{
+                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 50%, #fef08a 100%)',
+                  color: '#0f172a',
+                  fontWeight: '900',
+                  fontSize: '0.72rem',
+                  padding: '4px 12px',
+                  borderRadius: '20px',
+                  boxShadow: '0 0 15px rgba(212, 175, 55, 0.4)',
+                  letterSpacing: '0.05em',
+                  textTransform: 'uppercase',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <Sparkles size={14} /> Haftanın Podyum Vitrini
+                </span>
+                {podiumData.brand?.name && (
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '600' }}>
+                    • {podiumData.brand.name}
+                  </span>
+                )}
+              </div>
+
+              <button 
+                onClick={() => {
+                  setShowPodiumModal(false);
+                  if (podiumData.weekNumber) {
+                    sessionStorage.setItem(`sb_podium_seen_w${podiumData.weekNumber}`, 'true');
+                  }
+                }}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: '#fff',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Podium Stage Main Content */}
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* 3D Spotlight Pedestal Stage Visual */}
+              <div style={{
+                position: 'relative',
+                height: '240px',
+                borderRadius: '20px',
+                background: 'radial-gradient(ellipse at center, rgba(212, 175, 55, 0.25) 0%, rgba(15, 23, 42, 0.95) 75%)',
+                border: '1px solid rgba(212, 175, 55, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden'
+              }}>
+                {/* Stage Lights Rays */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-40px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '180px',
+                  height: '200px',
+                  background: 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(212,175,55,0.03) 100%)',
+                  clipPath: 'polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%)',
+                  pointerEvents: 'none'
+                }} />
+
+                {/* Product Image on Pedestal */}
+                {podiumData.product?.imageUrl && (
+                  <img 
+                    src={podiumData.product.imageUrl} 
+                    alt={podiumData.product.name}
+                    style={{
+                      height: '180px',
+                      maxWidth: '85%',
+                      objectFit: 'contain',
+                      borderRadius: '12px',
+                      boxShadow: '0 20px 40px rgba(0,0,0,0.6), 0 0 25px rgba(212, 175, 55, 0.3)',
+                      zIndex: 2,
+                      transform: 'perspective(600px) rotateX(4deg) translateY(-8px)'
+                    }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/textures/concrete_light_grey.jpg';
+                    }}
+                  />
+                )}
+
+                {/* Pedestal Base Grid */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '10px',
+                  width: '70%',
+                  height: '20px',
+                  borderRadius: '50%',
+                  background: 'radial-gradient(ellipse at center, rgba(212, 175, 55, 0.4) 0%, transparent 80%)',
+                  filter: 'blur(4px)',
+                  zIndex: 1
+                }} />
+              </div>
+
+              {/* Title & Description */}
+              <div>
+                <div style={{ fontSize: '0.78rem', color: '#d4af37', fontWeight: '800', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  {podiumData.product?.code} • {podiumData.product?.width}x{podiumData.product?.height} cm
+                </div>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 8px 0', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                  {podiumData.title || podiumData.product?.name}
+                </h3>
+                <p style={{ fontSize: '0.88rem', color: '#cbd5e1', margin: 0, lineHeight: '1.5' }}>
+                  {podiumData.description || `${podiumData.brand?.name} markasının bu haftaki özel tasarımlı seramik koleksiyonu SeramikBak Podyum'da.`}
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+                <button
+                  onClick={() => {
+                    setShowPodiumModal(false);
+                    if (podiumData.weekNumber) {
+                      sessionStorage.setItem(`sb_podium_seen_w${podiumData.weekNumber}`, 'true');
+                    }
+                    if (podiumData.product) {
+                      setActiveTileIndex(0);
+                      setActiveTab('studio');
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    color: '#090d16',
+                    border: 'none',
+                    borderRadius: '14px',
+                    padding: '14px',
+                    fontWeight: '800',
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: '0 8px 20px rgba(212,175,55,0.3)'
+                  }}
+                >
+                  <Sparkles size={18} /> 3D Sanal Stüdyoda Canlı Dene
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowPodiumModal(false);
+                    if (podiumData.weekNumber) {
+                      sessionStorage.setItem(`sb_podium_seen_w${podiumData.weekNumber}`, 'true');
+                    }
+                    if (podiumData.product) {
+                      handleTileCardClick(podiumData.product);
+                    }
+                  }}
+                  style={{
+                    background: 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '14px',
+                    padding: '14px 20px',
+                    fontWeight: '700',
+                    fontSize: '0.88rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Detayları İncele
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* FLOATING AI CHATBOT WIDGET */}
       <div className="floating-ai-chatbot" style={{ zIndex: 9999 }}>

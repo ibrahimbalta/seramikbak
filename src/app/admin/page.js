@@ -57,7 +57,7 @@ export default function AdminPage() {
   const handleTabSelect = useCallback((tab) => {
     setActiveTab(tab);
     if (isMobile) setSidebarOpen(false);
-    if (tab === 'campaigns') loadCampaigns();
+    if (tab === 'campaigns') { loadCampaigns(); loadAdminPodiumBids(); }
     if (tab === 'installers') loadAdminInstallers();
   }, [isMobile]);
 
@@ -97,6 +97,10 @@ export default function AdminPage() {
   const [saasConfigs, setSaasConfigs] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [campaignsLoading, setCampaignsLoading] = useState(false);
+
+  // Podium Auction Admin State
+  const [adminPodiumBids, setAdminPodiumBids] = useState([]);
+  const [adminPodiumLoading, setAdminPodiumLoading] = useState(false);
 
   // Scraper Sub-tab: 'crawler', 'excel', 'zip'
   const [scraperSubTab, setScraperSubTab] = useState('crawler');
@@ -1714,6 +1718,43 @@ export default function AdminPage() {
     } catch (err) {
       console.error(err);
       alert('Bağlantı hatası.');
+    }
+  };
+
+  const loadAdminPodiumBids = async () => {
+    setAdminPodiumLoading(true);
+    try {
+      const res = await fetch('/api/admin/podium');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setAdminPodiumBids(data.bids || []);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load admin podium bids:', err);
+    } finally {
+      setAdminPodiumLoading(false);
+    }
+  };
+
+  const handleAdminPodiumAction = async (bidId, action) => {
+    try {
+      const res = await fetch('/api/admin/podium', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bidId, action })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(data.message || 'İşlem tamamlandı.');
+        loadAdminPodiumBids();
+      } else {
+        alert(data.error || 'İşlem başarısız.');
+      }
+    } catch (err) {
+      alert('Bağlantı hatası.');
+      console.error(err);
     }
   };
 
@@ -5059,6 +5100,117 @@ export default function AdminPage() {
               </table>
             </div>
           )}
+
+          {/* 🏆 PODIUM AUCTION MANAGEMENT PANEL */}
+          <div style={{ marginTop: '24px', borderTop: '2px dashed #e2e8f0', paddingTop: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '900', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Sparkles size={20} style={{ color: '#d4af37' }} />
+                  Haftalık Podyum İhale Kontrol Yönetimi
+                </h3>
+                <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                  Markaların ana sayfa açılışında pop-up olarak yayınlanan Podyum Vitrini için verdiği haftalık teklifleri yönetin.
+                </p>
+              </div>
+
+              <button
+                onClick={loadAdminPodiumBids}
+                style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
+              >
+                Yenile
+              </button>
+            </div>
+
+            {adminPodiumLoading ? (
+              <div style={{ textAlign: 'center', padding: '32px', color: '#64748b' }}>
+                <Loader2 className="animate-spin" style={{ margin: '0 auto 8px auto' }} />
+                <span>Podyum teklifleri yükleniyor...</span>
+              </div>
+            ) : adminPodiumBids.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '32px', color: '#94a3b8', border: '1px dashed #cbd5e1', borderRadius: '12px', fontSize: '0.84rem' }}>
+                Henüz podyum reklam ihalesine verilmiş hiçbir teklif bulunmamaktadır.
+              </div>
+            ) : (
+              <div className="table-responsive" style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ background: '#090d16', color: '#cbd5e1', borderBottom: '1px solid #e2e8f0' }}>
+                      <th style={{ padding: '12px' }}>Hafta / Yıl</th>
+                      <th style={{ padding: '12px' }}>Marka</th>
+                      <th style={{ padding: '12px' }}>Hedef Ürün</th>
+                      <th style={{ padding: '12px' }}>Slogan / Başlık</th>
+                      <th style={{ padding: '12px' }}>Teklif Tutarı</th>
+                      <th style={{ padding: '12px' }}>Dekont No</th>
+                      <th style={{ padding: '12px', textAlign: 'center' }}>Durum</th>
+                      <th style={{ padding: '12px', textAlign: 'right' }}>İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {adminPodiumBids.map(bid => {
+                      let statusTag = { label: 'Onay Bekliyor', bg: '#fef3c7', color: '#d97706' };
+                      if (bid.status === 'WINNER_ACTIVE') statusTag = { label: '🏆 Kazanan (Aktif Podyumda)', bg: '#dcfce7', color: '#15803d' };
+                      if (bid.status === 'OUTBID') statusTag = { label: '⚠️ Geçildi', bg: '#ffedd5', color: '#c2410c' };
+                      if (bid.status === 'REJECTED') statusTag = { label: '❌ Reddedildi', bg: '#fee2e2', color: '#b91c1c' };
+
+                      return (
+                        <tr key={bid.id} style={{ borderBottom: '1px solid #e2e8f0', background: bid.status === 'WINNER_ACTIVE' ? '#f0fdf4' : 'transparent' }}>
+                          <td style={{ padding: '12px', fontWeight: '800' }}>Hafta {bid.weekNumber} ({bid.year})</td>
+                          <td style={{ padding: '12px', fontWeight: '700' }}>{bid.brand?.name}</td>
+                          <td style={{ padding: '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              {bid.product?.imageUrl && (
+                                <img 
+                                  src={bid.product.imageUrl} 
+                                  alt={bid.product.name} 
+                                  style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #cbd5e1' }}
+                                  onError={(e) => { e.target.onerror = null; e.target.src = '/textures/concrete_light_grey.jpg'; }} 
+                                />
+                              )}
+                              <div>
+                                <div>{bid.product?.name}</div>
+                                <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Kod: {bid.product?.code}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style={{ padding: '12px' }}>{bid.title || '-'}</td>
+                          <td style={{ padding: '12px', fontWeight: '900', color: '#d4af37', fontSize: '0.9rem' }}>
+                            ₺{bid.bidAmount.toLocaleString('tr-TR')}
+                          </td>
+                          <td style={{ padding: '12px', fontFamily: 'monospace' }}>{bid.paymentRef || '-'}</td>
+                          <td style={{ padding: '12px', textAlign: 'center' }}>
+                            <span style={{ fontSize: '0.7rem', background: statusTag.bg, color: statusTag.color, padding: '3px 10px', borderRadius: '12px', fontWeight: '800' }}>
+                              {statusTag.label}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px', textAlign: 'right' }}>
+                            <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                              {bid.status !== 'WINNER_ACTIVE' && (
+                                <button
+                                  onClick={() => handleAdminPodiumAction(bid.id, 'APPROVE')}
+                                  style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: '800' }}
+                                >
+                                  Podyumu Onayla & Yayınla
+                                </button>
+                              )}
+                              {bid.status !== 'REJECTED' && (
+                                <button
+                                  onClick={() => handleAdminPodiumAction(bid.id, 'REJECT')}
+                                  style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px 10px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: '700' }}
+                                >
+                                  Reddet
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SeramikBak - Yatırımcı Analiz ve Değerleme Raporu</title>
+
+  <!-- Google Fonts & Chart.js -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-slate-950: #090d16;
+      --bg-slate-900: #0f172a;
+      --bg-slate-800: #1e293b;
+      --gold-primary: #d4af37;
+      --gold-light: #fbbf24;
+      --gold-dark: #b8860b;
+      --text-white: #ffffff;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --card-bg: rgba(30, 41, 59, 0.7);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-slate-950);
+      color: #e2e8f0;
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-white);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    /* Print Controls Header */
+    .no-print-bar {
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+      color: #0f172a;
+      box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
+    }
+
+    .btn-gold:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #e2e8f0;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Hero Cover Section */
+    .hero-section {
+      background: radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.15), transparent 70%),
+                  linear-gradient(180deg, var(--bg-slate-900) 0%, var(--bg-slate-950) 100%);
+      padding: 80px 40px;
+      border-radius: 24px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 30px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: var(--gold-light);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      font-size: 3.2rem;
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, var(--gold-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin: 0 auto 36px auto;
+    }
+
+    .hero-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .hero-stat-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+    }
+
+    .stat-number {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--gold-light);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Report Section Cards */
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 36px;
+      margin-bottom: 32px;
+      backdrop-filter: blur(10px);
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #ffffff;
+    }
+
+    .section-title span.number {
+      background: rgba(212, 175, 55, 0.2);
+      color: var(--gold-light);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 28px;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    /* Feature Box */
+    .feature-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.2s ease;
+    }
+
+    .feature-box:hover {
+      border-color: rgba(212, 175, 55, 0.4);
+      transform: translateY(-3px);
+    }
+
+    .feature-box h4 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      margin-bottom: 10px;
+    }
+
+    .feature-box p {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    /* Tables */
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.9rem;
+    }
+
+    .custom-table th {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--gold-light);
+      text-align: left;
+      padding: 14px 18px;
+      font-weight: 700;
+      border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .custom-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+    }
+
+    .custom-table tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Badges */
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .tag-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .tag-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .tag-gold { background: rgba(212, 175, 55, 0.2); color: #fbbf24; border: 1px solid rgba(212, 175, 55, 0.3); }
+
+    /* Financial Chart Box */
+    .chart-container {
+      position: relative;
+      height: 320px;
+      margin-top: 20px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border-color);
+      margin-top: 60px;
+    }
+
+    @media print {
+      .no-print-bar { display: none; }
+      body { background: #ffffff; color: #000000; }
+      .section-card { background: #ffffff; border: 1px solid #ddd; color: #000000; page-break-inside: avoid; }
+      h1, h2, h3, h4, .section-title { color: #000000 !important; -webkit-text-fill-color: initial !important; }
+      .hero-section { background: #f8fafc; border: 1px solid #ccc; color: #000; }
+      .hero-title { -webkit-text-fill-color: #000; }
+      .stat-number { color: #b8860b; }
+      .feature-box { background: #f1f5f9; border: 1px solid #ccc; }
+      .feature-box p { color: #333; }
+      .custom-table th { background: #e2e8f0; color: #000; }
+      .custom-table td { color: #222; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Top Action Bar -->
+  <div class="no-print-bar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-weight: 800; font-size: 1.1rem; color: var(--gold-light);">SeramikBak</span>
+      <span style="color: var(--text-muted); font-size: 0.85rem;">| Yatırımcı Sunum ve Değerleme Raporu</span>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button class="btn btn-outline" onclick="window.print()">
+        📄 PDF Oluştur / Yazdır
+      </button>
+      <a href="https://www.seramikbak.com" target="_blank" class="btn btn-gold">
+        🚀 Canlı Platformu Aç
+      </a>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- HERO COVER SECTION -->
+    <header class="hero-section">
+      <div class="brand-badge">🏆 Yatırımcı Analiz Dokümanı • 2026 Q3</div>
+      <h1 class="hero-title">SeramikBak Platformu<br>Yatırım & Büyüme Raporu</h1>
+      <p class="hero-subtitle">
+        Türkiye'nin Lider Seramik Markalarını Tek Çatı Altında Toplayan, Web 3D Sanal Stüdyo, AR Teknolojisi ve B2B2C Pazaryeri Ekosistemi.
+      </p>
+
+      <div class="hero-stats-grid">
+        <div class="hero-stat-card">
+          <div class="stat-number">₺120M+</div>
+          <div class="stat-label">Türkiye Seramik Pazarı (Yıllık Hacim)</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="stat-number">10.000+</div>
+          <div class="stat-label">Katalogdaki Ürün Çeşidi</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="stat-number">81 İl</div>
+          <div class="stat-label">Bayi & Showroom Harita Ağ Kapsamı</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="stat-number">98/100</div>
+          <div class="stat-label">Altyapı Güvenlik ve Performans Skoru</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 1. YÖNETİCİ ÖZETİ (EXECUTIVE SUMMARY) -->
+    <section class="section-card">
+      <h2 class="section-title">
+        <span class="number">1</span>
+        Yönetici Özeti (Executive Summary)
+      </h2>
+      <p class="section-desc">
+        SeramikBak, geleneksel yapı malzemeleri ve seramik sektörünün dijital dönüşümünü gerçekleştiren yeni nesil bir **B2B2C pazar yeri ve 3D görselleştirme platformudur.**
+      </p>
+
+      <div class="grid-3">
+        <div class="feature-box">
+          <h4>🎯 Sektörel Problem</h4>
+          <p>
+            Tüketiciler banyo ve zemin seramiği seçerken ürünlerin mekânda nasıl duracağını öngöremiyor, bayi bayi gezmek zorunda kalıyor. Bayiler ise dijitalde sıcak müşteri (lead) yakalamakta zorlanıyor.
+          </p>
+        </div>
+        <div class="feature-box">
+          <h4>💡 SeramikBak Çözümü</h4>
+          <p>
+            Kurulum gerektirmeyen **Web 3D Sanal Stüdyo & AR** teknolojisi ile ürünleri canlı mekânda giydirme, en yakın bayiyi haritada bulup tek tıkla teklif alma ve usta eşleştirme platformu.
+          </p>
+        </div>
+        <div class="feature-box">
+          <h4>📈 Büyüme Potansiyeli</h4>
+          <p>
+            Türkiye genelindeki binlerce bayi, mimar, müteahhit ve nihai tüketiciyi buluşturan SaaS abonelik, öne çıkarılan reklam (CPC) ve proje komisyonu tabanlı çoklu gelir modeli.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. TEKNOLOJİ VE ALTYAPIMIZ (TECH STACK & ARCHITECTURE) -->
+    <section class="section-card">
+      <h2 class="section-title">
+        <span class="number">2</span>
+        Teknoloji Mimarisi ve Altyapı Gücü
+      </h2>
+      <p class="section-desc">
+        SeramikBak altyapısı yüksek ölçeklenebilirlik, sub-second API yanıt süreleri ve zirve seviye güvenlik protokolleri üzerine inşa edilmiştir.
+      </p>
+
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Bileşen</th>
+            <th>Kullanılan Teknolojiler</th>
+            <th>Yatırımcı / Operasyonel Avantajı</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Frontend & SSR</strong></td>
+            <td>Next.js 16 (App Router), React 19, Tailwind CSS v4</td>
+            <td>Mükemmel Google SEO skoru, anlık sayfa açılışı ve yüksek dönüşüm.</td>
+          </tr>
+          <tr>
+            <td><strong>3D Stüdyo & AR</strong></td>
+            <td>Three.js (WebGL Canvas), Dynamic Async Imports</td>
+            <td>Uygulama indirmeden web tarayıcısında anında 3D kaplama ve AR deneyimi.</td>
+          </tr>
+          <tr>
+            <td><strong>Veritabanı & CDN</strong></td>
+            <td>Prisma ORM, Turso (LibSQL/SQLite), Cloudinary CDN</td>
+            <td>Sıfır kilitlenme riski, milisaniyelik veri çekimi ve yedekli medya saklama.</td>
+          </tr>
+          <tr>
+            <td><strong>Güvenlik & Uyum</strong></td>
+            <td>HTTP-Only JWT Session, HSTS, Automated Backup</td>
+            <td>98/100 Siber güvenlik skoru, veri sızıntılarına karşı tam koruma.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 3. GELİR MODELİ (REVENUE MODEL) & FİNANSAL ÖNGÖRÜLER -->
+    <section class="section-card">
+      <h2 class="section-title">
+        <span class="number">3</span>
+        Gelir Modeli ve Finansal Projeksiyon
+      </h2>
+      <p class="section-desc">
+        Platformun finansal sürdürülebilirliği 4 temel gelir kalemiyle desteklenmektedir:
+      </p>
+
+      <div class="grid-2">
+        <div>
+          <div class="feature-box mb-4" style="margin-bottom: 16px;">
+            <h4>1. Bayi & Marka SaaS Abonelikleri</h4>
+            <p>Bayilere özel vitrin, sanal tur ekleme ve stok kataloğu yönetimi için aylık/yıllık Lite, Standart ve Premium abonelik paketleri.</p>
+          </div>
+          <div class="feature-box mb-4" style="margin-bottom: 16px;">
+            <h4>2. Sponsorlu Öne Çıkarılan Reklamlar (CPC Bidding)</h4>
+            <p>Markaların arama sonuçlarında ürünlerini üst sıralara çıkarmaları için teklif tabanlı (CPC) reklam gelirleri.</p>
+          </div>
+          <div class="feature-box">
+            <h4>3. Proje & Metraj Lead Komisyonları</h4>
+            <p>Mimar ve müteahhitlerin 5.000m²+ toplu seramik taleplerinden alınan işlem/eşleştirme komisyonları.</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="margin-bottom: 12px; color: var(--gold-light);">📊 3 Yıllık Tahmini Gelir Büyümesi (₺ Million)</h4>
+          <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. REKABET ANALİZİ (COMPETITOR MATRIX) -->
+    <section class="section-card">
+      <h2 class="section-title">
+        <span class="number">4</span>
+        Pazar ve Rekabet Analizi
+      </h2>
+      <p class="section-desc">
+        SeramikBak'ın pazardaki geleneksel e-ticaret ve ilan sitelerine karşı ezici avantajları:
+      </p>
+
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Kriter</th>
+            <th>Geleneksel İlan Siteleri</th>
+            <th>Marka Web Siteleri</th>
+            <th>SeramikBak Portal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Çoklu Marka Karşılaştırma</strong></td>
+            <td>❌ Sınırlı</td>
+            <td>❌ Sadece Kendi Markası</td>
+            <td><span class="tag tag-green">✓ Tüm Markalar Tek Çatıda</span></td>
+          </tr>
+          <tr>
+            <td><strong>Web 3D Sanal Stüdyo & AR</strong></td>
+            <td>❌ Yok</td>
+            <td>⚠️ Nadir / Ağır</td>
+            <td><span class="tag tag-green">✓ Anında WebGL 3D Giydirme</span></td>
+          </tr>
+          <tr>
+            <td><strong>Harita & En Yakın Bayi Stoku</strong></td>
+            <td>❌ Yok</td>
+            <td>⚠️ Sadece Statik Liste</td>
+            <td><span class="tag tag-green">✓ Canlı Konum & WhatsApp Teklif</span></td>
+          </tr>
+          <tr>
+            <td><strong>Garantili Usta & Proje Talebi</strong></td>
+            <td>❌ Yok</td>
+            <td>❌ Yok</td>
+            <td><span class="tag tag-green">✓ Bütünleşik Hizmet Ekosistemi</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 5. YATIRIM KULLANIM PLANI (USE OF FUNDS) -->
+    <section class="section-card">
+      <h2 class="section-title">
+        <span class="number">5</span>
+        Yatırım Kullanım Planı (Use of Funds)
+      </h2>
+      <p class="section-desc">
+        Alınacak yatırımın hedeflenen pazar payına ulaşmak üzere bütçelendirilmesi:
+      </p>
+
+      <div class="grid-2">
+        <div class="chart-container" style="height: 260px;">
+          <canvas id="useOfFundsChart"></canvas>
+        </div>
+        <div style="display: flex; flex-direction: column; justify-content: center; gap: 14px;">
+          <div style="display: flex; justify-content: space-between; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border-left: 4px solid #d4af37;">
+            <span><strong>%40 Pazarlama & Büyüme:</strong> Dijital reklamlar ve bayi saha ekibi</span>
+            <span style="color: var(--gold-light); font-weight: 800;">₺4.0M</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border-left: 4px solid #3b82f6;">
+            <span><strong>%30 Ar-Ge & AI Geliştirme:</strong> Yapay zeka banyo görselleştirme</span>
+            <span style="color: #60a5fa; font-weight: 800;">₺3.0M</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border-left: 4px solid #10b981;">
+            <span><strong>%20 Saha & Operasyon:</strong> 81 il bayi ağ genişletmesi</span>
+            <span style="color: #34d399; font-weight: 800;">₺2.0M</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 12px; background: rgba(15,23,42,0.6); border-radius: 10px; border-left: 4px solid #a855f7;">
+            <span><strong>%10 Hukuk & Lisans:</strong> Güvenlik ve marka tescilleri</span>
+            <span style="color: #c084fc; font-weight: 800;">₺1.0M</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>© 2026 SeramikBak Inc. Tüm Hakları Saklıdır. Gizli ve Özel Yatırımcı Dokümanıdır.</p>
+      <p style="margin-top: 6px; color: var(--gold-light);">www.seramikbak.com • destek@seramikbak.com</p>
+    </footer>
+
+  </div>
+
+  <!-- Chart.js Setup Scripts -->
+  <script>
+    // Revenue Growth Chart
+    const ctxRev = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctxRev, {
+      type: 'line',
+      data: {
+        labels: ['2026 (Mevcut)', '2027 (Hedef)', '2028 (Projeksiyon)'],
+        datasets: [{
+          label: 'Yıllık Toplam Gelir (₺ Million)',
+          data: [4.5, 18.2, 54.0],
+          borderColor: '#d4af37',
+          backgroundColor: 'rgba(212, 175, 55, 0.15)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 3,
+          pointRadius: 6,
+          pointBackgroundColor: '#fbbf24'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#cbd5e1', font: { family: 'Plus Jakarta Sans' } } }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+        }
+      }
+    });
+
+    // Use of Funds Chart
+    const ctxFunds = document.getElementById('useOfFundsChart').getContext('2d');
+    new Chart(ctxFunds, {
+      type: 'doughnut',
+      data: {
+        labels: ['Pazarlama & Büyüme', 'Ar-Ge & AI', 'Saha & Operasyon', 'Hukuk & Lisans'],
+        datasets: [{
+          data: [40, 30, 20, 10],
+          backgroundColor: ['#d4af37', '#3b82f6', '#10b981', '#a855f7'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right', labels: { color: '#cbd5e1', font: { family: 'Plus Jakarta Sans' } } }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
