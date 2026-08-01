@@ -45,32 +45,8 @@ export async function GET() {
       }
     });
 
-    // 3. Fallback to a featured premium product if no bids exist yet
+    // 2. If no approved winner active for this week, do not activate podium modal
     if (!activeBid) {
-      const fallbackProduct = await prisma.product.findFirst({
-        where: { isPremium: true },
-        include: {
-          brand: { select: { id: true, name: true, logoUrl: true } }
-        }
-      });
-
-      if (fallbackProduct) {
-        return NextResponse.json({
-          success: true,
-          active: true,
-          isFallback: true,
-          weekNumber,
-          year,
-          bid: {
-            id: 'featured-default',
-            bidAmount: 5000,
-            title: 'Haftanın Özel Koleksiyon Podyumu',
-            description: 'Mimari projelerde öne çıkan lüks porselen ve mermer konsepti.',
-            brand: fallbackProduct.brand,
-            product: fallbackProduct
-          }
-        });
-      }
       return NextResponse.json({ success: true, active: false });
     }
 
