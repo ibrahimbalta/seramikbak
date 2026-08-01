@@ -3890,7 +3890,7 @@ export default function Home() {
                           <img 
                             src={currentTile?.img || '/textures/calacatta_gold.jpg'} 
                             alt={currentTile?.name || 'Zemin Seramiği'}
-                            onError={(e) => { e.target.src = '/textures/calacatta_gold.jpg'; }}
+                            onError={(e) => { e.target.onerror = null; e.target.src = '/textures/calacatta_gold.jpg'; }}
                           />
                           <div className="tile-brand-tag">{currentTile?.brand || 'NG KÜTAHYA'}</div>
                           <div className="tile-price-tag">{currentTile?.price || '₺740/m²'}</div>
@@ -3935,7 +3935,7 @@ export default function Home() {
                           <img 
                             src={activeCombo?.wallTile?.img || '/textures/calacatta_gold.jpg'} 
                             alt={activeCombo?.wallTile?.name || 'Duvar Dekor Seramiği'}
-                            onError={(e) => { e.target.src = '/textures/calacatta_gold.jpg'; }}
+                            onError={(e) => { e.target.onerror = null; e.target.src = '/textures/calacatta_gold.jpg'; }}
                           />
                           <div className="tile-brand-tag">{activeCombo?.wallTile?.brand || 'VitrA'}</div>
                           <div className="tile-price-tag">{activeCombo?.wallTile?.price || '₺620/m²'}</div>

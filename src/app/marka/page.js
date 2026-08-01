@@ -1602,14 +1602,17 @@ export default function BrandPortalPage() {
                               {/* Product Thumbnail */}
                               <div style={{ position: 'relative', height: '180px', background: '#f8fafc', overflow: 'hidden' }}>
                                 <img 
-                                  src={prod.imageUrl || '/test.jpg'} 
+                                  src={prod.imageUrl || '/textures/concrete_light_grey.jpg'} 
                                   alt={prod.name}
                                   style={{
                                     width: '100%',
                                     height: '100%',
                                     objectFit: 'cover'
                                   }}
-                                  onError={(e) => { e.target.src = '/test.jpg'; }}
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = '/textures/concrete_light_grey.jpg';
+                                  }}
                                 />
                                 {prod.isPremium && (
                                   <span style={{
@@ -2270,9 +2273,13 @@ export default function BrandPortalPage() {
                               }}>
                                 <div style={{ height: '140px', position: 'relative', background: '#f8fafc' }}>
                                   <img 
-                                    src={selectedProd.imageUrl || '/test.jpg'} 
+                                    src={selectedProd.imageUrl || '/textures/concrete_light_grey.jpg'} 
                                     alt="Mockup" 
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                    onError={(e) => { 
+                                      e.target.onerror = null;
+                                      e.target.src = '/textures/concrete_light_grey.jpg'; 
+                                    }}
                                   />
                                   <span style={{
                                     position: 'absolute',
