@@ -72,3 +72,31 @@ export async function GET() {
     );
   }
 }
+
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const { bidId, action } = body;
+
+    if (!bidId || !action) {
+      return NextResponse.json({ error: 'Eksik parametre.' }, { status: 400 });
+    }
+
+    if (action === 'click') {
+      await prisma.podiumBid.update({
+        where: { id: bidId },
+        data: { clicks: { increment: 1 } }
+      });
+    } else if (action === 'studio') {
+      await prisma.podiumBid.update({
+        where: { id: bidId },
+        data: { studioTries: { increment: 1 } }
+      });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Podium interaction log error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

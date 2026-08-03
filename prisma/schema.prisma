@@ -193,6 +193,7 @@ model PodiumBid {
   title        String?   // Slogan / Campaign Title e.g., "Yeni Lüks Mermer Koleksiyonu"
   description  String?   // Promotional detail text
   clicks       Int       @default(0)
+  studioTries  Int       @default(0)
   impressions  Int       @default(0)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt

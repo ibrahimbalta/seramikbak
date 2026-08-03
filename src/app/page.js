@@ -7529,6 +7529,13 @@ export default function Home() {
                     if (podiumData.weekNumber) {
                       sessionStorage.setItem(`sb_podium_seen_w${podiumData.weekNumber}`, 'true');
                     }
+                    if (podiumData.bid?.id) {
+                      fetch('/api/podium/active', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ bidId: podiumData.bid.id, action: 'studio' })
+                      }).catch(() => {});
+                    }
                     if (podiumData.product) {
                       navigateTo3DStudio(podiumData.product);
                     }
@@ -7560,6 +7567,13 @@ export default function Home() {
                     setShowPodiumModal(false);
                     if (podiumData.weekNumber) {
                       sessionStorage.setItem(`sb_podium_seen_w${podiumData.weekNumber}`, 'true');
+                    }
+                    if (podiumData.bid?.id) {
+                      fetch('/api/podium/active', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ bidId: podiumData.bid.id, action: 'click' })
+                      }).catch(() => {});
                     }
                     if (podiumData.product) {
                       handleProductCardClick(podiumData.product);

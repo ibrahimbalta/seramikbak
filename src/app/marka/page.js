@@ -142,6 +142,8 @@ export default function BrandPortalPage() {
   const [podiumSubmitMsg, setPodiumSubmitMsg] = useState('');
   const [podiumErrorMsg, setPodiumErrorMsg] = useState('');
   const [isSubmittingPodium, setIsSubmittingPodium] = useState(false);
+  const [editingDekontMap, setEditingDekontMap] = useState({});
+  const [savingDekontId, setSavingDekontId] = useState(null);
 
   // SaaS Payment States
   const [bankDetails, setBankDetails] = useState({ bank_name: '', bank_recipient: '', bank_iban: '' });
@@ -490,6 +492,38 @@ export default function BrandPortalPage() {
       console.error(err);
     } finally {
       setIsSubmittingPodium(false);
+    }
+  };
+
+  const handleSavePaymentRef = async (bidId) => {
+    const ref = editingDekontMap[bidId];
+    if (!ref || !ref.trim()) {
+      alert('Lütfen geçerli bir banka dekont / referans numarası giriniz.');
+      return;
+    }
+    setSavingDekontId(bidId);
+    try {
+      const res = await fetch('/api/b2b/podium', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'submit_payment_ref',
+          bidId,
+          paymentRef: ref.trim()
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        alert(data.message || 'Banka dekont referans numarası başarıyla kaydedildi!');
+        if (brandInfo?.id) fetchPodiumAuctionInfo(brandInfo.id);
+      } else {
+        alert(data.error || 'Dekont kaydedilemedi.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('İşlem sırasında bir hata oluştu.');
+    } finally {
+      setSavingDekontId(null);
     }
   };
 
@@ -2514,6 +2548,30 @@ export default function BrandPortalPage() {
                         </p>
                       </div>
 
+                      {/* Auction Closed Warning Banner */}
+                      {podiumAuctionInfo?.isAuctionClosed && (
+                        <div style={{
+                          background: 'rgba(239, 68, 68, 0.12)',
+                          border: '1.5px solid rgba(239, 68, 68, 0.5)',
+                          borderRadius: '14px',
+                          padding: '14px 18px',
+                          color: '#f87171',
+                          fontSize: '0.85rem',
+                          fontWeight: '700',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px'
+                        }}>
+                          <Lock size={22} style={{ flexShrink: 0 }} />
+                          <div>
+                            <div style={{ fontSize: '0.9rem', fontWeight: '900', color: '#fca5a5' }}>🔒 BU HAFTANIN PODYUM İHALESİ KAPANMIŞTIR</div>
+                            <div style={{ fontSize: '0.78rem', color: '#f87171', fontWeight: '500', marginTop: '2px' }}>
+                              Yönetici tarafından bu haftanın kazanan podyum reklamı onaylanmıştır. Yeni teklif alımı kapatılmıştır, daha yüksek teklif verilemez.
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Live Auction Metrics Stats Bar */}
                       <div style={{
                         display: 'grid',
@@ -2537,9 +2595,9 @@ export default function BrandPortalPage() {
                           </div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700' }}>MİNİMUM GEREKLİ TEKLİF</div>
-                          <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#38bdf8', marginTop: '2px' }}>
-                            ₺{podiumAuctionInfo?.minNextBid ? podiumAuctionInfo.minNextBid.toLocaleString('tr-TR') : '1.500'}
+                          <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700' }}>İHALE DURUMU</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: '800', color: podiumAuctionInfo?.isAuctionClosed ? '#ef4444' : '#38bdf8', marginTop: '4px' }}>
+                            {podiumAuctionInfo?.isAuctionClosed ? '🔒 Kapanmış (Onaylandı)' : `₺${podiumAuctionInfo?.minNextBid ? podiumAuctionInfo.minNextBid.toLocaleString('tr-TR') : '1.500'} (Açık İhale)`}
                           </div>
                         </div>
                       </div>
@@ -2564,7 +2622,8 @@ export default function BrandPortalPage() {
                               value={podiumProduct}
                               onChange={(e) => setPodiumProduct(e.target.value)}
                               required
-                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff' }}
+                              disabled={podiumAuctionInfo?.isAuctionClosed || isSubmittingPodium}
+                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff', opacity: podiumAuctionInfo?.isAuctionClosed ? 0.6 : 1 }}
                             >
                               <option value="">Ürün Seçiniz...</option>
                               {brandProducts.map(p => (
@@ -2580,9 +2639,10 @@ export default function BrandPortalPage() {
                               value={podiumBidAmount}
                               onChange={(e) => setPodiumBidAmount(e.target.value)}
                               required
+                              disabled={podiumAuctionInfo?.isAuctionClosed || isSubmittingPodium}
                               min={podiumAuctionInfo?.minNextBid || 1500}
                               placeholder="Örn: 5000"
-                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff' }}
+                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff', opacity: podiumAuctionInfo?.isAuctionClosed ? 0.6 : 1 }}
                             />
                           </div>
                         </div>
@@ -2594,81 +2654,189 @@ export default function BrandPortalPage() {
                               type="text"
                               value={podiumTitle}
                               onChange={(e) => setPodiumTitle(e.target.value)}
+                              disabled={podiumAuctionInfo?.isAuctionClosed || isSubmittingPodium}
                               placeholder="Örn: Yeni Lüks Calacatta Mermer Serisi"
-                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff' }}
+                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff', opacity: podiumAuctionInfo?.isAuctionClosed ? 0.6 : 1 }}
                             />
                           </div>
 
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Banka Dekont / Referans No</label>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Kampanya Açıklaması (Opsiyonel)</label>
                             <input 
                               type="text"
-                              value={podiumPaymentRef}
-                              onChange={(e) => setPodiumPaymentRef(e.target.value)}
-                              placeholder="Örn: TR87-AKB-987654"
-                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff' }}
+                              value={podiumDescription}
+                              onChange={(e) => setPodiumDescription(e.target.value)}
+                              disabled={podiumAuctionInfo?.isAuctionClosed || isSubmittingPodium}
+                              placeholder="Örn: Özel koleksiyon podyum seramik tanıtımı"
+                              style={{ padding: '12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)', fontSize: '0.85rem', background: '#090d16', color: '#fff', opacity: podiumAuctionInfo?.isAuctionClosed ? 0.6 : 1 }}
                             />
                           </div>
                         </div>
 
+                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', background: 'rgba(255,255,255,0.03)', padding: '10px 14px', borderRadius: '8px', borderLeft: '3px solid #d4af37' }}>
+                          💡 <strong>Not:</strong> Teklifiniz yönetici tarafından onaylandıktan sonra banka dekont numaranızı aşağıdaki teklif listenizden kaydedebilirsiniz.
+                        </div>
+
                         <button 
                           type="submit"
-                          disabled={isSubmittingPodium || !podiumProduct}
+                          disabled={podiumAuctionInfo?.isAuctionClosed || isSubmittingPodium || !podiumProduct}
                           style={{
-                            background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                            color: '#000',
+                            background: podiumAuctionInfo?.isAuctionClosed 
+                              ? 'rgba(255,255,255,0.1)' 
+                              : 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                            color: podiumAuctionInfo?.isAuctionClosed ? '#94a3b8' : '#000',
                             border: 'none',
                             borderRadius: '12px',
                             padding: '14px',
                             fontWeight: '900',
                             fontSize: '0.9rem',
-                            cursor: 'pointer',
+                            cursor: podiumAuctionInfo?.isAuctionClosed ? 'not-allowed' : 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             gap: '8px',
-                            boxShadow: '0 8px 20px rgba(212,175,55,0.3)',
-                            marginTop: '8px'
+                            boxShadow: podiumAuctionInfo?.isAuctionClosed ? 'none' : '0 8px 20px rgba(212,175,55,0.3)',
+                            marginTop: '4px'
                           }}
                         >
                           <Sparkles size={18} />
-                          <span>{isSubmittingPodium ? 'Gönderiliyor...' : 'Podyum İhalesine Teklif Ver & Katıl'}</span>
+                          <span>
+                            {podiumAuctionInfo?.isAuctionClosed 
+                              ? '🔒 Bu Haftanın İhalesi Kapandı (Kazanan Onaylandı)' 
+                              : (isSubmittingPodium ? 'Gönderiliyor...' : 'Podyum İhalesine Teklif Ver & Katıl')}
+                          </span>
                         </button>
                       </form>
 
-                      {/* Brand's Podium Bids History Table */}
+                      {/* Brand's Podium Bids History & Analytics Table */}
                       {podiumBrandBids.length > 0 && (
-                        <div style={{ marginTop: '12px' }}>
-                          <h4 style={{ fontSize: '0.9rem', fontWeight: '800', margin: '0 0 12px 0', color: '#d4af37' }}>Geçmiş & Aktif Podyum Teklifleriniz</h4>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div style={{ marginTop: '16px' }}>
+                          <h4 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 14px 0', color: '#d4af37', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Activity size={18} />
+                            Geçmiş & Aktif Podyum Teklifleriniz ve Reklam Performansı
+                          </h4>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                             {podiumBrandBids.map(bid => {
-                              let statusBadge = { label: 'Admin Onayı Bekliyor', bg: 'rgba(234, 179, 8, 0.2)', color: '#facc15' };
+                              let statusBadge = { label: '⏳ Admin Onayı Bekliyor', bg: 'rgba(234, 179, 8, 0.2)', color: '#facc15' };
                               if (bid.status === 'WINNER_ACTIVE') statusBadge = { label: '🏆 Kazanan (Aktif Podyumda)', bg: 'rgba(16, 185, 129, 0.25)', color: '#34d399' };
+                              if (bid.status === 'EXPIRED') statusBadge = { label: '⏱️ Süresi Doldu (Pasif)', bg: 'rgba(148, 163, 184, 0.2)', color: '#cbd5e1' };
                               if (bid.status === 'OUTBID') statusBadge = { label: '⚠️ Geçildi (Daha yüksek teklif verildi)', bg: 'rgba(249, 115, 22, 0.2)', color: '#fb923c' };
                               if (bid.status === 'REJECTED') statusBadge = { label: '❌ Reddedildi', bg: 'rgba(239, 68, 68, 0.2)', color: '#f87171' };
 
+                              const currentDekontVal = editingDekontMap[bid.id] !== undefined ? editingDekontMap[bid.id] : (bid.paymentRef || '');
+
                               return (
                                 <div key={bid.id} style={{
-                                  background: 'rgba(255,255,255,0.04)',
-                                  border: '1px solid rgba(255,255,255,0.08)',
-                                  borderRadius: '12px',
-                                  padding: '12px 16px',
+                                  background: 'rgba(15, 23, 42, 0.6)',
+                                  border: bid.status === 'WINNER_ACTIVE' ? '1.5px solid rgba(16, 185, 129, 0.6)' : '1px solid rgba(255,255,255,0.08)',
+                                  borderRadius: '14px',
+                                  padding: '16px',
                                   display: 'flex',
-                                  justifyContent: 'space-between',
-                                  alignItems: 'center',
-                                  flexWrap: 'wrap',
-                                  gap: '10px'
+                                  flexDirection: 'column',
+                                  gap: '12px'
                                 }}>
-                                  <div>
-                                    <strong style={{ color: '#fff', fontSize: '0.88rem' }}>{bid.product?.name}</strong>
-                                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>Hafta {bid.weekNumber} ({bid.year}) • Slogan: {bid.title || 'Varsayılan'}</div>
+                                  {/* Header Info */}
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                                    <div>
+                                      <strong style={{ color: '#fff', fontSize: '0.95rem' }}>{bid.product?.name} ({bid.product?.code})</strong>
+                                      <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '3px' }}>
+                                        Hafta {bid.weekNumber} ({bid.year}) • Slogan: <span style={{ color: '#f1f5f9' }}>{bid.title || 'Varsayılan'}</span>
+                                      </div>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                      <div style={{ fontWeight: '900', color: '#d4af37', fontSize: '1.05rem' }}>₺{bid.bidAmount.toLocaleString('tr-TR')}</div>
+                                      <span style={{ fontSize: '0.7rem', background: statusBadge.bg, color: statusBadge.color, padding: '3px 10px', borderRadius: '12px', fontWeight: '800', marginTop: '3px', display: 'inline-block' }}>
+                                        {statusBadge.label}
+                                      </span>
+                                    </div>
                                   </div>
-                                  <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontWeight: '900', color: '#d4af37', fontSize: '0.95rem' }}>₺{bid.bidAmount.toLocaleString('tr-TR')}</div>
-                                    <span style={{ fontSize: '0.65rem', background: statusBadge.bg, color: statusBadge.color, padding: '2px 8px', borderRadius: '10px', fontWeight: '700', marginTop: '2px', display: 'inline-block' }}>
-                                      {statusBadge.label}
-                                    </span>
+
+                                  {/* Performance Analytics Metrics Bar */}
+                                  <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(3, 1fr)',
+                                    gap: '10px',
+                                    background: 'rgba(255,255,255,0.03)',
+                                    border: '1px solid rgba(255,255,255,0.06)',
+                                    borderRadius: '10px',
+                                    padding: '10px 14px'
+                                  }}>
+                                    <div>
+                                      <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: '700' }}>👁️ GÖRÜNTÜLENME</div>
+                                      <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#60a5fa', marginTop: '2px' }}>
+                                        {bid.impressions ? bid.impressions.toLocaleString('tr-TR') : 0} <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>kez</span>
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: '700' }}>🖱️ DETAY TIKLANMA</div>
+                                      <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#34d399', marginTop: '2px' }}>
+                                        {bid.clicks ? bid.clicks.toLocaleString('tr-TR') : 0} <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>kez</span>
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: '700' }}>🎨 3D STÜDYO DENENME</div>
+                                      <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#f59e0b', marginTop: '2px' }}>
+                                        {bid.studioTries ? bid.studioTries.toLocaleString('tr-TR') : 0} <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>kez</span>
+                                      </div>
+                                    </div>
                                   </div>
+
+                                  {/* Bank Dekont / Reference Submission Field */}
+                                  {(bid.status === 'WINNER_ACTIVE' || bid.status === 'PENDING_APPROVAL') && (
+                                    <div style={{
+                                      background: 'rgba(212, 175, 55, 0.08)',
+                                      border: '1px solid rgba(212, 175, 55, 0.25)',
+                                      borderRadius: '10px',
+                                      padding: '10px 14px',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      flexWrap: 'wrap',
+                                      gap: '10px'
+                                    }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <CreditCard size={16} style={{ color: '#d4af37' }} />
+                                        <span style={{ fontSize: '0.78rem', color: '#e2e8f0', fontWeight: '700' }}>
+                                          Banka Dekont / Ödeme Ref No:
+                                        </span>
+                                      </div>
+
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '220px', justifyContent: 'flex-end' }}>
+                                        <input 
+                                          type="text"
+                                          value={currentDekontVal}
+                                          onChange={(e) => setEditingDekontMap(prev => ({ ...prev, [bid.id]: e.target.value }))}
+                                          placeholder="Örn: TR87-AKB-987654"
+                                          style={{
+                                            padding: '6px 12px',
+                                            borderRadius: '8px',
+                                            border: '1px solid rgba(255,255,255,0.2)',
+                                            fontSize: '0.8rem',
+                                            background: '#090d16',
+                                            color: '#fff',
+                                            maxWidth: '200px'
+                                          }}
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={() => handleSavePaymentRef(bid.id)}
+                                          disabled={savingDekontId === bid.id || !currentDekontVal.trim()}
+                                          style={{
+                                            background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                                            color: '#000',
+                                            border: 'none',
+                                            borderRadius: '8px',
+                                            padding: '7px 14px',
+                                            fontWeight: '800',
+                                            fontSize: '0.75rem',
+                                            cursor: 'pointer'
+                                          }}
+                                        >
+                                          {savingDekontId === bid.id ? 'Kaydediliyor...' : 'Dekontu Kaydet'}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               );
                             })}

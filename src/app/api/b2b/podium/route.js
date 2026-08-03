@@ -17,8 +17,29 @@ export async function GET(request) {
 
     const { weekNumber, year } = getISOWeekDetails();
 
+    // Auto-expire winner active bids from past weeks
+    await prisma.podiumBid.updateMany({
+      where: {
+        OR: [
+          { year: { lt: year } },
+          { year: year, weekNumber: { lt: weekNumber } }
+        ],
+        status: 'WINNER_ACTIVE'
+      },
+      data: { status: 'EXPIRED' }
+    }).catch(err => console.error('Auto expire podium bids error:', err));
+
+    // Check if there is an approved winner active bid for this week
+    const activeWinner = await prisma.podiumBid.findFirst({
+      where: { weekNumber, year, status: 'WINNER_ACTIVE' },
+      include: {
+        brand: { select: { name: true } },
+        product: { select: { name: true, code: true } }
+      }
+    });
+
     // Get highest bid for current week
-    const highestBidObj = await prisma.podiumBid.findFirst({
+    const highestBidObj = activeWinner || await prisma.podiumBid.findFirst({
       where: { weekNumber, year, status: { in: ['PENDING_APPROVAL', 'WINNER_ACTIVE'] } },
       orderBy: { bidAmount: 'desc' },
       include: {
@@ -28,7 +49,7 @@ export async function GET(request) {
     });
 
     const highestBidAmount = highestBidObj ? highestBidObj.bidAmount : 0;
-    const minNextBid = highestBidAmount > 0 ? highestBidAmount + 250 : 1500; // Starting bid 1500 TL, min increment 250 TL
+    const minNextBid = highestBidAmount > 0 ? highestBidAmount + 250 : 1500;
 
     // Get bids for this brand if brandId supplied
     let brandBids = [];
@@ -46,6 +67,7 @@ export async function GET(request) {
       success: true,
       currentWeek: weekNumber,
       currentYear: year,
+      isAuctionClosed: !!activeWinner,
       highestBidAmount,
       highestBidBrand: highestBidObj?.brand?.name || null,
       highestBidProduct: highestBidObj?.product?.name || null,
@@ -64,7 +86,29 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { brandId, productId, bidAmount, paymentRef, title, description, targetWeek, targetYear } = body;
+
+    // 1. Dekont / Referans Güncelleme Aksiyonu (Onaylandıktan / Tekliften Sonra)
+    if (body.action === 'submit_payment_ref') {
+      const { bidId, paymentRef } = body;
+      if (!bidId || !paymentRef) {
+        return NextResponse.json({ error: 'Eksik parametre: bidId ve paymentRef zorunludur.' }, { status: 400 });
+      }
+
+      const updated = await prisma.podiumBid.update({
+        where: { id: bidId },
+        data: { paymentRef: String(paymentRef).trim() },
+        include: { product: { select: { name: true, code: true } } }
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: 'Banka dekont referans numarası başarıyla kaydedildi!',
+        bid: updated
+      });
+    }
+
+    // 2. Yeni Teklif Oluşturma Aksiyonu
+    const { brandId, productId, bidAmount, title, description, targetWeek, targetYear } = body;
 
     if (!brandId || !productId || !bidAmount) {
       return NextResponse.json(
@@ -78,9 +122,21 @@ export async function POST(request) {
     const year = parseInt(targetYear || currentYear, 10);
     const numericBid = parseFloat(bidAmount);
 
-    // Get current highest bid for this week
+    // KONTROL: Eğer bu hafta için onaylanmış aktif bir reklam varsa ihale KAPALIDIR! Daha yüksek teklif verilemez.
+    const activeWinner = await prisma.podiumBid.findFirst({
+      where: { weekNumber, year, status: 'WINNER_ACTIVE' }
+    });
+
+    if (activeWinner) {
+      return NextResponse.json(
+        { error: 'Bu hafta için yönetici tarafından onaylanmış aktif bir podyum reklamı bulunmaktadır. Bu haftanın reklam alanı kapatılmıştır, yeni teklif verilemez.' },
+        { status: 400 }
+      );
+    }
+
+    // Get current highest pending bid for this week
     const currentHighest = await prisma.podiumBid.findFirst({
-      where: { weekNumber, year, status: { in: ['PENDING_APPROVAL', 'WINNER_ACTIVE'] } },
+      where: { weekNumber, year, status: 'PENDING_APPROVAL' },
       orderBy: { bidAmount: 'desc' }
     });
 
@@ -98,13 +154,13 @@ export async function POST(request) {
       );
     }
 
-    // Create the new podium bid
+    // Create the new podium bid (Dekont is submitted after approval or confirmation)
     const newBid = await prisma.podiumBid.create({
       data: {
         brandId,
         productId,
         bidAmount: numericBid,
-        paymentRef: paymentRef || '',
+        paymentRef: body.paymentRef || '',
         title: title || 'Haftalık Podyum Özel Serisi',
         description: description || '',
         weekNumber,
@@ -116,7 +172,7 @@ export async function POST(request) {
       }
     });
 
-    // Mark lower pending bids for the same brand or outbid status
+    // Mark lower pending bids for outbid status
     if (currentHighest && currentHighest.brandId !== brandId) {
       await prisma.podiumBid.updateMany({
         where: {
@@ -131,7 +187,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Podyum reklam teklifiniz başarıyla alındı! Ödemeniz ve dekontunuz doğrulandıktan sonra onaylanacaktır.',
+      message: 'Podyum reklam teklifiniz başarıyla alındı! Yönetici onayından sonra dekont bilgisi girilerek yayın aktif edilecektir.',
       bid: newBid
     });
   } catch (error) {
