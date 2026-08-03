@@ -7350,12 +7350,12 @@ export default function Home() {
             onClick={(e) => e.stopPropagation()}
             style={{
               width: '100%',
-              maxWidth: '430px',
-              maxHeight: '92vh',
-              overflowY: 'auto',
+              maxWidth: '410px',
+              maxHeight: 'min(92vh, 590px)',
+              overflow: 'hidden',
               background: 'linear-gradient(180deg, #090d16 0%, #111827 50%, #030712 100%)',
               border: '1.5px solid rgba(212, 175, 55, 0.6)',
-              borderRadius: '26px',
+              borderRadius: '24px',
               boxShadow: '0 30px 80px -15px rgba(0,0,0,0.95), 0 0 60px rgba(212, 175, 55, 0.25)',
               position: 'relative',
               color: '#ffffff',
@@ -7365,7 +7365,7 @@ export default function Home() {
           >
             {/* Header Badge & Close Button */}
             <div style={{
-              padding: '18px 20px 12px 20px',
+              padding: '14px 18px 10px 18px',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -7376,8 +7376,8 @@ export default function Home() {
                   background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 50%, #fef08a 100%)',
                   color: '#090d16',
                   fontWeight: '900',
-                  fontSize: '0.7rem',
-                  padding: '5px 12px',
+                  fontSize: '0.68rem',
+                  padding: '4px 10px',
                   borderRadius: '20px',
                   boxShadow: '0 0 15px rgba(212, 175, 55, 0.5)',
                   letterSpacing: '0.06em',
@@ -7386,10 +7386,10 @@ export default function Home() {
                   alignItems: 'center',
                   gap: '6px'
                 }}>
-                  <Sparkles size={14} /> Haftanın Podyum Vitrini
+                  <Sparkles size={13} /> Haftanın Podyum Vitrini
                 </span>
                 {podiumData.brand?.name && (
-                  <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: '700' }}>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: '700' }}>
                     • {podiumData.brand.name}
                   </span>
                 )}
@@ -7406,8 +7406,8 @@ export default function Home() {
                   background: 'rgba(255,255,255,0.08)',
                   border: '1px solid rgba(255,255,255,0.15)',
                   color: '#cbd5e1',
-                  width: '32px',
-                  height: '32px',
+                  width: '28px',
+                  height: '28px',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
@@ -7416,33 +7416,33 @@ export default function Home() {
                   transition: 'all 0.2s'
                 }}
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
             {/* Podium Runway Stage Body */}
-            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+            <div style={{ padding: '14px 18px 18px 18px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* 3D Runway Stage & Tall Standing Slab Visual */}
               <div style={{
                 position: 'relative',
-                height: '340px',
-                borderRadius: '20px',
+                height: '250px',
+                borderRadius: '16px',
                 background: 'radial-gradient(ellipse at 50% 10%, rgba(212, 175, 55, 0.3) 0%, rgba(15, 23, 42, 0.98) 70%, #030712 100%)',
                 border: '1px solid rgba(212, 175, 55, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 overflow: 'hidden',
-                boxShadow: 'inset 0 0 40px rgba(0,0,0,0.8)'
+                boxShadow: 'inset 0 0 30px rgba(0,0,0,0.8)'
               }}>
                 {/* Overhead Runway Spotlight Beams */}
                 <div style={{
                   position: 'absolute',
-                  top: '-30px',
+                  top: '-25px',
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  width: '220px',
-                  height: '320px',
+                  width: '190px',
+                  height: '240px',
                   background: 'linear-gradient(180deg, rgba(255, 240, 180, 0.25) 0%, rgba(212, 175, 55, 0.08) 60%, transparent 100%)',
                   clipPath: 'polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%)',
                   pointerEvents: 'none',
@@ -7452,27 +7452,27 @@ export default function Home() {
                 {/* Shimmer Ambient Glow behind standing slab */}
                 <div style={{
                   position: 'absolute',
-                  width: '180px',
-                  height: '260px',
+                  width: '140px',
+                  height: '190px',
                   background: 'radial-gradient(circle, rgba(212, 175, 55, 0.35) 0%, transparent 70%)',
-                  filter: 'blur(20px)',
+                  filter: 'blur(16px)',
                   zIndex: 1
                 }} />
 
                 {/* Tall "Boydan" Standing Ceramic Slab on Runway */}
-                {podiumData.product?.imageUrl && (
+                {(podiumData.product?.imageUrl || podiumData.product?.textureUrl) && (
                   <img 
-                    src={podiumData.product.imageUrl} 
+                    src={podiumData.product.imageUrl || podiumData.product.textureUrl} 
                     alt={podiumData.product.name}
                     style={{
-                      height: '285px',
-                      width: '210px',
+                      height: '215px',
+                      width: '155px',
                       objectFit: 'cover',
-                      borderRadius: '16px',
+                      borderRadius: '12px',
                       border: '2px solid rgba(212, 175, 55, 0.6)',
-                      boxShadow: '0 25px 50px rgba(0,0,0,0.9), 0 0 35px rgba(212, 175, 55, 0.4)',
+                      boxShadow: '0 20px 40px rgba(0,0,0,0.9), 0 0 25px rgba(212, 175, 55, 0.4)',
                       zIndex: 3,
-                      transform: 'perspective(1000px) rotateX(6deg) translateY(-8px)',
+                      transform: 'perspective(1000px) rotateX(6deg) translateY(-6px)',
                       transition: 'transform 0.4s ease'
                     }}
                     onError={(e) => {
@@ -7485,12 +7485,12 @@ export default function Home() {
                 {/* Metallic Gold Catwalk Pedestal Base */}
                 <div style={{
                   position: 'absolute',
-                  bottom: '12px',
-                  width: '80%',
-                  height: '24px',
+                  bottom: '10px',
+                  width: '75%',
+                  height: '18px',
                   borderRadius: '50%',
                   background: 'radial-gradient(ellipse at center, rgba(212, 175, 55, 0.6) 0%, rgba(180, 140, 45, 0.2) 60%, transparent 90%)',
-                  boxShadow: '0 0 20px rgba(212, 175, 55, 0.5)',
+                  boxShadow: '0 0 16px rgba(212, 175, 55, 0.5)',
                   filter: 'blur(3px)',
                   zIndex: 2
                 }} />
@@ -7501,7 +7501,7 @@ export default function Home() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: '50px',
+                  height: '40px',
                   background: 'linear-gradient(180deg, transparent 0%, rgba(212, 175, 55, 0.1) 100%)',
                   borderTop: '1px solid rgba(212, 175, 55, 0.3)',
                   zIndex: 1
@@ -7509,20 +7509,20 @@ export default function Home() {
               </div>
 
               {/* Title & Description */}
-              <div style={{ textAlign: 'center', padding: '0 4px' }}>
-                <div style={{ fontSize: '0.75rem', color: '#d4af37', fontWeight: '800', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '6px' }}>
+              <div style={{ textAlign: 'center', padding: '0 2px' }}>
+                <div style={{ fontSize: '0.7rem', color: '#d4af37', fontWeight: '800', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '4px' }}>
                   {podiumData.product?.code} • {podiumData.product?.width || 60}x{podiumData.product?.height || 120} CM
                 </div>
-                <h3 style={{ fontSize: '1.35rem', fontWeight: '900', margin: '0 0 8px 0', fontFamily: 'var(--font-title, "Outfit", sans-serif)', color: '#ffffff', letterSpacing: '-0.01em' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '900', margin: '0 0 4px 0', fontFamily: 'var(--font-title, "Outfit", sans-serif)', color: '#ffffff', letterSpacing: '-0.01em' }}>
                   {podiumData.title || podiumData.product?.name}
                 </h3>
-                <p style={{ fontSize: '0.84rem', color: '#cbd5e1', margin: 0, lineHeight: '1.5' }}>
+                <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: 0, lineHeight: '1.4' }}>
                   {podiumData.description || `${podiumData.brand?.name} markasının bu haftaki podyum yıldızı olan özel koleksiyon seramiği SeramikBak Vitrini'nde.`}
                 </p>
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '4px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '2px' }}>
                 <button
                   onClick={() => {
                     setShowPodiumModal(false);
@@ -7539,21 +7539,21 @@ export default function Home() {
                     background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 50%, #fef08a 100%)',
                     color: '#090d16',
                     border: 'none',
-                    borderRadius: '14px',
-                    padding: '14px',
+                    borderRadius: '12px',
+                    padding: '11px',
                     fontWeight: '900',
-                    fontSize: '0.9rem',
+                    fontSize: '0.84rem',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '8px',
-                    boxShadow: '0 8px 25px rgba(212,175,55,0.4)',
+                    gap: '6px',
+                    boxShadow: '0 6px 20px rgba(212,175,55,0.4)',
                     letterSpacing: '0.02em',
                     transition: 'transform 0.2s'
                   }}
                 >
-                  <Sparkles size={18} /> 3D Sanal Stüdyoda Canlı Dene
+                  <Sparkles size={16} /> 3D Sanal Stüdyoda Canlı Dene
                 </button>
 
                 <button
@@ -7571,10 +7571,10 @@ export default function Home() {
                     background: 'rgba(255,255,255,0.06)',
                     color: '#e2e8f0',
                     border: '1px solid rgba(255,255,255,0.15)',
-                    borderRadius: '14px',
-                    padding: '12px',
+                    borderRadius: '12px',
+                    padding: '9px',
                     fontWeight: '700',
-                    fontSize: '0.84rem',
+                    fontSize: '0.78rem',
                     cursor: 'pointer',
                     textAlign: 'center',
                     transition: 'background 0.2s'
