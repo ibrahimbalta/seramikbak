@@ -5323,7 +5323,7 @@ export default function DealerPortalPage() {
                         value={outletTitle}
                         onChange={(e) => setOutletTitle(e.target.value)}
                         required
-                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
                       />
                     </div>
 
@@ -5374,7 +5374,7 @@ export default function DealerPortalPage() {
                           value={outletQuantityM2}
                           onChange={(e) => setOutletQuantityM2(e.target.value)}
                           required
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
                         />
                       </div>
 
@@ -5388,7 +5388,7 @@ export default function DealerPortalPage() {
                           value={outletUnitPrice}
                           onChange={(e) => setOutletUnitPrice(e.target.value)}
                           required
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
                         />
                       </div>
 
@@ -5401,7 +5401,7 @@ export default function DealerPortalPage() {
                           placeholder="Örn: 580"
                           value={outletOriginalPrice}
                           onChange={(e) => setOutletOriginalPrice(e.target.value)}
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
                         />
                       </div>
                     </div>
@@ -5416,7 +5416,7 @@ export default function DealerPortalPage() {
                           placeholder="Örn: 60x120 cm"
                           value={outletDimensions}
                           onChange={(e) => setOutletDimensions(e.target.value)}
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
                         />
                       </div>
 
@@ -5429,7 +5429,7 @@ export default function DealerPortalPage() {
                           placeholder="Örn: Parlak Beyaz Mermer"
                           value={outletColorFinish}
                           onChange={(e) => setOutletColorFinish(e.target.value)}
-                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
                         />
                       </div>
                     </div>
@@ -5443,7 +5443,7 @@ export default function DealerPortalPage() {
                         placeholder="https://... veya /textures/calacatta_gold.jpg"
                         value={outletImageUrl}
                         onChange={(e) => setOutletImageUrl(e.target.value)}
-                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', color: '#0f172a', backgroundColor: '#ffffff' }}
                       />
                     </div>
 
@@ -5456,7 +5456,7 @@ export default function DealerPortalPage() {
                         placeholder="Örn: Kadıköy lüks konut projesinden kalan paketli sıfır ürünler. Banyo yenilemek için ideal."
                         value={outletNotes}
                         onChange={(e) => setOutletNotes(e.target.value)}
-                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }}
+                        style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', color: '#0f172a', backgroundColor: '#ffffff' }}
                       />
                     </div>
 
