@@ -608,8 +608,8 @@ export default function OutletMarketplacePage() {
 
                   {/* Body Info */}
                   <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {/* Dealer info banner */}
-                    {d && (
+                    {/* Dealer / Brand info banner */}
+                    {d ? (
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '8px', gap: '8px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
                           <Building2 size={13} style={{ color: '#d4af37', flexShrink: 0 }} />
@@ -620,7 +620,17 @@ export default function OutletMarketplacePage() {
                           {d.district}, {d.city}
                         </span>
                       </div>
-                    )}
+                    ) : item.brand ? (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '8px', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                          <Sparkles size={13} style={{ color: '#38bdf8', flexShrink: 0 }} />
+                          <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#38bdf8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.brand.name}</span>
+                        </div>
+                        <span style={{ fontSize: '0.65rem', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '1px 6px', borderRadius: '6px', fontWeight: '700', flexShrink: 0 }}>
+                          🏭 Fabrika Çıkışlı
+                        </span>
+                      </div>
+                    ) : null}
 
                     <h3 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#ffffff', margin: 0, lineHeight: '1.4' }}>
                       {item.title}

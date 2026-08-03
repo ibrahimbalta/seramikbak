@@ -33,7 +33,9 @@ import {
   MousePointerClick,
   Handshake,
   DollarSign,
-  Package
+  Package,
+  Tag,
+  Trash2
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -156,6 +158,23 @@ export default function BrandPortalPage() {
   const [paymentSuccess, setPaymentSuccess] = useState('');
   const [paymentError, setPaymentError] = useState('');
 
+  // Brand Outlet States
+  const [brandOutletListings, setBrandOutletListings] = useState([]);
+  const [brandOutletLoading, setBrandOutletLoading] = useState(false);
+  const [brandOutletTitle, setBrandOutletTitle] = useState('');
+  const [brandOutletCategory, setBrandOutletCategory] = useState('PROJE_FAZLASI');
+  const [brandOutletBadgeTag, setBrandOutletBadgeTag] = useState('Fabrika Çıkışlı / Proje Fazlası');
+  const [brandOutletQuantityM2, setBrandOutletQuantityM2] = useState('');
+  const [brandOutletUnitPrice, setBrandOutletUnitPrice] = useState('');
+  const [brandOutletOriginalPrice, setBrandOutletOriginalPrice] = useState('');
+  const [brandOutletDimensions, setBrandOutletDimensions] = useState('60x120 cm');
+  const [brandOutletColorFinish, setBrandOutletColorFinish] = useState('');
+  const [brandOutletImageUrl, setBrandOutletImageUrl] = useState('');
+  const [brandOutletNotes, setBrandOutletNotes] = useState('');
+  const [brandOutletProductId, setBrandOutletProductId] = useState('');
+  const [brandOutletSuccess, setBrandOutletSuccess] = useState('');
+  const [brandOutletError, setBrandOutletError] = useState('');
+
   const hasPending = b2bStats?.saas?.status === 'PENDING_APPROVAL' || b2bStats?.saas?.pendingStatus === 'PENDING_APPROVAL';
   const requestedPlan = b2bStats?.saas?.status === 'PENDING_APPROVAL' ? b2bStats.saas.plan : (b2bStats?.saas?.pendingStatus === 'PENDING_APPROVAL' ? b2bStats.saas.pendingPlan : null);
   const isRejected = b2bStats?.saas?.status === 'REJECTED' || b2bStats?.saas?.pendingStatus === 'REJECTED';
@@ -193,8 +212,113 @@ export default function BrandPortalPage() {
       fetchDealers();
       fetchB2bTrends(brandInfo.id);
       fetchPodiumAuctionInfo(brandInfo.id);
+      fetchBrandOutletListings(brandInfo.id);
     }
   }, [isLoggedIn, brandInfo]);
+
+  const fetchBrandOutletListings = async (bId) => {
+    const targetId = bId || brandInfo?.id;
+    if (!targetId) return;
+    setBrandOutletLoading(true);
+    try {
+      const res = await fetch(`/api/brands/outlet?brandId=${targetId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) setBrandOutletListings(data.data || []);
+      }
+    } catch (err) {
+      console.error('Failed to load brand outlet listings:', err);
+    } finally {
+      setBrandOutletLoading(false);
+    }
+  };
+
+  const handleBrandOutletSubmit = async (e) => {
+    e.preventDefault();
+    if (!brandInfo || !brandOutletTitle || !brandOutletQuantityM2 || !brandOutletUnitPrice) {
+      setBrandOutletError('Lütfen zorunlu alanları doldurun.');
+      return;
+    }
+    setBrandOutletLoading(true);
+    setBrandOutletSuccess('');
+    setBrandOutletError('');
+
+    try {
+      const res = await fetch('/api/brands/outlet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brandId: brandInfo.id,
+          productId: brandOutletProductId || null,
+          title: brandOutletTitle,
+          category: brandOutletCategory,
+          badgeTag: brandOutletBadgeTag,
+          quantityM2: brandOutletQuantityM2,
+          unitPrice: brandOutletUnitPrice,
+          originalPrice: brandOutletOriginalPrice || null,
+          dimensions: brandOutletDimensions,
+          colorFinish: brandOutletColorFinish,
+          imageUrl: brandOutletImageUrl || null,
+          notes: brandOutletNotes
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setBrandOutletSuccess('Outlet / Proje fazlası stok ilanınız başarıyla yayınlandı!');
+        setBrandOutletTitle('');
+        setBrandOutletQuantityM2('');
+        setBrandOutletUnitPrice('');
+        setBrandOutletOriginalPrice('');
+        setBrandOutletColorFinish('');
+        setBrandOutletImageUrl('');
+        setBrandOutletNotes('');
+        setBrandOutletProductId('');
+        fetchBrandOutletListings(brandInfo.id);
+      } else {
+        setBrandOutletError(data.error || 'İlan oluşturulamadı.');
+      }
+    } catch (err) {
+      console.error(err);
+      setBrandOutletError('İlan eklenirken sunucu hatası oluştu.');
+    } finally {
+      setBrandOutletLoading(false);
+    }
+  };
+
+  const handleUpdateBrandOutletStatus = async (id, status) => {
+    if (!brandInfo) return;
+    try {
+      const res = await fetch('/api/brands/outlet', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, brandId: brandInfo.id, status })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        fetchBrandOutletListings(brandInfo.id);
+      } else {
+        alert(data.error || 'Güncelleme başarısız.');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteBrandOutlet = async (id) => {
+    if (!brandInfo || !confirm('Bu outlet/proje fazlası ilanını silmek istediğinize emin misiniz?')) return;
+    try {
+      const res = await fetch(`/api/brands/outlet?id=${id}&brandId=${brandInfo.id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        fetchBrandOutletListings(brandInfo.id);
+      } else {
+        alert(data.error || 'İlan silinemedi.');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const loadBankDetails = async () => {
     try {
@@ -952,6 +1076,7 @@ export default function BrandPortalPage() {
               { id: 'trends', label: 'Bölgesel Trendler', icon: <TrendingUp size={18} /> },
               { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={18} /> },
               { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={18} /> },
+              { id: 'outlet', label: 'Outlet & Seri Sonu', icon: <Tag size={18} /> },
               { id: 'saas', label: 'Lisans & Ödemeler', icon: <CreditCard size={18} /> }
             ].map(item => {
               const isActive = activePortalTab === item.id;
@@ -1077,6 +1202,7 @@ export default function BrandPortalPage() {
                     {activePortalTab === 'trends' && 'Pazar Trendleri'}
                     {activePortalTab === 'dealers' && 'Bayi Ağı'}
                     {activePortalTab === 'campaigns' && 'Reklam Yönetimi'}
+                    {activePortalTab === 'outlet' && 'Outlet & Seri Sonu'}
                     {activePortalTab === 'saas' && 'Lisans & Ödemeler'}
                   </span>
                 </div>
@@ -1102,6 +1228,7 @@ export default function BrandPortalPage() {
                   {activePortalTab === 'trends' && 'Bölgesel Pazar Trendleri'}
                   {activePortalTab === 'dealers' && 'Yetkili Bayi Ağı Kontrolü'}
                   {activePortalTab === 'campaigns' && 'Vitrin & Reklam Yönetimi'}
+                  {activePortalTab === 'outlet' && 'Fabrika Çıkışlı Outlet & Seri Sonu İlan Yönetimi'}
                   {activePortalTab === 'saas' && 'SaaS Abonelik & Ödeme Yönetimi'}
                 </h1>
                 <p style={{ fontSize: '0.75rem', color: '#64748b', margin: '2px 0 0 0' }}>
@@ -2862,7 +2989,360 @@ export default function BrandPortalPage() {
                 </div>
               )}
 
-              {/* -------------------- TAB 6: SAAS BILLING -------------------- */}
+              {/* -------------------- TAB 6: BRAND OUTLET & SERİ SONU -------------------- */}
+              {activePortalTab === 'outlet' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  
+                  {/* Outlet Header */}
+                  <div>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Tag size={22} style={{ color: '#ef4444' }} />
+                      Fabrika Çıkışlı Outlet & Seri Sonu İlan Yönetimi
+                    </h2>
+                    <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                      Fabrikanızdaki proje fazlası, 2. kalite stokları ve seri sonu seramiklerinizi SeramikBak Outlet Borsası'nda bayilere ve müşterilere doğrudan sunun.
+                    </p>
+                  </div>
+
+                  {/* Outlet Stats Summary Cards */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '16px'
+                  }}>
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                      <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Aktif Fabrika İlanları</div>
+                      <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#0f172a', marginTop: '4px' }}>
+                        {brandOutletListings.filter(i => i.status === 'ACTIVE').length} <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Adet</span>
+                      </div>
+                    </div>
+
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                      <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Toplu Satıştaki Metraj</div>
+                      <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#2563eb', marginTop: '4px' }}>
+                        {brandOutletListings.reduce((acc, curr) => acc + (curr.quantityM2 || 0), 0).toLocaleString('tr-TR')} <span style={{ fontSize: '0.85rem', color: '#64748b' }}>m²</span>
+                      </div>
+                    </div>
+
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                      <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Stok Fırsat Portföy Değeri</div>
+                      <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#059669', marginTop: '4px' }}>
+                        ₺{brandOutletListings.reduce((acc, curr) => acc + ((curr.unitPrice || 0) * (curr.quantityM2 || 0)), 0).toLocaleString('tr-TR')}
+                      </div>
+                    </div>
+
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                      <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Canlı Vitrin Durumu</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#d4af37', marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Sparkles size={16} />
+                        <span>Fabrika Çıkışlı Üretici Vitrini</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Form & Listings Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '28px' }} className="brand-campaign-grid">
+                    
+                    {/* Left: Create Outlet Listing Form */}
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: '850', margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Plus size={18} style={{ color: '#ef4444' }} />
+                        Yeni Fabrika Outlet / Seri Sonu İlanı Yayınla
+                      </h3>
+
+                      {brandOutletSuccess && (
+                        <div style={{ background: '#ecfdf5', border: '1px solid #10b981', color: '#065f46', padding: '10px 14px', borderRadius: '8px', fontSize: '0.78rem' }}>
+                          ✅ {brandOutletSuccess}
+                        </div>
+                      )}
+                      {brandOutletError && (
+                        <div style={{ background: '#fef2f2', border: '1px solid #ef4444', color: '#991b1b', padding: '10px 14px', borderRadius: '8px', fontSize: '0.78rem' }}>
+                          ⚠️ {brandOutletError}
+                        </div>
+                      )}
+
+                      <form onSubmit={handleBrandOutletSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Katalog Ürünü (Opsiyonel Seçim)</label>
+                          <select
+                            value={brandOutletProductId}
+                            onChange={(e) => {
+                              const pId = e.target.value;
+                              setBrandOutletProductId(pId);
+                              if (pId) {
+                                const prod = brandProducts.find(p => p.id === pId);
+                                if (prod) {
+                                  setBrandOutletTitle(prod.name);
+                                  if (prod.width && prod.height) setBrandOutletDimensions(`${prod.width}x${prod.height} cm`);
+                                  if (prod.style || prod.finish) setBrandOutletColorFinish(`${prod.finish || ''} ${prod.style || ''}`.trim());
+                                  if (prod.imageUrl) setBrandOutletImageUrl(prod.imageUrl);
+                                  if (prod.trendyolPrice) setBrandOutletOriginalPrice(prod.trendyolPrice.toString());
+                                }
+                              }
+                            }}
+                            style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', background: '#fff' }}
+                          >
+                            <option value="">Katalog dışı serbest ürün ismi girin veya ürün seçin...</option>
+                            {brandProducts.map(p => (
+                              <option key={p.id} value={p.id}>{p.name} ({p.code})</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>İlan / Ürün Başlığı *</label>
+                          <input 
+                            type="text"
+                            value={brandOutletTitle}
+                            onChange={(e) => setBrandOutletTitle(e.target.value)}
+                            required
+                            placeholder="Örn: Calacatta Mermer Desen 60x120 Parlak Seri Sonu"
+                            style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                          />
+                        </div>
+
+                        <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>İlan Kategorisi</label>
+                            <select
+                              value={brandOutletCategory}
+                              onChange={(e) => setBrandOutletCategory(e.target.value)}
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', background: '#fff' }}
+                            >
+                              <option value="PROJE_FAZLASI">Proje Fazlası Stok</option>
+                              <option value="SERI_SONU">Seri Sonu / Kapatıyoruz</option>
+                              <option value="IKINCI_KALITE">2. Kalite / Revize</option>
+                              <option value="OUTLET">Fırsat Outlet</option>
+                            </select>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Vitrin Etiketi</label>
+                            <select
+                              value={brandOutletBadgeTag}
+                              onChange={(e) => setBrandOutletBadgeTag(e.target.value)}
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', background: '#fff' }}
+                            >
+                              <option value="Fabrika Çıkışlı / Proje Fazlası">Fabrika Çıkışlı / Proje Fazlası</option>
+                              <option value="Şok Fiyat / Fabrika Satış">Şok Fiyat / Fabrika Satış</option>
+                              <option value="Son Paletler">Son Paletler</option>
+                              <option value="Stok Sonu Kapatıyoruz">Stok Sonu Kapatıyoruz</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Toplam Metraj (m²) *</label>
+                            <input 
+                              type="number"
+                              value={brandOutletQuantityM2}
+                              onChange={(e) => setBrandOutletQuantityM2(e.target.value)}
+                              required
+                              placeholder="Örn: 450"
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                            />
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Outlet Fiyatı (₺/m²) *</label>
+                            <input 
+                              type="number"
+                              value={brandOutletUnitPrice}
+                              onChange={(e) => setBrandOutletUnitPrice(e.target.value)}
+                              required
+                              placeholder="Örn: 180"
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Referans Liste Fiyatı (₺/m²)</label>
+                            <input 
+                              type="number"
+                              value={brandOutletOriginalPrice}
+                              onChange={(e) => setBrandOutletOriginalPrice(e.target.value)}
+                              placeholder="Örn: 450 (İndirim oranı hesabı için)"
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                            />
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Ebat / Ölçü</label>
+                            <input 
+                              type="text"
+                              value={brandOutletDimensions}
+                              onChange={(e) => setBrandOutletDimensions(e.target.value)}
+                              placeholder="Örn: 60x120 cm"
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Renk & Yüzey Bitişi</label>
+                            <input 
+                              type="text"
+                              value={brandOutletColorFinish}
+                              onChange={(e) => setBrandOutletColorFinish(e.target.value)}
+                              placeholder="Örn: Parlak Rektifiyeli Mermer"
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                            />
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Görsel URL</label>
+                            <input 
+                              type="text"
+                              value={brandOutletImageUrl}
+                              onChange={(e) => setBrandOutletImageUrl(e.target.value)}
+                              placeholder="https://..."
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Açıklama / Notlar</label>
+                          <textarea 
+                            value={brandOutletNotes}
+                            onChange={(e) => setBrandOutletNotes(e.target.value)}
+                            placeholder="Örn: Orijinal paletlerinde, fabrikadan hemen teslim. Minimum alım 1 palettir."
+                            rows={2}
+                            style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', resize: 'vertical' }}
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={brandOutletLoading || !brandOutletTitle || !brandOutletQuantityM2 || !brandOutletUnitPrice}
+                          style={{
+                            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '10px',
+                            padding: '12px',
+                            fontWeight: '800',
+                            fontSize: '0.85rem',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            boxShadow: '0 4px 14px rgba(239, 68, 68, 0.3)',
+                            marginTop: '4px'
+                          }}
+                        >
+                          <Tag size={16} />
+                          <span>{brandOutletLoading ? 'Yayınlanıyor...' : 'Fabrika Outlet İlanını Yayınla'}</span>
+                        </button>
+                      </form>
+                    </div>
+
+                    {/* Right: Active & Past Brand Outlet Listings */}
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: '850', margin: '0 0 16px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Sparkles size={18} style={{ color: '#d4af37' }} />
+                        Aktif & Geçmiş Fabrika İlanlarınız ({brandOutletListings.length})
+                      </h3>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxHeight: '750px', overflowY: 'auto' }}>
+                        {brandOutletListings.map(item => {
+                          const discountPercent = item.originalPrice && item.originalPrice > item.unitPrice
+                            ? Math.round(((item.originalPrice - item.unitPrice) / item.originalPrice) * 100)
+                            : null;
+
+                          return (
+                            <div key={item.id} style={{
+                              background: '#f8fafc',
+                              border: item.status === 'ACTIVE' ? '1.5px solid #10b981' : '1px solid #e2e8f0',
+                              borderRadius: '12px',
+                              padding: '14px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '10px'
+                            }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                                <div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <span style={{ fontSize: '0.62rem', background: '#ef4444', color: '#fff', padding: '2px 6px', borderRadius: '6px', fontWeight: '800' }}>
+                                      {item.badgeTag || 'Fabrika Çıkışlı'}
+                                    </span>
+                                    {discountPercent && (
+                                      <span style={{ fontSize: '0.62rem', background: '#10b981', color: '#fff', padding: '2px 6px', borderRadius: '6px', fontWeight: '800' }}>
+                                        %{discountPercent} İndirim
+                                      </span>
+                                    )}
+                                  </div>
+                                  <strong style={{ fontSize: '0.9rem', color: '#0f172a', marginTop: '4px', display: 'block' }}>{item.title}</strong>
+                                  <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '2px' }}>
+                                    📦 {item.quantityM2} m² • 📏 {item.dimensions || 'Standart'} • 🎨 {item.colorFinish || 'Mat'}
+                                  </div>
+                                </div>
+
+                                <div style={{ textAlign: 'right' }}>
+                                  <div style={{ fontSize: '1.1rem', fontWeight: '900', color: '#ef4444' }}>₺{item.unitPrice.toLocaleString('tr-TR')} / m²</div>
+                                  {item.originalPrice && <div style={{ fontSize: '0.72rem', color: '#94a3b8', textDecoration: 'line-through' }}>₺{item.originalPrice.toLocaleString('tr-TR')}</div>}
+                                  <span style={{ fontSize: '0.68rem', background: item.status === 'ACTIVE' ? '#d1fae5' : (item.status === 'REJECTED' ? '#fee2e2' : '#e2e8f0'), color: item.status === 'ACTIVE' ? '#047857' : (item.status === 'REJECTED' ? '#b91c1c' : '#475569'), padding: '2px 8px', borderRadius: '8px', fontWeight: '700', marginTop: '4px', display: 'inline-block' }}>
+                                    {item.status === 'ACTIVE' ? '🟢 Aktif Vitrinde' : (item.status === 'RESERVED' ? '🟡 Rezerve' : '🔴 Satıldı / Pasif')}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {item.notes && (
+                                <div style={{ fontSize: '0.74rem', color: '#475569', background: '#fff', padding: '8px 10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                  "{item.notes}"
+                                </div>
+                              )}
+
+                              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', borderTop: '1px solid #e2e8f0', paddingTop: '8px', marginTop: '4px' }}>
+                                {item.status === 'ACTIVE' ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateBrandOutletStatus(item.id, 'SOLD')}
+                                    style={{ background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.7rem', fontWeight: '700', cursor: 'pointer' }}
+                                  >
+                                    Satıldı Olarak İşaretle
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateBrandOutletStatus(item.id, 'ACTIVE')}
+                                    style={{ background: '#ecfdf5', color: '#047857', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.7rem', fontWeight: '700', cursor: 'pointer' }}
+                                  >
+                                    Yeniden Aktifleştir
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteBrandOutlet(item.id)}
+                                  style={{ background: '#fef2f2', color: '#ef4444', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.7rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                >
+                                  <Trash2 size={12} />
+                                  <span>Sil</span>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {brandOutletListings.length === 0 && (
+                          <div style={{ textAlign: 'center', padding: '48px 16px', color: '#94a3b8', fontStyle: 'italic', fontSize: '0.85rem' }}>
+                            Henüz yayınlanmış bir fabrika outlet veya seri sonu ilanınız bulunmamaktadır.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              )}
+
+              {/* -------------------- TAB 7: SAAS BILLING -------------------- */}
               {activePortalTab === 'saas' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                   <div>

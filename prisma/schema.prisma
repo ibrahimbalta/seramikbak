@@ -19,6 +19,7 @@ model Brand {
   analytics AnalyticsLog[]
   saas      SaaSConfig[]
   podiumBids PodiumBid[]
+  outletListings OutletListing[]
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 }
@@ -307,8 +308,10 @@ model DealerInventory {
 
 model OutletListing {
   id            String   @id @default(uuid())
-  dealerId      String
-  dealer        Dealer   @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  dealerId      String?
+  dealer        Dealer?  @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  brandId       String?
+  brand         Brand?   @relation(fields: [brandId], references: [id], onDelete: Cascade)
   productId     String?
   product       Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   title         String

@@ -61,6 +61,13 @@ export async function GET(request) {
             }
           }
         },
+        brand: {
+          select: {
+            id: true,
+            name: true,
+            logoUrl: true
+          }
+        },
         product: {
           select: {
             id: true,
