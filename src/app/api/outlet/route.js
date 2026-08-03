@@ -10,7 +10,13 @@ export async function GET(request) {
     const dealerId = searchParams.get('dealerId');
     const limit = parseInt(searchParams.get('limit') || '50', 10);
 
+    const includeInactive = searchParams.get('includeInactive') === 'true';
+
     const where = {};
+
+    if (!includeInactive) {
+      where.status = 'ACTIVE';
+    }
 
     if (dealerId) {
       where.dealerId = dealerId;
@@ -21,21 +27,31 @@ export async function GET(request) {
     }
 
     if (city && city !== 'ALL') {
-      where.dealer = {
-        city: {
-          contains: city
-        }
-      };
+      where.OR = [
+        { dealer: { city: { contains: city } } },
+        { brandId: { not: null } }
+      ];
     }
 
     if (search) {
-      where.OR = [
+      const searchCondition = [
         { title: { contains: search } },
         { notes: { contains: search } },
         { dimensions: { contains: search } },
         { colorFinish: { contains: search } },
-        { badgeTag: { contains: search } }
+        { badgeTag: { contains: search } },
+        { brand: { name: { contains: search } } }
       ];
+
+      if (where.OR) {
+        where.AND = [
+          { OR: where.OR },
+          { OR: searchCondition }
+        ];
+        delete where.OR;
+      } else {
+        where.OR = searchCondition;
+      }
     }
 
     const outletItems = await prisma.outletListing.findMany({
