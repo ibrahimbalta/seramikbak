@@ -855,12 +855,6 @@ export default function BrandPortalPage() {
               )}
             </button>
           </form>
-
-          <div style={{ textAlign: 'center', marginTop: '28px', fontSize: '0.75rem', color: '#64748b', lineHeight: '1.4' }}>
-            Demo Giriş Bilgileri:<br />
-            Kullanıcı Adı: <strong>vitra</strong> / Şifre: <strong>vitra123</strong><br />
-            Kullanıcı Adı: <strong>kutahya</strong> / Şifre: <strong>kutahya123</strong>
-          </div>
         </div>
       </main>
 
