@@ -7562,7 +7562,7 @@ export default function Home() {
                       sessionStorage.setItem(`sb_podium_seen_w${podiumData.weekNumber}`, 'true');
                     }
                     if (podiumData.product) {
-                      handleTileCardClick(podiumData.product);
+                      handleProductCardClick(podiumData.product);
                     }
                   }}
                   style={{
