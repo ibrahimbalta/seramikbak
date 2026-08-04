@@ -44,7 +44,9 @@ import {
   Wrench,
   Palette,
   Shuffle,
-  Users
+  Users,
+  Camera,
+  Copy
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
