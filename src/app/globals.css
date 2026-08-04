@@ -2993,3 +2993,293 @@ select option:hover {
   flex-wrap: wrap;
 }
 
+/* ==========================================================================
+   HYPER-REALISTIC 3D ARCHITECTURAL ROOM STAGE
+   ========================================================================== */
+.studio-composite-room-view {
+  width: 100%;
+  height: 440px;
+  margin: 16px 0;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #cbd5e1;
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.25), 0 12px 35px rgba(15, 23, 42, 0.12);
+  background: #0f172a;
+}
+
+.composite-room-stage {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.stage-wall-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  overflow: hidden;
+  box-shadow: inset 0 -15px 30px rgba(0,0,0,0.3);
+  transition: all 0.4s ease;
+}
+
+.wall-grout-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 80px 45px;
+  pointer-events: none;
+}
+
+.wall-specular-gloss {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 40%, rgba(0,0,0,0.2) 100%);
+  pointer-events: none;
+}
+
+.wall-spotlights {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 30% 0%, rgba(255,248,220,0.35) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 0%, rgba(255,248,220,0.35) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Floating LED Mirror & Vanity Unit Overlay */
+.stage-backlit-mirror {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.6);
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(200,225,255,0.1) 100%);
+  box-shadow: 0 0 30px rgba(255, 235, 180, 0.45);
+}
+
+.stage-vanity-unit {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 55px;
+}
+
+.vanity-cabinet-front {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px 8px 0 0;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.2), 0 8px 20px rgba(0,0,0,0.4);
+  position: relative;
+}
+
+.vanity-counter-top {
+  position: absolute;
+  top: -6px;
+  left: -5px;
+  right: -5px;
+  height: 8px;
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.stage-faucet-hardware {
+  position: absolute;
+  top: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 26px;
+  border-radius: 6px 6px 0 0;
+}
+
+.stage-faucet-hardware.finish-gold {
+  background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+.stage-faucet-hardware.finish-black {
+  background: linear-gradient(135deg, #334155 0%, #0f172a 100%);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.stage-faucet-hardware.finish-chrome {
+  background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+/* Floor Perspective Plane */
+.stage-baseboard-line {
+  position: absolute;
+  top: 60%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #1e293b;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.stage-floor-perspective {
+  position: absolute;
+  top: 60%;
+  bottom: 0;
+  left: -20%;
+  right: -20%;
+  perspective: 700px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.floor-tile-canvas {
+  width: 100%;
+  height: 100%;
+  transform: rotateX(55deg);
+  transform-origin: top center;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+  position: relative;
+  transition: all 0.4s ease;
+}
+
+.floor-grout-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(0,0,0,0.25) 2px, transparent 2px),
+    linear-gradient(to bottom, rgba(0,0,0,0.25) 2px, transparent 2px);
+  background-size: 60px 40px;
+}
+
+.floor-gloss-reflection {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.vanity-floor-shadow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 60px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%);
+}
+
+.stage-vignette-overlay {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.4);
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Controls inside stage */
+.stage-top-controls {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.camera-angle-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.camera-tab-btn {
+  padding: 5px 11px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.camera-tab-btn.active {
+  background: #c5a059;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(197, 160, 89, 0.3);
+}
+
+.stage-material-info-chip {
+  display: flex;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.stage-bottom-hotspots {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.hotspot-action-pill {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(15, 23, 42, 0.9);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+}
+
+.hotspot-action-pill:hover {
+  background: #c5a059;
+  transform: translateY(-2px);
+}
+
+.hotspot-action-pill.secondary {
+  background: rgba(255,255,255,0.92);
+  color: #0f172a;
+}
+
+/* Camera angle overrides */
+.camera-angle-top .floor-tile-canvas {
+  transform: rotateX(25deg) scale(1.15);
+}
+
+.camera-angle-macro .floor-tile-canvas {
+  transform: rotateX(40deg) scale(1.4);
+}
+

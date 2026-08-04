@@ -741,6 +741,7 @@ export default function Home() {
   // Advanced AI Studio v6.0 Interactive States
   const [studioRoomSizeM2, setStudioRoomSizeM2] = useState(15);
   const [studioViewMode, setStudioViewMode] = useState('cards'); // 'cards' | 'composite'
+  const [roomCameraAngle, setRoomCameraAngle] = useState('eye'); // 'eye' | 'top' | 'macro'
   const [showAiPhotoScanModal, setShowAiPhotoScanModal] = useState(false);
   const [specCopiedMsg, setSpecCopiedMsg] = useState(false);
   const [aiPhotoScanning, setAiPhotoScanning] = useState(false);
@@ -4098,38 +4099,99 @@ export default function Home() {
 
                     {/* CONDITIONALLY RENDER: 4-Material Cards OR Canlı Kompozit Oda Simülasyonu */}
                     {studioViewMode === 'composite' ? (
-                      /* LIVE COMPOSITE 2D/3D ARCHITECTURAL ROOM VISUALIZER */
-                      <div className="studio-composite-room-view">
-                        <div 
-                          className="composite-room-canvas"
-                          style={{
-                            backgroundImage: `url(${activeCombo?.wallTile?.img || '/textures/calacatta_gold.jpg'})`,
-                            backgroundSize: '300px',
-                            backgroundRepeat: 'repeat'
-                          }}
-                        >
-                          <div className="room-lighting-overlay" />
+                      /* HYPER-REALISTIC 3D ARCHITECTURAL ROOM VISUALIZER */
+                      <div className={`studio-composite-room-view camera-angle-${roomCameraAngle}`}>
+                        <div className="composite-room-stage">
+                          
+                          {/* 1. Wall Surface Layer with Seamless Tile Grid & Lighting */}
                           <div 
-                            className="composite-floor-plane"
+                            className="stage-wall-layer"
                             style={{
-                              backgroundImage: `url(${currentTile?.img || '/textures/calacatta_gold.jpg'})`,
-                              backgroundSize: '200px',
-                              backgroundRepeat: 'repeat',
-                              boxShadow: `inset 0 0 0 2px ${activeCombo?.grout?.hex || '#eae6df'}`
+                              backgroundImage: `url(${activeCombo?.wallTile?.img || '/textures/vista_bej.jpg'})`,
+                              backgroundSize: '240px 140px'
                             }}
-                          />
-                          <div className="composite-room-accents">
-                            <div className="accent-badge-tag">
+                          >
+                            <div className="wall-grout-grid-overlay" style={{ boxShadow: `inset 0 0 0 1px ${activeCombo?.grout?.hex || '#eae6df'}44` }} />
+                            <div className="wall-specular-gloss" />
+                            <div className="wall-spotlights" />
+
+                            {/* Floating LED Mirror & Vanity Unit Overlay */}
+                            <div className="stage-backlit-mirror">
+                              <div className="mirror-glass-glow" />
+                            </div>
+
+                            <div className="stage-vanity-unit">
+                              <div 
+                                className="vanity-cabinet-front" 
+                                style={{ background: activeCombo?.complement?.cabinetHex || '#5c4033' }}
+                              >
+                                <div className="vanity-drawer-lines" />
+                              </div>
+                              <div className="vanity-counter-top" />
+
+                              {/* Realistic Faucet Hardware Finish */}
+                              <div className={`stage-faucet-hardware finish-${currentFaucet.toLowerCase().includes('gold') ? 'gold' : currentFaucet.toLowerCase().includes('siyah') ? 'black' : 'chrome'}`}>
+                                <div className="faucet-body" />
+                                <div className="faucet-spout" />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 2. Wall-Floor Baseboard (Süpürgelik) & Contact Shadow */}
+                          <div className="stage-baseboard-line">
+                            <div className="baseboard-shadow" />
+                          </div>
+
+                          {/* 3. Floor Surface Plane with Perspective Distortion & Grout Lines */}
+                          <div className="stage-floor-perspective">
+                            <div 
+                              className="floor-tile-canvas"
+                              style={{
+                                backgroundImage: `url(${currentTile?.img || '/textures/calacatta_gold.jpg'})`,
+                                backgroundSize: roomCameraAngle === 'macro' ? '300px 180px' : '180px 110px'
+                              }}
+                            >
+                              <div className="floor-grout-grid-overlay" style={{ boxShadow: `inset 0 0 0 2px ${activeCombo?.grout?.hex || '#eae6df'}` }} />
+                              <div className="floor-gloss-reflection" />
+                              <div className="vanity-floor-shadow" />
+                            </div>
+                          </div>
+
+                          {/* 4. Ambient Vignette */}
+                          <div className="stage-vignette-overlay" />
+
+                          {/* 5. Top Controls: Camera Angles & Material Specs */}
+                          <div className="stage-top-controls">
+                            <div className="camera-angle-tabs">
+                              {[
+                                { key: 'eye', label: '👁️ Göz Hizası', title: 'Genel Mimar Perspektifi' },
+                                { key: 'top', label: '📐 Zemin & Derz', title: 'Zemin ve Derz Çizgileri Açısı' },
+                                { key: 'macro', label: '🔍 Doku Yakın Çekim', title: 'Yüzey Parlaklığı ve Dokusu' }
+                              ].map(cam => (
+                                <button
+                                  key={cam.key}
+                                  onClick={() => setRoomCameraAngle(cam.key)}
+                                  className={`camera-tab-btn ${roomCameraAngle === cam.key ? 'active' : ''}`}
+                                  title={cam.title}
+                                >
+                                  {cam.label}
+                                </button>
+                              ))}
+                            </div>
+
+                            <div className="stage-material-info-chip">
                               <span>🚰 Armatür: <strong>{currentFaucet}</strong></span>
                               <span>📐 Derz: <strong>{activeCombo?.grout?.color} ({activeCombo?.grout?.width || '1.5mm'})</strong></span>
                             </div>
                           </div>
-                          <div className="composite-hotspots-overlay">
+
+                          {/* 6. Interactive Hotspots Overlay */}
+                          <div className="stage-bottom-hotspots">
                             <button className="hotspot-badge floor" onClick={() => setActiveTileIndex((prev) => (prev + 1) % tilesList.length)}>
                               🔄 Zemin Değiştir ({currentTile?.name})
                             </button>
                             <button className="hotspot-badge wall" onClick={() => setStudioViewMode('cards')}>
-                              🧱 Duvar Dekorunu İncele
+                              🧱 Malzeme Kartlarını İncele
                             </button>
                           </div>
                         </div>
