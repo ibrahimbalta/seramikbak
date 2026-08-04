@@ -176,9 +176,9 @@ function generateMoodboardFromProduct(product, index) {
     accentColor = "#d4af37";
     cabinetHex = "#5c4033";
     faucetVal = "black";
-    styleName = `Lüks ${brandName} & Gold`;
+    styleName = index % 2 === 0 ? `Lüks ${brandName} & Gold` : `Elegans ${brandName} & Mermer`;
     tagline = "Modern, Şık ve Zengin Mimariler";
-    styleBadge = "👑 PREMİUM MARBLE";
+    styleBadge = index % 2 === 0 ? "👑 PREMİUM MARBLE" : "✨ CLASSIC MERMER";
     category = "banyo";
     groutName = "Weber Flex Fildişi Esnek Derz Dolgusu";
     groutColor = "Fildişi Bej (#EAE6DF)";
@@ -195,9 +195,9 @@ function generateMoodboardFromProduct(product, index) {
     accentColor = "#b38e47";
     cabinetHex = "#1a1a1a";
     faucetVal = "gold";
-    styleName = `Endüstriyel ${brandName} & Antrasit`;
+    styleName = index % 2 === 0 ? `Endüstriyel ${brandName} & Antrasit` : `Loft Beton ${brandName} Gri`;
     tagline = "Minimalist, Maskülen ve Güçlü Karakter";
-    styleBadge = "🏙️ LOFT BETON";
+    styleBadge = index % 2 === 0 ? "🏙️ LOFT BETON" : "🖤 MONOKROM BETON";
     category = "banyo";
     groutName = "Ceresit Koyu Antrasit Derz Dolgusu";
     groutColor = "Koyu Antrasit (#292524)";
