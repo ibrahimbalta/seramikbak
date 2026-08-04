@@ -745,6 +745,9 @@ export default function Home() {
   const [specCopiedMsg, setSpecCopiedMsg] = useState(false);
   const [aiPhotoScanning, setAiPhotoScanning] = useState(false);
   const [selectedPhotoTemplate, setSelectedPhotoTemplate] = useState(null);
+  const aiFileInputRef = useRef(null);
+  const [uploadedPhotoPreview, setUploadedPhotoPreview] = useState(null);
+  const [uploadedPhotoName, setUploadedPhotoName] = useState('');
 
   // Real-time Platform Statistics State (Directly computed from Prisma DB)
   const [liveStats, setLiveStats] = useState({
@@ -1705,6 +1708,42 @@ export default function Home() {
       const queryText = queryMap[sampleTemplate] || 'Modern Banyo Seramik';
       handleAiAnalyzePrompt(queryText);
     }, 1800);
+  };
+
+  const handleRealPhotoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadedPhotoName(file.name);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const imageUrl = event.target?.result;
+      setUploadedPhotoPreview(imageUrl);
+      handleProcessUploadedImage(imageUrl, file.name);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleProcessUploadedImage = (imageUrl, fileName) => {
+    setAiPhotoScanning(true);
+    setTimeout(() => {
+      setAiPhotoScanning(false);
+      setShowAiPhotoScanModal(false);
+      
+      const lowerName = (fileName || '').toLowerCase();
+      let queryText = 'Calacatta Mermer & Gold Banyo';
+      if (lowerName.includes('mutfak') || lowerName.includes('kitchen') || lowerName.includes('ahşap')) {
+        queryText = 'Sıcak Ahşap & Beton Mutfak';
+      } else if (lowerName.includes('salon') || lowerName.includes('living') || lowerName.includes('beton')) {
+        queryText = 'Endüstriyel Antrasit Beton Salon';
+      } else if (lowerName.includes('siyah') || lowerName.includes('dark') || lowerName.includes('black')) {
+        queryText = 'Mat Siyah Minimalist Banyo';
+      } else if (lowerName.includes('beyaz') || lowerName.includes('light') || lowerName.includes('ferah')) {
+        queryText = 'Açık Ferah Beyaz Banyo Seramik';
+      }
+
+      handleAiAnalyzePrompt(queryText);
+    }, 2000);
   };
 
   // General products fetch with filters (with pagination support)
@@ -6259,22 +6298,56 @@ export default function Home() {
                 </div>
               ) : (
                 <>
-                  {/* File Drag and Drop Box */}
+                  {/* Hidden Real File Input Picker */}
+                  <input 
+                    type="file" 
+                    ref={aiFileInputRef}
+                    accept="image/png, image/jpeg, image/webp"
+                    onChange={handleRealPhotoUpload}
+                    style={{ display: 'none' }}
+                  />
+
+                  {/* Real File Drag and Drop Box */}
                   <div 
                     className="ai-photo-dropzone"
-                    onClick={() => handleSimulatePhotoScan('banyo_modern')}
+                    onClick={() => aiFileInputRef.current?.click()}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const file = e.dataTransfer.files?.[0];
+                      if (file) {
+                        setUploadedPhotoName(file.name);
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          const imageUrl = ev.target?.result;
+                          setUploadedPhotoPreview(imageUrl);
+                          handleProcessUploadedImage(imageUrl, file.name);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
                   >
-                    <UploadCloud size={36} style={{ color: 'var(--accent-gold)' }} />
-                    <p style={{ fontWeight: '600', color: '#0f172a', margin: '8px 0 4px 0' }}>
-                      Fotoğrafınızı Buraya Sürükleyin veya Seçin
-                    </p>
-                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>JPG, PNG veya WEBP (Max 10MB)</span>
+                    {uploadedPhotoPreview ? (
+                      <div className="uploaded-photo-preview-box">
+                        <img src={uploadedPhotoPreview} alt="Yüklenen Fotoğraf" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '12px', marginBottom: '8px', border: '2px solid #c5a059' }} />
+                        <p style={{ fontWeight: '700', color: '#0f172a', fontSize: '0.8rem' }}>📷 {uploadedPhotoName}</p>
+                        <span style={{ fontSize: '0.72rem', color: '#059669', fontWeight: '600' }}>Fotoğraf Yüklendi! Değiştirmek İçin Tıklayın</span>
+                      </div>
+                    ) : (
+                      <>
+                        <UploadCloud size={38} style={{ color: 'var(--accent-gold)' }} />
+                        <p style={{ fontWeight: '700', color: '#0f172a', margin: '10px 0 4px 0' }}>
+                          Cihazınızdan Fotoğraf Seçmek İçin Tıklayın veya Sürükleyin
+                        </p>
+                        <span style={{ fontSize: '0.75rem', color: '#64748b' }}>JPG, PNG veya WEBP (Max 10MB)</span>
+                      </>
+                    )}
                   </div>
 
                   {/* Sample Room Templates */}
                   <div style={{ marginTop: '20px' }}>
                     <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '10px' }}>
-                      Veya Hazır Örnek Mekan Şablonu Seçin:
+                      Veya Örnek Mekan Şablonlarından Seçin:
                     </span>
                     <div className="sample-templates-grid">
                       {[
@@ -6300,8 +6373,8 @@ export default function Home() {
 
             <div className="modal-footer" style={{ padding: '14px 20px', borderTop: '1px solid #f1efe9', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
               <button onClick={() => setShowAiPhotoScanModal(false)} className="btn-secondary">İptal</button>
-              <button onClick={() => handleSimulatePhotoScan('banyo_modern')} className="btn-primary" disabled={aiPhotoScanning}>
-                {aiPhotoScanning ? 'Taranıyor...' : 'AI Analizi Başlat'}
+              <button onClick={() => aiFileInputRef.current?.click()} className="btn-primary" disabled={aiPhotoScanning}>
+                {aiPhotoScanning ? 'Taranıyor...' : 'Cihazdan Fotoğraf Seç'}
               </button>
             </div>
           </div>
