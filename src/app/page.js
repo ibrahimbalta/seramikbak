@@ -3822,33 +3822,30 @@ export default function Home() {
               </div>
             </div>
 
-            {/* -------------------- AI ARCHITECTURAL CERAMIC STUDIO v6.0 (INTERACTIVE REAL-TIME STUDIO) -------------------- */}
-            <div className="moodboard-container glass-panel">
+            {/* -------------------- AI ARCHITECTURAL CERAMIC STUDIO v7.0 (STANDALONE CLEAN MODULE) -------------------- */}
+            <div className="ai-studio-standalone-module">
               
-              {/* Top Studio Bar: Brand Title, Purpose Explanation & AI Prompt Bar */}
-              <div className="moodboard-studio-topbar">
-                <div className="studio-brand-group">
-                  <div className="studio-sparkle-badge">
-                    <Sparkles size={20} />
+              {/* Top Studio Module Header */}
+              <div className="ai-studio-mod-header">
+                <div className="ai-studio-title-group">
+                  <div className="ai-studio-icon-badge">
+                    <Sparkles size={22} />
                   </div>
-                  <div className="studio-brand-text">
-                    <div className="studio-title-row">
-                      <h3 className="studio-title">
-                        AI Mimarlık Kombin Stüdyosu v6.0
-                      </h3>
-                      <span className="live-pulse-badge">
-                        <span className="pulse-dot" /> CANLI MİMARİ EŞLEŞTİRİCİ
+                  <div>
+                    <div className="ai-studio-title-row">
+                      <h3 className="ai-studio-title">AI Mimarlık & Kombin Stüdyosu</h3>
+                      <span className="ai-live-badge">
+                        <span className="pulse-dot" /> CANLI İÇ MİMAR ALGORİTMASI
                       </span>
                     </div>
-                    <p className="studio-subtitle">
-                      Seçtiğiniz zemin ve duvar seramiklerini, derz dolgusunu ve armatür detaylarını canlı odada ve bütçe sihirbazında anında simüle edin.
+                    <p className="ai-studio-subdesc">
+                      Zemin ve duvar seramiklerini, derz dolgusunu ve armatür detaylarını mimari algoritma ve canlı oda simülasyonu ile tasarlayın.
                     </p>
                   </div>
                 </div>
 
-                {/* AI Search & Controls */}
-                <div className="studio-controls-right">
-                  {/* Photo Upload AI Scanner Trigger Button */}
+                {/* Top Module Action Controls */}
+                <div className="ai-studio-top-actions">
                   <button 
                     onClick={() => setShowAiPhotoScanModal(true)}
                     className="ai-photo-scan-btn"
@@ -3858,7 +3855,6 @@ export default function Home() {
                     <span>Oda Fotoğrafını Tara</span>
                   </button>
 
-                  {/* View Mode Switcher Toggle Button */}
                   <div className="studio-view-toggle-group">
                     <button
                       onClick={() => setStudioViewMode('cards')}
@@ -3866,7 +3862,7 @@ export default function Home() {
                       title="4-Malzeme kart görünümü"
                     >
                       <Layers size={13} />
-                      <span>4-Kart</span>
+                      <span>🧱 4-Kart</span>
                     </button>
                     <button
                       onClick={() => setStudioViewMode('composite')}
@@ -3874,98 +3870,72 @@ export default function Home() {
                       title="Canlı kompozit mimari oda simülasyonu"
                     >
                       <Eye size={13} />
-                      <span>Canlı Odada Gör</span>
+                      <span>🖼️ Canlı Odada Gör</span>
                     </button>
-                  </div>
-
-                  {/* Clean Dedicated Search Input Bar */}
-                  <div className="prompt-input-wrapper">
-                    <SearchIcon size={15} className="prompt-search-icon" />
-                    <input 
-                      type="text"
-                      value={aiPromptInput}
-                      onChange={(e) => setAiPromptInput(e.target.value)}
-                      placeholder="İç Mimara Sor (Örn: 'Woodline Mat', 'Calacatta Gold')..."
-                      className="prompt-input"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAiAnalyzePrompt(aiPromptInput);
-                        }
-                      }}
-                    />
-                    <button 
-                      onClick={() => handleAiAnalyzePrompt(aiPromptInput)}
-                      className="prompt-submit-btn"
-                      disabled={aiGeneratingCombo}
-                      title="Yazdığınız ürüne veya konsepte özel kombin üret"
-                    >
-                      <Sparkles size={13} />
-                      <span>{aiGeneratingCombo ? 'Analiz Ediliyor...' : 'AI Analiz Et'}</span>
-                    </button>
-                  </div>
-
-                  {/* Secondary Action & Room Category Filter Strip */}
-                  <div className="studio-toolbar-strip scrollbar-hidden">
-                    <button 
-                      onClick={() => handleAiAnalyzePrompt('')}
-                      className="random-combo-btn"
-                      disabled={aiGeneratingCombo}
-                      title="Tüm veritabanından rastgele yeni seramik kombinasyonları üret"
-                    >
-                      <Shuffle size={13} />
-                      <span>Rastgele Kombin</span>
-                    </button>
-
-                    <div className="studio-category-pills">
-                      {[
-                        { key: 'all', label: 'Tüm Alanlar' },
-                        { key: 'banyo', label: '<ctrl42> Banyo' },
-                        { key: 'mutfak', label: '🍳 Mutfak' },
-                        { key: 'salon', label: '🛋️ Salon' }
-                      ].map(cat => (
-                        <button
-                          key={cat.key}
-                          onClick={() => setMoodboardCategory(cat.key)}
-                          className={`studio-cat-pill ${moodboardCategory === cat.key ? 'active' : ''}`}
-                        >
-                          {cat.label}
-                        </button>
-                      ))}
-                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Instant Preset Concept Quick Chips */}
-              <div className="studio-preset-ribbon scrollbar-hidden">
-                <span className="ribbon-label">Hızlı Konseptler:</span>
-                <div className="preset-chips-row">
-                  {[
-                    { label: '🏰 Calacatta & Gold (Lüks)', query: 'Calacatta Gold Mermer Banyo' },
-                    { label: '🏙️ Loft Beton & Antrasit', query: 'Endüstriyel Antrasit Beton' },
-                    { label: '🌿 Ahşap & Bej Sıcak Banyo', query: 'Sıcak Ahşap Dokulu Seramik' },
-                    { label: '✨ Açık Tonlar (Küçük Banyo)', query: 'Açık Ferah Beyaz Banyo Seramik' },
-                    { label: '🖤 Mat Siyah Minimalist', query: 'Mat Siyah Granit Lüks Kombin' }
-                  ].map((chip, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => {
-                        setAiPromptInput(chip.query);
-                        handleAiAnalyzePrompt(chip.query);
-                      }}
-                      className="preset-quick-chip"
-                    >
-                      {chip.label}
-                    </button>
-                  ))}
+              {/* Clean Single Toolbar: Prompt Bar + Category Filter Chips */}
+              <div className="ai-studio-toolbar-row">
+                <div className="prompt-input-wrapper">
+                  <SearchIcon size={15} className="prompt-search-icon" />
+                  <input 
+                    type="text"
+                    value={aiPromptInput}
+                    onChange={(e) => setAiPromptInput(e.target.value)}
+                    placeholder="İç Mimara Sor (Örn: 'Woodline Mat', 'Calacatta Gold')..."
+                    className="prompt-input"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAiAnalyzePrompt(aiPromptInput);
+                      }
+                    }}
+                  />
+                  <button 
+                    onClick={() => handleAiAnalyzePrompt(aiPromptInput)}
+                    className="prompt-submit-btn"
+                    disabled={aiGeneratingCombo}
+                  >
+                    <Sparkles size={13} />
+                    <span>{aiGeneratingCombo ? 'Analiz Ediliyor...' : 'AI Analiz Et'}</span>
+                  </button>
+                </div>
+
+                <div className="ai-studio-toolbar-right">
+                  <button 
+                    onClick={() => handleAiAnalyzePrompt('')}
+                    className="random-combo-btn"
+                    disabled={aiGeneratingCombo}
+                  >
+                    <Shuffle size={13} />
+                    <span>Rastgele Kombin</span>
+                  </button>
+
+                  <div className="studio-category-pills">
+                    {[
+                      { key: 'all', label: 'Tüm Alanlar' },
+                      { key: 'banyo', label: '🛁 Banyo' },
+                      { key: 'mutfak', label: '🍳 Mutfak' },
+                      { key: 'salon', label: '🛋️ Salon' }
+                    ].map(cat => (
+                      <button
+                        key={cat.key}
+                        onClick={() => setMoodboardCategory(cat.key)}
+                        className={`studio-cat-pill ${moodboardCategory === cat.key ? 'active' : ''}`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* Horizontal Design Concept Switcher Ribbon */}
-              <div className="studio-concept-ribbon scrollbar-hidden">
-                <span className="ribbon-label">Seçili Kombinler:</span>
-                <div className="ribbon-items-group">
+              {/* Single Unified Concept Selector Ribbon */}
+              <div className="ai-studio-concept-ribbon scrollbar-hidden">
+                <span className="concept-ribbon-label">MİMARİ KONSEPTLER:</span>
+                <div className="concept-tabs-row">
                   {moodboardCombos
                     .filter(c => moodboardCategory === 'all' || c.category === moodboardCategory)
                     .map((combo) => {
@@ -3977,7 +3947,7 @@ export default function Home() {
                             setSelectedMoodIndex(combo.id);
                             setActiveTileIndex(0);
                           }}
-                          className={`concept-pill-btn ${isActive ? 'active' : ''}`}
+                          className={`concept-tab-btn ${isActive ? 'active' : ''}`}
                         >
                           <span className="pill-badge">{combo.styleBadge}</span>
                           <span className="pill-name">{combo.styleName}</span>
@@ -3988,7 +3958,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Main Material Composition Board & Calculator */}
+              {/* Main Workspace: Active Concept, Budget Calculator, Cards & Actions */}
               {(() => {
                 const activeCombo = (moodboardCombos && moodboardCombos.length > 0)
                   ? (moodboardCombos.find(c => c && c.id === selectedMoodIndex) || moodboardCombos[0])
@@ -4013,26 +3983,42 @@ export default function Home() {
                 const floorPriceNum = parseInt(String(currentTile?.price || activeCombo?.floorTile?.price || '740').replace(/[^0-9]/g, '')) || 740;
                 const wallPriceNum = parseInt(String(activeCombo?.wallTile?.price || '630').replace(/[^0-9]/g, '')) || 630;
                 
-                const floorM2Needed = Math.ceil(studioRoomSizeM2 * 1.1); // +10% waste
-                const wallM2Needed = Math.ceil(studioRoomSizeM2 * 1.8 * 1.1); // estimated wall m²
+                const floorM2Needed = Math.ceil(studioRoomSizeM2 * 1.1);
+                const wallM2Needed = Math.ceil(studioRoomSizeM2 * 1.8 * 1.1);
                 
                 const floorTotalCost = floorM2Needed * floorPriceNum;
                 const wallTotalCost = wallM2Needed * wallPriceNum;
-                const chemicalGroutCost = Math.ceil(studioRoomSizeM2 * 45); // estimated grout + adhesive
+                const chemicalGroutCost = Math.ceil(studioRoomSizeM2 * 45);
                 const totalEstimatedBudget = floorTotalCost + wallTotalCost + chemicalGroutCost;
 
                 return (
-                  <div className="studio-board-wrapper">
+                  <div className="ai-studio-workspace">
                     
-                    {/* Board Header Bar with Live Palette & Interactive m² Budget Calculator */}
-                    <div className="studio-board-header">
-                      <div className="board-active-info">
-                        <span className="board-badge">✨ SEÇİLİ MİMARİ KONSEPT & SERAMİK UYUMU</span>
-                        <h4 className="board-title">{activeCombo?.styleName || 'Konsept'} — {activeCombo?.tagline || ''}</h4>
+                    {/* Workspace Top Header Bar: Active Concept Info & Budget Calculator */}
+                    <div className="workspace-header-row">
+                      <div className="workspace-concept-info">
+                        <div className="concept-heading-box">
+                          <span className="concept-status-badge">✨ SEÇİLİ MİMARİ KONSEPT</span>
+                          <h4 className="concept-main-title">{activeCombo?.styleName || 'Konsept'} — <span className="concept-sub-tagline">{activeCombo?.tagline || ''}</span></h4>
+                        </div>
+                        
+                        <div className="concept-color-swatches">
+                          <span className="swatch-title">Harmonize Palet:</span>
+                          <div className="swatch-dots-row">
+                            {activeCombo?.colorPalette?.map((hex, idx) => (
+                              <div 
+                                key={idx} 
+                                className="studio-swatch-circle" 
+                                style={{ background: hex }} 
+                                title={`Doku / Ton ${idx+1}: ${hex}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Interactive Room Size m² Calculator Control Bar */}
-                      <div className="studio-calculator-bar">
+                      {/* Clean Budget Bar */}
+                      <div className="workspace-budget-card">
                         <div className="calc-size-group">
                           <label className="calc-label">📐 Proje Alanı:</label>
                           <div className="calc-input-wrapper">
@@ -4069,20 +4055,6 @@ export default function Home() {
                           <strong className="calc-result-value">₺{totalEstimatedBudget.toLocaleString('tr-TR')}</strong>
                         </div>
                       </div>
-
-                      <div className="board-palette-swatches">
-                        <span className="swatch-label">Harmonize Palet:</span>
-                        <div className="swatch-dots-row">
-                          {activeCombo?.colorPalette?.map((hex, idx) => (
-                            <div 
-                              key={idx} 
-                              className="studio-swatch-circle" 
-                              style={{ background: hex }} 
-                              title={`Doku / Ton ${idx+1}: ${hex}`}
-                            />
-                          ))}
-                        </div>
-                      </div>
                     </div>
 
                     {/* CONDITIONALLY RENDER: 4-Material Cards OR Canlı Kompozit Oda Simülasyonu */}
@@ -4097,10 +4069,7 @@ export default function Home() {
                             backgroundRepeat: 'repeat'
                           }}
                         >
-                          {/* Room Lighting Overlay */}
                           <div className="room-lighting-overlay" />
-
-                          {/* Floor Perspective Grid Layer */}
                           <div 
                             className="composite-floor-plane"
                             style={{
@@ -4110,16 +4079,12 @@ export default function Home() {
                               boxShadow: `inset 0 0 0 2px ${activeCombo?.grout?.hex || '#eae6df'}`
                             }}
                           />
-
-                          {/* Room Fixture & Cabinet Accent Highlight Overlay */}
                           <div className="composite-room-accents">
                             <div className="accent-badge-tag">
                               <span>🚰 Armatür: <strong>{currentFaucet}</strong></span>
                               <span>📐 Derz: <strong>{activeCombo?.grout?.color} ({activeCombo?.grout?.width || '1.5mm'})</strong></span>
                             </div>
                           </div>
-
-                          {/* Interactive Room Hotspots */}
                           <div className="composite-hotspots-overlay">
                             <button className="hotspot-badge floor" onClick={() => setActiveTileIndex((prev) => (prev + 1) % tilesList.length)}>
                               🔄 Zemin Değiştir ({currentTile?.name})
@@ -4141,7 +4106,6 @@ export default function Home() {
                             <span className="tile-badge-overlay">{currentTile?.badge || '👑 PREMİUM'}</span>
                           </div>
                           
-                          {/* Big Ceramic Image Box with Slider Nav */}
                           <div className="studio-tile-img-box">
                             <img 
                               src={currentTile?.img || '/textures/calacatta_gold.jpg'} 
@@ -4152,7 +4116,6 @@ export default function Home() {
                             <div className="tile-price-tag">{currentTile?.price || '₺740/m²'}</div>
                           </div>
 
-                          {/* Interactive Carousel Selector Dots/Buttons */}
                           {tilesList.length > 1 && (
                             <div className="tile-carousel-nav">
                               <span className="carousel-nav-label">Alternatif Zemin Seramikleri:</span>
@@ -4273,8 +4236,8 @@ export default function Home() {
                       </div>
                     )}
 
-                    {/* Bottom Architectural Specification & Multi-Action Bar */}
-                    <div className="studio-board-footer">
+                    {/* Workspace Bottom Specification & Action Bar */}
+                    <div className="workspace-footer-row">
                       <div className="studio-spec-notes">
                         <div className="spec-pill-group">
                           <span className="spec-pill gold">✨ %{activeCombo.matchScore} Uyum Skoru</span>
@@ -4286,7 +4249,6 @@ export default function Home() {
                         </p>
                       </div>
 
-                      {/* Multi-Action Button Bar */}
                       <div className="studio-action-buttons-group">
                         <button
                           onClick={() => handleCopyArchitectSpec(activeCombo, currentTile, currentFaucet, totalEstimatedBudget)}
@@ -4294,7 +4256,7 @@ export default function Home() {
                           title="Tüm malzeme reçetesini ve bütçe detaylarını kopyala"
                         >
                           <Copy size={15} />
-                          <span>{specCopiedMsg ? '✅ Reçete Kopyalandı!' : 'Mimar Reçetesini Kopyala'}</span>
+                          <span>{specCopiedMsg ? '✅ Reçete Kopyalandı!' : 'Reçeteyi Kopyala'}</span>
                         </button>
 
                         <button
@@ -4303,7 +4265,7 @@ export default function Home() {
                           title="Bu kombin için kayıtlı bayilerden doğrudan fiyat teklifi iste"
                         >
                           <DollarSign size={15} />
-                          <span>Bayilerden Fiyat Teklifi İstet</span>
+                          <span>Bayilerden Teklif İstet</span>
                         </button>
 
                         <button
@@ -4311,8 +4273,7 @@ export default function Home() {
                           className="studio-3d-action-btn"
                         >
                           <Palette size={16} />
-                          <span>3D Stüdyoda 360° Görselleştir</span>
-                          <ArrowRight size={14} />
+                          <span>3D Stüdyoda Aç →</span>
                         </button>
                       </div>
                     </div>
