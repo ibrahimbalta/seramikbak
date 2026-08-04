@@ -736,6 +736,14 @@ export default function Home() {
   const [customFaucetFinish, setCustomFaucetFinish] = useState(null);
   const [activeTileIndex, setActiveTileIndex] = useState(0);
 
+  // Advanced AI Studio v6.0 Interactive States
+  const [studioRoomSizeM2, setStudioRoomSizeM2] = useState(15);
+  const [studioViewMode, setStudioViewMode] = useState('cards'); // 'cards' | 'composite'
+  const [showAiPhotoScanModal, setShowAiPhotoScanModal] = useState(false);
+  const [specCopiedMsg, setSpecCopiedMsg] = useState(false);
+  const [aiPhotoScanning, setAiPhotoScanning] = useState(false);
+  const [selectedPhotoTemplate, setSelectedPhotoTemplate] = useState(null);
+
   // Real-time Platform Statistics State (Directly computed from Prisma DB)
   const [liveStats, setLiveStats] = useState({
     activeOnlineUsers: 0,
@@ -1627,6 +1635,74 @@ export default function Home() {
     } finally {
       setAiGeneratingCombo(false);
     }
+  };
+
+  const handleCopyArchitectSpec = (combo, currentTile, currentFaucet, calculatedBudget) => {
+    if (!combo) return;
+    const specText = `📋 SERAMİKBAK AI MİMARİ SERAMİK REÇETESİ
+• Konsept: ${combo.styleName || 'Lüks Konsept'} (${combo.tagline || ''})
+• Zemin Seramiği: ${currentTile?.name || combo.floorTile?.name || 'Zemin Karo'} (${currentTile?.size || '60x120 cm'}) - ${currentTile?.price || ''}
+• Duvar Seramiği: ${combo.wallTile?.name || 'Duvar Dekor'} (${combo.wallTile?.size || '30x90 cm'}) - ${combo.wallTile?.price || ''}
+• Derz Dolgusu: ${combo.grout?.name || 'Ceresit Derz'} (${combo.grout?.color || 'Antrasit'})
+• Armatür & Ekipman: ${combo.complement?.cabinet || 'Ünite'} (${currentFaucet || 'Gold'})
+• Proje Metrekaresi: ${studioRoomSizeM2} m² | Tahmini Bütçe: ₺${calculatedBudget ? calculatedBudget.toLocaleString('tr-TR') : '0'}
+• AI Uyum Skoru: %${combo.matchScore || 98}
+3D Canlı Görselleştirme: https://seramikbak.com`;
+
+    navigator.clipboard.writeText(specText);
+    setSpecCopiedMsg(true);
+    setTimeout(() => setSpecCopiedMsg(false), 3000);
+  };
+
+  const handleRequestQuoteForCombo = (combo, currentTile) => {
+    if (!combo) return;
+    const floorPriceStr = currentTile?.price || combo.floorTile?.price || '650';
+    const floorPriceNum = parseInt(String(floorPriceStr).replace(/[^0-9]/g, '')) || 650;
+    
+    const comboProdEnriched = enrichProductData({
+      id: 'ai-combo-' + Date.now(),
+      name: `${combo.styleName || 'Mimari Kombin'} Paket (${currentTile?.name || combo.floorTile?.name || 'Zemin'})`,
+      code: 'AI-COMBO-' + (combo.id || 1),
+      brandId: 'brand-ai',
+      brand: { name: combo.floorTile?.brand || 'NG Kütahya' },
+      dimensions: currentTile?.size || '60x120 cm',
+      width: 60,
+      height: 120,
+      finish: 'Mat / Parlak Kombin',
+      style: combo.styleName || 'Mermer',
+      color: 'Kombin',
+      imageUrl: currentTile?.img || combo.floorTile?.img || '/textures/calacatta_gold.jpg',
+      cheapestOffer: { price: floorPriceNum }
+    });
+
+    const defaultDealer = leadDealer || {
+      id: 'dealer-primary',
+      name: (combo.floorTile?.brand || 'NG Kütahya') + ' Yetkili Ana Bayii',
+      city: 'İstanbul / Merkez',
+      phone: '0850 300 00 00'
+    };
+
+    setActiveProduct(comboProdEnriched);
+    setLeadProduct(comboProdEnriched);
+    setLeadDealer(defaultDealer);
+    setShowLeadModal(true);
+  };
+
+  const handleSimulatePhotoScan = (sampleTemplate) => {
+    setAiPhotoScanning(true);
+    setSelectedPhotoTemplate(sampleTemplate);
+    setTimeout(() => {
+      setAiPhotoScanning(false);
+      setShowAiPhotoScanModal(false);
+      const queryMap = {
+        'banyo_modern': 'Calacatta Mermer & Gold Banyo',
+        'mutfak_ahsap': 'Sıcak Ahşap & Beton Mutfak',
+        'salon_beton': 'Endüstriyel Antrasit Beton Salon',
+        'banyo_minimal': 'Mat Siyah Minimalist Banyo'
+      };
+      const queryText = queryMap[sampleTemplate] || 'Modern Banyo Seramik';
+      handleAiAnalyzePrompt(queryText);
+    }, 1800);
   };
 
   // General products fetch with filters (with pagination support)
@@ -3744,32 +3820,62 @@ export default function Home() {
               </div>
             </div>
 
-            {/* -------------------- AI ARCHITECTURAL CERAMIC STUDIO v5.0 (100% CERAMIC MATCHING) -------------------- */}
+            {/* -------------------- AI ARCHITECTURAL CERAMIC STUDIO v6.0 (INTERACTIVE REAL-TIME STUDIO) -------------------- */}
             <div className="moodboard-container glass-panel">
               
               {/* Top Studio Bar: Brand Title, Purpose Explanation & AI Prompt Bar */}
               <div className="moodboard-studio-topbar">
                 <div className="studio-brand-group">
                   <div className="studio-sparkle-badge">
-                    <Sparkles size={18} />
+                    <Sparkles size={20} />
                   </div>
                   <div className="studio-brand-text">
                     <div className="studio-title-row">
                       <h3 className="studio-title">
-                        AI Mimarlık Kombin Stüdyosu
+                        AI Mimarlık Kombin Stüdyosu v6.0
                       </h3>
                       <span className="live-pulse-badge">
-                        <span className="pulse-dot" /> CANLI MİMARİ SERAMİK EŞLEŞTİRİCİ
+                        <span className="pulse-dot" /> CANLI MİMARİ EŞLEŞTİRİCİ
                       </span>
                     </div>
                     <p className="studio-subtitle">
-                      Seçtiğiniz zemin seramiğine en uygun duvar seramiğini, derz dolgusunu ve banyo ekipmanını iç mimar algoritması ile anında kombinleyin.
+                      Seçtiğiniz zemin ve duvar seramiklerini, derz dolgusunu ve armatür detaylarını canlı odada ve bütçe sihirbazında anında simüle edin.
                     </p>
                   </div>
                 </div>
 
                 {/* AI Search & Controls */}
                 <div className="studio-controls-right">
+                  {/* Photo Upload AI Scanner Trigger Button */}
+                  <button 
+                    onClick={() => setShowAiPhotoScanModal(true)}
+                    className="ai-photo-scan-btn"
+                    title="Banyonuzun veya odanızın fotoğrafını yükleyerek AI seramik eşleştirmesi yapın"
+                  >
+                    <Camera size={15} />
+                    <span>Oda Fotoğrafını Tara</span>
+                  </button>
+
+                  {/* View Mode Switcher Toggle Button */}
+                  <div className="studio-view-toggle-group">
+                    <button
+                      onClick={() => setStudioViewMode('cards')}
+                      className={`studio-view-btn ${studioViewMode === 'cards' ? 'active' : ''}`}
+                      title="4-Malzeme kart görünümü"
+                    >
+                      <Layers size={13} />
+                      <span>4-Kart</span>
+                    </button>
+                    <button
+                      onClick={() => setStudioViewMode('composite')}
+                      className={`studio-view-btn ${studioViewMode === 'composite' ? 'active' : ''}`}
+                      title="Canlı kompozit mimari oda simülasyonu"
+                    >
+                      <Eye size={13} />
+                      <span>Canlı Odada Gör</span>
+                    </button>
+                  </div>
+
                   {/* Clean Dedicated Search Input Bar */}
                   <div className="prompt-input-wrapper">
                     <SearchIcon size={15} className="prompt-search-icon" />
@@ -3812,7 +3918,7 @@ export default function Home() {
                     <div className="studio-category-pills">
                       {[
                         { key: 'all', label: 'Tüm Alanlar' },
-                        { key: 'banyo', label: '🛁 Banyo' },
+                        { key: 'banyo', label: '<ctrl42> Banyo' },
                         { key: 'mutfak', label: '🍳 Mutfak' },
                         { key: 'salon', label: '🛋️ Salon' }
                       ].map(cat => (
@@ -3829,9 +3935,34 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Instant Preset Concept Quick Chips */}
+              <div className="studio-preset-ribbon scrollbar-hidden">
+                <span className="ribbon-label">Hızlı Konseptler:</span>
+                <div className="preset-chips-row">
+                  {[
+                    { label: '🏰 Calacatta & Gold (Lüks)', query: 'Calacatta Gold Mermer Banyo' },
+                    { label: '🏙️ Loft Beton & Antrasit', query: 'Endüstriyel Antrasit Beton' },
+                    { label: '🌿 Ahşap & Bej Sıcak Banyo', query: 'Sıcak Ahşap Dokulu Seramik' },
+                    { label: '✨ Açık Tonlar (Küçük Banyo)', query: 'Açık Ferah Beyaz Banyo Seramik' },
+                    { label: '🖤 Mat Siyah Minimalist', query: 'Mat Siyah Granit Lüks Kombin' }
+                  ].map((chip, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setAiPromptInput(chip.query);
+                        handleAiAnalyzePrompt(chip.query);
+                      }}
+                      className="preset-quick-chip"
+                    >
+                      {chip.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Horizontal Design Concept Switcher Ribbon */}
               <div className="studio-concept-ribbon scrollbar-hidden">
-                <span className="ribbon-label">Konsept Seçimi:</span>
+                <span className="ribbon-label">Seçili Kombinler:</span>
                 <div className="ribbon-items-group">
                   {moodboardCombos
                     .filter(c => moodboardCategory === 'all' || c.category === moodboardCategory)
@@ -3855,7 +3986,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Main 4-Column Material Composition Board */}
+              {/* Main Material Composition Board & Calculator */}
               {(() => {
                 const activeCombo = (moodboardCombos && moodboardCombos.length > 0)
                   ? (moodboardCombos.find(c => c && c.id === selectedMoodIndex) || moodboardCombos[0])
@@ -3876,18 +4007,69 @@ export default function Home() {
                 const currentTile = tilesList[activeTileIndex % tilesList.length] || tilesList[0];
                 const currentFaucet = String(customFaucetFinish || activeCombo?.complement?.fixtureBadge || 'Mat Siyah');
 
+                // Dynamic Budget Calculations
+                const floorPriceNum = parseInt(String(currentTile?.price || activeCombo?.floorTile?.price || '740').replace(/[^0-9]/g, '')) || 740;
+                const wallPriceNum = parseInt(String(activeCombo?.wallTile?.price || '630').replace(/[^0-9]/g, '')) || 630;
+                
+                const floorM2Needed = Math.ceil(studioRoomSizeM2 * 1.1); // +10% waste
+                const wallM2Needed = Math.ceil(studioRoomSizeM2 * 1.8 * 1.1); // estimated wall m²
+                
+                const floorTotalCost = floorM2Needed * floorPriceNum;
+                const wallTotalCost = wallM2Needed * wallPriceNum;
+                const chemicalGroutCost = Math.ceil(studioRoomSizeM2 * 45); // estimated grout + adhesive
+                const totalEstimatedBudget = floorTotalCost + wallTotalCost + chemicalGroutCost;
+
                 return (
                   <div className="studio-board-wrapper">
                     
-                    {/* Board Header Bar */}
+                    {/* Board Header Bar with Live Palette & Interactive m² Budget Calculator */}
                     <div className="studio-board-header">
                       <div className="board-active-info">
                         <span className="board-badge">✨ SEÇİLİ MİMARİ KONSEPT & SERAMİK UYUMU</span>
                         <h4 className="board-title">{activeCombo?.styleName || 'Konsept'} — {activeCombo?.tagline || ''}</h4>
                       </div>
 
+                      {/* Interactive Room Size m² Calculator Control Bar */}
+                      <div className="studio-calculator-bar">
+                        <div className="calc-size-group">
+                          <label className="calc-label">📐 Proje Alanı:</label>
+                          <div className="calc-input-wrapper">
+                            <input 
+                              type="number" 
+                              min="3" 
+                              max="200" 
+                              value={studioRoomSizeM2}
+                              onChange={(e) => setStudioRoomSizeM2(Math.max(1, parseInt(e.target.value) || 1))}
+                              className="calc-m2-input"
+                            />
+                            <span className="m2-unit">m²</span>
+                          </div>
+
+                          <div className="calc-quick-pills">
+                            {[
+                              { label: '8 m² Banyo', val: 8 },
+                              { label: '15 m² Mutfak', val: 15 },
+                              { label: '30 m² Salon', val: 30 }
+                            ].map((preset, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => setStudioRoomSizeM2(preset.val)}
+                                className={`calc-quick-btn ${studioRoomSizeM2 === preset.val ? 'active' : ''}`}
+                              >
+                                {preset.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="calc-result-badge">
+                          <span className="calc-result-label">Tahmini Malzeme Bütçesi:</span>
+                          <strong className="calc-result-value">₺{totalEstimatedBudget.toLocaleString('tr-TR')}</strong>
+                        </div>
+                      </div>
+
                       <div className="board-palette-swatches">
-                        <span className="swatch-label">Harmonize Malzeme Paleti:</span>
+                        <span className="swatch-label">Harmonize Palet:</span>
                         <div className="swatch-dots-row">
                           {activeCombo?.colorPalette?.map((hex, idx) => (
                             <div 
@@ -3901,139 +4083,195 @@ export default function Home() {
                       </div>
                     </div>
 
-                    {/* 4 Equal-Width Clean Light Material Cards */}
-                    <div className="studio-materials-grid">
-                      
-                      {/* Card 1: 🔲 ZEMİN SERAMİĞİ */}
-                      <div className="studio-material-card studio-tile-showcase-card">
-                        <div className="card-header-tag">
-                          <span>01 / ZEMİN SERAMİĞİ</span>
-                          <span className="tile-badge-overlay">{currentTile?.badge || '👑 PREMİUM'}</span>
-                        </div>
-                        
-                        {/* Big Ceramic Image Box with Slider Nav */}
-                        <div className="studio-tile-img-box">
-                          <img 
-                            src={currentTile?.img || '/textures/calacatta_gold.jpg'} 
-                            alt={currentTile?.name || 'Zemin Seramiği'}
-                            onError={(e) => { e.target.onerror = null; e.target.src = '/textures/calacatta_gold.jpg'; }}
+                    {/* CONDITIONALLY RENDER: 4-Material Cards OR Canlı Kompozit Oda Simülasyonu */}
+                    {studioViewMode === 'composite' ? (
+                      /* LIVE COMPOSITE 2D/3D ARCHITECTURAL ROOM VISUALIZER */
+                      <div className="studio-composite-room-view">
+                        <div 
+                          className="composite-room-canvas"
+                          style={{
+                            backgroundImage: `url(${activeCombo?.wallTile?.img || '/textures/calacatta_gold.jpg'})`,
+                            backgroundSize: '300px',
+                            backgroundRepeat: 'repeat'
+                          }}
+                        >
+                          {/* Room Lighting Overlay */}
+                          <div className="room-lighting-overlay" />
+
+                          {/* Floor Perspective Grid Layer */}
+                          <div 
+                            className="composite-floor-plane"
+                            style={{
+                              backgroundImage: `url(${currentTile?.img || '/textures/calacatta_gold.jpg'})`,
+                              backgroundSize: '200px',
+                              backgroundRepeat: 'repeat',
+                              boxShadow: `inset 0 0 0 2px ${activeCombo?.grout?.hex || '#eae6df'}`
+                            }}
                           />
-                          <div className="tile-brand-tag">{currentTile?.brand || 'NG KÜTAHYA'}</div>
-                          <div className="tile-price-tag">{currentTile?.price || '₺740/m²'}</div>
+
+                          {/* Room Fixture & Cabinet Accent Highlight Overlay */}
+                          <div className="composite-room-accents">
+                            <div className="accent-badge-tag">
+                              <span>🚰 Armatür: <strong>{currentFaucet}</strong></span>
+                              <span>📐 Derz: <strong>{activeCombo?.grout?.color} ({activeCombo?.grout?.width || '1.5mm'})</strong></span>
+                            </div>
+                          </div>
+
+                          {/* Interactive Room Hotspots */}
+                          <div className="composite-hotspots-overlay">
+                            <button className="hotspot-badge floor" onClick={() => setActiveTileIndex((prev) => (prev + 1) % tilesList.length)}>
+                              🔄 Zemin Değiştir ({currentTile?.name})
+                            </button>
+                            <button className="hotspot-badge wall" onClick={() => setStudioViewMode('cards')}>
+                              🧱 Duvar Dekorunu İncele
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      /* 4 EQUAL-WIDTH CLEAN LIGHT MATERIAL CARDS */
+                      <div className="studio-materials-grid">
+                        
+                        {/* Card 1: 🔲 ZEMİN SERAMİĞİ */}
+                        <div className="studio-material-card studio-tile-showcase-card">
+                          <div className="card-header-tag">
+                            <span>01 / ZEMİN SERAMİĞİ</span>
+                            <span className="tile-badge-overlay">{currentTile?.badge || '👑 PREMİUM'}</span>
+                          </div>
+                          
+                          {/* Big Ceramic Image Box with Slider Nav */}
+                          <div className="studio-tile-img-box">
+                            <img 
+                              src={currentTile?.img || '/textures/calacatta_gold.jpg'} 
+                              alt={currentTile?.name || 'Zemin Seramiği'}
+                              onError={(e) => { e.target.onerror = null; e.target.src = '/textures/calacatta_gold.jpg'; }}
+                            />
+                            <div className="tile-brand-tag">{currentTile?.brand || 'NG KÜTAHYA'}</div>
+                            <div className="tile-price-tag">{currentTile?.price || '₺740/m²'}</div>
+                          </div>
+
+                          {/* Interactive Carousel Selector Dots/Buttons */}
+                          {tilesList.length > 1 && (
+                            <div className="tile-carousel-nav">
+                              <span className="carousel-nav-label">Alternatif Zemin Seramikleri:</span>
+                              <div className="carousel-dots-group">
+                                {tilesList.map((t, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => setActiveTileIndex(idx)}
+                                    className={`tile-carousel-dot ${activeTileIndex === idx ? 'active' : ''}`}
+                                    title={t.name}
+                                  >
+                                    {idx + 1}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="material-details">
+                            <h5 className="material-name">{currentTile?.name || activeCombo?.floorTile?.name}</h5>
+                            <p className="material-sub">{currentTile?.size} • {currentTile?.finish}</p>
+                            <div className="tech-spec-row">
+                              <span className="tech-badge">{activeCombo?.floorTile?.pei || 'PEI 4'}</span>
+                              <span className="tech-badge">{activeCombo?.floorTile?.slip || 'R10 Kaymaz'}</span>
+                            </div>
+                            <div className="calc-material-cost">
+                              Gereken: {floorM2Needed} m² • <strong>₺{floorTotalCost.toLocaleString('tr-TR')}</strong>
+                            </div>
+                          </div>
                         </div>
 
-                        {/* Interactive Carousel Selector Dots/Buttons */}
-                        {tilesList.length > 1 && (
-                          <div className="tile-carousel-nav">
-                            <span className="carousel-nav-label">Alternatif Zemin Seramikleri:</span>
-                            <div className="carousel-dots-group">
-                              {tilesList.map((t, idx) => (
+                        {/* Card 2: 🧱 DUVAR & DEKOR SERAMİĞİ */}
+                        <div className="studio-material-card studio-tile-showcase-card">
+                          <div className="card-header-tag">
+                            <span>02 / DUVAR & DEKOR SERAMİĞİ</span>
+                            <span className="tile-badge-overlay">{activeCombo?.wallTile?.badge || '✨ UYUMLU DEKOR'}</span>
+                          </div>
+                          <div className="studio-tile-img-box">
+                            <img 
+                              src={activeCombo?.wallTile?.img || '/textures/calacatta_gold.jpg'} 
+                              alt={activeCombo?.wallTile?.name || 'Duvar Dekor Seramiği'}
+                              onError={(e) => { e.target.onerror = null; e.target.src = '/textures/calacatta_gold.jpg'; }}
+                            />
+                            <div className="tile-brand-tag">{activeCombo?.wallTile?.brand || 'VitrA'}</div>
+                            <div className="tile-price-tag">{activeCombo?.wallTile?.price || '₺620/m²'}</div>
+                          </div>
+                          <div className="material-details">
+                            <h5 className="material-name">{activeCombo?.wallTile?.name}</h5>
+                            <p className="material-sub">{activeCombo?.wallTile?.size} • {activeCombo?.wallTile?.finish}</p>
+                            <div className="calc-material-cost">
+                              Gereken: ~{wallM2Needed} m² • <strong>₺{wallTotalCost.toLocaleString('tr-TR')}</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Card 3: 📐 DERZ & YAPI KİMYASALI */}
+                        <div className="studio-material-card">
+                          <div className="card-header-tag">
+                            <span>03 / DERZ & YAPI KİMYASALI</span>
+                            <span className="tile-badge-overlay">{activeCombo?.grout?.width || '1.5mm Derz'}</span>
+                          </div>
+                          <div className="studio-grout-box">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div 
+                                className="studio-grout-swatch-circle"
+                                style={{ background: activeCombo?.grout?.hex || '#eae6df' }}
+                                title={`Derz Rengi: ${activeCombo?.grout?.color}`}
+                              />
+                              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span className="grout-color-name">{activeCombo?.grout?.color || 'Derz Renk Tonu'}</span>
+                                <span style={{ fontSize: '0.6rem', color: '#64748b' }}>Uyumlu Derz Çizgisi</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="material-details">
+                            <h5 className="material-name">{activeCombo?.grout?.name}</h5>
+                            <p className="material-sub">Teknik Özellik: {activeCombo?.grout?.type}</p>
+                            <div className="calc-material-cost">
+                              Tahmini Sarfiyat • <strong>₺{chemicalGroutCost.toLocaleString('tr-TR')}</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Card 4: 🚪 BANYO & İÇ MEKAN TAMAMLAYICI */}
+                        <div className="studio-material-card">
+                          <div className="card-header-tag">
+                            <span>04 / TAMAMLAYICI EKİPMAN</span>
+                            <div className="fixture-chips-row">
+                              {['Mat Siyah', 'Gold', 'Krom'].map(f => (
                                 <button
-                                  key={idx}
-                                  onClick={() => setActiveTileIndex(idx)}
-                                  className={`tile-carousel-dot ${activeTileIndex === idx ? 'active' : ''}`}
-                                  title={t.name}
+                                  key={f}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCustomFaucetFinish(f);
+                                  }}
+                                  className={`fixture-mini-chip ${currentFaucet.includes(f) ? 'active' : ''}`}
                                 >
-                                  {idx + 1}
+                                  {f}
                                 </button>
                               ))}
                             </div>
                           </div>
-                        )}
-
-                        <div className="material-details">
-                          <h5 className="material-name">{currentTile?.name || activeCombo?.floorTile?.name}</h5>
-                          <p className="material-sub">{currentTile?.size} • {currentTile?.finish}</p>
-                          <div className="tech-spec-row">
-                            <span className="tech-badge">{activeCombo?.floorTile?.pei || 'PEI 4'}</span>
-                            <span className="tech-badge">{activeCombo?.floorTile?.slip || 'R10 Kaymaz'}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Card 2: 🧱 DUVAR & DEKOR SERAMİĞİ */}
-                      <div className="studio-material-card studio-tile-showcase-card">
-                        <div className="card-header-tag">
-                          <span>02 / DUVAR & DEKOR SERAMİĞİ</span>
-                          <span className="tile-badge-overlay">{activeCombo?.wallTile?.badge || '✨ UYUMLU DEKOR'}</span>
-                        </div>
-                        <div className="studio-tile-img-box">
-                          <img 
-                            src={activeCombo?.wallTile?.img || '/textures/calacatta_gold.jpg'} 
-                            alt={activeCombo?.wallTile?.name || 'Duvar Dekor Seramiği'}
-                            onError={(e) => { e.target.onerror = null; e.target.src = '/textures/calacatta_gold.jpg'; }}
-                          />
-                          <div className="tile-brand-tag">{activeCombo?.wallTile?.brand || 'VitrA'}</div>
-                          <div className="tile-price-tag">{activeCombo?.wallTile?.price || '₺620/m²'}</div>
-                        </div>
-                        <div className="material-details">
-                          <h5 className="material-name">{activeCombo?.wallTile?.name}</h5>
-                          <p className="material-sub">{activeCombo?.wallTile?.size} • {activeCombo?.wallTile?.finish}</p>
-                        </div>
-                      </div>
-
-                      {/* Card 3: 📐 DERZ & YAPI KİMYASALI */}
-                      <div className="studio-material-card">
-                        <div className="card-header-tag">
-                          <span>03 / DERZ & YAPI KİMYASALI</span>
-                          <span className="tile-badge-overlay">{activeCombo?.grout?.width || '1.5mm Derz'}</span>
-                        </div>
-                        <div className="studio-grout-box">
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div 
-                              className="studio-grout-swatch-circle"
-                              style={{ background: activeCombo?.grout?.hex || '#eae6df' }}
-                              title={`Derz Rengi: ${activeCombo?.grout?.color}`}
-                            />
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                              <span className="grout-color-name">{activeCombo?.grout?.color || 'Derz Renk Tonu'}</span>
-                              <span style={{ fontSize: '0.6rem', color: '#64748b' }}>Uyumlu Derz Çizgisi</span>
+                          <div className="studio-complement-box">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div className="wood-texture-icon" style={{ background: activeCombo?.complement?.cabinetHex || '#5c4033' }} title="Mobilya Dokusu" />
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                <div className="fixture-finish-badge">🚰 {currentFaucet}</div>
+                                <span style={{ fontSize: '0.6rem', color: '#64748b' }}>Seçili Armatür Stili</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="material-details">
-                          <h5 className="material-name">{activeCombo?.grout?.name}</h5>
-                          <p className="material-sub">Teknik Özellik: {activeCombo?.grout?.type}</p>
-                        </div>
-                      </div>
-
-                      {/* Card 4: 🚪 BANYO & İÇ MEKAN TAMAMLAYICI */}
-                      <div className="studio-material-card">
-                        <div className="card-header-tag">
-                          <span>04 / TAMAMLAYICI EKİPMAN</span>
-                          <div className="fixture-chips-row">
-                            {['Mat Siyah', 'Gold', 'Krom'].map(f => (
-                              <button
-                                key={f}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setCustomFaucetFinish(f);
-                                }}
-                                className={`fixture-mini-chip ${currentFaucet.includes(f) ? 'active' : ''}`}
-                              >
-                                {f}
-                              </button>
-                            ))}
+                          <div className="material-details">
+                            <h5 className="material-name">{activeCombo?.complement?.cabinet}</h5>
+                            <p className="material-sub">Armatür: {activeCombo?.complement?.fixture}</p>
                           </div>
                         </div>
-                        <div className="studio-complement-box">
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <div className="wood-texture-icon" style={{ background: activeCombo?.complement?.cabinetHex || '#5c4033' }} title="Mobilya Dokusu" />
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                              <div className="fixture-finish-badge">🚰 {currentFaucet}</div>
-                              <span style={{ fontSize: '0.6rem', color: '#64748b' }}>Seçili Armatür Stili</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="material-details">
-                          <h5 className="material-name">{activeCombo?.complement?.cabinet}</h5>
-                          <p className="material-sub">Armatür: {activeCombo?.complement?.fixture}</p>
-                        </div>
+
                       </div>
+                    )}
 
-                    </div>
-
-                    {/* Bottom Architectural Specification & 3D Action Footer */}
+                    {/* Bottom Architectural Specification & Multi-Action Bar */}
                     <div className="studio-board-footer">
                       <div className="studio-spec-notes">
                         <div className="spec-pill-group">
@@ -4046,14 +4284,35 @@ export default function Home() {
                         </p>
                       </div>
 
-                      <button
-                        onClick={() => handleTryMoodboard({ ...activeCombo, tileName: currentTile?.name || activeCombo?.floorTile?.name })}
-                        className="studio-3d-action-btn"
-                      >
-                        <Palette size={16} />
-                        <span>3D Stüdyoda Görselleştir</span>
-                        <ArrowRight size={14} />
-                      </button>
+                      {/* Multi-Action Button Bar */}
+                      <div className="studio-action-buttons-group">
+                        <button
+                          onClick={() => handleCopyArchitectSpec(activeCombo, currentTile, currentFaucet, totalEstimatedBudget)}
+                          className="studio-secondary-action-btn"
+                          title="Tüm malzeme reçetesini ve bütçe detaylarını kopyala"
+                        >
+                          <Copy size={15} />
+                          <span>{specCopiedMsg ? '✅ Reçete Kopyalandı!' : 'Mimar Reçetesini Kopyala'}</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleRequestQuoteForCombo(activeCombo, currentTile)}
+                          className="studio-quote-action-btn"
+                          title="Bu kombin için kayıtlı bayilerden doğrudan fiyat teklifi iste"
+                        >
+                          <DollarSign size={15} />
+                          <span>Bayilerden Fiyat Teklifi İstet</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleTryMoodboard({ ...activeCombo, tileName: currentTile?.name || activeCombo?.floorTile?.name })}
+                          className="studio-3d-action-btn"
+                        >
+                          <Palette size={16} />
+                          <span>3D Stüdyoda 360° Görselleştir</span>
+                          <ArrowRight size={14} />
+                        </button>
+                      </div>
                     </div>
 
                   </div>
@@ -6005,6 +6264,82 @@ export default function Home() {
 
 
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI PHOTO SCANNER MODAL */}
+      {showAiPhotoScanModal && (
+        <div className="modal-overlay animate-fade-in" onClick={() => setShowAiPhotoScanModal(false)}>
+          <div className="modal-content glass-panel-gold ai-photo-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Camera size={20} className="gold-icon" />
+                <h3>Oda Fotoğrafı Yükle & AI Seramik Eşleştir</h3>
+              </div>
+              <button onClick={() => setShowAiPhotoScanModal(false)} className="close-modal-btn">✕</button>
+            </div>
+
+            <div className="modal-body" style={{ padding: '20px' }}>
+              <p className="ai-modal-desc">
+                Mevcut mekanınızın (banyo, mutfak veya salon) fotoğrafını yükleyin veya hazır oda şablonlarından birini seçin. AI mimari algoritması renk skalasını ve ışık açısını analiz ederek en ideal seramik kombinasyonunu üretir.
+              </p>
+
+              {aiPhotoScanning ? (
+                <div className="ai-scanning-state-box">
+                  <div className="scanning-spinner-glow" />
+                  <p className="scanning-text">✨ AI Analiz Ediliyor: Renk skalası, doku derinliği ve ortam ışığı taranıyor...</p>
+                  <div className="scanning-progress-bar">
+                    <div className="scanning-progress-fill" />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* File Drag and Drop Box */}
+                  <div 
+                    className="ai-photo-dropzone"
+                    onClick={() => handleSimulatePhotoScan('banyo_modern')}
+                  >
+                    <UploadCloud size={36} style={{ color: 'var(--accent-gold)' }} />
+                    <p style={{ fontWeight: '600', color: '#0f172a', margin: '8px 0 4px 0' }}>
+                      Fotoğrafınızı Buraya Sürükleyin veya Seçin
+                    </p>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>JPG, PNG veya WEBP (Max 10MB)</span>
+                  </div>
+
+                  {/* Sample Room Templates */}
+                  <div style={{ marginTop: '20px' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '10px' }}>
+                      Veya Hazır Örnek Mekan Şablonu Seçin:
+                    </span>
+                    <div className="sample-templates-grid">
+                      {[
+                        { key: 'banyo_modern', name: '🛁 Modern Banyo', badge: 'Calacatta & Gold' },
+                        { key: 'mutfak_ahsap', name: '🍳 Ahşap Mutfak', badge: 'Meşe & Beton' },
+                        { key: 'salon_beton', name: '🛋️ Loft Salon', badge: 'Antrasit Granit' },
+                        { key: 'banyo_minimal', name: '✨ Minimal Banyo', badge: 'Mat Siyah & Beyaz' }
+                      ].map(tmpl => (
+                        <button
+                          key={tmpl.key}
+                          onClick={() => handleSimulatePhotoScan(tmpl.key)}
+                          className="sample-template-card"
+                        >
+                          <span className="tmpl-name">{tmpl.name}</span>
+                          <span className="tmpl-badge">{tmpl.badge}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="modal-footer" style={{ padding: '14px 20px', borderTop: '1px solid #f1efe9', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button onClick={() => setShowAiPhotoScanModal(false)} className="btn-secondary">İptal</button>
+              <button onClick={() => handleSimulatePhotoScan('banyo_modern')} className="btn-primary" disabled={aiPhotoScanning}>
+                {aiPhotoScanning ? 'Taranıyor...' : 'AI Analizi Başlat'}
+              </button>
             </div>
           </div>
         </div>
