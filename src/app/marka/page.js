@@ -1370,7 +1370,7 @@ export default function BrandPortalPage() {
                   </div>
 
                   {/* VISUAL ANALYTICS & MARKET SHARE ROW */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }} className="brand-campaign-grid">
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: isMobile ? '16px' : '24px' }} className="brand-campaign-grid">
                     
                     {/* DYNAMIC TIMELINE CHART WIDGET */}
                     <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
@@ -2391,13 +2391,13 @@ export default function BrandPortalPage() {
                   </div>
 
                   {/* Main Grid: Form/Mockup and Campaigns Table */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '28px' }} className="brand-campaign-grid">
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.2fr', gap: isMobile ? '20px' : '28px' }} className="brand-campaign-grid">
                     
                     {/* Left: Purchase Form and LIVE Mockup */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                       
                       {/* Create campaign form */}
-                      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: isMobile ? '16px' : '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
                         <h3 style={{ fontSize: '1rem', fontWeight: '850', margin: '0 0 16px 0', color: '#0f172a' }}>Yeni Vitrin İlanı Talep Et</h3>
                         
                         {campaignSuccessMsg && (
@@ -2414,7 +2414,7 @@ export default function BrandPortalPage() {
                               value={campaignProduct} 
                               onChange={(e) => setCampaignProduct(e.target.value)} 
                               required
-                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', background: '#fff' }}
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', background: '#fff', width: '100%', boxSizing: 'border-box' }}
                             >
                               <option value="">Seçiniz...</option>
                               {brandProducts.map(p => (
@@ -2428,7 +2428,7 @@ export default function BrandPortalPage() {
                             <select
                               value={campaignDuration}
                               onChange={(e) => setCampaignDuration(e.target.value)}
-                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', background: '#fff' }}
+                              style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', background: '#fff', width: '100%', boxSizing: 'border-box' }}
                             >
                               <option value="7">1 Hafta (500 TL)</option>
                               <option value="30">1 Ay (1500 TL)</option>
@@ -2453,7 +2453,9 @@ export default function BrandPortalPage() {
                               alignItems: 'center',
                               justifyContent: 'center',
                               gap: '6px',
-                              opacity: campaignProduct ? 1 : 0.6
+                              opacity: campaignProduct ? 1 : 0.6,
+                              width: '100%',
+                              boxSizing: 'border-box'
                             }}
                           >
                             <Plus size={16} />
@@ -2473,17 +2475,17 @@ export default function BrandPortalPage() {
                               background: '#090d16',
                               border: '1px solid #d4af37',
                               borderRadius: '16px',
-                              padding: '20px',
+                              padding: isMobile ? '14px' : '20px',
                               color: '#fff',
                               boxShadow: '0 8px 24px rgba(212,175,55,0.1)'
                             }}>
-                              <h4 style={{ fontSize: '0.75rem', color: '#d4af37', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px 0', borderBottom: '1px solid rgba(212,175,55,0.2)', paddingBottom: '6px' }}>
+                              <h4 style={{ fontSize: isMobile ? '0.7rem' : '0.75rem', color: '#d4af37', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px 0', borderBottom: '1px solid rgba(212,175,55,0.2)', paddingBottom: '6px' }}>
                                 Canlı Ana Sayfa Vitrin Önizlemesi (Görsel Taslak)
                               </h4>
                               
                               <div style={{
                                 width: '100%',
-                                maxWidth: '240px',
+                                maxWidth: isMobile ? '100%' : '240px',
                                 margin: '0 auto',
                                 background: '#fff',
                                 borderRadius: '12px',
@@ -2535,10 +2537,10 @@ export default function BrandPortalPage() {
                     </div>
 
                     {/* Right: Campaigns History Table */}
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: isMobile ? '16px' : '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
                       <h3 style={{ fontSize: '1rem', fontWeight: '850', margin: '0 0 16px 0', color: '#0f172a' }}>Mevcut Kampanyalarımız</h3>
                       
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '450px', overflowY: 'auto' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: isMobile ? '360px' : '450px', overflowY: 'auto' }}>
                         {b2bStats.campaigns.map(camp => {
                           const isExpired = camp.expiresAt && new Date(camp.expiresAt) < new Date();
                           
@@ -2566,9 +2568,11 @@ export default function BrandPortalPage() {
                           return (
                             <div key={camp.id} style={{
                               display: 'flex',
+                              flexDirection: isMobile ? 'column' : 'row',
                               justifyContent: 'space-between',
-                              alignItems: 'center',
-                              padding: '16px',
+                              alignItems: isMobile ? 'stretch' : 'center',
+                              gap: isMobile ? '12px' : '16px',
+                              padding: isMobile ? '12px' : '16px',
                               background: '#f8fafc',
                               border: '1px solid #e2e8f0',
                               borderRadius: '12px',
@@ -2607,7 +2611,7 @@ export default function BrandPortalPage() {
                                   )}
                                 </div>
                               </div>
-                              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '3px', alignItems: 'flex-end' }}>
+                              <div style={{ textAlign: isMobile ? 'left' : 'right', display: 'flex', flexDirection: 'column', gap: '3px', alignItems: isMobile ? 'flex-start' : 'flex-end', borderTop: isMobile ? '1px solid #e2e8f0' : 'none', paddingTop: isMobile ? '8px' : '0' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '800', color: '#2563eb', fontSize: '0.82rem' }}>
                                   <MousePointerClick size={13} />
                                   <span>{camp.clicks || 0} Tıklama</span>
@@ -2633,6 +2637,7 @@ export default function BrandPortalPage() {
                         )}
                       </div>
                     </div>
+                  </div>
 
                     {/* 🏆 HAFTALIK PODYUM REKLAM İHALESİ SECTION */}
                     <div style={{
@@ -2679,20 +2684,20 @@ export default function BrandPortalPage() {
                           background: 'rgba(239, 68, 68, 0.12)',
                           border: '1.5px solid rgba(239, 68, 68, 0.5)',
                           borderRadius: '14px',
-                          padding: '14px 18px',
+                          padding: isMobile ? '12px 14px' : '14px 18px',
                           color: '#f87171',
                           fontSize: '0.85rem',
                           fontWeight: '700',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '12px',
+                          gap: isMobile ? '8px' : '12px',
                           width: '100%',
                           boxSizing: 'border-box'
                         }}>
                           <Lock size={22} style={{ flexShrink: 0 }} />
                           <div>
-                            <div style={{ fontSize: '0.9rem', fontWeight: '900', color: '#fca5a5' }}>🔒 BU HAFTANIN PODYUM İHALESİ KAPANMIŞTIR</div>
-                            <div style={{ fontSize: '0.78rem', color: '#f87171', fontWeight: '500', marginTop: '2px' }}>
+                            <div style={{ fontSize: isMobile ? '0.82rem' : '0.9rem', fontWeight: '900', color: '#fca5a5' }}>🔒 BU HAFTANIN PODYUM İHALESİ KAPANMIŞTIR</div>
+                            <div style={{ fontSize: isMobile ? '0.72rem' : '0.78rem', color: '#f87171', fontWeight: '500', marginTop: '2px' }}>
                               Yönetici tarafından bu haftanın kazanan podyum reklamı onaylanmıştır. Yeni teklif alımı kapatılmıştır, daha yüksek teklif verilemez.
                             </div>
                           </div>
@@ -2702,18 +2707,18 @@ export default function BrandPortalPage() {
                       {/* Live Auction Metrics Stats Bar */}
                       <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-                        gap: '12px',
+                        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(160px, 1fr))',
+                        gap: isMobile ? '10px' : '12px',
                         background: 'rgba(255,255,255,0.05)',
                         border: '1px solid rgba(255,255,255,0.1)',
                         borderRadius: '14px',
-                        padding: '16px',
+                        padding: isMobile ? '12px' : '16px',
                         width: '100%',
                         boxSizing: 'border-box'
                       }}>
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700' }}>ŞU ANKİ EN YÜKSEK TEKLİF</div>
-                          <div style={{ fontSize: '1.3rem', fontWeight: '900', color: '#d4af37', marginTop: '2px', wordBreak: 'break-all' }}>
+                          <div style={{ fontSize: isMobile ? '1.15rem' : '1.3rem', fontWeight: '900', color: '#d4af37', marginTop: '2px', wordBreak: 'break-all' }}>
                             ₺{podiumAuctionInfo?.highestBidAmount ? podiumAuctionInfo.highestBidAmount.toLocaleString('tr-TR') : '1.500'}
                           </div>
                         </div>
@@ -2725,7 +2730,7 @@ export default function BrandPortalPage() {
                         </div>
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700' }}>İHALE DURUMU</div>
-                          <div style={{ fontSize: '1rem', fontWeight: '800', color: podiumAuctionInfo?.isAuctionClosed ? '#ef4444' : '#38bdf8', marginTop: '4px', wordBreak: 'break-word' }}>
+                          <div style={{ fontSize: '0.95rem', fontWeight: '800', color: podiumAuctionInfo?.isAuctionClosed ? '#ef4444' : '#38bdf8', marginTop: '4px', wordBreak: 'break-word' }}>
                             {podiumAuctionInfo?.isAuctionClosed ? '🔒 Kapanmış (Onaylandı)' : `₺${podiumAuctionInfo?.minNextBid ? podiumAuctionInfo.minNextBid.toLocaleString('tr-TR') : '1.500'} (Açık İhale)`}
                           </div>
                         </div>
@@ -2744,7 +2749,7 @@ export default function BrandPortalPage() {
                           </div>
                         )}
 
-                        <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', width: '100%', boxSizing: 'border-box' }}>
+                        <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '16px', width: '100%', boxSizing: 'border-box' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
                             <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Podyuma Çıkarılacak Ürün *</label>
                             <select 
@@ -2776,7 +2781,7 @@ export default function BrandPortalPage() {
                           </div>
                         </div>
 
-                        <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', width: '100%', boxSizing: 'border-box' }}>
+                        <div className="campaign-inputs-grid" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '16px', width: '100%', boxSizing: 'border-box' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
                             <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>Podyum Başlığı / Slogan</label>
                             <input 
@@ -2802,7 +2807,7 @@ export default function BrandPortalPage() {
                           </div>
                         </div>
 
-                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', background: 'rgba(255,255,255,0.03)', padding: '10px 14px', borderRadius: '8px', borderLeft: '3px solid #d4af37', width: '100%', boxSizing: 'border-box' }}>
+                        <div style={{ fontSize: isMobile ? '0.7rem' : '0.75rem', color: '#94a3b8', background: 'rgba(255,255,255,0.03)', padding: isMobile ? '8px 10px' : '10px 14px', borderRadius: '8px', borderLeft: '3px solid #d4af37', width: '100%', boxSizing: 'border-box' }}>
                           💡 <strong>Not:</strong> Teklifiniz yönetici tarafından onaylandıktan sonra banka dekont numaranızı aşağıdaki teklif listenizden kaydedebilirsiniz.
                         </div>
 
@@ -2816,9 +2821,9 @@ export default function BrandPortalPage() {
                             color: podiumAuctionInfo?.isAuctionClosed ? '#94a3b8' : '#000',
                             border: 'none',
                             borderRadius: '12px',
-                            padding: '14px',
+                            padding: isMobile ? '12px 14px' : '14px',
                             fontWeight: '900',
-                            fontSize: '0.9rem',
+                            fontSize: isMobile ? '0.82rem' : '0.9rem',
                             cursor: podiumAuctionInfo?.isAuctionClosed ? 'not-allowed' : 'pointer',
                             display: 'flex',
                             alignItems: 'center',
@@ -2842,7 +2847,7 @@ export default function BrandPortalPage() {
                       {/* Brand's Podium Bids History & Analytics Table */}
                       {podiumBrandBids.length > 0 && (
                         <div style={{ marginTop: '16px', width: '100%', boxSizing: 'border-box' }}>
-                          <h4 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 14px 0', color: '#d4af37', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <h4 style={{ fontSize: isMobile ? '0.88rem' : '0.95rem', fontWeight: '800', margin: '0 0 14px 0', color: '#d4af37', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <Activity size={18} />
                             Geçmiş & Aktif Podyum Teklifleriniz ve Reklam Performansı
                           </h4>
@@ -2861,7 +2866,7 @@ export default function BrandPortalPage() {
                                   background: 'rgba(15, 23, 42, 0.6)',
                                   border: bid.status === 'WINNER_ACTIVE' ? '1.5px solid rgba(16, 185, 129, 0.6)' : '1px solid rgba(255,255,255,0.08)',
                                   borderRadius: '14px',
-                                  padding: '16px',
+                                  padding: isMobile ? '12px' : '16px',
                                   display: 'flex',
                                   flexDirection: 'column',
                                   gap: '12px',
@@ -2869,14 +2874,14 @@ export default function BrandPortalPage() {
                                   boxSizing: 'border-box'
                                 }}>
                                   {/* Header Info */}
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px', width: '100%' }}>
+                                  <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'flex-start', flexWrap: 'wrap', gap: isMobile ? '6px' : '10px', width: '100%' }}>
                                     <div style={{ minWidth: 0, flex: 1 }}>
                                       <strong style={{ color: '#fff', fontSize: '0.95rem', wordBreak: 'break-word' }}>{bid.product?.name} ({bid.product?.code})</strong>
                                       <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '3px' }}>
                                         Hafta {bid.weekNumber} ({bid.year}) • Slogan: <span style={{ color: '#f1f5f9' }}>{bid.title || 'Varsayılan'}</span>
                                       </div>
                                     </div>
-                                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                    <div style={{ textAlign: isMobile ? 'left' : 'right', flexShrink: 0, marginTop: isMobile ? '4px' : '0' }}>
                                       <div style={{ fontWeight: '900', color: '#d4af37', fontSize: '1.05rem' }}>₺{bid.bidAmount.toLocaleString('tr-TR')}</div>
                                       <span style={{ fontSize: '0.7rem', background: statusBadge.bg, color: statusBadge.color, padding: '3px 10px', borderRadius: '12px', fontWeight: '800', marginTop: '3px', display: 'inline-block' }}>
                                         {statusBadge.label}
@@ -2887,12 +2892,12 @@ export default function BrandPortalPage() {
                                   {/* Performance Analytics Metrics Bar */}
                                   <div style={{
                                     display: 'grid',
-                                    gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-                                    gap: '10px',
+                                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(130px, 1fr))',
+                                    gap: isMobile ? '8px' : '10px',
                                     background: 'rgba(255,255,255,0.03)',
                                     border: '1px solid rgba(255,255,255,0.06)',
                                     borderRadius: '10px',
-                                    padding: '10px 14px',
+                                    padding: isMobile ? '8px 10px' : '10px 14px',
                                     width: '100%',
                                     boxSizing: 'border-box'
                                   }}>
@@ -2922,9 +2927,10 @@ export default function BrandPortalPage() {
                                       background: 'rgba(212, 175, 55, 0.08)',
                                       border: '1px solid rgba(212, 175, 55, 0.25)',
                                       borderRadius: '10px',
-                                      padding: '10px 14px',
+                                      padding: isMobile ? '8px 10px' : '10px 14px',
                                       display: 'flex',
-                                      alignItems: 'center',
+                                      flexDirection: isMobile ? 'column' : 'row',
+                                      alignItems: isMobile ? 'stretch' : 'center',
                                       justifyContent: 'space-between',
                                       flexWrap: 'wrap',
                                       gap: '10px',
@@ -2938,7 +2944,7 @@ export default function BrandPortalPage() {
                                         </span>
                                       </div>
 
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '180px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: isMobile ? '100%' : '180px', justifyContent: isMobile ? 'stretch' : 'flex-end', flexWrap: 'wrap' }}>
                                         <input 
                                           type="text"
                                           value={currentDekontVal}
@@ -2969,7 +2975,8 @@ export default function BrandPortalPage() {
                                             fontWeight: '800',
                                             fontSize: '0.75rem',
                                             cursor: 'pointer',
-                                            whiteSpace: 'nowrap'
+                                            whiteSpace: 'nowrap',
+                                            width: isMobile ? '100%' : 'auto'
                                           }}
                                         >
                                           {savingDekontId === bid.id ? 'Kaydediliyor...' : 'Dekontu Kaydet'}
@@ -2984,10 +2991,8 @@ export default function BrandPortalPage() {
                         </div>
                       )}
                     </div>
-
                   </div>
-                </div>
-              )}
+                )}
 
               {/* -------------------- TAB 6: BRAND OUTLET & SERİ SONU -------------------- */}
               {activePortalTab === 'outlet' && (
@@ -3041,7 +3046,7 @@ export default function BrandPortalPage() {
                   </div>
 
                   {/* Form & Listings Grid */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '28px' }} className="brand-campaign-grid">
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.2fr', gap: isMobile ? '20px' : '28px' }} className="brand-campaign-grid">
                     
                     {/* Left: Create Outlet Listing Form */}
                     <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -3435,7 +3440,7 @@ export default function BrandPortalPage() {
                     <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 8px 0' }}>Paket Yükseltme Ödeme Bildirimi Formu</h3>
                     <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>Banka havalesi ile gerçekleştirdiğiniz lisans bedeli ödemelerini buradan yönetime bildirin.</p>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '28px' }} className="brand-campaign-grid">
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.1fr 0.9fr', gap: isMobile ? '20px' : '28px' }} className="brand-campaign-grid">
                       {/* Left: Input values */}
                       <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         
@@ -3642,7 +3647,7 @@ export default function BrandPortalPage() {
                           };
 
                           return (
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }} className="brand-campaign-grid">
+                            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '16px' : '24px' }} className="brand-campaign-grid">
                               
                               {/* 1. TOP SIZES */}
                               <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
@@ -4455,12 +4460,19 @@ export default function BrandPortalPage() {
       )}
 
       {/* Responsive Layout Override */}
-      <style jsx>{`
+      <style jsx global>{`
         @media (max-width: 1080px) {
           .brand-campaign-grid,
           .campaign-inputs-grid {
             grid-template-columns: 1fr !important;
             gap: 16px !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .brand-campaign-grid > div,
+          .campaign-inputs-grid > div {
+            width: 100% !important;
+            box-sizing: border-box !important;
           }
         }
       `}</style>
