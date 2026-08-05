@@ -6,10 +6,14 @@ export default function StudioCanvas({
   floorProduct,
   wallProduct,
   accentProduct,
+  showerProduct,
+  toiletWallProduct,
   comparisonProduct,
   applyFloor = true, 
   applyWalls = true, 
   applyAccent = false,
+  applyShower = false,
+  applyToiletWall = false,
   comparisonMode = false,
   comparisonSplit = 50,
   walkthroughMode = false,
@@ -30,6 +34,9 @@ export default function StudioCanvas({
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
   const accentWallMeshRef = useRef(null);
+  const showerBackWallMeshRef = useRef(null);
+  const showerSideWallMeshRef = useRef(null);
+  const toiletWallMeshRef = useRef(null);
 
   // References to lights & meshes
   const floorMeshRef = useRef(null);
@@ -309,14 +316,42 @@ export default function StudioCanvas({
     scene.add(backWallMesh);
     backWallMeshRef.current = backWallMesh;
 
-    // Accent Wall Panel (Shower Nook / Feature Wall in Center)
+    // Accent Wall Panel (Feature Wall / Vanity Center)
     const accentWallGeo = new THREE.PlaneGeometry(1.2, ROOM_HEIGHT);
     const accentWallMat = new THREE.MeshStandardMaterial({ color: '#1a1e26', roughness: 0.85 });
     const accentWallMesh = new THREE.Mesh(accentWallGeo, accentWallMat);
-    accentWallMesh.position.set(-ROOM_WIDTH / 2 + 0.6, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2 + 0.005);
+    accentWallMesh.position.set(-ROOM_WIDTH / 2 + 0.6, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2 + 0.004);
     accentWallMesh.receiveShadow = true;
     scene.add(accentWallMesh);
     accentWallMeshRef.current = accentWallMesh;
+
+    // Shower Cabin Back Wall Panel (Duşakabin Arka Duvarı)
+    const showerBackGeo = new THREE.PlaneGeometry(1.15, ROOM_HEIGHT);
+    const showerBackMat = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+    const showerBackWallMesh = new THREE.Mesh(showerBackGeo, showerBackMat);
+    showerBackWallMesh.position.set(-ROOM_WIDTH / 2 + 0.575, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2 + 0.008);
+    showerBackWallMesh.receiveShadow = true;
+    scene.add(showerBackWallMesh);
+    showerBackWallMeshRef.current = showerBackWallMesh;
+
+    // Shower Cabin Side Wall Panel (Duşakabin Yan Duvarı)
+    const showerSideGeo = new THREE.PlaneGeometry(1.15, ROOM_HEIGHT);
+    const showerSideMat = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+    const showerSideWallMesh = new THREE.Mesh(showerSideGeo, showerSideMat);
+    showerSideWallMesh.rotation.y = Math.PI / 2;
+    showerSideWallMesh.position.set(-ROOM_WIDTH / 2 + 0.008, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2 + 0.575);
+    showerSideWallMesh.receiveShadow = true;
+    scene.add(showerSideWallMesh);
+    showerSideWallMeshRef.current = showerSideWallMesh;
+
+    // Toilet Back Wall Panel (Klozet Arkası Vurgu Duvarı)
+    const toiletWallGeo = new THREE.PlaneGeometry(1.0, ROOM_HEIGHT);
+    const toiletWallMat = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+    const toiletWallMesh = new THREE.Mesh(toiletWallGeo, toiletWallMat);
+    toiletWallMesh.position.set(0.9, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2 + 0.008);
+    toiletWallMesh.receiveShadow = true;
+    scene.add(toiletWallMesh);
+    toiletWallMeshRef.current = toiletWallMesh;
 
     // Left Wall (side wall)
     const leftWallGeo = new THREE.PlaneGeometry(ROOM_DEPTH, ROOM_HEIGHT);
@@ -377,6 +412,9 @@ export default function StudioCanvas({
 
       const targets = [];
       if (floorMeshRef.current) targets.push(floorMeshRef.current);
+      if (showerBackWallMeshRef.current) targets.push(showerBackWallMeshRef.current);
+      if (showerSideWallMeshRef.current) targets.push(showerSideWallMeshRef.current);
+      if (toiletWallMeshRef.current) targets.push(toiletWallMeshRef.current);
       if (accentWallMeshRef.current) targets.push(accentWallMeshRef.current);
       if (backWallMeshRef.current) targets.push(backWallMeshRef.current);
       if (leftWallMeshRef.current) targets.push(leftWallMeshRef.current);
@@ -386,6 +424,10 @@ export default function StudioCanvas({
         const hit = intersects[0].object;
         if (hit === floorMeshRef.current) {
           if (onToggleTargetRef.current) onToggleTargetRef.current('floor');
+        } else if (hit === showerBackWallMeshRef.current || hit === showerSideWallMeshRef.current) {
+          if (onToggleTargetRef.current) onToggleTargetRef.current('shower');
+        } else if (hit === toiletWallMeshRef.current) {
+          if (onToggleTargetRef.current) onToggleTargetRef.current('toilet');
         } else if (hit === accentWallMeshRef.current) {
           if (onToggleTargetRef.current) onToggleTargetRef.current('accent');
         } else {
@@ -1423,7 +1465,76 @@ export default function StudioCanvas({
       accentWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#1a1e26', roughness: 0.85 });
     }
 
-  }, [floorProduct, wallProduct, accentProduct, applyFloor, applyWalls, applyAccent, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
+    // 4. SHOWER CABIN WALLS (DUŞAKABİN İKİ TARAF) LOGIC
+    if (applyShower && showerProduct && (showerBackWallMeshRef.current || showerSideWallMeshRef.current)) {
+      const w_m = showerProduct.width / 100;
+      const h_m = showerProduct.height / 100;
+
+      const applyShowerTexture = (sourceImageOrCanvas) => {
+        const texture = generateGroutOverlay(sourceImageOrCanvas, showerProduct, groutWidth, groutColor, tileRotation, layPattern);
+        texture.colorSpace = THREE.SRGBColorSpace;
+
+        const backTex = texture.clone();
+        backTex.repeat.set(1.15 / w_m, ROOM_HEIGHT / h_m);
+        const showerBackMat = new THREE.MeshPhysicalMaterial({
+          map: backTex,
+          roughness: showerProduct.finish === 'Parlak' ? 0.08 : 0.85,
+          clearcoat: showerProduct.finish === 'Parlak' ? 1.0 : 0.0
+        });
+        if (showerBackWallMeshRef.current) showerBackWallMeshRef.current.material = showerBackMat;
+
+        const sideTex = texture.clone();
+        sideTex.repeat.set(1.15 / w_m, ROOM_HEIGHT / h_m);
+        const showerSideMat = new THREE.MeshPhysicalMaterial({
+          map: sideTex,
+          roughness: showerProduct.finish === 'Parlak' ? 0.08 : 0.85,
+          clearcoat: showerProduct.finish === 'Parlak' ? 1.0 : 0.0
+        });
+        if (showerSideWallMeshRef.current) showerSideWallMeshRef.current.material = showerSideMat;
+      };
+
+      const realUrl = showerProduct.textureUrl || showerProduct.imageUrl;
+      if (realUrl) {
+        const isAbsolute = realUrl.startsWith('http://') || realUrl.startsWith('https://') || realUrl.startsWith('//');
+        const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realUrl)}` : realUrl;
+        loader.load(finalUrl, (loaded) => applyShowerTexture(loaded.image), undefined, () => applyShowerTexture(generateProceduralTexture(showerProduct)));
+      } else {
+        applyShowerTexture(generateProceduralTexture(showerProduct));
+      }
+    } else {
+      if (showerBackWallMeshRef.current) showerBackWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+      if (showerSideWallMeshRef.current) showerSideWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+    }
+
+    // 5. TOILET BACK WALL (KLOZET ARKASI VURGU DUVARI) LOGIC
+    if (applyToiletWall && toiletWallProduct && toiletWallMeshRef.current) {
+      const w_m = toiletWallProduct.width / 100;
+      const h_m = toiletWallProduct.height / 100;
+
+      const applyToiletTexture = (sourceImageOrCanvas) => {
+        const texture = generateGroutOverlay(sourceImageOrCanvas, toiletWallProduct, groutWidth, groutColor, tileRotation, layPattern);
+        texture.repeat.set(1.0 / w_m, ROOM_HEIGHT / h_m);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        toiletWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
+          map: texture,
+          roughness: toiletWallProduct.finish === 'Parlak' ? 0.08 : 0.85,
+          clearcoat: toiletWallProduct.finish === 'Parlak' ? 1.0 : 0.0
+        });
+      };
+
+      const realUrl = toiletWallProduct.textureUrl || toiletWallProduct.imageUrl;
+      if (realUrl) {
+        const isAbsolute = realUrl.startsWith('http://') || realUrl.startsWith('https://') || realUrl.startsWith('//');
+        const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realUrl)}` : realUrl;
+        loader.load(finalUrl, (loaded) => applyToiletTexture(loaded.image), undefined, () => applyToiletTexture(generateProceduralTexture(toiletWallProduct)));
+      } else {
+        applyToiletTexture(generateProceduralTexture(toiletWallProduct));
+      }
+    } else if (toiletWallMeshRef.current) {
+      toiletWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+    }
+
+  }, [floorProduct, wallProduct, accentProduct, showerProduct, toiletWallProduct, applyFloor, applyWalls, applyAccent, applyShower, applyToiletWall, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
 
   const downloadSnapshot = () => {
     if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return;
