@@ -597,22 +597,32 @@ export default function StudioCanvas({
       roughness: 0.55
     });
 
+    const resolveCabinetHex = (col) => {
+      if (!col) return '#8b5a2b';
+      if (col === 'oak') return '#8b5a2b';
+      if (col === 'white') return '#f8fafc';
+      if (col === 'anthracite') return '#272b33';
+      if (col === 'walnut') return '#4a2e1b';
+      if (col.startsWith('#')) return col;
+      return '#8b5a2b';
+    };
+
     let activeFaucetMat = chromeMat;
     if (faucetColor === 'gold') {
       activeFaucetMat = brassMat;
     } else if (faucetColor === 'black') {
-      activeFaucetMat = new THREE.MeshStandardMaterial({
-        color: '#1a1a1a',
-        metalness: 0.1,
-        roughness: 0.85
-      });
+      activeFaucetMat = new THREE.MeshStandardMaterial({ color: '#181b20', metalness: 0.2, roughness: 0.8 });
+    } else if (faucetColor === 'rosegold') {
+      activeFaucetMat = new THREE.MeshStandardMaterial({ color: '#b76e79', metalness: 0.85, roughness: 0.2 });
     }
+
+    const cabHex = resolveCabinetHex(cabinetColor);
+    const cabWoodMat = new THREE.MeshStandardMaterial({ color: cabHex, roughness: cabinetColor === 'white' ? 0.25 : 0.6 });
 
     // Populate furnishings group depending on selected roomType
     if (roomType === 'bathroom') {
       // --- 1. SINK VANITY UNIT ---
       const cabGeo = new THREE.BoxGeometry(0.7, 0.6, 1.3);
-      const cabWoodMat = new THREE.MeshStandardMaterial({ color: cabinetColor || '#5c4033', roughness: 0.65 });
       const cabinet = new THREE.Mesh(cabGeo, cabWoodMat);
       cabinet.position.set(-ROOM_WIDTH / 2 + 0.35, 0.3, 0); 
       cabinet.castShadow = true;
@@ -620,7 +630,7 @@ export default function StudioCanvas({
       group.add(cabinet);
 
       const drawerGeo = new THREE.BoxGeometry(0.02, 0.52, 1.22);
-      const drawerPanel = new THREE.Mesh(drawerGeo, darkCabMat);
+      const drawerPanel = new THREE.Mesh(drawerGeo, cabWoodMat);
       drawerPanel.position.set(-ROOM_WIDTH / 2 + 0.36, 0.3, 0);
       drawerPanel.castShadow = true;
       group.add(drawerPanel);
