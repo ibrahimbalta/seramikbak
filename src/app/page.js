@@ -13693,7 +13693,7 @@ export default function Home() {
           opacity: 1;
         }
 
-        /* Modern Filter Chips Styles - Sleek Capsules */
+        /* Modern Filter Chips Styles - Sleek Modern Cards */
         .filters-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
@@ -13705,31 +13705,34 @@ export default function Home() {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 8px 6px;
-          background: rgba(0, 0, 0, 0.02);
-          border: 1px solid rgba(0, 0, 0, 0.04);
-          border-radius: 20px; /* capsule rounded */
-          font-size: 0.74rem;
+          padding: 8px 10px;
+          background: #ffffff;
+          border: 1px solid rgba(15, 23, 42, 0.09);
+          border-radius: 8px; /* Sleek modern rounded rectangle */
+          font-size: 0.76rem;
           font-family: var(--font-body);
           font-weight: 600;
-          color: var(--text-secondary);
+          color: #334155;
           cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           text-align: center;
           word-break: break-word;
           min-height: 38px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+          position: relative;
         }
         .filter-chip-btn:hover {
-          border-color: #8c6b30;
+          border-color: var(--accent-gold);
           color: #8c6b30;
-          background: rgba(179, 142, 71, 0.04);
+          background: rgba(212, 175, 55, 0.04);
           transform: translateY(-1px);
+          box-shadow: 0 4px 10px rgba(140, 107, 48, 0.1);
         }
         .filter-chip-btn.active {
-          background: #0f172a !important; /* solid contrast charcoal black */
-          border-color: #0f172a !important;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+          border-color: var(--accent-gold) !important;
           color: #ffffff !important;
-          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.22);
         }
         .color-chip-btn {
           justify-content: flex-start;
