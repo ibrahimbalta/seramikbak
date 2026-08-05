@@ -972,21 +972,27 @@ export default function Home() {
   const [visualSearchMatches, setVisualSearchMatches] = useState(null);
 
   // 3D Studio Options
-  const [studioTarget, setStudioTarget] = useState('floor'); // floor, walls
+  const [studioTarget, setStudioTarget] = useState('floor'); // floor, walls, accent
   const [studioApplyFloor, setStudioApplyFloor] = useState(true);
   const [studioApplyWalls, setStudioApplyWalls] = useState(true);
+  const [studioApplyAccent, setStudioApplyAccent] = useState(false);
   const [studioFloorProduct, setStudioFloorProduct] = useState(null);
   const [studioWallProduct, setStudioWallProduct] = useState(null);
+  const [studioAccentProduct, setStudioAccentProduct] = useState(null);
+  const [studioComparisonMode, setStudioComparisonMode] = useState(false);
+  const [studioComparisonProduct, setStudioComparisonProduct] = useState(null);
+  const [studioComparisonSplit, setStudioComparisonSplit] = useState(50);
+  const [studioWalkthroughMode, setStudioWalkthroughMode] = useState(false);
   const [studioRoomType, setStudioRoomType] = useState('bathroom'); // bathroom, livingroom, kitchen, hallway, terrace
   const [studioGroutWidth, setStudioGroutWidth] = useState('2'); // 1, 2, 3, 5 mm
   const [studioGroutColor, setStudioGroutColor] = useState('#888888'); // hex
   const [studioLightTemp, setStudioLightTemp] = useState('neutral'); // neutral, warm, cool
   const [studioLightIntensity, setStudioLightIntensity] = useState(1.0); // 0.2 to 2.0
   const [studioTileRotation, setStudioTileRotation] = useState(0); // 0 or 90
-  const [studioLayPattern, setStudioLayPattern] = useState('flat'); // flat or diagonal
-  const [studioTimeOfDay, setStudioTimeOfDay] = useState('day'); // day or night
-  const [studioCabinetColor, setStudioCabinetColor] = useState('#5c4033'); // default oak wood
-  const [studioFaucetColor, setStudioFaucetColor] = useState('chrome'); // chrome, gold, black
+  const [studioLayPattern, setStudioLayPattern] = useState('flat'); // flat, diagonal, herringbone, staggered_50, staggered_33
+  const [studioTimeOfDay, setStudioTimeOfDay] = useState('day'); // sunrise, day, sunset, night
+  const [studioCabinetColor, setStudioCabinetColor] = useState('#5c4033'); // oak, white, anthracite, walnut
+  const [studioFaucetColor, setStudioFaucetColor] = useState('chrome'); // chrome, black, gold, rosegold
 
   // Geolocation & Dealer Locator State
   const [userLocationName, setUserLocationName] = useState('Kadıköy Merkez');
@@ -5204,8 +5210,8 @@ export default function Home() {
                 )}
 
                 <div className="control-group">
-                  <label>Seramik Giydirme Alanı</label>
-                  <div className="segmented-control">
+                  <label>Seramik Giydirme Bölgesi</label>
+                  <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px' }}>
                     <button 
                       className={studioApplyFloor && studioFloorProduct?.id === activeProduct?.id ? 'active' : ''} 
                       onClick={() => {
@@ -5216,12 +5222,9 @@ export default function Home() {
                           setStudioApplyFloor(true);
                           if (activeProduct) logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
                         }
-                        if (uploadedRoomImage) {
-                          reprocessTiling('floor');
-                        }
                       }}
                     >
-                      Zemin Döşeme
+                      Zemin
                     </button>
                     <button 
                       className={studioApplyWalls && studioWallProduct?.id === activeProduct?.id ? 'active' : ''} 
@@ -5233,12 +5236,23 @@ export default function Home() {
                           setStudioApplyWalls(true);
                           if (activeProduct) logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
                         }
-                        if (uploadedRoomImage) {
-                          reprocessTiling('walls');
+                      }}
+                    >
+                      Duvarlar
+                    </button>
+                    <button 
+                      className={studioApplyAccent && studioAccentProduct?.id === activeProduct?.id ? 'active' : ''} 
+                      onClick={() => {
+                        if (studioApplyAccent && studioAccentProduct?.id === activeProduct?.id) {
+                          setStudioApplyAccent(false);
+                        } else {
+                          setStudioAccentProduct(activeProduct);
+                          setStudioApplyAccent(true);
+                          if (activeProduct) logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
                         }
                       }}
                     >
-                      Duvar Kaplama
+                      Vurgu Duvarı
                     </button>
                   </div>
                   
@@ -5255,43 +5269,88 @@ export default function Home() {
                     gap: '6px'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Zemin Kaplama:</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>Zemin:</span>
                       {studioApplyFloor && studioFloorProduct ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span style={{ fontWeight: '600', color: 'var(--accent-gold)' }}>
                             {studioFloorProduct.name.split(' ')[0]} {studioFloorProduct.code}
                           </span>
-                          <button 
-                            onClick={() => setStudioApplyFloor(false)} 
-                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px', fontSize: '0.75rem', fontWeight: 'bold' }}
-                            title="Temizle"
-                          >
-                            ✕
-                          </button>
+                          <button onClick={() => setStudioApplyFloor(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
                         </div>
                       ) : (
-                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Düz (Boyalı/Sıvalı)</span>
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Düz Zemin</span>
                       )}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Duvar Kaplama:</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>Ana Duvar:</span>
                       {studioApplyWalls && studioWallProduct ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span style={{ fontWeight: '600', color: 'var(--accent-gold)' }}>
                             {studioWallProduct.name.split(' ')[0]} {studioWallProduct.code}
                           </span>
-                          <button 
-                            onClick={() => setStudioApplyWalls(false)} 
-                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px', fontSize: '0.75rem', fontWeight: 'bold' }}
-                            title="Temizle"
-                          >
-                            ✕
-                          </button>
+                          <button onClick={() => setStudioApplyWalls(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
                         </div>
                       ) : (
-                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Düz (Boyalı/Sıvalı)</span>
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Düz Duvar</span>
                       )}
                     </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Vurgu Niş Wall:</span>
+                      {studioApplyAccent && studioAccentProduct ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontWeight: '600', color: '#38bdf8' }}>
+                            {studioAccentProduct.name.split(' ')[0]} {studioAccentProduct.code}
+                          </span>
+                          <button onClick={() => setStudioApplyAccent(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
+                        </div>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3D COMPARISON & CAMERA MODES */}
+                <div className="control-group" style={{ marginTop: '10px' }}>
+                  <label>Gelişmiş Modlar & Görünüm</label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button 
+                      onClick={() => {
+                        setStudioComparisonMode(!studioComparisonMode);
+                        if (!studioComparisonProduct && products.length > 1) {
+                          setStudioComparisonProduct(products[1]);
+                        }
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: '6px 10px',
+                        borderRadius: '6px',
+                        fontSize: '0.72rem',
+                        fontWeight: '700',
+                        border: studioComparisonMode ? '1px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.1)',
+                        background: studioComparisonMode ? 'rgba(212, 175, 55, 0.15)' : 'rgba(255,255,255,0.02)',
+                        color: studioComparisonMode ? 'var(--accent-gold)' : '#fff',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {studioComparisonMode ? '✓ 3D Kıyaslama Açık' : '⚖️ 3D Canlı Kıyasla'}
+                    </button>
+                    <button 
+                      onClick={() => setStudioWalkthroughMode(!studioWalkthroughMode)}
+                      style={{
+                        flex: 1,
+                        padding: '6px 10px',
+                        borderRadius: '6px',
+                        fontSize: '0.72rem',
+                        fontWeight: '700',
+                        border: studioWalkthroughMode ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                        background: studioWalkthroughMode ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255,255,255,0.02)',
+                        color: studioWalkthroughMode ? '#38bdf8' : '#fff',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {studioWalkthroughMode ? '🎥 Dış Kamera' : '🥽 360° İç Gezinti'}
+                    </button>
                   </div>
                 </div>
 
@@ -5310,48 +5369,39 @@ export default function Home() {
                 {/* 3D CUSTOMIZER SETTINGS TOOLBOX */}
                 <div className="studio-settings-toolbox" style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
                   <div className="studio-toolbox-section">
-                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Döşeme Ayarları</span>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Döşeme Deseni</span>
-                        <div className="segmented-control" style={{ padding: '2px' }}>
-                          <button className={studioLayPattern === 'flat' ? 'active' : ''} onClick={() => setStudioLayPattern('flat')} style={{ fontSize: '0.65rem', padding: '4px' }}>Düz</button>
-                          <button className={studioLayPattern === 'diagonal' ? 'active' : ''} onClick={() => setStudioLayPattern('diagonal')} style={{ fontSize: '0.65rem', padding: '4px' }}>Çapraz</button>
-                        </div>
+                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Gelişmiş Döşeme Desenleri</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', padding: '2px' }}>
+                        <button className={studioLayPattern === 'flat' ? 'active' : ''} onClick={() => setStudioLayPattern('flat')} style={{ fontSize: '0.65rem', padding: '4px' }}>Düz (Grid)</button>
+                        <button className={studioLayPattern === 'diagonal' ? 'active' : ''} onClick={() => setStudioLayPattern('diagonal')} style={{ fontSize: '0.65rem', padding: '4px' }}>Çapraz 45°</button>
+                        <button className={studioLayPattern === 'herringbone' ? 'active' : ''} onClick={() => setStudioLayPattern('herringbone')} style={{ fontSize: '0.65rem', padding: '4px' }}>Balıksırtı</button>
                       </div>
-                      <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Karo Yönü</span>
-                        <div className="segmented-control" style={{ padding: '2px' }}>
-                          <button className={studioTileRotation === 0 ? 'active' : ''} onClick={() => setStudioTileRotation(0)} style={{ fontSize: '0.65rem', padding: '4px' }}>0°</button>
-                          <button className={studioTileRotation === 90 ? 'active' : ''} onClick={() => setStudioTileRotation(90)} style={{ fontSize: '0.65rem', padding: '4px' }}>90°</button>
-                        </div>
+                      <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '4px', padding: '2px' }}>
+                        <button className={studioLayPattern === 'staggered_50' ? 'active' : ''} onClick={() => setStudioLayPattern('staggered_50')} style={{ fontSize: '0.65rem', padding: '4px' }}>Tuğla %50 Kaydırma</button>
+                        <button className={studioLayPattern === 'staggered_33' ? 'active' : ''} onClick={() => setStudioLayPattern('staggered_33')} style={{ fontSize: '0.65rem', padding: '4px' }}>Tuğla %33 Kaydırma</button>
                       </div>
                     </div>
                   </div>
 
                   <div className="studio-toolbox-section" style={{ borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '10px' }}>
-                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Derz Dolgu Ayarları</span>
+                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Armatür & Mobilya Dokusu</span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <div>
-                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Derz Kalınlığı</span>
-                        <div className="segmented-control" style={{ padding: '2px' }}>
-                          {['1', '2', '3', '5'].map(w => (
-                            <button key={w} className={studioGroutWidth === w ? 'active' : ''} onClick={() => setStudioGroutWidth(w)} style={{ fontSize: '0.65rem', padding: '4px' }}>{w}mm</button>
-                          ))}
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Armatür / Batarya Metali</span>
+                        <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', padding: '2px' }}>
+                          <button className={studioFaucetColor === 'chrome' ? 'active' : ''} onClick={() => setStudioFaucetColor('chrome')} style={{ fontSize: '0.65rem', padding: '4px' }}>Krom</button>
+                          <button className={studioFaucetColor === 'black' ? 'active' : ''} onClick={() => setStudioFaucetColor('black')} style={{ fontSize: '0.65rem', padding: '4px' }}>Mat Siyah</button>
+                          <button className={studioFaucetColor === 'gold' ? 'active' : ''} onClick={() => setStudioFaucetColor('gold')} style={{ fontSize: '0.65rem', padding: '4px' }}>Gold</button>
+                          <button className={studioFaucetColor === 'rosegold' ? 'active' : ''} onClick={() => setStudioFaucetColor('rosegold')} style={{ fontSize: '0.65rem', padding: '4px' }}>Rose Gold</button>
                         </div>
                       </div>
                       <div>
-                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>Derz Rengi</span>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          {[
-                            { name: 'Beyaz', color: '#ffffff' },
-                            { name: 'Gri', color: '#888888' },
-                            { name: 'Antrasit', color: '#2b2d35' },
-                            { name: 'Krem', color: '#d9ccb9' },
-                            { name: 'Kahve', color: '#664422' }
-                          ].map(c => (
-                            <button key={c.color} onClick={() => setStudioGroutColor(c.color)} style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: c.color, border: studioGroutColor === c.color ? '2px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: 'inset 0 0 2px rgba(0,0,0,0.3)' }} title={c.name} />
-                          ))}
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Banyo Mobilyası Kaplama</span>
+                        <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', padding: '2px' }}>
+                          <button className={studioCabinetColor === 'oak' ? 'active' : ''} onClick={() => setStudioCabinetColor('oak')} style={{ fontSize: '0.65rem', padding: '4px' }}>Meşe</button>
+                          <button className={studioCabinetColor === 'white' ? 'active' : ''} onClick={() => setStudioCabinetColor('white')} style={{ fontSize: '0.65rem', padding: '4px' }}>Beyaz Lake</button>
+                          <button className={studioCabinetColor === 'anthracite' ? 'active' : ''} onClick={() => setStudioCabinetColor('anthracite')} style={{ fontSize: '0.65rem', padding: '4px' }}>Antrasit</button>
+                          <button className={studioCabinetColor === 'walnut' ? 'active' : ''} onClick={() => setStudioCabinetColor('walnut')} style={{ fontSize: '0.65rem', padding: '4px' }}>Ceviz</button>
                         </div>
                       </div>
                     </div>
@@ -5360,21 +5410,21 @@ export default function Home() {
                   <div className="studio-toolbox-section" style={{ borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '10px' }}>
                     <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Işıklandırma & Ortam</span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <div style={{ flex: 1.2 }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Günün Saati</span>
-                          <div className="segmented-control" style={{ padding: '2px' }}>
-                            <button className={studioTimeOfDay === 'day' ? 'active' : ''} onClick={() => setStudioTimeOfDay('day')} style={{ fontSize: '0.65rem', padding: '4px' }}>Gündüz</button>
-                            <button className={studioTimeOfDay === 'night' ? 'active' : ''} onClick={() => setStudioTimeOfDay('night')} style={{ fontSize: '0.65rem', padding: '4px' }}>Gece (Spotlar)</button>
-                          </div>
+                      <div>
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Günün Saati & Atmosfer</span>
+                        <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px', padding: '2px' }}>
+                          <button className={studioTimeOfDay === 'sunrise' ? 'active' : ''} onClick={() => setStudioTimeOfDay('sunrise')} style={{ fontSize: '0.65rem', padding: '4px' }}>Gündoğumu</button>
+                          <button className={studioTimeOfDay === 'day' ? 'active' : ''} onClick={() => setStudioTimeOfDay('day')} style={{ fontSize: '0.65rem', padding: '4px' }}>Gündüz</button>
+                          <button className={studioTimeOfDay === 'sunset' ? 'active' : ''} onClick={() => setStudioTimeOfDay('sunset')} style={{ fontSize: '0.65rem', padding: '4px' }}>Günbatımı</button>
+                          <button className={studioTimeOfDay === 'night' ? 'active' : ''} onClick={() => setStudioTimeOfDay('night')} style={{ fontSize: '0.65rem', padding: '4px' }}>Gece</button>
                         </div>
-                        <div style={{ flex: 0.8 }}>
-                          <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Işık Rengi</span>
-                          <div className="segmented-control" style={{ padding: '2px' }}>
-                            <button className={studioLightTemp === 'warm' ? 'active' : ''} onClick={() => setStudioLightTemp('warm')} style={{ fontSize: '0.65rem', padding: '4px' }}>Sarı</button>
-                            <button className={studioLightTemp === 'neutral' ? 'active' : ''} onClick={() => setStudioLightTemp('neutral')} style={{ fontSize: '0.65rem', padding: '4px' }}>Doğal</button>
-                            <button className={studioLightTemp === 'cool' ? 'active' : ''} onClick={() => setStudioLightTemp('cool')} style={{ fontSize: '0.65rem', padding: '4px' }}>Beyaz</button>
-                          </div>
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Işık Rengi</span>
+                        <div className="segmented-control" style={{ padding: '2px' }}>
+                          <button className={studioLightTemp === 'warm' ? 'active' : ''} onClick={() => setStudioLightTemp('warm')} style={{ fontSize: '0.65rem', padding: '4px' }}>Sarı</button>
+                          <button className={studioLightTemp === 'neutral' ? 'active' : ''} onClick={() => setStudioLightTemp('neutral')} style={{ fontSize: '0.65rem', padding: '4px' }}>Doğal</button>
+                          <button className={studioLightTemp === 'cool' ? 'active' : ''} onClick={() => setStudioLightTemp('cool')} style={{ fontSize: '0.65rem', padding: '4px' }}>Beyaz</button>
                         </div>
                       </div>
                       <div>
@@ -5414,8 +5464,14 @@ export default function Home() {
                     activeProduct={activeProduct} 
                     floorProduct={studioFloorProduct}
                     wallProduct={studioWallProduct}
+                    accentProduct={studioAccentProduct}
+                    comparisonProduct={studioComparisonProduct}
                     applyFloor={studioApplyFloor} 
                     applyWalls={studioApplyWalls} 
+                    applyAccent={studioApplyAccent}
+                    comparisonMode={studioComparisonMode}
+                    comparisonSplit={studioComparisonSplit}
+                    walkthroughMode={studioWalkthroughMode}
                     onToggleTarget={(target) => {
                       if (target === 'floor') {
                         if (studioApplyFloor && studioFloorProduct?.id === activeProduct?.id) {
@@ -5431,6 +5487,14 @@ export default function Home() {
                         } else {
                           setStudioWallProduct(activeProduct);
                           setStudioApplyWalls(true);
+                        }
+                      }
+                      if (target === 'accent') {
+                        if (studioApplyAccent && studioAccentProduct?.id === activeProduct?.id) {
+                          setStudioApplyAccent(false);
+                        } else {
+                          setStudioAccentProduct(activeProduct);
+                          setStudioApplyAccent(true);
                         }
                       }
                     }}

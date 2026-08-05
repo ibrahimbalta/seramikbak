@@ -5,8 +5,14 @@ export default function StudioCanvas({
   activeProduct, 
   floorProduct,
   wallProduct,
+  accentProduct,
+  comparisonProduct,
   applyFloor = true, 
   applyWalls = true, 
+  applyAccent = false,
+  comparisonMode = false,
+  comparisonSplit = 50,
+  walkthroughMode = false,
   onToggleTarget,
   roomType = 'bathroom',
   groutWidth = '2',
@@ -23,6 +29,7 @@ export default function StudioCanvas({
   const rendererRef = useRef(null);
   const sceneRef = useRef(null);
   const cameraRef = useRef(null);
+  const accentWallMeshRef = useRef(null);
 
   // References to lights & meshes
   const floorMeshRef = useRef(null);
@@ -166,34 +173,58 @@ export default function StudioCanvas({
     return canvas;
   };
 
-  // Helper to generate a CanvasTexture dynamically injecting grout border overlays and tiling rotation
+  // Helper to generate a CanvasTexture dynamically injecting grout border overlays, tile patterns (Herringbone, Staggered) and rotation
   const generateGroutOverlay = (sourceCanvasOrImage, product, gWidth, gColor, rotation, pattern) => {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    // Grout line: only 1px on right and bottom edges
-    // When tiles repeat, right+left and bottom+top edges combine into a single thin grout line
     const groutMm = parseFloat(gWidth) || 2;
-    const borderPx = groutMm > 0 ? Math.max(1, Math.min(2, Math.round(groutMm * 0.5))) : 0;
+    const borderPx = groutMm > 0 ? Math.max(1, Math.min(3, Math.round(groutMm * 0.6))) : 0;
 
-    // 1. Fill entire canvas with grout color first
+    // Fill entire canvas with grout color first
     ctx.fillStyle = gColor || '#888888';
     ctx.fillRect(0, 0, 512, 512);
 
-    // 2. Draw tile image to fill almost all of the canvas
-    // Leave only a thin line on right and bottom edges for grout
-    const tileW = 512 - borderPx;
-    const tileH = 512 - borderPx;
-    ctx.drawImage(sourceCanvasOrImage, 0, 0, tileW, tileH);
+    if (pattern === 'herringbone') {
+      const pw = 250 - borderPx;
+      const ph = 120 - borderPx;
 
-    // 3. Create CanvasTexture
+      ctx.drawImage(sourceCanvasOrImage, 10, 10, pw, ph);
+      ctx.drawImage(sourceCanvasOrImage, 260, 10, pw, ph);
+      
+      ctx.save();
+      ctx.translate(135, 380);
+      ctx.rotate(Math.PI / 2);
+      ctx.drawImage(sourceCanvasOrImage, -ph/2, -pw/2, ph, pw);
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(385, 380);
+      ctx.rotate(Math.PI / 2);
+      ctx.drawImage(sourceCanvasOrImage, -ph/2, -pw/2, ph, pw);
+      ctx.restore();
+    } 
+    else if (pattern === 'staggered_50' || pattern === 'staggered_33') {
+      const rowH = 256 - borderPx;
+      const offsetRatio = pattern === 'staggered_50' ? 0.5 : 0.33;
+
+      ctx.drawImage(sourceCanvasOrImage, 0, 0, 512 - borderPx, rowH);
+      const offsetPx = 512 * offsetRatio;
+      ctx.drawImage(sourceCanvasOrImage, offsetPx, 256, 512 - borderPx, rowH);
+      ctx.drawImage(sourceCanvasOrImage, offsetPx - 512, 256, 512 - borderPx, rowH);
+    } 
+    else {
+      const tileW = 512 - borderPx;
+      const tileH = 512 - borderPx;
+      ctx.drawImage(sourceCanvasOrImage, 0, 0, tileW, tileH);
+    }
+
     const texture = new THREE.CanvasTexture(canvas);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
 
-    // 4. Handle lay patterns (diagonal rotates +45°) and tile rotation (90°)
     let totalRotationRad = 0;
     if (pattern === 'diagonal') {
       totalRotationRad += Math.PI / 4; // 45 deg
@@ -278,6 +309,15 @@ export default function StudioCanvas({
     scene.add(backWallMesh);
     backWallMeshRef.current = backWallMesh;
 
+    // Accent Wall Panel (Shower Nook / Feature Wall in Center)
+    const accentWallGeo = new THREE.PlaneGeometry(1.2, ROOM_HEIGHT);
+    const accentWallMat = new THREE.MeshStandardMaterial({ color: '#1a1e26', roughness: 0.85 });
+    const accentWallMesh = new THREE.Mesh(accentWallGeo, accentWallMat);
+    accentWallMesh.position.set(-ROOM_WIDTH / 2 + 0.6, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2 + 0.005);
+    accentWallMesh.receiveShadow = true;
+    scene.add(accentWallMesh);
+    accentWallMeshRef.current = accentWallMesh;
+
     // Left Wall (side wall)
     const leftWallGeo = new THREE.PlaneGeometry(ROOM_DEPTH, ROOM_HEIGHT);
     const leftWallMat = new THREE.MeshStandardMaterial({ color: '#1f2229', roughness: 0.9 });
@@ -337,6 +377,7 @@ export default function StudioCanvas({
 
       const targets = [];
       if (floorMeshRef.current) targets.push(floorMeshRef.current);
+      if (accentWallMeshRef.current) targets.push(accentWallMeshRef.current);
       if (backWallMeshRef.current) targets.push(backWallMeshRef.current);
       if (leftWallMeshRef.current) targets.push(leftWallMeshRef.current);
 
@@ -345,6 +386,8 @@ export default function StudioCanvas({
         const hit = intersects[0].object;
         if (hit === floorMeshRef.current) {
           if (onToggleTargetRef.current) onToggleTargetRef.current('floor');
+        } else if (hit === accentWallMeshRef.current) {
+          if (onToggleTargetRef.current) onToggleTargetRef.current('accent');
         } else {
           if (onToggleTargetRef.current) onToggleTargetRef.current('walls');
         }
@@ -1352,7 +1395,35 @@ export default function StudioCanvas({
       }
     }
 
-  }, [floorProduct, wallProduct, applyFloor, applyWalls, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
+    // 3. ACCENT WALL TILING LOGIC
+    if (applyAccent && accentProduct && accentWallMeshRef.current) {
+      const w_m = accentProduct.width / 100;
+      const h_m = accentProduct.height / 100;
+
+      const applyAccentTexture = (sourceImageOrCanvas) => {
+        const texture = generateGroutOverlay(sourceImageOrCanvas, accentProduct, groutWidth, groutColor, tileRotation, layPattern);
+        texture.repeat.set(1.2 / w_m, ROOM_HEIGHT / h_m);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        accentWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
+          map: texture,
+          roughness: accentProduct.finish === 'Parlak' ? 0.08 : 0.85,
+          clearcoat: accentProduct.finish === 'Parlak' ? 1.0 : 0.0
+        });
+      };
+
+      const realUrl = accentProduct.textureUrl || accentProduct.imageUrl;
+      if (realUrl) {
+        const isAbsolute = realUrl.startsWith('http://') || realUrl.startsWith('https://') || realUrl.startsWith('//');
+        const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realUrl)}` : realUrl;
+        loader.load(finalUrl, (loaded) => applyAccentTexture(loaded.image), undefined, () => applyAccentTexture(generateProceduralTexture(accentProduct)));
+      } else {
+        applyAccentTexture(generateProceduralTexture(accentProduct));
+      }
+    } else if (accentWallMeshRef.current) {
+      accentWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#1a1e26', roughness: 0.85 });
+    }
+
+  }, [floorProduct, wallProduct, accentProduct, applyFloor, applyWalls, applyAccent, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
 
   const downloadSnapshot = () => {
     if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return;
@@ -1367,11 +1438,46 @@ export default function StudioCanvas({
   };
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
       <div 
         ref={containerRef} 
-        style={{ width: '100%', height: '100%', cursor: 'grab' }} 
+        style={{ width: '100%', height: '100%', cursor: walkthroughMode ? 'crosshair' : 'grab' }} 
       />
+
+      {/* 3D Split-Screen Comparison Slider Line */}
+      {comparisonMode && (
+        <div 
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: `${comparisonSplit}%`,
+            width: '3px',
+            background: 'var(--accent-gold)',
+            boxShadow: '0 0 12px rgba(212, 175, 55, 0.8)',
+            zIndex: 10,
+            pointerEvents: 'none'
+          }}
+        >
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            background: 'var(--accent-gold)',
+            color: '#0f172a',
+            padding: '6px 12px',
+            borderRadius: '20px',
+            fontSize: '0.7rem',
+            fontWeight: '800',
+            whiteSpace: 'nowrap',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.4)'
+          }}>
+            ◀ Kıyasla ▶
+          </div>
+        </div>
+      )}
+
       {/* Information Overlay */}
       <div className="canvas-overlay">
         <div className="overlay-left-badges">
@@ -1382,7 +1488,7 @@ export default function StudioCanvas({
             </strong>
           </div>
           <div className="overlay-badge">
-            <span>Sahne: </span>
+            <span>Oda Türü: </span>
             <strong style={{ textTransform: 'capitalize', color: 'var(--accent-gold)' }}>
               {roomType === 'bathroom' ? 'Lüks Banyo' : 
                roomType === 'livingroom' ? 'Modern Salon' : 
@@ -1394,19 +1500,25 @@ export default function StudioCanvas({
           <div className="overlay-badge">
             <span>Kaplama: </span>
             <strong style={{ textTransform: 'capitalize', color: '#38bdf8' }}>
-              {applyFloor && applyWalls ? 'Zemin & Duvar' : 
-               applyFloor ? 'Sadece Zemin' : 
-               applyWalls ? 'Sadece Duvar' : 'Döşenmemiş'}
+              {applyAccent ? 'Zemin, Duvar & Vurgu' : applyFloor && applyWalls ? 'Zemin & Duvar' : applyFloor ? 'Sadece Zemin' : 'Döşenmemiş'}
             </strong>
           </div>
+          {layPattern !== 'flat' && (
+            <div className="overlay-badge" style={{ borderColor: 'var(--accent-gold)' }}>
+              <span>Desen: </span>
+              <strong style={{ textTransform: 'uppercase', color: 'var(--accent-gold)' }}>
+                {layPattern}
+              </strong>
+            </div>
+          )}
         </div>
         
         <div className="overlay-right-actions">
           <button onClick={downloadSnapshot} className="overlay-action-btn">
-            📷 Fotoğrafı İndir
+            📷 HD Fotoğraf İndir
           </button>
           <div className="overlay-instructions">
-            Zemine/Duvara Tıklayarak Kapla
+            {walkthroughMode ? '360° Oda İçinde Gezintidesiniz' : 'Zemine/Duvara Tıklayarak Kapla'}
           </div>
         </div>
       </div>
