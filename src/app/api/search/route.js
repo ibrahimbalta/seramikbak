@@ -255,6 +255,16 @@ export async function GET(request) {
           imageUrl: true,
           textureUrl: true,
           isPremium: true,
+          trendyolPrice: true,
+          trendyolUrl: true,
+          hepsiburadaPrice: true,
+          hepsiburadaUrl: true,
+          n11Price: true,
+          n11Url: true,
+          koctasPrice: true,
+          koctasUrl: true,
+          bauhausPrice: true,
+          bauhausUrl: true,
           brand: {
             select: {
               id: true,

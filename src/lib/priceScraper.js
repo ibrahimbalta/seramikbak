@@ -121,51 +121,66 @@ export function extractPriceFromHtml(html, url) {
   if (price) return price;
 
   // 2. Selectors based fallback (if LD+JSON isn't available or empty)
-  const isSearchPage = url.includes('/sr?') || url.includes('/ara?') || url.includes('/arama?');
+  const isSearchPage = url.includes('/sr?') || url.includes('/ara?') || url.includes('/arama?') || url.includes('search');
 
   if (vendor === 'trendyol') {
     if (isSearchPage) {
-      const priceText = $('.p-card-wrppr .prc-dsc, .p-card-chldrn-cntnr .prc-dsc').first().text();
+      const priceText = $('.p-card-wrppr .prc-dsc, .p-card-chldrn-cntnr .prc-dsc, .prc-box-dsc, [class*="price-box"], [class*="prc-dsc"]').first().text();
       price = parsePriceText(priceText);
     } else {
-      const priceText = $('.prc-dsc, .product-price-container .pr-bx-w, .pr-bx-w').first().text();
+      const priceText = $('.prc-dsc, .product-price-container .pr-bx-w, .pr-bx-w, .prc-box-dsc, span.prc-slg').first().text();
       price = parsePriceText(priceText);
     }
   } 
   else if (vendor === 'hepsiburada') {
     if (isSearchPage) {
-      const priceText = $('[data-test-id="price-current-price"], [class*="currentPrice"]').first().text();
+      const priceText = $('[data-test-id="price-current-price"], [class*="currentPrice"], [class*="Price-module"], .price-value').first().text();
       price = parsePriceText(priceText);
     } else {
-      const priceText = $('span[itemprop="price"], .price-val, #offering-price').first().text();
+      const priceText = $('span[itemprop="price"], .price-val, #offering-price, [data-test-id="price-current-price"]').first().text();
       price = parsePriceText(priceText);
     }
   } 
   else if (vendor === 'n11') {
     if (isSearchPage) {
-      const priceText = $('.pro .newPrice ins, li.column .newPrice ins, .newPrice ins').first().text();
+      const priceText = $('.pro .newPrice ins, li.column .newPrice ins, .newPrice ins, .oldAndNewPrice .newPrice').first().text();
       price = parsePriceText(priceText);
     } else {
-      const priceText = $('#priceins, .newPrice ins, span.price').first().text();
+      const priceText = $('#priceins, .newPrice ins, span.price, .unf-p-detail-price-txt').first().text();
       price = parsePriceText(priceText);
     }
   } 
   else if (vendor === 'koctas') {
     if (isSearchPage) {
-      const priceText = $('.product-item .product-price, .product-card .price, .product-tile .price, .price').first().text();
+      const priceText = $('.product-item .product-price, .product-card .price, .product-tile .price, .price, [class*="productPrice"]').first().text();
       price = parsePriceText(priceText);
     } else {
-      const priceText = $('.product-price, span.price, .amount, .price').first().text();
+      const priceText = $('.product-price, span.price, .amount, .price, [class*="productPrice"]').first().text();
       price = parsePriceText(priceText);
     }
   } 
   else if (vendor === 'bauhaus') {
     if (isSearchPage) {
-      const priceText = $('.product-item .price, .product-card .amount, .price').first().text();
+      const priceText = $('.product-item .price, .product-card .amount, .price, [class*="price"]').first().text();
       price = parsePriceText(priceText);
     } else {
-      const priceText = $('.price, .amount, .price-box').first().text();
+      const priceText = $('.price, .amount, .price-box, .product-detail-price').first().text();
       price = parsePriceText(priceText);
+    }
+  }
+
+  // 3. Global Regex Fallback for Turkish Price Formats (e.g. 450,00 TL, 1.250 TL, ₺380)
+  if (!price) {
+    const textContent = $.text();
+    const matches = textContent.match(/(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)\s*(?:TL|₺)/gi);
+    if (matches && matches.length > 0) {
+      for (const m of matches) {
+        const p = parsePriceText(m);
+        if (p && p > 50 && p < 10000) { // realistic range for m² tile prices
+          price = p;
+          break;
+        }
+      }
     }
   }
 

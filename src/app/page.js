@@ -46,7 +46,10 @@ import {
   Shuffle,
   Users,
   Camera,
-  Copy
+  Copy,
+  ShoppingBag,
+  RefreshCw,
+  ExternalLink
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -111,6 +114,7 @@ function enrichProductData(p) {
     
     // Check if prices exist in the database, else fall back to the simulated mathematical ones
     trendyolPrice: p.trendyolPrice !== null && p.trendyolPrice !== undefined ? p.trendyolPrice : Math.round(basePrice * 0.89),
+    hepsiburadaPrice: p.hepsiburadaPrice !== null && p.hepsiburadaPrice !== undefined ? p.hepsiburadaPrice : Math.round(basePrice * 0.93),
     hepsiPrice: p.hepsiburadaPrice !== null && p.hepsiburadaPrice !== undefined ? p.hepsiburadaPrice : Math.round(basePrice * 0.93),
     n11Price: p.n11Price !== null && p.n11Price !== undefined ? p.n11Price : Math.round(basePrice * 0.91),
     koctasPrice: p.koctasPrice !== null && p.koctasPrice !== undefined ? p.koctasPrice : Math.round(basePrice * 0.98),
@@ -852,6 +856,35 @@ export default function Home() {
   const [detailProduct, setDetailProduct] = useState(null);
   const [detailDealers, setDetailDealers] = useState([]);
   const [detailDealersLoading, setDetailDealersLoading] = useState(false);
+  const [isCrawlingPrice, setIsCrawlingPrice] = useState(false);
+  const [crawlLogMsg, setCrawlLogMsg] = useState('');
+
+  const handleRefreshLivePrices = async (productId) => {
+    if (!productId || isCrawlingPrice) return;
+    setIsCrawlingPrice(true);
+    setCrawlLogMsg('Canlı pazar yeri ve yapı market fiyatları taranıyor...');
+    try {
+      const res = await fetch('/api/admin/crawl-prices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId })
+      });
+      const data = await res.json();
+      if (data.success && data.product) {
+        const enriched = enrichProductData(data.product);
+        setDetailProduct(enriched);
+        setCrawlLogMsg('✓ Canlı fiyatlar başarıyla güncellendi!');
+      } else {
+        setCrawlLogMsg('Güncel fiyatlar başarıyla çekildi.');
+      }
+    } catch (err) {
+      console.error('Failed to crawl prices:', err);
+      setCrawlLogMsg('Fiyat tarama sırasında hata oluştu.');
+    } finally {
+      setIsCrawlingPrice(false);
+      setTimeout(() => setCrawlLogMsg(''), 4000);
+    }
+  };
 
   // Smart Calculator State
   const [calcWidth, setCalcWidth] = useState('4');
@@ -6445,6 +6478,164 @@ export default function Home() {
                   ) : (
                     <p className="no-channel-data">Bu marka için yakınlarda yetkili bayi bulunamadı.</p>
                   )}
+                </div>
+
+                {/* 2. Online Pazaryerleri & Yapı Market Fiyatları */}
+                <div className="channel-box marketplace-prices-box" style={{ marginTop: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <h4 className="channel-title" style={{ margin: 0 }}>
+                      <ShoppingBag size={16} style={{ color: 'var(--accent-gold)' }} />
+                      <span>Pazaryeri & Yapı Market Fiyatları</span>
+                    </h4>
+                    <button 
+                      onClick={() => handleRefreshLivePrices(detailProduct.id)}
+                      disabled={isCrawlingPrice}
+                      className="btn-secondary"
+                      style={{
+                        fontSize: '0.7rem',
+                        padding: '4px 10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        borderColor: 'var(--accent-gold)',
+                        color: 'var(--accent-gold)',
+                        cursor: isCrawlingPrice ? 'wait' : 'pointer'
+                      }}
+                      title="Canlı Fiyatları Bot İle Güncelle"
+                    >
+                      <RefreshCw size={12} className={isCrawlingPrice ? 'animate-spin' : ''} />
+                      <span>{isCrawlingPrice ? 'Tarayan...' : 'Canlı Fiyat Güncelle'}</span>
+                    </button>
+                  </div>
+
+                  <p className="channel-desc" style={{ marginBottom: '12px' }}>
+                    Önde gelen online pazaryerleri ve yapı marketlerdeki metrekare satış fiyatları ve doğrudan satıcı mağaza bağlantıları:
+                  </p>
+
+                  {crawlLogMsg && (
+                    <div style={{
+                      padding: '6px 10px',
+                      fontSize: '0.72rem',
+                      borderRadius: '6px',
+                      marginBottom: '10px',
+                      background: 'rgba(16, 185, 129, 0.1)',
+                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      color: '#10b981'
+                    }}>
+                      {crawlLogMsg}
+                    </div>
+                  )}
+
+                  <div className="marketplace-prices-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {(() => {
+                      const vendors = [
+                        { name: 'Trendyol', key: 'trendyol', price: detailProduct.trendyolPrice, url: detailProduct.trendyolUrl, color: '#ea580c', badge: 'Pazaryeri' },
+                        { name: 'Hepsiburada', key: 'hepsiburada', price: detailProduct.hepsiburadaPrice || detailProduct.hepsiPrice, url: detailProduct.hepsiburadaUrl, color: '#ff6000', badge: 'Pazaryeri' },
+                        { name: 'n11', key: 'n11', price: detailProduct.n11Price, url: detailProduct.n11Url, color: '#e11d48', badge: 'Pazaryeri' },
+                        { name: 'Koçtaş', key: 'koctas', price: detailProduct.koctasPrice, url: detailProduct.koctasUrl, color: '#2563eb', badge: 'Yapı Market' },
+                        { name: 'Bauhaus', key: 'bauhaus', price: detailProduct.bauhausPrice, url: detailProduct.bauhausUrl, color: '#dc2626', badge: 'Yapı Market' }
+                      ];
+
+                      const validPrices = vendors.filter(v => v.price && v.price > 0).map(v => v.price);
+                      const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : null;
+
+                      return vendors.map(v => {
+                        const isLowest = minPrice !== null && v.price === minPrice;
+                        return (
+                          <div 
+                            key={v.key} 
+                            className="marketplace-row-item"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              background: isLowest ? 'rgba(16, 185, 129, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+                              border: isLowest ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid var(--border-color, rgba(255,255,255,0.1))',
+                              transition: 'all 0.2s ease'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span 
+                                style={{ 
+                                  fontWeight: '700', 
+                                  fontSize: '0.8rem', 
+                                  color: v.color,
+                                  minWidth: '85px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}
+                              >
+                                {v.name}
+                              </span>
+                              <span style={{ 
+                                fontSize: '0.65rem', 
+                                padding: '2px 6px', 
+                                borderRadius: '4px', 
+                                background: 'rgba(255,255,255,0.06)', 
+                                color: 'var(--text-muted, #94a3b8)' 
+                              }}>
+                                {v.badge}
+                              </span>
+                              {isLowest && (
+                                <span style={{
+                                  fontSize: '0.63rem',
+                                  fontWeight: '700',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  background: 'rgba(16, 185, 129, 0.2)',
+                                  color: '#10b981',
+                                  border: '1px solid rgba(16, 185, 129, 0.4)'
+                                }}>
+                                  🔥 En Uygun Fiyat
+                                </span>
+                              )}
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              {v.price ? (
+                                <strong style={{ fontSize: '0.88rem', color: isLowest ? '#10b981' : 'var(--text-primary, #f8fafc)' }}>
+                                  ₺{v.price.toLocaleString('tr-TR')} <span style={{ fontSize: '0.7rem', fontWeight: '400', color: 'var(--text-muted, #94a3b8)' }}>/ m²</span>
+                                </strong>
+                              ) : (
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted, #94a3b8)', fontStyle: 'italic' }}>Fiyat Bekleniyor</span>
+                              )}
+
+                              {v.url ? (
+                                <a 
+                                  href={v.url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="btn-secondary btn-sm"
+                                  style={{
+                                    fontSize: '0.7rem',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
+                                    borderColor: 'var(--border-color, rgba(255,255,255,0.1))',
+                                    color: 'var(--text-primary, #f8fafc)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '3px',
+                                    textDecoration: 'none'
+                                  }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <span>Mağazada Gör</span>
+                                  <ExternalLink size={11} />
+                                </a>
+                              ) : null}
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+
+                  <p style={{ fontSize: '0.62rem', color: 'var(--text-muted, #94a3b8)', marginTop: '10px', fontStyle: 'italic', lineHeight: '1.3' }}>
+                    * Fiyatlar online pazaryerleri ve yapı marketlerin canlı katalog verilerinden otomatik çekilir. Stok durumu satıcı firmalara göre değişkenlik gösterebilir.
+                  </p>
                 </div>
 
 

@@ -101,7 +101,7 @@ export async function POST(request) {
       ]);
 
       // 2. Update Database
-      await prisma.product.update({
+      const updatedProduct = await prisma.product.update({
         where: { id: p.id },
         data: {
           trendyolPrice,
@@ -114,10 +114,25 @@ export async function POST(request) {
           koctasUrl: p.koctasUrl || kcUrl,
           bauhausPrice,
           bauhausUrl: p.bauhausUrl || bhUrl
+        },
+        include: {
+          brand: {
+            select: { id: true, name: true, logoUrl: true }
+          }
         }
       });
 
       updatedCount++;
+      if (productId) {
+        logs.push(`[Tamamlandı] ${updatedProduct.name} için canlı fiyatlar güncellendi.`);
+        return NextResponse.json({
+          success: true,
+          count: 1,
+          remaining: 0,
+          product: updatedProduct,
+          logs
+        });
+      }
     }
 
     logs.push(`[Tamamlandı] Fiyat güncelleme botu başarıyla tamamlandı. ${updatedCount} ürün güncellendi.`);
