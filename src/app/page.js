@@ -105,20 +105,20 @@ function enrichProductData(p) {
     offers: dealerOffers,
     cheapestOffer: sortedOffers[0],
     
-    // Check if URLs exist in the database, else fall back to the dynamic search links
-    trendyolUrl: p.trendyolUrl || `https://www.trendyol.com/sr?q=${encodeURIComponent(searchKeyword)}`,
-    hepsiburadaUrl: p.hepsiburadaUrl || `https://www.hepsiburada.com/ara?q=${encodeURIComponent(searchKeyword)}`,
-    n11Url: p.n11Url || `https://www.n11.com/arama?q=${encodeURIComponent(searchKeyword)}`,
-    koctasUrl: p.koctasUrl || `https://www.koctas.com.tr/arama?q=${encodeURIComponent(searchKeyword)}`,
-    bauhausUrl: p.bauhausUrl || `https://www.bauhaus.com.tr/arama?q=${encodeURIComponent(searchKeyword)}`,
+    // Only return real URLs stored in database (no fake search links)
+    trendyolUrl: p.trendyolUrl || null,
+    hepsiburadaUrl: p.hepsiburadaUrl || null,
+    n11Url: p.n11Url || null,
+    koctasUrl: p.koctasUrl || null,
+    bauhausUrl: p.bauhausUrl || null,
     
-    // Check if prices exist in the database, else fall back to the simulated mathematical ones
-    trendyolPrice: p.trendyolPrice !== null && p.trendyolPrice !== undefined ? p.trendyolPrice : Math.round(basePrice * 0.89),
-    hepsiburadaPrice: p.hepsiburadaPrice !== null && p.hepsiburadaPrice !== undefined ? p.hepsiburadaPrice : Math.round(basePrice * 0.93),
-    hepsiPrice: p.hepsiburadaPrice !== null && p.hepsiburadaPrice !== undefined ? p.hepsiburadaPrice : Math.round(basePrice * 0.93),
-    n11Price: p.n11Price !== null && p.n11Price !== undefined ? p.n11Price : Math.round(basePrice * 0.91),
-    koctasPrice: p.koctasPrice !== null && p.koctasPrice !== undefined ? p.koctasPrice : Math.round(basePrice * 0.98),
-    bauhausPrice: p.bauhausPrice !== null && p.bauhausPrice !== undefined ? p.bauhausPrice : Math.round(basePrice * 1.02)
+    // Only return real prices stored in database (no fake formula prices)
+    trendyolPrice: (p.trendyolPrice && p.trendyolPrice > 0) ? p.trendyolPrice : null,
+    hepsiburadaPrice: (p.hepsiburadaPrice && p.hepsiburadaPrice > 0) ? p.hepsiburadaPrice : null,
+    hepsiPrice: (p.hepsiburadaPrice && p.hepsiburadaPrice > 0) ? p.hepsiburadaPrice : null,
+    n11Price: (p.n11Price && p.n11Price > 0) ? p.n11Price : null,
+    koctasPrice: (p.koctasPrice && p.koctasPrice > 0) ? p.koctasPrice : null,
+    bauhausPrice: (p.bauhausPrice && p.bauhausPrice > 0) ? p.bauhausPrice : null
   };
 }
 
@@ -6551,7 +6551,14 @@ export default function Home() {
                       const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : null;
 
                       return vendors.map(v => {
-                        const isLowest = minPrice !== null && v.price === minPrice;
+                        const hasRealPrice = v.price && v.price > 0;
+                        const hasDirectLink = v.url && 
+                          !v.url.includes('/sr?q=') && 
+                          !v.url.includes('/ara?q=') && 
+                          !v.url.includes('/arama?q=') && 
+                          !v.url.includes('/search?q=');
+                        const isLowest = hasRealPrice && minPrice !== null && v.price === minPrice;
+
                         return (
                           <div 
                             key={v.key} 
@@ -6562,8 +6569,9 @@ export default function Home() {
                               justifyContent: 'space-between',
                               padding: '10px 14px',
                               borderRadius: '8px',
-                              background: isLowest ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.07)',
-                              border: isLowest ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.12)',
+                              background: isLowest ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                              border: isLowest ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.1)',
+                              opacity: hasRealPrice ? 1 : 0.65,
                               transition: 'all 0.2s ease'
                             }}
                           >
@@ -6586,8 +6594,8 @@ export default function Home() {
                                 fontWeight: '600',
                                 padding: '2px 7px', 
                                 borderRadius: '4px', 
-                                background: 'rgba(255, 255, 255, 0.12)', 
-                                color: '#e2e8f0' 
+                                background: 'rgba(255, 255, 255, 0.1)', 
+                                color: '#cbd5e1' 
                               }}>
                                 {v.badge}
                               </span>
@@ -6608,7 +6616,7 @@ export default function Home() {
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              {v.price ? (
+                              {hasRealPrice ? (
                                 <strong style={{ 
                                   fontSize: isLowest ? '0.98rem' : '0.92rem', 
                                   fontWeight: '800', 
@@ -6618,10 +6626,10 @@ export default function Home() {
                                   ₺{v.price.toLocaleString('tr-TR')} <span style={{ fontSize: '0.74rem', fontWeight: '400', color: '#cbd5e1' }}>/ m²</span>
                                 </strong>
                               ) : (
-                                <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontStyle: 'italic' }}>Fiyat Bekleniyor</span>
+                                <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontStyle: 'italic', fontWeight: '500' }}>Fiyat Bulunamadı</span>
                               )}
 
-                              {v.url ? (
+                              {hasRealPrice && hasDirectLink ? (
                                 <a 
                                   href={v.url} 
                                   target="_blank" 
@@ -6632,7 +6640,7 @@ export default function Home() {
                                     padding: '5px 10px',
                                     borderRadius: '6px',
                                     border: '1px solid rgba(255, 255, 255, 0.3)',
-                                    background: 'rgba(255, 255, 255, 0.12)',
+                                    background: 'rgba(255, 255, 255, 0.15)',
                                     color: '#ffffff',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -6645,7 +6653,9 @@ export default function Home() {
                                   <span>Mağazada Gör</span>
                                   <ExternalLink size={12} style={{ color: '#ffffff' }} />
                                 </a>
-                              ) : null}
+                              ) : (
+                                <span style={{ fontSize: '0.72rem', color: '#64748b', fontStyle: 'italic', padding: '4px 6px' }}>Satışta Değil</span>
+                              )}
                             </div>
                           </div>
                         );

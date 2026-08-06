@@ -52,25 +52,15 @@ export async function POST(request) {
       const p = products[i];
       logs.push(`[Tarama] SKU: ${p.code} | "${p.name}" taranıyor...`);
 
-      // 1. Calculate backup formula prices (to be used if live fetch fails and there is no existing price)
-      const nameWeight = p.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 200;
-      const basePrice = 500 + nameWeight + (p.width === 120 || p.height === 120 ? 80 : 0);
-      
-      const tyFallback = Math.round(basePrice * 0.89);
-      const hbFallback = Math.round(basePrice * 0.93);
-      const n11Fallback = Math.round(basePrice * 0.91);
-      const kcFallback = Math.round(basePrice * 0.98);
-      const bhFallback = Math.round(basePrice * 1.02);
+      // Define target URLs for scraping (search query used for scraping only)
+      const tyScrapeUrl = p.trendyolUrl || `https://www.trendyol.com/sr?q=${encodeURIComponent(p.code)}`;
+      const hbScrapeUrl = p.hepsiburadaUrl || `https://www.hepsiburada.com/ara?q=${encodeURIComponent(p.code)}`;
+      const n11ScrapeUrl = p.n11Url || `https://www.n11.com/arama?q=${encodeURIComponent(p.code)}`;
+      const kcScrapeUrl = p.koctasUrl || `https://www.koctas.com.tr/search?q=${encodeURIComponent(p.code)}`;
+      const bhScrapeUrl = p.bauhausUrl || `https://www.bauhaus.com.tr/arama?q=${encodeURIComponent(p.code)}`;
 
-      // Define target URLs
-      const tyUrl = p.trendyolUrl || `https://www.trendyol.com/sr?q=${encodeURIComponent(p.code)}`;
-      const hbUrl = p.hepsiburadaUrl || `https://www.hepsiburada.com/ara?q=${encodeURIComponent(p.code)}`;
-      const n11Url = p.n11Url || `https://www.n11.com/arama?q=${encodeURIComponent(p.code)}`;
-      const kcUrl = p.koctasUrl || `https://www.koctas.com.tr/search?q=${encodeURIComponent(p.code)}`;
-      const bhUrl = p.bauhausUrl || `https://www.bauhaus.com.tr/arama?q=${encodeURIComponent(p.code)}`;
-
-      // Helper to fetch price with fail-safe fallback
-      const getLivePrice = async (url, label, previousPrice, fallbackPrice) => {
+      // Helper to fetch price cleanly without fake math fallbacks
+      const getLivePrice = async (url, label, previousPrice) => {
         try {
           const html = await fetchHtml(url, scrapingApiKey);
           const price = extractPriceFromHtml(html, url);
@@ -78,42 +68,42 @@ export async function POST(request) {
             logs.push(`[Eşleşti] ${label}: Canlı fiyat çekildi -> ${price} TL`);
             return price;
           } else {
-            logs.push(`[Bilgi] ${label}: Sayfada listeli fiyat bulunamadı. Kayıtlı fiyat veya şablon fiyat kullanılıyor.`);
-            return previousPrice || fallbackPrice;
+            logs.push(`[Bilgi] ${label}: Sayfada listeli fiyat bulunamadı.`);
+            return previousPrice || null;
           }
         } catch (err) {
           if (err.message.includes('404')) {
             logs.push(`[Bilgi] ${label}: Ürün bu pazaryerinde bulunamadı (404 Not Found).`);
           } else {
-            logs.push(`[Engellendi/Hata] ${label}: Bağlantı engellendi veya hata oluştu (${err.message}). Mevcut fiyat korunuyor.`);
+            logs.push(`[Engellendi/Hata] ${label}: Bağlantı engellendi veya hata oluştu (${err.message}).`);
           }
-          return previousPrice || fallbackPrice;
+          return previousPrice || null;
         }
       };
 
       // Crawl each marketplace in parallel to prevent Next.js request timeouts
       const [trendyolPrice, hepsiburadaPrice, n11Price, koctasPrice, bauhausPrice] = await Promise.all([
-        getLivePrice(tyUrl, 'Trendyol', p.trendyolPrice, tyFallback),
-        getLivePrice(hbUrl, 'Hepsiburada', p.hepsiburadaPrice, hbFallback),
-        getLivePrice(n11Url, 'n11', p.n11Price, n11Fallback),
-        getLivePrice(kcUrl, 'Koçtaş', p.koctasPrice, kcFallback),
-        getLivePrice(bhUrl, 'Bauhaus', p.bauhausPrice, bhFallback)
+        getLivePrice(tyScrapeUrl, 'Trendyol', p.trendyolPrice),
+        getLivePrice(hbScrapeUrl, 'Hepsiburada', p.hepsiburadaPrice),
+        getLivePrice(n11ScrapeUrl, 'n11', p.n11Price),
+        getLivePrice(kcScrapeUrl, 'Koçtaş', p.koctasPrice),
+        getLivePrice(bhScrapeUrl, 'Bauhaus', p.bauhausPrice)
       ]);
 
-      // 2. Update Database
+      // 2. Update Database (only save specific direct product URLs if real price exists or URL was explicitly stored)
       const updatedProduct = await prisma.product.update({
         where: { id: p.id },
         data: {
-          trendyolPrice,
-          trendyolUrl: p.trendyolUrl || tyUrl,
-          hepsiburadaPrice,
-          hepsiburadaUrl: p.hepsiburadaUrl || hbUrl,
-          n11Price,
-          n11Url: p.n11Url || n11Url,
-          koctasPrice,
-          koctasUrl: p.koctasUrl || kcUrl,
-          bauhausPrice,
-          bauhausUrl: p.bauhausUrl || bhUrl
+          trendyolPrice: trendyolPrice || null,
+          trendyolUrl: p.trendyolUrl || null,
+          hepsiburadaPrice: hepsiburadaPrice || null,
+          hepsiburadaUrl: p.hepsiburadaUrl || null,
+          n11Price: n11Price || null,
+          n11Url: p.n11Url || null,
+          koctasPrice: koctasPrice || null,
+          koctasUrl: p.koctasUrl || null,
+          bauhausPrice: bauhausPrice || null,
+          bauhausUrl: p.bauhausUrl || null
         },
         include: {
           brand: {
