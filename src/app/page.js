@@ -6481,46 +6481,57 @@ export default function Home() {
                 </div>
 
                 {/* 2. Online Pazaryerleri & Yapı Market Fiyatları */}
-                <div className="channel-box marketplace-prices-box" style={{ marginTop: '16px' }}>
+                <div className="channel-box marketplace-prices-box" style={{ 
+                  marginTop: '16px', 
+                  background: 'rgba(15, 23, 42, 0.85)', 
+                  border: '1px solid rgba(245, 158, 11, 0.3)', 
+                  borderRadius: '12px', 
+                  padding: '16px',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
+                }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <h4 className="channel-title" style={{ margin: 0 }}>
-                      <ShoppingBag size={16} style={{ color: 'var(--accent-gold)' }} />
-                      <span>Pazaryeri & Yapı Market Fiyatları</span>
+                    <h4 className="channel-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <ShoppingBag size={18} style={{ color: '#fbbf24' }} />
+                      <span style={{ color: '#fbbf24', fontSize: '0.92rem', fontWeight: '800', letterSpacing: '0.3px' }}>Pazaryeri & Yapı Market Fiyatları</span>
                     </h4>
                     <button 
                       onClick={() => handleRefreshLivePrices(detailProduct.id)}
                       disabled={isCrawlingPrice}
-                      className="btn-secondary"
                       style={{
-                        fontSize: '0.7rem',
-                        padding: '4px 10px',
+                        fontSize: '0.72rem',
+                        fontWeight: '700',
+                        padding: '5px 11px',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '5px',
-                        borderColor: 'var(--accent-gold)',
-                        color: 'var(--accent-gold)',
-                        cursor: isCrawlingPrice ? 'wait' : 'pointer'
+                        gap: '6px',
+                        borderRadius: '6px',
+                        border: '1px solid #f59e0b',
+                        background: 'rgba(245, 158, 11, 0.18)',
+                        color: '#fbbf24',
+                        cursor: isCrawlingPrice ? 'wait' : 'pointer',
+                        transition: 'all 0.2s ease'
                       }}
                       title="Canlı Fiyatları Bot İle Güncelle"
                     >
-                      <RefreshCw size={12} className={isCrawlingPrice ? 'animate-spin' : ''} />
+                      <RefreshCw size={13} className={isCrawlingPrice ? 'animate-spin' : ''} />
                       <span>{isCrawlingPrice ? 'Tarayan...' : 'Canlı Fiyat Güncelle'}</span>
                     </button>
                   </div>
 
-                  <p className="channel-desc" style={{ marginBottom: '12px' }}>
+                  <p className="channel-desc" style={{ marginBottom: '14px', color: '#cbd5e1', fontSize: '0.78rem', lineHeight: '1.4' }}>
                     Önde gelen online pazaryerleri ve yapı marketlerdeki metrekare satış fiyatları ve doğrudan satıcı mağaza bağlantıları:
                   </p>
 
                   {crawlLogMsg && (
                     <div style={{
-                      padding: '6px 10px',
-                      fontSize: '0.72rem',
-                      borderRadius: '6px',
-                      marginBottom: '10px',
-                      background: 'rgba(16, 185, 129, 0.1)',
-                      border: '1px solid rgba(16, 185, 129, 0.3)',
-                      color: '#10b981'
+                      padding: '8px 12px',
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      borderRadius: '8px',
+                      marginBottom: '12px',
+                      background: 'rgba(16, 185, 129, 0.2)',
+                      border: '1px solid rgba(16, 185, 129, 0.5)',
+                      color: '#34d399'
                     }}>
                       {crawlLogMsg}
                     </div>
@@ -6529,11 +6540,11 @@ export default function Home() {
                   <div className="marketplace-prices-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {(() => {
                       const vendors = [
-                        { name: 'Trendyol', key: 'trendyol', price: detailProduct.trendyolPrice, url: detailProduct.trendyolUrl, color: '#ea580c', badge: 'Pazaryeri' },
-                        { name: 'Hepsiburada', key: 'hepsiburada', price: detailProduct.hepsiburadaPrice || detailProduct.hepsiPrice, url: detailProduct.hepsiburadaUrl, color: '#ff6000', badge: 'Pazaryeri' },
-                        { name: 'n11', key: 'n11', price: detailProduct.n11Price, url: detailProduct.n11Url, color: '#e11d48', badge: 'Pazaryeri' },
-                        { name: 'Koçtaş', key: 'koctas', price: detailProduct.koctasPrice, url: detailProduct.koctasUrl, color: '#2563eb', badge: 'Yapı Market' },
-                        { name: 'Bauhaus', key: 'bauhaus', price: detailProduct.bauhausPrice, url: detailProduct.bauhausUrl, color: '#dc2626', badge: 'Yapı Market' }
+                        { name: 'Trendyol', key: 'trendyol', price: detailProduct.trendyolPrice, url: detailProduct.trendyolUrl, color: '#f97316', badge: 'Pazaryeri' },
+                        { name: 'Hepsiburada', key: 'hepsiburada', price: detailProduct.hepsiburadaPrice || detailProduct.hepsiPrice, url: detailProduct.hepsiburadaUrl, color: '#ff6600', badge: 'Pazaryeri' },
+                        { name: 'n11', key: 'n11', price: detailProduct.n11Price, url: detailProduct.n11Url, color: '#ff3b5c', badge: 'Pazaryeri' },
+                        { name: 'Koçtaş', key: 'koctas', price: detailProduct.koctasPrice, url: detailProduct.koctasUrl, color: '#60a5fa', badge: 'Yapı Market' },
+                        { name: 'Bauhaus', key: 'bauhaus', price: detailProduct.bauhausPrice, url: detailProduct.bauhausUrl, color: '#f87171', badge: 'Yapı Market' }
                       ];
 
                       const validPrices = vendors.filter(v => v.price && v.price > 0).map(v => v.price);
@@ -6549,20 +6560,20 @@ export default function Home() {
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
-                              padding: '8px 12px',
+                              padding: '10px 14px',
                               borderRadius: '8px',
-                              background: isLowest ? 'rgba(16, 185, 129, 0.08)' : 'rgba(255, 255, 255, 0.03)',
-                              border: isLowest ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid var(--border-color, rgba(255,255,255,0.1))',
+                              background: isLowest ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.07)',
+                              border: isLowest ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.12)',
                               transition: 'all 0.2s ease'
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <span 
                                 style={{ 
-                                  fontWeight: '700', 
-                                  fontSize: '0.8rem', 
+                                  fontWeight: '800', 
+                                  fontSize: '0.85rem', 
                                   color: v.color,
-                                  minWidth: '85px',
+                                  minWidth: '92px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   gap: '4px'
@@ -6571,36 +6582,43 @@ export default function Home() {
                                 {v.name}
                               </span>
                               <span style={{ 
-                                fontSize: '0.65rem', 
-                                padding: '2px 6px', 
+                                fontSize: '0.68rem', 
+                                fontWeight: '600',
+                                padding: '2px 7px', 
                                 borderRadius: '4px', 
-                                background: 'rgba(255,255,255,0.06)', 
-                                color: 'var(--text-muted, #94a3b8)' 
+                                background: 'rgba(255, 255, 255, 0.12)', 
+                                color: '#e2e8f0' 
                               }}>
                                 {v.badge}
                               </span>
                               {isLowest && (
                                 <span style={{
-                                  fontSize: '0.63rem',
-                                  fontWeight: '700',
-                                  padding: '2px 6px',
+                                  fontSize: '0.68rem',
+                                  fontWeight: '800',
+                                  padding: '2px 8px',
                                   borderRadius: '4px',
-                                  background: 'rgba(16, 185, 129, 0.2)',
-                                  color: '#10b981',
-                                  border: '1px solid rgba(16, 185, 129, 0.4)'
+                                  background: 'rgba(16, 185, 129, 0.3)',
+                                  color: '#34d399',
+                                  border: '1px solid #10b981',
+                                  boxShadow: '0 0 10px rgba(16, 185, 129, 0.2)'
                                 }}>
                                   🔥 En Uygun Fiyat
                                 </span>
                               )}
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                               {v.price ? (
-                                <strong style={{ fontSize: '0.88rem', color: isLowest ? '#10b981' : 'var(--text-primary, #f8fafc)' }}>
-                                  ₺{v.price.toLocaleString('tr-TR')} <span style={{ fontSize: '0.7rem', fontWeight: '400', color: 'var(--text-muted, #94a3b8)' }}>/ m²</span>
+                                <strong style={{ 
+                                  fontSize: isLowest ? '0.98rem' : '0.92rem', 
+                                  fontWeight: '800', 
+                                  color: isLowest ? '#34d399' : '#ffffff',
+                                  textShadow: isLowest ? '0 0 8px rgba(52, 211, 153, 0.3)' : 'none'
+                                }}>
+                                  ₺{v.price.toLocaleString('tr-TR')} <span style={{ fontSize: '0.74rem', fontWeight: '400', color: '#cbd5e1' }}>/ m²</span>
                                 </strong>
                               ) : (
-                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted, #94a3b8)', fontStyle: 'italic' }}>Fiyat Bekleniyor</span>
+                                <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontStyle: 'italic' }}>Fiyat Bekleniyor</span>
                               )}
 
                               {v.url ? (
@@ -6608,22 +6626,24 @@ export default function Home() {
                                   href={v.url} 
                                   target="_blank" 
                                   rel="noopener noreferrer" 
-                                  className="btn-secondary btn-sm"
                                   style={{
-                                    fontSize: '0.7rem',
-                                    padding: '4px 8px',
+                                    fontSize: '0.72rem',
+                                    fontWeight: '700',
+                                    padding: '5px 10px',
                                     borderRadius: '6px',
-                                    borderColor: 'var(--border-color, rgba(255,255,255,0.1))',
-                                    color: 'var(--text-primary, #f8fafc)',
+                                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                                    background: 'rgba(255, 255, 255, 0.12)',
+                                    color: '#ffffff',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '3px',
-                                    textDecoration: 'none'
+                                    gap: '4px',
+                                    textDecoration: 'none',
+                                    transition: 'all 0.2s ease'
                                   }}
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <span>Mağazada Gör</span>
-                                  <ExternalLink size={11} />
+                                  <ExternalLink size={12} style={{ color: '#ffffff' }} />
                                 </a>
                               ) : null}
                             </div>
@@ -6633,7 +6653,7 @@ export default function Home() {
                     })()}
                   </div>
 
-                  <p style={{ fontSize: '0.62rem', color: 'var(--text-muted, #94a3b8)', marginTop: '10px', fontStyle: 'italic', lineHeight: '1.3' }}>
+                  <p style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '12px', fontStyle: 'italic', lineHeight: '1.4' }}>
                     * Fiyatlar online pazaryerleri ve yapı marketlerin canlı katalog verilerinden otomatik çekilir. Stok durumu satıcı firmalara göre değişkenlik gösterebilir.
                   </p>
                 </div>
