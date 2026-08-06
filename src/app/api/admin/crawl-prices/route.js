@@ -69,8 +69,8 @@ export async function POST(request) {
             logs.push(`[Eşleşti] ${label}: Canlı fiyat çekildi -> ${price} TL`);
             return price;
           } else {
-            logs.push(`[Bilgi] ${label}: Sayfada listeli fiyat bulunamadı.`);
-            return previousPrice || null;
+            logs.push(`[Bilgi] ${label}: Sayfada güncel fiyat bulunamadı.`);
+            return productId ? null : (previousPrice || null);
           }
         } catch (err) {
           if (err.message.includes('404')) {
@@ -78,7 +78,7 @@ export async function POST(request) {
           } else {
             logs.push(`[Engellendi/Hata] ${label}: Bağlantı engellendi veya hata oluştu (${err.message}).`);
           }
-          return previousPrice || null;
+          return productId ? null : (previousPrice || null);
         }
       };
 

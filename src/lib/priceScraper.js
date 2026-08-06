@@ -49,8 +49,8 @@ export async function fetchHtml(url, apiKey = null) {
 
   // Support for residential proxy/anti-bot bypass (e.g. Scrape.do, ScrapingBee)
   if (activeApiKey) {
-    const proxyUrl = `https://api.scrape.do?token=${activeApiKey}&url=${encodeURIComponent(url)}`;
-    const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(15000) });
+    const proxyUrl = `https://api.scrape.do?token=${activeApiKey}&url=${encodeURIComponent(url)}&render=true&geoCode=tr`;
+    const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(25000) });
     if (!response.ok) {
       throw new Error(`Proxy service returned HTTP ${response.status}`);
     }
@@ -176,6 +176,16 @@ export function extractPriceFromHtml(html, url) {
     } else {
       const priceText = $('.product-price, .product-price-current, span.price, #price-value, .current-price, .item-price, .price').first().text();
       price = parsePriceText(priceText);
+    }
+  }
+
+  // 2.5 Title / Meta description fallback (e.g. Hepsiburada search page title: "890₺'den Başlayan Fiyatlar")
+  if (!price) {
+    const pageTitle = ($('title').text() || '') + ' ' + ($('meta[name="description"]').attr('content') || '');
+    const titleMatch = pageTitle.match(/(\d{1,4}(?:\.\d{3})*(?:,\d{2})?)\s*(?:TL|₺|’den|'den)/i);
+    if (titleMatch) {
+      const p = parsePriceText(titleMatch[1]);
+      if (p && p > 50 && p < 20000) price = p;
     }
   }
 
