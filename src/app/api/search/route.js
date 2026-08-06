@@ -265,6 +265,8 @@ export async function GET(request) {
           koctasUrl: true,
           bauhausPrice: true,
           bauhausUrl: true,
+          yerevdekorPrice: true,
+          yerevdekorUrl: true,
           brand: {
             select: {
               id: true,

@@ -1918,6 +1918,13 @@ export default function BrandPortalPage() {
                                         <strong style={{ color: '#0f172a' }}>₺{prod.hepsiburadaPrice.toLocaleString('tr-TR')} / m²</strong>
                                       </div>
                                     )}
+
+                                    {prod.yerevdekorPrice && (
+                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                                        <span style={{ color: '#0d9488', fontWeight: '700' }}>YerEvDekor:</span>
+                                        <strong style={{ color: '#0f172a' }}>₺{prod.yerevdekorPrice.toLocaleString('tr-TR')} / m²</strong>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </div>

@@ -58,6 +58,7 @@ export async function POST(request) {
       const n11ScrapeUrl = p.n11Url || `https://www.n11.com/arama?q=${encodeURIComponent(p.code)}`;
       const kcScrapeUrl = p.koctasUrl || `https://www.koctas.com.tr/search?q=${encodeURIComponent(p.code)}`;
       const bhScrapeUrl = p.bauhausUrl || `https://www.bauhaus.com.tr/arama?q=${encodeURIComponent(p.code)}`;
+      const yedScrapeUrl = p.yerevdekorUrl || `https://www.yerevdekor.com/arama?q=${encodeURIComponent(p.code)}`;
 
       // Helper to fetch price cleanly without fake math fallbacks
       const getLivePrice = async (url, label, previousPrice) => {
@@ -82,12 +83,13 @@ export async function POST(request) {
       };
 
       // Crawl each marketplace in parallel to prevent Next.js request timeouts
-      const [trendyolPrice, hepsiburadaPrice, n11Price, koctasPrice, bauhausPrice] = await Promise.all([
+      const [trendyolPrice, hepsiburadaPrice, n11Price, koctasPrice, bauhausPrice, yerevdekorPrice] = await Promise.all([
         getLivePrice(tyScrapeUrl, 'Trendyol', p.trendyolPrice),
         getLivePrice(hbScrapeUrl, 'Hepsiburada', p.hepsiburadaPrice),
         getLivePrice(n11ScrapeUrl, 'n11', p.n11Price),
         getLivePrice(kcScrapeUrl, 'Koçtaş', p.koctasPrice),
-        getLivePrice(bhScrapeUrl, 'Bauhaus', p.bauhausPrice)
+        getLivePrice(bhScrapeUrl, 'Bauhaus', p.bauhausPrice),
+        getLivePrice(yedScrapeUrl, 'YerEvDekor', p.yerevdekorPrice)
       ]);
 
       // 2. Update Database (only save specific direct product URLs if real price exists or URL was explicitly stored)
@@ -103,7 +105,9 @@ export async function POST(request) {
           koctasPrice: koctasPrice || null,
           koctasUrl: p.koctasUrl || null,
           bauhausPrice: bauhausPrice || null,
-          bauhausUrl: p.bauhausUrl || null
+          bauhausUrl: p.bauhausUrl || null,
+          yerevdekorPrice: yerevdekorPrice || null,
+          yerevdekorUrl: p.yerevdekorUrl || null
         },
         include: {
           brand: {

@@ -83,6 +83,7 @@ export function extractPriceFromHtml(html, url) {
   else if (url.includes('n11.com')) vendor = 'n11';
   else if (url.includes('koctas.com.tr')) vendor = 'koctas';
   else if (url.includes('bauhaus.com.tr')) vendor = 'bauhaus';
+  else if (url.includes('yerevdekor.com')) vendor = 'yerevdekor';
 
   if (!vendor) return null;
 
@@ -165,6 +166,15 @@ export function extractPriceFromHtml(html, url) {
       price = parsePriceText(priceText);
     } else {
       const priceText = $('.price, .amount, .price-box, .product-detail-price').first().text();
+      price = parsePriceText(priceText);
+    }
+  }
+  else if (vendor === 'yerevdekor') {
+    if (isSearchPage) {
+      const priceText = $('.product-item .price, .product-card .price, [class*="product"] [class*="price"], .price-new, .current-price').first().text();
+      price = parsePriceText(priceText);
+    } else {
+      const priceText = $('.product-price, .product-price-current, span.price, #price-value, .current-price, .item-price, .price').first().text();
       price = parsePriceText(priceText);
     }
   }

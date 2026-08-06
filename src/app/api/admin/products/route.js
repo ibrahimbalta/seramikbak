@@ -153,7 +153,9 @@ export async function POST(request) {
       koctasPrice,
       koctasUrl,
       bauhausPrice,
-      bauhausUrl
+      bauhausUrl,
+      yerevdekorPrice,
+      yerevdekorUrl
     } = body;
 
     // Validation
@@ -218,7 +220,9 @@ export async function POST(request) {
         koctasPrice: koctasPrice ? parseFloat(koctasPrice) : null,
         koctasUrl: koctasUrl || null,
         bauhausPrice: bauhausPrice ? parseFloat(bauhausPrice) : null,
-        bauhausUrl: bauhausUrl || null
+        bauhausUrl: bauhausUrl || null,
+        yerevdekorPrice: yerevdekorPrice ? parseFloat(yerevdekorPrice) : null,
+        yerevdekorUrl: yerevdekorUrl || null
       }
     });
 
@@ -266,7 +270,9 @@ export async function PUT(request) {
       koctasPrice,
       koctasUrl,
       bauhausPrice,
-      bauhausUrl
+      bauhausUrl,
+      yerevdekorPrice,
+      yerevdekorUrl
     } = body;
 
     if (!id) {
@@ -316,6 +322,8 @@ export async function PUT(request) {
     updateData.koctasUrl = koctasUrl !== undefined ? (koctasUrl || null) : undefined;
     updateData.bauhausPrice = bauhausPrice !== undefined ? (bauhausPrice ? parseFloat(bauhausPrice) : null) : undefined;
     updateData.bauhausUrl = bauhausUrl !== undefined ? (bauhausUrl || null) : undefined;
+    updateData.yerevdekorPrice = yerevdekorPrice !== undefined ? (yerevdekorPrice ? parseFloat(yerevdekorPrice) : null) : undefined;
+    updateData.yerevdekorUrl = yerevdekorUrl !== undefined ? (yerevdekorUrl || null) : undefined;
 
     // Save custom images if base64 provided
     if (imageBase64) {

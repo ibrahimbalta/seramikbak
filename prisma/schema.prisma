@@ -51,6 +51,8 @@ model Product {
   koctasUrl        String?
   bauhausPrice     Float?
   bauhausUrl       String?
+  yerevdekorPrice  Float?
+  yerevdekorUrl    String?
 
   leads      Lead[]
   campaigns  AdCampaign[]

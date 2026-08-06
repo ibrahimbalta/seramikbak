@@ -284,6 +284,8 @@ export default function AdminPage() {
   const [manualKoctasUrl, setManualKoctasUrl] = useState('');
   const [manualBauhausPrice, setManualBauhausPrice] = useState('');
   const [manualBauhausUrl, setManualBauhausUrl] = useState('');
+  const [manualYerevdekorPrice, setManualYerevdekorPrice] = useState('');
+  const [manualYerevdekorUrl, setManualYerevdekorUrl] = useState('');
 
   // Price Crawler Bot State
   const [isCrawlingPrices, setIsCrawlingPrices] = useState(false);
@@ -635,6 +637,8 @@ export default function AdminPage() {
     setManualKoctasUrl(product.koctasUrl || '');
     setManualBauhausPrice(product.bauhausPrice ? String(product.bauhausPrice) : '');
     setManualBauhausUrl(product.bauhausUrl || '');
+    setManualYerevdekorPrice(product.yerevdekorPrice ? String(product.yerevdekorPrice) : '');
+    setManualYerevdekorUrl(product.yerevdekorUrl || '');
 
     setManualImageFile(null);
     setManualTextureFile(null);
@@ -672,6 +676,8 @@ export default function AdminPage() {
     setManualKoctasUrl('');
     setManualBauhausPrice('');
     setManualBauhausUrl('');
+    setManualYerevdekorPrice('');
+    setManualYerevdekorUrl('');
 
     setManualImageFile(null);
     setManualTextureFile(null);
@@ -740,7 +746,9 @@ export default function AdminPage() {
         koctasPrice: manualKoctasPrice ? parseFloat(manualKoctasPrice) : null,
         koctasUrl: manualKoctasUrl || null,
         bauhausPrice: manualBauhausPrice ? parseFloat(manualBauhausPrice) : null,
-        bauhausUrl: manualBauhausUrl || null
+        bauhausUrl: manualBauhausUrl || null,
+        yerevdekorPrice: manualYerevdekorPrice ? parseFloat(manualYerevdekorPrice) : null,
+        yerevdekorUrl: manualYerevdekorUrl || null
       };
 
       if (manualImageBase64) {

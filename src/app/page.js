@@ -111,6 +111,7 @@ function enrichProductData(p) {
     n11Url: p.n11Url || null,
     koctasUrl: p.koctasUrl || null,
     bauhausUrl: p.bauhausUrl || null,
+    yerevdekorUrl: p.yerevdekorUrl || null,
     
     // Only return real prices stored in database (no fake formula prices)
     trendyolPrice: (p.trendyolPrice && p.trendyolPrice > 0) ? p.trendyolPrice : null,
@@ -118,7 +119,8 @@ function enrichProductData(p) {
     hepsiPrice: (p.hepsiburadaPrice && p.hepsiburadaPrice > 0) ? p.hepsiburadaPrice : null,
     n11Price: (p.n11Price && p.n11Price > 0) ? p.n11Price : null,
     koctasPrice: (p.koctasPrice && p.koctasPrice > 0) ? p.koctasPrice : null,
-    bauhausPrice: (p.bauhausPrice && p.bauhausPrice > 0) ? p.bauhausPrice : null
+    bauhausPrice: (p.bauhausPrice && p.bauhausPrice > 0) ? p.bauhausPrice : null,
+    yerevdekorPrice: (p.yerevdekorPrice && p.yerevdekorPrice > 0) ? p.yerevdekorPrice : null
   };
 }
 
@@ -6543,6 +6545,7 @@ export default function Home() {
                         { name: 'Trendyol', key: 'trendyol', price: detailProduct.trendyolPrice, url: detailProduct.trendyolUrl, color: '#f97316', badge: 'Pazaryeri' },
                         { name: 'Hepsiburada', key: 'hepsiburada', price: detailProduct.hepsiburadaPrice || detailProduct.hepsiPrice, url: detailProduct.hepsiburadaUrl, color: '#ff6600', badge: 'Pazaryeri' },
                         { name: 'n11', key: 'n11', price: detailProduct.n11Price, url: detailProduct.n11Url, color: '#ff3b5c', badge: 'Pazaryeri' },
+                        { name: 'YerEvDekor', key: 'yerevdekor', price: detailProduct.yerevdekorPrice, url: detailProduct.yerevdekorUrl, color: '#2dd4bf', badge: 'Yapı Market' },
                         { name: 'Koçtaş', key: 'koctas', price: detailProduct.koctasPrice, url: detailProduct.koctasUrl, color: '#60a5fa', badge: 'Yapı Market' },
                         { name: 'Bauhaus', key: 'bauhaus', price: detailProduct.bauhausPrice, url: detailProduct.bauhausUrl, color: '#f87171', badge: 'Yapı Market' }
                       ];
