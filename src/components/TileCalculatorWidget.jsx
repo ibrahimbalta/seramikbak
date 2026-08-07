@@ -58,40 +58,43 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      background: 'rgba(15, 23, 42, 0.72)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
       borderRadius: '24px',
       padding: '32px',
       color: '#ffffff',
-      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 175, 55, 0.2)',
+      border: '1px solid rgba(212, 175, 55, 0.35)',
+      boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.12)',
       position: 'relative',
       overflow: 'hidden',
-      margin: '40px 0'
+      margin: '36px 0 10px 0'
     }}>
-      {/* Subtle Background Glow */}
+      {/* Subtle Ambient Radial Glow */}
       <div style={{
         position: 'absolute',
-        top: '-100px',
-        right: '-100px',
-        width: '300px',
-        height: '300px',
-        background: 'radial-gradient(circle, rgba(212,175,55,0.15) 0%, rgba(0,0,0,0) 70%)',
+        top: '-80px',
+        right: '-80px',
+        width: '320px',
+        height: '320px',
+        background: 'radial-gradient(circle, rgba(212,175,55,0.2) 0%, rgba(0,0,0,0) 70%)',
         pointerEvents: 'none'
       }} />
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '20px', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.3)', color: '#d4af37', fontSize: '0.8rem', fontWeight: '700', marginBottom: '8px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '20px', background: 'rgba(212, 175, 55, 0.18)', border: '1px solid rgba(212, 175, 55, 0.4)', color: '#ffd700', fontSize: '0.8rem', fontWeight: '800', marginBottom: '8px' }}>
             <Calculator size={14} /> AKILLI MALİYET & METRAJ SİHİRBAZI
           </div>
-          <h3 style={{ fontSize: '1.6rem', fontWeight: '800', margin: 0, color: '#f8fafc' }}>
+          <h3 style={{ fontSize: '1.65rem', fontWeight: '800', margin: 0, color: '#f8fafc', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
             Projenizin Malzeme ve Kutu İhtiyacını Anında Hesaplayın
           </h3>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.05)', padding: '8px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(8px)', padding: '8px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.15)' }}>
           <ShieldCheck size={18} style={{ color: '#38bdf8' }} />
-          <span style={{ fontSize: '0.82rem', color: '#cbd5e1' }}>%100 Doğru Kutu & Fire Hesabı</span>
+          <span style={{ fontSize: '0.82rem', color: '#e2e8f0', fontWeight: '600' }}>%100 Doğru Kutu & Fire Hesabı</span>
         </div>
       </div>
 
@@ -99,11 +102,11 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '28px' }}>
         
         {/* Left Inputs Column */}
-        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '24px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(10px)', padding: '24px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)' }}>
           
           {/* Room Type */}
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#94a3b8', marginBottom: '10px' }}>1. Mekan Türü</label>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '10px' }}>1. Mekan Türü</label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
               {[
                 { id: 'banyo', label: 'Banyo 🛁' },
@@ -122,7 +125,8 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
                     border: 'none',
                     cursor: 'pointer',
                     background: roomType === item.id ? '#d4af37' : 'rgba(255,255,255,0.08)',
-                    color: roomType === item.id ? '#0f172a' : '#cbd5e1',
+                    color: roomType === item.id ? '#0f172a' : '#f1f5f9',
+                    boxShadow: roomType === item.id ? '0 4px 12px rgba(212,175,55,0.4)' : 'none',
                     transition: 'all 0.2s ease'
                   }}
                 >
@@ -135,8 +139,8 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
           {/* Area Slider / Input */}
           <div style={{ marginBottom: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <label style={{ fontSize: '0.82rem', fontWeight: '700', color: '#94a3b8' }}>2. Uygulama Alanı (m²)</label>
-              <span style={{ fontSize: '1rem', fontWeight: '800', color: '#d4af37' }}>{areaM2} m²</span>
+              <label style={{ fontSize: '0.82rem', fontWeight: '700', color: '#cbd5e1' }}>2. Uygulama Alanı (m²)</label>
+              <span style={{ fontSize: '1.05rem', fontWeight: '800', color: '#ffd700' }}>{areaM2} m²</span>
             </div>
             <input
               type="range"
@@ -156,17 +160,17 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
           {/* Tile Size & Style */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#94a3b8', marginBottom: '6px' }}>Karo Ebadı</label>
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '6px' }}>Karo Ebadı</label>
               <select
                 value={tileSize}
                 onChange={(e) => setTileSize(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '10px',
+                  padding: '11px',
                   borderRadius: '10px',
-                  background: '#0f172a',
+                  background: 'rgba(15, 23, 42, 0.85)',
                   color: '#f8fafc',
-                  border: '1px solid rgba(255,255,255,0.15)',
+                  border: '1px solid rgba(255,255,255,0.2)',
                   fontSize: '0.85rem',
                   outline: 'none'
                 }}
@@ -179,17 +183,17 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#94a3b8', marginBottom: '6px' }}>Seramik Dokusu</label>
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '6px' }}>Seramik Dokusu</label>
               <select
                 value={tileStyle}
                 onChange={(e) => setTileStyle(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '10px',
+                  padding: '11px',
                   borderRadius: '10px',
-                  background: '#0f172a',
+                  background: 'rgba(15, 23, 42, 0.85)',
                   color: '#f8fafc',
-                  border: '1px solid rgba(255,255,255,0.15)',
+                  border: '1px solid rgba(255,255,255,0.2)',
                   fontSize: '0.85rem',
                   outline: 'none'
                 }}
@@ -204,33 +208,33 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
         </div>
 
         {/* Right Results Column */}
-        <div style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(255,255,255,0.02) 100%)', padding: '24px', borderRadius: '18px', border: '1px solid rgba(212,175,55,0.2)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(15,23,42,0.6) 100%)', backdropFilter: 'blur(12px)', padding: '24px', borderRadius: '18px', border: '1px solid rgba(212,175,55,0.3)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           
           <div>
-            <div style={{ fontSize: '0.82rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Sparkles size={16} style={{ color: '#d4af37' }} /> HESAPLANAN MALZEME GEREKSİNİMİ
+            <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#f8fafc', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Sparkles size={16} style={{ color: '#ffd700' }} /> HESAPLANAN MALZEME GEREKSİNİMİ
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-              <div style={{ background: 'rgba(15,23,42,0.6)', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'block' }}>Gerekli Seramik Kutusı</span>
-                <span style={{ fontSize: '1.4rem', fontWeight: '800', color: '#ffffff' }}>{requiredBoxes} Kutu</span>
+              <div style={{ background: 'rgba(15,23,42,0.65)', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.12)' }}>
+                <span style={{ fontSize: '0.75rem', color: '#cbd5e1', display: 'block' }}>Gerekli Seramik Kutusu</span>
+                <span style={{ fontSize: '1.45rem', fontWeight: '900', color: '#ffffff' }}>{requiredBoxes} Kutu</span>
                 <span style={{ fontSize: '0.72rem', color: '#38bdf8', display: 'block', marginTop: '2px' }}>({totalM2WithWastage} m² - %{wastagePercent} fire dahil)</span>
               </div>
 
-              <div style={{ background: 'rgba(15,23,42,0.6)', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'block' }}>Harç & Derz İhtiyacı</span>
+              <div style={{ background: 'rgba(15,23,42,0.65)', padding: '14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.12)' }}>
+                <span style={{ fontSize: '0.75rem', color: '#cbd5e1', display: 'block' }}>Harç & Derz İhtiyacı</span>
                 <span style={{ fontSize: '1.1rem', fontWeight: '800', color: '#ffffff' }}>{adhesiveBags} Çuval / {groutPacks} Pak</span>
-                <span style={{ fontSize: '0.72rem', color: '#cbd5e1', display: 'block', marginTop: '2px' }}>{adhesiveBags * 25} kg Yapıştırıcı</span>
+                <span style={{ fontSize: '0.72rem', color: '#e2e8f0', display: 'block', marginTop: '2px' }}>{adhesiveBags * 25} kg Yapıştırıcı</span>
               </div>
             </div>
 
-            <div style={{ background: 'rgba(212,175,55,0.12)', padding: '16px', borderRadius: '14px', border: '1px solid rgba(212,175,55,0.3)', marginBottom: '20px' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#d4af37', display: 'block', marginBottom: '4px' }}>TAHMİNİ ORTALAMA MALZEME BÜTÇESİ</span>
-              <div style={{ fontSize: '1.5rem', fontWeight: '900', color: '#ffffff' }}>
+            <div style={{ background: 'rgba(212,175,55,0.16)', padding: '16px', borderRadius: '14px', border: '1px solid rgba(212,175,55,0.4)', marginBottom: '20px' }}>
+              <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#ffd700', display: 'block', marginBottom: '4px' }}>TAHMİNİ ORTALAMA MALZEME BÜTÇESİ</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#ffffff', textShadow: '0 2px 6px rgba(0,0,0,0.5)' }}>
                 ₺{estimatedMinCost.toLocaleString('tr-TR')} - ₺{estimatedMaxCost.toLocaleString('tr-TR')}
               </div>
-              <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>* Bölgenizdeki yetkili bayi toptan indirimlerine göre değişiklik gösterebilir.</span>
+              <span style={{ fontSize: '0.72rem', color: '#e2e8f0' }}>* Bölgenizdeki yetkili bayi toptan indirimlerine göre değişiklik gösterebilir.</span>
             </div>
           </div>
 
@@ -240,17 +244,17 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
               width: '100%',
               padding: '14px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+              background: 'linear-gradient(135deg, #d4af37 0%, #c59b27 100%)',
               color: '#0f172a',
-              fontWeight: '800',
-              fontSize: '0.95rem',
+              fontWeight: '900',
+              fontSize: '0.96rem',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              boxShadow: '0 8px 20px rgba(212, 175, 55, 0.3)',
+              boxShadow: '0 8px 22px rgba(212, 175, 55, 0.4)',
               transition: 'all 0.2s ease'
             }}
           >
