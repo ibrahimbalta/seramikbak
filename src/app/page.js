@@ -1063,6 +1063,16 @@ export default function Home() {
   const [projectPhotoUrl, setProjectPhotoUrl] = useState('');
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [isSubmittingLead, setIsSubmittingLead] = useState(false);
+
+  const handleOpenLeadModalWithProduct = (calcData) => {
+    if (typeof window !== 'undefined') {
+      const dealerSec = document.getElementById('resmi-yetkili-bayiler-section');
+      if (dealerSec) {
+        dealerSec.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    setShowLeadModal(true);
+  };
   
   // Dealer Details Modal State
   const [showDealerDetailModal, setShowDealerDetailModal] = useState(false);
