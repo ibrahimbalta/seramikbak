@@ -6620,44 +6620,69 @@ export default function Home() {
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                               {hasRealPrice ? (
-                                <strong style={{ 
-                                  fontSize: isLowest ? '0.98rem' : '0.92rem', 
-                                  fontWeight: '800', 
-                                  color: isLowest ? '#34d399' : '#ffffff',
-                                  textShadow: isLowest ? '0 0 8px rgba(52, 211, 153, 0.3)' : 'none'
-                                }}>
-                                  ₺{v.price.toLocaleString('tr-TR')} <span style={{ fontSize: '0.74rem', fontWeight: '400', color: '#cbd5e1' }}>/ m²</span>
-                                </strong>
-                              ) : (
-                                <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontStyle: 'italic', fontWeight: '500' }}>Fiyat Bulunamadı</span>
-                              )}
+                                <>
+                                  <strong style={{ 
+                                    fontSize: isLowest ? '0.98rem' : '0.92rem', 
+                                    fontWeight: '800', 
+                                    color: isLowest ? '#34d399' : '#ffffff',
+                                    textShadow: isLowest ? '0 0 8px rgba(52, 211, 153, 0.3)' : 'none'
+                                  }}>
+                                    ₺{v.price.toLocaleString('tr-TR')} <span style={{ fontSize: '0.74rem', fontWeight: '400', color: '#cbd5e1' }}>/ m²</span>
+                                  </strong>
 
-                              {hasRealPrice && hasDirectLink ? (
+                                  {hasDirectLink ? (
+                                    <a 
+                                      href={v.url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      style={{
+                                        fontSize: '0.72rem',
+                                        fontWeight: '700',
+                                        padding: '5px 10px',
+                                        borderRadius: '6px',
+                                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                                        background: 'rgba(255, 255, 255, 0.15)',
+                                        color: '#ffffff',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px',
+                                        textDecoration: 'none',
+                                        transition: 'all 0.2s ease'
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <span>Mağazada Gör</span>
+                                      <ExternalLink size={12} style={{ color: '#ffffff' }} />
+                                    </a>
+                                  ) : (
+                                    <span style={{ fontSize: '0.72rem', color: '#64748b', fontStyle: 'italic', padding: '4px 6px' }}>Satışta Değil</span>
+                                  )}
+                                </>
+                              ) : (
                                 <a 
-                                  href={v.url} 
+                                  href={`https://wa.me/908501234567?text=${encodeURIComponent(`Merhaba, SeramikBak üzerinden "${detailProduct.brand?.name || ''} ${detailProduct.name}" (${v.name}) ürünü için özel fiyat teklifi ve stok bilgisi almak istiyorum.`)}`}
                                   target="_blank" 
                                   rel="noopener noreferrer" 
                                   style={{
-                                    fontSize: '0.72rem',
+                                    fontSize: '0.74rem',
                                     fontWeight: '700',
-                                    padding: '5px 10px',
+                                    padding: '6px 12px',
                                     borderRadius: '6px',
-                                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                                    background: 'rgba(255, 255, 255, 0.15)',
-                                    color: '#ffffff',
+                                    border: '1px solid rgba(16, 185, 129, 0.4)',
+                                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%)',
+                                    color: '#34d399',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '4px',
+                                    gap: '6px',
                                     textDecoration: 'none',
+                                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.15)',
                                     transition: 'all 0.2s ease'
                                   }}
                                   onClick={(e) => e.stopPropagation()}
                                 >
-                                  <span>Mağazada Gör</span>
-                                  <ExternalLink size={12} style={{ color: '#ffffff' }} />
+                                  <MessageSquare size={13} style={{ color: '#34d399' }} />
+                                  <span>Teklif Al / WhatsApp'tan Sor</span>
                                 </a>
-                              ) : (
-                                <span style={{ fontSize: '0.72rem', color: '#64748b', fontStyle: 'italic', padding: '4px 6px' }}>Satışta Değil</span>
                               )}
                             </div>
                           </div>

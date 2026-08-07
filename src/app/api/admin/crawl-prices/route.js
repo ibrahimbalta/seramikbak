@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { fetchHtml, extractPriceFromHtml } from '@/lib/priceScraper';
+import { fetchHtml, extractPriceFromHtml, searchProductUrlViaGoogle } from '@/lib/priceScraper';
 
 export async function POST(request) {
   const logs = [];
@@ -13,7 +13,10 @@ export async function POST(request) {
     let products = [];
     let totalCount = 0;
     if (productId) {
-      const p = await prisma.product.findUnique({ where: { id: productId } });
+      const p = await prisma.product.findUnique({
+        where: { id: productId },
+        include: { brand: true }
+      });
       if (p) products = [p];
       totalCount = products.length;
     } else {
@@ -21,7 +24,8 @@ export async function POST(request) {
       products = await prisma.product.findMany({
         take: limit,
         skip: offset,
-        orderBy: { id: 'asc' }
+        orderBy: { id: 'asc' },
+        include: { brand: true }
       });
     }
 
@@ -29,7 +33,7 @@ export async function POST(request) {
       return NextResponse.json({ success: true, count: 0, remaining: 0, logs: ['[Fiyat Botu] Güncellenecek ürün kalmadı.'] });
     }
 
-    // Load proxy API key from database settings
+    // Load proxy & serper API keys from database settings
     const settings = await prisma.systemSetting.findMany();
     const settingsMap = {};
     settings.forEach(s => {
@@ -39,38 +43,60 @@ export async function POST(request) {
     const dbScrapingKey = settingsMap['scraping_api_key'];
     const scrapingApiKey = dbScrapingKey || process.env.SCRAPING_API_KEY;
 
+    const dbSerperKey = settingsMap['serper_api_key'];
+    const serperApiKey = dbSerperKey || process.env.SERPER_API_KEY;
+
     const remaining = Math.max(0, totalCount - (offset + products.length));
     logs.push(`[Fiyat Botu] Sıra: ${offset + 1} - ${offset + products.length} (Kalan: ${remaining}) | Toplam ${totalCount} üründen ${products.length} adedi taranıyor...`);
     
     if (scrapingApiKey) {
       logs.push(`[Sistem] Güvenlik duvarı aşımı için Scrape.do proxy servisi aktif.`);
     } else {
-      logs.push(`[Uyarı] Proxy API anahtarı (Ayarlar veya .env altında SCRAPING_API_KEY) tanımlanmadığı için doğrudan istek atılacak. Engellenme olasılığı yüksektir.`);
+      logs.push(`[Uyarı] Proxy API anahtarı (Ayarlar veya .env altında SCRAPING_API_KEY) tanımlanmadığı için doğrudan istek atılacak.`);
+    }
+
+    if (serperApiKey) {
+      logs.push(`[Sistem] Akıllı ilan bulma için Serper.dev Google Arama API servisi aktif.`);
     }
 
     for (let i = 0; i < products.length; i++) {
       const p = products[i];
-      logs.push(`[Tarama] SKU: ${p.code} | "${p.name}" taranıyor...`);
+      logs.push(`[Tarama] SKU: ${p.code} | "${p.brand?.name || ''} ${p.name}" taranıyor...`);
 
-      // Define target URLs for scraping (search query used for scraping only)
-      const tyScrapeUrl = p.trendyolUrl || `https://www.trendyol.com/sr?q=${encodeURIComponent(p.code)}`;
-      const hbScrapeUrl = p.hepsiburadaUrl || `https://www.hepsiburada.com/ara?q=${encodeURIComponent(p.code)}`;
-      const n11ScrapeUrl = p.n11Url || `https://www.n11.com/arama?q=${encodeURIComponent(p.code)}`;
-      const kcScrapeUrl = p.koctasUrl || `https://www.koctas.com.tr/search?q=${encodeURIComponent(p.code)}`;
-      const bhScrapeUrl = p.bauhausUrl || `https://www.bauhaus.com.tr/arama?q=${encodeURIComponent(p.code)}`;
-      const yedScrapeUrl = p.yerevdekorUrl || `https://www.yerevdekor.com/arama?q=${encodeURIComponent(p.code)}`;
+      // Helper to crawl and discover direct product URLs
+      const crawlVendorPrice = async (vendorKey, label, domain, defaultSearchUrl, currentPrice, currentUrl) => {
+        let targetUrl = currentUrl;
+        
+        // If current URL is missing or just a search query URL, try Google Search for direct link
+        const isSearchUrl = !targetUrl || 
+          targetUrl.includes('/sr?q=') || 
+          targetUrl.includes('/ara?q=') || 
+          targetUrl.includes('/arama?q=') || 
+          targetUrl.includes('/search?q=');
 
-      // Helper to fetch price cleanly without fake math fallbacks
-      const getLivePrice = async (url, label, previousPrice) => {
+        if (isSearchUrl) {
+          const searchQuery = `${p.brand?.name || ''} ${p.name}`.trim();
+          const discoveredUrl = await searchProductUrlViaGoogle(searchQuery, domain, serperApiKey, scrapingApiKey);
+          if (discoveredUrl) {
+            logs.push(`[Google Serper] ${label}: Doğrudan ürün linki otomatik bulundu -> ${discoveredUrl}`);
+            targetUrl = discoveredUrl;
+          } else {
+            targetUrl = defaultSearchUrl;
+          }
+        }
+
         try {
-          const html = await fetchHtml(url, scrapingApiKey);
-          const price = extractPriceFromHtml(html, url);
+          const html = await fetchHtml(targetUrl, scrapingApiKey);
+          const price = extractPriceFromHtml(html, targetUrl);
           if (price && price > 0) {
             logs.push(`[Eşleşti] ${label}: Canlı fiyat çekildi -> ${price} TL`);
-            return price;
+            return { price, url: targetUrl };
           } else {
             logs.push(`[Bilgi] ${label}: Sayfada güncel fiyat bulunamadı.`);
-            return productId ? null : (previousPrice || null);
+            return { 
+              price: productId ? null : (currentPrice || null), 
+              url: targetUrl && !targetUrl.includes('?q=') ? targetUrl : null 
+            };
           }
         } catch (err) {
           if (err.message.includes('404')) {
@@ -78,36 +104,39 @@ export async function POST(request) {
           } else {
             logs.push(`[Engellendi/Hata] ${label}: Bağlantı engellendi veya hata oluştu (${err.message}).`);
           }
-          return productId ? null : (previousPrice || null);
+          return { 
+            price: productId ? null : (currentPrice || null), 
+            url: targetUrl && !targetUrl.includes('?q=') ? targetUrl : null 
+          };
         }
       };
 
-      // Crawl each marketplace in parallel to prevent Next.js request timeouts
-      const [trendyolPrice, hepsiburadaPrice, n11Price, koctasPrice, bauhausPrice, yerevdekorPrice] = await Promise.all([
-        getLivePrice(tyScrapeUrl, 'Trendyol', p.trendyolPrice),
-        getLivePrice(hbScrapeUrl, 'Hepsiburada', p.hepsiburadaPrice),
-        getLivePrice(n11ScrapeUrl, 'n11', p.n11Price),
-        getLivePrice(kcScrapeUrl, 'Koçtaş', p.koctasPrice),
-        getLivePrice(bhScrapeUrl, 'Bauhaus', p.bauhausPrice),
-        getLivePrice(yedScrapeUrl, 'YerEvDekor', p.yerevdekorPrice)
+      // Crawl each marketplace in parallel
+      const [tyRes, hbRes, n11Res, kcRes, bhRes, yedRes] = await Promise.all([
+        crawlVendorPrice('trendyol', 'Trendyol', 'trendyol.com', `https://www.trendyol.com/sr?q=${encodeURIComponent(p.code)}`, p.trendyolPrice, p.trendyolUrl),
+        crawlVendorPrice('hepsiburada', 'Hepsiburada', 'hepsiburada.com', `https://www.hepsiburada.com/ara?q=${encodeURIComponent(p.code)}`, p.hepsiburadaPrice, p.hepsiburadaUrl),
+        crawlVendorPrice('n11', 'n11', 'n11.com', `https://www.n11.com/arama?q=${encodeURIComponent(p.code)}`, p.n11Price, p.n11Url),
+        crawlVendorPrice('koctas', 'Koçtaş', 'koctas.com.tr', `https://www.koctas.com.tr/search?q=${encodeURIComponent(p.code)}`, p.koctasPrice, p.koctasUrl),
+        crawlVendorPrice('bauhaus', 'Bauhaus', 'bauhaus.com.tr', `https://www.bauhaus.com.tr/arama?q=${encodeURIComponent(p.code)}`, p.bauhausPrice, p.bauhausUrl),
+        crawlVendorPrice('yerevdekor', 'YerEvDekor', 'yerevdekor.com', `https://www.yerevdekor.com/arama?q=${encodeURIComponent(p.code)}`, p.yerevdekorPrice, p.yerevdekorUrl)
       ]);
 
-      // 2. Update Database (only save specific direct product URLs if real price exists or URL was explicitly stored)
+      // 2. Update Database with discovered links & live prices
       const updatedProduct = await prisma.product.update({
         where: { id: p.id },
         data: {
-          trendyolPrice: trendyolPrice || null,
-          trendyolUrl: p.trendyolUrl || null,
-          hepsiburadaPrice: hepsiburadaPrice || null,
-          hepsiburadaUrl: p.hepsiburadaUrl || null,
-          n11Price: n11Price || null,
-          n11Url: p.n11Url || null,
-          koctasPrice: koctasPrice || null,
-          koctasUrl: p.koctasUrl || null,
-          bauhausPrice: bauhausPrice || null,
-          bauhausUrl: p.bauhausUrl || null,
-          yerevdekorPrice: yerevdekorPrice || null,
-          yerevdekorUrl: p.yerevdekorUrl || null
+          trendyolPrice: tyRes.price || null,
+          trendyolUrl: tyRes.url || null,
+          hepsiburadaPrice: hbRes.price || null,
+          hepsiburadaUrl: hbRes.url || null,
+          n11Price: n11Res.price || null,
+          n11Url: n11Res.url || null,
+          koctasPrice: kcRes.price || null,
+          koctasUrl: kcRes.url || null,
+          bauhausPrice: bhRes.price || null,
+          bauhausUrl: bhRes.url || null,
+          yerevdekorPrice: yedRes.price || null,
+          yerevdekorUrl: yedRes.url || null
         },
         include: {
           brand: {
@@ -118,7 +147,7 @@ export async function POST(request) {
 
       updatedCount++;
       if (productId) {
-        logs.push(`[Tamamlandı] ${updatedProduct.name} için canlı fiyatlar güncellendi.`);
+        logs.push(`[Tamamlandı] ${updatedProduct.name} için canlı fiyatlar ve ilan linkleri güncellendi.`);
         return NextResponse.json({
           success: true,
           count: 1,
@@ -144,3 +173,4 @@ export async function POST(request) {
     return NextResponse.json({ success: false, error: error.message, logs }, { status: 500 });
   }
 }
+

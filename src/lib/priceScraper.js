@@ -206,3 +206,76 @@ export function extractPriceFromHtml(html, url) {
 
   return price;
 }
+
+/**
+ * Searches Google for direct marketplace product links using Serper API or HTTP search scraping.
+ * @param {string} query - Product title and brand name (e.g. "Qua Granite Qua Pulpis Grey 60X120")
+ * @param {string} domain - Vendor domain (e.g. "trendyol.com", "hepsiburada.com")
+ * @param {string|null} serperApiKey - Optional Serper.dev API key
+ * @param {string|null} scrapingApiKey - Optional proxy API key for scraping Google Search
+ * @returns {Promise<string|null>} Discovered direct product URL or null
+ */
+export async function searchProductUrlViaGoogle(query, domain, serperApiKey = null, scrapingApiKey = null) {
+  if (!query || !domain) return null;
+  const searchQuery = `"${query}" site:${domain}`;
+
+  // 1. Try via Serper.dev API if API key is provided
+  const activeSerperKey = serperApiKey || process.env.SERPER_API_KEY;
+  if (activeSerperKey) {
+    try {
+      const res = await fetch('https://google.serper.dev/search', {
+        method: 'POST',
+        headers: {
+          'X-API-KEY': activeSerperKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ q: searchQuery, gl: 'tr', hl: 'tr' }),
+        signal: AbortSignal.timeout(8000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.organic && data.organic.length > 0) {
+          for (const item of data.organic) {
+            if (item.link && item.link.includes(domain) && !item.link.includes('/sr?') && !item.link.includes('/ara?')) {
+              return item.link;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[Serper API Error]', err.message);
+    }
+  }
+
+  // 2. Direct Google Search scraping fallback
+  try {
+    const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+    const html = await fetchHtml(googleSearchUrl, scrapingApiKey);
+    if (html) {
+      const $ = cheerio.load(html);
+      let foundLink = null;
+      
+      $('a[href]').each((_, el) => {
+        let href = $(el).attr('href') || '';
+        if (href.startsWith('/url?q=')) {
+          href = href.replace('/url?q=', '').split('&')[0];
+        }
+        if (href.includes(domain) && 
+            !href.includes('/sr?') && 
+            !href.includes('/ara?') && 
+            !href.includes('/arama?') && 
+            !href.includes('google.com')) {
+          foundLink = decodeURIComponent(href);
+          return false; // break loop
+        }
+      });
+
+      if (foundLink) return foundLink;
+    }
+  } catch (err) {
+    console.warn('[Google Search Scrape Error]', err.message);
+  }
+
+  return null;
+}
+
