@@ -157,14 +157,15 @@ export default function UyelikPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
       const script = document.createElement('script');
       script.src = 'https://accounts.google.com/gsi/client';
       script.async = true;
       script.defer = true;
       script.onload = () => {
-        if (window.google?.accounts?.id) {
+        if (window.google?.accounts?.id && clientId) {
           window.google.accounts.id.initialize({
-            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1058293750294-mock.apps.googleusercontent.com',
+            client_id: clientId,
             callback: (response) => {
               if (response.credential) {
                 handleGoogleAuthSubmit({ credential: response.credential });
@@ -182,32 +183,22 @@ export default function UyelikPage() {
     setSuccess('');
     setLoading(true);
 
-    const targetEmail = overrideEmail || googleEmailInput || email;
-    const targetName = overrideName || googleNameInput || name;
-
-    if (!credential && (!targetEmail || !targetEmail.includes('@'))) {
-      setError('Lütfen geçerli bir Google e-posta adresi girin.');
-      setLoading(false);
-      return;
-    }
-
     try {
       const res = await fetch('/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           credential,
-          email: targetEmail,
-          name: targetName
+          email: overrideEmail,
+          name: overrideName
         })
       });
 
       const data = await res.json();
 
       if (res.ok && data.success) {
-        setSuccess(`✓ Google Hesabı ile Giriş Yapıldı! Hoş geldiniz ${data.user.name}.`);
+        setSuccess(`✓ Google Hesabı (${data.user.email}) ile Giriş Yapıldı! Hoş geldiniz ${data.user.name}.`);
         localStorage.setItem('seramikbak_user', JSON.stringify(data.user));
-        setShowGoogleModal(false);
         setTimeout(() => {
           window.location.href = '/';
         }, 1000);
@@ -222,42 +213,23 @@ export default function UyelikPage() {
     }
   };
 
-  const handleGoogleButtonClick = async () => {
+  const handleGoogleButtonClick = () => {
     setError('');
-    setSuccess('Google Hesabı ile giriş yapılıyor...');
-    setLoading(true);
-
-    const targetEmail = (email && email.includes('@')) 
-      ? email.toLowerCase() 
-      : 'google.user@gmail.com';
-    const targetName = name || (targetEmail ? targetEmail.split('@')[0] : 'Google Kullanıcısı');
-
-    try {
-      const res = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: targetEmail,
-          name: targetName
-        })
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        setSuccess(`✓ Google Hesabı ile Başarıyla Giriş Yapıldı! Hoş geldiniz ${data.user.name}.`);
-        localStorage.setItem('seramikbak_user', JSON.stringify(data.user));
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 800);
-      } else {
-        setError(data.error || 'Google hesabı ile giriş başarısız oldu.');
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    
+    if (clientId && window.google?.accounts?.id) {
+      setSuccess('Google Hesabınız doğrulanıyor, lütfen açılan Google penceresinden hesabınızı seçin...');
+      try {
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            console.log('Google One-Tap notification state:', notification.getNotDisplayedReason());
+          }
+        });
+      } catch (e) {
+        console.warn('Google Prompt error:', e);
       }
-    } catch (err) {
-      console.error('Google Auth Error:', err);
-      setError('Google girişi sırasında bir hata oluştu.');
-    } finally {
-      setLoading(false);
+    } else {
+      setError('Google OAuth girişi için Google Cloud Console üzerinden alınan NEXT_PUBLIC_GOOGLE_CLIENT_ID anahtarı gereklidir.');
     }
   };
 
