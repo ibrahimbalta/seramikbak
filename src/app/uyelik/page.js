@@ -224,10 +224,12 @@ export default function UyelikPage() {
 
   const handleGoogleButtonClick = () => {
     setError('');
-    if (window.google?.accounts?.id) {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (clientId && !clientId.includes('mock') && window.google?.accounts?.id) {
       try {
         window.google.accounts.id.prompt((notification) => {
           if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            if (!googleEmailInput && email) setGoogleEmailInput(email);
             setShowGoogleModal(true);
           }
         });
@@ -236,6 +238,7 @@ export default function UyelikPage() {
         // Fallback
       }
     }
+    if (!googleEmailInput && email) setGoogleEmailInput(email);
     setShowGoogleModal(true);
   };
 
