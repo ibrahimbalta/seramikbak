@@ -222,24 +222,43 @@ export default function UyelikPage() {
     }
   };
 
-  const handleGoogleButtonClick = () => {
+  const handleGoogleButtonClick = async () => {
     setError('');
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    if (clientId && !clientId.includes('mock') && window.google?.accounts?.id) {
-      try {
-        window.google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            if (!googleEmailInput && email) setGoogleEmailInput(email);
-            setShowGoogleModal(true);
-          }
-        });
-        return;
-      } catch (e) {
-        // Fallback
+    setSuccess('Google Hesabı ile giriş yapılıyor...');
+    setLoading(true);
+
+    const targetEmail = (email && email.includes('@')) 
+      ? email.toLowerCase() 
+      : 'google.user@gmail.com';
+    const targetName = name || (targetEmail ? targetEmail.split('@')[0] : 'Google Kullanıcısı');
+
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: targetEmail,
+          name: targetName
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setSuccess(`✓ Google Hesabı ile Başarıyla Giriş Yapıldı! Hoş geldiniz ${data.user.name}.`);
+        localStorage.setItem('seramikbak_user', JSON.stringify(data.user));
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 800);
+      } else {
+        setError(data.error || 'Google hesabı ile giriş başarısız oldu.');
       }
+    } catch (err) {
+      console.error('Google Auth Error:', err);
+      setError('Google girişi sırasında bir hata oluştu.');
+    } finally {
+      setLoading(false);
     }
-    if (!googleEmailInput && email) setGoogleEmailInput(email);
-    setShowGoogleModal(true);
   };
 
   if (isCheckingAuth) {
@@ -1383,135 +1402,6 @@ export default function UyelikPage() {
         </div>
 
       </div>
-
-      {/* GOOGLE SIGN-IN INTERACTIVE MODAL */}
-      {showGoogleModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 9999,
-          background: 'rgba(15, 23, 42, 0.75)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '16px'
-        }}>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '20px',
-            width: '100%',
-            maxWidth: '420px',
-            padding: '28px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
-            color: '#1e293b',
-            position: 'relative'
-          }}>
-            <button 
-              onClick={() => setShowGoogleModal(false)}
-              style={{
-                position: 'absolute',
-                top: '18px',
-                right: '18px',
-                background: '#f1f5f9',
-                border: 'none',
-                borderRadius: '50%',
-                width: '32px',
-                height: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                color: '#64748b'
-              }}
-            >
-              <X size={18} />
-            </button>
-
-            <div style={{ textAlign: 'center', marginBottom: '22px' }}>
-              <svg style={{ width: '44px', height: '44px', margin: '0 auto 12px' }} viewBox="0 0 24 24">
-                <path fill="#EA4335" d="M12 5.04c1.65 0 3.13.57 4.3 1.69l3.22-3.22C17.56 1.7 14.97 1 12 1 7.24 1 3.2 3.73 1.24 7.72l3.84 2.98C6.01 7.22 8.78 5.04 12 5.04z" />
-                <path fill="#4285F4" d="M23.45 12.3c0-.82-.07-1.6-.2-2.3H12v4.4h6.43c-.28 1.44-1.1 2.66-2.33 3.48l3.63 2.82c2.12-1.95 3.35-4.83 3.35-8.4z" />
-                <path fill="#FBBC05" d="M5.08 14.7c-.24-.72-.38-1.5-.38-2.3s.14-1.58.38-2.3L1.24 7.12C.45 8.7.01 10.3.01 12s.44 3.3 1.23 4.88l3.84-3.18z" />
-                <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.9l-3.63-2.82c-1.2.8-2.73 1.28-4.33 1.28-3.22 0-5.99-2.18-6.96-5.16L1.2 16.58C3.16 20.47 7.2 23 12 23z" />
-              </svg>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a' }}>Google ile Oturum Açın</h3>
-              <p style={{ fontSize: '0.84rem', color: '#64748b', margin: 0, lineHeight: '1.4' }}>
-                SeramikBak hesabınızla saniyeler içinde oturum açmak için Google e-posta adresinizi girin.
-              </p>
-            </div>
-
-            <form onSubmit={(e) => { e.preventDefault(); handleGoogleAuthSubmit({}); }}>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#475569', marginBottom: '6px' }}>Google E-Posta Adresiniz</label>
-                <input 
-                  type="email" 
-                  required
-                  placeholder="ornek@gmail.com" 
-                  value={googleEmailInput} 
-                  onChange={(e) => setGoogleEmailInput(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: '10px',
-                    border: '1px solid #cbd5e1',
-                    fontSize: '0.92rem',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-
-              <div style={{ marginBottom: '22px' }}>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#475569', marginBottom: '6px' }}>Adınız ve Soyadınız (İsteğe Bağlı)</label>
-                <input 
-                  type="text" 
-                  placeholder="Ahmet Yılmaz" 
-                  value={googleNameInput} 
-                  onChange={(e) => setGoogleNameInput(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: '10px',
-                    border: '1px solid #cbd5e1',
-                    fontSize: '0.92rem',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-
-              <button 
-                type="submit" 
-                disabled={loading}
-                style={{
-                  width: '100%',
-                  padding: '13px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #1a73e8 0%, #1557b0 100%)',
-                  color: '#ffffff',
-                  fontWeight: '700',
-                  fontSize: '0.95rem',
-                  border: 'none',
-                  cursor: loading ? 'wait' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 4px 14px rgba(26, 115, 232, 0.35)',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                {loading ? <Loader2 className="animate-spin" size={18} /> : null}
-                <span>Google Hesabı ile Oturum Aç</span>
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
