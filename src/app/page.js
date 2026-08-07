@@ -9757,7 +9757,7 @@ export default function Home() {
         /* Wide Centered Search Bar style */
         .wide-search-bar-form {
           width: 100%;
-          max-width: 620px;
+          max-width: 100%;
           margin-top: 6px;
         }
 
