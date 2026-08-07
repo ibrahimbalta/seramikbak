@@ -215,21 +215,53 @@ export default function UyelikPage() {
 
   const handleGoogleButtonClick = () => {
     setError('');
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '994830104230-v19gj9ts8ed2ngslcsfm0k8obpuulqb6.apps.googleusercontent.com';
     
-    if (clientId && window.google?.accounts?.id) {
+    if (typeof window !== 'undefined' && window.google?.accounts) {
       setSuccess('Google Hesabınız doğrulanıyor, lütfen açılan Google penceresinden hesabınızı seçin...');
+      
       try {
-        window.google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            console.log('Google One-Tap notification state:', notification.getNotDisplayedReason());
-          }
-        });
+        if (window.google.accounts.id) {
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: (response) => {
+              if (response.credential) {
+                handleGoogleAuthSubmit({ credential: response.credential });
+              }
+            }
+          });
+          window.google.accounts.id.prompt((notification) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+              if (window.google.accounts.oauth2) {
+                const tokenClient = window.google.accounts.oauth2.initTokenClient({
+                  client_id: clientId,
+                  scope: 'email profile',
+                  callback: async (tokenResponse) => {
+                    if (tokenResponse.access_token) {
+                      try {
+                        const userinfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                          headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+                        });
+                        const info = await userinfoRes.json();
+                        if (info.email) {
+                          handleGoogleAuthSubmit({ email: info.email, name: info.name, picture: info.picture });
+                        }
+                      } catch (err) {
+                        console.error('Failed to fetch userinfo:', err);
+                      }
+                    }
+                  }
+                });
+                tokenClient.requestAccessToken();
+              }
+            }
+          });
+        }
       } catch (e) {
         console.warn('Google Prompt error:', e);
       }
     } else {
-      setError('Google OAuth girişi için Google Cloud Console üzerinden alınan NEXT_PUBLIC_GOOGLE_CLIENT_ID anahtarı gereklidir.');
+      setError('Google Servisleri yükleniyor, lütfen birkaç saniye bekleyip tekrar tıklayın.');
     }
   };
 
