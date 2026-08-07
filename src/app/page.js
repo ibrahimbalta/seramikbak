@@ -86,6 +86,8 @@ const ModelViewerAR = dynamic(() => import('@/components/ModelViewerAR'), {
 
 import TileVisualPreview from '@/components/TileVisualPreview';
 import ProductCard from '@/components/ProductCard';
+import TileCalculatorWidget from '@/components/TileCalculatorWidget';
+import LiveDealsTicker from '@/components/LiveDealsTicker';
 
 function enrichProductData(p) {
   const basePrice = p.width * p.height * 0.08 + (p.finish === 'Parlak' ? 120 : 0) + (p.style === 'Mermer' ? 150 : 80);
@@ -3503,6 +3505,9 @@ export default function Home() {
         </div>
       )}
 
+      {/* CANLI FIRSAT RADARI & CANLI İNDİRİM ŞERİDİ */}
+      <LiveDealsTicker />
+
       {/* Main Content */}
       <div className="content-container">
         
@@ -3644,6 +3649,9 @@ export default function Home() {
                     </div>
                   )}
                 </form>
+
+                {/* AKILLI MALİYET & METRAJ SİHİRBAZI */}
+                <TileCalculatorWidget onOpenQuoteModal={handleOpenLeadModalWithProduct} />
 
                 {/* Popular Searches */}
                 <div className="hero-popular-tags">
