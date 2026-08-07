@@ -6439,7 +6439,7 @@ export default function Home() {
                 </div>
 
                 {/* 1. Resmi Yetkili Bayiler */}
-                <div className="channel-box">
+                <div className="channel-box" id="resmi-yetkili-bayiler-section">
                   <h4 className="channel-title">
                     <MapPin size={16} style={{ color: 'var(--accent-blue)' }} />
                     <span>Resmi Yetkili Bayiler (Teklif Al)</span>
@@ -6574,7 +6574,7 @@ export default function Home() {
                               borderRadius: '8px',
                               background: isLowest ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.05)',
                               border: isLowest ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.1)',
-                              opacity: hasRealPrice ? 1 : 0.65,
+                              opacity: hasRealPrice ? 1 : 0.9,
                               transition: 'all 0.2s ease'
                             }}
                           >
@@ -6659,30 +6659,53 @@ export default function Home() {
                                   )}
                                 </>
                               ) : (
-                                <a 
-                                  href={`https://wa.me/908501234567?text=${encodeURIComponent(`Merhaba, SeramikBak üzerinden "${detailProduct.brand?.name || ''} ${detailProduct.name}" (${v.name}) ürünü için özel fiyat teklifi ve stok bilgisi almak istiyorum.`)}`}
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const dealerSec = document.getElementById('resmi-yetkili-bayiler-section');
+                                    if (dealerSec) {
+                                      dealerSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }
+                                    if (detailDealers && detailDealers.length > 0) {
+                                      const nearestDealer = detailDealers[0];
+                                      setLeadProduct(detailProduct);
+                                      setLeadDealer(nearestDealer);
+                                      setLeadName('');
+                                      setLeadPhone('');
+                                      setLeadEmail('');
+                                      setLeadNotes(`Bana 50 metrekare bu ${detailProduct.brand?.name || ''} ${detailProduct.name} ürününden lazım (${v.name} pazaryerinde stok görünmediği için doğrudan en yakın bayinizden fiyat teklifi rica ediyorum).`);
+                                      setLeadSuccessMsg('');
+                                      setLeadErrorMsg('');
+                                      setShowLeadModal(true);
+                                    } else {
+                                      const waText = encodeURIComponent(`Merhaba, SeramikBak üzerinden "${detailProduct.brand?.name || ''} ${detailProduct.name}" (${v.name}) ürünü için konumuma en yakın yetkili bayinizden palet / m² fiyat teklifi ve stok bilgisi almak istiyorum.`);
+                                      window.open(`https://wa.me/908501234567?text=${waText}`, '_blank', 'noopener,noreferrer');
+                                    }
+                                  }}
                                   style={{
                                     fontSize: '0.74rem',
                                     fontWeight: '700',
                                     padding: '6px 12px',
                                     borderRadius: '6px',
-                                    border: '1px solid rgba(16, 185, 129, 0.4)',
-                                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.3) 100%)',
-                                    color: '#34d399',
+                                    border: '1px solid rgba(59, 130, 246, 0.4)',
+                                    background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(29, 78, 216, 0.35) 100%)',
+                                    color: '#60a5fa',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '6px',
-                                    textDecoration: 'none',
-                                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.15)',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)',
                                     transition: 'all 0.2s ease'
                                   }}
-                                  onClick={(e) => e.stopPropagation()}
+                                  title="Konumunuzdaki en yakın yetkili bayiden canlı fiyat teklifi alın"
                                 >
-                                  <MessageSquare size={13} style={{ color: '#34d399' }} />
-                                  <span>Teklif Al / WhatsApp'tan Sor</span>
-                                </a>
+                                  <MapPin size={13} style={{ color: '#60a5fa' }} />
+                                  <span>
+                                    {detailDealers && detailDealers.length > 0 
+                                      ? `En Yakın Bayiden Teklif Al (${detailDealers[0].distanceKm} km)` 
+                                      : `En Yakın Bayiye Sor / Teklif Al`}
+                                  </span>
+                                </button>
                               )}
                             </div>
                           </div>
