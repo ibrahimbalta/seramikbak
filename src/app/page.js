@@ -3276,6 +3276,16 @@ export default function Home() {
       {!isKioskMode && (
         <div className="top-utility-bar glass-panel-dark">
           <div className="utility-left" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+            <Link href="/" className="utility-item portal-link" onClick={() => setActiveTab('search')}>
+              <HomeIcon size={13} />
+              <span style={{ fontWeight: '800' }}>{t('home')}</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/hakkimizda" className="utility-item portal-link">
+              <Info size={13} />
+              <span>{t('about')}</span>
+            </Link>
+            <span className="utility-divider">|</span>
             <Link href="/proje-talep" className="utility-item b2b-btn-link">
               <Building2 size={13} />
               <span>{t('b2bQuotes')}</span>
@@ -3302,11 +3312,6 @@ export default function Home() {
           </div>
 
           <div className="utility-right" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
-            <Link href="/" className="utility-item portal-link" onClick={() => setActiveTab('search')}>
-              <HomeIcon size={13} />
-              <span>{t('home')}</span>
-            </Link>
-            <span className="utility-divider">|</span>
             <Link href="/outlet" className="utility-item outlet-btn-link">
               <Sparkles size={13} style={{ color: '#ef4444' }} />
               <span style={{ color: '#ef4444', fontWeight: '800' }}>{t('outlet')}</span>
@@ -3321,11 +3326,6 @@ export default function Home() {
             <Link href="/ilham" className="utility-item portal-link">
               <Sparkles size={13} />
               <span>{t('inspiration')}</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/hakkimizda" className="utility-item portal-link">
-              <Info size={13} />
-              <span>{t('about')}</span>
             </Link>
           </div>
         </div>
