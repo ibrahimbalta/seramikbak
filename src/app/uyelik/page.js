@@ -21,7 +21,8 @@ import {
   Layers,
   Activity,
   X,
-  Lock
+  Lock,
+  Home
 } from 'lucide-react';
 
 export default function UyelikPage() {
@@ -501,21 +502,30 @@ export default function UyelikPage() {
         <div className="dashboard-container">
           {/* Header */}
           <div className="dashboard-header">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: 'inherit' }}>
               <div style={{ background: '#b38e47', color: '#fff', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '1rem' }}>SB</div>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '800' }}>SeramikBak</h3>
                 <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Müşteri Cockpit Paneli</span>
               </div>
-            </div>
+            </Link>
             
-            <button 
-              onClick={handleLogout}
-              style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#f87171', border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <LogOut size={13} />
-              <span>Çıkış Yap</span>
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Link
+                href="/"
+                style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#e2e8f0', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <Home size={13} />
+                <span>Anasayfa</span>
+              </Link>
+              <button 
+                onClick={handleLogout}
+                style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <LogOut size={13} />
+                <span>Çıkış Yap</span>
+              </button>
+            </div>
           </div>
 
           {/* Navigation */}

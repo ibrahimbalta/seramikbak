@@ -1353,6 +1353,17 @@ export default function Home() {
     }
   }, [currentUser]);
 
+  // Close user dropdown menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showUserMenu && !e.target.closest('.user-menu-wrapper')) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showUserMenu]);
+
   const handleAuthLogin = async (e) => {
     e.preventDefault();
     setAuthError('');
@@ -3404,7 +3415,29 @@ export default function Home() {
               </>
             )}
           </div>
-          <button className="hamburger-menu-btn" onClick={() => setShowMobileMenu(!showMobileMenu)}>
+          {/* Mobile Header Actions (Visible on mobile <= 960px) */}
+          <div className="mobile-header-user-actions">
+            {currentUser ? (
+              <Link 
+                href="/uyelik?tab=overview" 
+                className="mobile-header-user-btn logged-in" 
+                title="Kullanıcı Paneline Git"
+              >
+                <div className="user-avatar-mini">{currentUser.name.charAt(0).toUpperCase()}</div>
+                <span className="mobile-user-label">Panelim</span>
+              </Link>
+            ) : (
+              <Link 
+                href="/uyelik" 
+                className="mobile-header-user-btn" 
+                title="Giriş Yap / Üye Ol"
+              >
+                <UserIcon size={16} />
+                <span className="mobile-user-label">Giriş</span>
+              </Link>
+            )}
+          </div>
+          <button className="hamburger-menu-btn" onClick={() => setShowMobileMenu(!showMobileMenu)} aria-label="Menü">
             <MenuIcon size={20} />
           </button>
         </div>
@@ -3425,6 +3458,57 @@ export default function Home() {
               <button className="mobile-menu-close" onClick={() => setShowMobileMenu(false)} aria-label="Kapat">✕</button>
             </div>
             <div className="mobile-menu-nav">
+              {currentUser && (
+                <div className="mobile-user-card-box" style={{
+                  padding: '12px 14px',
+                  background: 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(15,23,42,0.7) 100%)',
+                  borderRadius: '14px',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  marginBottom: '12px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                    <div style={{
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                      color: '#ffffff',
+                      fontWeight: '900',
+                      fontSize: '1rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 4px 10px rgba(179,142,71,0.3)',
+                      flexShrink: 0
+                    }}>
+                      {currentUser.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ overflow: 'hidden' }}>
+                      <div style={{ fontWeight: '800', fontSize: '0.9rem', color: 'var(--text-primary)', lineHeight: '1.2' }}>{currentUser.name}</div>
+                      <div style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser.email}</div>
+                    </div>
+                  </div>
+                  <Link 
+                    href="/uyelik?tab=overview" 
+                    className="mobile-nav-link"
+                    onClick={() => setShowMobileMenu(false)}
+                    style={{
+                      textDecoration: 'none',
+                      background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)',
+                      color: '#ffffff',
+                      fontWeight: '800',
+                      justifyContent: 'center',
+                      borderRadius: '10px',
+                      padding: '9px 12px',
+                      boxShadow: '0 4px 10px rgba(179,142,71,0.25)'
+                    }}
+                  >
+                    <Activity size={16} />
+                    <span>🚀 Kullanıcı Paneline Git</span>
+                  </Link>
+                </div>
+              )}
+
               <Link href="/" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => { setActiveTab('search'); setShowMobileMenu(false); }}>
                 <HomeIcon size={16} />
                 <span style={{ fontWeight: '800' }}>Anasayfa</span>
@@ -3486,29 +3570,60 @@ export default function Home() {
               
               <div className="mobile-menu-divider" />
               
-              <button 
-                className="mobile-nav-link fav-link" 
-                onClick={() => { if(currentUser) { setShowFavoritesPanel(true); } else { window.location.href = '/uyelik'; } setShowMobileMenu(false); }}
-              >
-                <HeartIcon size={16} />
-                <span>Favorilerim ({userFavorites.length})</span>
-              </button>
-              
               {currentUser ? (
                 <>
-                  <div className="mobile-user-info">
-                    Giriş yapan: <strong>{currentUser.name}</strong>
-                  </div>
+                  <Link 
+                    href="/uyelik?tab=overview" 
+                    className="mobile-nav-link panel-link" 
+                    style={{ textDecoration: 'none', background: 'rgba(179, 142, 71, 0.1)', color: '#b38e47', fontWeight: '800', border: '1px solid rgba(179, 142, 71, 0.3)' }}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <Activity size={16} />
+                    <span>Panelim / Hesabım</span>
+                  </Link>
+
+                  <button 
+                    className="mobile-nav-link fav-link" 
+                    onClick={() => { setShowFavoritesPanel(true); setShowMobileMenu(false); }}
+                  >
+                    <HeartIcon size={16} />
+                    <span>Favorilerim ({userFavorites.length})</span>
+                  </button>
+
+                  <Link 
+                    href="/uyelik?tab=settings" 
+                    className="mobile-nav-link" 
+                    style={{ textDecoration: 'none' }}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <Settings size={16} />
+                    <span>Hesap Ayarları</span>
+                  </Link>
+
                   <button className="mobile-nav-link logout-link" onClick={() => { handleLogout(); setShowMobileMenu(false); }}>
                     <ArrowRight size={16} />
-                    <span>Çıkış Yap</span>
+                    <span>Çıkış Yap ({currentUser.name.split(' ')[0]})</span>
                   </button>
                 </>
               ) : (
-                <button className="mobile-nav-link login-link" onClick={() => { window.location.href = '/uyelik'; setShowMobileMenu(false); }}>
-                  <UserIcon size={16} />
-                  <span>Üyelik</span>
-                </button>
+                <>
+                  <button 
+                    className="mobile-nav-link fav-link" 
+                    onClick={() => { window.location.href = '/uyelik'; setShowMobileMenu(false); }}
+                  >
+                    <HeartIcon size={16} />
+                    <span>Favorilerim (0)</span>
+                  </button>
+                  <Link 
+                    href="/uyelik" 
+                    className="mobile-nav-link login-link" 
+                    style={{ textDecoration: 'none' }}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <UserIcon size={16} />
+                    <span>Giriş Yap / Üye Ol</span>
+                  </Link>
+                </>
               )}
             </div>
           </div>
@@ -9629,12 +9744,55 @@ export default function Home() {
           to { transform: translateX(0); }
         }
 
+        .mobile-header-user-actions {
+          display: none;
+        }
+
         @media (max-width: 960px) {
           .header-nav {
             display: none !important;
           }
           .desktop-header-actions {
             display: none !important;
+          }
+          .mobile-header-user-actions {
+            display: flex !important;
+            align-items: center;
+            margin-right: 4px;
+          }
+          .mobile-header-user-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(179, 142, 71, 0.12);
+            border: 1px solid rgba(179, 142, 71, 0.3);
+            color: #b38e47;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 800;
+            transition: all 0.2s ease;
+          }
+          .mobile-header-user-btn.logged-in {
+            background: linear-gradient(135deg, rgba(179, 142, 71, 0.18) 0%, rgba(212, 175, 55, 0.1) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            box-shadow: 0 2px 8px rgba(179, 142, 71, 0.15);
+          }
+          .mobile-header-user-btn .user-avatar-mini {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #b38e47 0%, #d4af37 100%);
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .mobile-user-label {
+            font-weight: 800;
           }
           .hamburger-menu-btn {
             display: flex !important;
