@@ -5,11 +5,11 @@ import { useLanguage } from '@/lib/languageContext';
 import { Globe, ChevronDown } from 'lucide-react';
 
 const languages = [
-  { code: 'tr', name: 'Türkçe', flag: '🇹🇷', label: 'TR' },
-  { code: 'en', name: 'English', flag: '🇬🇧', label: 'EN' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪', label: 'DE' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦', label: 'AR' },
-  { code: 'ru', name: 'Русский', flag: '🇷🇺', label: 'RU' }
+  { code: 'tr', name: 'Türkçe', label: 'TR' },
+  { code: 'en', name: 'English', label: 'EN' },
+  { code: 'de', name: 'Deutsch', label: 'DE' },
+  { code: 'ar', name: 'العربية', label: 'AR' },
+  { code: 'ru', name: 'Русский', label: 'RU' }
 ];
 
 export default function LanguageSelector({ compact = false }) {
@@ -38,7 +38,7 @@ export default function LanguageSelector({ compact = false }) {
           gap: 6px;
           background: rgba(255, 255, 255, 0.95);
           border: 1px solid #e2e8f0;
-          padding: ${compact ? '5px 10px' : '7px 13px'};
+          padding: ${compact ? '5px 10px' : '7px 12px'};
           border-radius: 12px;
           font-size: ${compact ? '0.78rem' : '0.82rem'};
           font-weight: 700;
@@ -104,7 +104,7 @@ export default function LanguageSelector({ compact = false }) {
         className="lang-trigger-btn"
         aria-label="Select Language"
       >
-        <span style={{ fontSize: '1rem', lineHeight: 1 }}>{currentLangObj.flag}</span>
+        <Globe size={14} style={{ color: '#b38e47' }} />
         <span>{currentLangObj.label}</span>
         <ChevronDown size={13} style={{ color: '#64748b', transition: 'transform 0.2s', transform: isOpen ? 'rotate(180deg)' : 'none' }} />
       </button>
@@ -122,7 +122,7 @@ export default function LanguageSelector({ compact = false }) {
               className={`lang-option-btn ${lang === l.code ? 'active' : ''}`}
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '1rem' }}>{l.flag}</span>
+                <span style={{ fontWeight: '800', color: '#b38e47', fontSize: '0.75rem', width: '20px' }}>{l.label}</span>
                 <span>{l.name}</span>
               </span>
               {lang === l.code && <span style={{ color: '#b38e47', fontWeight: '900', fontSize: '0.75rem' }}>✓</span>}

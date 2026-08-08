@@ -3422,7 +3422,6 @@ export default function Home() {
           </div>
           {/* Mobile Header Actions (Visible on mobile <= 960px) */}
           <div className="mobile-header-user-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <LanguageSelector compact />
             {currentUser ? (
               <Link 
                 href="/uyelik?tab=overview" 
