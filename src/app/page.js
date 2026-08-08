@@ -9751,6 +9751,13 @@ export default function Home() {
         }
 
         @media (max-width: 960px) {
+          .header-brand {
+            margin-right: auto !important;
+          }
+          .header-right-buttons {
+            margin-left: auto !important;
+            gap: 8px !important;
+          }
           .header-nav {
             display: none !important;
           }
@@ -9760,7 +9767,7 @@ export default function Home() {
           .mobile-header-user-actions {
             display: flex !important;
             align-items: center;
-            margin-right: 6px;
+            margin-right: 4px;
           }
           :global(a.mobile-header-user-btn),
           :global(.mobile-header-user-btn) {
