@@ -3275,55 +3275,32 @@ export default function Home() {
       {/* Top Utility Bar (B2B and Corporate Portal Links) */}
       {!isKioskMode && (
         <div className="top-utility-bar glass-panel-dark">
-          <div className="utility-right" style={{ marginLeft: 'auto' }}>
-            <Link href="/" className="utility-item portal-link" onClick={() => setActiveTab('search')}>
-              <HomeIcon size={13} />
-              <span style={{ fontWeight: '800' }}>{t('home')}</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/hakkimizda" className="utility-item portal-link">
-              <Info size={13} />
-              <span>{t('about')}</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/ilham" className="utility-item portal-link">
-              <Sparkles size={13} />
-              <span>İlham & Trendler</span>
-            </Link>
-            <span className="utility-divider">|</span>
+          <div className="utility-left" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: '#94a3b8', fontWeight: '600' }}>
+            <span>✦ Türkiye'nin Akıllı Seramik Arama Motoru & B2B İhracat Portalı</span>
+          </div>
+          <div className="utility-right" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button 
               onClick={() => setIsKioskMode(true)} 
               className="utility-item kiosk-btn-link"
               title="Bayi Teşhir Modu (Kiosk)"
             >
               <div className="pulse-indicator-green" />
-              <span>Teşhir Kiosk</span>
+              <span>{t('kioskMode')}</span>
             </button>
             <span className="utility-divider">|</span>
             <Link href="/bayi" className="utility-item portal-link">
               <UserIcon size={13} />
-              <span>Bayi Portalı</span>
+              <span>{t('dealerPortal')}</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/marka" className="utility-item portal-link">
               <TrendingUp size={13} />
-              <span>Marka Girişi</span>
+              <span>{t('brandPortal')}</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/proje-talep" className="utility-item b2b-btn-link">
               <Building2 size={13} />
               <span>{t('b2bQuotes')}</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/outlet" className="utility-item outlet-btn-link">
-              <Sparkles size={13} style={{ color: '#ef4444' }} />
-              <span style={{ color: '#ef4444', fontWeight: '800' }}>Outlet & Stoklar</span>
-              <span className="outlet-small-badge">Fırsat</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/ustalar" className="utility-item portal-link">
-              <Wrench size={13} style={{ color: '#b45309' }} />
-              <span style={{ color: '#b45309', fontWeight: '800' }}>Seramik Ustaları</span>
             </Link>
           </div>
         </div>
@@ -3356,6 +3333,22 @@ export default function Home() {
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
               </button>
+              <Link href="/outlet" className="nav-link" style={{ textDecoration: 'none' }}>
+                <Sparkles size={14} style={{ color: '#ef4444' }} />
+                <span style={{ color: '#ef4444', fontWeight: '800' }}>{t('outlet')}</span>
+              </Link>
+              <Link href="/ustalar" className="nav-link" style={{ textDecoration: 'none' }}>
+                <Wrench size={14} style={{ color: '#b45309' }} />
+                <span>{t('installers')}</span>
+              </Link>
+              <Link href="/ilham" className="nav-link" style={{ textDecoration: 'none' }}>
+                <Sparkles size={14} />
+                <span>{t('inspiration')}</span>
+              </Link>
+              <Link href="/hakkimizda" className="nav-link" style={{ textDecoration: 'none' }}>
+                <Info size={14} />
+                <span>{t('about')}</span>
+              </Link>
             </>
           )}
         </nav>
@@ -3494,61 +3487,60 @@ export default function Home() {
 
               <Link href="/" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => { setActiveTab('search'); setShowMobileMenu(false); }}>
                 <HomeIcon size={16} />
-                <span style={{ fontWeight: '800' }}>Anasayfa</span>
+                <span style={{ fontWeight: '800' }}>{t('home')}</span>
               </Link>
               <button 
                 className={`mobile-nav-link ${activeTab === 'search' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('search'); setShowMobileMenu(false); }}
               >
                 <SearchIcon size={16} />
-                <span>Arama Motoru</span>
+                <span>{t('products')}</span>
               </button>
               <button 
                 className={`mobile-nav-link ${activeTab === 'studio' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); }}
               >
                 <Palette size={16} />
-                <span>3D Sanal Stüdyo</span>
+                <span>{t('studio3d')}</span>
               </button>
               <button 
                 className={`mobile-nav-link ${activeTab === 'dealers' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); }}
               >
                 <MapPin size={16} />
-                <span>Bayi Bulucu</span>
+                <span>{t('dealers')}</span>
               </button>
-              
-              <Link href="/hakkimizda" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => setShowMobileMenu(false)}>
-                <Info size={16} />
-                <span>Hakkımızda</span>
+              <Link href="/outlet" className="mobile-nav-link outlet-link" onClick={() => setShowMobileMenu(false)}>
+                <Sparkles size={16} style={{ color: '#ef4444' }} />
+                <span style={{ color: '#ef4444', fontWeight: '800' }}>{t('outlet')}</span>
+                <span className="outlet-small-badge">Fırsat</span>
+              </Link>
+              <Link href="/ustalar" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
+                <Wrench size={16} style={{ color: '#b45309' }} />
+                <span style={{ color: '#b45309', fontWeight: '800' }}>{t('installers')}</span>
               </Link>
               <Link href="/ilham" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => setShowMobileMenu(false)}>
                 <Sparkles size={16} />
-                <span>İlham Galerisi & Trendler</span>
+                <span>{t('inspiration')}</span>
+              </Link>
+              <Link href="/hakkimizda" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => setShowMobileMenu(false)}>
+                <Info size={16} />
+                <span>{t('about')}</span>
               </Link>
 
               <div className="mobile-menu-divider" />
               
               <Link href="/proje-talep" className="mobile-nav-link b2b-link" onClick={() => setShowMobileMenu(false)}>
                 <Building2 size={16} />
-                <span>Proje Talebi (B2B)</span>
-              </Link>
-              <Link href="/outlet" className="mobile-nav-link outlet-link" onClick={() => setShowMobileMenu(false)}>
-                <Sparkles size={16} />
-                <span>Outlet & Stoklar</span>
-                <span className="outlet-small-badge">Fırsat</span>
-              </Link>
-              <Link href="/ustalar" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
-                <Wrench size={16} style={{ color: '#b45309' }} />
-                <span style={{ color: '#b45309', fontWeight: '800' }}>Seramik Ustaları</span>
+                <span>{t('b2bQuotes')}</span>
               </Link>
               <Link href="/bayi" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
                 <UserIcon size={16} />
-                <span>Bayi Portalı</span>
+                <span>{t('dealerPortal')}</span>
               </Link>
               <Link href="/marka" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
                 <TrendingUp size={16} />
-                <span>Marka Girişi</span>
+                <span>{t('brandPortal')}</span>
               </Link>
               
               <div className="mobile-menu-divider" />
