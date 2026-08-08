@@ -1,7 +1,8 @@
 /**
  * SeramikBak Email Utility
- * Sends transactional emails (Password Reset, Verification, Notifications)
+ * Supports Resend API or SMTP (Gmail/Nodemailer)
  */
+import nodemailer from 'nodemailer';
 
 export async function sendPasswordResetEmail({ toEmail, userName, resetLink }) {
   const subject = 'SeramikBak - Şifre Sıfırlama Talebiniz';
@@ -57,7 +58,7 @@ export async function sendPasswordResetEmail({ toEmail, userName, resetLink }) {
     </html>
   `;
 
-  // Option A: Check for Resend API Key
+  // Option 1: Resend API
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
     try {
@@ -68,7 +69,7 @@ export async function sendPasswordResetEmail({ toEmail, userName, resetLink }) {
           'Authorization': `Bearer ${resendApiKey}`
         },
         body: JSON.stringify({
-          from: process.env.EMAIL_FROM || 'SeramikBak <noreply@seramikbak.com>',
+          from: process.env.EMAIL_FROM || 'SeramikBak <onboarding@resend.dev>',
           to: [toEmail],
           subject: subject,
           html: htmlBody
@@ -85,7 +86,35 @@ export async function sendPasswordResetEmail({ toEmail, userName, resetLink }) {
     }
   }
 
-  // Development Fallback & Console Logging
+  // Option 2: SMTP / Nodemailer (Gmail / Custom Mail Server)
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  if (smtpUser && smtpPass) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: smtpUser,
+          pass: smtpPass
+        }
+      });
+
+      const info = await transporter.sendMail({
+        from: process.env.EMAIL_FROM || `"SeramikBak" <${smtpUser}>`,
+        to: toEmail,
+        subject: subject,
+        html: htmlBody
+      });
+
+      return { success: true, messageId: info.messageId };
+    } catch (err) {
+      console.error('Failed to send email via SMTP:', err);
+    }
+  }
+
+  // Development Fallback Logging
   console.log('====================================================');
   console.log(`[SERAMİKBAK MAIL SIMULATOR] To: ${toEmail}`);
   console.log(`Subject: ${subject}`);
@@ -94,7 +123,7 @@ export async function sendPasswordResetEmail({ toEmail, userName, resetLink }) {
 
   return { 
     success: true, 
-    simulated: !resendApiKey, 
-    message: 'Reset link generated successfully' 
+    simulated: true, 
+    message: 'Reset link logged to console (No mail API key configured)' 
   };
 }
