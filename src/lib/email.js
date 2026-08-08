@@ -97,7 +97,7 @@ export async function sendPasswordResetEmail({ toEmail, userName, resetLink }) {
           'Authorization': `Bearer ${resendApiKey}`
         },
         body: JSON.stringify({
-          from: process.env.EMAIL_FROM || 'SeramikBak <onboarding@resend.dev>',
+          from: process.env.EMAIL_FROM || 'SeramikBak <noreply@seramikbak.com>',
           to: [toEmail],
           subject: subject,
           html: htmlBody
