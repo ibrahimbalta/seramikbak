@@ -908,16 +908,145 @@ export default function UyelikPage() {
           margin: 0 0 40px 0;
         }
 
+        /* PURE CSS ANIMATED HERO CARD (0ms Load Time, No External Images!) */
+        .pure-css-hero-card {
+          width: 100%;
+          height: 190px;
+          border-radius: 20px;
+          background: linear-gradient(135deg, #1e293b 0%, #0f172a 60%, #1e1b4b 100%);
+          position: relative;
+          overflow: hidden;
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+          margin-bottom: 28px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 20px;
+        }
+
+        .hero-card-pattern {
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: 
+            radial-gradient(ellipse at 30% 20%, rgba(212, 175, 55, 0.25) 0%, transparent 50%),
+            radial-gradient(ellipse at 70% 80%, rgba(56, 189, 248, 0.15) 0%, transparent 50%),
+            linear-gradient(45deg, transparent 48%, rgba(212, 175, 55, 0.12) 50%, transparent 52%);
+          background-size: 100% 100%, 100% 100%, 40px 40px;
+          animation: heroMeshRotate 25s linear infinite;
+          pointer-events: none;
+        }
+
+        @keyframes heroMeshRotate {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .hero-card-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 5px 12px;
+          background: rgba(212, 175, 55, 0.15);
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          border-radius: 20px;
+          color: #ffd700;
+          font-size: 0.72rem;
+          font-weight: 800;
+          letter-spacing: 0.05em;
+          width: fit-content;
+          z-index: 5;
+          backdrop-filter: blur(8px);
+        }
+
+        .spin-gold-icon {
+          color: #ffd700;
+          animation: spinSlow 8s linear infinite;
+        }
+
+        @keyframes spinSlow {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .hero-card-title-box {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          z-index: 5;
+        }
+
+        .hero-card-brand {
+          font-family: var(--font-title);
+          font-size: 1.2rem;
+          font-weight: 850;
+          color: #ffffff;
+          letter-spacing: -0.01em;
+          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-card-sub {
+          font-size: 0.78rem;
+          color: #cbd5e1;
+          font-weight: 500;
+        }
+
+        .hero-floating-stat-badge {
+          position: absolute;
+          bottom: 16px;
+          right: 16px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(15, 23, 42, 0.85);
+          backdrop-filter: blur(10px);
+          padding: 5px 12px;
+          border-radius: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #f8fafc;
+          font-size: 0.72rem;
+          font-weight: 700;
+          z-index: 5;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+          animation: floatMini 4s ease-in-out infinite alternate;
+        }
+
+        .live-dot-green {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #10b981;
+          box-shadow: 0 0 8px #10b981;
+        }
+
+        @keyframes floatMini {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-4px); }
+        }
+
         /* FEATURE ITEMS */
         .info-features-list {
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 16px;
         }
 
         .info-feature-item {
           display: flex;
           gap: 16px;
+          padding: 10px 14px;
+          border-radius: 14px;
+          border: 1px solid transparent;
+          transition: all 0.25s ease;
+        }
+
+        .info-feature-item:hover {
+          background: rgba(255, 255, 255, 0.05);
+          border-color: rgba(255, 255, 255, 0.08);
+          transform: translateX(6px);
         }
 
         .feature-icon-box {
@@ -1208,18 +1337,22 @@ export default function UyelikPage() {
               <span>Anasayfaya Dön</span>
             </button>
 
-            {/* Premium Ceramic Tile Banner - Larger size */}
-            <div style={{
-              width: '100%',
-              height: '180px',
-              borderRadius: '16px',
-              backgroundImage: 'url("/ceramic_tile_premium.png")',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              border: '1.5px solid rgba(212, 175, 55, 0.3)',
-              boxShadow: '0 12px 32px rgba(0, 0, 0, 0.25)',
-              marginBottom: '28px'
-            }} />
+            {/* Pure CSS 3D Animated Luxury Ceramic Showcase (0ms Load Time, No External Images!) */}
+            <div className="pure-css-hero-card">
+              <div className="hero-card-pattern" />
+              <div className="hero-card-badge">
+                <Sparkles size={13} className="spin-gold-icon" />
+                <span>SERAMİKBAK AKILLI PLATFORM</span>
+              </div>
+              <div className="hero-card-title-box">
+                <span className="hero-card-brand">Tüm Markaların Fiyatlarını Karşılaştırın</span>
+                <span className="hero-card-sub">Bayilerden en iyi teklifleri toplayın, 3D stüdyoda deneyimleyin</span>
+              </div>
+              <div className="hero-floating-stat-badge">
+                <span className="live-dot-green" />
+                <span>81 İl Onaylı Bayi Ağı</span>
+              </div>
+            </div>
 
             <h1 className="info-title">
               Fırsatlardan ilk <span>sen haberdar ol</span>
