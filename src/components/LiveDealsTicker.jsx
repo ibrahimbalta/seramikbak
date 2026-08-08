@@ -87,7 +87,7 @@ export default function LiveDealsTicker() {
 
         {/* Fixed Right Social Proof (Desktop Only - 100% Real Live Database Metrics) */}
         <div className="ticker-social-proof">
-          <Activity size={14} style={{ color: '#38bdf8' }} />
+          <Activity size={14} style={{ color: '#0284c7' }} />
           {stats && stats.outletCount > 0 ? (
             <span>Sistemde <strong>{stats.outletCount} aktif outlet fırsatı</strong> ve <strong>{stats.dealerCount} bayi</strong> yayında</span>
           ) : stats && stats.todayLogsCount > 0 ? (
@@ -113,17 +113,18 @@ export default function LiveDealsTicker() {
           z-index: 100;
         }
 
+        /* Soft Warm Light Luxury Glass Styling - Harmonious with Page Header */
         .outlet-radar-ticker-bar {
           width: 100vw;
-          background: linear-gradient(90deg, #050811 0%, #0f172a 50%, #050811 100%);
-          border-top: 1px solid rgba(212, 175, 55, 0.35);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+          background: linear-gradient(90deg, #fbf9f5 0%, #ffffff 50%, #fbf9f5 100%);
+          border-top: 1px solid rgba(179, 142, 71, 0.18);
+          border-bottom: 1px solid rgba(179, 142, 71, 0.18);
           padding: 10px 24px;
           display: flex;
           align-items: center;
           gap: 20px;
           position: relative;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
           box-sizing: border-box;
           overflow: hidden;
         }
@@ -140,19 +141,19 @@ export default function LiveDealsTicker() {
           gap: 8px;
           padding: 6px 14px;
           border-radius: 20px;
-          background: rgba(239, 68, 68, 0.18);
-          border: 1px solid rgba(239, 68, 68, 0.5);
-          color: #f87171;
+          background: rgba(239, 68, 68, 0.08);
+          border: 1px solid rgba(239, 68, 68, 0.28);
+          color: #dc2626;
           font-size: 0.78rem;
           font-weight: 800;
           white-space: nowrap;
-          box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
+          box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
           transition: transform 0.2s ease, background 0.2s ease;
         }
 
         .live-badge-content:hover {
           transform: scale(1.03);
-          background: rgba(239, 68, 68, 0.28);
+          background: rgba(239, 68, 68, 0.14);
         }
 
         .live-pulse-dot {
@@ -215,57 +216,58 @@ export default function LiveDealsTicker() {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
-          background: rgba(255, 255, 255, 0.05) !important;
+          background: #ffffff !important;
           padding: 7px 16px !important;
           border-radius: 12px !important;
-          border: 1px solid rgba(255, 255, 255, 0.09) !important;
+          border: 1px solid rgba(0, 0, 0, 0.07) !important;
           font-size: 0.82rem !important;
           white-space: nowrap !important;
           text-decoration: none !important;
-          color: inherit !important;
-          transition: all 0.2s ease !important;
+          color: #1e293b !important;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
           flex-shrink: 0 !important;
         }
 
         :global(a.ticker-deal-card:hover) {
-          background: rgba(212, 175, 55, 0.16) !important;
-          border-color: rgba(212, 175, 55, 0.45) !important;
+          background: #ffffff !important;
+          border-color: rgba(179, 142, 71, 0.35) !important;
           transform: translateY(-1px) !important;
-          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.2) !important;
+          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.12) !important;
         }
 
         .deal-brand {
           font-weight: 800;
-          color: #ffd700;
+          color: #b38e47;
         }
 
         .deal-name {
-          color: #f8fafc;
+          color: #1e293b;
           font-weight: 600;
         }
 
         .deal-discount {
           padding: 2px 7px;
           border-radius: 6px;
-          background: rgba(34, 197, 94, 0.18);
-          border: 1px solid rgba(34, 197, 94, 0.35);
-          color: #4ade80;
+          background: rgba(16, 185, 129, 0.08);
+          border: 1px solid rgba(16, 185, 129, 0.25);
+          color: #059669;
           font-weight: 800;
           font-size: 0.74rem;
         }
 
         .deal-price {
           font-weight: 900;
-          color: #ffffff;
+          color: #0f172a;
         }
 
         .deal-dealer {
-          color: #94a3b8;
+          color: #64748b;
           font-size: 0.76rem;
         }
 
         :global(.deal-arrow) {
-          color: #ffd700;
+          color: #b38e47;
           opacity: 0.7;
           transition: transform 0.2s ease, opacity 0.2s ease;
         }
@@ -280,12 +282,16 @@ export default function LiveDealsTicker() {
           align-items: center;
           gap: 8px;
           font-size: 0.78rem;
-          color: #cbd5e1;
+          color: #475569;
           white-space: nowrap;
-          border-left: 1px solid rgba(255, 255, 255, 0.12);
+          border-left: 1px solid rgba(0, 0, 0, 0.08);
           padding-left: 16px;
           flex-shrink: 0;
           z-index: 5;
+        }
+
+        .ticker-social-proof strong {
+          color: #0f172a;
         }
 
         @media (max-width: 960px) {
