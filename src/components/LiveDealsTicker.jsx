@@ -176,7 +176,7 @@ export default function LiveDealsTicker() {
           align-items: center;
           gap: 20px;
           width: max-content;
-          animation: tickerSlide 35s linear infinite;
+          animation: tickerSlide 75s linear infinite;
         }
 
         .outlet-radar-track:hover {
