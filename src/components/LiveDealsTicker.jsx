@@ -14,7 +14,9 @@ export default function LiveDealsTicker() {
     { id: 6, brand: 'Graniser', name: 'Beton Gri 60x60 Outlet', dealer: 'Gebze Stok Depo', discount: '%50 Fırsat', price: '₺290 / m²', city: 'Kocaeli' }
   ]);
 
-  // Fetch real live outlet deals from API if available
+  const [stats, setStats] = useState(null);
+
+  // Fetch real live outlet deals & system stats from API
   useEffect(() => {
     fetch('/api/outlet?limit=12')
       .then((res) => res.json())
@@ -34,6 +36,17 @@ export default function LiveDealsTicker() {
       })
       .catch((err) => {
         console.warn('LiveDealsTicker: using default deals list', err);
+      });
+
+    fetch('/api/stats/ticker')
+      .then((res) => res.json())
+      .then((resData) => {
+        if (resData.success && resData.data) {
+          setStats(resData.data);
+        }
+      })
+      .catch((err) => {
+        console.warn('LiveDealsTicker: stats fetch error', err);
       });
   }, []);
 
@@ -72,10 +85,16 @@ export default function LiveDealsTicker() {
           </div>
         </div>
 
-        {/* Fixed Right Social Proof (Desktop Only) */}
+        {/* Fixed Right Social Proof (Desktop Only - 100% Real Live Database Metrics) */}
         <div className="ticker-social-proof">
           <Activity size={14} style={{ color: '#38bdf8' }} />
-          <span>Bugün <strong>1,420 usta & mimar</strong> bayilerden fiyat topladı</span>
+          {stats && stats.outletCount > 0 ? (
+            <span>Sistemde <strong>{stats.outletCount} aktif outlet fırsatı</strong> ve <strong>{stats.dealerCount} bayi</strong> yayında</span>
+          ) : stats && stats.todayLogsCount > 0 ? (
+            <span>Bugün <strong>{stats.todayLogsCount} canlı arama & teklif</strong> kaydedildi</span>
+          ) : (
+            <span>Canlı Türkiye <strong>Bayi & Stok Fırsatları</strong> Radarı</span>
+          )}
         </div>
       </div>
 
