@@ -3422,17 +3422,19 @@ export default function Home() {
                 href="/uyelik?tab=overview" 
                 className="mobile-header-user-btn logged-in" 
                 title="Kullanıcı Paneline Git"
+                style={{ textDecoration: 'none', color: '#b38e47' }}
               >
                 <div className="user-avatar-mini">{currentUser.name.charAt(0).toUpperCase()}</div>
-                <span className="mobile-user-label">Panelim</span>
+                <span className="mobile-user-label">{currentUser.name.split(' ')[0]}</span>
               </Link>
             ) : (
               <Link 
                 href="/uyelik" 
                 className="mobile-header-user-btn" 
                 title="Giriş Yap / Üye Ol"
+                style={{ textDecoration: 'none', color: '#b38e47' }}
               >
-                <UserIcon size={16} />
+                <UserIcon size={15} />
                 <span className="mobile-user-label">Giriş</span>
               </Link>
             )}
@@ -9758,41 +9760,54 @@ export default function Home() {
           .mobile-header-user-actions {
             display: flex !important;
             align-items: center;
-            margin-right: 4px;
+            margin-right: 6px;
           }
-          .mobile-header-user-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background: rgba(179, 142, 71, 0.12);
-            border: 1px solid rgba(179, 142, 71, 0.3);
-            color: #b38e47;
-            text-decoration: none;
-            font-size: 0.78rem;
-            font-weight: 800;
-            transition: all 0.2s ease;
+          :global(a.mobile-header-user-btn),
+          :global(.mobile-header-user-btn) {
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            padding: 4px 10px 4px 5px !important;
+            border-radius: 20px !important;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.16) 0%, rgba(179, 142, 71, 0.08) 100%) !important;
+            border: 1px solid rgba(212, 175, 55, 0.35) !important;
+            color: #b38e47 !important;
+            text-decoration: none !important;
+            font-size: 0.76rem !important;
+            font-weight: 800 !important;
+            line-height: 1 !important;
+            white-space: nowrap !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 2px 8px rgba(179, 142, 71, 0.12) !important;
+            outline: none !important;
           }
-          .mobile-header-user-btn.logged-in {
-            background: linear-gradient(135deg, rgba(179, 142, 71, 0.18) 0%, rgba(212, 175, 55, 0.1) 100%);
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            box-shadow: 0 2px 8px rgba(179, 142, 71, 0.15);
+          :global(a.mobile-header-user-btn:hover),
+          :global(.mobile-header-user-btn:hover),
+          :global(a.mobile-header-user-btn:visited),
+          :global(.mobile-header-user-btn:visited) {
+            color: #b38e47 !important;
+            text-decoration: none !important;
           }
-          .mobile-header-user-btn .user-avatar-mini {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #b38e47 0%, #d4af37 100%);
-            color: #ffffff;
-            font-size: 0.75rem;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+          :global(.mobile-header-user-btn .user-avatar-mini) {
+            width: 24px !important;
+            height: 24px !important;
+            border-radius: 50% !important;
+            background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%) !important;
+            color: #ffffff !important;
+            font-size: 0.75rem !important;
+            font-weight: 900 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 2px 6px rgba(179, 142, 71, 0.3) !important;
+            flex-shrink: 0 !important;
           }
-          .mobile-user-label {
-            font-weight: 800;
+          :global(.mobile-header-user-btn .mobile-user-label) {
+            font-weight: 800 !important;
+            color: #b38e47 !important;
+            text-decoration: none !important;
+            font-size: 0.76rem !important;
+            line-height: 1 !important;
           }
           .hamburger-menu-btn {
             display: flex !important;
