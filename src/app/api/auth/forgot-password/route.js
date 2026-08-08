@@ -9,7 +9,7 @@ export async function POST(request) {
 
     if (!email || !email.trim()) {
       return NextResponse.json(
-        { error: 'Lütfen e-posta adresinizi girin.' },
+        { error: 'Lütfen kayıtlı e-posta adresinizi girin.' },
         { status: 400 }
       );
     }
@@ -24,7 +24,7 @@ export async function POST(request) {
     if (!user) {
       return NextResponse.json(
         { 
-          error: `"${trimmedEmail}" adresiyle kayıtlı bir kullanıcı bulunamadı. Lütfen e-posta adresinizi doğru yazdığınızdan emin olun veya 'Hesap Oluştur' seçeneğinden ücretsiz kayıt olun.` 
+          error: `Girmiş olduğunuz (${trimmedEmail}) e-posta adresi sistemimizde kayıtlı değildir. Lütfen e-posta adresinizi kontrol edin veya 'Hesap Oluştur' kısmından ücretsiz kayıt olun.` 
         },
         { status: 404 }
       );

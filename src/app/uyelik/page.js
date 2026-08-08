@@ -11,6 +11,7 @@ import {
   ArrowLeft, 
   Loader2, 
   CheckCircle,
+  XCircle,
   Building2,
   Phone,
   User,
@@ -1280,6 +1281,32 @@ export default function UyelikPage() {
         .forgot-link:hover {
           color: #b38e47;
         }
+
+        .form-feedback {
+          padding: 12px 16px;
+          border-radius: 12px;
+          font-size: 0.82rem;
+          font-weight: 600;
+          line-height: 1.45;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 18px;
+        }
+
+        .form-feedback.error {
+          background: #fef2f2;
+          color: #dc2626;
+          border: 1px solid #fecaca;
+          box-shadow: 0 4px 12px rgba(220, 38, 38, 0.06);
+        }
+
+        .form-feedback.success {
+          background: #f0fdf4;
+          color: #15803d;
+          border: 1px solid #bbf7d0;
+          box-shadow: 0 4px 12px rgba(21, 128, 61, 0.06);
+        }
       `}</style>
 
       <div className="uyelik-light-grid">
@@ -1408,8 +1435,18 @@ export default function UyelikPage() {
           </div>
 
           {/* Feedback Messages */}
-          {error && <div className="form-feedback error" style={{ marginBottom: '16px' }}>{error}</div>}
-          {success && <div className="form-feedback success" style={{ marginBottom: '16px' }}>{success}</div>}
+          {error && (
+            <div className="form-feedback error">
+              <XCircle size={18} style={{ flexShrink: 0, color: '#dc2626' }} />
+              <span>{error}</span>
+            </div>
+          )}
+          {success && (
+            <div className="form-feedback success">
+              <CheckCircle size={18} style={{ flexShrink: 0, color: '#15803d' }} />
+              <span>{success}</span>
+            </div>
+          )}
 
           {authTab === 'forgot' ? (
             <form onSubmit={handleForgotPasswordSubmit} className="auth-form">
