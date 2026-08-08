@@ -158,6 +158,8 @@ export const viewport = {
   ],
 };
 
+import { LanguageProvider } from "@/lib/languageContext";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="tr" className={`${outfit.variable} ${plusJakarta.variable}`}>
@@ -203,7 +205,9 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

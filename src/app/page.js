@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
+import LanguageSelector from '@/components/LanguageSelector';
+import { useLanguage } from '@/lib/languageContext';
 
 import { 
   Search as SearchIcon, 
@@ -690,6 +692,8 @@ const DEFAULT_MOODBOARD_COMBOS = [
 ];
 
 export default function Home() {
+  const { t, lang, translateStyle, translateFinish } = useLanguage();
+
   // Page Preloader State
   const [pageLoading, setPageLoading] = useState(true);
   const [initialBrandsLoaded, setInitialBrandsLoaded] = useState(false);
@@ -3409,14 +3413,16 @@ export default function Home() {
                 ) : (
                   <button className="header-btn account-btn" onClick={() => window.location.href = '/uyelik'}>
                     <UserIcon size={16} />
-                    <span>Üyelik</span>
+                    <span>{t('account')}</span>
                   </button>
                 )}
               </>
             )}
+            <LanguageSelector />
           </div>
           {/* Mobile Header Actions (Visible on mobile <= 960px) */}
-          <div className="mobile-header-user-actions">
+          <div className="mobile-header-user-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <LanguageSelector compact />
             {currentUser ? (
               <Link 
                 href="/uyelik?tab=overview" 

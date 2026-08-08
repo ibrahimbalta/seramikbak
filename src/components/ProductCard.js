@@ -1,5 +1,8 @@
+'use client';
+
 import { Heart as HeartIcon } from 'lucide-react';
 import TileVisualPreview from './TileVisualPreview';
+import { useLanguage } from '@/lib/languageContext';
 
 export default function ProductCard({
   product,
@@ -15,6 +18,7 @@ export default function ProductCard({
   handleProductCardClick,
   onOpenAR
 }) {
+  const { t, translateFinish, translateStyle } = useLanguage();
   const hasAd = product.campaigns && product.campaigns.length > 0;
   
   return (
@@ -37,19 +41,19 @@ export default function ProductCard({
         <button 
           className={`card-compare-btn-overlay ${comparedProducts.some(p => p.id === product.id) ? 'active' : ''}`} 
           onClick={(e) => { e.stopPropagation(); toggleCompareProduct(product); }}
-          title="Karşılaştır"
+          title={t('comparePrices')}
         >
           <span className="compare-icon-indicator">
             {comparedProducts.some(p => p.id === product.id) ? '✓' : '+'}
           </span>
-          <span>{comparedProducts.some(p => p.id === product.id) ? 'Seçildi' : 'Karşılaştır'}</span>
+          <span>{comparedProducts.some(p => p.id === product.id) ? '✓' : '+'}</span>
         </button>
         
         {/* Heart icon button overlay */}
         <button 
           className="card-favorites-heart-btn" 
           onClick={(e) => { e.stopPropagation(); handleToggleFavorite(product.id); }}
-          title="Favorilerime Ekle"
+          title={t('addToFavorites')}
         >
           <HeartIcon size={16} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
         </button>
@@ -61,13 +65,13 @@ export default function ProductCard({
             className="btn-primary card-action-btn-new"
             style={{ fontSize: '0.65rem', padding: '6px 4px' }}
           >
-            3D Dene
+            3D
           </button>
           <button 
             onClick={(e) => { e.stopPropagation(); onOpenAR ? onOpenAR(product) : navigateTo3DStudio(product); }}
             className="btn-primary card-action-btn-new"
             style={{ fontSize: '0.65rem', padding: '6px 4px', backgroundColor: 'var(--accent-gold)', borderColor: 'var(--accent-gold)' }}
-            title="Kamerayla Evinizde Görün (AR)"
+            title="AR"
           >
             📷 AR
           </button>
@@ -76,7 +80,7 @@ export default function ProductCard({
             className="btn-secondary card-action-btn-new"
             style={{ fontSize: '0.65rem', padding: '6px 4px' }}
           >
-            Bayi Bul
+            {t('dealers')}
           </button>
         </div>
       </div>
@@ -86,7 +90,7 @@ export default function ProductCard({
         <div className="card-badges-row-new">
           {hasAd && (
             <span className="card-badge-tag-new gold animate-pulse" style={{ animationDuration: '1.2s' }}>
-              SPONSORLU
+              SPONSOR
             </span>
           )}
           {(() => {
@@ -97,16 +101,11 @@ export default function ProductCard({
               </span>
             );
           })()}
-          <span className="card-badge-tag-new grey">{product.finish}</span>
-          {product.similarityScore !== undefined && product.similarityScore > 0 && (
-            <span className="card-badge-tag-new gold animate-pulse">
-              %{product.similarityScore} {product.isFallback ? 'Renk Uyumu' : 'Eşleşme'}
-            </span>
-          )}
+          <span className="card-badge-tag-new grey">{translateFinish(product.finish) || product.finish}</span>
         </div>
         
         <h4 className="card-title-new">{product.name}</h4>
-        <p className="card-specs-new">{product.width}x{product.height} cm</p>
+        <p className="card-specs-new">{product.width}x{product.height} cm • {translateStyle(product.style) || product.style}</p>
         <p className="card-brand-new">{product.brand?.name}</p>
       </div>
     </div>
