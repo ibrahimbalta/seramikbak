@@ -3278,12 +3278,12 @@ export default function Home() {
           <div className="utility-right" style={{ marginLeft: 'auto' }}>
             <Link href="/" className="utility-item portal-link" onClick={() => setActiveTab('search')}>
               <HomeIcon size={13} />
-              <span style={{ fontWeight: '800' }}>Anasayfa</span>
+              <span style={{ fontWeight: '800' }}>{t('home')}</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/hakkimizda" className="utility-item portal-link">
               <Info size={13} />
-              <span>Hakkımızda</span>
+              <span>{t('about')}</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/ilham" className="utility-item portal-link">
@@ -3312,7 +3312,7 @@ export default function Home() {
             <span className="utility-divider">|</span>
             <Link href="/proje-talep" className="utility-item b2b-btn-link">
               <Building2 size={13} />
-              <span>Proje Talebi (B2B)</span>
+              <span>{t('b2bQuotes')}</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/outlet" className="utility-item outlet-btn-link">
@@ -3346,15 +3346,15 @@ export default function Home() {
             <>
               <button className={`nav-link ${activeTab === 'search' ? 'active' : ''}`} onClick={() => setActiveTab('search')}>
                 <SearchIcon size={14} />
-                <span>Arama Motoru</span>
+                <span>{t('products')}</span>
               </button>
               <button className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); }}>
                 <Palette size={14} />
-                <span>3D Sanal Stüdyo</span>
+                <span>{t('studio3d')}</span>
               </button>
               <button className={`nav-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); }}>
                 <MapPin size={14} />
-                <span>Bayi Bulucu</span>
+                <span>{t('dealers')}</span>
               </button>
             </>
           )}
