@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Activity, ArrowUpRight, Flame, Sparkles } from 'lucide-react';
+import { Activity, ArrowUpRight } from 'lucide-react';
 
 export default function LiveDealsTicker() {
   const deals = [
@@ -13,86 +13,94 @@ export default function LiveDealsTicker() {
     { id: 6, brand: 'Graniser', name: 'Beton Gri 60x60 Outlet', dealer: 'Gebze Stok Depo', discount: '%50 Fırsat', price: '₺290 / m²', city: 'Kocaeli' }
   ];
 
-  // Double the array for seamless infinite looping (Borsa Ticker effect)
-  const tickerDeals = [...deals, ...deals];
+  // Quadruple the array for an unbroken, 100% seamless infinite loop across wide screens
+  const tickerDeals = [...deals, ...deals, ...deals, ...deals];
 
   return (
-    <div className="live-ticker-container">
-      {/* Fixed Left Live Badge */}
-      <Link href="/outlet" className="live-badge-link" title="Tüm Outlet ve Stoklu İndirimleri Gör">
-        <div className="live-badge-content">
-          <span className="live-pulse-dot" />
-          <span>CANLI FIRSAT RADARI</span>
-        </div>
-      </Link>
+    <div className="live-ticker-fullwidth-wrapper">
+      <div className="live-ticker-container">
+        {/* Left Fixed Badge */}
+        <Link href="/outlet" className="live-badge-link" title="Tüm Outlet ve Stoklu İndirimleri Gör">
+          <div className="live-badge-content">
+            <span className="live-pulse-dot" />
+            <span>CANLI FIRSAT RADARI</span>
+          </div>
+        </Link>
 
-      {/* Infinite Smooth Scrolling Ticker Track */}
-      <div className="ticker-viewport">
-        <div className="ticker-track">
-          {tickerDeals.map((deal, idx) => (
-            <Link
-              key={`${deal.id}-${idx}`}
-              href="/outlet"
-              className="ticker-deal-card"
-              title={`${deal.brand} ${deal.name} - Outlet İlanına Git`}
-            >
-              <span className="deal-brand">[{deal.brand}]</span>
-              <span className="deal-name">{deal.name}</span>
-              <span className="deal-discount">{deal.discount}</span>
-              <span className="deal-price">{deal.price}</span>
-              <span className="deal-dealer">• {deal.dealer} ({deal.city})</span>
-              <ArrowUpRight size={13} className="deal-arrow" />
-            </Link>
-          ))}
+        {/* Viewport & Endless Ticker Track */}
+        <div className="ticker-viewport">
+          <div className="ticker-track">
+            {tickerDeals.map((deal, idx) => (
+              <Link
+                key={`${deal.id}-${idx}`}
+                href="/outlet"
+                className="ticker-deal-card"
+                title={`${deal.brand} ${deal.name} - Outlet İlanına Git`}
+              >
+                <span className="deal-brand">[{deal.brand}]</span>
+                <span className="deal-name">{deal.name}</span>
+                <span className="deal-discount">{deal.discount}</span>
+                <span className="deal-price">{deal.price}</span>
+                <span className="deal-dealer">• {deal.dealer} ({deal.city})</span>
+                <ArrowUpRight size={13} className="deal-arrow" />
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Fixed Right Social Proof Badge (Desktop Only) */}
-      <div className="ticker-social-proof">
-        <Activity size={14} style={{ color: '#38bdf8' }} />
-        <span>Bugün <strong>1,420 usta & mimar</strong> bayilerden fiyat topladı</span>
+        {/* Right Fixed Social Proof (Desktop) */}
+        <div className="ticker-social-proof">
+          <Activity size={14} style={{ color: '#38bdf8' }} />
+          <span>Bugün <strong>1,420 usta & mimar</strong> bayilerden fiyat topladı</span>
+        </div>
       </div>
 
       <style jsx>{`
-        .live-ticker-container {
-          background: linear-gradient(90deg, #070a12 0%, #0f172a 50%, #070a12 100%);
-          border-top: 1px solid rgba(212, 175, 55, 0.3);
-          border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-          padding: 10px 16px;
+        .live-ticker-fullwidth-wrapper {
+          width: 100%;
           margin: 20px 0;
+          position: relative;
+        }
+
+        .live-ticker-container {
+          width: 100%;
+          background: linear-gradient(90deg, #050811 0%, #0f172a 50%, #050811 100%);
+          border-top: 1px solid rgba(212, 175, 55, 0.35);
+          border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+          padding: 12px 24px;
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 20px;
           overflow: hidden;
           position: relative;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
         }
 
         :global(a.live-badge-link) {
           text-decoration: none !important;
           flex-shrink: 0;
-          z-index: 2;
+          z-index: 5;
         }
 
         .live-badge-content {
           display: flex;
           align-items: center;
           gap: 8px;
-          padding: 6px 12px;
+          padding: 6px 14px;
           border-radius: 20px;
-          background: rgba(239, 68, 68, 0.15);
-          border: 1px solid rgba(239, 68, 68, 0.45);
+          background: rgba(239, 68, 68, 0.16);
+          border: 1px solid rgba(239, 68, 68, 0.5);
           color: #f87171;
-          font-size: 0.76rem;
+          font-size: 0.78rem;
           font-weight: 800;
           white-space: nowrap;
-          box-shadow: 0 0 14px rgba(239, 68, 68, 0.25);
+          box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
           transition: transform 0.2s ease, background 0.2s ease;
         }
 
         .live-badge-content:hover {
           transform: scale(1.03);
-          background: rgba(239, 68, 68, 0.25);
+          background: rgba(239, 68, 68, 0.28);
         }
 
         .live-pulse-dot {
@@ -124,16 +132,16 @@ export default function LiveDealsTicker() {
           flex: 1;
           overflow: hidden;
           position: relative;
-          mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
-          -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+          mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
+          -webkit-mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
         }
 
         .ticker-track {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 20px;
           width: max-content;
-          animation: tickerSlide 28s linear infinite;
+          animation: tickerSlide 40s linear infinite;
         }
 
         .ticker-track:hover {
@@ -153,11 +161,11 @@ export default function LiveDealsTicker() {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
-          background: rgba(255, 255, 255, 0.05) !important;
-          padding: 6px 14px !important;
+          background: rgba(255, 255, 255, 0.04) !important;
+          padding: 7px 16px !important;
           border-radius: 12px !important;
-          border: 1px solid rgba(255, 255, 255, 0.1) !important;
-          font-size: 0.8rem !important;
+          border: 1px solid rgba(255, 255, 255, 0.08) !important;
+          font-size: 0.82rem !important;
           white-space: nowrap !important;
           text-decoration: none !important;
           color: inherit !important;
@@ -169,7 +177,7 @@ export default function LiveDealsTicker() {
           background: rgba(212, 175, 55, 0.15) !important;
           border-color: rgba(212, 175, 55, 0.4) !important;
           transform: translateY(-1px) !important;
-          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15) !important;
+          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.2) !important;
         }
 
         .deal-brand {
@@ -186,7 +194,7 @@ export default function LiveDealsTicker() {
           padding: 2px 7px;
           border-radius: 6px;
           background: rgba(34, 197, 94, 0.18);
-          border: 1px solid rgba(34, 197, 94, 0.3);
+          border: 1px solid rgba(34, 197, 94, 0.35);
           color: #4ade80;
           font-weight: 800;
           font-size: 0.74rem;
@@ -199,7 +207,7 @@ export default function LiveDealsTicker() {
 
         .deal-dealer {
           color: #94a3b8;
-          font-size: 0.75rem;
+          font-size: 0.76rem;
         }
 
         :global(.deal-arrow) {
@@ -217,12 +225,13 @@ export default function LiveDealsTicker() {
           display: flex;
           align-items: center;
           gap: 8px;
-          font-size: 0.76rem;
+          font-size: 0.78rem;
           color: #cbd5e1;
           white-space: nowrap;
           border-left: 1px solid rgba(255, 255, 255, 0.12);
-          padding-left: 14px;
+          padding-left: 16px;
           flex-shrink: 0;
+          z-index: 5;
         }
 
         @media (max-width: 960px) {
@@ -230,9 +239,9 @@ export default function LiveDealsTicker() {
             display: none;
           }
           .live-ticker-container {
-            padding: 8px 12px;
+            padding: 10px 12px;
             margin: 14px 0;
-            gap: 10px;
+            gap: 12px;
           }
         }
       `}</style>
