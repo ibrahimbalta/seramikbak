@@ -3420,30 +3420,6 @@ export default function Home() {
             )}
             <LanguageSelector />
           </div>
-          {/* Mobile Header Actions (Visible on mobile <= 960px) */}
-          <div className="mobile-header-user-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {currentUser ? (
-              <Link 
-                href="/uyelik?tab=overview" 
-                className="mobile-header-user-btn logged-in" 
-                title="Kullanıcı Paneline Git"
-                style={{ textDecoration: 'none', color: '#b38e47' }}
-              >
-                <div className="user-avatar-mini">{currentUser.name.charAt(0).toUpperCase()}</div>
-                <span className="mobile-user-label">{currentUser.name.split(' ')[0]}</span>
-              </Link>
-            ) : (
-              <Link 
-                href="/uyelik" 
-                className="mobile-header-user-btn" 
-                title="Giriş Yap / Üye Ol"
-                style={{ textDecoration: 'none', color: '#b38e47' }}
-              >
-                <UserIcon size={15} />
-                <span className="mobile-user-label">Giriş</span>
-              </Link>
-            )}
-          </div>
           <button className="hamburger-menu-btn" onClick={() => setShowMobileMenu(!showMobileMenu)} aria-label="Menü">
             <MenuIcon size={20} />
           </button>
