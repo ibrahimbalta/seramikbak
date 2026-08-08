@@ -72,17 +72,17 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
       {/* Top Header Row (Compact Single Line) */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '16px', background: 'rgba(212, 175, 55, 0.2)', border: '1px solid rgba(212, 175, 55, 0.4)', color: '#ffd700', fontSize: '0.75rem', fontWeight: '800' }}>
-            <Calculator size={13} /> METRAJ & MALİYET ROBOTU
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '16px', background: 'rgba(212, 175, 55, 0.2)', border: '1px solid rgba(212, 175, 55, 0.4)', color: '#ffd700', fontSize: '0.75rem', fontWeight: '800', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <Calculator size={13} /> MALİYET ROBOTU
           </div>
-          <h4 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: '#ffffff', textShadow: '0 2px 6px rgba(0,0,0,0.6)' }}>
+          <h4 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: '#ffffff', textShadow: '0 2px 6px rgba(0,0,0,0.6)' }}>
             Projenizin Malzeme ve Kutu İhtiyacını Anında Hesaplayın
           </h4>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#e2e8f0', background: 'rgba(0,0,0,0.25)', padding: '4px 12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#e2e8f0', background: 'rgba(0,0,0,0.25)', padding: '4px 12px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)', whiteSpace: 'nowrap', flexShrink: 0 }}>
           <ShieldCheck size={14} style={{ color: '#38bdf8' }} />
-          <span>%100 Doğru Kutu & Fire Hesabı</span>
+          <span>%100 Doğru Kutu & Fire</span>
         </div>
       </div>
 
@@ -114,7 +114,8 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
                     cursor: 'pointer',
                     background: roomType === item.id ? '#d4af37' : 'rgba(255,255,255,0.1)',
                     color: roomType === item.id ? '#0f172a' : '#f8fafc',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   {item.label}
@@ -223,7 +224,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
               background: 'linear-gradient(135deg, #d4af37 0%, #c59b27 100%)',
               color: '#0f172a',
               fontWeight: '900',
-              fontSize: '0.85rem',
+              fontSize: '0.88rem',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
@@ -231,10 +232,11 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
               justifyContent: 'center',
               gap: '6px',
               boxShadow: '0 4px 14px rgba(212, 175, 55, 0.35)',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              whiteSpace: 'nowrap'
             }}
           >
-            <span>Bu Metraj İçin En Yakın Bayilerden Teklif Al</span>
+            <span>Bayilerden Teklif Al</span>
             <ArrowRight size={15} />
           </button>
         </div>
