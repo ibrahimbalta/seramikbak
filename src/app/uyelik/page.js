@@ -38,6 +38,8 @@ export default function UyelikPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [verifiedUserName, setVerifiedUserName] = useState('');
+  const [activeResetToken, setActiveResetToken] = useState('');
+  const [emailSentSuccess, setEmailSentSuccess] = useState(false);
 
   // Logged-in User Session State
   const [currentUser, setCurrentUser] = useState(null);
@@ -55,18 +57,49 @@ export default function UyelikPage() {
       setName(user.name);
       setEmail(user.email);
       loadDashboardData(user);
+    }
 
-      // Parse query tab parameter
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const t = params.get('tab');
-        if (t === 'settings' || t === 'favorites' || t === 'projects' || t === 'overview') {
-          setActiveTab(t);
-        }
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const t = params.get('tab');
+      if (t === 'settings' || t === 'favorites' || t === 'projects' || t === 'overview') {
+        setActiveTab(t);
+      }
+
+      const resetTokenParam = params.get('resetToken');
+      if (resetTokenParam) {
+        setAuthTab('forgot');
+        setActiveResetToken(resetTokenParam);
+        validateTokenOnMount(resetTokenParam);
       }
     }
     setIsCheckingAuth(false);
   }, []);
+
+  const validateTokenOnMount = async (token) => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'validate_token', resetToken: token })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setResetStep(2);
+        if (data.email) setEmail(data.email);
+        if (data.userName) setVerifiedUserName(data.userName);
+        setSuccess(`✓ E-posta Güvenlik Doğrulaması Başarılı! Sn. ${data.userName} (${data.email}), lütfen yeni şifrenizi belirleyin.`);
+      } else {
+        setError(data.error || 'Şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş.');
+        setResetStep(1);
+      }
+    } catch (err) {
+      setError('Bağlantı doğrulama hatası oluştu.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadDashboardData = async (user) => {
     setLoadingData(true);
@@ -165,7 +198,7 @@ export default function UyelikPage() {
 
     try {
       if (resetStep === 1) {
-        // Step 1: Verify Registered Email Address in DB
+        // Step 1: Send Password Reset Token Link via Email
         const res = await fetch('/api/auth/forgot-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -174,14 +207,13 @@ export default function UyelikPage() {
         const data = await res.json();
 
         if (res.ok && data.success) {
-          setSuccess(data.message || '✓ Kayıtlı e-posta adresiniz doğrulandı.');
-          if (data.userName) setVerifiedUserName(data.userName);
-          setResetStep(2);
+          setEmailSentSuccess(true);
+          setSuccess(data.message || `✓ Şifre sıfırlama bağlantısı e-posta adresinize (${email}) gönderildi.`);
         } else {
           setError(data.error || 'Bu e-posta adresi ile kayıtlı bir kullanıcı bulunamadı. Lütfen e-posta adresinizi doğru yazdığınızdan emin olun.');
         }
       } else {
-        // Step 2: Set New Password
+        // Step 2: Set New Password via Verified Token
         if (newPassword !== confirmPassword) {
           setError('Girilen yeni şifreler birbiriyle eşleşmiyor. Lütfen tekrar kontrol edin.');
           setLoading(false);
@@ -191,7 +223,7 @@ export default function UyelikPage() {
         const res = await fetch('/api/auth/forgot-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'reset_password', email, newPassword })
+          body: JSON.stringify({ action: 'reset_password', resetToken: activeResetToken, newPassword })
         });
         const data = await res.json();
 
@@ -1463,23 +1495,40 @@ export default function UyelikPage() {
               </div>
 
               {resetStep === 1 ? (
-                <>
-                  <div className="input-group">
-                    <label>E-posta Adresiniz</label>
-                    <input 
-                      type="email" 
-                      required 
-                      placeholder="ornek@email.com" 
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="auth-input"
-                    />
+                emailSentSuccess ? (
+                  <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📬</div>
+                    <h4 style={{ fontSize: '0.9rem', fontWeight: '800', margin: '0 0 6px 0', color: '#0f172a' }}>E-postanızı Kontrol Edin</h4>
+                    <p style={{ fontSize: '0.78rem', color: '#475569', lineHeight: '1.5', margin: '0 0 16px 0' }}>
+                      <strong>{email}</strong> adresinize tek kullanımlık güvenli şifre sıfırlama bağlantısı gönderilmiştir. Lütfen e-postanızın gelen kutusunu veya spam klasörünü kontrol edin.
+                    </p>
+                    <button 
+                      type="button" 
+                      onClick={() => { setEmailSentSuccess(false); setSuccess(''); setError(''); }}
+                      style={{ background: '#e2e8f0', color: '#0f172a', border: 'none', padding: '8px 14px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
+                    >
+                      Tekrar Mail Gönder
+                    </button>
                   </div>
+                ) : (
+                  <>
+                    <div className="input-group">
+                      <label>E-posta Adresiniz</label>
+                      <input 
+                        type="email" 
+                        required 
+                        placeholder="ornek@email.com" 
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="auth-input"
+                      />
+                    </div>
 
-                  <button type="submit" className="submit-btn" disabled={loading}>
-                    {loading ? <Loader2 className="animate-spin" size={18} /> : 'Devam Et & Şifre Yenile'}
-                  </button>
-                </>
+                    <button type="submit" className="submit-btn" disabled={loading}>
+                      {loading ? <Loader2 className="animate-spin" size={18} /> : 'Şifre Sıfırlama Bağlantısı Gönder'}
+                    </button>
+                  </>
+                )
               ) : (
                 <>
                   <div className="input-group">
@@ -1513,7 +1562,7 @@ export default function UyelikPage() {
 
               <button 
                 type="button" 
-                onClick={() => { setAuthTab('login'); setResetStep(1); setError(''); setSuccess(''); }} 
+                onClick={() => { setAuthTab('login'); setResetStep(1); setEmailSentSuccess(false); setActiveResetToken(''); setError(''); setSuccess(''); }} 
                 className="google-btn"
                 style={{ marginTop: '6px' }}
               >
