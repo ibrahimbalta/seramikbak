@@ -3275,10 +3275,33 @@ export default function Home() {
       {/* Top Utility Bar (B2B and Corporate Portal Links) */}
       {!isKioskMode && (
         <div className="top-utility-bar glass-panel-dark">
-          <div className="utility-left" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: '#94a3b8', fontWeight: '600' }}>
-            <span>✦ Türkiye'nin Akıllı Seramik Arama Motoru & B2B İhracat Portalı</span>
-          </div>
-          <div className="utility-right" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="utility-right" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+            <Link href="/" className="utility-item portal-link" onClick={() => setActiveTab('search')}>
+              <HomeIcon size={13} />
+              <span>{t('home')}</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/outlet" className="utility-item outlet-btn-link">
+              <Sparkles size={13} style={{ color: '#ef4444' }} />
+              <span style={{ color: '#ef4444', fontWeight: '800' }}>{t('outlet')}</span>
+              <span className="outlet-small-badge">Fırsat</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/ustalar" className="utility-item portal-link">
+              <Wrench size={13} style={{ color: '#b45309' }} />
+              <span style={{ color: '#b45309', fontWeight: '800' }}>{t('installers')}</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/ilham" className="utility-item portal-link">
+              <Sparkles size={13} />
+              <span>{t('inspiration')}</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/hakkimizda" className="utility-item portal-link">
+              <Info size={13} />
+              <span>{t('about')}</span>
+            </Link>
+            <span className="utility-divider">|</span>
             <button 
               onClick={() => setIsKioskMode(true)} 
               className="utility-item kiosk-btn-link"
@@ -3333,22 +3356,6 @@ export default function Home() {
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
               </button>
-              <Link href="/outlet" className="nav-link" style={{ textDecoration: 'none' }}>
-                <Sparkles size={14} style={{ color: '#ef4444' }} />
-                <span style={{ color: '#ef4444', fontWeight: '800' }}>{t('outlet')}</span>
-              </Link>
-              <Link href="/ustalar" className="nav-link" style={{ textDecoration: 'none' }}>
-                <Wrench size={14} style={{ color: '#b45309' }} />
-                <span>{t('installers')}</span>
-              </Link>
-              <Link href="/ilham" className="nav-link" style={{ textDecoration: 'none' }}>
-                <Sparkles size={14} />
-                <span>{t('inspiration')}</span>
-              </Link>
-              <Link href="/hakkimizda" className="nav-link" style={{ textDecoration: 'none' }}>
-                <Info size={14} />
-                <span>{t('about')}</span>
-              </Link>
             </>
           )}
         </nav>
@@ -9051,6 +9058,15 @@ export default function Home() {
           align-items: center;
           gap: 8px;
           letter-spacing: 0.02em;
+          white-space: nowrap !important;
+          flex-shrink: 0;
+        }
+
+        .nav-link span {
+          white-space: nowrap !important;
+          word-break: keep-all !important;
+          line-height: 1 !important;
+          display: inline-block !important;
         }
 
         .nav-link svg {
