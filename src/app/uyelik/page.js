@@ -789,10 +789,6 @@ export default function UyelikPage() {
                     <label>E-posta Adresiniz</label>
                     <input type="email" className="auth-input" value={email} onChange={e => setEmail(e.target.value)} required />
                   </div>
-                  <div className="input-group">
-                    <label>Şifre Güncelleme (Boş bırakırsanız değişmez)</label>
-                    <input type="password" className="auth-input" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} />
-                  </div>
                   <button type="submit" disabled={loading} className="submit-btn">
                     {loading ? <Loader2 size={16} className="animate-spin" /> : null}
                     <span>Ayarları Kaydet</span>
@@ -807,251 +803,238 @@ export default function UyelikPage() {
   }
 
   return (
-    <div className="uyelik-page-wrapper">
+    <div className="uyelik-light-page-wrapper">
       <style jsx global>{`
-        .uyelik-page-wrapper {
+        .uyelik-light-page-wrapper {
           min-height: 100vh;
-          background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+          background: radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.05) 0%, #f8fafc 90%);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-family: 'Inter', system-ui, -apple-system, sans-serif;
-          padding: 40px 20px;
+          padding: 40px 24px;
+          font-family: var(--font-body);
         }
 
-        .uyelik-container {
-          max-width: 1080px;
+        .uyelik-light-grid {
+          max-width: 1180px;
           width: 100%;
-          background: #ffffff;
-          border-radius: 24px;
-          box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
-          border: 1px solid rgba(226, 232, 240, 0.8);
-          overflow: hidden;
           display: grid;
-          grid-template-columns: 1.1fr 0.9fr;
+          grid-template-columns: 1.15fr 0.85fr;
+          gap: 48px;
+          align-items: start;
         }
 
-        @media (max-width: 900px) {
-          .uyelik-container {
+        @media (max-width: 960px) {
+          .uyelik-light-grid {
             grid-template-columns: 1fr;
-          }
-          .uyelik-info-side {
-            padding: 40px 30px !important;
+            gap: 32px;
           }
         }
 
-        /* LEFT INFO SIDE */
-        .uyelik-info-side {
-          padding: 60px 50px;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-          color: #ffffff;
+        /* LEFT COLUMN LIGHT STYLING */
+        .uyelik-left-content {
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
-          position: relative;
-          overflow: hidden;
+          gap: 22px;
         }
 
-        .back-btn {
+        .back-to-home-btn {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          color: #94a3b8;
-          font-size: 0.85rem;
-          font-weight: 600;
-          text-decoration: none;
-          margin-bottom: 30px;
-          transition: color 0.2s;
-          cursor: pointer;
-          background: none;
-          border: none;
-          padding: 0;
-        }
-
-        .back-btn:hover {
-          color: #ffffff;
-        }
-
-        .brand-badge {
-          background: rgba(212, 175, 55, 0.15);
-          color: #d4af37;
-          font-size: 0.72rem;
+          color: #64748b;
+          font-size: 0.82rem;
           font-weight: 700;
-          padding: 6px 14px;
+          background: #ffffff;
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          padding: 7px 14px;
           border-radius: 20px;
-          display: inline-block;
+          cursor: pointer;
           width: fit-content;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          margin-bottom: 20px;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
         }
 
-        .info-title {
-          font-size: 2.1rem;
+        .back-to-home-btn:hover {
+          color: #b38e47;
+          border-color: rgba(179, 142, 71, 0.4);
+          transform: translateX(-2px);
+        }
+
+        .uyelik-top-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 5px 14px;
+          background: rgba(212, 175, 55, 0.12);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          border-radius: 20px;
+          color: #8c6b30;
+          font-size: 0.76rem;
+          font-weight: 800;
+          width: fit-content;
+        }
+
+        .uyelik-main-title {
+          font-family: var(--font-title);
+          font-size: 2.3rem;
           font-weight: 900;
-          color: #ffffff;
-          line-height: 1.25;
-          margin: 0 0 16px 0;
+          color: #0f172a;
+          line-height: 1.2;
           letter-spacing: -0.02em;
+          margin: 0;
         }
 
-        .info-title span {
-          background: linear-gradient(135deg, #d4af37 0%, #ffffff 100%);
+        .uyelik-main-title span {
+          background: linear-gradient(135deg, #b38e47 0%, #d4af37 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
 
-        .info-subtitle {
+        .uyelik-subtitle-text {
           font-size: 0.95rem;
-          color: #94a3b8;
+          color: #475569;
           line-height: 1.6;
-          margin: 0 0 40px 0;
+          margin: 0;
         }
 
-        /* PURE CSS ANIMATED HERO CARD (0ms Load Time, No External Images!) */
-        .pure-css-hero-card {
-          width: 100%;
-          height: 190px;
+        /* CERAMIC MODEL TILES SHOWCASE GRID */
+        .ceramic-showcase-box {
+          background: #ffffff;
           border-radius: 20px;
-          background: linear-gradient(135deg, #1e293b 0%, #0f172a 60%, #1e1b4b 100%);
-          position: relative;
-          overflow: hidden;
-          border: 1px solid rgba(212, 175, 55, 0.4);
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-          margin-bottom: 28px;
+          padding: 16px 18px;
+          border: 1px solid rgba(179, 142, 71, 0.22);
+          box-shadow: 0 6px 24px rgba(15, 23, 42, 0.03);
           display: flex;
           flex-direction: column;
+          gap: 12px;
+        }
+
+        .showcase-header-row {
+          display: flex;
+          align-items: center;
           justify-content: space-between;
-          padding: 20px;
+          font-size: 0.78rem;
+          font-weight: 800;
+          color: #0f172a;
         }
 
-        .hero-card-pattern {
-          position: absolute;
-          top: -50%;
-          left: -50%;
-          width: 200%;
-          height: 200%;
-          background: 
-            radial-gradient(ellipse at 30% 20%, rgba(212, 175, 55, 0.25) 0%, transparent 50%),
-            radial-gradient(ellipse at 70% 80%, rgba(56, 189, 248, 0.15) 0%, transparent 50%),
-            linear-gradient(45deg, transparent 48%, rgba(212, 175, 55, 0.12) 50%, transparent 52%);
-          background-size: 100% 100%, 100% 100%, 40px 40px;
-          animation: heroMeshRotate 25s linear infinite;
-          pointer-events: none;
-        }
-
-        @keyframes heroMeshRotate {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        .hero-card-badge {
-          display: inline-flex;
+        .showcase-header-row span {
+          display: flex;
           align-items: center;
           gap: 6px;
-          padding: 5px 12px;
-          background: rgba(212, 175, 55, 0.15);
-          border: 1px solid rgba(212, 175, 55, 0.4);
-          border-radius: 20px;
-          color: #ffd700;
-          font-size: 0.72rem;
-          font-weight: 800;
-          letter-spacing: 0.05em;
-          width: fit-content;
-          z-index: 5;
-          backdrop-filter: blur(8px);
+          color: #8c6b30;
         }
 
-        .spin-gold-icon {
-          color: #ffd700;
-          animation: spinSlow 8s linear infinite;
+        .ceramic-tiles-row {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 10px;
         }
 
-        @keyframes spinSlow {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+        @media (max-width: 600px) {
+          .ceramic-tiles-row {
+            grid-template-columns: repeat(2, 1fr);
+          }
         }
 
-        .hero-card-title-box {
+        .tile-model-card {
           display: flex;
           flex-direction: column;
-          gap: 4px;
-          z-index: 5;
+          gap: 6px;
+          background: #f8fafc;
+          border-radius: 12px;
+          padding: 7px;
+          border: 1px solid rgba(0, 0, 0, 0.06);
+          transition: all 0.2s ease;
         }
 
-        .hero-card-brand {
-          font-family: var(--font-title);
-          font-size: 1.2rem;
-          font-weight: 850;
-          color: #ffffff;
-          letter-spacing: -0.01em;
-          text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        .tile-model-card:hover {
+          background: #ffffff;
+          border-color: rgba(179, 142, 71, 0.4);
+          transform: translateY(-3px);
+          box-shadow: 0 8px 18px rgba(179, 142, 71, 0.12);
         }
 
-        .hero-card-sub {
-          font-size: 0.78rem;
-          color: #cbd5e1;
+        .tile-model-img {
+          width: 100%;
+          height: 72px;
+          border-radius: 8px;
+          background-size: cover;
+          background-position: center;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .tile-model-badge {
+          position: absolute;
+          bottom: 4px;
+          left: 4px;
+          background: rgba(15, 23, 42, 0.85);
+          backdrop-filter: blur(4px);
+          color: #ffd700;
+          font-size: 0.6rem;
+          font-weight: 800;
+          padding: 2px 6px;
+          border-radius: 4px;
+        }
+
+        .tile-model-name {
+          font-size: 0.74rem;
+          font-weight: 700;
+          color: #0f172a;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .tile-model-spec {
+          font-size: 0.66rem;
+          color: #64748b;
           font-weight: 500;
         }
 
-        .hero-floating-stat-badge {
-          position: absolute;
-          bottom: 16px;
-          right: 16px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: rgba(15, 23, 42, 0.85);
-          backdrop-filter: blur(10px);
-          padding: 5px 12px;
-          border-radius: 20px;
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: #f8fafc;
-          font-size: 0.72rem;
-          font-weight: 700;
-          z-index: 5;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-          animation: floatMini 4s ease-in-out infinite alternate;
+        /* SECTION TITLE & FEATURE CARDS (Inspired by Screenshot 2) */
+        .features-section-title {
+          font-family: var(--font-title);
+          font-size: 1.05rem;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 6px 0 0 0;
         }
 
-        .live-dot-green {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #10b981;
-          box-shadow: 0 0 8px #10b981;
-        }
-
-        @keyframes floatMini {
-          0% { transform: translateY(0); }
-          100% { transform: translateY(-4px); }
-        }
-
-        /* FEATURE ITEMS */
-        .info-features-list {
+        .features-light-list {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 12px;
         }
 
-        .info-feature-item {
+        .feature-light-card {
           display: flex;
+          align-items: center;
           gap: 16px;
-          padding: 10px 14px;
-          border-radius: 14px;
-          border: 1px solid transparent;
-          transition: all 0.25s ease;
+          padding: 16px 20px;
+          background: #ffffff;
+          border: 1px solid rgba(226, 232, 240, 0.9);
+          border-radius: 16px;
+          box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .info-feature-item:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(255, 255, 255, 0.08);
-          transform: translateX(6px);
+        .feature-light-card:hover {
+          transform: translateY(-2px);
+          border-color: rgba(179, 142, 71, 0.35);
+          box-shadow: 0 10px 24px rgba(179, 142, 71, 0.08);
         }
 
-        .feature-icon-box {
-          width: 44px;
-          height: 44px;
+        .icon-box-rose { background: rgba(225, 29, 72, 0.08); color: #e11d48; }
+        .icon-box-sky { background: rgba(2, 132, 199, 0.08); color: #0284c7; }
+        .icon-box-amber { background: rgba(217, 119, 6, 0.08); color: #d97706; }
+        .icon-box-emerald { background: rgba(16, 185, 129, 0.08); color: #059669; }
+
+        .feature-card-icon {
+          width: 42px;
+          height: 42px;
           border-radius: 12px;
           display: flex;
           align-items: center;
@@ -1059,75 +1042,42 @@ export default function UyelikPage() {
           flex-shrink: 0;
         }
 
-        .feature-icon-box.purple {
-          background: rgba(212, 175, 55, 0.15);
-          color: #d4af37;
-        }
-        
-        .feature-icon-box.blue {
-          background: rgba(2, 132, 199, 0.15);
-          color: #38bdf8;
-        }
-
-        .feature-icon-box.amber {
-          background: rgba(217, 119, 6, 0.15);
-          color: #fbbf24;
-        }
-
-        .feature-icon-box.green {
-          background: rgba(16, 185, 129, 0.15);
-          color: #34d399;
-        }
-
-        .feature-icon-box.rose {
-          background: rgba(225, 29, 72, 0.15);
-          color: #fda4af;
-        }
-
-        .feature-texts {
+        .feature-card-body {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 3px;
         }
 
-        .feature-title {
-          font-size: 0.9rem;
-          font-weight: 700;
-          color: #ffffff;
+        .feature-card-title {
+          font-size: 0.88rem;
+          font-weight: 750;
+          color: #0f172a;
         }
 
-        .feature-desc {
-          font-size: 0.8rem;
-          color: #94a3b8;
+        .feature-card-desc {
+          font-size: 0.78rem;
+          color: #475569;
           line-height: 1.4;
         }
 
-        /* RIGHT FORM SIDE */
-        .uyelik-form-side {
-          padding: 60px 50px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
+        /* RIGHT FLOATING AUTH CARD */
+        .uyelik-floating-card {
+          background: #ffffff;
+          border-radius: 24px;
+          padding: 36px 32px;
+          box-shadow: 0 20px 60px rgba(15, 23, 42, 0.07);
+          border: 1px solid rgba(212, 175, 55, 0.25);
+          position: sticky;
+          top: 40px;
         }
 
-        @media (max-width: 600px) {
-          .uyelik-info-side, .uyelik-form-side {
-            padding: 30px 20px !important;
-          }
-        }
-
-        .auth-card-panel {
-          width: 100%;
-        }
-
-        /* Tab Switcher */
         .auth-tab-row {
           display: grid;
           grid-template-columns: 1fr 1fr;
           background: #f1f5f9;
           padding: 4px;
-          border-radius: 10px;
-          margin-bottom: 30px;
+          border-radius: 12px;
+          margin-bottom: 24px;
         }
 
         .auth-tab-btn {
@@ -1135,9 +1085,9 @@ export default function UyelikPage() {
           border: none;
           padding: 10px;
           font-size: 0.85rem;
-          font-weight: 600;
+          font-weight: 700;
           color: #64748b;
-          border-radius: 8px;
+          border-radius: 9px;
           cursor: pointer;
           transition: all 0.2s ease;
           text-align: center;
@@ -1146,24 +1096,17 @@ export default function UyelikPage() {
         .auth-tab-btn.active {
           background: #ffffff;
           color: #0f172a;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
-        /* Form Inputs */
         .auth-form {
           display: flex;
           flex-direction: column;
-          gap: 20px;
-        }
-
-        .input-group {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
+          gap: 18px;
         }
 
         .input-group label {
-          font-size: 0.75rem;
+          font-size: 0.76rem;
           font-weight: 700;
           color: #475569;
         }
@@ -1186,58 +1129,34 @@ export default function UyelikPage() {
           box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.15);
         }
 
-        .form-feedback {
-          padding: 10px 14px;
-          border-radius: 8px;
-          font-size: 0.78rem;
-          font-weight: 600;
-        }
-
-        .form-feedback.error {
-          background: #fee2e2;
-          color: #ef4444;
-          border: 1px solid #fecaca;
-        }
-
-        .form-feedback.success {
-          background: #ecfdf5;
-          color: #10b981;
-          border: 1px solid #a7f3d0;
-        }
-
         .submit-btn {
           width: 100%;
-          background: #0f172a;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
           color: #ffffff;
           border: none;
-          padding: 14px;
+          padding: 13px;
           border-radius: 10px;
           font-size: 0.9rem;
-          font-weight: 700;
+          font-weight: 800;
           cursor: pointer;
-          transition: all 0.3s;
+          transition: all 0.25s ease;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
-          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
         }
 
         .submit-btn:hover:not(:disabled) {
-          background: #b38e47;
+          background: linear-gradient(135deg, #b38e47 0%, #987532 100%);
           transform: translateY(-1px);
           box-shadow: 0 6px 20px rgba(179, 142, 71, 0.3);
-        }
-
-        .submit-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
         }
 
         .divider-row {
           position: relative;
           text-align: center;
-          margin: 20px 0;
+          margin: 16px 0;
         }
 
         .divider-row::before {
@@ -1266,10 +1185,10 @@ export default function UyelikPage() {
           width: 100%;
           background: #ffffff;
           border: 1px solid #e2e8f0;
-          padding: 12px;
+          padding: 11px;
           border-radius: 10px;
-          font-size: 0.88rem;
-          font-weight: 600;
+          font-size: 0.86rem;
+          font-weight: 700;
           color: #334155;
           cursor: pointer;
           transition: all 0.2s;
@@ -1284,10 +1203,7 @@ export default function UyelikPage() {
           border-color: #cbd5e1;
         }
 
-        .google-icon {
-          width: 18px;
-          height: 18px;
-        }
+        .google-icon { width: 18px; height: 18px; }
 
         .forgot-link {
           display: block;
@@ -1296,7 +1212,7 @@ export default function UyelikPage() {
           font-weight: 600;
           color: #64748b;
           text-decoration: none;
-          margin-top: 16px;
+          margin-top: 14px;
           transition: color 0.2s;
         }
 
@@ -1305,214 +1221,105 @@ export default function UyelikPage() {
         }
       `}</style>
 
-      <div className="uyelik-container">
-        
-        {/* LEFT COLUMN - PROPOSITION */}
-        <div className="uyelik-info-side">
-          {/* Subtle gold decoration spheres */}
-          <div style={{
-            position: 'absolute',
-            top: '-10%',
-            right: '-10%',
-            width: '400px',
-            height: '400px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%)',
-            pointerEvents: 'none'
-          }} />
-          <div style={{
-            position: 'absolute',
-            bottom: '-10%',
-            left: '-10%',
-            width: '300px',
-            height: '300px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(99,102,241,0.05) 0%, transparent 70%)',
-            pointerEvents: 'none'
-          }} />
+      <div className="uyelik-light-grid">
+        {/* LEFT COLUMN - PROPOSITION & CERAMIC TILES SHOWCASE */}
+        <div className="uyelik-left-content">
+          <button onClick={() => window.location.href = '/'} className="back-to-home-btn">
+            <Home size={14} />
+            <span>Anasayfaya Dön</span>
+          </button>
 
-          <div style={{ position: 'relative', zIndex: 10 }}>
-            <button onClick={() => window.location.href = '/'} className="back-btn">
-              <ArrowLeft size={16} />
-              <span>Anasayfaya Dön</span>
-            </button>
-
-            {/* Pure CSS 3D Animated Luxury Ceramic Showcase (0ms Load Time, No External Images!) */}
-            <div className="pure-css-hero-card">
-              <div className="hero-card-pattern" />
-              <div className="hero-card-badge">
-                <Sparkles size={13} className="spin-gold-icon" />
-                <span>SERAMİKBAK AKILLI PLATFORM</span>
-              </div>
-              <div className="hero-card-title-box">
-                <span className="hero-card-brand">Tüm Markaların Fiyatlarını Karşılaştırın</span>
-                <span className="hero-card-sub">Bayilerden en iyi teklifleri toplayın, 3D stüdyoda deneyimleyin</span>
-              </div>
-              <div className="hero-floating-stat-badge">
-                <span className="live-dot-green" />
-                <span>81 İl Onaylı Bayi Ağı</span>
-              </div>
-            </div>
-
-            <h1 className="info-title">
-              Fırsatlardan ilk <span>sen haberdar ol</span>
-            </h1>
-            <p className="info-subtitle">
-              SeramikBak'a üye olun, dilediğiniz seramik modellerini takip edin, bayilerden en avantajlı teklifleri toplayın.
-            </p>
+          <div className="uyelik-top-pill">
+            <Sparkles size={13} />
+            <span>10.000+ Mimar & Usta Aramızda</span>
           </div>
 
-          <div className="info-features-list" style={{ position: 'relative', zIndex: 10 }}>
-            <div className="info-feature-item">
-              <div className="feature-icon-box purple">
+          <h1 className="uyelik-main-title">
+            İndirimlerden ve Fırsatlardan <span>ilk sen haberdar ol</span>
+          </h1>
+          <p className="uyelik-subtitle-text">
+            SeramikBak'a üye olun, dilediğiniz seramik modellerini takip edin, bölgenizdeki bayilerden en avantajlı teklifleri toplayın.
+          </p>
+
+          {/* Small Ceramic Model Visual Cards Showcase (Requested by User) */}
+          <div className="ceramic-showcase-box">
+            <div className="showcase-header-row">
+              <span>
+                <Sparkles size={14} /> Popüler Seramik Modelleri & Bayi Fiyatları
+              </span>
+            </div>
+            <div className="ceramic-tiles-row">
+              <div className="tile-model-card" onClick={() => window.location.href = '/'} style={{ cursor: 'pointer' }}>
+                <div className="tile-model-img" style={{ backgroundImage: 'url("/hero/luxury_bathroom.png")' }}>
+                  <span className="tile-model-badge">VitrA</span>
+                </div>
+                <span className="tile-model-name">Calacatta Gold</span>
+                <span className="tile-model-spec">60x120 • Mermer</span>
+              </div>
+
+              <div className="tile-model-card" onClick={() => window.location.href = '/'} style={{ cursor: 'pointer' }}>
+                <div className="tile-model-img" style={{ backgroundImage: 'url("/hero/modern_living.png")' }}>
+                  <span className="tile-model-badge">Kütahya</span>
+                </div>
+                <span className="tile-model-name">Albatros Antrasit</span>
+                <span className="tile-model-spec">80x80 • Lapatto</span>
+              </div>
+
+              <div className="tile-model-card" onClick={() => window.location.href = '/'} style={{ cursor: 'pointer' }}>
+                <div className="tile-model-img" style={{ backgroundImage: 'url("/hero/scandinavian_kitchen.png")' }}>
+                  <span className="tile-model-badge">Bien</span>
+                </div>
+                <span className="tile-model-name">Natural Oak</span>
+                <span className="tile-model-spec">20x120 • Ahşap</span>
+              </div>
+
+              <div className="tile-model-card" onClick={() => window.location.href = '/'} style={{ cursor: 'pointer' }}>
+                <div className="tile-model-img" style={{ backgroundImage: 'url("/hero/hero_ceramics.jpg")' }}>
+                  <span className="tile-model-badge">Ege Seramik</span>
+                </div>
+                <span className="tile-model-name">Travertino</span>
+                <span className="tile-model-spec">60x120 • Mat</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Neler Seni Bekliyor? Section & Feature Cards */}
+          <h3 className="features-section-title">Neler Seni Bekliyor?</h3>
+          <div className="features-light-list">
+            <div className="feature-light-card">
+              <div className="feature-card-icon icon-box-rose">
                 <Heart size={20} />
               </div>
-              <div className="feature-texts">
-                <h4 className="feature-title">Ürünleri Favorilerine Ekle</h4>
-                <p className="feature-desc">Beğendiğin karoları favori listelerine ekle, mimarlarla ve seramik ustalarıyla kolayca paylaş.</p>
+              <div className="feature-card-body">
+                <div className="feature-card-title">Ürünleri Favorilerine Ekle</div>
+                <div className="feature-card-desc">İstediğin seramik modelini takip et, sevdiklerinle ve ustalarla kolayca paylaş.</div>
               </div>
             </div>
 
-            <div className="info-feature-item">
-              <div className="feature-icon-box blue">
+            <div className="feature-light-card">
+              <div className="feature-card-icon icon-box-sky">
                 <Bell size={20} />
               </div>
-              <div className="feature-texts">
-                <h4 className="feature-title">Fiyat & Kampanya Bildirimleri</h4>
-                <p className="feature-desc">Takip ettiğin seramik modelinde bir bayi indirim yaptığında veya kampanya başladığında anında haberin olsun.</p>
+              <div className="feature-card-body">
+                <div className="feature-card-title">Fiyat & Kampanya Bildirimleri</div>
+                <div className="feature-card-desc">Takip ettiğin seramik modelinde bir bayi indirim yaptığında anında haberin olsun.</div>
               </div>
             </div>
 
-            <div className="info-feature-item">
-              <div className="feature-icon-box amber">
+            <div className="feature-light-card">
+              <div className="feature-card-icon icon-box-amber">
                 <Building2 size={20} />
               </div>
-              <div className="feature-texts">
-                <h4 className="feature-title">Toplu B2B Teklif Toplama</h4>
-                <p className="feature-desc">Projenizin metraj ve ebat ihtiyaçlarını girin, bölgenizdeki tüm yetkili bayilere teklif talebi gönderin.</p>
+              <div className="feature-card-body">
+                <div className="feature-card-title">Toplu B2B Teklif Toplama</div>
+                <div className="feature-card-desc">Projenizin metraj ihtiyaçlarını girin, bölgenizdeki tüm yetkili bayilerden fiyat toplayın.</div>
               </div>
             </div>
 
-            <div className="info-feature-item">
-              <div className="feature-icon-box green">
+            <div className="feature-light-card">
+              <div className="feature-card-icon icon-box-emerald">
                 <Sparkles size={20} />
               </div>
-              <div className="feature-texts">
-                <h4 className="feature-title">Yapay Zeka Destekli Görsel Arama</h4>
-                <p className="feature-desc">Seramiğin fotoğrafını yükleyin, yapay zekamız tüm markalar arasından birebir aynısını veya en yakın benzerini bulsun.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT COLUMN - AUTH CARD */}
-        <div className="uyelik-form-side">
-          <div className="auth-card-panel">
-            
-            {/* Tab Switcher */}
-            <div className="auth-tab-row">
-              <button 
-                onClick={() => { setAuthTab('login'); setError(''); setSuccess(''); }} 
-                className={`auth-tab-btn ${authTab === 'login' ? 'active' : ''}`}
-              >
-                Giriş Yap
-              </button>
-              <button 
-                onClick={() => { setAuthTab('register'); setError(''); setSuccess(''); }} 
-                className={`auth-tab-btn ${authTab === 'register' ? 'active' : ''}`}
-              >
-                Hesap Oluştur
-              </button>
-            </div>
-
-            {/* Error / Success Feedback */}
-            {error && (
-              <div className="form-feedback error" style={{ marginBottom: '20px' }}>
-                {error}
-              </div>
-            )}
-            {success && (
-              <div className="form-feedback success" style={{ marginBottom: '20px' }}>
-                {success}
-              </div>
-            )}
-
-            {/* LOGIN FORM */}
-            {authTab === 'login' ? (
-              <form onSubmit={handleLoginSubmit} className="auth-form">
-                <div className="input-group">
-                  <label>E-posta Adresiniz</label>
-                  <input 
-                    type="email" 
-                    required 
-                    placeholder="ornek@seramikbak.com" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="auth-input"
-                  />
-                </div>
-
-                <div className="input-group">
-                  <label>Şifreniz</label>
-                  <input 
-                    type="password" 
-                    required 
-                    placeholder="••••••••" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="auth-input"
-                  />
-                </div>
-
-                <button type="submit" disabled={loading} className="submit-btn">
-                  {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                  <span>Giriş Yap</span>
-                </button>
-              </form>
-            ) : (
-              /* REGISTER FORM */
-              <form onSubmit={handleRegisterSubmit} className="auth-form">
-                <div className="input-group">
-                  <label>Adınız Soyadınız / Firma Ünvanı</label>
-                  <input 
-                    type="text" 
-                    required 
-                    placeholder="Ahmet Yılmaz veya Yılmaz Mimarlık" 
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="auth-input"
-                  />
-                </div>
-
-                <div className="input-group">
-                  <label>E-posta Adresiniz</label>
-                  <input 
-                    type="email" 
-                    required 
-                    placeholder="ornek@seramikbak.com" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="auth-input"
-                  />
-                </div>
-
-                <div className="input-group">
-                  <label>Şifreniz</label>
-                  <input 
-                    type="password" 
-                    required 
-                    placeholder="Min. 6 Karakter" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="auth-input"
-                  />
-                </div>
-
-                <button type="submit" disabled={loading} className="submit-btn">
-                  {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                  <span>Hesap Oluştur</span>
-                </button>
-              </form>
             )}
 
             {/* Simulated OAuth section */}
