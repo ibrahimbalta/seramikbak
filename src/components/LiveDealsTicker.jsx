@@ -13,13 +13,13 @@ export default function LiveDealsTicker() {
     { id: 6, brand: 'Graniser', name: 'Beton Gri 60x60 Outlet', dealer: 'Gebze Stok Depo', discount: '%50 Fırsat', price: '₺290 / m²', city: 'Kocaeli' }
   ];
 
-  // Quadruple the array for an unbroken, 100% seamless infinite loop across wide screens
+  // Quadruple the deals array for an unbroken 100% infinite loop
   const tickerDeals = [...deals, ...deals, ...deals, ...deals];
 
   return (
     <div className="live-ticker-fullwidth-wrapper">
       <div className="live-ticker-container">
-        {/* Left Fixed Badge */}
+        {/* Fixed Left Live Badge */}
         <Link href="/outlet" className="live-badge-link" title="Tüm Outlet ve Stoklu İndirimleri Gör">
           <div className="live-badge-content">
             <span className="live-pulse-dot" />
@@ -27,7 +27,7 @@ export default function LiveDealsTicker() {
           </div>
         </Link>
 
-        {/* Viewport & Endless Ticker Track */}
+        {/* Viewport with min-width: 0 & Endless Ticker Track */}
         <div className="ticker-viewport">
           <div className="ticker-track">
             {tickerDeals.map((deal, idx) => (
@@ -48,18 +48,26 @@ export default function LiveDealsTicker() {
           </div>
         </div>
 
-        {/* Right Fixed Social Proof (Desktop) */}
+        {/* Fixed Right Social Proof Badge (Desktop Only) */}
         <div className="ticker-social-proof">
-          <Activity size={14} style={{ color: '#38bdf8' }} />
+          <Activity size={15} style={{ color: '#38bdf8' }} />
           <span>Bugün <strong>1,420 usta & mimar</strong> bayilerden fiyat topladı</span>
         </div>
       </div>
 
       <style jsx>{`
+        /* Full-Bleed 100vw Breakout Wrapper */
         .live-ticker-fullwidth-wrapper {
-          width: 100%;
-          margin: 20px 0;
+          width: 100vw;
           position: relative;
+          left: 50%;
+          right: 50%;
+          margin-left: -50vw;
+          margin-right: -50vw;
+          margin-top: 16px;
+          margin-bottom: 24px;
+          overflow: hidden;
+          z-index: 10;
         }
 
         .live-ticker-container {
@@ -67,13 +75,12 @@ export default function LiveDealsTicker() {
           background: linear-gradient(90deg, #050811 0%, #0f172a 50%, #050811 100%);
           border-top: 1px solid rgba(212, 175, 55, 0.35);
           border-bottom: 1px solid rgba(212, 175, 55, 0.35);
-          padding: 12px 24px;
+          padding: 10px 24px;
           display: flex;
           align-items: center;
           gap: 20px;
-          overflow: hidden;
           position: relative;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         :global(a.live-badge-link) {
@@ -89,12 +96,12 @@ export default function LiveDealsTicker() {
           padding: 6px 14px;
           border-radius: 20px;
           background: rgba(239, 68, 68, 0.16);
-          border: 1px solid rgba(239, 68, 68, 0.5);
+          border: 1px solid rgba(239, 68, 68, 0.45);
           color: #f87171;
           font-size: 0.78rem;
           font-weight: 800;
           white-space: nowrap;
-          box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
+          box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
           transition: transform 0.2s ease, background 0.2s ease;
         }
 
@@ -128,12 +135,14 @@ export default function LiveDealsTicker() {
           }
         }
 
+        /* Viewport MUST have min-width: 0 to prevent flex item collapsing */
         .ticker-viewport {
           flex: 1;
+          min-width: 0;
           overflow: hidden;
           position: relative;
-          mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
-          -webkit-mask-image: linear-gradient(to right, transparent, black 3%, black 97%, transparent);
+          mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
         }
 
         .ticker-track {
@@ -141,7 +150,7 @@ export default function LiveDealsTicker() {
           align-items: center;
           gap: 20px;
           width: max-content;
-          animation: tickerSlide 40s linear infinite;
+          animation: tickerSlide 36s linear infinite;
         }
 
         .ticker-track:hover {
@@ -161,10 +170,10 @@ export default function LiveDealsTicker() {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
-          background: rgba(255, 255, 255, 0.04) !important;
+          background: rgba(255, 255, 255, 0.05) !important;
           padding: 7px 16px !important;
           border-radius: 12px !important;
-          border: 1px solid rgba(255, 255, 255, 0.08) !important;
+          border: 1px solid rgba(255, 255, 255, 0.09) !important;
           font-size: 0.82rem !important;
           white-space: nowrap !important;
           text-decoration: none !important;
@@ -174,8 +183,8 @@ export default function LiveDealsTicker() {
         }
 
         :global(a.ticker-deal-card:hover) {
-          background: rgba(212, 175, 55, 0.15) !important;
-          border-color: rgba(212, 175, 55, 0.4) !important;
+          background: rgba(212, 175, 55, 0.16) !important;
+          border-color: rgba(212, 175, 55, 0.45) !important;
           transform: translateY(-1px) !important;
           box-shadow: 0 4px 14px rgba(212, 175, 55, 0.2) !important;
         }
@@ -239,8 +248,7 @@ export default function LiveDealsTicker() {
             display: none;
           }
           .live-ticker-container {
-            padding: 10px 12px;
-            margin: 14px 0;
+            padding: 8px 12px;
             gap: 12px;
           }
         }
