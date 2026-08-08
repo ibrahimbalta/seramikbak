@@ -64,6 +64,13 @@ export async function POST(request) {
         resetLink
       });
 
+      if (mailResult && mailResult.success === false) {
+        return NextResponse.json(
+          { error: mailResult.error || 'E-posta gönderimi başarısız oldu. Lütfen tekrar deneyin.' },
+          { status: 400 }
+        );
+      }
+
       return NextResponse.json({
         success: true,
         emailSent: true,

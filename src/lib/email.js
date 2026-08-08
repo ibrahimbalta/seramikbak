@@ -58,35 +58,7 @@ export async function sendPasswordResetEmail({ toEmail, userName, resetLink }) {
     </html>
   `;
 
-  // Option 1: Resend API
-  const resendApiKey = process.env.RESEND_API_KEY;
-  if (resendApiKey) {
-    try {
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${resendApiKey}`
-        },
-        body: JSON.stringify({
-          from: process.env.EMAIL_FROM || 'SeramikBak <onboarding@resend.dev>',
-          to: [toEmail],
-          subject: subject,
-          html: htmlBody
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        return { success: true, messageId: data.id };
-      } else {
-        console.error('Resend email error:', data);
-      }
-    } catch (err) {
-      console.error('Failed to send email via Resend API:', err);
-    }
-  }
-
-  // Option 2: SMTP / Nodemailer (Gmail / Custom Mail Server)
+  // Option 1: SMTP / Nodemailer (Gmail / Custom Mail Server)
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
   if (smtpUser && smtpPass) {
@@ -114,6 +86,39 @@ export async function sendPasswordResetEmail({ toEmail, userName, resetLink }) {
     }
   }
 
+  // Option 2: Resend API
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (resendApiKey) {
+    try {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${resendApiKey}`
+        },
+        body: JSON.stringify({
+          from: process.env.EMAIL_FROM || 'SeramikBak <onboarding@resend.dev>',
+          to: [toEmail],
+          subject: subject,
+          html: htmlBody
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        return { success: true, messageId: data.id };
+      } else {
+        console.error('Resend email API error:', data);
+        return { 
+          success: false, 
+          error: data.message || 'Resend mail gönderimi başarısız oldu.',
+          resendError: data 
+        };
+      }
+    } catch (err) {
+      console.error('Failed to send email via Resend API:', err);
+    }
+  }
+
   // Development Fallback Logging
   console.log('====================================================');
   console.log(`[SERAMİKBAK MAIL SIMULATOR] To: ${toEmail}`);
@@ -124,6 +129,6 @@ export async function sendPasswordResetEmail({ toEmail, userName, resetLink }) {
   return { 
     success: true, 
     simulated: true, 
-    message: 'Reset link logged to console (No mail API key configured)' 
+    message: 'Reset link logged to console' 
   };
 }
