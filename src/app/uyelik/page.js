@@ -152,6 +152,32 @@ export default function UyelikPage() {
     }
   };
 
+  const handleForgotPasswordSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setSuccess(data.message || '✓ Şifre sıfırlama e-postası gönderildi. Lütfen e-postanızı kontrol edin.');
+      } else {
+        setError(data.error || 'Şifre sıfırlama isteği gönderilemedi.');
+      }
+    } catch (err) {
+      setError('Sunucu hatası oluştu. Lütfen tekrar deneyin.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const [showGoogleModal, setShowGoogleModal] = useState(false);
   const [googleEmailInput, setGoogleEmailInput] = useState('');
   const [googleNameInput, setGoogleNameInput] = useState('');
@@ -1350,7 +1376,44 @@ export default function UyelikPage() {
           {error && <div className="form-feedback error" style={{ marginBottom: '16px' }}>{error}</div>}
           {success && <div className="form-feedback success" style={{ marginBottom: '16px' }}>{success}</div>}
 
-          {authTab === 'login' ? (
+          {authTab === 'forgot' ? (
+            <form onSubmit={handleForgotPasswordSubmit} className="auth-form">
+              <div style={{ textAlign: 'center', marginBottom: '6px' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: '800', color: '#0f172a', margin: '0 0 6px 0' }}>
+                  Şifrenizi mi Unuttunuz?
+                </h3>
+                <p style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: '1.4', margin: 0 }}>
+                  Kayıtlı e-posta adresinizi girin. Size sıfırlama bağlantısı göndereceğiz.
+                </p>
+              </div>
+
+              <div className="input-group">
+                <label>E-posta Adresiniz</label>
+                <input 
+                  type="email" 
+                  required 
+                  placeholder="ornek@email.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="auth-input"
+                />
+              </div>
+
+              <button type="submit" className="submit-btn" disabled={loading}>
+                {loading ? <Loader2 className="animate-spin" size={18} /> : 'Sıfırlama Bağlantısı Gönder'}
+              </button>
+
+              <button 
+                type="button" 
+                onClick={() => { setAuthTab('login'); setError(''); setSuccess(''); }} 
+                className="google-btn"
+                style={{ marginTop: '6px' }}
+              >
+                <ArrowLeft size={16} />
+                <span>Giriş Ekranına Dön</span>
+              </button>
+            </form>
+          ) : authTab === 'login' ? (
             <form onSubmit={handleLoginSubmit} className="auth-form">
               <div className="input-group">
                 <label>E-posta Adresiniz</label>
@@ -1391,7 +1454,13 @@ export default function UyelikPage() {
                 </svg>
                 <span>Google ile Giriş Yap</span>
               </button>
-              <a href="#" onClick={(e) => { e.preventDefault(); alert('Şifre sıfırlama bağlantısı e-posta adresinize gönderilecektir. Lütfen canlı destek veya e-posta ile iletişime geçin.'); }} className="forgot-link">Şifremi unuttum</a>
+              <a 
+                href="#" 
+                onClick={(e) => { e.preventDefault(); setAuthTab('forgot'); setError(''); setSuccess(''); }} 
+                className="forgot-link"
+              >
+                Şifremi unuttum
+              </a>
             </form>
           ) : (
             <form onSubmit={handleRegisterSubmit} className="auth-form">
