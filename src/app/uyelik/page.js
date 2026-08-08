@@ -26,13 +26,16 @@ import {
 } from 'lucide-react';
 
 export default function UyelikPage() {
-  const [authTab, setAuthTab] = useState('login'); // 'login' or 'register'
+  const [authTab, setAuthTab] = useState('login'); // 'login', 'register', or 'forgot'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetStep, setResetStep] = useState(1); // 1: verify email, 2: new password
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Logged-in User Session State
   const [currentUser, setCurrentUser] = useState(null);
@@ -159,17 +162,47 @@ export default function UyelikPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      const data = await res.json();
+      if (resetStep === 1) {
+        // Step 1: Verify Email Address
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'verify_email', email })
+        });
+        const data = await res.json();
 
-      if (res.ok && data.success) {
-        setSuccess(data.message || '✓ Şifre sıfırlama e-postası gönderildi. Lütfen e-postanızı kontrol edin.');
+        if (res.ok && data.success) {
+          setSuccess(data.message || '✓ E-posta adresiniz doğrulandı. Yeni şifrenizi belirleyin.');
+          setResetStep(2);
+        } else {
+          setError(data.error || 'E-posta adresi doğrulanırken bir hata oluştu.');
+        }
       } else {
-        setError(data.error || 'Şifre sıfırlama isteği gönderilemedi.');
+        // Step 2: Set New Password
+        if (newPassword !== confirmPassword) {
+          setError('Girilen yeni şifreler birbiriyle eşleşmiyor. Lütfen tekrar kontrol edin.');
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'reset_password', email, newPassword })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          setSuccess(data.message || '✓ Şifreniz başarıyla yenilendi! Hesabınıza giriş yapılıyor...');
+          if (data.user) {
+            localStorage.setItem('seramikbak_user', JSON.stringify(data.user));
+          }
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1200);
+        } else {
+          setError(data.error || 'Şifre güncellenirken bir hata oluştu.');
+        }
       }
     } catch (err) {
       setError('Sunucu hatası oluştu. Lütfen tekrar deneyin.');
@@ -1380,32 +1413,68 @@ export default function UyelikPage() {
             <form onSubmit={handleForgotPasswordSubmit} className="auth-form">
               <div style={{ textAlign: 'center', marginBottom: '6px' }}>
                 <h3 style={{ fontSize: '1.05rem', fontWeight: '800', color: '#0f172a', margin: '0 0 6px 0' }}>
-                  Şifrenizi mi Unuttunuz?
+                  {resetStep === 1 ? 'Şifrenizi mi Unuttunuz?' : 'Yeni Şifrenizi Belirleyin'}
                 </h3>
                 <p style={{ fontSize: '0.78rem', color: '#64748b', lineHeight: '1.4', margin: 0 }}>
-                  Kayıtlı e-posta adresinizi girin. Size sıfırlama bağlantısı göndereceğiz.
+                  {resetStep === 1 
+                    ? 'Kayıtlı e-posta adresinizi girin, anında şifre yenileme adımlarına geçelim.' 
+                    : `${email} hesabı için yeni şifrenizi oluşturun.`
+                  }
                 </p>
               </div>
 
-              <div className="input-group">
-                <label>E-posta Adresiniz</label>
-                <input 
-                  type="email" 
-                  required 
-                  placeholder="ornek@email.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="auth-input"
-                />
-              </div>
+              {resetStep === 1 ? (
+                <>
+                  <div className="input-group">
+                    <label>E-posta Adresiniz</label>
+                    <input 
+                      type="email" 
+                      required 
+                      placeholder="ornek@email.com" 
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="auth-input"
+                    />
+                  </div>
 
-              <button type="submit" className="submit-btn" disabled={loading}>
-                {loading ? <Loader2 className="animate-spin" size={18} /> : 'Sıfırlama Bağlantısı Gönder'}
-              </button>
+                  <button type="submit" className="submit-btn" disabled={loading}>
+                    {loading ? <Loader2 className="animate-spin" size={18} /> : 'Devam Et & Şifre Yenile'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="input-group">
+                    <label>Yeni Şifreniz</label>
+                    <input 
+                      type="password" 
+                      required 
+                      placeholder="Yeni şifrenizi girin (Min. 4 karakter)" 
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="auth-input"
+                    />
+                  </div>
+                  <div className="input-group">
+                    <label>Yeni Şifreniz (Tekrar)</label>
+                    <input 
+                      type="password" 
+                      required 
+                      placeholder="Yeni şifrenizi tekrar girin" 
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="auth-input"
+                    />
+                  </div>
+
+                  <button type="submit" className="submit-btn" disabled={loading}>
+                    {loading ? <Loader2 className="animate-spin" size={18} /> : 'Şifremi Güncelle ve Giriş Yap'}
+                  </button>
+                </>
+              )}
 
               <button 
                 type="button" 
-                onClick={() => { setAuthTab('login'); setError(''); setSuccess(''); }} 
+                onClick={() => { setAuthTab('login'); setResetStep(1); setError(''); setSuccess(''); }} 
                 className="google-btn"
                 style={{ marginTop: '6px' }}
               >
