@@ -1320,41 +1320,134 @@ export default function UyelikPage() {
               <div className="feature-card-icon icon-box-emerald">
                 <Sparkles size={20} />
               </div>
-            )}
-
-            {/* Simulated OAuth section */}
-            <div className="divider-row">
-              <span className="divider-text">veya</span>
+              <div className="feature-card-body">
+                <div className="feature-card-title">Yapay Zeka Destekli Görsel Arama</div>
+                <div className="feature-card-desc">Seramiğin fotoğrafını yükleyin, yapay zekamız tüm markalar arasından en benzerini bulsun.</div>
+              </div>
             </div>
-
-            <button onClick={handleGoogleButtonClick} className="google-btn">
-              <svg className="google-icon" viewBox="0 0 24 24">
-                <path
-                  fill="#EA4335"
-                  d="M12 5.04c1.65 0 3.13.57 4.3 1.69l3.22-3.22C17.56 1.7 14.97 1 12 1 7.24 1 3.2 3.73 1.24 7.72l3.84 2.98C6.01 7.22 8.78 5.04 12 5.04z"
-                />
-                <path
-                  fill="#4285F4"
-                  d="M23.45 12.3c0-.82-.07-1.6-.2-2.3H12v4.4h6.43c-.28 1.44-1.1 2.66-2.33 3.48l3.63 2.82c2.12-1.95 3.35-4.83 3.35-8.4z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.08 14.7c-.24-.72-.38-1.5-.38-2.3s.14-1.58.38-2.3L1.24 7.12C.45 8.7.01 10.3.01 12s.44 3.3 1.23 4.88l3.84-3.18z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c3.24 0 5.97-1.07 7.96-2.9l-3.63-2.82c-1.2.8-2.73 1.28-4.33 1.28-3.22 0-5.99-2.18-6.96-5.16L1.2 16.58C3.16 20.47 7.2 23 12 23z"
-                />
-              </svg>
-              <span>Google ile Giriş Yap</span>
-            </button>
-
-            <a href="#" onClick={(e) => { e.preventDefault(); setError('Şifre sıfırlama bağlantısı gönderildi.'); }} className="forgot-link">
-              Şifremi unuttum
-            </a>
           </div>
         </div>
 
+        {/* RIGHT COLUMN - FLOATING AUTH CARD */}
+        <div className="uyelik-floating-card">
+          {/* Tab Switcher */}
+          <div className="auth-tab-row">
+            <button 
+              onClick={() => { setAuthTab('login'); setError(''); setSuccess(''); }} 
+              className={`auth-tab-btn ${authTab === 'login' ? 'active' : ''}`}
+            >
+              Giriş Yap
+            </button>
+            <button 
+              onClick={() => { setAuthTab('register'); setError(''); setSuccess(''); }} 
+              className={`auth-tab-btn ${authTab === 'register' ? 'active' : ''}`}
+            >
+              Hesap Oluştur
+            </button>
+          </div>
+
+          {/* Feedback Messages */}
+          {error && <div className="form-feedback error" style={{ marginBottom: '16px' }}>{error}</div>}
+          {success && <div className="form-feedback success" style={{ marginBottom: '16px' }}>{success}</div>}
+
+          {authTab === 'login' ? (
+            <form onSubmit={handleLoginSubmit} className="auth-form">
+              <div className="input-group">
+                <label>E-posta Adresiniz</label>
+                <input 
+                  type="email" 
+                  required 
+                  placeholder="ornek@email.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="auth-input"
+                />
+              </div>
+              <div className="input-group">
+                <label>Şifreniz</label>
+                <input 
+                  type="password" 
+                  required 
+                  placeholder="••••••••" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="auth-input"
+                />
+              </div>
+              <button type="submit" className="submit-btn" disabled={loading}>
+                {loading ? <Loader2 className="animate-spin" size={18} /> : 'Giriş Yap'}
+              </button>
+
+              <div className="divider-row">
+                <span className="divider-text">veya</span>
+              </div>
+
+              <button type="button" onClick={handleGoogleButtonClick} className="google-btn">
+                <svg className="google-icon" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                </svg>
+                <span>Google ile Giriş Yap</span>
+              </button>
+              <a href="#" onClick={(e) => { e.preventDefault(); alert('Şifre sıfırlama bağlantısı e-posta adresinize gönderilecektir. Lütfen canlı destek veya e-posta ile iletişime geçin.'); }} className="forgot-link">Şifremi unuttum</a>
+            </form>
+          ) : (
+            <form onSubmit={handleRegisterSubmit} className="auth-form">
+              <div className="input-group">
+                <label>Adınız Soyadınız</label>
+                <input 
+                  type="text" 
+                  required 
+                  placeholder="Ahmet Yılmaz" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="auth-input"
+                />
+              </div>
+              <div className="input-group">
+                <label>E-posta Adresiniz</label>
+                <input 
+                  type="email" 
+                  required 
+                  placeholder="ornek@email.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="auth-input"
+                />
+              </div>
+              <div className="input-group">
+                <label>Şifreniz</label>
+                <input 
+                  type="password" 
+                  required 
+                  placeholder="Şifreniz (En az 6 karakter)" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="auth-input"
+                />
+              </div>
+              <button type="submit" className="submit-btn" disabled={loading}>
+                {loading ? <Loader2 className="animate-spin" size={18} /> : 'Hesap Oluştur'}
+              </button>
+
+              <div className="divider-row">
+                <span className="divider-text">veya</span>
+              </div>
+
+              <button type="button" onClick={handleGoogleButtonClick} className="google-btn">
+                <svg className="google-icon" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                </svg>
+                <span>Google ile Hızlı Kayıt Ol</span>
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
