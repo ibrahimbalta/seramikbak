@@ -1,24 +1,48 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Activity, ArrowUpRight } from 'lucide-react';
 
 export default function LiveDealsTicker() {
-  const deals = [
+  const [deals, setDeals] = useState([
     { id: 1, brand: 'VitrA', name: 'Calacatta Gold 60x120', dealer: 'Kadıköy Bayi', discount: '%35 İndirim', price: '₺490 / m²', city: 'İstanbul' },
     { id: 2, brand: 'NG Kütahya', name: 'Albatros Antrasit 80x80', dealer: 'Çankaya Showroom', discount: '%40 İndirim', price: '₺420 / m²', city: 'Ankara' },
     { id: 3, brand: 'Qua Seramik', name: 'Pulpis Grey 60x120', dealer: 'Alsancak Konsept Store', discount: '%30 İndirim', price: '₺450 / m²', city: 'İzmir' },
     { id: 4, brand: 'Bien Seramik', name: 'Travertino 120x240 Plaka', dealer: 'Nilüfer Bayi', discount: '%45 İndirim', price: '₺890 / m²', city: 'Bursa' },
     { id: 5, brand: 'Kütahya Seramik', name: 'Verso Mermer 60x120', dealer: 'Akdeniz Showroom', discount: '%38 İndirim', price: '₺510 / m²', city: 'Antalya' },
     { id: 6, brand: 'Graniser', name: 'Beton Gri 60x60 Outlet', dealer: 'Gebze Stok Depo', discount: '%50 Fırsat', price: '₺290 / m²', city: 'Kocaeli' }
-  ];
+  ]);
 
-  // Quadruple the deals array for an unbroken 100% infinite loop
+  // Fetch real live outlet deals from API if available
+  useEffect(() => {
+    fetch('/api/outlet?limit=12')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          const formatted = data.data.map((item, idx) => ({
+            id: item.id || idx,
+            brand: item.brand?.name || item.badgeTag || 'Outlet',
+            name: item.title || item.dimensions || 'Seramik Ürün',
+            dealer: item.dealer?.name || 'Yetkili Bayi',
+            discount: item.discountBadge || item.category || 'Outlet Fırsatı',
+            price: item.pricePerM2 ? `₺${item.pricePerM2} / m²` : 'Özel Fiyat',
+            city: item.dealer?.city || 'Türkiye'
+          }));
+          setDeals(formatted);
+        }
+      })
+      .catch((err) => {
+        console.warn('LiveDealsTicker: using default deals list', err);
+      });
+  }, []);
+
+  // Quadruple the deals array for an unbroken, 100% seamless infinite loop across wide screens
   const tickerDeals = [...deals, ...deals, ...deals, ...deals];
 
   return (
-    <div className="live-ticker-fullwidth-wrapper">
-      <div className="live-ticker-container">
+    <div className="outlet-radar-fullwidth-wrapper">
+      <div className="outlet-radar-ticker-bar">
         {/* Fixed Left Live Badge */}
         <Link href="/outlet" className="live-badge-link" title="Tüm Outlet ve Stoklu İndirimleri Gör">
           <div className="live-badge-content">
@@ -28,8 +52,8 @@ export default function LiveDealsTicker() {
         </Link>
 
         {/* Viewport with min-width: 0 & Endless Ticker Track */}
-        <div className="ticker-viewport">
-          <div className="ticker-track">
+        <div className="outlet-radar-viewport">
+          <div className="outlet-radar-track">
             {tickerDeals.map((deal, idx) => (
               <Link
                 key={`${deal.id}-${idx}`}
@@ -48,30 +72,30 @@ export default function LiveDealsTicker() {
           </div>
         </div>
 
-        {/* Fixed Right Social Proof Badge (Desktop Only) */}
+        {/* Fixed Right Social Proof (Desktop Only) */}
         <div className="ticker-social-proof">
-          <Activity size={15} style={{ color: '#38bdf8' }} />
+          <Activity size={14} style={{ color: '#38bdf8' }} />
           <span>Bugün <strong>1,420 usta & mimar</strong> bayilerden fiyat topladı</span>
         </div>
       </div>
 
       <style jsx>{`
-        /* Full-Bleed 100vw Breakout Wrapper */
-        .live-ticker-fullwidth-wrapper {
+        /* Full-Bleed 100vw Breakout Wrapper: Spans 100% full screen width edge-to-edge */
+        .outlet-radar-fullwidth-wrapper {
           width: 100vw;
           position: relative;
           left: 50%;
           right: 50%;
           margin-left: -50vw;
           margin-right: -50vw;
-          margin-top: 16px;
-          margin-bottom: 24px;
+          margin-top: 14px;
+          margin-bottom: 20px;
           overflow: hidden;
-          z-index: 10;
+          z-index: 100;
         }
 
-        .live-ticker-container {
-          width: 100%;
+        .outlet-radar-ticker-bar {
+          width: 100vw;
           background: linear-gradient(90deg, #050811 0%, #0f172a 50%, #050811 100%);
           border-top: 1px solid rgba(212, 175, 55, 0.35);
           border-bottom: 1px solid rgba(212, 175, 55, 0.35);
@@ -80,7 +104,9 @@ export default function LiveDealsTicker() {
           align-items: center;
           gap: 20px;
           position: relative;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+          box-sizing: border-box;
+          overflow: hidden;
         }
 
         :global(a.live-badge-link) {
@@ -95,13 +121,13 @@ export default function LiveDealsTicker() {
           gap: 8px;
           padding: 6px 14px;
           border-radius: 20px;
-          background: rgba(239, 68, 68, 0.16);
-          border: 1px solid rgba(239, 68, 68, 0.45);
+          background: rgba(239, 68, 68, 0.18);
+          border: 1px solid rgba(239, 68, 68, 0.5);
           color: #f87171;
           font-size: 0.78rem;
           font-weight: 800;
           white-space: nowrap;
-          box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
+          box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
           transition: transform 0.2s ease, background 0.2s ease;
         }
 
@@ -135,25 +161,25 @@ export default function LiveDealsTicker() {
           }
         }
 
-        /* Viewport MUST have min-width: 0 to prevent flex item collapsing */
-        .ticker-viewport {
+        /* Viewport MUST have min-width: 0 to prevent flexbox item collapsing */
+        .outlet-radar-viewport {
           flex: 1;
           min-width: 0;
           overflow: hidden;
           position: relative;
-          mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
-          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+          mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
         }
 
-        .ticker-track {
+        .outlet-radar-track {
           display: flex;
           align-items: center;
           gap: 20px;
           width: max-content;
-          animation: tickerSlide 36s linear infinite;
+          animation: tickerSlide 35s linear infinite;
         }
 
-        .ticker-track:hover {
+        .outlet-radar-track:hover {
           animation-play-state: paused;
         }
 
@@ -247,7 +273,7 @@ export default function LiveDealsTicker() {
           .ticker-social-proof {
             display: none;
           }
-          .live-ticker-container {
+          .outlet-radar-ticker-bar {
             padding: 8px 12px;
             gap: 12px;
           }
