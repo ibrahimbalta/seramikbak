@@ -47,7 +47,7 @@ export default function LiveDealsTicker() {
         <Link href="/outlet" className="live-badge-link" title="Tüm Outlet ve Stoklu İndirimleri Gör">
           <div className="live-badge-content">
             <span className="live-pulse-dot" />
-            <span>🔥 OUTLET RADARI</span>
+            <span>Outlet</span>
           </div>
         </Link>
 
