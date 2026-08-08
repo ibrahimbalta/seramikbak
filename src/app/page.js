@@ -3965,61 +3965,84 @@ export default function Home() {
             {/* Dynamic Live Platform Activity & Traffic Statistics Section */}
             <div className="live-stats-section-banner glass-panel">
               <div className="live-stats-header">
-                <div className="live-pulse-badge">
-                  <span className="pulse-dot" />
-                  <span className="live-badge-text">CANLI PLATFORM TRAFİĞİ & YOĞUNLUK HAREKETLERİ</span>
+                <div className="live-header-title-group">
+                  <div className="live-pulse-badge">
+                    <span className="pulse-dot" />
+                    <span className="live-badge-text">CANLI HAREKETLER & MİMARİ TRAFİK</span>
+                  </div>
+                  <h3 className="live-banner-heading">
+                    Türkiye Geneli <span>Canlı Platform Analitiği</span>
+                  </h3>
                 </div>
+
                 {liveActivities && liveActivities.length > 0 && (
-                  <div className="live-ticker-container">
-                    <span className="live-ticker-label">⚡ ANLIK AKIŞ:</span>
-                    <span className="live-ticker-text animate-fade-in">
+                  <div className="live-ticker-capsule">
+                    <div className="ticker-capsule-badge">⚡ ANLIK AKIŞ</div>
+                    <div className="ticker-capsule-text animate-fade-in">
                       {liveActivities[activeActivityIdx % liveActivities.length]?.text} 
-                      <small>({liveActivities[activeActivityIdx % liveActivities.length]?.time})</small>
-                    </span>
+                      <span className="ticker-time-ago">• {liveActivities[activeActivityIdx % liveActivities.length]?.time}</span>
+                    </div>
                   </div>
                 )}
               </div>
 
               <div className="live-stats-grid">
-                <div className="stat-card-item">
-                  <div className="stat-icon-wrapper green-glow">
-                    <Users size={22} />
+                <div className="stat-card-item card-green">
+                  <div className="stat-card-top">
+                    <div className="stat-icon-wrapper green-glow">
+                      <Users size={18} />
+                    </div>
+                    <span className="stat-tag-badge tag-green">GERÇEK ZAMANLI</span>
                   </div>
                   <div className="stat-card-info">
                     <div className="stat-card-number">
                       {(liveStats.todayVisitors || liveStats.activeOnlineUsers || 0).toLocaleString('tr-TR')}
-                      <span className="online-now-badge">Gerçek Zamanlı</span>
                     </div>
                     <div className="stat-card-title">Bugünkü Ziyaretçi & İnceleme</div>
                   </div>
                 </div>
 
-                <div className="stat-card-item">
-                  <div className="stat-icon-wrapper gold-glow">
-                    <Building2 size={22} />
+                <div className="stat-card-item card-gold">
+                  <div className="stat-card-top">
+                    <div className="stat-icon-wrapper gold-glow">
+                      <Building2 size={18} />
+                    </div>
+                    <span className="stat-tag-badge tag-gold">81 İLDE</span>
                   </div>
                   <div className="stat-card-info">
-                    <div className="stat-card-number">{liveStats.approvedDealers ? liveStats.approvedDealers.toLocaleString('tr-TR') : 0}</div>
+                    <div className="stat-card-number">
+                      {liveStats.approvedDealers ? liveStats.approvedDealers.toLocaleString('tr-TR') : 0}
+                    </div>
                     <div className="stat-card-title">Kayıtlı Bayi & Marka Ağı</div>
                   </div>
                 </div>
 
-                <div className="stat-card-item">
-                  <div className="stat-icon-wrapper blue-glow">
-                    <FileText size={22} />
+                <div className="stat-card-item card-blue">
+                  <div className="stat-card-top">
+                    <div className="stat-icon-wrapper blue-glow">
+                      <FileText size={18} />
+                    </div>
+                    <span className="stat-tag-badge tag-blue">TEKLİFLER</span>
                   </div>
                   <div className="stat-card-info">
-                    <div className="stat-card-number">{liveStats.totalRFQs ? liveStats.totalRFQs.toLocaleString('tr-TR') : 0}</div>
+                    <div className="stat-card-number">
+                      {liveStats.totalRFQs ? liveStats.totalRFQs.toLocaleString('tr-TR') : 0}
+                    </div>
                     <div className="stat-card-title">Gelen Teklif & Proje Talebi</div>
                   </div>
                 </div>
 
-                <div className="stat-card-item">
-                  <div className="stat-icon-wrapper purple-glow">
-                    <Sparkles size={22} />
+                <div className="stat-card-item card-purple">
+                  <div className="stat-card-top">
+                    <div className="stat-icon-wrapper purple-glow">
+                      <Sparkles size={18} />
+                    </div>
+                    <span className="stat-tag-badge tag-purple">3D KATALOG</span>
                   </div>
                   <div className="stat-card-info">
-                    <div className="stat-card-number">{liveStats.productCount ? liveStats.productCount.toLocaleString('tr-TR') : 0}</div>
+                    <div className="stat-card-number">
+                      {liveStats.productCount ? liveStats.productCount.toLocaleString('tr-TR') : 0}
+                    </div>
                     <div className="stat-card-title">Katalogdaki Ürün Modeli</div>
                   </div>
                 </div>
