@@ -36,6 +36,7 @@ export default function UyelikPage() {
   const [resetStep, setResetStep] = useState(1); // 1: verify email, 2: new password
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [verifiedUserName, setVerifiedUserName] = useState('');
 
   // Logged-in User Session State
   const [currentUser, setCurrentUser] = useState(null);
@@ -163,7 +164,7 @@ export default function UyelikPage() {
 
     try {
       if (resetStep === 1) {
-        // Step 1: Verify Email Address
+        // Step 1: Verify Registered Email Address in DB
         const res = await fetch('/api/auth/forgot-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -172,10 +173,11 @@ export default function UyelikPage() {
         const data = await res.json();
 
         if (res.ok && data.success) {
-          setSuccess(data.message || '✓ E-posta adresiniz doğrulandı. Yeni şifrenizi belirleyin.');
+          setSuccess(data.message || '✓ Kayıtlı e-posta adresiniz doğrulandı.');
+          if (data.userName) setVerifiedUserName(data.userName);
           setResetStep(2);
         } else {
-          setError(data.error || 'E-posta adresi doğrulanırken bir hata oluştu.');
+          setError(data.error || 'Bu e-posta adresi ile kayıtlı bir kullanıcı bulunamadı. Lütfen e-posta adresinizi doğru yazdığınızdan emin olun.');
         }
       } else {
         // Step 2: Set New Password

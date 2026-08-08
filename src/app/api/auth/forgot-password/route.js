@@ -16,7 +16,21 @@ export async function POST(request) {
 
     const trimmedEmail = email.trim().toLowerCase();
 
-    // ACTION 2: RESET & UPDATE PASSWORD
+    // STRICT USER CHECK IN DATABASE
+    const user = await prisma.user.findUnique({
+      where: { email: trimmedEmail }
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { 
+          error: `"${trimmedEmail}" adresiyle kayıtlı bir kullanıcı bulunamadı. Lütfen e-posta adresinizi doğru yazdığınızdan emin olun veya 'Hesap Oluştur' seçeneğinden ücretsiz kayıt olun.` 
+        },
+        { status: 404 }
+      );
+    }
+
+    // ACTION 2: RESET PASSWORD FOR EXISTING VERIFIED USER
     if (action === 'reset_password') {
       if (!newPassword || newPassword.length < 4) {
         return NextResponse.json(
@@ -27,20 +41,15 @@ export async function POST(request) {
 
       const hashedPassword = hashPassword(newPassword);
 
-      // Find or create user to update password
-      const updatedUser = await prisma.user.upsert({
-        where: { email: trimmedEmail },
-        update: { password: hashedPassword },
-        create: {
-          email: trimmedEmail,
-          name: trimmedEmail.split('@')[0],
-          password: hashedPassword
-        }
+      // Update password strictly for existing user
+      const updatedUser = await prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashedPassword }
       });
 
       return NextResponse.json({
         success: true,
-        message: '✓ Şifreniz başarıyla yenilendi! Hesabınıza otomatik olarak giriş yapılıyor...',
+        message: `✓ Sn. ${updatedUser.name}, şifreniz başarıyla yenilendi! Hesabınıza otomatik olarak giriş yapılıyor...`,
         user: {
           id: updatedUser.id,
           name: updatedUser.name,
@@ -49,16 +58,13 @@ export async function POST(request) {
       });
     }
 
-    // ACTION 1 (DEFAULT): VERIFY EMAIL
-    const user = await prisma.user.findUnique({
-      where: { email: trimmedEmail }
-    });
-
+    // ACTION 1 (DEFAULT): VERIFY REGISTERED USER EMAIL
     return NextResponse.json({
       success: true,
       verified: true,
-      message: '✓ E-posta adresiniz doğrulandı. Lütfen aşağıdaki alandan yeni şifrenizi belirleyin.',
-      user: user ? { id: user.id, name: user.name, email: user.email } : { email: trimmedEmail }
+      userName: user.name,
+      message: `✓ Kayıtlı Hesap Doğrulandı: Sn. ${user.name} (${user.email}). Lütfen yeni şifrenizi belirleyin.`,
+      user: { id: user.id, name: user.name, email: user.email }
     });
 
   } catch (error) {
