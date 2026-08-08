@@ -3275,6 +3275,32 @@ export default function Home() {
       {/* Top Utility Bar (B2B and Corporate Portal Links) */}
       {!isKioskMode && (
         <div className="top-utility-bar glass-panel-dark">
+          <div className="utility-left" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+            <Link href="/proje-talep" className="utility-item b2b-btn-link">
+              <Building2 size={13} />
+              <span>{t('b2bQuotes')}</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/bayi" className="utility-item portal-link">
+              <UserIcon size={13} />
+              <span>{t('dealerPortal')}</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/marka" className="utility-item portal-link">
+              <TrendingUp size={13} />
+              <span>{t('brandPortal')}</span>
+            </Link>
+            <span className="utility-divider">|</span>
+            <button 
+              onClick={() => setIsKioskMode(true)} 
+              className="utility-item kiosk-btn-link"
+              title="Bayi Teşhir Modu (Kiosk)"
+            >
+              <div className="pulse-indicator-green" />
+              <span>{t('kioskMode')}</span>
+            </button>
+          </div>
+
           <div className="utility-right" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
             <Link href="/" className="utility-item portal-link" onClick={() => setActiveTab('search')}>
               <HomeIcon size={13} />
@@ -3300,30 +3326,6 @@ export default function Home() {
             <Link href="/hakkimizda" className="utility-item portal-link">
               <Info size={13} />
               <span>{t('about')}</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <button 
-              onClick={() => setIsKioskMode(true)} 
-              className="utility-item kiosk-btn-link"
-              title="Bayi Teşhir Modu (Kiosk)"
-            >
-              <div className="pulse-indicator-green" />
-              <span>{t('kioskMode')}</span>
-            </button>
-            <span className="utility-divider">|</span>
-            <Link href="/bayi" className="utility-item portal-link">
-              <UserIcon size={13} />
-              <span>{t('dealerPortal')}</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/marka" className="utility-item portal-link">
-              <TrendingUp size={13} />
-              <span>{t('brandPortal')}</span>
-            </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/proje-talep" className="utility-item b2b-btn-link">
-              <Building2 size={13} />
-              <span>{t('b2bQuotes')}</span>
             </Link>
           </div>
         </div>
