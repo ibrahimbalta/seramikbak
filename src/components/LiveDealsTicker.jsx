@@ -262,7 +262,8 @@ export default function LiveDealsTicker() {
         }
 
         .deal-dealer {
-          color: #64748b;
+          color: #334155;
+          font-weight: 600;
           font-size: 0.76rem;
         }
 
