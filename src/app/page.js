@@ -731,7 +731,6 @@ export default function Home() {
   // Navigation
   const [activeTab, setActiveTab] = useState('search'); // search, studio, dealers, b2b
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showGlobalExportModal, setShowGlobalExportModal] = useState(false);
 
   // Database State
   const [products, setProducts] = useState([]);
@@ -3362,13 +3361,14 @@ export default function Home() {
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
               </button>
-              <button 
+              <Link 
+                href="/global-tanitim"
                 className="nav-link global-export-nav-link" 
-                onClick={() => setShowGlobalExportModal(true)}
+                style={{ textDecoration: 'none' }}
               >
                 <Globe size={14} style={{ color: '#d4af37' }} />
-                <span style={{ color: '#d4af37', fontWeight: '800' }}>🌍 Global İhracat</span>
-              </button>
+                <span style={{ color: '#d4af37', fontWeight: '800' }}>🌍 Global Tanıtım</span>
+              </Link>
             </>
           )}
         </nav>
@@ -3531,16 +3531,15 @@ export default function Home() {
                 <MapPin size={16} />
                 <span>{t('dealers')}</span>
               </button>
-              <button 
+              <Link 
+                href="/global-tanitim"
                 className="mobile-nav-link"
-                onClick={() => {
-                  setShowMobileMenu(false);
-                  setShowGlobalExportModal(true);
-                }}
+                onClick={() => setShowMobileMenu(false)}
+                style={{ textDecoration: 'none' }}
               >
                 <Globe size={16} style={{ color: '#d4af37' }} />
-                <span style={{ color: '#d4af37', fontWeight: '800' }}>🌍 Global İhracat Portalı</span>
-              </button>
+                <span style={{ color: '#d4af37', fontWeight: '800' }}>🌍 Global Tanıtım</span>
+              </Link>
               <Link href="/outlet" className="mobile-nav-link outlet-link" onClick={() => setShowMobileMenu(false)}>
                 <Sparkles size={16} style={{ color: '#ef4444' }} />
                 <span style={{ color: '#ef4444', fontWeight: '800' }}>{t('outlet')}</span>
@@ -7496,26 +7495,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Global Export Hub Modal Overlay */}
-      {showGlobalExportModal && (
-        <div 
-          className="export-modal-overlay" 
-          onClick={() => setShowGlobalExportModal(false)}
-        >
-          <div 
-            onClick={(e) => e.stopPropagation()} 
-            style={{ width: '100%', maxWidth: '1100px', maxHeight: '90vh', overflowY: 'auto' }}
-          >
-            <GlobalExportHub 
-              onClose={() => setShowGlobalExportModal(false)} 
-              onOpen3DStudio={() => {
-                setShowGlobalExportModal(false);
-                setActiveTab('studio');
-              }} 
-            />
-          </div>
-        </div>
-      )}
+
 
       {/* Premium Footer Section */}
       <footer className="site-footer">
@@ -7584,6 +7564,7 @@ export default function Home() {
               <li><Link href="/bayi?tab=register">Bayimiz Olun (B2B Başvuru)</Link></li>
               <li><Link href="/bayi">Bayi Giriş Portalı</Link></li>
               <li><Link href="/marka">B2B Marka Portalı</Link></li>
+              <li><Link href="/global-tanitim" style={{ color: '#d4af37', fontWeight: '800' }}>🌍 Global Tanıtım Portalı</Link></li>
             </ul>
           </div>
 
