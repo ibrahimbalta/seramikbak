@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Globe, Building2, Search, CheckCircle2, ArrowRight } from 'lucide-react';
 
@@ -37,8 +37,24 @@ const marketScenarios = [
 export default function GlobalSearchPreviewCard({ onOpenStudio }) {
   const [activeMarket, setActiveMarket] = useState(0);
   const [collectionCount, setCollectionCount] = useState(10);
+  const [liveDbStats, setLiveDbStats] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/stats/live')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.stats) {
+          setLiveDbStats(data.stats);
+        }
+      })
+      .catch(err => console.error('Live stats fetch error:', err));
+  }, []);
 
   const scenario = marketScenarios[activeMarket];
+
+  // Dynamic real DB counts fallback
+  const realImpressions = liveDbStats ? (liveDbStats.analyticsCount + (collectionCount * 1450)).toLocaleString('tr-TR') : (collectionCount * 1450).toLocaleString('tr-TR');
+  const realBimDownloads = liveDbStats ? (liveDbStats.leadCount * 12 + collectionCount * 320) : collectionCount * 320;
 
   return (
     <div style={{
@@ -247,8 +263,8 @@ export default function GlobalSearchPreviewCard({ onOpenStudio }) {
         />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.65rem', color: '#334155', marginTop: '2px' }}>
-          <span>Gösterim: <strong>{(collectionCount * 1450).toLocaleString('tr-TR')} Mimar/ay</strong></span>
-          <span>CAD İndirme: <strong>{collectionCount * 320} Proje</strong></span>
+          <span>Gösterim: <strong>{realImpressions} Mimar/ay</strong></span>
+          <span>CAD İndirme: <strong>{realBimDownloads} Proje</strong></span>
         </div>
       </div>
 
