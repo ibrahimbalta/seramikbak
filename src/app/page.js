@@ -3981,7 +3981,7 @@ export default function Home() {
                 background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
                 border: '1px solid #e2e8f0',
                 borderRadius: '24px',
-                padding: isMobile ? '24px 16px' : '36px 28px',
+                padding: '32px 24px',
                 margin: '24px 0 32px 0',
                 boxShadow: '0 15px 35px rgba(0,0,0,0.03), 0 0 30px rgba(179, 142, 71, 0.06)',
                 position: 'relative',
@@ -4006,7 +4006,7 @@ export default function Home() {
                 {/* 3-Column Desktop Grid Layout */}
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: isMobile ? '1fr' : 'minmax(220px, 1fr) minmax(320px, 2fr) minmax(220px, 1fr)',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
                   gap: '20px',
                   alignItems: 'stretch',
                   marginBottom: '28px'
@@ -4089,7 +4089,7 @@ export default function Home() {
 
                     {/* Main Headline */}
                     <h2 style={{
-                      fontSize: 'clamp(1.4rem, 2.8vw, 2.1rem)',
+                      fontSize: 'clamp(1.3rem, 2.5vw, 1.9rem)',
                       fontWeight: '900',
                       color: '#0f172a',
                       lineHeight: '1.25',
@@ -4252,15 +4252,15 @@ export default function Home() {
                     <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>5 Dilde</div>
                     <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Otomatik SEO</div>
                   </div>
-                  <div style={{ textAlign: 'center', borderLeft: isMobile ? 'none' : '1px solid #f1f5f9' }}>
+                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
                     <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>85+</div>
                     <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>İhracat Ülkesi</div>
                   </div>
-                  <div style={{ textAlign: 'center', borderLeft: isMobile ? 'none' : '1px solid #f1f5f9' }}>
+                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
                     <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>15.000+</div>
                     <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Uluslararası Mimar</div>
                   </div>
-                  <div style={{ textAlign: 'center', borderLeft: isMobile ? 'none' : '1px solid #f1f5f9' }}>
+                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
                     <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>6 Döviz</div>
                     <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Canlı Kur Dönüşümü</div>
                   </div>
