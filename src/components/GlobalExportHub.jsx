@@ -23,7 +23,7 @@ const exportCountriesList = [
   { flag: '🇰🇼', name: 'Kuveyt (Kuwait)', searchTarget: 'Google KW', lang: 'العربية / English' }
 ];
 
-export default function GlobalExportHub({ onOpen3DStudio }) {
+export default function GlobalExportHub({ onOpen3DStudio, onClose }) {
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [isBimModalOpen, setIsBimModalOpen] = useState(false);
   const [isCountriesModalOpen, setIsCountriesModalOpen] = useState(false);
@@ -42,6 +42,11 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
   return (
     <div className="global-export-hub-container">
       <div className="global-export-banner-card">
+        {onClose && (
+          <button onClick={onClose} className="global-hub-close-btn" title="Kapat">
+            <X size={18} />
+          </button>
+        )}
 
         {/* Header Badge & SEO Tagline */}
         <div className="global-banner-header">
@@ -425,6 +430,30 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
           gap: 18px;
           position: relative;
           overflow: hidden;
+        }
+
+        .global-hub-close-btn {
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #cbd5e1;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          z-index: 10;
+        }
+
+        .global-hub-close-btn:hover {
+          background: rgba(239, 68, 68, 0.25);
+          border-color: rgba(239, 68, 68, 0.5);
+          color: #ef4444;
         }
 
         .global-banner-header {

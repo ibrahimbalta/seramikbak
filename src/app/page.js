@@ -731,6 +731,7 @@ export default function Home() {
   // Navigation
   const [activeTab, setActiveTab] = useState('search'); // search, studio, dealers, b2b
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showGlobalExportModal, setShowGlobalExportModal] = useState(false);
 
   // Database State
   const [products, setProducts] = useState([]);
@@ -3363,13 +3364,7 @@ export default function Home() {
               </button>
               <button 
                 className="nav-link global-export-nav-link" 
-                onClick={() => {
-                  setActiveTab('search');
-                  setTimeout(() => {
-                    const el = document.getElementById('global-export-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
-                }}
+                onClick={() => setShowGlobalExportModal(true)}
               >
                 <Globe size={14} style={{ color: '#d4af37' }} />
                 <span style={{ color: '#d4af37', fontWeight: '800' }}>🌍 Global İhracat</span>
@@ -3539,12 +3534,8 @@ export default function Home() {
               <button 
                 className="mobile-nav-link"
                 onClick={() => {
-                  setActiveTab('search');
                   setShowMobileMenu(false);
-                  setTimeout(() => {
-                    const el = document.getElementById('global-export-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
+                  setShowGlobalExportModal(true);
                 }}
               >
                 <Globe size={16} style={{ color: '#d4af37' }} />
@@ -3887,10 +3878,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Global Brand Export Hub Showcase Section */}
-            <div id="global-export-section" style={{ margin: '24px 0' }}>
-              <GlobalExportHub onOpen3DStudio={() => setActiveTab('studio')} />
-            </div>
+
 
             {/* Categories & 3D Showcase Section */}
             <div className="categories-showcase-container">
@@ -7508,10 +7496,26 @@ export default function Home() {
         </div>
       )}
 
-      {/* Global Brand Export Hub Showcase Section */}
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
-        <GlobalExportHub onOpen3DStudio={() => setActiveTab('studio')} />
-      </div>
+      {/* Global Export Hub Modal Overlay */}
+      {showGlobalExportModal && (
+        <div 
+          className="export-modal-overlay" 
+          onClick={() => setShowGlobalExportModal(false)}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ width: '100%', maxWidth: '1100px', maxHeight: '90vh', overflowY: 'auto' }}
+          >
+            <GlobalExportHub 
+              onClose={() => setShowGlobalExportModal(false)} 
+              onOpen3DStudio={() => {
+                setShowGlobalExportModal(false);
+                setActiveTab('studio');
+              }} 
+            />
+          </div>
+        </div>
+      )}
 
       {/* Premium Footer Section */}
       <footer className="site-footer">
