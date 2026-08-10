@@ -54,22 +54,95 @@ export default function GlobalPromotionPage() {
       {/* Background Soft Glow Effects */}
       <div className="bg-soft-glow" />
 
-      {/* Top Header Navbar (Matching /ilham Page) */}
-      <header className="global-page-header">
-        <div className="header-inner">
-          <Link href="/" className="back-link">
-            <ArrowLeft size={16} />
-            <span>Ana Sayfaya Dön</span>
+      {/* Top Header Navbar */}
+      <header className="global-page-header" style={{
+        background: 'rgba(255, 255, 255, 0.92)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid #e2e8f0',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
+        padding: '12px 24px',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
+      }}>
+        <div className="header-inner" style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px'
+        }}>
+          {/* Ana Sayfaya Dön (Sleek White Pill Button) */}
+          <Link 
+            href="/" 
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              color: '#0f172a',
+              background: '#ffffff',
+              border: '1px solid #cbd5e1',
+              borderRadius: '12px',
+              padding: '8px 16px',
+              fontSize: '0.85rem',
+              fontWeight: '800',
+              textDecoration: 'none',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <ArrowLeft size={16} style={{ color: '#b45309' }} />
+            <span style={{ color: '#0f172a', fontWeight: '800' }}>Ana Sayfaya Dön</span>
           </Link>
           
-          <div className="header-brand">
-            <div className="logo-icon">SB</div>
-            <span className="logo-text">SeramikBak Global</span>
-          </div>
+          {/* Logo Center */}
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+              color: '#d4af37',
+              border: '1px solid rgba(212, 175, 55, 0.4)',
+              borderRadius: '10px',
+              fontWeight: '900',
+              fontSize: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+            }}>SB</div>
+            <span style={{
+              fontFamily: 'var(--font-title, "Outfit", sans-serif)',
+              fontSize: '1.2rem',
+              fontWeight: '900',
+              color: '#0f172a',
+              letterSpacing: '-0.02em'
+            }}>SeramikBak Global</span>
+          </Link>
 
-          <Link href="/marka" className="header-join-btn">
-            <Building2 size={15} />
-            <span>Marka Portalı</span>
+          {/* Marka Portalı (Dark Slate Gold CTA Button) */}
+          <Link 
+            href="/marka" 
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+              color: '#ffffff',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              borderRadius: '12px',
+              padding: '8px 18px',
+              fontSize: '0.85rem',
+              fontWeight: '800',
+              textDecoration: 'none',
+              boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Building2 size={16} style={{ color: '#d4af37' }} />
+            <span style={{ color: '#ffffff', fontWeight: '800' }}>Marka Portalı</span>
           </Link>
         </div>
       </header>
