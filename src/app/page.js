@@ -3977,15 +3977,17 @@ export default function Home() {
             <div 
               className="homepage-global-export-banner glass-panel"
               style={{
+                width: '100%',
                 background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
                 border: '1px solid #e2e8f0',
                 borderRadius: '24px',
-                padding: '36px 24px',
+                padding: '36px 32px',
                 margin: '24px 0 32px 0',
-                boxShadow: '0 15px 35px rgba(0,0,0,0.03), 0 0 30px rgba(180, 83, 9, 0.04)',
+                boxShadow: '0 15px 35px rgba(0,0,0,0.03), 0 0 30px rgba(179, 142, 71, 0.06)',
                 textAlign: 'center',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                boxSizing: 'border-box'
               }}
             >
               {/* Subtle Ambient Background Lighting */}
@@ -3994,50 +3996,51 @@ export default function Home() {
                 top: '-60px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                width: '350px',
-                height: '180px',
-                background: 'radial-gradient(circle, rgba(180, 83, 9, 0.08) 0%, rgba(255,255,255,0) 70%)',
+                width: '500px',
+                height: '200px',
+                background: 'radial-gradient(circle, rgba(179, 142, 71, 0.1) 0%, rgba(255,255,255,0) 70%)',
                 pointerEvents: 'none',
                 zIndex: 0
               }} />
 
-              <div style={{ position: 'relative', zIndex: 1, maxWidth: '920px', margin: '0 auto' }}>
+              <div style={{ position: 'relative', zIndex: 1, width: '100%', margin: '0 auto' }}>
                 {/* Top Badge */}
                 <div style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  background: 'rgba(180, 83, 9, 0.06)',
-                  border: '1px solid rgba(180, 83, 9, 0.2)',
+                  background: 'rgba(179, 142, 71, 0.08)',
+                  border: '1px solid rgba(179, 142, 71, 0.3)',
                   borderRadius: '30px',
-                  padding: '6px 16px',
+                  padding: '6px 18px',
                   marginBottom: '18px'
                 }}>
-                  <Globe size={13} style={{ color: '#b45309' }} />
-                  <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#b45309', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  <Globe size={14} style={{ color: '#b38e47' }} />
+                  <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#b38e47', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                     GLOBAL CERAMICS MULTI-LINGUAL SEO SHOWROOM
                   </span>
                 </div>
 
                 {/* Main Headline */}
                 <h2 style={{
-                  fontSize: 'clamp(1.4rem, 3.2vw, 2.2rem)',
+                  fontSize: 'clamp(1.5rem, 3.5vw, 2.3rem)',
                   fontWeight: '900',
                   color: '#0f172a',
                   lineHeight: '1.28',
-                  margin: '0 0 16px 0',
+                  margin: '0 auto 16px auto',
+                  maxWidth: '960px',
                   fontFamily: 'var(--font-title, "Outfit", sans-serif)',
                   letterSpacing: '-0.02em'
                 }}>
-                  Markalarınızı ve Ürünlerinizi <span style={{ color: '#b45309' }}>5 Dilde Çoklu SEO</span> ile <span style={{ color: '#b45309' }}>Dünya Pazarına</span> Açıyoruz
+                  Markalarınızı ve Ürünlerinizi <span style={{ color: '#b38e47' }}>5 Dilde Çoklu SEO</span> ile <span style={{ color: '#b38e47' }}>Dünya Pazarına</span> Açıyoruz
                 </h2>
 
                 {/* Subtitle */}
                 <p style={{
-                  fontSize: '0.92rem',
+                  fontSize: '0.94rem',
                   color: '#64748b',
                   margin: '0 auto 24px auto',
-                  maxWidth: '780px',
+                  maxWidth: '860px',
                   lineHeight: '1.65',
                   fontWeight: '500'
                 }}>
@@ -4049,15 +4052,15 @@ export default function Home() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
+                  gap: '10px',
                   flexWrap: 'wrap',
-                  marginBottom: '24px'
+                  marginBottom: '26px'
                 }}>
-                  <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '4px 12px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇹🇷 Türkçe</span>
-                  <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '4px 12px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇬🇧 English</span>
-                  <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '4px 12px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇩🇪 Deutsch</span>
-                  <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '4px 12px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇸🇦 العربية</span>
-                  <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '4px 12px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇷🇺 Русский</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇹🇷 Türkçe</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇬🇧 English</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇩🇪 Deutsch</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇸🇦 العربية</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇷🇺 Русский</span>
                 </div>
 
                 {/* Action Buttons */}
@@ -4065,9 +4068,9 @@ export default function Home() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '12px',
+                  gap: '14px',
                   flexWrap: 'wrap',
-                  marginBottom: '28px'
+                  marginBottom: '30px'
                 }}>
                   <Link 
                     href="/global-tanitim#brand-apply-form" 
@@ -4075,20 +4078,20 @@ export default function Home() {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '8px',
-                      background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
-                      color: '#ffffff',
-                      padding: '13px 24px',
+                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                      color: '#111827',
+                      padding: '13px 26px',
                       borderRadius: '14px',
-                      fontSize: '0.88rem',
+                      fontSize: '0.9rem',
                       fontWeight: '800',
                       textDecoration: 'none',
-                      boxShadow: '0 8px 20px rgba(180, 83, 9, 0.25)',
+                      boxShadow: '0 8px 24px rgba(212, 175, 55, 0.25)',
                       transition: 'all 0.2s ease'
                     }}
                   >
                     <Building2 size={16} />
                     <span>Markanızı Global Tanıtım Ağına Ekleyin</span>
-                    <ArrowRight size={14} />
+                    <ArrowRight size={15} />
                   </Link>
 
                   <Link 
@@ -4100,46 +4103,46 @@ export default function Home() {
                       background: '#ffffff',
                       color: '#0f172a',
                       border: '1px solid #cbd5e1',
-                      padding: '13px 22px',
+                      padding: '13px 24px',
                       borderRadius: '14px',
-                      fontSize: '0.88rem',
+                      fontSize: '0.9rem',
                       fontWeight: '700',
                       textDecoration: 'none',
                       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                       transition: 'all 0.2s ease'
                     }}
                   >
-                    <Info size={16} style={{ color: '#b45309' }} />
+                    <Info size={16} style={{ color: '#b38e47' }} />
                     <span>5 Dilde SEO Mimarisini İnceleyin</span>
                   </Link>
                 </div>
 
-                {/* 4 Metric Stats Pill Bar */}
+                {/* 4 Metric Stats Pill Bar - Full Container Stretch */}
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-                  gap: '12px',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '16px',
                   background: '#ffffff',
                   border: '1px solid #e2e8f0',
                   borderRadius: '18px',
-                  padding: '16px 20px',
+                  padding: '20px 24px',
                   boxShadow: '0 8px 25px rgba(0, 0, 0, 0.03)'
                 }}>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b45309' }}>5 Dilde</div>
-                    <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Otomatik SEO</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>5 Dilde</div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Otomatik SEO</div>
                   </div>
                   <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b45309' }}>85+</div>
-                    <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>İhracat Ülkesi</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>85+</div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>İhracat Ülkesi</div>
                   </div>
                   <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b45309' }}>15.000+</div>
-                    <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Uluslararası Mimar</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>15.000+</div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Uluslararası Mimar</div>
                   </div>
                   <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b45309' }}>6 Döviz</div>
-                    <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Canlı Kur Dönüşümü</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>6 Döviz</div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Canlı Kur Dönüşümü</div>
                   </div>
                 </div>
               </div>
