@@ -26,6 +26,7 @@ const tileSpecsData = [
 
 export default function GlobalExportHub() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [sqm, setSqm] = useState(1200);
   const [selectedTile, setSelectedTile] = useState(tileSpecsData[0]);
   const [selectedPort, setSelectedPort] = useState(portsData[0]);
@@ -184,14 +185,95 @@ export default function GlobalExportHub() {
             <CheckCircle2 size={18} style={{ color: '#10b981' }} />
             <span>Markanızın seramik kataloglarını dünya pazarına açmak ve global B2B projelerden teklif almak ister misiniz?</span>
           </div>
-          <Link href="/marka" className="global-brand-join-btn">
-            <Building2 size={16} />
-            <span>Markanızı İhracat Ağına Ekleyin</span>
-            <ArrowRight size={14} />
-          </Link>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <button onClick={() => setIsHowItWorksOpen(true)} className="global-how-it-works-btn">
+              <Info size={15} />
+              <span>İhracat Mekanizması Nasıl Çalışır?</span>
+            </button>
+            <Link href="/marka" className="global-brand-join-btn">
+              <Building2 size={16} />
+              <span>Markanızı İhracat Ağına Ekleyin</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
         </div>
 
       </div>
+
+      {/* HOW EXPORT MATCHING ENGINE WORKS MODAL FOR BRANDS */}
+      {isHowItWorksOpen && (
+        <div className="export-modal-overlay" onClick={() => setIsHowItWorksOpen(false)}>
+          <div className="export-modal-card glass-panel" style={{ maxWidth: '840px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="export-modal-header">
+              <div className="modal-title-box">
+                <div className="modal-icon-gold">
+                  <Globe size={22} />
+                </div>
+                <div>
+                  <h3>🌐 SeramikBak İhracat Eşleştirme Motoru Nasıl Çalışır?</h3>
+                  <p>Üretici markaların seramik koleksiyonlarını dünya pazarına 5 adımda bağlayan teknolojik altyapımız</p>
+                </div>
+              </div>
+              <button className="export-modal-close" onClick={() => setIsHowItWorksOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="how-it-works-steps-grid">
+              
+              <div className="how-step-card">
+                <div className="step-num-badge">1</div>
+                <div>
+                  <h4>5 Dilde Otomatik SEO & Arama Motoru İndekslemesi</h4>
+                  <p>Markanızın tüm ürünleri Türkçe, İngilizce, Almanca, Arapça ve Rusça indekslenir. Dubai, Hamburg veya New York'taki bir alıcı Google Global'de arama yaptığında ürünleriniz en üstte listelenir.</p>
+                </div>
+              </div>
+
+              <div className="how-step-card">
+                <div className="step-num-badge">2</div>
+                <div>
+                  <h4>Global BIM / CAD Mimari Şartname Entegrasyonu</h4>
+                  <p>Uluslararası mimarlık ofisleri basılı katalog yerine Revit (.rfa), AutoCAD (.dwg) ve 4K dikişsiz PBR dokuları indirir. Seramikleriniz doğrudan yurt dışındaki dev otel ve konut projelerinin şartnamesine girer.</p>
+                </div>
+              </div>
+
+              <div className="how-step-card">
+                <div className="step-num-badge">3</div>
+                <div>
+                  <h4>Canlı B2B Konteyner & Navlun Fiyatlama Engine</h4>
+                  <p>Yabancı distribütör metrajını ve ebadını girdiğinde; tonaj, palet sayısı, 20ft konteyner adedi ve Hamburg, Dubai, NY liman navlun bedeli otomatik hesaplanır. İhracat belirsizliği ortadan kalkar.</p>
+                </div>
+              </div>
+
+              <div className="how-step-card">
+                <div className="step-num-badge">4</div>
+                <div>
+                  <h4>Uygulamasız Web 3D & AR Canlı Mekan Görselleştirici</h4>
+                  <p>Alıcılar fiziki showroom ziyareti yapmadan cep telefonu veya bilgisayar üzerinden seramiklerinizi 360° sanal banyoda veya kendi mekanlarında AR ile canlı dener.</p>
+                </div>
+              </div>
+
+              <div className="how-step-card highlight">
+                <div className="step-num-badge gold">5</div>
+                <div>
+                  <h4>Onaylı B2B İhracat Taleplerinin Marka Kokpitine İletilmesi</h4>
+                  <p>Gelen yüksek metrajlı proje ve distribütör alım talepleri doğrulanır (Firma adı, Ülke, Proje m²) ve doğrudan markanızın B2B İhracat Paneline (`/marka`) ve ihracat müdürünüze aktarılır.</p>
+                </div>
+              </div>
+
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '12px' }}>
+              <Link href="/marka" className="global-brand-join-btn" style={{ padding: '12px 24px', fontSize: '0.88rem' }}>
+                <Building2 size={16} />
+                <span>Markanızı İhracat Ağına Dahil Edin</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* INTERACTIVE CONTAINER & LOGISTICS EXPORT CALCULATOR MODAL */}
       {isModalOpen && (
@@ -1060,6 +1142,83 @@ export default function GlobalExportHub() {
           font-size: 0.62rem;
           color: #64748b;
           line-height: 1.4;
+        }
+
+        .global-how-it-works-btn {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #e2e8f0;
+          padding: 10px 16px;
+          border-radius: 10px;
+          font-size: 0.8rem;
+          font-weight: 700;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+
+        .global-how-it-works-btn:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border-color: rgba(212, 175, 55, 0.4);
+          color: #fef08a;
+        }
+
+        .how-it-works-steps-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin: 10px 0;
+        }
+
+        .how-step-card {
+          display: flex;
+          align-items: flex-start;
+          gap: 14px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 14px;
+          padding: 14px 16px;
+        }
+
+        .how-step-card.highlight {
+          background: rgba(212, 175, 55, 0.08);
+          border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .step-num-badge {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
+          color: #ffffff;
+          font-size: 0.9rem;
+          font-weight: 900;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .step-num-badge.gold {
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          color: #0b0f17;
+        }
+
+        .how-step-card h4 {
+          font-size: 0.9rem;
+          font-weight: 800;
+          color: #f8fafc;
+          margin: 0 0 4px 0;
+        }
+
+        .how-step-card p {
+          font-size: 0.78rem;
+          color: #94a3b8;
+          line-height: 1.5;
+          margin: 0;
         }
       `}</style>
     </div>
