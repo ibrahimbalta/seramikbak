@@ -13897,36 +13897,57 @@ export default function Home() {
           /* Detail Modal Mobile Overrides */
           .modal-overlay {
             padding: 0 !important;
-            align-items: stretch !important;
-            justify-content: stretch !important;
+            align-items: flex-end !important;
+            justify-content: center !important;
+            z-index: 99999 !important;
           }
           .detail-modal-content-premium {
             width: 100% !important;
             max-width: 100% !important;
-            height: 100% !important;
-            max-height: 100vh !important;
-            border-radius: 0 !important;
-            padding: 16px 16px 24px 16px !important;
+            height: 94vh !important;
+            max-height: 94vh !important;
+            border-radius: 22px 22px 0 0 !important;
+            padding: 16px 14px 84px 14px !important;
             margin: 0 !important;
             display: flex !important;
             flex-direction: column !important;
             gap: 12px !important;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7) !important;
+            position: relative !important;
           }
           .detail-modal-body {
             flex: 1 !important;
-            max-height: calc(100vh - 80px) !important;
+            max-height: calc(100vh - 120px) !important;
             overflow-y: auto !important;
-            padding-right: 4px !important;
-            gap: 16px !important;
+            padding-right: 2px !important;
+            padding-bottom: 84px !important;
+            gap: 14px !important;
             -webkit-overflow-scrolling: touch !important;
             scrollbar-width: thin !important;
           }
           .detail-modal-body::-webkit-scrollbar {
             display: block !important;
-            width: 6px !important;
+            width: 4px !important;
           }
           .detail-modal-header-title h3 {
             font-size: 1.15rem !important;
+            line-height: 1.25 !important;
+          }
+          .detail-visual-box {
+            height: 175px !important;
+          }
+          .detail-specs-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 6px !important;
+          }
+          .spec-item-box {
+            padding: 6px 8px !important;
+          }
+          .spec-lbl {
+            font-size: 0.52rem !important;
+          }
+          .spec-val {
+            font-size: 0.72rem !important;
           }
           .detail-primary-actions {
             flex-direction: column !important;
@@ -13934,9 +13955,18 @@ export default function Home() {
           }
           .detail-primary-actions button {
             width: 100% !important;
+            min-height: 44px !important;
+            font-size: 0.82rem !important;
           }
           .calc-inputs-row {
             grid-template-columns: 1fr !important;
+            gap: 8px !important;
+          }
+          .architect-download-box {
+            padding: 12px !important;
+          }
+          .detail-trust-badges-box {
+            padding: 10px 12px !important;
             gap: 8px !important;
           }
 

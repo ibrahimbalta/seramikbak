@@ -609,6 +609,21 @@ export default function BathroomMockupPreview({ product, onOpenStudio }) {
           transform: translateY(-2px);
           box-shadow: 0 6px 22px rgba(212, 175, 55, 0.45);
         }
+
+        @media (max-width: 768px) {
+          .bathroom-mockup-box {
+            padding: 10px !important;
+            gap: 10px !important;
+          }
+          .mockup-canvas-wrapper {
+            min-height: 220px !important;
+            aspect-ratio: 4 / 3 !important;
+          }
+          .mockup-studio-launch-btn {
+            padding: 6px 10px !important;
+            font-size: 0.68rem !important;
+          }
+        }
       `}</style>
     </div>
   );
