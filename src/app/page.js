@@ -93,6 +93,7 @@ import BathroomMockupPreview from '@/components/BathroomMockupPreview';
 import ProductCard from '@/components/ProductCard';
 import TileCalculatorWidget from '@/components/TileCalculatorWidget';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
+import GlobalSearchPreviewCard from '@/components/GlobalSearchPreviewCard';
 
 function enrichProductData(p) {
   const basePrice = p.width * p.height * 0.08 + (p.finish === 'Parlak' ? 120 : 0) + (p.style === 'Mermer' ? 150 : 80);
@@ -4122,135 +4123,11 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* RIGHT COLUMN: Live B2B Architectural Project & Distributor Demand Showcase */}
-                  <div style={{
-                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                    borderRadius: '24px',
-                    padding: '24px',
-                    border: '1px solid rgba(212, 175, 55, 0.3)',
-                    boxShadow: '0 20px 40px rgba(15, 23, 42, 0.2)',
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}>
-                    {/* Header */}
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginBottom: '18px',
-                      borderBottom: '1px solid rgba(255,255,255,0.1)',
-                      paddingBottom: '12px'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '50%',
-                          background: '#22c55e',
-                          boxShadow: '0 0 10px #22c55e'
-                        }} />
-                        <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#ffffff', letterSpacing: '0.04em' }}>
-                          CANLI ULUSLARARASI B2B PROJE TALEP AKIŞI
-                        </span>
-                      </div>
-                      <span style={{ fontSize: '0.72rem', color: '#d4af37', fontWeight: '700' }}>85+ Ülke Ağı</span>
-                    </div>
-
-                    {/* 3 Live Project Cards */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '18px' }}>
-                      
-                      {/* Project 1: Dubai */}
-                      <div style={{
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        borderRadius: '14px',
-                        padding: '12px 14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                      }}>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span style={{ fontSize: '1rem' }}>🇦🇪</span>
-                            <span style={{ fontSize: '0.84rem', fontWeight: '800', color: '#ffffff' }}>Dubai Commercial Tower</span>
-                          </div>
-                          <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>15.000 m² Porselen Karo Demand</div>
-                        </div>
-                        <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '4px 10px', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.3)' }}>
-                          B2B Teklif Açık
-                        </span>
-                      </div>
-
-                      {/* Project 2: Berlin */}
-                      <div style={{
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        borderRadius: '14px',
-                        padding: '12px 14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                      }}>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span style={{ fontSize: '1rem' }}>🇩🇪</span>
-                            <span style={{ fontSize: '0.84rem', fontWeight: '800', color: '#ffffff' }}>Berlin Hotel Renovation</span>
-                          </div>
-                          <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>4.800 m² Marble Look Ceramic</div>
-                        </div>
-                        <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '4px 10px', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.3)' }}>
-                          Mimari İncelemede
-                        </span>
-                      </div>
-
-                      {/* Project 3: London */}
-                      <div style={{
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        borderRadius: '14px',
-                        padding: '12px 14px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                      }}>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span style={{ fontSize: '1rem' }}>🇬🇧</span>
-                            <span style={{ fontSize: '0.84rem', fontWeight: '800', color: '#ffffff' }}>London Luxury Residence</span>
-                          </div>
-                          <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>2.200 m² Large Format Slab</div>
-                        </div>
-                        <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '4px 10px', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.3)' }}>
-                          Revit CAD İndirildi
-                        </span>
-                      </div>
-
-                    </div>
-
-                    {/* Bottom Feature Badges */}
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(3, 1fr)',
-                      gap: '8px',
-                      textAlign: 'center'
-                    }}>
-                      <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '8px 4px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#ffffff' }}>⚡ Google SEO</div>
-                        <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '2px' }}>5 Dilde İndeks</div>
-                      </div>
-                      <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '8px 4px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#ffffff' }}>📐 3D BIM</div>
-                        <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '2px' }}>Revit Arşivi</div>
-                      </div>
-                      <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '8px 4px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#ffffff' }}>🤝 B2B Distribütör</div>
-                        <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '2px' }}>Doğrudan Temas</div>
-                      </div>
-                    </div>
-                  </div>
+                  {/* RIGHT COLUMN: Live Interactive Global Search & BIM Spec Integration Card */}
+                  <GlobalSearchPreviewCard onOpenStudio={() => {
+                    const el = document.getElementById('studio3d-anchor');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }} />
 
                 </div>
 
