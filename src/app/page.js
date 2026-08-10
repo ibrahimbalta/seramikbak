@@ -3973,7 +3973,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* GLOBAL EXPORT & MULTI-LINGUAL SHOWCASE BANNER */}
+            {/* GLOBAL EXPORT & MULTI-LINGUAL SHOWCASE BANNER (3-Column Balanced Layout) */}
             <div 
               className="homepage-global-export-banner glass-panel"
               style={{
@@ -3981,10 +3981,9 @@ export default function Home() {
                 background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
                 border: '1px solid #e2e8f0',
                 borderRadius: '24px',
-                padding: '36px 32px',
+                padding: isMobile ? '24px 16px' : '36px 28px',
                 margin: '24px 0 32px 0',
                 boxShadow: '0 15px 35px rgba(0,0,0,0.03), 0 0 30px rgba(179, 142, 71, 0.06)',
-                textAlign: 'center',
                 position: 'relative',
                 overflow: 'hidden',
                 boxSizing: 'border-box'
@@ -3996,153 +3995,274 @@ export default function Home() {
                 top: '-60px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                width: '500px',
-                height: '200px',
-                background: 'radial-gradient(circle, rgba(179, 142, 71, 0.1) 0%, rgba(255,255,255,0) 70%)',
+                width: '600px',
+                height: '220px',
+                background: 'radial-gradient(circle, rgba(179, 142, 71, 0.09) 0%, rgba(255,255,255,0) 70%)',
                 pointerEvents: 'none',
                 zIndex: 0
               }} />
 
-              <div style={{ position: 'relative', zIndex: 1, width: '100%', margin: '0 auto' }}>
-                {/* Top Badge */}
-                <div style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: 'rgba(179, 142, 71, 0.08)',
-                  border: '1px solid rgba(179, 142, 71, 0.3)',
-                  borderRadius: '30px',
-                  padding: '6px 18px',
-                  marginBottom: '18px'
-                }}>
-                  <Globe size={14} style={{ color: '#b38e47' }} />
-                  <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#b38e47', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                    GLOBAL CERAMICS MULTI-LINGUAL SEO SHOWROOM
-                  </span>
-                </div>
-
-                {/* Main Headline */}
-                <h2 style={{
-                  fontSize: 'clamp(1.5rem, 3.5vw, 2.3rem)',
-                  fontWeight: '900',
-                  color: '#0f172a',
-                  lineHeight: '1.28',
-                  margin: '0 auto 16px auto',
-                  maxWidth: '960px',
-                  fontFamily: 'var(--font-title, "Outfit", sans-serif)',
-                  letterSpacing: '-0.02em'
-                }}>
-                  Markalarınızı ve Ürünlerinizi <span style={{ color: '#b38e47' }}>5 Dilde Çoklu SEO</span> ile <span style={{ color: '#b38e47' }}>Dünya Pazarına</span> Açıyoruz
-                </h2>
-
-                {/* Subtitle */}
-                <p style={{
-                  fontSize: '0.94rem',
-                  color: '#64748b',
-                  margin: '0 auto 24px auto',
-                  maxWidth: '860px',
-                  lineHeight: '1.65',
-                  fontWeight: '500'
-                }}>
-                  SeramikBak Global Altyapısı; Türk ve dünya seramik üreticilerinin tüm koleksiyonlarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global ve Yandex arama motorlarında indeksleyerek 85+ ülkedeki uluslararası mimar, distribütör ve projelerle buluşturur.
-                </p>
-
-                {/* Floating Multi-Language Badges */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '10px',
-                  flexWrap: 'wrap',
-                  marginBottom: '26px'
-                }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇹🇷 Türkçe</span>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇬🇧 English</span>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇩🇪 Deutsch</span>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇸🇦 العربية</span>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇷🇺 Русский</span>
-                </div>
-
-                {/* Action Buttons */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '14px',
-                  flexWrap: 'wrap',
-                  marginBottom: '30px'
-                }}>
-                  <Link 
-                    href="/global-tanitim#brand-apply-form" 
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                      color: '#111827',
-                      padding: '13px 26px',
-                      borderRadius: '14px',
-                      fontSize: '0.9rem',
-                      fontWeight: '800',
-                      textDecoration: 'none',
-                      boxShadow: '0 8px 24px rgba(212, 175, 55, 0.25)',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <Building2 size={16} />
-                    <span>Markanızı Global Tanıtım Ağına Ekleyin</span>
-                    <ArrowRight size={15} />
-                  </Link>
-
-                  <Link 
-                    href="/global-tanitim" 
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      background: '#ffffff',
-                      color: '#0f172a',
-                      border: '1px solid #cbd5e1',
-                      padding: '13px 24px',
-                      borderRadius: '14px',
-                      fontSize: '0.9rem',
-                      fontWeight: '700',
-                      textDecoration: 'none',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <Info size={16} style={{ color: '#b38e47' }} />
-                    <span>5 Dilde SEO Mimarisini İnceleyin</span>
-                  </Link>
-                </div>
-
-                {/* 4 Metric Stats Pill Bar - Full Container Stretch */}
+              <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
+                {/* 3-Column Desktop Grid Layout */}
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '16px',
+                  gridTemplateColumns: isMobile ? '1fr' : 'minmax(220px, 1fr) minmax(320px, 2fr) minmax(220px, 1fr)',
+                  gap: '20px',
+                  alignItems: 'stretch',
+                  marginBottom: '28px'
+                }}>
+                  
+                  {/* LEFT COLUMN: Architectural BIM & CAD Library Card */}
+                  <div style={{
+                    background: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '20px',
+                    padding: '20px 18px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    textAlign: 'left',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+                    transition: 'all 0.2s ease'
+                  }}>
+                    <div>
+                      <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: 'rgba(179, 142, 71, 0.08)',
+                        border: '1px solid rgba(179, 142, 71, 0.25)',
+                        borderRadius: '20px',
+                        padding: '4px 10px',
+                        marginBottom: '12px'
+                      }}>
+                        <Layers2 size={12} style={{ color: '#b38e47' }} />
+                        <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#b38e47', letterSpacing: '0.04em' }}>
+                          MİMARLIK KÜTÜPHANESİ
+                        </span>
+                      </div>
+                      <h4 style={{ fontSize: '1rem', fontWeight: '800', color: '#0f172a', margin: '0 0 8px 0', lineHeight: '1.3' }}>
+                        Revit (.RFA) & 4K Texture Paketi
+                      </h4>
+                      <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0, lineHeight: '1.5' }}>
+                        Londra, Berlin ve New York merkezli uluslararası mimarlık ofisleri için dikişsiz seramik doku arşivleri.
+                      </p>
+                    </div>
+
+                    <Link 
+                      href="/global-tanitim#bim-cad" 
+                      style={{
+                        marginTop: '16px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.8rem',
+                        fontWeight: '800',
+                        color: '#b38e47',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <span>BIM Dosyalarını İnceleyin</span>
+                      <ArrowRight size={13} />
+                    </Link>
+                  </div>
+
+                  {/* CENTER COLUMN: Main Headline & SEO Showcase */}
+                  <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    {/* Top Badge */}
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      background: 'rgba(179, 142, 71, 0.08)',
+                      border: '1px solid rgba(179, 142, 71, 0.3)',
+                      borderRadius: '30px',
+                      padding: '5px 16px',
+                      marginBottom: '14px',
+                      margin: '0 auto 14px auto'
+                    }}>
+                      <Globe size={13} style={{ color: '#b38e47' }} />
+                      <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#b38e47', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                        GLOBAL CERAMICS MULTI-LINGUAL SEO SHOWROOM
+                      </span>
+                    </div>
+
+                    {/* Main Headline */}
+                    <h2 style={{
+                      fontSize: 'clamp(1.4rem, 2.8vw, 2.1rem)',
+                      fontWeight: '900',
+                      color: '#0f172a',
+                      lineHeight: '1.25',
+                      margin: '0 auto 12px auto',
+                      fontFamily: 'var(--font-title, "Outfit", sans-serif)',
+                      letterSpacing: '-0.02em'
+                    }}>
+                      Markalarınızı ve Ürünlerinizi <span style={{ color: '#b38e47' }}>5 Dilde Çoklu SEO</span> ile <span style={{ color: '#b38e47' }}>Dünya Pazarına</span> Açıyoruz
+                    </h2>
+
+                    {/* Subtitle */}
+                    <p style={{
+                      fontSize: '0.88rem',
+                      color: '#64748b',
+                      margin: '0 auto 18px auto',
+                      lineHeight: '1.6',
+                      fontWeight: '500'
+                    }}>
+                      SeramikBak Global Altyapısı; Türk ve dünya seramik üreticilerini Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global & Yandex arama motorlarında indeksleyerek 85+ ülkedeki mimar ve distribütörlerle buluşturur.
+                    </p>
+
+                    {/* Floating Multi-Language Badges */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      flexWrap: 'wrap',
+                      marginBottom: '20px'
+                    }}>
+                      <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '4px 12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>🇹🇷 Türkçe</span>
+                      <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '4px 12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>🇬🇧 English</span>
+                      <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '4px 12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>🇩🇪 Deutsch</span>
+                      <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '4px 12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>🇸🇦 العربية</span>
+                      <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '4px 12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>🇷🇺 Русский</span>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '12px',
+                      flexWrap: 'wrap'
+                    }}>
+                      <Link 
+                        href="/global-tanitim#brand-apply-form" 
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                          color: '#111827',
+                          padding: '12px 22px',
+                          borderRadius: '12px',
+                          fontSize: '0.86rem',
+                          fontWeight: '800',
+                          textDecoration: 'none',
+                          boxShadow: '0 8px 20px rgba(212, 175, 55, 0.25)',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <Building2 size={15} />
+                        <span>Markanızı Global Tanıtım Ağına Ekleyin</span>
+                        <ArrowRight size={14} />
+                      </Link>
+
+                      <Link 
+                        href="/global-tanitim" 
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          background: '#ffffff',
+                          color: '#0f172a',
+                          border: '1px solid #cbd5e1',
+                          padding: '12px 20px',
+                          borderRadius: '12px',
+                          fontSize: '0.86rem',
+                          fontWeight: '700',
+                          textDecoration: 'none',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <Info size={15} style={{ color: '#b38e47' }} />
+                        <span>5 Dilde SEO Mimarisini İnceleyin</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* RIGHT COLUMN: Multi-Currency & B2B Freight Card */}
+                  <div style={{
+                    background: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '20px',
+                    padding: '20px 18px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    textAlign: 'left',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+                    transition: 'all 0.2s ease'
+                  }}>
+                    <div>
+                      <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: 'rgba(179, 142, 71, 0.08)',
+                        border: '1px solid rgba(179, 142, 71, 0.25)',
+                        borderRadius: '20px',
+                        padding: '4px 10px',
+                        marginBottom: '12px'
+                      }}>
+                        <DollarSign size={12} style={{ color: '#b38e47' }} />
+                        <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#b38e47', letterSpacing: '0.04em' }}>
+                          B2B DÖVİZ & LOJİSTİK
+                        </span>
+                      </div>
+                      <h4 style={{ fontSize: '1rem', fontWeight: '800', color: '#0f172a', margin: '0 0 8px 0', lineHeight: '1.3' }}>
+                        6 Canlı Döviz & Fiyatlandırma
+                      </h4>
+                      <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0, lineHeight: '1.5' }}>
+                        USD $, EUR €, GBP £, SAR ﷼, RUB ₽ ve TRY ₺ canlı kur dönüşümü ile B2B ihracat teklifi altyapısı.
+                      </p>
+                    </div>
+
+                    <Link 
+                      href="/global-tanitim#multi-currency" 
+                      style={{
+                        marginTop: '16px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '0.8rem',
+                        fontWeight: '800',
+                        color: '#b38e47',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <span>Döviz Simülatörünü İnceleyin</span>
+                      <ArrowRight size={13} />
+                    </Link>
+                  </div>
+                </div>
+
+                {/* 4 Metric Stats Pill Bar - Full Width Stretch */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '12px',
                   background: '#ffffff',
                   border: '1px solid #e2e8f0',
                   borderRadius: '18px',
-                  padding: '20px 24px',
-                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.03)'
+                  padding: '16px 20px',
+                  boxShadow: '0 6px 20px rgba(0, 0, 0, 0.02)'
                 }}>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>5 Dilde</div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Otomatik SEO</div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>5 Dilde</div>
+                    <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Otomatik SEO</div>
                   </div>
-                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>85+</div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>İhracat Ülkesi</div>
+                  <div style={{ textAlign: 'center', borderLeft: isMobile ? 'none' : '1px solid #f1f5f9' }}>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>85+</div>
+                    <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>İhracat Ülkesi</div>
                   </div>
-                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>15.000+</div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Uluslararası Mimar</div>
+                  <div style={{ textAlign: 'center', borderLeft: isMobile ? 'none' : '1px solid #f1f5f9' }}>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>15.000+</div>
+                    <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Uluslararası Mimar</div>
                   </div>
-                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>6 Döviz</div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Canlı Kur Dönüşümü</div>
+                  <div style={{ textAlign: 'center', borderLeft: isMobile ? 'none' : '1px solid #f1f5f9' }}>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>6 Döviz</div>
+                    <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Canlı Kur Dönüşümü</div>
                   </div>
                 </div>
               </div>
