@@ -5,9 +5,11 @@ export async function GET() {
   try {
     const brands = await prisma.brand.findMany({
       include: {
-        saas: true
+        saas: {
+          orderBy: { createdAt: 'desc' }
+        }
       },
-      orderBy: { name: 'asc' }
+      orderBy: { updatedAt: 'desc' }
     });
     
     // Format the response so that every brand has a saas object
@@ -19,6 +21,15 @@ export async function GET() {
         logoUrl: brand.logoUrl,
         saas: activeSaaS
       };
+    });
+
+    // Sort brands so that PENDING_APPROVAL applications appear FIRST
+    brandSaaSMaps.sort((a, b) => {
+      const statusA = a.saas?.status || a.saas?.pendingStatus || '';
+      const statusB = b.saas?.status || b.saas?.pendingStatus || '';
+      if (statusA === 'PENDING_APPROVAL' && statusB !== 'PENDING_APPROVAL') return -1;
+      if (statusA !== 'PENDING_APPROVAL' && statusB === 'PENDING_APPROVAL') return 1;
+      return a.name.localeCompare(b.name, 'tr');
     });
 
     return NextResponse.json(brandSaaSMaps);
@@ -53,60 +64,24 @@ export async function POST(request) {
         const newExpiresAt = new Date();
         newExpiresAt.setFullYear(newExpiresAt.getFullYear() + 1); // Extend for 1 year from approval
 
-        if (existingSaaS.status === 'PENDING_APPROVAL') {
-          config = await prisma.saaSConfig.update({
-            where: { id: existingSaaS.id },
-            data: {
-              status: 'ACTIVE',
-              expiresAt: newExpiresAt,
-              pendingPlan: null,
-              pendingStatus: null,
-              paymentSender: null,
-              paymentDate: null,
-              paymentNote: null
-            }
-          });
-        } else if (existingSaaS.pendingStatus === 'PENDING_APPROVAL') {
-          config = await prisma.saaSConfig.update({
-            where: { id: existingSaaS.id },
-            data: {
-              plan: existingSaaS.pendingPlan,
-              status: 'ACTIVE',
-              expiresAt: newExpiresAt,
-              pendingPlan: null,
-              pendingStatus: null,
-              paymentSender: null,
-              paymentDate: null,
-              paymentNote: null
-            }
-          });
-        } else {
-          return NextResponse.json({ error: 'No pending subscription request found' }, { status: 400 });
-        }
+        config = await prisma.saaSConfig.update({
+          where: { id: existingSaaS.id },
+          data: {
+            plan: existingSaaS.pendingPlan || existingSaaS.plan || 'ENTERPRISE_GLOBAL_EXPORTS',
+            status: 'ACTIVE',
+            expiresAt: newExpiresAt,
+            pendingPlan: null,
+            pendingStatus: null
+          }
+        });
       } else if (action === 'reject') {
-        if (existingSaaS.status === 'PENDING_APPROVAL') {
-          config = await prisma.saaSConfig.update({
-            where: { id: existingSaaS.id },
-            data: {
-              status: 'REJECTED',
-              paymentSender: null,
-              paymentDate: null,
-              paymentNote: null
-            }
-          });
-        } else if (existingSaaS.pendingStatus === 'PENDING_APPROVAL') {
-          config = await prisma.saaSConfig.update({
-            where: { id: existingSaaS.id },
-            data: {
-              pendingStatus: 'REJECTED',
-              paymentSender: null,
-              paymentDate: null,
-              paymentNote: null
-            }
-          });
-        } else {
-          return NextResponse.json({ error: 'No pending subscription request found' }, { status: 400 });
-        }
+        config = await prisma.saaSConfig.update({
+          where: { id: existingSaaS.id },
+          data: {
+            status: 'REJECTED',
+            pendingStatus: 'REJECTED'
+          }
+        });
       } else {
         return NextResponse.json({ error: 'Invalid action parameter' }, { status: 400 });
       }
