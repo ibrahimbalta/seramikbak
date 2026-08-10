@@ -3973,6 +3973,178 @@ export default function Home() {
               </div>
             </div>
 
+            {/* GLOBAL EXPORT & MULTI-LINGUAL SHOWCASE BANNER */}
+            <div 
+              className="homepage-global-export-banner glass-panel"
+              style={{
+                background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+                border: '1px solid #e2e8f0',
+                borderRadius: '24px',
+                padding: '36px 24px',
+                margin: '24px 0 32px 0',
+                boxShadow: '0 15px 35px rgba(0,0,0,0.03), 0 0 30px rgba(180, 83, 9, 0.04)',
+                textAlign: 'center',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+            >
+              {/* Subtle Ambient Background Lighting */}
+              <div style={{
+                position: 'absolute',
+                top: '-60px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '350px',
+                height: '180px',
+                background: 'radial-gradient(circle, rgba(180, 83, 9, 0.08) 0%, rgba(255,255,255,0) 70%)',
+                pointerEvents: 'none',
+                zIndex: 0
+              }} />
+
+              <div style={{ position: 'relative', zIndex: 1, maxWidth: '920px', margin: '0 auto' }}>
+                {/* Top Badge */}
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(180, 83, 9, 0.06)',
+                  border: '1px solid rgba(180, 83, 9, 0.2)',
+                  borderRadius: '30px',
+                  padding: '6px 16px',
+                  marginBottom: '18px'
+                }}>
+                  <Globe size={13} style={{ color: '#b45309' }} />
+                  <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#b45309', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                    GLOBAL CERAMICS MULTI-LINGUAL SEO SHOWROOM
+                  </span>
+                </div>
+
+                {/* Main Headline */}
+                <h2 style={{
+                  fontSize: 'clamp(1.4rem, 3.2vw, 2.2rem)',
+                  fontWeight: '900',
+                  color: '#0f172a',
+                  lineHeight: '1.28',
+                  margin: '0 0 16px 0',
+                  fontFamily: 'var(--font-title, "Outfit", sans-serif)',
+                  letterSpacing: '-0.02em'
+                }}>
+                  Markalarınızı ve Ürünlerinizi <span style={{ color: '#b45309' }}>5 Dilde Çoklu SEO</span> ile <span style={{ color: '#b45309' }}>Dünya Pazarına</span> Açıyoruz
+                </h2>
+
+                {/* Subtitle */}
+                <p style={{
+                  fontSize: '0.92rem',
+                  color: '#64748b',
+                  margin: '0 auto 24px auto',
+                  maxWidth: '780px',
+                  lineHeight: '1.65',
+                  fontWeight: '500'
+                }}>
+                  SeramikBak Global Altyapısı; Türk ve dünya seramik üreticilerinin tüm koleksiyonlarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global ve Yandex arama motorlarında indeksleyerek 85+ ülkedeki uluslararası mimar, distribütör ve projelerle buluşturur.
+                </p>
+
+                {/* Floating Multi-Language Badges */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  flexWrap: 'wrap',
+                  marginBottom: '24px'
+                }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '4px 12px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇹🇷 Türkçe</span>
+                  <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '4px 12px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇬🇧 English</span>
+                  <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '4px 12px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇩🇪 Deutsch</span>
+                  <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '4px 12px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇸🇦 العربية</span>
+                  <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '4px 12px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇷🇺 Русский</span>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px',
+                  flexWrap: 'wrap',
+                  marginBottom: '28px'
+                }}>
+                  <Link 
+                    href="/global-tanitim#brand-apply-form" 
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      background: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
+                      color: '#ffffff',
+                      padding: '13px 24px',
+                      borderRadius: '14px',
+                      fontSize: '0.88rem',
+                      fontWeight: '800',
+                      textDecoration: 'none',
+                      boxShadow: '0 8px 20px rgba(180, 83, 9, 0.25)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Building2 size={16} />
+                    <span>Markanızı Global Tanıtım Ağına Ekleyin</span>
+                    <ArrowRight size={14} />
+                  </Link>
+
+                  <Link 
+                    href="/global-tanitim" 
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      border: '1px solid #cbd5e1',
+                      padding: '13px 22px',
+                      borderRadius: '14px',
+                      fontSize: '0.88rem',
+                      fontWeight: '700',
+                      textDecoration: 'none',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Info size={16} style={{ color: '#b45309' }} />
+                    <span>5 Dilde SEO Mimarisini İnceleyin</span>
+                  </Link>
+                </div>
+
+                {/* 4 Metric Stats Pill Bar */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                  gap: '12px',
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '18px',
+                  padding: '16px 20px',
+                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.03)'
+                }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b45309' }}>5 Dilde</div>
+                    <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Otomatik SEO</div>
+                  </div>
+                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b45309' }}>85+</div>
+                    <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>İhracat Ülkesi</div>
+                  </div>
+                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b45309' }}>15.000+</div>
+                    <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Uluslararası Mimar</div>
+                  </div>
+                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b45309' }}>6 Döviz</div>
+                    <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Canlı Kur Dönüşümü</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Dynamic Live Platform Activity & Traffic Statistics Section (Compact & Modern) */}
             <div className="live-stats-section-banner glass-panel">
               <div className="live-stats-header">
