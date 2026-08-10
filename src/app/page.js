@@ -3361,6 +3361,19 @@ export default function Home() {
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
               </button>
+              <button 
+                className="nav-link global-export-nav-link" 
+                onClick={() => {
+                  setActiveTab('search');
+                  setTimeout(() => {
+                    const el = document.getElementById('global-export-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+              >
+                <Globe size={14} style={{ color: '#d4af37' }} />
+                <span style={{ color: '#d4af37', fontWeight: '800' }}>🌍 Global İhracat</span>
+              </button>
             </>
           )}
         </nav>
@@ -3522,6 +3535,20 @@ export default function Home() {
               >
                 <MapPin size={16} />
                 <span>{t('dealers')}</span>
+              </button>
+              <button 
+                className="mobile-nav-link"
+                onClick={() => {
+                  setActiveTab('search');
+                  setShowMobileMenu(false);
+                  setTimeout(() => {
+                    const el = document.getElementById('global-export-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+              >
+                <Globe size={16} style={{ color: '#d4af37' }} />
+                <span style={{ color: '#d4af37', fontWeight: '800' }}>🌍 Global İhracat Portalı</span>
               </button>
               <Link href="/outlet" className="mobile-nav-link outlet-link" onClick={() => setShowMobileMenu(false)}>
                 <Sparkles size={16} style={{ color: '#ef4444' }} />
@@ -3858,6 +3885,11 @@ export default function Home() {
                   />
                 ))}
               </div>
+            </div>
+
+            {/* Global Brand Export Hub Showcase Section */}
+            <div id="global-export-section" style={{ margin: '24px 0' }}>
+              <GlobalExportHub />
             </div>
 
             {/* Categories & 3D Showcase Section */}
