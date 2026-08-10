@@ -3,81 +3,32 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
-  Globe, Ship, Layers2, Sparkles, Building2, ShieldCheck, 
-  ArrowRight, FileCheck, CheckCircle2, Calculator, X, MessageSquare, 
-  FileText, ArrowUpRight, ChevronRight, Info, Download, Check
+  Globe, Layers2, Sparkles, Building2, ShieldCheck, 
+  ArrowRight, FileCheck, CheckCircle2, X, MessageSquare, 
+  FileText, Info, Download, Check, DollarSign, Search, Zap
 } from 'lucide-react';
 
-const portsData = [
-  { id: 'hamburg', name: 'Hamburg Port', country: '🇩🇪 Almanya', currency: 'EUR (€)', ratePer20ft: 1850, days: '10 - 14 Gün' },
-  { id: 'jebel_ali', name: 'Jebel Ali Port', country: '🇦🇪 Dubai / BAE', currency: 'USD ($)', ratePer20ft: 2200, days: '12 - 16 Gün' },
-  { id: 'ny', name: 'Port of New York', country: '🇺🇸 ABD', currency: 'USD ($)', ratePer20ft: 3400, days: '16 - 22 Gün' },
-  { id: 'london', name: 'Port of London', country: '🇬🇧 İngiltere', currency: 'GBP (£)', ratePer20ft: 2100, days: '12 - 15 Gün' },
-  { id: 'jeddah', name: 'Jeddah Islamic Port', country: '🇸🇦 Suudi Arabistan', currency: 'SAR (﷼)', ratePer20ft: 2600, days: '8 - 12 Gün' },
-  { id: 'hamad', name: 'Hamad Port', country: '🇶🇦 Katar', currency: 'USD ($)', ratePer20ft: 2450, days: '10 - 14 Gün' }
-];
-
-const tileSpecsData = [
-  { id: '60x120', label: '60x120 cm (Standart Porselen - 9mm)', kgPerM2: 22, m2PerPallet: 34.56 },
-  { id: '120x120', label: '120x120 cm (Büyük Ebat Porselen - 9.5mm)', kgPerM2: 23, m2PerPallet: 36.00 },
-  { id: '60x60', label: '60x60 cm (Porselen Karo - 8.5mm)', kgPerM2: 20.5, m2PerPallet: 43.20 },
-  { id: '120x240', label: '120x240 cm (Slab Dev Plaka - 12mm)', kgPerM2: 28, m2PerPallet: 28.80 }
-];
-
 const exportCountriesList = [
-  { flag: '🇩🇪', name: 'Almanya (Germany)', port: 'Hamburg / Bremen', lang: 'Deutsch (DE)' },
-  { flag: '🇦🇪', name: 'BAE (United Arab Emirates)', port: 'Jebel Ali / Abu Dhabi', lang: 'English / Arabic' },
-  { flag: '🇺🇸', name: 'ABD (United States)', port: 'New York / Los Angeles', lang: 'English (US)' },
-  { flag: '🇬🇧', name: 'İngiltere (United Kingdom)', port: 'London Gateway / Felixstowe', lang: 'English (UK)' },
-  { flag: '🇸🇦', name: 'Suudi Arabistan (Saudi Arabia)', port: 'Jeddah / Dammam', lang: 'العربية (AR)' },
-  { flag: '🇶🇦', name: 'Katar (Qatar)', port: 'Hamad Port', lang: 'English / Arabic' },
-  { flag: '🇫🇷', name: 'Fransa (France)', port: 'Le Havre / Marseille', lang: 'Français' },
-  { flag: '🇳🇱', name: 'Hollanda (Netherlands)', port: 'Rotterdam', lang: 'Dutch / English' },
-  { flag: '🇮🇹', name: 'İtalya (Italy)', port: 'Genoa / Trieste', lang: 'Italiano' },
-  { flag: '🇪🇸', name: 'İspanya (Spain)', port: 'Valencia / Barcelona', lang: 'Español' },
-  { flag: '🇷🇺', name: 'Rusya (Russia)', port: 'Novorossiysk / St. Petersburg', lang: 'Русский (RU)' },
-  { flag: '🇰🇼', name: 'Kuveyt (Kuwait)', port: 'Shuwaikh Port', lang: 'العربية / English' }
+  { flag: '🇩🇪', name: 'Almanya (Germany)', searchTarget: 'Google DE / Yandex', lang: 'Deutsch (DE)' },
+  { flag: '🇦🇪', name: 'BAE (United Arab Emirates)', searchTarget: 'Google AE / Arabia', lang: 'English / Arabic' },
+  { flag: '🇺🇸', name: 'ABD (United States)', searchTarget: 'Google US / Bing', lang: 'English (US)' },
+  { flag: '🇬🇧', name: 'İngiltere (United Kingdom)', searchTarget: 'Google UK', lang: 'English (UK)' },
+  { flag: '🇸🇦', name: 'Suudi Arabistan (Saudi Arabia)', searchTarget: 'Google SA / Arabia', lang: 'العربية (AR)' },
+  { flag: '🇶🇦', name: 'Katar (Qatar)', searchTarget: 'Google QA / Arabia', lang: 'English / Arabic' },
+  { flag: '🇫🇷', name: 'Fransa (France)', searchTarget: 'Google FR', lang: 'Français' },
+  { flag: '🇳🇱', name: 'Hollanda (Netherlands)', searchTarget: 'Google NL', lang: 'Dutch / English' },
+  { flag: '🇮🇹', name: 'İtalya (Italy)', searchTarget: 'Google IT', lang: 'Italiano' },
+  { flag: '🇪🇸', name: 'İspanya (Spain)', searchTarget: 'Google ES', lang: 'Español' },
+  { flag: '🇷🇺', name: 'Rusya (Russia)', searchTarget: 'Yandex RU / Google RU', lang: 'Русский (RU)' },
+  { flag: '🇰🇼', name: 'Kuveyt (Kuwait)', searchTarget: 'Google KW', lang: 'العربية / English' }
 ];
 
 export default function GlobalExportHub({ onOpen3DStudio }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [isBimModalOpen, setIsBimModalOpen] = useState(false);
   const [isCountriesModalOpen, setIsCountriesModalOpen] = useState(false);
-
-  const [sqm, setSqm] = useState(1200);
-  const [selectedTile, setSelectedTile] = useState(tileSpecsData[0]);
-  const [selectedPort, setSelectedPort] = useState(portsData[0]);
-  const [incoterm, setIncoterm] = useState('CIF'); // 'FOB' or 'CIF'
-  const [showRfqSuccess, setShowRfqSuccess] = useState(false);
+  const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
   const [downloadedBim, setDownloadedBim] = useState(false);
-
-  // Calculation Math
-  const totalWeightKg = Math.round(sqm * selectedTile.kgPerM2);
-  const totalWeightTon = (totalWeightKg / 1000).toFixed(1);
-  const totalPallets = Math.ceil(sqm / selectedTile.m2PerPallet);
-
-  // Max payload 20ft container: ~21,500 kg
-  const container20ftCount = Math.ceil(totalWeightKg / 21500);
-
-  // Freight estimate (CIF includes ocean freight + insurance)
-  const baseFreightUSD = incoterm === 'CIF' ? container20ftCount * selectedPort.ratePer20ft : 450 * container20ftCount;
-  const freightRangeLow = Math.round(baseFreightUSD * 0.95);
-  const freightRangeHigh = Math.round(baseFreightUSD * 1.10);
-
-  const handleWhatsAppSend = () => {
-    const text = encodeURIComponent(
-      `Merhaba SeramikBak İhracat Ekibi! B2B İhracat Navlun ve Konteyner Sorgusu:\n\n` +
-      `📦 Metraj: ${sqm} m²\n` +
-      `📐 Ebat: ${selectedTile.label}\n` +
-      `🚢 Hedef Liman: ${selectedPort.country} (${selectedPort.name})\n` +
-      `📄 Teslim Şekli: ${incoterm}\n` +
-      `⚖️ Brüt Ağırlık: ${totalWeightTon} Ton (${totalPallets} Palet)\n` +
-      `🚢 Konteyner: ${container20ftCount}x 20ft FCL Container\n\n` +
-      `Resmi proforma teklifi ve fabrika teslim şartlarını almak istiyorum.`
-    );
-    window.open(`https://wa.me/905321234567?text=${text}`, '_blank');
-  };
 
   const handle3DStudioClick = () => {
     if (onOpen3DStudio) {
@@ -92,42 +43,60 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
     <div className="global-export-hub-container">
       <div className="global-export-banner-card">
 
-        {/* Compact Header Badge & Tagline */}
+        {/* Header Badge & SEO Tagline */}
         <div className="global-banner-header">
           <div className="global-pill-badge">
             <Globe size={13} className="globe-spin-icon" />
-            <span>GLOBAL CERAMICS EXPORT PORTAL</span>
+            <span>GLOBAL CERAMICS MULTI-LINGUAL SEO SHOWROOM</span>
           </div>
           <h2 className="global-banner-title">
-            Markalarınızı ve Koleksiyonlarınızı <span>85+ Ülkeye & 15.000+ Uluslararası Mimara</span> Açıyoruz
+            Markalarınızı ve Ürünlerinizi <span>5 Dilde Çoklu SEO ile Dünya Pazarına</span> Açıyoruz
           </h2>
           <p className="global-banner-desc">
-            SeramikBak Global altyapısı; yerli ve uluslararası seramik üreticilerini dünya genelindeki B2B distribütörler, mimarlık büroları ve yüksek metrajlı projeler ile buluşturan yeni nesil dijital ihracat portalıdır.
+            SeramikBak Global Altyapısı; Türk ve dünya seramik üreticilerinin koleksiyonlarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global ve Yandex arama motorlarında indeksleyerek 85+ ülkedeki uluslararası mimar, distribütör ve projelerle buluşturur.
           </p>
         </div>
 
-        {/* 4 Pillars Grid (Compact Layout) */}
+        {/* 4 Pillars Grid (SEO & Global Promotion Focused) */}
         <div className="global-pillars-grid">
 
-          {/* Pillar 1: Container Logistics */}
-          <div className="global-pillar-card clickable" onClick={() => setIsModalOpen(true)}>
+          {/* Pillar 1: Multi-lingual SEO */}
+          <div className="global-pillar-card clickable" onClick={() => setIsCountriesModalOpen(true)}>
             <div className="pillar-top-row">
-              <div className="pillar-icon-box gold">
-                <Ship size={18} />
+              <div className="pillar-icon-box emerald">
+                <Globe size={18} />
               </div>
-              <span className="pillar-action-badge">Canlı Hesapla ⚡</span>
+              <span className="pillar-action-badge emerald">5 Dilde SEO ⚡</span>
             </div>
-            <h3>Konteyner Bazlı B2B İhracat Altyapısı</h3>
-            <p>Fabrikadan dünya limanlarına palet ve 20ft konteyner bazlı lojistik & FOB/CIF navlun altyapısı.</p>
+            <h3>5 Dilde Uluslararası SEO & İndeksleme</h3>
+            <p>Ürünleriniz Türkçe, İngilizce, Almanca, Arapça ve Rusça otomatik Schema.org ve Hreflang SEO mimarisiyle Google Global ve Yandex'te ilk sıralarda indekslenir.</p>
 
-            <button className="pillar-trigger-btn gold">
-              <Calculator size={13} />
-              <span>İhracat Navlun & Konteyner Hesapla</span>
+            <button className="pillar-trigger-btn emerald">
+              <Globe size={13} />
+              <span>85+ İhracat Ülkesi & Diller</span>
               <ArrowRight size={12} />
             </button>
           </div>
 
-          {/* Pillar 2: Architectural BIM */}
+          {/* Pillar 2: Multi-Currency Pricing */}
+          <div className="global-pillar-card clickable" onClick={() => setIsCurrencyModalOpen(true)}>
+            <div className="pillar-top-row">
+              <div className="pillar-icon-box gold">
+                <DollarSign size={18} />
+              </div>
+              <span className="pillar-action-badge gold">Çoklu Kur</span>
+            </div>
+            <h3>Çoklu Döviz (Multi-Currency) Fiyatlama</h3>
+            <p>Uluslararası alıcılar $ USD, € EUR, £ GBP, ﷼ SAR, ₽ RUB ve ₺ TRY cinsinden canlı fiyatları ve teklifleri kendi para birimlerinde görüntüler.</p>
+
+            <button className="pillar-trigger-btn gold">
+              <DollarSign size={13} />
+              <span>Desteklenen Döviz Cinslerini Gör</span>
+              <ArrowRight size={12} />
+            </button>
+          </div>
+
+          {/* Pillar 3: Architectural BIM / CAD */}
           <div className="global-pillar-card clickable" onClick={() => setIsBimModalOpen(true)}>
             <div className="pillar-top-row">
               <div className="pillar-icon-box blue">
@@ -135,8 +104,8 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
               </div>
               <span className="pillar-action-badge blue">4K PBR Ready</span>
             </div>
-            <h3>Global BIM / CAD Kütüphanesi</h3>
-            <p>Uluslararası mimarlık büroları için Revit (.rfa), AutoCAD (.dwg) ve dikişsiz 4K PBR dokular.</p>
+            <h3>Global BIM / CAD Şartname Kütüphanesi</h3>
+            <p>Londra, New York ve Berlin merkezli mimarlık büroları için Revit (.rfa), AutoCAD (.dwg) ve dikişsiz 4K PBR dokular ile projelerinizin şartnameye girmesi sağlanır.</p>
 
             <button className="pillar-trigger-btn blue">
               <Layers2 size={13} />
@@ -145,34 +114,16 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
             </button>
           </div>
 
-          {/* Pillar 3: Multi-lingual SEO */}
-          <div className="global-pillar-card clickable" onClick={() => setIsCountriesModalOpen(true)}>
-            <div className="pillar-top-row">
-              <div className="pillar-icon-box emerald">
-                <Globe size={18} />
-              </div>
-              <span className="pillar-action-badge emerald">85+ Ülke</span>
-            </div>
-            <h3>5 Dilde Dijital Showroom & SEO</h3>
-            <p>Türkçe, İngilizce, Almanca, Arapça ve Rusça arama motoru indekslemesi ile Google Global görünürlük.</p>
-
-            <button className="pillar-trigger-btn emerald">
-              <Globe size={13} />
-              <span>İhracat Ülkeleri & Diller</span>
-              <ArrowRight size={12} />
-            </button>
-          </div>
-
-          {/* Pillar 4: Web 3D / AR */}
+          {/* Pillar 4: AI Visual Search & Web 3D/AR */}
           <div className="global-pillar-card clickable" onClick={handle3DStudioClick}>
             <div className="pillar-top-row">
               <div className="pillar-icon-box purple">
                 <Sparkles size={18} />
               </div>
-              <span className="pillar-action-badge purple">Web 3D Live</span>
+              <span className="pillar-action-badge purple">AI & Web3D</span>
             </div>
-            <h3>Web 3D & AR Canlı Deneyim Engine</h3>
-            <p>Uygulamasız tarayıcı üzerinden 360° sanal banyoda ve mekanda canlı karo kaplama simülatörü.</p>
+            <h3>Görsel Arama & Web 3D Canlı Deneyim</h3>
+            <p>Yapay zekalı görsel arama (Visual Search) ve tarayıcı üzerinden uygulama indirmeden çalışan Web 3D & AR simülatörü ile ürünleriniz 360° deneyimlenir.</p>
 
             <button className="pillar-trigger-btn purple">
               <Sparkles size={13} />
@@ -183,9 +134,13 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
 
         </div>
 
-        {/* Compact Integrated Metrics & High-Contrast CTA Bar */}
+        {/* Integrated Mini Metrics & High-Contrast CTA Bar */}
         <div className="global-metrics-and-cta-bar">
           <div className="global-metrics-mini">
+            <div className="mini-metric">
+              <strong>5 Dilde</strong> <span>Otomatik SEO</span>
+            </div>
+            <div className="mini-divider" />
             <div className="mini-metric">
               <strong>85+</strong> <span>İhracat Ülkesi</span>
             </div>
@@ -195,18 +150,14 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
             </div>
             <div className="mini-divider" />
             <div className="mini-metric">
-              <strong>25.000+</strong> <span>Aylık BIM İndirme</span>
-            </div>
-            <div className="mini-divider" />
-            <div className="mini-metric">
-              <strong>5 Dilde</strong> <span>Canlı Katalog</span>
+              <strong>6 Döviz</strong> <span>Canlı Kur</span>
             </div>
           </div>
 
           <div className="global-cta-buttons-mini">
             <button onClick={() => setIsHowItWorksOpen(true)} className="global-how-it-works-btn">
               <Info size={14} />
-              <span>İhracat Mekanizması Nasıl Çalışır?</span>
+              <span>SEO & Tanıtım Altyapısı Nasıl Çalışır?</span>
             </button>
             <Link href="/marka" className="global-brand-join-btn">
               <Building2 size={15} />
@@ -218,7 +169,7 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
 
       </div>
 
-      {/* MODAL 1: HOW EXPORT MATCHING ENGINE WORKS FOR BRANDS */}
+      {/* MODAL 1: HOW MULTI-LINGUAL SEO & BRAND SHOWCASE WORKS */}
       {isHowItWorksOpen && (
         <div className="export-modal-overlay" onClick={() => setIsHowItWorksOpen(false)}>
           <div className="export-modal-card glass-panel" style={{ maxWidth: '840px' }} onClick={(e) => e.stopPropagation()}>
@@ -228,8 +179,8 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
                   <Globe size={22} />
                 </div>
                 <div>
-                  <h3>🌐 SeramikBak İhracat Eşleştirme Motoru Nasıl Çalışır?</h3>
-                  <p>Üretici markaların seramik koleksiyonlarını dünya pazarına 5 adımda bağlayan teknolojik altyapımız</p>
+                  <h3>🌐 SeramikBak Çok Dilli SEO & Küresel Tanıtım Altyapısı</h3>
+                  <p>Üretici markaların seramik koleksiyonlarını dünya pazarına 5 dilde bağlayan SEO ve dijital vitrin sistemimiz</p>
                 </div>
               </div>
               <button className="export-modal-close" onClick={() => setIsHowItWorksOpen(false)}>
@@ -242,13 +193,21 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
               <div className="how-step-card">
                 <div className="step-num-badge">1</div>
                 <div>
-                  <h4>5 Dilde Otomatik SEO & Arama Motoru İndekslemesi</h4>
-                  <p>Markanızın tüm ürünleri Türkçe, İngilizce, Almanca, Arapça ve Rusça indekslenir. Dubai, Hamburg veya New York'taki bir alıcı Google Global'de arama yaptığında ürünleriniz en üstte listelenir.</p>
+                  <h4>5 Dilde Otomatik SEO & Google/Yandex İndekslemesi</h4>
+                  <p>Markanızın tüm koleksiyonları Türkçe, İngilizce, Almanca, Arapça ve Rusça otomatik Schema.org ve Hreflang etiketleriyle arama motorlarında indekslenir. Yabancı alıcılar kendi dillerinde arama yaptığında ürünleriniz en üst sıralarda çıkar.</p>
                 </div>
               </div>
 
               <div className="how-step-card">
                 <div className="step-num-badge">2</div>
+                <div>
+                  <h4>Çoklu Döviz Cinsi ile Uluslararası Fiyat Görünürlüğü</h4>
+                  <p>Alıcılar $ USD, € EUR, £ GBP, ﷼ SAR, ₽ RUB veya ₺ TRY cinsinden canlı fiyatları ve metraj bütçelerini kendi para birimlerinde hesaplayarak teklif talebi gönderir.</p>
+                </div>
+              </div>
+
+              <div className="how-step-card">
+                <div className="step-num-badge">3</div>
                 <div>
                   <h4>Global BIM / CAD Mimari Şartname Entegrasyonu</h4>
                   <p>Uluslararası mimarlık ofisleri basılı katalog yerine Revit (.rfa), AutoCAD (.dwg) ve 4K dikişsiz PBR dokuları indirir. Seramikleriniz doğrudan yurt dışındaki dev otel ve konut projelerinin şartnamesine girer.</p>
@@ -256,26 +215,18 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
               </div>
 
               <div className="how-step-card">
-                <div className="step-num-badge">3</div>
-                <div>
-                  <h4>Canlı B2B Konteyner & Navlun Fiyatlama Engine</h4>
-                  <p>Yabancı distribütör metrajını ve ebadını girdiğinde; tonaj, palet sayısı, 20ft konteyner adedi ve Hamburg, Dubai, NY liman navlun bedeli otomatik hesaplanır. İhracat belirsizliği ortadan kalkar.</p>
-                </div>
-              </div>
-
-              <div className="how-step-card">
                 <div className="step-num-badge">4</div>
                 <div>
-                  <h4>Uygulamasız Web 3D & AR Canlı Mekan Görselleştirici</h4>
-                  <p>Alıcılar fiziki showroom ziyareti yapmadan cep telefonu veya bilgisayar üzerinden seramiklerinizi 360° sanal banyoda veya kendi mekanlarında AR ile canlı dener.</p>
+                  <h4>Yapay Zekalı Görsel Arama & Web 3D/AR Simülatörü</h4>
+                  <p>Alıcılar fotoğraf yükleyerek seramiklerinizi arayabilir ve fiziki showroom ziyareti yapmadan cep telefonu veya bilgisayar üzerinden seramiklerinizi 360° sanal banyoda veya kendi mekanlarında AR ile canlı dener.</p>
                 </div>
               </div>
 
               <div className="how-step-card highlight">
                 <div className="step-num-badge gold">5</div>
                 <div>
-                  <h4>Onaylı B2B İhracat Taleplerinin Marka Kokpitine İletilmesi</h4>
-                  <p>Gelen yüksek metrajlı proje ve distribütör alım talepleri doğrulanır (Firma adı, Ülke, Proje m²) ve doğrudan markanızın B2B İhracat Paneline (`/marka`) ve ihracat müdürünüze aktarılır.</p>
+                  <h4>Onaylı Uluslararası Proje Taleplerinin Marka Kokpitine İletilmesi</h4>
+                  <p>Dünya genelinden gelen proje ve alım talepleri doğrulanır (Firma adı, Ülke, Proje m²) ve doğrudan markanızın B2B İhracat Paneline (`/marka`) ve ihracat temsilcinize iletilir.</p>
                 </div>
               </div>
 
@@ -293,186 +244,55 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
         </div>
       )}
 
-      {/* MODAL 2: INTERACTIVE CONTAINER & LOGISTICS EXPORT CALCULATOR MODAL */}
-      {isModalOpen && (
-        <div className="export-modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="export-modal-card glass-panel" onClick={(e) => e.stopPropagation()}>
-            
-            {/* Modal Header */}
+      {/* MODAL 2: MULTI-CURRENCY SUPPORT MODAL */}
+      {isCurrencyModalOpen && (
+        <div className="export-modal-overlay" onClick={() => setIsCurrencyModalOpen(false)}>
+          <div className="export-modal-card glass-panel" style={{ maxWidth: '680px' }} onClick={(e) => e.stopPropagation()}>
             <div className="export-modal-header">
               <div className="modal-title-box">
                 <div className="modal-icon-gold">
-                  <Ship size={22} />
+                  <DollarSign size={22} />
                 </div>
                 <div>
-                  <h3>🚢 B2B İhracat Navlun & Konteyner Hesaplayıcı</h3>
-                  <p>Fabrikadan dünya limanlarına otomatik konteyner, palet ve navlun maliyeti hesaplama portalı</p>
+                  <h3>💲 Desteklenen Çoklu Döviz Cinsleri (Multi-Currency)</h3>
+                  <p>Uluslararası alıcılar m² fiyatlarını anında kendi para birimlerinde görüntüler</p>
                 </div>
               </div>
-              <button className="export-modal-close" onClick={() => setIsModalOpen(false)}>
+              <button className="export-modal-close" onClick={() => setIsCurrencyModalOpen(false)}>
                 <X size={18} />
               </button>
             </div>
 
-            {/* Modal Body: Controls & Real-Time Calculation */}
-            <div className="export-modal-body">
-              
-              {/* Left Column: Input Form */}
-              <div className="export-form-column">
-                
-                {/* SQM Slider & Input */}
-                <div className="input-group">
-                  <div className="input-label-row">
-                    <label>Proje Metrajı (m²)</label>
-                    <span className="sqm-badge-value">{sqm.toLocaleString('tr-TR')} m²</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="100" 
-                    max="10000" 
-                    step="50" 
-                    value={sqm} 
-                    onChange={(e) => setSqm(parseInt(e.target.value) || 100)} 
-                    className="export-range-slider"
-                  />
-                  <div className="quick-sqm-presets">
-                    {[500, 1200, 2500, 5000].map(val => (
-                      <button 
-                        key={val} 
-                        onClick={() => setSqm(val)}
-                        className={`preset-btn ${sqm === val ? 'active' : ''}`}
-                      >
-                        {val.toLocaleString('tr-TR')} m²
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Tile Spec Selection */}
-                <div className="input-group">
-                  <label>Seramik Ebadı & Kalınlık Tipi</label>
-                  <select 
-                    value={selectedTile.id} 
-                    onChange={(e) => setSelectedTile(tileSpecsData.find(t => t.id === e.target.value))}
-                    className="export-select-input"
-                  >
-                    {tileSpecsData.map(tile => (
-                      <option key={tile.id} value={tile.id}>{tile.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Destination Port Selection */}
-                <div className="input-group">
-                  <label>Hedef Liman (Destination Port)</label>
-                  <select 
-                    value={selectedPort.id} 
-                    onChange={(e) => setSelectedPort(portsData.find(p => p.id === e.target.value))}
-                    className="export-select-input"
-                  >
-                    {portsData.map(port => (
-                      <option key={port.id} value={port.id}>{port.country} - {port.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Incoterms Trade Terms */}
-                <div className="input-group">
-                  <label>Teslim Şekli (Incoterms 2020)</label>
-                  <div className="incoterm-buttons">
-                    <button 
-                      onClick={() => setIncoterm('CIF')} 
-                      className={`incoterm-btn ${incoterm === 'CIF' ? 'active' : ''}`}
-                    >
-                      <strong>CIF (Cost, Insurance & Freight)</strong>
-                      <span>Sigortalı Deniz Navlunu Dahil (Hedef Liman Teslim)</span>
-                    </button>
-                    <button 
-                      onClick={() => setIncoterm('FOB')} 
-                      className={`incoterm-btn ${incoterm === 'FOB' ? 'active' : ''}`}
-                    >
-                      <strong>FOB (Free On Board)</strong>
-                      <span>Türkiye Çıkış Limanı Teslim (Ambarlı/Alsancak/Mersin)</span>
-                    </button>
-                  </div>
-                </div>
-
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', margin: '14px 0' }}>
+              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '12px', borderRadius: '12px' }}>
+                <div style={{ fontWeight: '800', color: '#d4af37', fontSize: '1rem' }}>$ USD (US Dollar)</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Kuzey Amerika, Orta Doğu & Küresel Ticaret</div>
               </div>
-
-              {/* Right Column: Live Calculation Results Card */}
-              <div className="export-results-column">
-                <div className="results-card-inner">
-                  <div className="results-card-title">
-                    <span>OTOMATİK SEVKIYAT VE NAVLUN RAPORU</span>
-                    <span className="live-status-dot" />
-                  </div>
-
-                  <div className="results-stats-grid">
-                    
-                    <div className="result-stat-box">
-                      <span className="stat-label">Brüt Tonaj</span>
-                      <strong className="stat-val-highlight">{totalWeightTon} Ton</strong>
-                      <span className="stat-sub">~{totalWeightKg.toLocaleString('tr-TR')} kg</span>
-                    </div>
-
-                    <div className="result-stat-box">
-                      <span className="stat-label">Palet İhtiyacı</span>
-                      <strong className="stat-val-highlight">{totalPallets} Palet</strong>
-                      <span className="stat-sub">Export Euro-Palet</span>
-                    </div>
-
-                    <div className="result-stat-box full-width">
-                      <span className="stat-label">Konteyner İhtiyacı (FCL)</span>
-                      <strong className="stat-val-gold">{container20ftCount}x 20ft Heavy FCL Container</strong>
-                      <span className="stat-sub">Max payload ~21.5 Ton / Konteyner</span>
-                    </div>
-
-                    <div className="result-stat-box">
-                      <span className="stat-label">Tahmini Transit Süre</span>
-                      <strong className="stat-val-white">{selectedPort.days}</strong>
-                      <span className="stat-sub">{selectedPort.name}</span>
-                    </div>
-
-                    <div className="result-stat-box">
-                      <span className="stat-label">Tahmini Navlun Aralığı</span>
-                      <strong className="stat-val-green">${freightRangeLow.toLocaleString()} - ${freightRangeHigh.toLocaleString()} USD</strong>
-                      <span className="stat-sub">{incoterm} bazında liman navlunu</span>
-                    </div>
-
-                  </div>
-
-                  {/* Actions Inside Calculator Modal */}
-                  <div className="results-action-group">
-                    <button onClick={() => setShowRfqSuccess(true)} className="proforma-request-btn">
-                      <FileText size={16} />
-                      <span>Resmi İhracat Proforma Teklifi Al</span>
-                    </button>
-
-                    <button onClick={handleWhatsAppSend} className="whatsapp-export-btn">
-                      <MessageSquare size={16} />
-                      <span>İhracat Temsilcisine WhatsApp'tan İlet</span>
-                    </button>
-                  </div>
-
-                  {showRfqSuccess && (
-                    <div className="rfq-success-banner">
-                      <CheckCircle2 size={16} style={{ color: '#10b981' }} />
-                      <span>İhracat talebiniz kaydedildi. Müşteri temsilcimiz proforma faturayı e-posta adresinize gönderecektir.</span>
-                    </div>
-                  )}
-
-                  <div className="export-disclaimer">
-                    <ShieldCheck size={14} style={{ color: '#d4af37', flexShrink: 0, marginTop: '2px' }} />
-                    <span>
-                      <strong>Yasal Uyarı & Şeffaf Fiyatlandırma:</strong> Bu araç uluslararası alıcılar için <em>Ön İhracat Lojistik Simülasyonudur (Pre-Export Estimate)</em>. Hesaplanan tonaj ve navlun değerleri hukuken bağlayıcı teklif (binding offer) niteliğinde olmayıp; nihai bedel fabrika resmi kantar tartımı, çelik çemberleme ve güncel deniz navlun kurlarına göre <strong>resmi proforma faturada</strong> kesinleşir.
-                    </span>
-                  </div>
-
-                </div>
+              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '12px', borderRadius: '12px' }}>
+                <div style={{ fontWeight: '800', color: '#38bdf8', fontSize: '1rem' }}>€ EUR (Euro)</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Avrupa Birliği & Akdeniz Havzası</div>
               </div>
-
+              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '12px', borderRadius: '12px' }}>
+                <div style={{ fontWeight: '800', color: '#34d399', fontSize: '1rem' }}>£ GBP (British Pound)</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>İngiltere & Birleşik Krallık Projeleri</div>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '12px', borderRadius: '12px' }}>
+                <div style={{ fontWeight: '800', color: '#fef08a', fontSize: '1rem' }}>﷼ SAR (Saudi Riyal)</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Suudi Arabistan & Körfez Ülkeleri</div>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '12px', borderRadius: '12px' }}>
+                <div style={{ fontWeight: '800', color: '#c084fc', fontSize: '1rem' }}>₽ RUB (Russian Ruble)</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Rusya & BDT Pazarları</div>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '12px', borderRadius: '12px' }}>
+                <div style={{ fontWeight: '800', color: '#ffffff', fontSize: '1rem' }}>₺ TRY (Türk Lirası)</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Türkiye İçi Projeler & Bayiler</div>
+              </div>
             </div>
 
+            <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>
+              Sitemizin sağ üst köşesinde yer alan döviz seçiciden dilediğiniz para birimini seçebilir veya müşterilerinizin anlık kur dönüşümlerini yapmasını sağlayabilirsiniz.
+            </p>
           </div>
         </div>
       )}
@@ -523,8 +343,8 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
               <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                 <button 
                   onClick={() => { setDownloadedBim(true); setTimeout(() => setDownloadedBim(false), 3000); }} 
-                  className="proforma-request-btn"
-                  style={{ flex: 1 }}
+                  className="global-brand-join-btn"
+                  style={{ flex: 1, padding: '12px', justifyContent: 'center' }}
                 >
                   <Download size={16} />
                   <span>Örnek 4K BIM Paketini İndir (.ZIP)</span>
@@ -532,7 +352,7 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
               </div>
 
               {downloadedBim && (
-                <div className="rfq-success-banner">
+                <div style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.4)', color: '#34d399', padding: '10px 12px', borderRadius: '10px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Check size={16} />
                   <span>Örnek 4K PBR ve BIM kütüphanesi indiriliyor. İstediğiniz seramiğin detay sayfasından o ürüne özel 4K CAD dosyasını indirebilirsiniz.</span>
                 </div>
@@ -553,7 +373,7 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
                 </div>
                 <div>
                   <h3>🌍 85+ İhracat Ülkesi & Desteklenen Diller</h3>
-                  <p>SeramikBak Global Ağının Hizmet Verdiği Bölgesel İhracat Limanları ve Diller</p>
+                  <p>SeramikBak Global Ağının Hizmet Verdiği Bölgesel Arama Motorları ve Diller</p>
                 </div>
               </div>
               <button className="export-modal-close" onClick={() => setIsCountriesModalOpen(false)}>
@@ -567,7 +387,7 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
                   <span style={{ fontSize: '1.4rem' }}>{country.flag}</span>
                   <div>
                     <div style={{ fontWeight: '800', fontSize: '0.82rem', color: '#f1f5f9' }}>{country.name}</div>
-                    <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Liman: {country.port} | {country.lang}</div>
+                    <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Arama Engine: {country.searchTarget} | {country.lang}</div>
                   </div>
                 </div>
               ))}
@@ -613,7 +433,7 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
           align-items: center;
           text-align: center;
           gap: 6px;
-          max-width: 760px;
+          max-width: 780px;
           margin: 0 auto;
         }
 
@@ -886,7 +706,7 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
           box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
         }
 
-        /* EXPORT CALCULATOR & MODAL STYLES */
+        /* MODAL STYLES */
         .export-modal-overlay {
           position: fixed;
           top: 0;
@@ -982,303 +802,6 @@ export default function GlobalExportHub({ onOpen3DStudio }) {
         .export-modal-close:hover {
           background: rgba(239, 68, 68, 0.2);
           color: #ef4444;
-        }
-
-        .export-modal-body {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 24px;
-        }
-
-        @media (max-width: 768px) {
-          .export-modal-body {
-            grid-template-columns: 1fr;
-          }
-          .export-modal-card {
-            padding: 18px;
-          }
-        }
-
-        .export-form-column {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .input-group {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .input-group label {
-          font-size: 0.78rem;
-          font-weight: 700;
-          color: #cbd5e1;
-        }
-
-        .input-label-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        .sqm-badge-value {
-          font-size: 0.85rem;
-          font-weight: 900;
-          color: #d4af37;
-          background: rgba(212, 175, 55, 0.15);
-          padding: 2px 8px;
-          border-radius: 6px;
-        }
-
-        .export-range-slider {
-          accent-color: #d4af37;
-          height: 6px;
-          border-radius: 3px;
-          cursor: pointer;
-        }
-
-        .quick-sqm-presets {
-          display: flex;
-          gap: 6px;
-        }
-
-        .preset-btn {
-          flex: 1;
-          padding: 5px;
-          border-radius: 6px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.03);
-          color: #94a3b8;
-          font-size: 0.68rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-
-        .preset-btn.active, .preset-btn:hover {
-          background: rgba(212, 175, 55, 0.2);
-          color: #fef08a;
-          border-color: rgba(212, 175, 55, 0.4);
-        }
-
-        .export-select-input {
-          background: rgba(0, 0, 0, 0.5);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: #ffffff;
-          padding: 10px 12px;
-          border-radius: 10px;
-          font-size: 0.82rem;
-          outline: none;
-        }
-
-        .export-select-input option {
-          background: #0f172a;
-          color: #ffffff;
-        }
-
-        .incoterm-buttons {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-
-        .incoterm-btn {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 2px;
-          padding: 10px 12px;
-          border-radius: 10px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.02);
-          color: #cbd5e1;
-          cursor: pointer;
-          transition: all 0.2s;
-          text-align: left;
-        }
-
-        .incoterm-btn.active {
-          background: rgba(212, 175, 55, 0.15);
-          border-color: rgba(212, 175, 55, 0.5);
-          color: #ffffff;
-        }
-
-        .incoterm-btn strong {
-          font-size: 0.8rem;
-          color: #d4af37;
-        }
-
-        .incoterm-btn span {
-          font-size: 0.68rem;
-          color: #94a3b8;
-        }
-
-        /* Results Card */
-        .export-results-column {
-          display: flex;
-        }
-
-        .results-card-inner {
-          background: rgba(0, 0, 0, 0.45);
-          border: 1px solid rgba(212, 175, 55, 0.3);
-          border-radius: 18px;
-          padding: 20px;
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .results-card-title {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          font-size: 0.7rem;
-          font-weight: 900;
-          color: #d4af37;
-          letter-spacing: 0.08em;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-          padding-bottom: 10px;
-        }
-
-        .live-status-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #10b981;
-          box-shadow: 0 0 8px #10b981;
-        }
-
-        .results-stats-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 10px;
-        }
-
-        .result-stat-box {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          padding: 10px 12px;
-          border-radius: 12px;
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-
-        .result-stat-box.full-width {
-          grid-column: span 2;
-          background: rgba(212, 175, 55, 0.08);
-          border-color: rgba(212, 175, 55, 0.25);
-        }
-
-        .stat-label {
-          font-size: 0.65rem;
-          color: #94a3b8;
-          font-weight: 700;
-          text-transform: uppercase;
-        }
-
-        .stat-val-highlight {
-          font-size: 1.1rem;
-          font-weight: 900;
-          color: #ffffff;
-        }
-
-        .stat-val-gold {
-          font-size: 0.95rem;
-          font-weight: 900;
-          color: #d4af37;
-        }
-
-        .stat-val-white {
-          font-size: 0.95rem;
-          font-weight: 900;
-          color: #f1f5f9;
-        }
-
-        .stat-val-green {
-          font-size: 0.9rem;
-          font-weight: 900;
-          color: #34d399;
-        }
-
-        .stat-sub {
-          font-size: 0.62rem;
-          color: #64748b;
-        }
-
-        .results-action-group {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          margin-top: 8px;
-        }
-
-        .proforma-request-btn {
-          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
-          color: #0b0f17;
-          border: none;
-          padding: 12px;
-          border-radius: 12px;
-          font-size: 0.84rem;
-          font-weight: 900;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
-          transition: all 0.2s;
-        }
-
-        .proforma-request-btn:hover {
-          background: linear-gradient(135deg, #fef08a 0%, #d4af37 100%);
-          transform: translateY(-2px);
-        }
-
-        .whatsapp-export-btn {
-          background: rgba(34, 197, 94, 0.15);
-          border: 1px solid rgba(34, 197, 94, 0.4);
-          color: #4ade80;
-          padding: 10px;
-          border-radius: 12px;
-          font-size: 0.8rem;
-          font-weight: 800;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          transition: all 0.2s;
-        }
-
-        .whatsapp-export-btn:hover {
-          background: #22c55e;
-          color: #ffffff;
-        }
-
-        .rfq-success-banner {
-          background: rgba(16, 185, 129, 0.15);
-          border: 1px solid rgba(16, 185, 129, 0.4);
-          color: #34d399;
-          padding: 10px 12px;
-          border-radius: 10px;
-          font-size: 0.72rem;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          line-height: 1.4;
-        }
-
-        .export-disclaimer {
-          display: flex;
-          align-items: flex-start;
-          gap: 6px;
-          font-size: 0.62rem;
-          color: #64748b;
-          line-height: 1.4;
         }
 
         .how-it-works-steps-grid {
