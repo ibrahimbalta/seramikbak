@@ -3278,29 +3278,29 @@ export default function Home() {
       {/* Top Utility Bar (B2B and Corporate Portal Links) */}
       {!isKioskMode && (
         <div className="top-utility-bar glass-panel-dark">
-          <div className="utility-left" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+          <div className="utility-left" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
             <Link href="/" className="utility-item portal-link" onClick={() => setActiveTab('search')}>
-              <HomeIcon size={13} />
+              <HomeIcon size={12} />
               <span style={{ fontWeight: '800' }}>{t('home')}</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/hakkimizda" className="utility-item portal-link">
-              <Info size={13} />
+              <Info size={12} />
               <span>{t('about')}</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/proje-talep" className="utility-item b2b-btn-link">
-              <Building2 size={13} />
+              <Building2 size={12} />
               <span>{t('b2bQuotes')}</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/bayi" className="utility-item portal-link">
-              <UserIcon size={13} />
+              <UserIcon size={12} />
               <span>{t('dealerPortal')}</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/marka" className="utility-item portal-link">
-              <TrendingUp size={13} />
+              <TrendingUp size={12} />
               <span>{t('brandPortal')}</span>
             </Link>
             <span className="utility-divider">|</span>
@@ -3314,26 +3314,35 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="utility-right" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+          <div className="utility-right" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
             <Link href="/outlet" className="utility-item outlet-btn-link">
-              <Sparkles size={13} style={{ color: '#ef4444' }} />
+              <Sparkles size={12} style={{ color: '#ef4444' }} />
               <span style={{ color: '#ef4444', fontWeight: '800' }}>{t('outlet')}</span>
               <span className="outlet-small-badge">Fırsat</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/ustalar" className="utility-item portal-link">
-              <Wrench size={13} style={{ color: '#b45309' }} />
+              <Wrench size={12} style={{ color: '#b45309' }} />
               <span style={{ color: '#b45309', fontWeight: '800' }}>{t('installers')}</span>
             </Link>
             <span className="utility-divider">|</span>
             <Link href="/ilham" className="utility-item portal-link">
-              <Sparkles size={13} />
+              <Sparkles size={12} />
               <span>{t('inspiration')}</span>
             </Link>
             <span className="utility-divider">|</span>
-            <Link href="/global-tanitim" className="utility-item portal-link">
-              <Globe size={13} style={{ color: '#d4af37' }} />
-              <span style={{ color: '#d4af37', fontWeight: '800' }}>Global</span>
+            <Link 
+              href="/global-tanitim" 
+              className="utility-item global-highlight-btn"
+              style={{
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(180, 83, 9, 0.15) 100%)',
+                border: '1px solid rgba(212, 175, 55, 0.4)',
+                borderRadius: '14px',
+                padding: '3px 9px'
+              }}
+            >
+              <Globe size={12} style={{ color: '#b45309' }} />
+              <span style={{ color: '#b45309', fontWeight: '800' }}>🌍 Global</span>
             </Link>
           </div>
         </div>
@@ -8866,7 +8875,7 @@ export default function Home() {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 6px 24px;
+          padding: 5px 12px;
           background: #ffffff;
           border: 1px solid rgba(0, 0, 0, 0.07);
           border-bottom: none;
