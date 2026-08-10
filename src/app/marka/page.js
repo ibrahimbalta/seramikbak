@@ -57,6 +57,18 @@ export default function BrandPortalPage() {
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
+  // Brand Registration / Application States
+  const [registerTab, setRegisterTab] = useState('login'); // 'login' or 'register'
+  const [regBrandName, setRegBrandName] = useState('');
+  const [regContactPerson, setRegContactPerson] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPhone, setRegPhone] = useState('');
+  const [regNote, setRegNote] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [regSuccess, setRegSuccess] = useState('');
+  const [regError, setRegError] = useState('');
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
+
   // Brand Session Info
   const [brandInfo, setBrandInfo] = useState(null);
 
@@ -72,8 +84,57 @@ export default function BrandPortalPage() {
     };
     handleResize();
     window.addEventListener('resize', handleResize);
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('tab') === 'register') {
+        setRegisterTab('register');
+      }
+    }
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const handleBrandRegister = async (e) => {
+    e.preventDefault();
+    if (!kvkkAccepted) {
+      setRegError('Lütfen devam etmek için KVKK Aydınlatma Metnini onaylayın.');
+      return;
+    }
+    setIsRegistering(true);
+    setRegError('');
+    setRegSuccess('');
+
+    try {
+      const res = await fetch('/api/brands', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: regBrandName,
+          contactPerson: regContactPerson,
+          email: regEmail,
+          phone: regPhone,
+          note: regNote
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setRegSuccess(data.message || 'Marka katılım başvurunuz başarıyla alındı! Müşteri temsilcimiz 24 saat içinde iletişime geçecektir.');
+        setRegBrandName('');
+        setRegContactPerson('');
+        setRegEmail('');
+        setRegPhone('');
+        setRegNote('');
+      } else {
+        setRegError(data.error || 'Başvuru gönderilemedi.');
+      }
+    } catch (err) {
+      console.error(err);
+      setRegError('Sunucu bağlantı hatası oluştu.');
+    } finally {
+      setIsRegistering(false);
+    }
+  };
 
   const handleMobileTabChange = (tabId) => {
     setActivePortalTab(tabId);
@@ -807,7 +868,7 @@ export default function BrandPortalPage() {
     };
   };
 
-  // 1. LOGIN LAYOUT (Premium Dark theme with gold highlight)
+  // 1. LOGIN & BRAND APPLICATION LAYOUT (Premium Dark theme with gold highlight)
   if (!isLoggedIn) {
     return (
       <>
@@ -825,19 +886,21 @@ export default function BrandPortalPage() {
             backdropFilter: 'var(--glass-backdrop, blur(16px))',
             border: '1px solid rgba(212, 175, 55, 0.2)',
             borderRadius: 'var(--border-radius-lg, 24px)',
-            padding: isMobile ? '24px 18px' : '44px 36px',
+            padding: isMobile ? '24px 16px' : '40px 36px',
             width: '100%',
-            maxWidth: '450px',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05)'
+            maxWidth: registerTab === 'login' ? '450px' : '650px',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.05)',
+            transition: 'max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxSizing: 'border-box'
           }}>
-          <div className="login-header" style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div className="login-header" style={{ textAlign: 'center', marginBottom: '24px' }}>
             <Link href="/" style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
               textDecoration: 'none',
               color: 'var(--text-muted, #94a3b8)',
-              marginBottom: '20px',
+              marginBottom: '16px',
               fontSize: '0.8rem',
               fontWeight: '600',
               transition: 'color 0.2s'
@@ -845,9 +908,9 @@ export default function BrandPortalPage() {
               <ArrowLeft size={14} /> Ana Sayfaya Dön
             </Link>
             <div className="logo-icon" style={{
-              width: '54px',
-              height: '54px',
-              borderRadius: '14px',
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
               background: 'linear-gradient(135deg, #111 0%, #1e293b 100%)',
               color: '#d4af37',
               border: '1px solid #d4af37',
@@ -855,130 +918,407 @@ export default function BrandPortalPage() {
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '900',
-              fontSize: '1.6rem',
-              margin: '0 auto 16px auto',
-              boxShadow: '0 0 20px rgba(212,175,55,0.3)'
+              fontSize: '1.4rem',
+              margin: '0 auto 12px auto',
+              boxShadow: '0 0 15px rgba(212,175,55,0.25)'
             }}>SB</div>
             <h3 style={{ 
-              fontSize: '1.6rem', 
+              fontSize: '1.45rem', 
               fontWeight: '800', 
               color: '#fff', 
-              margin: '0 0 8px 0',
+              margin: '0 0 6px 0',
               fontFamily: 'var(--font-title, "Outfit", sans-serif)',
               letterSpacing: '-0.02em'
             }}>B2B Marka Portalı</h3>
-            <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: 0, lineHeight: '1.5' }}>
+            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0, lineHeight: '1.5' }}>
               Seramik fabrikaları ve üretici yetkilileri için akıllı analiz, bayi ve reklam kontrol paneli.
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="login-form" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {loginError && (
-              <div className="error-alert" style={{
-                background: 'rgba(239, 68, 68, 0.1)',
-                color: '#f87171',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-                borderRadius: '12px',
-                padding: '12px 16px',
-                fontSize: '0.8rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <AlertCircle size={16} style={{ flexShrink: 0 }} />
-                <span>{loginError}</span>
-              </div>
-            )}
-
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Kullanıcı Adı</label>
-              <div style={{ position: 'relative' }}>
-                <input 
-                  type="text" 
-                  value={username} 
-                  onChange={(e) => setUsername(e.target.value)} 
-                  required 
-                  placeholder="vitra, kutahya, bien..." 
-                  style={{
-                    width: '100%',
-                    padding: '14px 16px 14px 44px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    fontSize: '0.9rem',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    color: '#fff',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    transition: 'border-color 0.2s, box-shadow 0.2s'
-                  }}
-                  className="login-input"
-                />
-                <User size={16} style={{ position: 'absolute', left: '16px', top: '17px', color: '#94a3b8' }} />
-              </div>
-            </div>
-
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Şifre</label>
-              <div style={{ position: 'relative' }}>
-                <input 
-                  type="password" 
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
-                  required 
-                  placeholder="••••••••" 
-                  style={{
-                    width: '100%',
-                    padding: '14px 16px 14px 44px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    fontSize: '0.9rem',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    color: '#fff',
-                    outline: 'none',
-                    boxSizing: 'border-box',
-                    transition: 'border-color 0.2s, box-shadow 0.2s'
-                  }}
-                  className="login-input"
-                />
-                <Lock size={16} style={{ position: 'absolute', left: '16px', top: '17px', color: '#94a3b8' }} />
-              </div>
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={loginLoading}
+          {/* Tab Switcher (Yetkili Girişi / Marka Başvurusu) */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            background: 'rgba(255, 255, 255, 0.05)',
+            padding: '4px',
+            borderRadius: '10px',
+            marginBottom: '24px',
+            border: '1px solid rgba(255, 255, 255, 0.05)'
+          }}>
+            <button
+              type="button"
+              onClick={() => { setRegisterTab('login'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
               style={{
-                background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                color: '#111',
+                background: registerTab === 'login' ? '#d4af37' : 'transparent',
                 border: 'none',
-                borderRadius: '12px',
-                padding: '15px',
-                fontWeight: '800',
-                fontSize: '0.95rem',
+                padding: '10px',
+                fontSize: '0.82rem',
+                fontWeight: '700',
+                color: registerTab === 'login' ? '#090d16' : '#94a3b8',
+                borderRadius: '8px',
                 cursor: 'pointer',
-                boxShadow: '0 8px 24px rgba(212, 175, 55, 0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                marginTop: '10px',
                 transition: 'all 0.2s'
               }}
-              className="login-btn"
             >
-              {loginLoading ? (
-                <>
-                  <Loader2 size={18} className="animate-spin" />
-                  <span>Bağlanılıyor...</span>
-                </>
-              ) : (
-                <>
-                  <ShieldCheck size={18} />
-                  <span>Marka Paneline Giriş Yap</span>
-                </>
-              )}
+              Marka Girişi
             </button>
-          </form>
+            <button
+              type="button"
+              onClick={() => { setRegisterTab('register'); setLoginError(''); setRegError(''); setRegSuccess(''); }}
+              style={{
+                background: registerTab === 'register' ? '#d4af37' : 'transparent',
+                border: 'none',
+                padding: '10px',
+                fontSize: '0.82rem',
+                fontWeight: '700',
+                color: registerTab === 'register' ? '#090d16' : '#94a3b8',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              Marka Katılım Başvurusu
+            </button>
+          </div>
+
+          {/* TAB 1: LOGIN FORM */}
+          {registerTab === 'login' && (
+            <form onSubmit={handleLogin} className="login-form" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              {loginError && (
+                <div className="error-alert" style={{
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  color: '#f87171',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                  <span>{loginError}</span>
+                </div>
+              )}
+
+              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>KULLANICI ADI VEYA E-POSTA</label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="text" 
+                    value={username} 
+                    onChange={(e) => setUsername(e.target.value)} 
+                    required 
+                    placeholder="vitra, bien, kutahya..." 
+                    style={{
+                      width: '100%',
+                      padding: '13px 16px 13px 44px',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      fontSize: '0.88rem',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      color: '#fff',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      transition: 'border-color 0.2s, box-shadow 0.2s'
+                    }}
+                    className="login-input"
+                  />
+                  <User size={16} style={{ position: 'absolute', left: '16px', top: '15px', color: '#94a3b8' }} />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ŞİFRE</label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    required 
+                    placeholder="••••••••" 
+                    style={{
+                      width: '100%',
+                      padding: '13px 16px 13px 44px',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      fontSize: '0.88rem',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      color: '#fff',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                      transition: 'border-color 0.2s, box-shadow 0.2s'
+                    }}
+                    className="login-input"
+                  />
+                  <Lock size={16} style={{ position: 'absolute', left: '16px', top: '15px', color: '#94a3b8' }} />
+                </div>
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={loginLoading}
+                style={{
+                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                  color: '#111',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '14px',
+                  fontWeight: '800',
+                  fontSize: '0.92rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 8px 24px rgba(212, 175, 55, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginTop: '8px',
+                  transition: 'all 0.2s'
+                }}
+                className="login-btn"
+              >
+                {loginLoading ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    <span>Bağlanılıyor...</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck size={18} />
+                    <span>Marka Paneline Giriş Yap</span>
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          {/* TAB 2: BRAND REGISTER / APPLICATION FORM */}
+          {registerTab === 'register' && (
+            <form onSubmit={handleBrandRegister} className="register-form" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {regError && (
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  color: '#f87171',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                  <span>{regError}</span>
+                </div>
+              )}
+
+              {regSuccess && (
+                <div style={{
+                  background: 'rgba(34, 197, 94, 0.1)',
+                  color: '#4ade80',
+                  border: '1px solid rgba(34, 197, 94, 0.3)',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  fontSize: '0.85rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  <CheckCircle size={18} style={{ flexShrink: 0 }} />
+                  <span>{regSuccess}</span>
+                </div>
+              )}
+
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase' }}>
+                    ÜRETİCİ / MARKA FİRMA ADI *
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      value={regBrandName}
+                      onChange={(e) => setRegBrandName(e.target.value)}
+                      required
+                      placeholder="Örn: Bien Seramik, Qua Granite..."
+                      style={{
+                        width: '100%',
+                        padding: '12px 14px 12px 40px',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        fontSize: '0.85rem',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        color: '#fff',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                    <Building2 size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#94a3b8' }} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase' }}>
+                    YETKİLİ AD SOYAD *
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      value={regContactPerson}
+                      onChange={(e) => setRegContactPerson(e.target.value)}
+                      required
+                      placeholder="Örn: Ahmet Yılmaz"
+                      style={{
+                        width: '100%',
+                        padding: '12px 14px 12px 40px',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        fontSize: '0.85rem',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        color: '#fff',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                    <User size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#94a3b8' }} />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '14px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase' }}>
+                    KURUMSAL E-POSTA *
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="email"
+                      value={regEmail}
+                      onChange={(e) => setRegEmail(e.target.value)}
+                      required
+                      placeholder="pazarlama@marka.com"
+                      style={{
+                        width: '100%',
+                        padding: '12px 14px 12px 40px',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        fontSize: '0.85rem',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        color: '#fff',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                    <User size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#94a3b8' }} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase' }}>
+                    TELEFON / WHATSAPP *
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="tel"
+                      value={regPhone}
+                      onChange={(e) => setRegPhone(e.target.value)}
+                      required
+                      placeholder="0532 000 00 00"
+                      style={{
+                        width: '100%',
+                        padding: '12px 14px 12px 40px',
+                        borderRadius: '10px',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        fontSize: '0.85rem',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        color: '#fff',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                    <Activity size={16} style={{ position: 'absolute', left: '14px', top: '13px', color: '#94a3b8' }} />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', textTransform: 'uppercase' }}>
+                  ÜRÜN KATEGORİSİ & KATILIM NOTUNUZ (OPSİYONEL)
+                </label>
+                <textarea
+                  value={regNote}
+                  onChange={(e) => setRegNote(e.target.value)}
+                  rows={2}
+                  placeholder="Ürün çeşitleri, fabrika lokasyonu veya ihracat hedefleriniz hakkında kısa bilgi yazabilirsiniz..."
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    fontSize: '0.85rem',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    color: '#fff',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                <input
+                  type="checkbox"
+                  id="markaKvkkAccepted"
+                  checked={kvkkAccepted}
+                  onChange={(e) => setKvkkAccepted(e.target.checked)}
+                  style={{ cursor: 'pointer', accentColor: '#d4af37' }}
+                />
+                <label htmlFor="markaKvkkAccepted" style={{ fontSize: '0.78rem', color: '#94a3b8', cursor: 'pointer' }}>
+                  <span>SeramikBak B2B Marka Katılım Şartları ve KVKK Aydınlatma Metnini okudum, kabul ediyorum.</span>
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isRegistering}
+                style={{
+                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                  color: '#111',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '14px',
+                  fontWeight: '800',
+                  fontSize: '0.92rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 8px 24px rgba(212, 175, 55, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginTop: '8px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {isRegistering ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    <span>Başvuru İletiliyor...</span>
+                  </>
+                ) : (
+                  <>
+                    <Building2 size={18} />
+                    <span>Marka Katılım Başvurusunu Gönder</span>
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+              🔒 SSL ve Üretici Marka Portalı Güvenliği Koruması Altındadır.
+            </span>
+          </div>
         </div>
       </main>
 

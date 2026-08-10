@@ -46,3 +46,38 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to fetch brands' }, { status: 500 });
   }
 }
+
+export async function POST(request) {
+  try {
+    const payload = await request.json();
+    const { name, contactPerson, email, phone, note } = payload;
+
+    if (!name || !email || !phone) {
+      return NextResponse.json({ error: 'Lütfen Marka Adı, E-Posta ve Telefon alanlarını doldurun.' }, { status: 400 });
+    }
+
+    // Record brand lead request in DB
+    const lead = await prisma.lead.create({
+      data: {
+        name: contactPerson || name,
+        phone,
+        email,
+        city: 'MARKA_BASVURU',
+        district: name,
+        notes: `[B2B MARKA BAŞVURUSU] Firma: ${name} | İletişim: ${contactPerson || '-'} | Not: ${note || '-'}`
+      }
+    });
+
+    console.log(`[Yeni Marka Katılım Başvurusu] ${name} (${email}) - ID: ${lead.id}`);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Marka katılım başvurunuz başarıyla alındı. Müşteri temsilcimiz 24 saat içinde sizinle iletişime geçecektir.',
+      id: lead.id
+    });
+  } catch (error) {
+    console.error('Brand Register API Error:', error);
+    return NextResponse.json({ error: 'Başvuru kaydedilemedi', details: error.message }, { status: 500 });
+  }
+}
+
