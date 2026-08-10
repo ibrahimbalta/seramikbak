@@ -94,6 +94,7 @@ import ProductCard from '@/components/ProductCard';
 import TileCalculatorWidget from '@/components/TileCalculatorWidget';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
 import GlobalSearchPreviewCard from '@/components/GlobalSearchPreviewCard';
+import ProductSchemaJsonLd from '@/components/ProductSchemaJsonLd';
 
 function enrichProductData(p) {
   const basePrice = p.width * p.height * 0.08 + (p.finish === 'Parlak' ? 120 : 0) + (p.style === 'Mermer' ? 150 : 80);
@@ -3973,6 +3974,9 @@ export default function Home() {
                 </div>
               </div>
             </div>
+
+            {/* Dynamic Schema.org JSON-LD Structured Data for Google Global & Yandex */}
+            <ProductSchemaJsonLd product={selectedTile || (products && products[0])} />
 
             {/* UNIFIED GLOBAL B2B EXPORT SHOWCASE HERO */}
             <div 
