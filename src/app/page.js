@@ -87,6 +87,7 @@ const ModelViewerAR = dynamic(() => import('@/components/ModelViewerAR'), {
 });
 
 import TileVisualPreview from '@/components/TileVisualPreview';
+import BathroomMockupPreview from '@/components/BathroomMockupPreview';
 import ProductCard from '@/components/ProductCard';
 import TileCalculatorWidget from '@/components/TileCalculatorWidget';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
@@ -6420,6 +6421,15 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+
+                {/* BANYO ORTAMINDA DÖŞENMİŞ GÖRSEL MOCKUP */}
+                <BathroomMockupPreview 
+                  product={detailProduct} 
+                  onOpenStudio={() => {
+                    setShowDetailModal(false);
+                    navigateTo3DStudio(detailProduct);
+                  }}
+                />
               </div>
 
               {/* Right Column: Ingestion Channels & Prices */}
