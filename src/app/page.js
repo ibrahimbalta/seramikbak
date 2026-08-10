@@ -3889,7 +3889,7 @@ export default function Home() {
 
             {/* Global Brand Export Hub Showcase Section */}
             <div id="global-export-section" style={{ margin: '24px 0' }}>
-              <GlobalExportHub />
+              <GlobalExportHub onOpen3DStudio={() => setActiveTab('studio')} />
             </div>
 
             {/* Categories & 3D Showcase Section */}
@@ -7510,7 +7510,7 @@ export default function Home() {
 
       {/* Global Brand Export Hub Showcase Section */}
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
-        <GlobalExportHub />
+        <GlobalExportHub onOpen3DStudio={() => setActiveTab('studio')} />
       </div>
 
       {/* Premium Footer Section */}

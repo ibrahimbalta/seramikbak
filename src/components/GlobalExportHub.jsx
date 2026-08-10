@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   Globe, Ship, Layers2, Sparkles, Building2, ShieldCheck, 
   ArrowRight, FileCheck, CheckCircle2, Calculator, X, MessageSquare, 
-  FileText, ArrowUpRight, ChevronRight, Info
+  FileText, ArrowUpRight, ChevronRight, Info, Download, Check
 } from 'lucide-react';
 
 const portsData = [
@@ -24,14 +24,33 @@ const tileSpecsData = [
   { id: '120x240', label: '120x240 cm (Slab Dev Plaka - 12mm)', kgPerM2: 28, m2PerPallet: 28.80 }
 ];
 
-export default function GlobalExportHub() {
+const exportCountriesList = [
+  { flag: '🇩🇪', name: 'Almanya (Germany)', port: 'Hamburg / Bremen', lang: 'Deutsch (DE)' },
+  { flag: '🇦🇪', name: 'BAE (United Arab Emirates)', port: 'Jebel Ali / Abu Dhabi', lang: 'English / Arabic' },
+  { flag: '🇺🇸', name: 'ABD (United States)', port: 'New York / Los Angeles', lang: 'English (US)' },
+  { flag: '🇬🇧', name: 'İngiltere (United Kingdom)', port: 'London Gateway / Felixstowe', lang: 'English (UK)' },
+  { flag: '🇸🇦', name: 'Suudi Arabistan (Saudi Arabia)', port: 'Jeddah / Dammam', lang: 'العربية (AR)' },
+  { flag: '🇶🇦', name: 'Katar (Qatar)', port: 'Hamad Port', lang: 'English / Arabic' },
+  { flag: '🇫🇷', name: 'Fransa (France)', port: 'Le Havre / Marseille', lang: 'Français' },
+  { flag: '🇳🇱', name: 'Hollanda (Netherlands)', port: 'Rotterdam', lang: 'Dutch / English' },
+  { flag: '🇮🇹', name: 'İtalya (Italy)', port: 'Genoa / Trieste', lang: 'Italiano' },
+  { flag: '🇪🇸', name: 'İspanya (Spain)', port: 'Valencia / Barcelona', lang: 'Español' },
+  { flag: '🇷🇺', name: 'Rusya (Russia)', port: 'Novorossiysk / St. Petersburg', lang: 'Русский (RU)' },
+  { flag: '🇰🇼', name: 'Kuveyt (Kuwait)', port: 'Shuwaikh Port', lang: 'العربية / English' }
+];
+
+export default function GlobalExportHub({ onOpen3DStudio }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
+  const [isBimModalOpen, setIsBimModalOpen] = useState(false);
+  const [isCountriesModalOpen, setIsCountriesModalOpen] = useState(false);
+
   const [sqm, setSqm] = useState(1200);
   const [selectedTile, setSelectedTile] = useState(tileSpecsData[0]);
   const [selectedPort, setSelectedPort] = useState(portsData[0]);
   const [incoterm, setIncoterm] = useState('CIF'); // 'FOB' or 'CIF'
   const [showRfqSuccess, setShowRfqSuccess] = useState(false);
+  const [downloadedBim, setDownloadedBim] = useState(false);
 
   // Calculation Math
   const totalWeightKg = Math.round(sqm * selectedTile.kgPerM2);
@@ -60,6 +79,15 @@ export default function GlobalExportHub() {
     window.open(`https://wa.me/905321234567?text=${text}`, '_blank');
   };
 
+  const handle3DStudioClick = () => {
+    if (onOpen3DStudio) {
+      onOpen3DStudio();
+    } else {
+      const el = document.getElementById('studio3d-anchor');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="global-export-hub-container">
       <div className="global-export-banner-card">
@@ -74,7 +102,7 @@ export default function GlobalExportHub() {
             Markalarınızı ve Koleksiyonlarınızı <span>85+ Ülkeye & 15.000+ Uluslararası Mimara</span> Açıyoruz
           </h2>
           <p className="global-banner-desc">
-            SeramikBak Global altyapısı; üreticileri dünya genelindeki B2B distribütörler ve mimarlar ile buluşturan yeni nesil dijital ihracat portalıdır.
+            SeramikBak Global altyapısı; yerli ve uluslararası seramik üreticilerini dünya genelindeki B2B distribütörler, mimarlık büroları ve yüksek metrajlı projeler ile buluşturan yeni nesil dijital ihracat portalıdır.
           </p>
         </div>
 
@@ -100,16 +128,17 @@ export default function GlobalExportHub() {
           </div>
 
           {/* Pillar 2: Architectural BIM */}
-          <div className="global-pillar-card">
+          <div className="global-pillar-card clickable" onClick={() => setIsBimModalOpen(true)}>
             <div className="pillar-top-row">
               <div className="pillar-icon-box blue">
                 <Layers2 size={18} />
               </div>
+              <span className="pillar-action-badge blue">4K PBR Ready</span>
             </div>
             <h3>Global BIM / CAD Kütüphanesi</h3>
             <p>Uluslararası mimarlık büroları için Revit (.rfa), AutoCAD (.dwg) ve dikişsiz 4K PBR dokular.</p>
 
-            <button className="pillar-trigger-btn blue" onClick={() => alert('CAD & BIM İndirme Portalı: İstediğiniz seramiğin detay sayfasından .ZIP formatında tüm 4K dikişsiz dokuları ve AutoCAD dosyalarını 1 tıkla indirebilirsiniz.')}>
+            <button className="pillar-trigger-btn blue">
               <Layers2 size={13} />
               <span>4K BIM / CAD Paketleri</span>
               <ArrowRight size={12} />
@@ -117,33 +146,35 @@ export default function GlobalExportHub() {
           </div>
 
           {/* Pillar 3: Multi-lingual SEO */}
-          <div className="global-pillar-card">
+          <div className="global-pillar-card clickable" onClick={() => setIsCountriesModalOpen(true)}>
             <div className="pillar-top-row">
               <div className="pillar-icon-box emerald">
                 <Globe size={18} />
               </div>
+              <span className="pillar-action-badge emerald">85+ Ülke</span>
             </div>
             <h3>5 Dilde Dijital Showroom & SEO</h3>
             <p>Türkçe, İngilizce, Almanca, Arapça ve Rusça arama motoru indekslemesi ile Google Global görünürlük.</p>
 
-            <button className="pillar-trigger-btn emerald" onClick={() => alert('Desteklenen Küresel Diller: Türkçe (TR), English (EN), Deutsch (DE), العربية (AR), Русский (RU). Üst menüden dilediğiniz dili seçebilirsiniz.')}>
+            <button className="pillar-trigger-btn emerald">
               <Globe size={13} />
-              <span>85+ İhracat Ülkesi & Diller</span>
+              <span>İhracat Ülkeleri & Diller</span>
               <ArrowRight size={12} />
             </button>
           </div>
 
           {/* Pillar 4: Web 3D / AR */}
-          <div className="global-pillar-card">
+          <div className="global-pillar-card clickable" onClick={handle3DStudioClick}>
             <div className="pillar-top-row">
               <div className="pillar-icon-box purple">
                 <Sparkles size={18} />
               </div>
+              <span className="pillar-action-badge purple">Web 3D Live</span>
             </div>
             <h3>Web 3D & AR Canlı Deneyim Engine</h3>
             <p>Uygulamasız tarayıcı üzerinden 360° sanal banyoda ve mekanda canlı karo kaplama simülatörü.</p>
 
-            <button className="pillar-trigger-btn purple" onClick={() => { const el = document.getElementById('studio3d-anchor'); if(el) el.scrollIntoView({ behavior: 'smooth' }); }}>
+            <button className="pillar-trigger-btn purple">
               <Sparkles size={13} />
               <span>3D Canlı Stüdyoyu Aç</span>
               <ArrowRight size={12} />
@@ -152,30 +183,30 @@ export default function GlobalExportHub() {
 
         </div>
 
-        {/* Compact Integrated Metrics & CTA Bar */}
+        {/* Compact Integrated Metrics & High-Contrast CTA Bar */}
         <div className="global-metrics-and-cta-bar">
           <div className="global-metrics-mini">
             <div className="mini-metric">
-              <strong>85+</strong> <span>Ülke</span>
+              <strong>85+</strong> <span>İhracat Ülkesi</span>
             </div>
             <div className="mini-divider" />
             <div className="mini-metric">
-              <strong>15.000+</strong> <span>Mimar</span>
+              <strong>15.000+</strong> <span>Uluslararası Mimar</span>
             </div>
             <div className="mini-divider" />
             <div className="mini-metric">
-              <strong>25.000+</strong> <span>BIM İndirme</span>
+              <strong>25.000+</strong> <span>Aylık BIM İndirme</span>
             </div>
             <div className="mini-divider" />
             <div className="mini-metric">
-              <strong>5 Dilde</strong> <span>Katalog</span>
+              <strong>5 Dilde</strong> <span>Canlı Katalog</span>
             </div>
           </div>
 
           <div className="global-cta-buttons-mini">
             <button onClick={() => setIsHowItWorksOpen(true)} className="global-how-it-works-btn">
               <Info size={14} />
-              <span>İhracat Mekanizması</span>
+              <span>İhracat Mekanizması Nasıl Çalışır?</span>
             </button>
             <Link href="/marka" className="global-brand-join-btn">
               <Building2 size={15} />
@@ -187,7 +218,7 @@ export default function GlobalExportHub() {
 
       </div>
 
-      {/* HOW EXPORT MATCHING ENGINE WORKS MODAL FOR BRANDS */}
+      {/* MODAL 1: HOW EXPORT MATCHING ENGINE WORKS FOR BRANDS */}
       {isHowItWorksOpen && (
         <div className="export-modal-overlay" onClick={() => setIsHowItWorksOpen(false)}>
           <div className="export-modal-card glass-panel" style={{ maxWidth: '840px' }} onClick={(e) => e.stopPropagation()}>
@@ -262,7 +293,7 @@ export default function GlobalExportHub() {
         </div>
       )}
 
-      {/* INTERACTIVE CONTAINER & LOGISTICS EXPORT CALCULATOR MODAL */}
+      {/* MODAL 2: INTERACTIVE CONTAINER & LOGISTICS EXPORT CALCULATOR MODAL */}
       {isModalOpen && (
         <div className="export-modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="export-modal-card glass-panel" onClick={(e) => e.stopPropagation()}>
@@ -446,6 +477,113 @@ export default function GlobalExportHub() {
         </div>
       )}
 
+      {/* MODAL 3: 4K BIM / CAD ARCHITECTURAL DOWNLOAD MODAL */}
+      {isBimModalOpen && (
+        <div className="export-modal-overlay" onClick={() => setIsBimModalOpen(false)}>
+          <div className="export-modal-card glass-panel" style={{ maxWidth: '720px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="export-modal-header">
+              <div className="modal-title-box">
+                <div className="modal-icon-gold">
+                  <Layers2 size={22} />
+                </div>
+                <div>
+                  <h3>📐 Global BIM / CAD Mimari Doku Kütüphanesi</h3>
+                  <p>Revit (.RFA), AutoCAD (.DWG) ve 4K Seamless PBR Doku Paketleri</p>
+                </div>
+              </div>
+              <button className="export-modal-close" onClick={() => setIsBimModalOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', margin: '10px 0' }}>
+              <p style={{ fontSize: '0.85rem', color: '#e2e8f0', lineHeight: 1.6, margin: 0 }}>
+                SeramikBak, uluslararası mimarlık ve iç mimarlık büroları için tüm markaların koleksiyonlarını **4K Seamless PBR (Diffuse, Roughness, Normal Map)** ve **Autodesk Revit / AutoCAD** formatlarında sunar.
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '14px', borderRadius: '12px' }}>
+                  <div style={{ fontWeight: '800', color: '#d4af37', fontSize: '0.9rem', marginBottom: '4px' }}>Revit BIM Family (.RFA)</div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Revit 2020-2026 Uyumlu Şartname Nesnesi</div>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '14px', borderRadius: '12px' }}>
+                  <div style={{ fontWeight: '800', color: '#38bdf8', fontSize: '0.9rem', marginBottom: '4px' }}>AutoCAD Hatch (.DWG)</div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>2D Seramik Döşeme Planları & Derz Çizimleri</div>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '14px', borderRadius: '12px' }}>
+                  <div style={{ fontWeight: '800', color: '#34d399', fontSize: '0.9rem', marginBottom: '4px' }}>4K Seamless PBR Textures</div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>3ds Max, Blender, Corona & V-Ray Hazır</div>
+                </div>
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', padding: '14px', borderRadius: '12px' }}>
+                  <div style={{ fontWeight: '800', color: '#c084fc', fontSize: '0.9rem', marginBottom: '4px' }}>SketchUp Material (.SKM)</div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Tek Tıkla İç Mimari Modellere Ekleme</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button 
+                  onClick={() => { setDownloadedBim(true); setTimeout(() => setDownloadedBim(false), 3000); }} 
+                  className="proforma-request-btn"
+                  style={{ flex: 1 }}
+                >
+                  <Download size={16} />
+                  <span>Örnek 4K BIM Paketini İndir (.ZIP)</span>
+                </button>
+              </div>
+
+              {downloadedBim && (
+                <div className="rfq-success-banner">
+                  <Check size={16} />
+                  <span>Örnek 4K PBR ve BIM kütüphanesi indiriliyor. İstediğiniz seramiğin detay sayfasından o ürüne özel 4K CAD dosyasını indirebilirsiniz.</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 4: 85+ EXPORT COUNTRIES & REGIONAL HUBS MODAL */}
+      {isCountriesModalOpen && (
+        <div className="export-modal-overlay" onClick={() => setIsCountriesModalOpen(false)}>
+          <div className="export-modal-card glass-panel" style={{ maxWidth: '780px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="export-modal-header">
+              <div className="modal-title-box">
+                <div className="modal-icon-gold">
+                  <Globe size={22} />
+                </div>
+                <div>
+                  <h3>🌍 85+ İhracat Ülkesi & Desteklenen Diller</h3>
+                  <p>SeramikBak Global Ağının Hizmet Verdiği Bölgesel İhracat Limanları ve Diller</p>
+                </div>
+              </div>
+              <button className="export-modal-close" onClick={() => setIsCountriesModalOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', margin: '14px 0', maxHeight: '50vh', overflowY: 'auto' }}>
+              {exportCountriesList.map((country, idx) => (
+                <div key={idx} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', padding: '10px 12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '1.4rem' }}>{country.flag}</span>
+                  <div>
+                    <div style={{ fontWeight: '800', fontSize: '0.82rem', color: '#f1f5f9' }}>{country.name}</div>
+                    <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Liman: {country.port} | {country.lang}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+              <Link href="/marka" className="global-brand-join-btn">
+                <Building2 size={15} />
+                <span>Markanızı Bu İhracat Ağına Dahil Edin</span>
+                <ArrowRight size={13} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
         .global-export-hub-container {
           width: 100%;
@@ -453,17 +591,18 @@ export default function GlobalExportHub() {
         }
 
         .global-export-banner-card {
-          background: rgba(15, 23, 42, 0.75);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(197, 160, 89, 0.3);
-          border-radius: 18px;
-          padding: 20px 24px;
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+          background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.88) 100%);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border: 1px solid rgba(197, 160, 89, 0.35);
+          border-top: 2px solid rgba(212, 175, 55, 0.5);
+          border-radius: 20px;
+          padding: 24px 28px;
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 60px rgba(179, 142, 71, 0.12);
           color: #ffffff;
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 18px;
           position: relative;
           overflow: hidden;
         }
@@ -474,7 +613,7 @@ export default function GlobalExportHub() {
           align-items: center;
           text-align: center;
           gap: 6px;
-          max-width: 720px;
+          max-width: 760px;
           margin: 0 auto;
         }
 
@@ -482,14 +621,15 @@ export default function GlobalExportHub() {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          background: rgba(197, 160, 89, 0.12);
-          border: 1px solid rgba(197, 160, 89, 0.35);
-          color: #d4af37;
-          font-size: 0.65rem;
+          background: rgba(197, 160, 89, 0.18);
+          border: 1px solid rgba(197, 160, 89, 0.45);
+          color: #fef08a;
+          font-size: 0.68rem;
           font-weight: 800;
-          padding: 3px 12px;
+          padding: 4px 14px;
           border-radius: 20px;
           letter-spacing: 0.08em;
+          box-shadow: 0 2px 10px rgba(179, 142, 71, 0.2);
         }
 
         .globe-spin-icon {
@@ -503,8 +643,8 @@ export default function GlobalExportHub() {
 
         .global-banner-title {
           font-family: var(--font-title);
-          font-size: 1.25rem;
-          font-weight: 800;
+          font-size: 1.35rem;
+          font-weight: 900;
           line-height: 1.3;
           letter-spacing: -0.01em;
           margin: 0;
@@ -518,9 +658,10 @@ export default function GlobalExportHub() {
         }
 
         .global-banner-desc {
-          font-size: 0.78rem;
-          color: #94a3b8;
-          line-height: 1.45;
+          font-size: 0.82rem;
+          color: #e2e8f0;
+          font-weight: 500;
+          line-height: 1.5;
           margin: 0;
         }
 
@@ -541,16 +682,16 @@ export default function GlobalExportHub() {
             grid-template-columns: 1fr;
           }
           .global-export-banner-card {
-            padding: 16px 14px;
+            padding: 18px 14px;
           }
           .global-banner-title {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
           }
         }
 
         .global-pillar-card {
-          background: rgba(255, 255, 255, 0.025);
-          border: 1px solid rgba(255, 255, 255, 0.06);
+          background: rgba(255, 255, 255, 0.035);
+          border: 1px solid rgba(255, 255, 255, 0.09);
           border-radius: 14px;
           padding: 14px 14px;
           display: flex;
@@ -565,10 +706,10 @@ export default function GlobalExportHub() {
         }
 
         .global-pillar-card:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(197, 160, 89, 0.4);
+          background: rgba(255, 255, 255, 0.07);
+          border-color: rgba(197, 160, 89, 0.5);
           transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
         }
 
         .pillar-top-row {
@@ -587,6 +728,10 @@ export default function GlobalExportHub() {
           border-radius: 10px;
         }
 
+        .pillar-action-badge.blue { background: rgba(2, 132, 199, 0.2); border-color: rgba(2, 132, 199, 0.4); color: #38bdf8; }
+        .pillar-action-badge.emerald { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #34d399; }
+        .pillar-action-badge.purple { background: rgba(168, 85, 247, 0.2); border-color: rgba(168, 85, 247, 0.4); color: #c084fc; }
+
         .pillar-icon-box {
           width: 36px;
           height: 36px;
@@ -602,17 +747,17 @@ export default function GlobalExportHub() {
         .pillar-icon-box.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
 
         .global-pillar-card h3 {
-          font-size: 0.82rem;
+          font-size: 0.85rem;
           font-weight: 800;
           margin: 0;
-          color: #f8fafc;
+          color: #ffffff;
           line-height: 1.3;
         }
 
         .global-pillar-card p {
-          font-size: 0.72rem;
-          color: #94a3b8;
-          line-height: 1.4;
+          font-size: 0.74rem;
+          color: #cbd5e1;
+          line-height: 1.45;
           margin: 0;
           flex: 1;
         }
@@ -631,26 +776,26 @@ export default function GlobalExportHub() {
           margin-top: 2px;
         }
 
-        .pillar-trigger-btn.gold { background: rgba(212, 175, 55, 0.18); color: #fef08a; border: 1px solid rgba(212, 175, 55, 0.35); }
+        .pillar-trigger-btn.gold { background: rgba(212, 175, 55, 0.2); color: #fef08a; border: 1px solid rgba(212, 175, 55, 0.4); }
         .pillar-trigger-btn.gold:hover { background: #d4af37; color: #0b0f17; }
 
-        .pillar-trigger-btn.blue { background: rgba(2, 132, 199, 0.18); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.35); }
+        .pillar-trigger-btn.blue { background: rgba(2, 132, 199, 0.2); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.4); }
         .pillar-trigger-btn.blue:hover { background: #0284c7; color: #ffffff; }
 
-        .pillar-trigger-btn.emerald { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
+        .pillar-trigger-btn.emerald { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
         .pillar-trigger-btn.emerald:hover { background: #10b981; color: #ffffff; }
 
-        .pillar-trigger-btn.purple { background: rgba(168, 85, 247, 0.18); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35); }
+        .pillar-trigger-btn.purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
         .pillar-trigger-btn.purple:hover { background: #a855f7; color: #ffffff; }
 
-        /* Integrated Mini Metrics & CTA Bar */
+        /* Integrated Mini Metrics & High-Contrast CTA Bar */
         .global-metrics-and-cta-bar {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          background: rgba(0, 0, 0, 0.3);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 12px;
+          background: rgba(0, 0, 0, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 14px;
           padding: 10px 16px;
           flex-wrap: wrap;
           gap: 12px;
@@ -659,27 +804,28 @@ export default function GlobalExportHub() {
         .global-metrics-mini {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 14px;
         }
 
         .mini-metric {
           display: flex;
           align-items: center;
           gap: 5px;
-          font-size: 0.72rem;
-          color: #94a3b8;
+          font-size: 0.75rem;
+          color: #e2e8f0;
+          font-weight: 500;
         }
 
         .mini-metric strong {
-          font-size: 0.95rem;
-          color: #d4af37;
-          font-weight: 800;
+          font-size: 1rem;
+          color: #fef08a;
+          font-weight: 900;
         }
 
         .mini-divider {
           width: 1px;
           height: 16px;
-          background: rgba(255, 255, 255, 0.12);
+          background: rgba(255, 255, 255, 0.15);
         }
 
         @media (max-width: 640px) {
@@ -690,55 +836,57 @@ export default function GlobalExportHub() {
         .global-cta-buttons-mini {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 10px;
+          flex-wrap: wrap;
         }
 
         .global-how-it-works-btn {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: #e2e8f0;
-          padding: 7px 12px;
-          border-radius: 8px;
-          font-size: 0.75rem;
-          font-weight: 700;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          color: #ffffff !important;
+          padding: 8px 14px;
+          border-radius: 9px;
+          font-size: 0.76rem;
+          font-weight: 800;
           cursor: pointer;
           display: flex;
           align-items: center;
-          gap: 5px;
+          gap: 6px;
           transition: all 0.2s ease;
           white-space: nowrap;
         }
 
         .global-how-it-works-btn:hover {
-          background: rgba(255, 255, 255, 0.12);
-          border-color: rgba(212, 175, 55, 0.4);
-          color: #fef08a;
+          background: rgba(255, 255, 255, 0.18);
+          border-color: rgba(212, 175, 55, 0.6);
+          color: #fef08a !important;
         }
 
         .global-brand-join-btn {
-          background: linear-gradient(135deg, #b38e47 0%, #987532 100%);
-          color: #ffffff;
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          color: #0b0f17 !important;
           border: none;
-          padding: 7px 14px;
-          border-radius: 8px;
-          font-size: 0.75rem;
-          font-weight: 800;
+          padding: 8px 16px;
+          border-radius: 9px;
+          font-size: 0.78rem;
+          font-weight: 900;
           cursor: pointer;
           text-decoration: none;
           display: flex;
           align-items: center;
           gap: 6px;
-          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.25);
+          box-shadow: 0 4px 16px rgba(212, 175, 55, 0.35);
           transition: all 0.2s ease;
           white-space: nowrap;
         }
 
         .global-brand-join-btn:hover {
-          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          background: linear-gradient(135deg, #fef08a 0%, #d4af37 100%);
           transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
         }
 
-        /* EXPORT CALCULATOR MODAL STYLES */
+        /* EXPORT CALCULATOR & MODAL STYLES */
         .export-modal-overlay {
           position: fixed;
           top: 0;
