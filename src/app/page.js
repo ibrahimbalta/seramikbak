@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
 import LanguageSelector from '@/components/LanguageSelector';
+import CurrencySelector from '@/components/CurrencySelector';
+import GlobalExportHub from '@/components/GlobalExportHub';
 import { useLanguage } from '@/lib/languageContext';
 
 import { 
@@ -3421,6 +3423,7 @@ export default function Home() {
                 )}
               </>
             )}
+            <CurrencySelector />
             <LanguageSelector />
           </div>
           <button className="hamburger-menu-btn" onClick={() => setShowMobileMenu(!showMobileMenu)} aria-label="Menü">
@@ -7472,6 +7475,11 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Global Brand Export Hub Showcase Section */}
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 20px' }}>
+        <GlobalExportHub />
+      </div>
 
       {/* Premium Footer Section */}
       <footer className="site-footer">
