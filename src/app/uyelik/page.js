@@ -591,6 +591,104 @@ export default function UyelikPage() {
             background: rgba(16, 185, 129, 0.1);
             color: #10b981;
           }
+
+          /* MOBILE RESPONSIVE DASHBOARD STYLES */
+          @media (max-width: 768px) {
+            .uyelik-page-wrapper {
+              padding: 10px 8px !important;
+            }
+            .dashboard-container {
+              border-radius: 16px !important;
+              min-height: auto !important;
+              box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+            }
+            .dashboard-header {
+              padding: 14px 16px !important;
+              flex-direction: row !important;
+              flex-wrap: wrap !important;
+              justify-content: space-between !important;
+              gap: 10px !important;
+            }
+            .dashboard-nav {
+              padding: 8px 10px !important;
+              gap: 6px !important;
+              overflow-x: auto !important;
+              white-space: nowrap !important;
+              -webkit-overflow-scrolling: touch !important;
+              scrollbar-width: none !important;
+            }
+            .dashboard-nav::-webkit-scrollbar {
+              display: none !important;
+            }
+            .dashboard-nav-btn {
+              padding: 8px 14px !important;
+              font-size: 0.78rem !important;
+              flex-shrink: 0 !important;
+              border-radius: 8px !important;
+            }
+            .dashboard-nav-btn.active {
+              background: #ffffff !important;
+              color: #0f172a !important;
+              border: 1px solid #b38e47 !important;
+              box-shadow: 0 2px 8px rgba(179, 142, 71, 0.15) !important;
+            }
+            .dashboard-content {
+              padding: 16px 12px !important;
+            }
+            .dashboard-welcome-banner {
+              padding: 18px 14px !important;
+              border-radius: 14px !important;
+              margin-bottom: 20px !important;
+            }
+            .dashboard-welcome-banner h2 {
+              font-size: 1.2rem !important;
+            }
+            .stats-grid {
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 10px !important;
+              margin-bottom: 20px !important;
+            }
+            .stat-card {
+              padding: 12px 10px !important;
+              gap: 10px !important;
+              border-radius: 12px !important;
+            }
+            .stat-icon {
+              width: 36px !important;
+              height: 36px !important;
+            }
+            .tools-grid {
+              grid-template-columns: 1fr !important;
+              gap: 12px !important;
+            }
+            .tool-card {
+              padding: 16px 14px !important;
+              border-radius: 14px !important;
+            }
+            .fav-grid {
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 10px !important;
+            }
+            .fav-img-box {
+              height: 120px !important;
+            }
+            .fav-info {
+              padding: 10px !important;
+            }
+            .project-card {
+              padding: 14px 12px !important;
+              border-radius: 12px !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .stats-grid {
+              grid-template-columns: 1fr !important;
+            }
+            .fav-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
         `}</style>
 
         <div className="dashboard-container">
@@ -1338,6 +1436,33 @@ export default function UyelikPage() {
           color: #15803d;
           border: 1px solid #bbf7d0;
           box-shadow: 0 4px 12px rgba(21, 128, 61, 0.06);
+        }
+
+        @media (max-width: 768px) {
+          .uyelik-light-page-wrapper {
+            padding: 16px 10px !important;
+          }
+          .uyelik-light-grid {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+          }
+          .uyelik-floating-card {
+            padding: 20px 16px !important;
+            border-radius: 18px !important;
+            position: static !important;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+          }
+          .uyelik-main-title {
+            font-size: 1.6rem !important;
+          }
+          .ceramic-tiles-row {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px !important;
+          }
+          .submit-btn, .google-btn {
+            min-height: 44px !important;
+            font-size: 0.86rem !important;
+          }
         }
       `}</style>
 
