@@ -362,8 +362,10 @@ export default function GlobalExportHub() {
                   )}
 
                   <div className="export-disclaimer">
-                    <Info size={13} />
-                    <span>Hesaplanan değerler nihai fabrika kantar ve güncel deniz navlun kurlarını baz alan resmi ihracat proforma simülasyonudur.</span>
+                    <ShieldCheck size={14} style={{ color: '#d4af37', flexShrink: 0, marginTop: '2px' }} />
+                    <span>
+                      <strong>Yasal Uyarı & Şeffaf Fiyatlandırma:</strong> Bu araç uluslararası alıcılar için <em>Ön İhracat Lojistik Simülasyonudur (Pre-Export Estimate)</em>. Hesaplanan tonaj ve navlun değerleri hukuken bağlayıcı teklif (binding offer) niteliğinde olmayıp; nihai bedel fabrika resmi kantar tartımı, çelik çemberleme ve güncel deniz navlun kurlarına göre <strong>resmi proforma faturada</strong> kesinleşir.
+                    </span>
                   </div>
 
                 </div>
