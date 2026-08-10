@@ -259,7 +259,7 @@ export default function GlobalSearchPreviewCard({ onOpenStudio }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
           <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#0f172a' }}>
-            📊 Markanız İçin Tahmini İhrakat SEO Potansiyeli
+            📊 Markanız İçin Tahmini İhracat SEO Potansiyeli
           </span>
           <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#b38e47' }}>
             {collectionCount} Koleksiyon
@@ -303,7 +303,7 @@ export default function GlobalSearchPreviewCard({ onOpenStudio }) {
           }}
         >
           <Building2 size={16} />
-          <span>Markanızı İhrakat Ağına Ekleyin</span>
+          <span>Markanızı İhracat Ağına Ekleyin</span>
           <ArrowRight size={14} />
         </Link>
       </div>
