@@ -3973,121 +3973,46 @@ export default function Home() {
               </div>
             </div>
 
-            {/* GLOBAL EXPORT & MULTI-LINGUAL VISUAL SHOWCASE BANNER */}
+            {/* UNIFIED GLOBAL B2B EXPORT SHOWCASE HERO */}
             <div 
               className="homepage-global-export-banner glass-panel"
               style={{
                 width: '100%',
-                background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+                background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
                 border: '1px solid #e2e8f0',
                 borderRadius: '24px',
-                padding: '32px 24px',
+                padding: '36px 32px',
                 margin: '24px 0 32px 0',
-                boxShadow: '0 15px 35px rgba(0,0,0,0.03), 0 0 30px rgba(179, 142, 71, 0.06)',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.03), 0 0 40px rgba(179, 142, 71, 0.08)',
                 position: 'relative',
                 overflow: 'hidden',
                 boxSizing: 'border-box'
               }}
             >
-              {/* Ambient Radial Glow Lighting */}
+              {/* Subtle Ambient Gold Background Lighting */}
               <div style={{
                 position: 'absolute',
-                top: '-80px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '650px',
-                height: '240px',
-                background: 'radial-gradient(circle, rgba(179, 142, 71, 0.1) 0%, rgba(255,255,255,0) 70%)',
+                top: '-100px',
+                right: '-50px',
+                width: '600px',
+                height: '300px',
+                background: 'radial-gradient(circle, rgba(179, 142, 71, 0.12) 0%, rgba(255,255,255,0) 70%)',
                 pointerEvents: 'none',
                 zIndex: 0
               }} />
 
               <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
-                {/* 3-Column Visual Desktop Layout */}
+                {/* 2-Column Split Hero Layout */}
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                  gap: '24px',
-                  alignItems: 'stretch',
-                  marginBottom: '28px'
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                  gap: '36px',
+                  alignItems: 'center',
+                  marginBottom: '32px'
                 }}>
                   
-                  {/* LEFT VISUAL CARD: Architectural BIM Showcase Image */}
-                  <div style={{
-                    background: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '20px',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
-                    transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-                  }} className="hover-lift">
-                    <div style={{ position: 'relative', height: '165px', overflow: 'hidden', background: '#0f172a' }}>
-                      <img 
-                        src="/images/global_architect_bim.jpg" 
-                        alt="Architectural BIM Ceramics" 
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          opacity: 0.9,
-                          transition: 'transform 0.5s ease'
-                        }}
-                      />
-                      <div style={{
-                        position: 'absolute',
-                        top: '12px',
-                        left: '12px',
-                        background: 'rgba(15, 23, 42, 0.85)',
-                        backdropFilter: 'blur(8px)',
-                        WebkitBackdropFilter: 'blur(8px)',
-                        border: '1px solid rgba(212, 175, 55, 0.4)',
-                        borderRadius: '20px',
-                        padding: '4px 10px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}>
-                        <Layers2 size={12} style={{ color: '#d4af37' }} />
-                        <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#ffffff', letterSpacing: '0.04em' }}>
-                          MİMARİ BIM KÜTÜPHANESİ
-                        </span>
-                      </div>
-                    </div>
-
-                    <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
-                      <div>
-                        <h4 style={{ fontSize: '1.05rem', fontWeight: '900', color: '#0f172a', margin: '0 0 6px 0', lineHeight: '1.3' }}>
-                          Revit (.RFA) & 4K Texture
-                        </h4>
-                        <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
-                          Londra, Berlin & Dubai mimarlık büroları için dikişsiz seramik dokuları.
-                        </p>
-                      </div>
-
-                      <Link 
-                        href="/global-tanitim#bim-cad" 
-                        style={{
-                          marginTop: '16px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          fontSize: '0.82rem',
-                          fontWeight: '800',
-                          color: '#b38e47',
-                          textDecoration: 'none'
-                        }}
-                      >
-                        <span>BIM Dosyalarını İnceleyin</span>
-                        <ArrowRight size={14} />
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* CENTER COLUMN: Main SEO & Global Showcase Text & Badges */}
-                  <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '10px 0' }}>
+                  {/* LEFT COLUMN: High Impact Global Export Message & Multi-lingual SEO */}
+                  <div style={{ textAlign: 'left' }}>
                     {/* Top Badge */}
                     <div style={{
                       display: 'inline-flex',
@@ -4097,60 +4022,58 @@ export default function Home() {
                       border: '1px solid rgba(179, 142, 71, 0.3)',
                       borderRadius: '30px',
                       padding: '6px 18px',
-                      margin: '0 auto 16px auto'
+                      marginBottom: '16px'
                     }}>
                       <Globe size={14} style={{ color: '#b38e47' }} />
-                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#b38e47', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                        GLOBAL CERAMICS MULTI-LINGUAL SEO SHOWROOM
+                      <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#b38e47', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                        SERAMİKBAK GLOBAL B2B İHRACAT PORTALI
                       </span>
                     </div>
 
                     {/* Main Headline */}
                     <h2 style={{
-                      fontSize: 'clamp(1.4rem, 2.6vw, 2rem)',
+                      fontSize: 'clamp(1.6rem, 3.2vw, 2.3rem)',
                       fontWeight: '900',
                       color: '#0f172a',
                       lineHeight: '1.25',
-                      margin: '0 auto 14px auto',
+                      margin: '0 0 16px 0',
                       fontFamily: 'var(--font-title, "Outfit", sans-serif)',
                       letterSpacing: '-0.02em'
                     }}>
-                      Markalarınızı ve Ürünlerinizi <span style={{ color: '#b38e47' }}>5 Dilde Çoklu SEO</span> ile <span style={{ color: '#b38e47' }}>Dünya Pazarına</span> Açıyoruz
+                      Markalarınızı ve Koleksiyonlarınızı <span style={{ color: '#b38e47' }}>85+ Ülkeye & 15.000+ Uluslararası Mimara</span> Taşıyoruz
                     </h2>
 
                     {/* Subtitle */}
                     <p style={{
-                      fontSize: '0.88rem',
+                      fontSize: '0.94rem',
                       color: '#64748b',
-                      margin: '0 auto 20px auto',
-                      lineHeight: '1.6',
+                      margin: '0 0 24px 0',
+                      lineHeight: '1.65',
                       fontWeight: '500'
                     }}>
-                      SeramikBak Global Altyapısı; Türk ve dünya seramik üreticilerini Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global & Yandex arama motorlarında indeksleyerek 85+ ülkedeki mimar ve distribütörlerle buluşturur.
+                      SeramikBak Global Altyapısı; yerli ve uluslararası seramik üreticilerinin tüm koleksiyonlarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global ve Yandex arama motorlarında indeksleyerek B2B distribütörler, mimarlık büroları ve yüksek metrajlı projeler ile buluşturur.
                     </p>
 
-                    {/* Floating Multi-Language Badges */}
+                    {/* 5 Language Flag Badges */}
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
                       gap: '8px',
                       flexWrap: 'wrap',
-                      marginBottom: '22px'
+                      marginBottom: '28px'
                     }}>
-                      <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '4px 12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>🇹🇷 Türkçe</span>
-                      <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '4px 12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>🇬🇧 English</span>
-                      <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '4px 12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>🇩🇪 Deutsch</span>
-                      <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '4px 12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>🇸🇦 العربية</span>
-                      <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '4px 12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>🇷🇺 Русский</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇹🇷 Türkçe</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇬🇧 English</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇩🇪 Deutsch</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇸🇦 العربية</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇷🇺 Русский</span>
                     </div>
 
                     {/* Action Buttons */}
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '12px',
+                      gap: '14px',
                       flexWrap: 'wrap'
                     }}>
                       <Link 
@@ -4161,18 +4084,18 @@ export default function Home() {
                           gap: '8px',
                           background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                           color: '#111827',
-                          padding: '12px 22px',
-                          borderRadius: '12px',
-                          fontSize: '0.86rem',
+                          padding: '14px 26px',
+                          borderRadius: '14px',
+                          fontSize: '0.9rem',
                           fontWeight: '800',
                           textDecoration: 'none',
-                          boxShadow: '0 8px 20px rgba(212, 175, 55, 0.25)',
+                          boxShadow: '0 8px 24px rgba(212, 175, 55, 0.25)',
                           transition: 'all 0.2s ease'
                         }}
                       >
-                        <Building2 size={15} />
-                        <span>Markanızı Global Tanıtım Ağına Ekleyin</span>
-                        <ArrowRight size={14} />
+                        <Building2 size={16} />
+                        <span>Markanızı Global Tanıtıma Ekleyin</span>
+                        <ArrowRight size={15} />
                       </Link>
 
                       <Link 
@@ -4184,123 +4107,179 @@ export default function Home() {
                           background: '#ffffff',
                           color: '#0f172a',
                           border: '1px solid #cbd5e1',
-                          padding: '12px 20px',
-                          borderRadius: '12px',
-                          fontSize: '0.86rem',
+                          padding: '14px 24px',
+                          borderRadius: '14px',
+                          fontSize: '0.9rem',
                           fontWeight: '700',
                           textDecoration: 'none',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                           transition: 'all 0.2s ease'
                         }}
                       >
-                        <Info size={15} style={{ color: '#b38e47' }} />
-                        <span>5 Dilde SEO Mimarisini İnceleyin</span>
+                        <Info size={16} style={{ color: '#b38e47' }} />
+                        <span>Global SEO Mimarisini İnceleyin</span>
                       </Link>
                     </div>
                   </div>
 
-                  {/* RIGHT VISUAL CARD: B2B Export Logistics & Currency Showcase Image */}
+                  {/* RIGHT COLUMN: Live B2B Architectural Project & Distributor Demand Showcase */}
                   <div style={{
-                    background: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '20px',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
-                    transition: 'transform 0.3s ease, box-shadow 0.3s ease'
-                  }} className="hover-lift">
-                    <div style={{ position: 'relative', height: '165px', overflow: 'hidden', background: '#0f172a' }}>
-                      <img 
-                        src="/images/global_export_trade.jpg" 
-                        alt="B2B Export Logistics & Currency" 
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          opacity: 0.9,
-                          transition: 'transform 0.5s ease'
-                        }}
-                      />
-                      <div style={{
-                        position: 'absolute',
-                        top: '12px',
-                        left: '12px',
-                        background: 'rgba(15, 23, 42, 0.85)',
-                        backdropFilter: 'blur(8px)',
-                        WebkitBackdropFilter: 'blur(8px)',
-                        border: '1px solid rgba(212, 175, 55, 0.4)',
-                        borderRadius: '20px',
-                        padding: '4px 10px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}>
-                        <DollarSign size={12} style={{ color: '#d4af37' }} />
-                        <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#ffffff', letterSpacing: '0.04em' }}>
-                          B2B DÖVİZ & LOJİSTİK
+                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                    borderRadius: '24px',
+                    padding: '24px',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    boxShadow: '0 20px 40px rgba(15, 23, 42, 0.2)',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}>
+                    {/* Header */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: '18px',
+                      borderBottom: '1px solid rgba(255,255,255,0.1)',
+                      paddingBottom: '12px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          background: '#22c55e',
+                          boxShadow: '0 0 10px #22c55e'
+                        }} />
+                        <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#ffffff', letterSpacing: '0.04em' }}>
+                          CANLI ULUSLARARASI B2B PROJE TALEP AKIŞI
                         </span>
                       </div>
+                      <span style={{ fontSize: '0.72rem', color: '#d4af37', fontWeight: '700' }}>85+ Ülke Ağı</span>
                     </div>
 
-                    <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
-                      <div>
-                        <h4 style={{ fontSize: '1.05rem', fontWeight: '900', color: '#0f172a', margin: '0 0 6px 0', lineHeight: '1.3' }}>
-                          6 Canlı Döviz & Fiyatlandırma
-                        </h4>
-                        <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0, lineHeight: '1.5', fontWeight: '500' }}>
-                          USD $, EUR €, GBP £, SAR ﷼, RUB ₽ ve TRY ₺ canlı kur dönüşümü ile B2B teklifleri.
-                        </p>
+                    {/* 3 Live Project Cards */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '18px' }}>
+                      
+                      {/* Project 1: Dubai */}
+                      <div style={{
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '14px',
+                        padding: '12px 14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontSize: '1rem' }}>🇦🇪</span>
+                            <span style={{ fontSize: '0.84rem', fontWeight: '800', color: '#ffffff' }}>Dubai Commercial Tower</span>
+                          </div>
+                          <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>15.000 m² Porselen Karo Demand</div>
+                        </div>
+                        <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '4px 10px', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.3)' }}>
+                          B2B Teklif Açık
+                        </span>
                       </div>
 
-                      <Link 
-                        href="/global-tanitim#multi-currency" 
-                        style={{
-                          marginTop: '16px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          fontSize: '0.82rem',
-                          fontWeight: '800',
-                          color: '#b38e47',
-                          textDecoration: 'none'
-                        }}
-                      >
-                        <span>Döviz Simülatörünü İnceleyin</span>
-                        <ArrowRight size={14} />
-                      </Link>
+                      {/* Project 2: Berlin */}
+                      <div style={{
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '14px',
+                        padding: '12px 14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontSize: '1rem' }}>🇩🇪</span>
+                            <span style={{ fontSize: '0.84rem', fontWeight: '800', color: '#ffffff' }}>Berlin Hotel Renovation</span>
+                          </div>
+                          <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>4.800 m² Marble Look Ceramic</div>
+                        </div>
+                        <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '4px 10px', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.3)' }}>
+                          Mimari İncelemede
+                        </span>
+                      </div>
+
+                      {/* Project 3: London */}
+                      <div style={{
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '14px',
+                        padding: '12px 14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontSize: '1rem' }}>🇬🇧</span>
+                            <span style={{ fontSize: '0.84rem', fontWeight: '800', color: '#ffffff' }}>London Luxury Residence</span>
+                          </div>
+                          <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>2.200 m² Large Format Slab</div>
+                        </div>
+                        <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '4px 10px', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.3)' }}>
+                          Revit CAD İndirildi
+                        </span>
+                      </div>
+
+                    </div>
+
+                    {/* Bottom Feature Badges */}
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(3, 1fr)',
+                      gap: '8px',
+                      textAlign: 'center'
+                    }}>
+                      <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '8px 4px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#ffffff' }}>⚡ Google SEO</div>
+                        <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '2px' }}>5 Dilde İndeks</div>
+                      </div>
+                      <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '8px 4px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#ffffff' }}>📐 3D BIM</div>
+                        <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '2px' }}>Revit Arşivi</div>
+                      </div>
+                      <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '8px 4px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#ffffff' }}>🤝 B2B Distribütör</div>
+                        <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '2px' }}>Doğrudan Temas</div>
+                      </div>
                     </div>
                   </div>
 
                 </div>
 
-                {/* 4 Metric Stats Pill Bar - Full Width Stretch */}
+                {/* 4 Metric Stats Pill Bar - Full Container Stretch */}
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                  gap: '12px',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '16px',
                   background: '#ffffff',
                   border: '1px solid #e2e8f0',
                   borderRadius: '18px',
-                  padding: '16px 20px',
-                  boxShadow: '0 6px 20px rgba(0, 0, 0, 0.02)'
+                  padding: '20px 24px',
+                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.03)'
                 }}>
                   <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>5 Dilde</div>
-                    <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Otomatik SEO</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>5 Dilde</div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Otomatik SEO</div>
                   </div>
                   <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>85+</div>
-                    <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>İhracat Ülkesi</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>85+</div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>İhracat Ülkesi</div>
                   </div>
                   <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>15.000+</div>
-                    <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Uluslararası Mimar</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>15.000+</div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Uluslararası Mimar</div>
                   </div>
                   <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#b38e47' }}>6 Döviz</div>
-                    <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: '600', marginTop: '2px' }}>Canlı Kur Dönüşümü</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>6 Döviz</div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Canlı Kur Dönüşümü</div>
                   </div>
                 </div>
               </div>
