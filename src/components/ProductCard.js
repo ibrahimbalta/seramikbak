@@ -35,6 +35,8 @@ export default function ProductCard({
           width={product.width}
           height={product.height}
           imageUrl={product.imageUrl}
+          productName={product.name}
+          brandName={product.brand?.name}
         />
         
         {/* Compare button overlay */}

@@ -6,12 +6,14 @@ import { useState } from 'react';
 // visual and clearly screams "ceramics" without broken image paths.
 // If a real image is provided (imageUrl), it loads the image instead.
 // ----------------------------------------------------------------------
-export default function TileVisualPreview({ style, color, finish, width, height, imageUrl }) {
+export default function TileVisualPreview({ style, color, finish, width, height, imageUrl, productName, brandName, altText }) {
   const [imageError, setImageError] = useState(false);
-  const isDark = color.toLowerCase().includes('antrasit') || color.toLowerCase().includes('siyah') || color.toLowerCase().includes('füme');
-  const isBeige = color.toLowerCase().includes('bej') || color.toLowerCase().includes('krem');
-  const isBrown = color.toLowerCase().includes('kahve') || color.toLowerCase().includes('ahşap');
+  const isDark = (color || '').toLowerCase().includes('antrasit') || (color || '').toLowerCase().includes('siyah') || (color || '').toLowerCase().includes('füme');
+  const isBeige = (color || '').toLowerCase().includes('bej') || (color || '').toLowerCase().includes('krem');
+  const isBrown = (color || '').toLowerCase().includes('kahve') || (color || '').toLowerCase().includes('ahşap');
   
+  const seoAltString = altText || `${brandName ? brandName + ' ' : ''}${productName ? productName + ' - ' : ''}${color || ''} ${style || ''} ${finish || ''} Seramik Fayans Karo (${width}x${height} cm) | Ceramic Porcelain Tile Fliesen سيراميك`;
+
   // Base background color determination
   let bgColor = '#e5e7eb'; // Default light grey
   if (style === 'Mermer') {
@@ -25,10 +27,11 @@ export default function TileVisualPreview({ style, color, finish, width, height,
   // If a real image path exists and has loaded successfully, render it!
   if (imageUrl && !imageError) {
     return (
-      <div className="tile-preview-container" style={{ backgroundColor: bgColor }}>
+      <div className="tile-preview-container" style={{ backgroundColor: bgColor }} title={seoAltString} aria-label={seoAltString}>
         <img 
           src={imageUrl} 
-          alt={`${color} ${style} Seramik`} 
+          alt={seoAltString}
+          title={seoAltString}
           onError={() => setImageError(true)} 
           loading="lazy"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}

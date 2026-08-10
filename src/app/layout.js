@@ -18,20 +18,37 @@ const plusJakarta = Plus_Jakarta_Sans({
 export const metadata = {
   metadataBase: new URL("https://www.seramikbak.com"),
   title: {
-    default: "SeramikBak | Akıllı Seramik Arama Motoru, 3D Sanal Stüdyo & AR Portalı",
-    template: "%s | SeramikBak"
+    default: "SeramikBak | Global Ceramic Tile Engine, 3D Room Visualizer & B2B Portal",
+    template: "%s | SeramikBak Global"
   },
-  description: "Türkiye'nin lider seramik markalarını (Kütahya, Bien, Ege, Güral) tek çatı altında toplayan, Web 3D Sanal Stüdyo ve AR (Artırılmış Gerçeklik) entegrasyonu sunan yeni nesil B2B2C seramik pazar yeri.",
+  description: "Türkiye'nin ve dünyanın önde gelen seramik markalarını (Kütahya, Bien, Ege, Güral, Vitra) tek platformda sunan, Web 3D Sanal Stüdyo ve AR (Artırılmış Gerçeklik) destekli uluslararası seramik arama motoru ve ihracat portalı.",
   keywords: [
+    // Turkish SEO Keywords
     "seramik", "fayans", "karo", "zemin kaplama", "duvar karosu",
     "banyo seramik", "mutfak fayans", "3d sanal stüdyo", "seramik bak",
-    "kütahya seramik", "bien seramik", "ege seramik", "güral seramik",
+    "kütahya seramik", "bien seramik", "ege seramik", "güral seramik", "vitra seramik",
     "seramik fiyatları", "seramik modelleri", "banyo tasarımı",
     "artırılmış gerçeklik", "AR", "seramik pazar yeri",
-    "seramik bayi", "seramik showroom", "online seramik",
-    "seramik karşılaştırma", "seramik teklif"
+    "seramik bayi", "seramik showroom", "online seramik", "seramik ihracat",
+
+    // Global English SEO Keywords
+    "ceramic tiles", "porcelain tiles", "wall tiles", "floor tiles",
+    "bathroom tile design", "marble porcelain slabs", "3D room visualizer",
+    "Turkish ceramics export", "tile suppliers", "porcelain tiles wholesale",
+
+    // German SEO Keywords (DE)
+    "Keramikfliesen", "Feinsteinzeug", "Wandfliesen", "Bodenfliesen",
+    "Badfliesen", "Marmorfliesen", "Türkische Keramik Export",
+
+    // Arabic SEO Keywords (AR)
+    "سيراميك", "بلاط", "سيراميك الحمامات", "سيراميك الأرضيات",
+    "سيراميك تركي", "بلاط بورسلين", "تصدير السيراميك",
+
+    // Russian SEO Keywords (RU)
+    "Керамическая плитка", "керамогранит", "плитка для ванной",
+    "напольная плитка", "турецкая плитка", "экспорт плитки"
   ],
-  authors: [{ name: "SeramikBak", url: "https://www.seramikbak.com" }],
+  authors: [{ name: "SeramikBak Global", url: "https://www.seramikbak.com" }],
   creator: "SeramikBak",
   publisher: "SeramikBak",
   formatDetection: {
@@ -43,29 +60,35 @@ export const metadata = {
     canonical: "https://www.seramikbak.com",
     languages: {
       "tr-TR": "https://www.seramikbak.com",
+      "en-US": "https://www.seramikbak.com?lang=en",
+      "de-DE": "https://www.seramikbak.com?lang=de",
+      "ar-SA": "https://www.seramikbak.com?lang=ar",
+      "ru-RU": "https://www.seramikbak.com?lang=ru",
+      "x-default": "https://www.seramikbak.com"
     },
   },
   openGraph: {
-    title: "SeramikBak | Akıllı Seramik Arama Motoru, 3D Sanal Stüdyo & AR Portalı",
-    description: "Türkiye'nin lider seramik markalarını tek çatı altında toplayan, Web 3D Sanal Stüdyo ve AR entegrasyonu sunan yeni nesil B2B2C seramik pazar yeri.",
+    title: "SeramikBak | Global Ceramic Tile Engine & 3D Visualizer",
+    description: "Discover Turkish ceramic tile collections worldwide. Interactive 3D room visualizer, AR preview, and direct authorized dealer network.",
     url: "https://www.seramikbak.com",
-    siteName: "SeramikBak",
+    siteName: "SeramikBak Global",
     locale: "tr_TR",
+    alternateLocale: ["en_US", "de_DE", "ar_SA", "ru_RU"],
     type: "website",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "SeramikBak - Akıllı Seramik Arama Motoru",
+        alt: "SeramikBak Global - Ceramic Tile Search Engine & 3D Studio",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SeramikBak | Akıllı Seramik Arama Motoru",
-    description: "Türkiye'nin lider seramik markalarını tek çatı altında toplayan yeni nesil B2B2C seramik pazar yeri.",
+    title: "SeramikBak Global | Ceramic Tile Search Engine",
+    description: "Explore top ceramic & porcelain tile brands worldwide with 3D Room Visualizer and AR portal.",
     images: ["/og-image.png"],
     creator: "@seramikbak",
   },
@@ -82,21 +105,16 @@ export const metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    // Google Search Console ve Bing doğrulama kodları buraya eklenecek
-    // google: 'GOOGLE_VERIFICATION_CODE',
-    // yandex: 'YANDEX_VERIFICATION_CODE',
-  },
   category: "shopping",
 };
 
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "SeramikBak",
-  "alternateName": "Seramik Bak",
+  "name": "SeramikBak Global",
+  "alternateName": ["Seramik Bak", "SeramikBak International"],
   "url": "https://www.seramikbak.com",
-  "inLanguage": "tr-TR",
+  "inLanguage": ["tr-TR", "en-US", "de-DE", "ar-SA", "ru-RU"],
   "potentialAction": {
     "@type": "SearchAction",
     "target": {
@@ -110,7 +128,7 @@ const websiteJsonLd = {
 const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "SeramikBak",
+  "name": "SeramikBak Global",
   "url": "https://www.seramikbak.com",
   "logo": {
     "@type": "ImageObject",
@@ -118,22 +136,29 @@ const orgJsonLd = {
     "width": 512,
     "height": 512
   },
-  "description": "Türkiye'nin lider seramik markalarını tek çatı altında toplayan, Web 3D Sanal Stüdyo ve AR (Artırılmış Gerçeklik) entegrasyonu sunan yeni nesil B2B2C seramik arama motoru ve pazar yeri.",
+  "description": "Türkiye'nin ve dünyanın önde gelen seramik markalarını buluşturan, 3D Sanal Stüdyo ve AR desteği sunan uluslararası B2B2C seramik platformu.",
   "sameAs": [
     "https://www.instagram.com/seramikbak",
     "https://www.facebook.com/seramikbak",
     "https://twitter.com/seramikbak"
   ],
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "contactType": "müşteri desteği",
-    "email": "destek@seramikbak.com",
-    "availableLanguage": "Turkish"
-  },
-  "areaServed": {
-    "@type": "Country",
-    "name": "Türkiye"
-  }
+  "contactPoint": [
+    {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "destek@seramikbak.com",
+      "availableLanguage": ["Turkish", "English", "German", "Arabic", "Russian"]
+    }
+  ],
+  "areaServed": [
+    { "@type": "Country", "name": "Turkey" },
+    { "@type": "Country", "name": "Germany" },
+    { "@type": "Country", "name": "United States" },
+    { "@type": "Country", "name": "Saudi Arabia" },
+    { "@type": "Country", "name": "United Arab Emirates" },
+    { "@type": "Country", "name": "Russia" },
+    { "@type": "Country", "name": "United Kingdom" }
+  ]
 };
 
 const breadcrumbJsonLd = {
