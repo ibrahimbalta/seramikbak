@@ -3330,6 +3330,11 @@ export default function Home() {
               <Sparkles size={13} />
               <span>{t('inspiration')}</span>
             </Link>
+            <span className="utility-divider">|</span>
+            <Link href="/global-tanitim" className="utility-item portal-link">
+              <Globe size={13} style={{ color: '#d4af37' }} />
+              <span style={{ color: '#d4af37', fontWeight: '800' }}>Global</span>
+            </Link>
           </div>
         </div>
       )}
@@ -3361,14 +3366,6 @@ export default function Home() {
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
               </button>
-              <Link 
-                href="/global-tanitim"
-                className="nav-link global-export-nav-link" 
-                style={{ textDecoration: 'none' }}
-              >
-                <Globe size={14} style={{ color: '#d4af37' }} />
-                <span style={{ color: '#d4af37', fontWeight: '800' }}>🌍 Global Tanıtım</span>
-              </Link>
             </>
           )}
         </nav>
@@ -3538,7 +3535,7 @@ export default function Home() {
                 style={{ textDecoration: 'none' }}
               >
                 <Globe size={16} style={{ color: '#d4af37' }} />
-                <span style={{ color: '#d4af37', fontWeight: '800' }}>🌍 Global Tanıtım</span>
+                <span style={{ color: '#d4af37', fontWeight: '800' }}>Global</span>
               </Link>
               <Link href="/outlet" className="mobile-nav-link outlet-link" onClick={() => setShowMobileMenu(false)}>
                 <Sparkles size={16} style={{ color: '#ef4444' }} />
