@@ -3976,7 +3976,7 @@ export default function Home() {
             </div>
 
             {/* Dynamic Schema.org JSON-LD Structured Data for Google Global & Yandex */}
-            <ProductSchemaJsonLd product={selectedTile || (products && products[0])} />
+            <ProductSchemaJsonLd product={activeProduct || (products && products[0])} />
 
             {/* UNIFIED GLOBAL B2B EXPORT SHOWCASE HERO */}
             <div 
