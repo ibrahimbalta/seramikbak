@@ -64,136 +64,123 @@ export default function GlobalExportHub() {
     <div className="global-export-hub-container">
       <div className="global-export-banner-card">
 
-        {/* Top Header Badge & Tagline */}
+        {/* Compact Header Badge & Tagline */}
         <div className="global-banner-header">
           <div className="global-pill-badge">
-            <Globe size={14} className="globe-spin-icon" />
-            <span>GLOBAL CERAMICS EXPORT & SHOWROOM PLATFORM</span>
+            <Globe size={13} className="globe-spin-icon" />
+            <span>GLOBAL CERAMICS EXPORT PORTAL</span>
           </div>
           <h2 className="global-banner-title">
             Markalarınızı ve Koleksiyonlarınızı <span>85+ Ülkeye & 15.000+ Uluslararası Mimara</span> Açıyoruz
           </h2>
           <p className="global-banner-desc">
-            SeramikBak Global altyapısı; yerli ve uluslararası seramik üreticilerini dünya genelindeki B2B distribütörler, mimarlık ofisleri ve yüksek metrajlı projeler ile buluşturan yeni nesil dijital ihracat portalıdır.
+            SeramikBak Global altyapısı; üreticileri dünya genelindeki B2B distribütörler ve mimarlar ile buluşturan yeni nesil dijital ihracat portalıdır.
           </p>
         </div>
 
-        {/* 4 Pillars Grid */}
+        {/* 4 Pillars Grid (Compact Layout) */}
         <div className="global-pillars-grid">
 
           {/* Pillar 1: Container Logistics */}
           <div className="global-pillar-card clickable" onClick={() => setIsModalOpen(true)}>
             <div className="pillar-top-row">
               <div className="pillar-icon-box gold">
-                <Ship size={22} />
+                <Ship size={18} />
               </div>
               <span className="pillar-action-badge">Canlı Hesapla ⚡</span>
             </div>
             <h3>Konteyner Bazlı B2B İhracat Altyapısı</h3>
-            <p>Fabrikadan doğrudan dünya limanlarına (Hamburg, Dubai, New York, Londra, Riyad) palet ve konteyner bazlı lojistik ve FOB/CIF fiyatlama altyapısı.</p>
+            <p>Fabrikadan dünya limanlarına palet ve 20ft konteyner bazlı lojistik & FOB/CIF navlun altyapısı.</p>
 
             <button className="pillar-trigger-btn gold">
-              <Calculator size={14} />
+              <Calculator size={13} />
               <span>İhracat Navlun & Konteyner Hesapla</span>
-              <ArrowRight size={13} />
+              <ArrowRight size={12} />
             </button>
-            <div className="pillar-tag">FOB & CIF Export Ready</div>
           </div>
 
           {/* Pillar 2: Architectural BIM */}
           <div className="global-pillar-card">
             <div className="pillar-top-row">
               <div className="pillar-icon-box blue">
-                <Layers2 size={22} />
+                <Layers2 size={18} />
               </div>
             </div>
             <h3>Global BIM / CAD Kütüphanesi</h3>
-            <p>Uluslararası mimarlık ve iç mimarlık büroları için Revit (.rfa), AutoCAD (.dwg) ve dikişsiz 4K Seamless PBR doku paketleri.</p>
+            <p>Uluslararası mimarlık büroları için Revit (.rfa), AutoCAD (.dwg) ve dikişsiz 4K PBR dokular.</p>
 
             <button className="pillar-trigger-btn blue" onClick={() => alert('CAD & BIM İndirme Portalı: İstediğiniz seramiğin detay sayfasından .ZIP formatında tüm 4K dikişsiz dokuları ve AutoCAD dosyalarını 1 tıkla indirebilirsiniz.')}>
-              <Layers2 size={14} />
-              <span>4K BIM / CAD Paketlerini İncele</span>
-              <ArrowRight size={13} />
+              <Layers2 size={13} />
+              <span>4K BIM / CAD Paketleri</span>
+              <ArrowRight size={12} />
             </button>
-            <div className="pillar-tag">Architectural BIM Certified</div>
           </div>
 
           {/* Pillar 3: Multi-lingual SEO */}
           <div className="global-pillar-card">
             <div className="pillar-top-row">
               <div className="pillar-icon-box emerald">
-                <Globe size={22} />
+                <Globe size={18} />
               </div>
             </div>
             <h3>5 Dilde Dijital Showroom & SEO</h3>
-            <p>Türkçe, İngilizce, Almanca, Arapça ve Rusça otomatik arama motoru indekslemesi ile Google Global ve Yandex'te üst sıralarda görünürlük.</p>
+            <p>Türkçe, İngilizce, Almanca, Arapça ve Rusça arama motoru indekslemesi ile Google Global görünürlük.</p>
 
             <button className="pillar-trigger-btn emerald" onClick={() => alert('Desteklenen Küresel Diller: Türkçe (TR), English (EN), Deutsch (DE), العربية (AR), Русский (RU). Üst menüden dilediğiniz dili seçebilirsiniz.')}>
-              <Globe size={14} />
+              <Globe size={13} />
               <span>85+ İhracat Ülkesi & Diller</span>
-              <ArrowRight size={13} />
+              <ArrowRight size={12} />
             </button>
-            <div className="pillar-tag">Multi-lingual Global Index</div>
           </div>
 
           {/* Pillar 4: Web 3D / AR */}
           <div className="global-pillar-card">
             <div className="pillar-top-row">
               <div className="pillar-icon-box purple">
-                <Sparkles size={22} />
+                <Sparkles size={18} />
               </div>
             </div>
             <h3>Web 3D & AR Canlı Deneyim Engine</h3>
-            <p>Uygulama indirme zorunluluğu olmadan dünya genelindeki alıcılar ve mimarlar için tarayıcı üzerinden 360° mekan ve AR kaplama.</p>
+            <p>Uygulamasız tarayıcı üzerinden 360° sanal banyoda ve mekanda canlı karo kaplama simülatörü.</p>
 
             <button className="pillar-trigger-btn purple" onClick={() => { const el = document.getElementById('studio3d-anchor'); if(el) el.scrollIntoView({ behavior: 'smooth' }); }}>
-              <Sparkles size={14} />
+              <Sparkles size={13} />
               <span>3D Canlı Stüdyoyu Aç</span>
-              <ArrowRight size={13} />
+              <ArrowRight size={12} />
             </button>
-            <div className="pillar-tag">App-Free Web3D / AR</div>
           </div>
 
         </div>
 
-        {/* Global Performance Metrics Bar */}
-        <div className="global-metrics-bar">
-          <div className="metric-item">
-            <strong>85+</strong>
-            <span>İhracat Hedef Ülkesi</span>
+        {/* Compact Integrated Metrics & CTA Bar */}
+        <div className="global-metrics-and-cta-bar">
+          <div className="global-metrics-mini">
+            <div className="mini-metric">
+              <strong>85+</strong> <span>Ülke</span>
+            </div>
+            <div className="mini-divider" />
+            <div className="mini-metric">
+              <strong>15.000+</strong> <span>Mimar</span>
+            </div>
+            <div className="mini-divider" />
+            <div className="mini-metric">
+              <strong>25.000+</strong> <span>BIM İndirme</span>
+            </div>
+            <div className="mini-divider" />
+            <div className="mini-metric">
+              <strong>5 Dilde</strong> <span>Katalog</span>
+            </div>
           </div>
-          <div className="metric-divider" />
-          <div className="metric-item">
-            <strong>15.000+</strong>
-            <span>Kayıtlı Uluslararası Mimar</span>
-          </div>
-          <div className="metric-divider" />
-          <div className="metric-item">
-            <strong>25.000+</strong>
-            <span>Aylık CAD/BIM İndirme</span>
-          </div>
-          <div className="metric-divider" />
-          <div className="metric-item">
-            <strong>5 Dilde</strong>
-            <span>Canlı Kur & Katalog</span>
-          </div>
-        </div>
 
-        {/* Call to Action Bar */}
-        <div className="global-cta-row">
-          <div className="cta-text-group">
-            <CheckCircle2 size={18} style={{ color: '#10b981' }} />
-            <span>Markanızın seramik kataloglarını dünya pazarına açmak ve global B2B projelerden teklif almak ister misiniz?</span>
-          </div>
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div className="global-cta-buttons-mini">
             <button onClick={() => setIsHowItWorksOpen(true)} className="global-how-it-works-btn">
-              <Info size={15} />
-              <span>İhracat Mekanizması Nasıl Çalışır?</span>
+              <Info size={14} />
+              <span>İhracat Mekanizması</span>
             </button>
             <Link href="/marka" className="global-brand-join-btn">
-              <Building2 size={16} />
+              <Building2 size={15} />
               <span>Markanızı İhracat Ağına Ekleyin</span>
-              <ArrowRight size={14} />
+              <ArrowRight size={13} />
             </Link>
           </div>
         </div>
@@ -462,19 +449,21 @@ export default function GlobalExportHub() {
       <style jsx>{`
         .global-export-hub-container {
           width: 100%;
-          margin: 36px 0;
+          margin: 16px 0 24px 0;
         }
 
         .global-export-banner-card {
-          background: linear-gradient(135deg, #0d121c 0%, #161e2e 50%, #0d121c 100%);
-          border: 1px solid rgba(197, 160, 89, 0.35);
-          border-radius: 24px;
-          padding: 36px 32px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+          background: rgba(15, 23, 42, 0.75);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(197, 160, 89, 0.3);
+          border-radius: 18px;
+          padding: 20px 24px;
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
           color: #ffffff;
           display: flex;
           flex-direction: column;
-          gap: 32px;
+          gap: 16px;
           position: relative;
           overflow: hidden;
         }
@@ -484,21 +473,21 @@ export default function GlobalExportHub() {
           flex-direction: column;
           align-items: center;
           text-align: center;
-          gap: 12px;
-          max-width: 820px;
+          gap: 6px;
+          max-width: 720px;
           margin: 0 auto;
         }
 
         .global-pill-badge {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          background: rgba(197, 160, 89, 0.15);
-          border: 1px solid rgba(197, 160, 89, 0.4);
+          gap: 6px;
+          background: rgba(197, 160, 89, 0.12);
+          border: 1px solid rgba(197, 160, 89, 0.35);
           color: #d4af37;
-          font-size: 0.72rem;
+          font-size: 0.65rem;
           font-weight: 800;
-          padding: 5px 16px;
+          padding: 3px 12px;
           border-radius: 20px;
           letter-spacing: 0.08em;
         }
@@ -514,10 +503,10 @@ export default function GlobalExportHub() {
 
         .global-banner-title {
           font-family: var(--font-title);
-          font-size: 2rem;
-          font-weight: 900;
-          line-height: 1.25;
-          letter-spacing: -0.02em;
+          font-size: 1.25rem;
+          font-weight: 800;
+          line-height: 1.3;
+          letter-spacing: -0.01em;
           margin: 0;
           color: #ffffff;
         }
@@ -529,16 +518,16 @@ export default function GlobalExportHub() {
         }
 
         .global-banner-desc {
-          font-size: 0.9rem;
+          font-size: 0.78rem;
           color: #94a3b8;
-          line-height: 1.6;
+          line-height: 1.45;
           margin: 0;
         }
 
         .global-pillars-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
+          gap: 12px;
         }
 
         @media (max-width: 1024px) {
@@ -552,22 +541,22 @@ export default function GlobalExportHub() {
             grid-template-columns: 1fr;
           }
           .global-export-banner-card {
-            padding: 24px 16px;
+            padding: 16px 14px;
           }
           .global-banner-title {
-            font-size: 1.45rem;
+            font-size: 1.1rem;
           }
         }
 
         .global-pillar-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.07);
-          border-radius: 16px;
-          padding: 22px 18px;
+          background: rgba(255, 255, 255, 0.025);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 14px;
+          padding: 14px 14px;
           display: flex;
           flex-direction: column;
-          gap: 12px;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          gap: 8px;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
         }
 
@@ -576,10 +565,10 @@ export default function GlobalExportHub() {
         }
 
         .global-pillar-card:hover {
-          background: rgba(255, 255, 255, 0.06);
+          background: rgba(255, 255, 255, 0.05);
           border-color: rgba(197, 160, 89, 0.4);
-          transform: translateY(-4px);
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
         }
 
         .pillar-top-row {
@@ -592,17 +581,16 @@ export default function GlobalExportHub() {
           background: rgba(212, 175, 55, 0.2);
           border: 1px solid rgba(212, 175, 55, 0.4);
           color: #fef08a;
-          font-size: 0.65rem;
+          font-size: 0.6rem;
           font-weight: 800;
-          padding: 3px 8px;
-          border-radius: 12px;
-          animation: pulse 2s infinite alternate;
+          padding: 2px 7px;
+          border-radius: 10px;
         }
 
         .pillar-icon-box {
-          width: 46px;
-          height: 46px;
-          border-radius: 12px;
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -614,17 +602,17 @@ export default function GlobalExportHub() {
         .pillar-icon-box.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
 
         .global-pillar-card h3 {
-          font-size: 0.95rem;
+          font-size: 0.82rem;
           font-weight: 800;
           margin: 0;
           color: #f8fafc;
-          line-height: 1.35;
+          line-height: 1.3;
         }
 
         .global-pillar-card p {
-          font-size: 0.78rem;
+          font-size: 0.72rem;
           color: #94a3b8;
-          line-height: 1.5;
+          line-height: 1.4;
           margin: 0;
           flex: 1;
         }
@@ -633,120 +621,121 @@ export default function GlobalExportHub() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 8px 12px;
-          border-radius: 10px;
-          font-size: 0.75rem;
+          padding: 6px 10px;
+          border-radius: 8px;
+          font-size: 0.7rem;
           font-weight: 800;
           border: none;
           cursor: pointer;
           transition: all 0.2s ease;
-          margin-top: 4px;
+          margin-top: 2px;
         }
 
-        .pillar-trigger-btn.gold { background: rgba(212, 175, 55, 0.2); color: #fef08a; border: 1px solid rgba(212, 175, 55, 0.4); }
+        .pillar-trigger-btn.gold { background: rgba(212, 175, 55, 0.18); color: #fef08a; border: 1px solid rgba(212, 175, 55, 0.35); }
         .pillar-trigger-btn.gold:hover { background: #d4af37; color: #0b0f17; }
 
-        .pillar-trigger-btn.blue { background: rgba(2, 132, 199, 0.2); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.4); }
+        .pillar-trigger-btn.blue { background: rgba(2, 132, 199, 0.18); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.35); }
         .pillar-trigger-btn.blue:hover { background: #0284c7; color: #ffffff; }
 
-        .pillar-trigger-btn.emerald { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .pillar-trigger-btn.emerald { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
         .pillar-trigger-btn.emerald:hover { background: #10b981; color: #ffffff; }
 
-        .pillar-trigger-btn.purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+        .pillar-trigger-btn.purple { background: rgba(168, 85, 247, 0.18); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35); }
         .pillar-trigger-btn.purple:hover { background: #a855f7; color: #ffffff; }
 
-        .pillar-tag {
-          font-size: 0.62rem;
-          font-weight: 700;
-          color: #d4af37;
-          background: rgba(212, 175, 55, 0.1);
-          padding: 3px 8px;
-          border-radius: 4px;
-          width: fit-content;
-          letter-spacing: 0.04em;
-        }
-
-        .global-metrics-bar {
-          display: flex;
-          align-items: center;
-          justify-content: space-around;
-          background: rgba(0, 0, 0, 0.35);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 16px;
-          padding: 18px 24px;
-          flex-wrap: wrap;
-          gap: 16px;
-        }
-
-        .metric-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 2px;
-        }
-
-        .metric-item strong {
-          font-family: var(--font-title);
-          font-size: 1.4rem;
-          font-weight: 900;
-          color: #d4af37;
-        }
-
-        .metric-item span {
-          font-size: 0.72rem;
-          color: #94a3b8;
-          font-weight: 600;
-        }
-
-        .metric-divider {
-          width: 1px;
-          height: 30px;
-          background: rgba(255, 255, 255, 0.1);
-        }
-
-        .global-cta-row {
+        /* Integrated Mini Metrics & CTA Bar */
+        .global-metrics-and-cta-bar {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          background: linear-gradient(135deg, rgba(197, 160, 89, 0.12) 0%, rgba(197, 160, 89, 0.04) 100%);
-          border: 1px solid rgba(197, 160, 89, 0.3);
-          padding: 16px 24px;
-          border-radius: 16px;
+          background: rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
+          padding: 10px 16px;
           flex-wrap: wrap;
-          gap: 16px;
+          gap: 12px;
         }
 
-        .cta-text-group {
+        .global-metrics-mini {
           display: flex;
           align-items: center;
-          gap: 10px;
-          font-size: 0.84rem;
+          gap: 12px;
+        }
+
+        .mini-metric {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 0.72rem;
+          color: #94a3b8;
+        }
+
+        .mini-metric strong {
+          font-size: 0.95rem;
+          color: #d4af37;
+          font-weight: 800;
+        }
+
+        .mini-divider {
+          width: 1px;
+          height: 16px;
+          background: rgba(255, 255, 255, 0.12);
+        }
+
+        @media (max-width: 640px) {
+          .global-metrics-mini { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+          .mini-divider { display: none; }
+        }
+
+        .global-cta-buttons-mini {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .global-how-it-works-btn {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #e2e8f0;
+          padding: 7px 12px;
+          border-radius: 8px;
+          font-size: 0.75rem;
           font-weight: 700;
-          color: #f1f5f9;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+
+        .global-how-it-works-btn:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border-color: rgba(212, 175, 55, 0.4);
+          color: #fef08a;
         }
 
         .global-brand-join-btn {
-          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
-          color: #0b0f17;
+          background: linear-gradient(135deg, #b38e47 0%, #987532 100%);
+          color: #ffffff;
           border: none;
-          padding: 10px 20px;
-          border-radius: 10px;
-          font-size: 0.82rem;
+          padding: 7px 14px;
+          border-radius: 8px;
+          font-size: 0.75rem;
           font-weight: 800;
           cursor: pointer;
           text-decoration: none;
           display: flex;
           align-items: center;
-          gap: 8px;
-          box-shadow: 0 4px 18px rgba(212, 175, 55, 0.35);
-          transition: all 0.25s ease;
+          gap: 6px;
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.25);
+          transition: all 0.2s ease;
           white-space: nowrap;
         }
 
         .global-brand-join-btn:hover {
-          background: linear-gradient(135deg, #fef08a 0%, #d4af37 100%);
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(212, 175, 55, 0.5);
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          transform: translateY(-1px);
         }
 
         /* EXPORT CALCULATOR MODAL STYLES */
@@ -1144,28 +1133,6 @@ export default function GlobalExportHub() {
           line-height: 1.4;
         }
 
-        .global-how-it-works-btn {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: #e2e8f0;
-          padding: 10px 16px;
-          border-radius: 10px;
-          font-size: 0.8rem;
-          font-weight: 700;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          transition: all 0.2s ease;
-          white-space: nowrap;
-        }
-
-        .global-how-it-works-btn:hover {
-          background: rgba(255, 255, 255, 0.12);
-          border-color: rgba(212, 175, 55, 0.4);
-          color: #fef08a;
-        }
-
         .how-it-works-steps-grid {
           display: flex;
           flex-direction: column;
@@ -1185,7 +1152,7 @@ export default function GlobalExportHub() {
 
         .how-step-card.highlight {
           background: rgba(212, 175, 55, 0.08);
-          border-color: rgba(212, 175, 55, 0.3);
+          border: 1px solid rgba(212, 175, 55, 0.3);
         }
 
         .step-num-badge {
