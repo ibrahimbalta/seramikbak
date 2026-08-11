@@ -230,10 +230,6 @@ export default function GlobalPromotionPage() {
               <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#b38e47' }}>15.000+</strong>
               <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>Uluslararası Mimar</span>
             </div>
-            <div className="gt-metric-item gt-metric-item-bordered">
-              <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#0f172a' }}>6 Döviz</strong>
-              <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>Canlı Kur Dönüşümü</span>
-            </div>
           </div>
 
         </section>
@@ -244,7 +240,7 @@ export default function GlobalPromotionPage() {
           <div className="gt-tabs-container">
             {[
               { id: 'seo', label: '5 Dilde SEO & İndeksleme', icon: Globe },
-              { id: 'currency', label: 'Çoklu Döviz & Metraj Teklifi', icon: DollarSign },
+              { id: 'currency', label: 'Otomatik Metraj & Lojistik Teklifi', icon: Package },
               { id: 'bim', label: 'Global BIM / CAD Kütüphanesi', icon: Layers2 },
               { id: 'ai', label: 'AI Görsel Arama & Web 3D', icon: Sparkles },
               { id: 'process', label: '5 Adımda Fonksiyonel İşleyiş', icon: Zap }

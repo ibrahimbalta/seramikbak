@@ -247,7 +247,7 @@
 /* Metrics Bar */
 .gt-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   background: #ffffff;
   border: 1px solid rgba(197, 160, 89, 0.3);
@@ -265,21 +265,23 @@
   border-left: 1px solid #f1f5f9;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .gt-metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
-    padding: 16px;
-    gap: 14px;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 16px 10px;
+    gap: 8px;
     border-radius: 14px;
+  }
+}
+
+@media (max-width: 440px) {
+  .gt-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
   }
   .gt-metric-item-bordered {
     border-left: none;
-  }
-  .gt-metric-item:nth-child(even) {
-    border-left: 1px solid #f1f5f9;
-  }
-  .gt-metric-item:nth-child(3),
-  .gt-metric-item:nth-child(4) {
     border-top: 1px solid #f1f5f9;
     padding-top: 10px;
   }
