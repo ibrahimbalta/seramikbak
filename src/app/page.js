@@ -3279,33 +3279,28 @@ export default function Home() {
 
       {/* Top Utility Bar (B2B and Corporate Portal Links) */}
       {!isKioskMode && (
-        <div className="top-utility-bar glass-panel-dark">
-          <div className="utility-left" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+        <div className="top-utility-bar">
+          <div className="utility-left">
             <Link href="/" className="utility-item portal-link" onClick={() => setActiveTab('search')}>
-              <HomeIcon size={12} />
+              <HomeIcon size={13} />
               <span style={{ fontWeight: '800' }}>{t('home')}</span>
             </Link>
-            <span className="utility-divider">|</span>
             <Link href="/hakkimizda" className="utility-item portal-link">
-              <Info size={12} />
+              <Info size={13} />
               <span>{t('about')}</span>
             </Link>
-            <span className="utility-divider">|</span>
             <Link href="/proje-talep" className="utility-item b2b-btn-link">
-              <Building2 size={12} />
+              <Building2 size={13} />
               <span>{t('b2bQuotes')}</span>
             </Link>
-            <span className="utility-divider">|</span>
             <Link href="/bayi" className="utility-item portal-link">
-              <UserIcon size={12} />
+              <UserIcon size={13} />
               <span>{t('dealerPortal')}</span>
             </Link>
-            <span className="utility-divider">|</span>
             <Link href="/marka" className="utility-item portal-link">
-              <TrendingUp size={12} />
+              <TrendingUp size={13} />
               <span>{t('brandPortal')}</span>
             </Link>
-            <span className="utility-divider">|</span>
             <button 
               onClick={() => setIsKioskMode(true)} 
               className="utility-item kiosk-btn-link"
@@ -3316,35 +3311,26 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="utility-right" style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+          <div className="utility-right">
             <Link href="/outlet" className="utility-item outlet-btn-link">
-              <Sparkles size={12} style={{ color: '#ef4444' }} />
+              <Sparkles size={13} style={{ color: '#ef4444' }} />
               <span style={{ color: '#ef4444', fontWeight: '800' }}>{t('outlet')}</span>
               <span className="outlet-small-badge">Fırsat</span>
             </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/ustalar" className="utility-item portal-link">
-              <Wrench size={12} style={{ color: '#b45309' }} />
+            <Link href="/ustalar" className="utility-item ustalar-btn-link">
+              <Wrench size={13} style={{ color: '#b45309' }} />
               <span style={{ color: '#b45309', fontWeight: '800' }}>{t('installers')}</span>
             </Link>
-            <span className="utility-divider">|</span>
-            <Link href="/ilham" className="utility-item portal-link">
-              <Sparkles size={12} />
+            <Link href="/ilham" className="utility-item ilham-btn-link">
+              <Sparkles size={13} style={{ color: '#8b5cf6' }} />
               <span>{t('inspiration')}</span>
             </Link>
-            <span className="utility-divider">|</span>
             <Link 
               href="/global-tanitim" 
               className="utility-item global-highlight-btn"
-              style={{
-                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(180, 83, 9, 0.15) 100%)',
-                border: '1px solid rgba(212, 175, 55, 0.4)',
-                borderRadius: '14px',
-                padding: '3px 9px'
-              }}
             >
-              <Globe size={12} style={{ color: '#b45309' }} />
-              <span style={{ color: '#b45309', fontWeight: '800' }}>🌍 Global</span>
+              <Globe size={13} style={{ color: '#d4af37' }} />
+              <span style={{ color: '#fef08a', fontWeight: '800' }}>🌍 Global</span>
             </Link>
           </div>
         </div>
@@ -9063,54 +9049,35 @@ export default function Home() {
            ========================================================================== */
 
         /* Top Utility Bar - Light Luxury Version */
-        /* Top Utility Bar - Modern Single-Line Professional Version */
+        /* Top Utility Bar - Ultra Modern Glassmorphic Chip Pills */
         :global(.top-utility-bar) {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 5px 12px;
-          background: #ffffff;
-          border: 1px solid rgba(0, 0, 0, 0.07);
-          border-bottom: none;
-          border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+          padding: 6px 14px;
+          background: rgba(255, 255, 255, 0.92);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(226, 232, 240, 0.9);
+          border-radius: var(--border-radius-lg);
           font-family: var(--font-title);
           font-size: 0.76rem;
           color: #475569;
-          margin-bottom: 0px;
+          margin-bottom: 8px;
           z-index: 1001;
           position: relative;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+          box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
           overflow-x: auto;
           white-space: nowrap !important;
           scrollbar-width: none;
+          gap: 12px;
         }
 
         :global(.top-utility-bar::-webkit-scrollbar) {
           display: none;
         }
 
-        :global(.utility-left) {
-          display: flex;
-          align-items: center;
-          flex-shrink: 0;
-          white-space: nowrap !important;
-        }
-
-        :global(.utility-message) {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-weight: 600;
-          letter-spacing: 0.01em;
-          white-space: nowrap !important;
-          color: #334155;
-        }
-
-        :global(.text-gold) {
-          color: #b38e47;
-          font-weight: 700;
-        }
-
+        :global(.utility-left),
         :global(.utility-right) {
           display: flex;
           align-items: center;
@@ -9126,15 +9093,16 @@ export default function Home() {
           color: #475569 !important;
           text-decoration: none !important;
           font-weight: 600;
-          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-          background: transparent;
-          border: 1px solid transparent;
+          font-size: 0.76rem;
+          padding: 6px 11px;
+          border-radius: 10px;
+          background: rgba(248, 250, 252, 0.9);
+          border: 1px solid rgba(226, 232, 240, 0.8);
           cursor: pointer;
-          padding: 5px 10px;
-          border-radius: 8px;
           white-space: nowrap !important;
           line-height: 1 !important;
-          font-size: 0.75rem;
+          transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+          user-select: none;
         }
 
         :global(.utility-item span) {
@@ -9145,39 +9113,40 @@ export default function Home() {
 
         :global(.utility-item:hover) {
           color: #0f172a !important;
-          background: #f8fafc;
-          border-color: rgba(0, 0, 0, 0.05);
+          background: #ffffff;
+          border-color: rgba(179, 142, 71, 0.35);
           transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
         }
 
-        :global(.utility-item) svg {
-          color: #64748b !important;
-          transition: color 0.2s ease;
+        :global(.utility-item:active) {
+          transform: translateY(0) scale(0.98);
+        }
+
+        :global(.utility-item svg) {
+          color: #64748b;
+          transition: color 0.2s ease, transform 0.2s ease;
           flex-shrink: 0;
         }
 
-        :global(.utility-item:hover) svg {
+        :global(.utility-item:hover svg) {
           color: #b38e47 !important;
-        }
-
-        :global(.utility-divider) {
-          color: #cbd5e1;
-          user-select: none;
-          font-size: 0.7rem;
-          opacity: 0.5;
-          margin: 0 1px;
+          transform: scale(1.1);
         }
 
         :global(.kiosk-btn-link) {
           position: relative;
-          background: rgba(16, 185, 129, 0.05) !important;
-          border: 1px solid rgba(16, 185, 129, 0.2) !important;
+          background: rgba(16, 185, 129, 0.06) !important;
+          border: 1px solid rgba(16, 185, 129, 0.25) !important;
           color: #059669 !important;
+          font-weight: 700 !important;
         }
 
         :global(.kiosk-btn-link:hover) {
-          background: rgba(16, 185, 129, 0.12) !important;
-          border-color: rgba(16, 185, 129, 0.35) !important;
+          background: rgba(16, 185, 129, 0.14) !important;
+          border-color: rgba(16, 185, 129, 0.4) !important;
+          color: #047857 !important;
+          box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15) !important;
         }
 
         :global(.pulse-indicator-green) {
@@ -9197,31 +9166,91 @@ export default function Home() {
         }
 
         :global(.b2b-btn-link) {
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(179, 142, 71, 0.12) 100%) !important;
-          border: 1px solid rgba(179, 142, 71, 0.3) !important;
-          color: #8c6b30 !important;
-          padding: 5px 11px !important;
-          border-radius: 20px !important;
-          font-weight: 700 !important;
+          background: linear-gradient(135deg, rgba(253, 251, 247, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%) !important;
+          border: 1px solid rgba(197, 160, 89, 0.4) !important;
+          color: #92722b !important;
+          padding: 6px 12px !important;
+          border-radius: 10px !important;
+          font-weight: 800 !important;
         }
 
         :global(.b2b-btn-link:hover) {
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(179, 142, 71, 0.22) 100%) !important;
-          border-color: rgba(179, 142, 71, 0.5) !important;
-          color: #715523 !important;
-          box-shadow: 0 2px 8px rgba(179, 142, 71, 0.15);
+          background: linear-gradient(135deg, rgba(254, 249, 231, 1) 0%, rgba(253, 251, 247, 1) 100%) !important;
+          border-color: rgba(179, 142, 71, 0.6) !important;
+          color: #785a1e !important;
+          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.15) !important;
+        }
+        :global(.b2b-btn-link svg) {
+          color: #b38e47 !important;
         }
 
         :global(.outlet-btn-link) {
-          background: rgba(239, 68, 68, 0.05) !important;
-          border: 1px solid rgba(239, 68, 68, 0.2) !important;
-          border-radius: 20px !important;
-          padding: 5px 11px !important;
+          background: rgba(239, 68, 68, 0.06) !important;
+          border: 1px solid rgba(239, 68, 68, 0.25) !important;
+          border-radius: 10px !important;
+          padding: 6px 11px !important;
+          color: #dc2626 !important;
         }
 
         :global(.outlet-btn-link:hover) {
-          background: rgba(239, 68, 68, 0.12) !important;
+          background: rgba(239, 68, 68, 0.14) !important;
           border-color: rgba(239, 68, 68, 0.4) !important;
+          box-shadow: 0 4px 14px rgba(239, 68, 68, 0.15) !important;
+        }
+
+        :global(.outlet-small-badge) {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+          color: #ffffff;
+          font-size: 0.6rem;
+          font-weight: 800;
+          padding: 2px 6px;
+          border-radius: 6px;
+          letter-spacing: 0.02em;
+          margin-left: 2px;
+          box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+        }
+
+        :global(.ustalar-btn-link) {
+          background: rgba(217, 119, 6, 0.06) !important;
+          border: 1px solid rgba(217, 119, 6, 0.25) !important;
+          border-radius: 10px !important;
+          padding: 6px 11px !important;
+        }
+
+        :global(.ustalar-btn-link:hover) {
+          background: rgba(217, 119, 6, 0.14) !important;
+          border-color: rgba(217, 119, 6, 0.4) !important;
+          box-shadow: 0 4px 14px rgba(217, 119, 6, 0.15) !important;
+        }
+
+        :global(.ilham-btn-link) {
+          background: rgba(139, 92, 246, 0.06) !important;
+          border: 1px solid rgba(139, 92, 246, 0.25) !important;
+          border-radius: 10px !important;
+          padding: 6px 11px !important;
+        }
+
+        :global(.ilham-btn-link:hover) {
+          background: rgba(139, 92, 246, 0.14) !important;
+          border-color: rgba(139, 92, 246, 0.4) !important;
+          box-shadow: 0 4px 14px rgba(139, 92, 246, 0.15) !important;
+        }
+
+        :global(.global-highlight-btn) {
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+          border: 1px solid rgba(212, 175, 55, 0.5) !important;
+          border-radius: 10px !important;
+          padding: 6px 14px !important;
+          color: #ffffff !important;
+          font-weight: 800 !important;
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12) !important;
+        }
+
+        :global(.global-highlight-btn:hover) {
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+          border-color: rgba(212, 175, 55, 0.8) !important;
+          box-shadow: 0 6px 18px rgba(212, 175, 55, 0.25) !important;
+          transform: translateY(-1px);
         }
 
         :global(.b2b-small-badge) {
