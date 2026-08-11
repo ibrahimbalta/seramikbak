@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { 
   ArrowLeft, Globe, Layers2, Sparkles, Building2, ShieldCheck, 
   ArrowRight, CheckCircle2, DollarSign, Search, Zap, Download, 
   Check, FileText, Compass, Code, Package, Truck, Info
 } from 'lucide-react';
+import './global-tanitim.css';
 
 const exportCountriesList = [
   { flag: '🇩🇪', name: 'Almanya (Germany)', searchTarget: 'Google DE / Yandex', lang: 'Deutsch (DE)', region: 'Avrupa' },
@@ -94,7 +95,7 @@ export default function GlobalPromotionPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/brands/saas-request', {
+      await fetch('/api/brands/saas-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -117,134 +118,45 @@ export default function GlobalPromotionPage() {
   const sampleSeoItem = sampleProductsForSeo[selectedSeoSampleIndex];
 
   return (
-    <div style={{
-      background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 40%, #f1f5f9 100%)',
-      minHeight: '100vh',
-      color: '#0f172a',
-      fontFamily: 'system-ui, -apple-system, sans-serif'
-    }}>
+    <div className="gt-page-bg">
 
       {/* Top Header Navbar */}
-      <header style={{
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid #e2e8f0',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000,
-        padding: '12px 24px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '16px'
-        }}>
+      <header className="gt-header-bar">
+        <div className="gt-header-content">
           {/* Ana Sayfaya Dön */}
-          <Link 
-            href="/" 
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              color: '#0f172a',
-              background: '#ffffff',
-              border: '1px solid #cbd5e1',
-              borderRadius: '12px',
-              padding: '8px 16px',
-              fontSize: '0.85rem',
-              fontWeight: '800',
-              textDecoration: 'none',
-              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)'
-            }}
-          >
-            <ArrowLeft size={16} style={{ color: '#b38e47' }} />
-            <span style={{ color: '#0f172a', fontWeight: '800' }}>Ana Sayfaya Dön</span>
+          <Link href="/" className="gt-btn-back">
+            <ArrowLeft size={16} style={{ color: '#b38e47', flexShrink: 0 }} />
+            <span className="gt-btn-back-text-full">Ana Sayfaya Dön</span>
+            <span className="gt-btn-back-text-short">Ana Sayfa</span>
           </Link>
           
           {/* Logo Center */}
-          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-              color: '#d4af37',
-              border: '1px solid rgba(212, 175, 55, 0.4)',
-              borderRadius: '10px',
-              fontWeight: '900',
-              fontSize: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-            }}>SB</div>
-            <span style={{
-              fontSize: '1.2rem',
-              fontWeight: '900',
-              color: '#0f172a',
-              letterSpacing: '-0.02em'
-            }}>SeramikBak Global</span>
+          <Link href="/" className="gt-logo-link">
+            <div className="gt-logo-badge">SB</div>
+            <span className="gt-logo-title">SeramikBak Global</span>
           </Link>
 
           {/* Marka Portalı */}
-          <Link 
-            href="/marka" 
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-              color: '#ffffff',
-              border: '1px solid rgba(212, 175, 55, 0.3)',
-              borderRadius: '12px',
-              padding: '8px 18px',
-              fontSize: '0.85rem',
-              fontWeight: '800',
-              textDecoration: 'none',
-              boxShadow: '0 4px 14px rgba(15, 23, 42, 0.15)'
-            }}
-          >
-            <Building2 size={16} style={{ color: '#d4af37' }} />
-            <span style={{ color: '#ffffff', fontWeight: '800' }}>Marka Kokpiti</span>
+          <Link href="/marka" className="gt-btn-dashboard">
+            <Building2 size={16} style={{ color: '#d4af37', flexShrink: 0 }} />
+            <span className="gt-btn-dash-text-full">Marka Kokpiti</span>
+            <span className="gt-btn-dash-text-short">Kokpit</span>
           </Link>
         </div>
       </header>
 
       {/* Main Container */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px' }}>
+      <div className="gt-main-container">
 
         {/* HERO SECTION */}
-        <section style={{ textAlign: 'center', marginBottom: '40px' }}>
+        <section className="gt-hero-section">
           
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'rgba(179, 142, 71, 0.1)',
-            color: '#b38e47',
-            padding: '6px 18px',
-            borderRadius: '20px',
-            fontWeight: '800',
-            fontSize: '0.72rem',
-            marginBottom: '16px',
-            border: '1px solid rgba(179, 142, 71, 0.25)'
-          }}>
-            <Compass size={14} />
+          <div className="gt-hero-badge">
+            <Compass size={14} style={{ flexShrink: 0 }} />
             <span>GLOBAL CERAMICS MULTI-LINGUAL SEO SHOWROOM</span>
           </div>
 
-          <h1 style={{
-            fontSize: '2.4rem',
-            fontWeight: '900',
-            color: '#0f172a',
-            lineHeight: '1.25',
-            margin: '0 0 16px 0',
-            letterSpacing: '-0.02em'
-          }}>
+          <h1 className="gt-hero-h1">
             Markalarınızı ve Ürünlerinizi <span style={{
               background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
               WebkitBackgroundClip: 'text',
@@ -252,20 +164,15 @@ export default function GlobalPromotionPage() {
             }}>5 Dilde Çoklu SEO ile Dünya Pazarına</span> Açıyoruz
           </h1>
 
-          <p style={{
-            color: '#475569',
-            maxWidth: '820px',
-            margin: '0 auto 28px auto',
-            fontSize: '1.02rem',
-            lineHeight: '1.6'
-          }}>
+          <p className="gt-hero-p">
             SeramikBak Global Altyapısı; Türk ve dünya seramik üreticilerinin tüm koleksiyonlarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global ve Yandex arama motorlarında indeksleyerek 85+ ülkedeki uluslararası mimar, distribütör ve projelerle buluşturur.
           </p>
 
           {/* Hero Buttons */}
-          <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '40px' }}>
+          <div className="gt-hero-buttons">
             <a 
               href="#brand-apply-form" 
+              className="gt-hero-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -281,13 +188,14 @@ export default function GlobalPromotionPage() {
                 border: '1px solid rgba(212, 175, 55, 0.5)'
               }}
             >
-              <Building2 size={18} style={{ color: '#0f172a' }} />
-              <span style={{ color: '#0f172a' }}>Markanızı Global Tanıtım Ağına Ekleyin</span>
-              <ArrowRight size={16} style={{ color: '#0f172a' }} />
+              <Building2 size={18} style={{ color: '#0f172a', flexShrink: 0 }} />
+              <span>Markanızı Global Tanıtım Ağına Ekleyin</span>
+              <ArrowRight size={16} style={{ color: '#0f172a', flexShrink: 0 }} />
             </a>
 
             <a 
               href="#seo-features" 
+              className="gt-hero-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -303,37 +211,28 @@ export default function GlobalPromotionPage() {
                 boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)'
               }}
             >
-              <Info size={18} style={{ color: '#b38e47' }} />
-              <span style={{ color: '#0f172a' }}>5 Dilde SEO Mimarisini İnceleyin</span>
+              <Info size={18} style={{ color: '#b38e47', flexShrink: 0 }} />
+              <span>5 Dilde SEO Mimarisini İnceleyin</span>
             </a>
           </div>
 
-          {/* Clean Light Metrics Bar */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '16px',
-            background: '#ffffff',
-            border: '1px solid rgba(197, 160, 89, 0.3)',
-            borderRadius: '18px',
-            padding: '24px',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.04)'
-          }}>
-            <div style={{ textAlign: 'center' }}>
-              <strong style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#b38e47' }}>5 Dilde</strong>
-              <span style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>Otomatik SEO İndeks</span>
+          {/* Metrics Bar */}
+          <div className="gt-metrics-grid">
+            <div className="gt-metric-item">
+              <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#b38e47' }}>5 Dilde</strong>
+              <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>Otomatik SEO İndeks</span>
             </div>
-            <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-              <strong style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#0f172a' }}>85+</strong>
-              <span style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>İhracat Ülkesi</span>
+            <div className="gt-metric-item gt-metric-item-bordered">
+              <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#0f172a' }}>85+</strong>
+              <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>İhracat Ülkesi</span>
             </div>
-            <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-              <strong style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#b38e47' }}>15.000+</strong>
-              <span style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>Uluslararası Mimar</span>
+            <div className="gt-metric-item gt-metric-item-bordered">
+              <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#b38e47' }}>15.000+</strong>
+              <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>Uluslararası Mimar</span>
             </div>
-            <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-              <strong style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#0f172a' }}>6 Döviz</strong>
-              <span style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>Canlı Kur Dönüşümü</span>
+            <div className="gt-metric-item gt-metric-item-bordered">
+              <strong className="gt-metric-val" style={{ display: 'block', fontSize: '1.7rem', fontWeight: '900', color: '#0f172a' }}>6 Döviz</strong>
+              <span className="gt-metric-lbl" style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: '700' }}>Canlı Kur Dönüşümü</span>
             </div>
           </div>
 
@@ -342,17 +241,7 @@ export default function GlobalPromotionPage() {
         {/* NAVIGATION TABS BAR */}
         <section id="seo-features" style={{ marginBottom: '40px' }}>
           
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '8px',
-            justifyContent: 'center',
-            background: 'rgba(241, 245, 249, 0.9)',
-            padding: '6px',
-            borderRadius: '16px',
-            border: '1px solid #e2e8f0',
-            marginBottom: '28px'
-          }}>
+          <div className="gt-tabs-container">
             {[
               { id: 'seo', label: '5 Dilde SEO & İndeksleme', icon: Globe },
               { id: 'currency', label: 'Çoklu Döviz & Metraj Teklifi', icon: DollarSign },
@@ -366,6 +255,7 @@ export default function GlobalPromotionPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
+                  className="gt-tab-btn"
                   style={{
                     background: isActive ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' : 'transparent',
                     color: isActive ? '#ffffff' : '#475569',
@@ -382,7 +272,7 @@ export default function GlobalPromotionPage() {
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  <IconComp size={16} style={{ color: isActive ? '#d4af37' : '#64748b' }} />
+                  <IconComp size={16} style={{ color: isActive ? '#d4af37' : '#64748b', flexShrink: 0 }} />
                   <span>{tab.label}</span>
                 </button>
               );
@@ -391,13 +281,13 @@ export default function GlobalPromotionPage() {
 
           {/* TAB 1: SEO & SCHEMA.ORG SIMULATOR */}
           {activeTab === 'seo' && (
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '28px', boxShadow: '0 8px 30px rgba(0,0,0,0.03)' }}>
+            <div className="gt-tab-panel">
               
               <div style={{ marginBottom: '24px' }}>
                 <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#059669', background: 'rgba(16, 185, 129, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
                   ÇOKLU DİL & ARAMA MOTORU MİMARİSİ
                 </span>
-                <h2 style={{ fontSize: '1.6rem', fontWeight: '900', color: '#0f172a', margin: '8px 0 6px 0' }}>
+                <h2 style={{ fontSize: 'clamp(1.2rem, 3.5vw, 1.6rem)', fontWeight: '900', color: '#0f172a', margin: '8px 0 6px 0' }}>
                   🌍 Google Global & Yandex Otomatik Yapısal Veri (Schema.org) Sistemimiz
                 </h2>
                 <p style={{ color: '#64748b', margin: 0, fontSize: '0.94rem' }}>
@@ -406,22 +296,14 @@ export default function GlobalPromotionPage() {
               </div>
 
               {/* Real Interactive Schema & Rich Snippet Inspector */}
-              <div style={{
-                background: '#0f172a',
-                color: '#ffffff',
-                borderRadius: '18px',
-                padding: '20px',
-                marginBottom: '24px',
-                boxShadow: '0 12px 35px rgba(15, 23, 42, 0.25)',
-                border: '1px solid rgba(212, 175, 55, 0.3)'
-              }}>
+              <div className="gt-inspector-box">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
                   <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#fef08a', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Code size={16} style={{ color: '#d4af37' }} />
+                    <Code size={16} style={{ color: '#d4af37', flexShrink: 0 }} />
                     CANLI SCHEMA.ORG & HREFLANG İNCELEYİCİ
                   </span>
                   
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {sampleProductsForSeo.map((sp, idx) => (
                       <button
                         key={sp.code}
@@ -443,9 +325,9 @@ export default function GlobalPromotionPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+                <div className="gt-inspector-grid">
                   <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', padding: '14px' }}>
-                    <div style={{ fontSize: '0.68rem', color: '#38bdf8', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '0.68rem', color: '#38bdf8', marginBottom: '4px', wordBreak: 'break-all' }}>
                       https://seramikbak.com/de/koleksiyon/{sampleSeoItem.code.toLowerCase()}
                     </div>
                     <div style={{ fontSize: '0.94rem', fontWeight: '800', color: '#fef08a', marginBottom: '6px' }}>
@@ -455,12 +337,12 @@ export default function GlobalPromotionPage() {
                       {sampleSeoItem.specs}. Google Global & Yandex 1. Sayfa Rich Snippet onaylı seramik kaplamaları.
                     </div>
                     <div style={{ background: 'rgba(0,0,0,0.4)', padding: '6px 10px', borderRadius: '8px', fontSize: '0.7rem', color: '#34d399', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                      <CheckCircle2 size={13} /> Schema.org Product, Brand, Offer Validated
+                      <CheckCircle2 size={13} style={{ flexShrink: 0 }} /> Schema.org Product, Brand, Offer Validated
                     </div>
                   </div>
 
                   <div style={{ background: '#090d16', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', padding: '12px', fontFamily: 'monospace', fontSize: '0.7rem', color: '#38bdf8', overflowX: 'auto', maxHeight: '180px' }}>
-                    <pre style={{ margin: 0 }}>
+                    <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                       {JSON.stringify(sampleSeoItem.schemaSample, null, 2)}
                     </pre>
                   </div>
@@ -468,7 +350,7 @@ export default function GlobalPromotionPage() {
               </div>
 
               {/* 3 Core Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+              <div className="gt-cards-3col">
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '20px' }}>
                   <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.1)', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
                     <Globe size={20} />
@@ -497,13 +379,13 @@ export default function GlobalPromotionPage() {
               {/* Export Countries Grid */}
               <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
                 <h3 style={{ fontSize: '1.05rem', fontWeight: '800', color: '#0f172a', marginBottom: '16px' }}>🌐 Hedef İhracat Ülkeleri ve Arama Engine'leri</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '10px' }}>
+                <div className="gt-countries-grid">
                   {exportCountriesList.map((country, idx) => (
-                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#f8fafc', border: '1px solid #f1f5f9', padding: '10px 12px', borderRadius: '10px' }}>
-                      <span style={{ fontSize: '1.3rem' }}>{country.flag}</span>
-                      <div>
-                        <strong style={{ display: 'block', fontSize: '0.8rem', color: '#0f172a' }}>{country.name}</strong>
-                        <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{country.searchTarget} • {country.lang}</span>
+                    <div key={idx} className="gt-country-card" style={{ display: 'flex', alignItems: 'center', gap: '10px', background: '#f8fafc', border: '1px solid #f1f5f9', padding: '10px 12px', borderRadius: '10px' }}>
+                      <span className="gt-country-flag" style={{ fontSize: '1.3rem', flexShrink: 0 }}>{country.flag}</span>
+                      <div style={{ overflow: 'hidden' }}>
+                        <strong className="gt-country-title" style={{ display: 'block', fontSize: '0.8rem', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{country.name}</strong>
+                        <span className="gt-country-sub" style={{ fontSize: '0.68rem', color: '#64748b', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{country.searchTarget} • {country.lang}</span>
                       </div>
                     </div>
                   ))}
@@ -515,13 +397,13 @@ export default function GlobalPromotionPage() {
 
           {/* TAB 2: MULTI-CURRENCY & METRAJ CALCULATOR */}
           {activeTab === 'currency' && (
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '28px', boxShadow: '0 8px 30px rgba(0,0,0,0.03)' }}>
+            <div className="gt-tab-panel">
               
               <div style={{ marginBottom: '24px' }}>
                 <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#b38e47', background: 'rgba(179, 142, 71, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
                   CANLI DÖVİZ VE METRAJ HESAPLAMA MOTORU
                 </span>
-                <h2 style={{ fontSize: '1.6rem', fontWeight: '900', color: '#0f172a', margin: '8px 0 6px 0' }}>
+                <h2 style={{ fontSize: 'clamp(1.2rem, 3.5vw, 1.6rem)', fontWeight: '900', color: '#0f172a', margin: '8px 0 6px 0' }}>
                   💲 6 Farklı Para Birimi ile Otomatik Lojistik & Teklif Hesabı
                 </h2>
                 <p style={{ color: '#64748b', margin: 0, fontSize: '0.94rem' }}>
@@ -533,10 +415,10 @@ export default function GlobalPromotionPage() {
               <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '20px', boxShadow: '0 8px 25px rgba(0,0,0,0.03)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                   <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#0f172a', margin: 0 }}>Canlı B2B İhracat & Lojistik Teklif Simülatörü</h3>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a', boxShadow: '0 0 8px #16a34a' }} />
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a', boxShadow: '0 0 8px #16a34a', flexShrink: 0 }} />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.74rem', color: '#64748b', fontWeight: '700', marginBottom: '4px' }}>Proje Metrajı (m²)</label>
                     <input 
@@ -573,17 +455,17 @@ export default function GlobalPromotionPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', background: '#0f172a', color: '#ffffff', padding: '12px 14px', borderRadius: '12px', textAlign: 'center', fontSize: '0.76rem' }}>
+                <div className="gt-logistics-strip">
                   <div>
-                    <Package size={14} style={{ color: '#d4af37', marginBottom: '2px' }} />
+                    <Package size={16} style={{ color: '#d4af37', marginBottom: '2px', flexShrink: 0 }} />
                     <div>Tahmini Palet: <strong>{palletCount} Palet</strong></div>
                   </div>
                   <div>
-                    <Truck size={14} style={{ color: '#38bdf8', marginBottom: '2px' }} />
+                    <Truck size={16} style={{ color: '#38bdf8', marginBottom: '2px', flexShrink: 0 }} />
                     <div>Toplam Ağırlık: <strong>{(totalKg / 1000).toFixed(1)} Ton</strong></div>
                   </div>
                   <div>
-                    <ShieldCheck size={14} style={{ color: '#34d399', marginBottom: '2px' }} />
+                    <ShieldCheck size={16} style={{ color: '#34d399', marginBottom: '2px', flexShrink: 0 }} />
                     <div>Konteyner: <strong>{Math.ceil(totalKg / 24000)} Konteyner (20FT)</strong></div>
                   </div>
                 </div>
@@ -594,13 +476,13 @@ export default function GlobalPromotionPage() {
 
           {/* TAB 3: BIM / CAD LIBRARY */}
           {activeTab === 'bim' && (
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '28px', boxShadow: '0 8px 30px rgba(0,0,0,0.03)' }}>
+            <div className="gt-tab-panel">
               
               <div style={{ marginBottom: '24px' }}>
                 <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#0284c7', background: 'rgba(56, 189, 248, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
                   MİMARİ ŞARTNAME VE DOKU KÜTÜPHANESİ
                 </span>
-                <h2 style={{ fontSize: '1.6rem', fontWeight: '900', color: '#0f172a', margin: '8px 0 6px 0' }}>
+                <h2 style={{ fontSize: 'clamp(1.2rem, 3.5vw, 1.6rem)', fontWeight: '900', color: '#0f172a', margin: '8px 0 6px 0' }}>
                   📐 Global Mimarlık Büroları İçin 4K BIM & CAD Paketleri
                 </h2>
                 <p style={{ color: '#64748b', margin: 0, fontSize: '0.94rem' }}>
@@ -608,7 +490,7 @@ export default function GlobalPromotionPage() {
                 </p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+              <div className="gt-cards-3col">
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
                   <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(56, 189, 248, 0.1)', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
                     <Layers2 size={22} />
@@ -645,6 +527,7 @@ export default function GlobalPromotionPage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '8px',
                     background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                     color: '#0f172a',
@@ -653,17 +536,19 @@ export default function GlobalPromotionPage() {
                     borderRadius: '12px',
                     fontWeight: '900',
                     fontSize: '0.84rem',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    width: '100%',
+                    maxWidth: '320px'
                   }}
                 >
-                  <Download size={18} />
+                  <Download size={18} style={{ flexShrink: 0 }} />
                   <span>Örnek 4K BIM Paketini İndir (.ZIP)</span>
                 </button>
               </div>
 
               {downloadedBim && (
                 <div style={{ marginTop: '14px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#065f46', padding: '12px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Check size={18} />
+                  <Check size={18} style={{ flexShrink: 0 }} />
                   <span>Örnek 4K BIM & PBR doku paketi indiriliyor! İstediğiniz seramiğin detay sayfasından o ürüne özel CAD dosyasını indirebilirsiniz.</span>
                 </div>
               )}
@@ -673,13 +558,13 @@ export default function GlobalPromotionPage() {
 
           {/* TAB 4: AI & WEB 3D */}
           {activeTab === 'ai' && (
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '28px', boxShadow: '0 8px 30px rgba(0,0,0,0.03)' }}>
+            <div className="gt-tab-panel">
               
               <div style={{ marginBottom: '24px' }}>
                 <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#8b5cf6', background: 'rgba(139, 92, 246, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
                   YAPAY ZEKA VE CANLI 3D TEKNOLOJİSİ
                 </span>
-                <h2 style={{ fontSize: '1.6rem', fontWeight: '900', color: '#0f172a', margin: '8px 0 6px 0' }}>
+                <h2 style={{ fontSize: 'clamp(1.2rem, 3.5vw, 1.6rem)', fontWeight: '900', color: '#0f172a', margin: '8px 0 6px 0' }}>
                   📲 Yapay Zekalı Görsel Arama & Web 3D / AR Simülatörü
                 </h2>
                 <p style={{ color: '#64748b', margin: 0, fontSize: '0.94rem' }}>
@@ -687,7 +572,7 @@ export default function GlobalPromotionPage() {
                 </p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+              <div className="gt-cards-3col">
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px' }}>
                   <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
                     <Search size={22} />
@@ -711,6 +596,7 @@ export default function GlobalPromotionPage() {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '8px',
                     background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
                     color: '#ffffff',
@@ -719,12 +605,14 @@ export default function GlobalPromotionPage() {
                     borderRadius: '12px',
                     fontSize: '0.88rem',
                     fontWeight: '900',
-                    textDecoration: 'none'
+                    textDecoration: 'none',
+                    width: '100%',
+                    maxWidth: '320px'
                   }}
                 >
-                  <Sparkles size={18} style={{ color: '#d4af37' }} />
+                  <Sparkles size={18} style={{ color: '#d4af37', flexShrink: 0 }} />
                   <span>Canlı 3D Stüdyoyu Şimdi Deneyin</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} style={{ flexShrink: 0 }} />
                 </Link>
               </div>
 
@@ -733,13 +621,13 @@ export default function GlobalPromotionPage() {
 
           {/* TAB 5: 5-STEP PROCESS FLOW */}
           {activeTab === 'process' && (
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '28px', boxShadow: '0 8px 30px rgba(0,0,0,0.03)' }}>
+            <div className="gt-tab-panel">
               
               <div style={{ marginBottom: '24px' }}>
                 <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#b38e47', background: 'rgba(179, 142, 71, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
                   MARKA KATILIM MEKANİZMASI
                 </span>
-                <h2 style={{ fontSize: '1.6rem', fontWeight: '900', color: '#0f172a', margin: '8px 0 6px 0' }}>
+                <h2 style={{ fontSize: 'clamp(1.2rem, 3.5vw, 1.6rem)', fontWeight: '900', color: '#0f172a', margin: '8px 0 6px 0' }}>
                   ⚙️ SeramikBak İhracat ve SEO Motoru Adım Adım Nasıl Çalışır?
                 </h2>
                 <p style={{ color: '#64748b', margin: 0, fontSize: '0.94rem' }}>
@@ -760,17 +648,17 @@ export default function GlobalPromotionPage() {
                     style={{
                       display: 'flex',
                       alignItems: 'flex-start',
-                      gap: '16px',
+                      gap: '14px',
                       background: step.gold ? 'linear-gradient(135deg, rgba(253, 251, 247, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%)' : '#f8fafc',
                       border: step.gold ? '1px solid rgba(197, 160, 89, 0.4)' : '1px solid #f1f5f9',
                       borderLeft: step.gold ? '4px solid #b38e47' : '4px solid #0f172a',
                       borderRadius: '14px',
-                      padding: '18px 20px'
+                      padding: '16px'
                     }}
                   >
                     <div style={{
-                      width: '38px',
-                      height: '38px',
+                      width: '34px',
+                      height: '34px',
                       borderRadius: '50%',
                       background: step.gold ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
                       color: step.gold ? '#0f172a' : '#d4af37',
@@ -778,14 +666,14 @@ export default function GlobalPromotionPage() {
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontWeight: '900',
-                      fontSize: '1rem',
+                      fontSize: '0.9rem',
                       flexShrink: 0
                     }}>
                       {step.num}
                     </div>
 
                     <div>
-                      <h4 style={{ fontSize: '0.96rem', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>{step.title}</h4>
+                      <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>{step.title}</h4>
                       <p style={{ fontSize: '0.84rem', color: '#475569', margin: 0, lineHeight: '1.5' }}>{step.desc}</p>
                     </div>
                   </div>
@@ -798,20 +686,14 @@ export default function GlobalPromotionPage() {
         </section>
 
         {/* MARKA BAŞVURU FORMU SECTION */}
-        <section id="brand-apply-form" style={{
-          background: '#ffffff',
-          border: '1px solid rgba(197, 160, 89, 0.4)',
-          borderRadius: '24px',
-          padding: '36px',
-          boxShadow: '0 20px 50px rgba(0,0,0,0.06)'
-        }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px' }}>
+        <section id="brand-apply-form" className="gt-form-section">
+          <div className="gt-form-grid">
             
             <div>
               <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#b38e47', background: 'rgba(179, 142, 71, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
                 MARKA KATILIM FORMU
               </span>
-              <h2 style={{ fontSize: '1.8rem', fontWeight: '900', color: '#0f172a', margin: '10px 0 12px 0' }}>
+              <h2 style={{ fontSize: 'clamp(1.3rem, 4vw, 1.8rem)', fontWeight: '900', color: '#0f172a', margin: '10px 0 12px 0' }}>
                 Markanızı Global Tanıtım Ağına Ekleyin
               </h2>
               <p style={{ color: '#64748b', fontSize: '0.94rem', lineHeight: '1.6', marginBottom: '24px' }}>
@@ -856,7 +738,7 @@ export default function GlobalPromotionPage() {
                     />
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div className="gt-form-row-2col">
                     <div>
                       <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '800', color: '#0f172a', marginBottom: '4px' }}>Yetkili Adı Soyadı *</label>
                       <input 
@@ -921,25 +803,11 @@ export default function GlobalPromotionPage() {
                   <button 
                     type="submit" 
                     disabled={isSubmitting} 
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 50%, #b38e47 100%)',
-                      color: '#0f172a',
-                      padding: '14px',
-                      borderRadius: '12px',
-                      fontSize: '0.92rem',
-                      fontWeight: '900',
-                      border: 'none',
-                      cursor: 'pointer',
-                      boxShadow: '0 6px 20px rgba(179, 142, 71, 0.35)'
-                    }}
+                    className="gt-btn-submit"
                   >
-                    <Building2 size={18} />
+                    <Building2 size={18} style={{ flexShrink: 0 }} />
                     <span>{isSubmitting ? 'Başvuru Gönderiliyor...' : 'Marka İhracat Ağını Başlatın'}</span>
-                    <ArrowRight size={16} />
+                    <ArrowRight size={16} style={{ flexShrink: 0 }} />
                   </button>
 
                 </form>
