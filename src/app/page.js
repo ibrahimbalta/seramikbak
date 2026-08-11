@@ -4159,8 +4159,8 @@ export default function Home() {
                     <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Uluslararası Mimar</div>
                   </div>
                   <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>6 Döviz</div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Canlı Kur Dönüşümü</div>
+                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>4K BIM / CAD</div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Mimari Şartname</div>
                   </div>
                 </div>
               </div>

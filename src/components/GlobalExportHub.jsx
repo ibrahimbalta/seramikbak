@@ -155,7 +155,7 @@ export default function GlobalExportHub({ onOpen3DStudio, onClose }) {
             </div>
             <div className="mini-divider" />
             <div className="mini-metric">
-              <strong>6 Döviz</strong> <span>Canlı Kur</span>
+              <strong>4K BIM / CAD</strong> <span>Mimari Şartname</span>
             </div>
           </div>
 
