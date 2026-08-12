@@ -4044,7 +4044,7 @@ export default function Home() {
                       fontFamily: 'var(--font-title, "Outfit", sans-serif)',
                       letterSpacing: '-0.02em'
                     }}>
-                      Markalarınızı ve Koleksiyonlarınızı <span style={{ color: '#b38e47' }}>85+ Ülkeye & 15.000+ Uluslararası Mimara</span> Taşıyoruz
+                      Seramik Koleksiyonlarınızı <span style={{ color: '#b38e47' }}>5 Dilde SEO Altyapımızla</span> Uluslararası Pazarlarda Görünür Kılıyoruz
                     </h2>
 
                     {/* Subtitle */}
