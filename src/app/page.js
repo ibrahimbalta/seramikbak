@@ -3775,7 +3775,20 @@ export default function Home() {
                 </form>
 
                 {/* AKILLI MALİYET & METRAJ SİHİRBAZI */}
-                <TileCalculatorWidget onOpenQuoteModal={handleOpenLeadModalWithProduct} />
+                <TileCalculatorWidget 
+                  onGoToDealers={() => {
+                    setActiveTab('dealers');
+                    setTimeout(() => {
+                      const el = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
+                      if (el) {
+                        el.scrollIntoView({ behavior: 'smooth' });
+                      } else {
+                        window.scrollTo({ top: 300, behavior: 'smooth' });
+                      }
+                    }, 100);
+                  }}
+                  onOpenQuoteModal={handleOpenLeadModalWithProduct} 
+                />
 
                 {/* Popular Searches */}
                 <div className="hero-popular-tags">
@@ -5957,7 +5970,7 @@ export default function Home() {
           });
 
           return (
-            <div className="dealers-portal animate-fade-in">
+            <div className="dealers-portal animate-fade-in" id="bayi-bul-section">
               <div className="dealers-layout">
                 <div className="dealers-control-panel glass-panel">
                   <div className="panel-title-row">

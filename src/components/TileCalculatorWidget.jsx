@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Calculator, ArrowRight, ShieldCheck } from 'lucide-react';
 
-export default function TileCalculatorWidget({ onOpenQuoteModal }) {
+export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }) {
   const [roomType, setRoomType] = useState('banyo');
   const [areaM2, setAreaM2] = useState(25);
   const [tileSize, setTileSize] = useState('60x120');
@@ -40,7 +40,15 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
   const estimatedMaxCost = Math.round(totalM2WithWastage * basePricePerM2 * 1.15);
 
   const handleRequestQuote = () => {
-    if (onOpenQuoteModal) {
+    if (onGoToDealers) {
+      onGoToDealers({
+        areaM2,
+        totalM2WithWastage,
+        requiredBoxes,
+        tileSize,
+        roomType
+      });
+    } else if (onOpenQuoteModal) {
       onOpenQuoteModal({
         areaM2,
         totalM2WithWastage,
@@ -49,7 +57,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal }) {
         roomType
       });
     } else {
-      const dealerSec = document.getElementById('resmi-yetkili-bayiler-section');
+      const dealerSec = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
       if (dealerSec) {
         dealerSec.scrollIntoView({ behavior: 'smooth' });
       }
