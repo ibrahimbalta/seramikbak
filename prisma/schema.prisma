@@ -217,10 +217,12 @@ model AnalyticsLog {
   dealer    Dealer?  @relation(fields: [dealerId], references: [id], onDelete: SetNull)
   query     String?  // search queries if action is SEARCH
   city      String?  // user's city
+  country   String?  // user's country code (e.g. DE, AE, GB, US, TR)
   createdAt DateTime @default(now())
 
   @@index([action])
   @@index([createdAt])
+  @@index([country])
 }
 
 model SaaSConfig {

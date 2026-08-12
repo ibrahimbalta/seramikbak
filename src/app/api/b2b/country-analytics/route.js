@@ -56,40 +56,56 @@ export async function GET(request) {
       dateFilter = { gte: d };
     }
 
-    // Fetch real AnalyticsLogs for brand if available
-    const logs = await prisma.analyticsLog.findMany({
+    // 1. Fetch real country analytics counts from Prisma DB
+    const realCountryLogs = await prisma.analyticsLog.groupBy({
+      by: ['country', 'action'],
       where: {
         brandId,
+        country: { not: null },
         ...(Object.keys(dateFilter).length > 0 ? { createdAt: dateFilter } : {})
       },
-      select: {
-        action: true,
-        userCity: true,
-        createdAt: true,
-        product: { select: { name: true, code: true } }
-      }
+      _count: { id: true }
     });
 
-    // Fetch brand products count
-    const totalProducts = await prisma.product.count({
-      where: { brandId }
-    });
+    // Country Code Map
+    const codeToFlagMap = {
+      'DE': { country: 'Almanya', flag: '🇩🇪' },
+      'AE': { country: 'Birleşik Arap Emirlikleri', flag: '🇦🇪' },
+      'GB': { country: 'İngiltere', flag: '🇬🇧' },
+      'SA': { country: 'Suudi Arabistan', flag: '🇸🇦' },
+      'US': { country: 'Amerika Birleşik Devletleri', flag: '🇺🇸' },
+      'FR': { country: 'Fransa', flag: '🇫🇷' },
+      'RU': { country: 'Rusya', flag: '🇷🇺' },
+      'TR': { country: 'Türkiye', flag: '🇹🇷' }
+    };
 
-    // Calculate aggregated country metrics (merge live logs + baseline multiplier)
+    // Calculate aggregated country metrics (merge live logs + baseline values)
     const multiplier = period === '90d' ? 2.2 : period === '1y' ? 6.5 : period === 'all' ? 8.2 : 1.0;
 
-    // Build country metrics array
+    // Build country metrics array with live DB overlays
     const countryStats = countryBaselines.map(item => {
-      const scaledViews = Math.round(item.views * multiplier);
-      const scaledDownloads = Math.round(item.specDownloads * multiplier);
-      const scaledLeads = Math.round(item.b2bLeads * multiplier);
+      const liveViews = realCountryLogs
+        .filter(l => l.country === item.code && (l.action === 'VIEW' || l.action === 'SEARCH'))
+        .reduce((sum, l) => sum + l._count.id, 0);
+
+      const liveDownloads = realCountryLogs
+        .filter(l => l.country === item.code && (l.action === 'PDF_DOWNLOAD' || l.action === 'BIM_DOWNLOAD'))
+        .reduce((sum, l) => sum + l._count.id, 0);
+
+      const liveLeads = realCountryLogs
+        .filter(l => l.country === item.code && l.action === 'LEAD')
+        .reduce((sum, l) => sum + l._count.id, 0);
+
+      const scaledViews = Math.round(item.views * multiplier) + liveViews;
+      const scaledDownloads = Math.round(item.specDownloads * multiplier) + liveDownloads;
+      const scaledLeads = Math.round(item.b2bLeads * multiplier) + liveLeads;
 
       return {
         ...item,
         views: scaledViews,
         specDownloads: scaledDownloads,
         b2bLeads: scaledLeads,
-        sharePercent: 0 // Will compute below
+        sharePercent: 0
       };
     });
 

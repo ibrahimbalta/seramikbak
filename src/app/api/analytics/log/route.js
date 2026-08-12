@@ -46,6 +46,12 @@ export async function POST(request) {
       });
     }
 
+    // Detect visitor country via server GeoIP headers (Vercel, Cloudflare, Nginx proxy)
+    const country = request.headers.get('x-vercel-ip-country') || 
+                    request.headers.get('cf-ipcountry') || 
+                    body.country || 
+                    'TR';
+
     // 1. Create the general analytics log record
     const log = await prisma.analyticsLog.create({
       data: {
@@ -53,7 +59,8 @@ export async function POST(request) {
         productId: productId || null,
         brandId: brandId || null,
         dealerId: dealerId || null,
-        city: city
+        city: city,
+        country: country
       }
     });
 
