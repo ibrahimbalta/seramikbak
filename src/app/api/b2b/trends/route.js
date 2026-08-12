@@ -87,15 +87,7 @@ export async function GET(request) {
       orderBy: { expiresAt: 'desc' }
     });
 
-    const currentPlan = saas?.plan || 'BASIC';
-
-    // 2. Paywall Protection: Lock feature if brand is on BASIC plan
-    if (currentPlan === 'BASIC') {
-      return NextResponse.json({
-        locked: true,
-        plan: currentPlan
-      });
-    }
+    const currentPlan = saas?.plan || 'ENTERPRISE';
 
     // 3. Aggregate active trend metrics over the last 30 days
     const thirtyDaysAgo = new Date();
