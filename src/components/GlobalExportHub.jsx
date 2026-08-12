@@ -58,7 +58,7 @@ export default function GlobalExportHub({ onOpen3DStudio, onClose }) {
             Markalarınızı ve Ürünlerinizi <span>5 Dilde Çoklu SEO ile Dünya Pazarına</span> Açıyoruz
           </h2>
           <p className="global-banner-desc">
-            SeramikBak Global Altyapısı; Türk ve dünya seramik üreticilerinin koleksiyonlarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global ve Yandex arama motorlarında indeksleyerek 85+ ülkedeki uluslararası mimar, distribütör ve projelerle buluşturur.
+            SeramikBak Global Altyapısı; Türkiye'deki seramik üreticilerinin koleksiyonlarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global ve Yandex arama motorlarında indeksleyerek 85+ ülkedeki uluslararası mimar, distribütör ve projelerle buluşturur.
           </p>
         </div>
 

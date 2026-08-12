@@ -4055,7 +4055,7 @@ export default function Home() {
                       lineHeight: '1.65',
                       fontWeight: '500'
                     }}>
-                      SeramikBak Global Altyapısı; yerli ve uluslararası seramik üreticilerinin tüm koleksiyonlarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global ve Yandex arama motorlarında indeksleyerek B2B distribütörler, mimarlık büroları ve yüksek metrajlı projeler ile buluşturur.
+                      SeramikBak Global Altyapısı; Türkiye'deki seramik üreticilerinin tüm koleksiyonlarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global ve Yandex arama motorlarında indeksleyerek B2B distribütörler, mimarlık büroları ve yüksek metrajlı projeler ile buluşturur.
                     </p>
 
                     {/* 5 Language Flag Badges */}
