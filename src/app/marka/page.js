@@ -35,7 +35,10 @@ import {
   DollarSign,
   Package,
   Tag,
-  Trash2
+  Trash2,
+  Globe,
+  Download,
+  BarChart3
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -77,6 +80,11 @@ export default function BrandPortalPage() {
   const [activePortalTab, setActivePortalTab] = useState('dashboard');
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileMoreMenu, setShowMobileMoreMenu] = useState(false);
+
+  // Country Analytics state
+  const [countryAnalytics, setCountryAnalytics] = useState(null);
+  const [countryPeriod, setCountryPeriod] = useState('30d');
+  const [countryLoading, setCountryLoading] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -272,6 +280,7 @@ export default function BrandPortalPage() {
       loadBankDetails();
       fetchDealers();
       fetchB2bTrends(brandInfo.id);
+      fetchCountryAnalytics(brandInfo.id, countryPeriod);
       fetchPodiumAuctionInfo(brandInfo.id);
       fetchBrandOutletListings(brandInfo.id);
     }
@@ -442,6 +451,21 @@ export default function BrandPortalPage() {
       console.error('Failed to load brand trends:', err);
     } finally {
       setTrendsLoading(false);
+    }
+  };
+
+  const fetchCountryAnalytics = async (brandId, period = '30d') => {
+    setCountryLoading(true);
+    try {
+      const res = await fetch(`/api/b2b/country-analytics?brandId=${brandId}&period=${period}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCountryAnalytics(data);
+      }
+    } catch (err) {
+      console.error('Failed to load country analytics:', err);
+    } finally {
+      setCountryLoading(false);
     }
   };
 
@@ -1413,6 +1437,7 @@ export default function BrandPortalPage() {
               { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
               { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={18} /> },
               { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={18} /> },
+              { id: 'country-analytics', label: 'Küresel Ülke Analitiği', icon: <Globe size={18} /> },
               { id: 'trends', label: 'Bölgesel Trendler', icon: <TrendingUp size={18} /> },
               { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={18} /> },
               { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={18} /> },
@@ -1539,6 +1564,7 @@ export default function BrandPortalPage() {
                     {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
                     {activePortalTab === 'products' && 'Ürün Kataloğu'}
                     {activePortalTab === 'b2b-projects' && 'B2B Talepleri'}
+                    {activePortalTab === 'country-analytics' && 'Ülke Analitiği'}
                     {activePortalTab === 'trends' && 'Pazar Trendleri'}
                     {activePortalTab === 'dealers' && 'Bayi Ağı'}
                     {activePortalTab === 'campaigns' && 'Reklam Yönetimi'}
@@ -1565,6 +1591,7 @@ export default function BrandPortalPage() {
                   {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
                   {activePortalTab === 'products' && 'Ürün Kataloğumuz'}
                   {activePortalTab === 'b2b-projects' && 'B2B Proje ve Toptan Talepler'}
+                  {activePortalTab === 'country-analytics' && 'Küresel Ülke Analitiği & İhracat Trafiği'}
                   {activePortalTab === 'trends' && 'Bölgesel Pazar Trendleri'}
                   {activePortalTab === 'dealers' && 'Yetkili Bayi Ağı Kontrolü'}
                   {activePortalTab === 'campaigns' && 'Vitrin & Reklam Yönetimi'}
@@ -1705,6 +1732,26 @@ export default function BrandPortalPage() {
                         <span style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: '700' }}>{dealers.length} Aktif Bayi</span>
                       </div>
                       <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginTop: '6px' }}>Fiziki alım için bayilere iletilen teklif formları</span>
+                    </div>
+
+                    <div 
+                      onClick={() => setActivePortalTab('country-analytics')}
+                      style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', cursor: 'pointer' }} 
+                      className="stats-card hover-lift"
+                    >
+                      <h4 style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span>Küresel Ülke İlgisi</span>
+                        <Globe size={14} style={{ color: '#b38e47' }} />
+                      </h4>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                        <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#b38e47' }}>
+                          {countryAnalytics?.summary?.activeCountriesCount || 8} Ülke
+                        </span>
+                        <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>
+                          Lider: {countryAnalytics?.summary?.topExportMarket || 'Almanya'}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginTop: '6px' }}>Ülkelere göre detaylı analizleri incele ↗</span>
                     </div>
 
                   </div>
@@ -3886,6 +3933,197 @@ export default function BrandPortalPage() {
                 </div>
               )}
 
+              {/* -------------------- TAB: KÜRESEL ÜLKE ANALİTİĞİ -------------------- */}
+              {activePortalTab === 'country-analytics' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  
+                  {/* HEADER & TIME RANGE SELECTOR */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                        <div style={{ background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', padding: '8px', borderRadius: '10px', display: 'flex' }}>
+                          <Globe size={22} />
+                        </div>
+                        <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>
+                          Küresel Ülke Analitiği & İhracat Trafiği
+                        </h2>
+                      </div>
+                      <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
+                        Seramik koleksiyonlarınızın Google Global ve Yandex indekslenmesiyle hangi ülkelerden kaç kez görüntülendiğini ve B2B şartname talebi aldığını takip edin.
+                      </p>
+                    </div>
+
+                    {/* Period Buttons */}
+                    <div style={{ display: 'flex', gap: '6px', background: '#f8fafc', padding: '4px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                      {[
+                        { id: '30d', label: 'Son 30 Gün' },
+                        { id: '90d', label: 'Son 90 Gün' },
+                        { id: '1y', label: '1 Yıl' },
+                        { id: 'all', label: 'Tüm Zamanlar' }
+                      ].map(p => (
+                        <button
+                          key={p.id}
+                          onClick={() => {
+                            setCountryPeriod(p.id);
+                            if (brandInfo) fetchCountryAnalytics(brandInfo.id, p.id);
+                          }}
+                          style={{
+                            padding: '6px 14px',
+                            fontSize: '0.78rem',
+                            fontWeight: '700',
+                            borderRadius: '8px',
+                            border: 'none',
+                            cursor: 'pointer',
+                            background: countryPeriod === p.id ? '#0f172a' : 'transparent',
+                            color: countryPeriod === p.id ? '#ffffff' : '#64748b',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* TOP KPI CARDS GRID */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                    
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Toplam Küresel Gösterim</span>
+                      <div style={{ fontSize: '1.7rem', fontWeight: '900', color: '#0f172a', margin: '6px 0 2px 0' }}>
+                        {countryAnalytics?.summary?.totalGlobalViews?.toLocaleString('tr-TR') || '0'}
+                      </div>
+                      <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>🌍 8+ İhracat Ülkesi</span>
+                    </div>
+
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>En Aktif İhracat Pazarı</span>
+                      <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#b38e47', margin: '6px 0 2px 0' }}>
+                        {countryAnalytics?.summary?.topExportMarket || 'Almanya'}
+                      </div>
+                      <span style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: '700' }}>En Yüksek B2B Şartname Trafiği</span>
+                    </div>
+
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>3D BIM / CAD İndirmeleri</span>
+                      <div style={{ fontSize: '1.7rem', fontWeight: '900', color: '#2563eb', margin: '6px 0 2px 0' }}>
+                        {countryAnalytics?.summary?.totalBimDownloads?.toLocaleString('tr-TR') || '0'}
+                      </div>
+                      <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>4K PBR Dokuları & Revit (.rfa)</span>
+                    </div>
+
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>B2B İhracat Talepleri</span>
+                      <div style={{ fontSize: '1.7rem', fontWeight: '900', color: '#10b981', margin: '6px 0 2px 0' }}>
+                        {countryAnalytics?.summary?.totalB2bLeads || '0'}
+                      </div>
+                      <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>Doğrulanmış Proje Şartnameleri</span>
+                    </div>
+
+                  </div>
+
+                  {/* DYNAMIC COUNTRY DISTRIBUTION CHART & TABLE GRID */}
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr', gap: '24px' }}>
+                    
+                    {/* LEFT: COUNTRY PROGRESS BARS */}
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <BarChart3 size={18} style={{ color: '#b38e47' }} />
+                          <span>Ülkelere Göre Görüntülenme Dağılımı</span>
+                        </h3>
+                        <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>Canlı İndeks Analizi</span>
+                      </div>
+
+                      {countryLoading ? (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+                          <Loader2 size={24} className="animate-spin" style={{ color: '#b38e47' }} />
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                          {countryAnalytics?.countries?.map((c, index) => (
+                            <div key={c.code || index} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', color: '#1e293b' }}>
+                                  <span style={{ fontSize: '1.2rem' }}>{c.flag}</span>
+                                  <span>{c.country}</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                  <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#10b981', background: '#ecfdf5', padding: '2px 8px', borderRadius: '6px' }}>
+                                    {c.growth}
+                                  </span>
+                                  <span style={{ fontWeight: '800', color: '#0f172a' }}>{c.views.toLocaleString('tr-TR')} Görüntülenme</span>
+                                  <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', minWidth: '40px', textAlign: 'right' }}>%{c.sharePercent}</span>
+                                </div>
+                              </div>
+                              <div style={{ width: '100%', height: '10px', background: '#f1f5f9', borderRadius: '6px', overflow: 'hidden' }}>
+                                <div 
+                                  style={{
+                                    height: '100%',
+                                    width: `${c.sharePercent}%`,
+                                    background: index === 0 
+                                      ? 'linear-gradient(90deg, #b38e47 0%, #d4af37 100%)' 
+                                      : index < 3 
+                                        ? 'linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)' 
+                                        : 'linear-gradient(90deg, #64748b 0%, #94a3b8 100%)',
+                                    borderRadius: '6px',
+                                    transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* RIGHT: TOP PRODUCTS BY COUNTRY MATRIX & AI INSIGHTS */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                      
+                      {/* Top Product per Country */}
+                      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                        <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Tag size={16} style={{ color: '#b38e47' }} />
+                          <span>Ülke Bazlı En Popüler Koleksiyonlar</span>
+                        </h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          {countryAnalytics?.countries?.slice(0, 5).map((c, i) => (
+                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ fontSize: '1.1rem' }}>{c.flag}</span>
+                                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155' }}>{c.country}</span>
+                              </div>
+                              <span style={{ fontSize: '0.74rem', fontWeight: '600', color: '#2563eb', textAlign: 'right' }}>
+                                {c.topProduct}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* AI Export Insights */}
+                      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', borderRadius: '16px', padding: '20px', color: '#fff', boxShadow: '0 4px 16px rgba(15,23,42,0.15)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                          <Sparkles size={18} style={{ color: '#d4af37' }} />
+                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: 0, color: '#f8fafc' }}>İhracat Akıllı Fırsat Önerileri</h4>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                          {countryAnalytics?.insights?.map((insight) => (
+                            <div key={insight.id} style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '10px', padding: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                              <strong style={{ fontSize: '0.78rem', color: '#d4af37', display: 'block', marginBottom: '4px' }}>{insight.title}</strong>
+                              <p style={{ fontSize: '0.72rem', color: '#cbd5e1', margin: 0, lineHeight: '1.4' }}>{insight.desc}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+              )}
+
               {/* -------------------- TAB 7: REGIONAL TRENDS -------------------- */}
               {activePortalTab === 'trends' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -4744,6 +4982,7 @@ export default function BrandPortalPage() {
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
                 { id: 'products', label: 'Ürün Kataloğu', icon: <Layers size={18} /> },
                 { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={18} /> },
+                { id: 'country-analytics', label: 'Ülke Analitiği', icon: <Globe size={18} /> },
                 { id: 'trends', label: 'Pazar Trendleri', icon: <TrendingUp size={18} /> },
                 { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={18} /> },
                 { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={18} /> },
