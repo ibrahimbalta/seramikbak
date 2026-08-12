@@ -4121,34 +4121,7 @@ export default function Home() {
 
                 </div>
 
-                {/* 4 Metric Stats Pill Bar - Full Container Stretch */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '16px',
-                  background: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '18px',
-                  padding: '20px 24px',
-                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.03)'
-                }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>5 Dilde</div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Otomatik SEO</div>
-                  </div>
-                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>85+</div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>İhracat Ülkesi</div>
-                  </div>
-                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>15.000+</div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Uluslararası Mimar</div>
-                  </div>
-                  <div style={{ textAlign: 'center', borderLeft: '1px solid #f1f5f9' }}>
-                    <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47' }}>4K BIM / CAD</div>
-                    <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600', marginTop: '3px' }}>Mimari Şartname</div>
-                  </div>
-                </div>
+
               </div>
             </div>
 
