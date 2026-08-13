@@ -4014,8 +4014,9 @@ export default function Home() {
                   marginBottom: '32px'
                 }}>
                   
-                  {/* LEFT COLUMN: High Impact Global Export Message & Multi-lingual SEO */}
-                  <div style={{ textAlign: 'left' }}>
+                  {/* FULL WIDTH: High Impact Global SEO Export Section */}
+                  <div style={{ textAlign: 'left', width: '100%' }}>
+                    
                     {/* Top Badge */}
                     <div style={{
                       display: 'inline-flex',
@@ -4029,7 +4030,7 @@ export default function Home() {
                     }}>
                       <Globe size={14} style={{ color: '#b38e47' }} />
                       <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#b38e47', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                        SERAMİKBAK GLOBAL B2B İHRACAT PORTALI
+                        ÇOK DİLLİ GLOBAL SEO & İHRACAT MİMARİSİ
                       </span>
                     </div>
 
@@ -4046,30 +4047,63 @@ export default function Home() {
                       Seramik Koleksiyonlarınızı <span style={{ color: '#b38e47' }}>5 Dilde SEO Altyapımızla</span> Uluslararası Pazarlarda Görünür Kılıyoruz
                     </h2>
 
-                    {/* Subtitle */}
+                    {/* Expanded Subtitle */}
                     <p style={{
-                      fontSize: '0.94rem',
-                      color: '#64748b',
+                      fontSize: '0.96rem',
+                      color: '#475569',
                       margin: '0 0 24px 0',
-                      lineHeight: '1.65',
-                      fontWeight: '500'
+                      lineHeight: '1.7',
+                      fontWeight: '500',
+                      maxWidth: '1100px'
                     }}>
-                      SeramikBak Global Altyapısı; Türkiye'deki seramik üreticilerinin tüm koleksiyonlarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global ve Yandex arama motorlarında indeksleyerek B2B distribütörler, mimarlık büroları ve yüksek metrajlı projeler ile buluşturur.
+                      SeramikBak Global SEO Altyapısı; Türkiye'deki seramik üreticilerinin tüm koleksiyonlarını ve teknik detaylarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde yapılandırır. Google Global ve Yandex arama motorlarında indeksleyerek, uluslararası B2B distribütörler, mimarlık büroları ve yüksek metrajlı konut/otel projeleri ile doğrudan buluşturur.
                     </p>
 
                     {/* 5 Language Flag Badges */}
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px',
+                      gap: '10px',
                       flexWrap: 'wrap',
                       marginBottom: '28px'
                     }}>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇹🇷 Türkçe</span>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇬🇧 English</span>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇩🇪 Deutsch</span>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇸🇦 العربية</span>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '5px 14px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇷🇺 Русский</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 16px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇹🇷 Türkçe</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 16px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇬🇧 English</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 16px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇩🇪 Deutsch</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 16px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇸🇦 العربية</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 16px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇷🇺 Русский</span>
+                    </div>
+
+                    {/* 4-Pillar Visual Feature Cards Grid */}
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                      gap: '16px',
+                      marginBottom: '28px'
+                    }}>
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '18px 20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                        <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>🌐</div>
+                        <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>5 Dilde SEO İndeksleme</h4>
+                        <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: '1.45' }}>Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde hedef kitleye özel içerik mimarisi.</p>
+                      </div>
+
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '18px 20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                        <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>🔍</div>
+                        <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>Google Global & Yandex</h4>
+                        <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: '1.45' }}>Almanya, İngiltere, Körfez ve Rusya pazarlarındaki arama motorlarında üst sıra görünürlüğü.</p>
+                      </div>
+
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '18px 20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                        <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>📦</div>
+                        <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>BIM & 4K CAD Şartnamesi</h4>
+                        <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: '1.45' }}>Uluslararası mimarlık bürolarının projelerinde kullanabileceği Revit (.rfa) ve 4K PBR kaplamalar.</p>
+                      </div>
+
+                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '18px 20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                        <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>🤝</div>
+                        <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>Doğrudan B2B İhracat</h4>
+                        <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: '1.45' }}>Yüksek metrajlı toplu konut/otel projelerine ve distribütörlere komisyonsuz doğrudan erişim.</p>
+                      </div>
                     </div>
 
                     {/* Action Buttons */}
