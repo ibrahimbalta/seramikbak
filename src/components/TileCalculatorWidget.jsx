@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Calculator, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Calculator, ArrowRight, ShieldCheck, Bath, Utensils, Sofa, Home, ChevronDown } from 'lucide-react';
 
 export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }) {
   const [roomType, setRoomType] = useState('banyo');
@@ -64,6 +64,13 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
     }
   };
 
+  const roomItems = [
+    { id: 'banyo', icon: Bath, label: 'Banyo' },
+    { id: 'mutfak', icon: Utensils, label: 'Mutfak' },
+    { id: 'salon', icon: Sofa, label: 'Salon' },
+    { id: 'teras', icon: Home, label: 'Teras' }
+  ];
+
   return (
     <div className="tile-calculator-card">
       {/* Top Header Section */}
@@ -71,11 +78,11 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         <div className="tile-calc-badges">
           <div className="badge-gold">
             <Calculator size={13} />
-            <span>MALİYET ROBOTU</span>
+            <span>MALİYET & METRAJ ROBOTU</span>
           </div>
           <div className="badge-trust">
             <ShieldCheck size={14} style={{ color: '#38bdf8' }} />
-            <span>%100 Doğru Fire Hesabı</span>
+            <span>%100 Hassas Fire Hesabı</span>
           </div>
         </div>
 
@@ -91,23 +98,22 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           
           {/* Mekan Seçimi */}
           <div className="calc-group">
-            <label className="calc-label">Mekan Seçin</label>
+            <label className="calc-label">Mekan Seçimi</label>
             <div className="room-selector-grid">
-              {[
-                { id: 'banyo', icon: '🛁', label: 'Banyo' },
-                { id: 'mutfak', icon: '🍳', label: 'Mutfak' },
-                { id: 'salon', icon: '🛋️', label: 'Salon' },
-                { id: 'teras', icon: '🏡', label: 'Teras' }
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setRoomType(item.id)}
-                  className={`room-btn ${roomType === item.id ? 'active' : ''}`}
-                >
-                  <span className="room-icon">{item.icon}</span>
-                  <span className="room-text">{item.label}</span>
-                </button>
-              ))}
+              {roomItems.map((item) => {
+                const IconComponent = item.icon;
+                const isActive = roomType === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setRoomType(item.id)}
+                    className={`room-btn ${isActive ? 'active' : ''}`}
+                  >
+                    <IconComponent size={16} className={`room-icon-svg ${isActive ? 'active' : ''}`} />
+                    <span className="room-text">{item.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -131,30 +137,36 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           <div className="dropdowns-row">
             <div className="select-box">
               <label className="select-label">Seramik Ebadı</label>
-              <select
-                value={tileSize}
-                onChange={(e) => setTileSize(e.target.value)}
-                className="calc-select"
-              >
-                <option value="60x120">60x120 cm</option>
-                <option value="80x80">80x80 cm</option>
-                <option value="120x240">120x240 cm (Mega)</option>
-                <option value="30x60">30x60 cm</option>
-              </select>
+              <div className="select-wrapper">
+                <select
+                  value={tileSize}
+                  onChange={(e) => setTileSize(e.target.value)}
+                  className="calc-select"
+                >
+                  <option value="60x120">60x120 cm</option>
+                  <option value="80x80">80x80 cm</option>
+                  <option value="120x240">120x240 cm (Mega)</option>
+                  <option value="30x60">30x60 cm</option>
+                </select>
+                <ChevronDown size={14} className="select-arrow" />
+              </div>
             </div>
 
             <div className="select-box">
               <label className="select-label">Doku / Tarz</label>
-              <select
-                value={tileStyle}
-                onChange={(e) => setTileStyle(e.target.value)}
-                className="calc-select"
-              >
-                <option value="mermer">Mermer Doku</option>
-                <option value="ahsap">Ahşap Doku</option>
-                <option value="beton">Beton / Taş</option>
-                <option value="duz">Düz / Modern</option>
-              </select>
+              <div className="select-wrapper">
+                <select
+                  value={tileStyle}
+                  onChange={(e) => setTileStyle(e.target.value)}
+                  className="calc-select"
+                >
+                  <option value="mermer">Mermer Doku</option>
+                  <option value="ahsap">Ahşap Doku</option>
+                  <option value="beton">Beton / Taş</option>
+                  <option value="duz">Düz / Modern</option>
+                </select>
+                <ChevronDown size={14} className="select-arrow" />
+              </div>
             </div>
           </div>
         </div>
@@ -166,19 +178,19 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
               <span className="result-label">Gerekli Seramik Kutusu</span>
               <div className="result-value-row">
                 <span className="result-main-val">{requiredBoxes} Kutu</span>
-                <span className="result-sub-val">({totalM2WithWastage} m²)</span>
+                <span className="result-sub-val">({totalM2WithWastage} m² Dahil)</span>
               </div>
             </div>
 
             <div className="result-item">
               <span className="result-label">Harç & Derz İhtiyacı</span>
-              <span className="result-main-val small">{adhesiveBags} Çuval / {groutPacks} Pak</span>
+              <span className="result-main-val small">{adhesiveBags} Çuval Harç / {groutPacks} Pak Derz</span>
             </div>
 
             <div className="result-item budget-highlight">
               <span className="result-label gold">Tahmini Bütçe Aralığı</span>
               <span className="result-main-val gold">
-                ₺{estimatedMinCost.toLocaleString('tr-TR')} - ₺{estimatedMaxCost.toLocaleString('tr-TR')}
+                ₺{estimatedMinCost.toLocaleString('tr-TR')} – ₺{estimatedMaxCost.toLocaleString('tr-TR')}
               </span>
             </div>
           </div>
@@ -192,41 +204,42 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
 
       <style jsx>{`
         .tile-calculator-card {
-          background: linear-gradient(180deg, rgba(15, 23, 42, 0.65) 0%, rgba(15, 23, 42, 0.45) 100%);
+          background: linear-gradient(145deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.75) 100%);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           border-radius: 20px;
-          padding: 20px 24px;
+          padding: 24px;
           color: #ffffff;
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.15);
           margin: 24px 0 16px 0;
           transition: all 0.3s ease;
         }
 
         .tile-calc-header {
-          margin-bottom: 18px;
+          margin-bottom: 20px;
         }
 
         .tile-calc-badges {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 10px;
           flex-wrap: wrap;
-          margin-bottom: 10px;
+          margin-bottom: 12px;
         }
 
         .badge-gold {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          padding: 4px 10px;
-          border-radius: 14px;
-          background: rgba(212, 175, 55, 0.18);
-          border: 1px solid rgba(212, 175, 55, 0.4);
-          color: #ffd700;
-          font-size: 0.73rem;
+          padding: 5px 12px;
+          border-radius: 20px;
+          background: rgba(212, 175, 55, 0.12);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          color: #d4af37;
+          font-size: 0.72rem;
           font-weight: 800;
+          letter-spacing: 0.04em;
           white-space: nowrap;
         }
 
@@ -234,12 +247,12 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          padding: 4px 10px;
-          border-radius: 14px;
-          background: rgba(0, 0, 0, 0.3);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          color: #e2e8f0;
-          font-size: 0.73rem;
+          padding: 5px 12px;
+          border-radius: 20px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: #94a3b8;
+          font-size: 0.72rem;
           font-weight: 700;
           white-space: nowrap;
         }
@@ -248,42 +261,42 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           font-size: 1.15rem;
           font-weight: 800;
           margin: 0;
-          color: #ffffff;
-          line-height: 1.3;
-          text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+          color: #f8fafc;
+          line-height: 1.35;
+          letter-spacing: -0.01em;
         }
 
         .tile-calc-grid {
           display: grid;
-          grid-template-columns: 1.1fr 0.9fr;
-          gap: 20px;
+          grid-template-columns: 1.15fr 0.85fr;
+          gap: 24px;
           align-items: stretch;
         }
 
         .tile-calc-inputs {
           display: flex;
           flex-direction: column;
-          gap: 14px;
+          gap: 16px;
         }
 
         .calc-group {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 8px;
         }
 
         .calc-label {
-          font-size: 0.75rem;
-          font-weight: 700;
-          color: #cbd5e1;
+          font-size: 0.72rem;
+          font-weight: 800;
+          color: #94a3b8;
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 0.06em;
         }
 
         .room-selector-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 6px;
+          gap: 8px;
           width: 100%;
         }
 
@@ -292,38 +305,46 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 8px 4px;
-          border-radius: 10px;
-          font-size: 0.76rem;
-          font-weight: 700;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          padding: 10px 6px;
+          border-radius: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
           cursor: pointer;
-          background: rgba(255, 255, 255, 0.06);
-          color: #f8fafc;
-          transition: all 0.2s ease;
-          gap: 2px;
+          background: rgba(255, 255, 255, 0.04);
+          color: #cbd5e1;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          gap: 6px;
           white-space: nowrap;
         }
 
         .room-btn:hover {
-          background: rgba(255, 255, 255, 0.12);
+          background: rgba(255, 255, 255, 0.09);
+          border-color: rgba(255, 255, 255, 0.16);
+          color: #ffffff;
         }
 
         .room-btn.active {
-          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
-          color: #0f172a;
-          border-color: #ffd700;
-          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+          background: rgba(212, 175, 55, 0.14);
+          color: #ffffff;
+          border: 1px solid rgba(212, 175, 55, 0.5);
+          box-shadow: 0 4px 16px rgba(212, 175, 55, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
-        .room-icon {
-          font-size: 1.1rem;
-          line-height: 1;
+        .room-icon-svg {
+          color: #94a3b8;
+          transition: color 0.2s ease;
+        }
+
+        .room-btn:hover .room-icon-svg {
+          color: #cbd5e1;
+        }
+
+        .room-btn.active .room-icon-svg {
+          color: #d4af37;
         }
 
         .room-text {
-          font-size: 0.72rem;
-          font-weight: 800;
+          font-size: 0.75rem;
+          font-weight: 700;
         }
 
         .slider-header {
@@ -333,12 +354,12 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         }
 
         .area-badge {
-          font-size: 0.95rem;
-          font-weight: 900;
-          color: #ffd700;
-          background: rgba(212, 175, 55, 0.15);
-          padding: 2px 8px;
-          border-radius: 6px;
+          font-size: 0.88rem;
+          font-weight: 800;
+          color: #d4af37;
+          background: rgba(212, 175, 55, 0.12);
+          padding: 3px 10px;
+          border-radius: 8px;
           border: 1px solid rgba(212, 175, 55, 0.3);
         }
 
@@ -348,113 +369,145 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           cursor: pointer;
           height: 6px;
           margin-top: 4px;
+          border-radius: 4px;
         }
 
         .dropdowns-row {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 10px;
+          gap: 12px;
         }
 
         .select-box {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 6px;
         }
 
         .select-label {
           font-size: 0.72rem;
-          font-weight: 700;
+          font-weight: 800;
           color: #94a3b8;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .select-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
         }
 
         .calc-select {
           width: 100%;
-          padding: 8px 10px;
-          border-radius: 10px;
-          background: rgba(15, 23, 42, 0.85);
+          padding: 10px 32px 10px 12px;
+          border-radius: 12px;
+          background: rgba(15, 23, 42, 0.75);
           color: #f8fafc;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          font-size: 0.8rem;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          font-size: 0.82rem;
           font-weight: 600;
           outline: none;
           cursor: pointer;
+          appearance: none;
+          -webkit-appearance: none;
+          transition: border-color 0.2s ease;
+        }
+
+        .calc-select:hover {
+          border-color: rgba(255, 255, 255, 0.22);
+        }
+
+        .calc-select:focus {
+          border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .select-arrow {
+          position: absolute;
+          right: 12px;
+          pointer-events: none;
+          color: #94a3b8;
         }
 
         .tile-calc-results {
-          background: rgba(0, 0, 0, 0.35);
-          backdrop-filter: blur(12px);
-          padding: 16px;
+          background: rgba(15, 23, 42, 0.6);
+          backdrop-filter: blur(14px);
+          padding: 20px;
           border-radius: 16px;
-          border: 1px solid rgba(212, 175, 55, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.1);
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          gap: 14px;
+          gap: 16px;
+          box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
         }
 
         .results-inner-grid {
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 12px;
         }
 
         .result-item {
           display: flex;
           flex-direction: column;
-          gap: 2px;
+          gap: 4px;
         }
 
         .result-item.budget-highlight {
           background: rgba(212, 175, 55, 0.08);
-          padding: 8px 10px;
-          border-radius: 10px;
-          border: 1px solid rgba(212, 175, 55, 0.2);
+          padding: 10px 14px;
+          border-radius: 12px;
+          border: 1px solid rgba(212, 175, 55, 0.25);
         }
 
         .result-label {
           font-size: 0.72rem;
-          color: #cbd5e1;
-          font-weight: 600;
+          color: #94a3b8;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
         }
 
         .result-label.gold {
-          color: #ffd700;
-          font-weight: 700;
+          color: #d4af37;
+          font-weight: 800;
         }
 
         .result-value-row {
           display: flex;
           align-items: baseline;
-          gap: 6px;
+          gap: 8px;
         }
 
         .result-main-val {
-          font-size: 1.2rem;
+          font-size: 1.25rem;
           font-weight: 900;
           color: #ffffff;
         }
 
         .result-main-val.small {
-          font-size: 0.95rem;
+          font-size: 0.92rem;
+          color: #e2e8f0;
+          font-weight: 700;
         }
 
         .result-main-val.gold {
-          font-size: 1.15rem;
-          color: #ffd700;
+          font-size: 1.2rem;
+          color: #e5c158;
         }
 
         .result-sub-val {
-          font-size: 0.75rem;
+          font-size: 0.76rem;
           color: #38bdf8;
-          font-weight: 600;
+          font-weight: 700;
         }
 
         .calc-cta-button {
           width: 100%;
-          padding: 12px 16px;
+          padding: 13px 18px;
           border-radius: 12px;
-          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          background: linear-gradient(135deg, #c5a059 0%, #d4af37 50%, #b38e47 100%);
           color: #0f172a;
           font-weight: 900;
           font-size: 0.88rem;
@@ -464,47 +517,45 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           align-items: center;
           justify-content: center;
           gap: 8px;
-          box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4);
-          transition: all 0.2s ease;
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.28);
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           white-space: nowrap;
+          letter-spacing: 0.01em;
         }
 
         .calc-cta-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+          transform: translateY(-2px);
+          box-shadow: 0 10px 28px rgba(212, 175, 55, 0.4);
+          background: linear-gradient(135deg, #d4af37 0%, #e5c158 50%, #c5a059 100%);
         }
 
         @media (max-width: 640px) {
           .tile-calculator-card {
-            padding: 16px;
+            padding: 18px;
             border-radius: 16px;
             margin: 16px 0 12px 0;
           }
 
           .tile-calc-grid {
             grid-template-columns: 1fr;
-            gap: 16px;
+            gap: 18px;
           }
 
           .tile-calc-title {
-            font-size: 1rem;
+            font-size: 1.05rem;
           }
 
           .room-btn {
-            padding: 6px 2px;
-          }
-
-          .room-icon {
-            font-size: 1rem;
+            padding: 8px 4px;
           }
 
           .room-text {
-            font-size: 0.7rem;
+            font-size: 0.72rem;
           }
 
           .calc-cta-button {
-            padding: 11px 14px;
-            font-size: 0.85rem;
+            padding: 12px 16px;
+            font-size: 0.86rem;
           }
         }
       `}</style>
