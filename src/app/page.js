@@ -6636,21 +6636,59 @@ export default function Home() {
                       setShowDetailModal(false);
                       navigateTo3DStudio(detailProduct);
                     }}
-                    className="btn-primary w-full-btn flex-center-btn detail-action-btn"
+                    className="detail-action-btn btn-action-studio"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.18) 0%, rgba(180, 140, 50, 0.28) 100%)',
+                      border: '1px solid rgba(212, 175, 55, 0.45)',
+                      color: '#fbbf24',
+                      padding: '11px 18px',
+                      borderRadius: '10px',
+                      fontWeight: '700',
+                      fontSize: '0.84rem',
+                      letterSpacing: '0.2px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 16px rgba(212, 175, 55, 0.12)',
+                      width: '100%',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.25s ease'
+                    }}
                   >
-                    <Sparkles size={16} />
+                    <Sparkles size={16} style={{ color: '#fbbf24' }} />
                     <span style={{ whiteSpace: 'nowrap' }}>3D Sanal Stüdyoda Dene</span>
                   </button>
+
                   <button 
                     onClick={() => {
                       setShowDetailModal(false);
                       navigateToDealers(detailProduct);
                     }}
-                    className="btn-secondary w-full-btn flex-center-btn detail-action-btn"
+                    className="detail-action-btn btn-action-dealer"
+                    style={{
+                      background: 'rgba(30, 41, 59, 0.5)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      color: '#cbd5e1',
+                      padding: '11px 18px',
+                      borderRadius: '10px',
+                      fontWeight: '600',
+                      fontSize: '0.84rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      width: '100%',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.25s ease'
+                    }}
                   >
-                    <Map size={16} />
+                    <MapPin size={16} style={{ color: '#60a5fa' }} />
                     <span style={{ whiteSpace: 'nowrap' }}>Haritada Bayileri Gör & Teklif Al</span>
                   </button>
+
                   <button 
                     onClick={() => {
                       setSampleProduct(detailProduct);
@@ -6666,27 +6704,27 @@ export default function Home() {
                       setSampleErrorMsg('');
                       setShowSampleModal(true);
                     }}
+                    className="detail-action-btn btn-action-sample"
                     style={{
-                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                      color: '#0f172a',
-                      border: 'none',
-                      padding: '12px 18px',
-                      borderRadius: '12px',
-                      fontWeight: '800',
-                      fontSize: '0.88rem',
+                      background: 'rgba(245, 158, 11, 0.08)',
+                      border: '1px solid rgba(245, 158, 11, 0.35)',
+                      color: '#fbbf24',
+                      padding: '11px 18px',
+                      borderRadius: '10px',
+                      fontWeight: '700',
+                      fontSize: '0.84rem',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '8px',
-                      boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
                       width: '100%',
                       whiteSpace: 'nowrap',
-                      transition: 'all 0.2s ease'
+                      transition: 'all 0.25s ease'
                     }}
                   >
-                    <Truck size={18} />
-                    <span style={{ whiteSpace: 'nowrap' }}>🚚 1-Tıkla Adrese Ücretsiz Numune Karo İste</span>
+                    <Truck size={16} style={{ color: '#fbbf24' }} />
+                    <span style={{ whiteSpace: 'nowrap' }}>1-Tıkla Adrese Ücretsiz Numune Karo İste</span>
                   </button>
                 </div>
 
