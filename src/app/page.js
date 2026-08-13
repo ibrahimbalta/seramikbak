@@ -332,7 +332,7 @@ function generateMoodboardFromProduct(product, index) {
 const heroSlides = [
   {
     title: "Türkiye'nin Seramik Arama Motoru",
-    subtitle: "100+ seçkin marka ve 25.000+ seramik ürününü saniyeler içinde karşılaştırın, en ucuz pazar yeri fiyatlarını ve yetkili bayileri bulun.",
+    subtitle: "17 seçkin marka ve 25.000+ seramik ürününü saniyeler içinde karşılaştırın, en ucuz pazar yeri fiyatlarını ve yetkili bayileri bulun.",
     bg: "/hero/luxury_bathroom.png",
     tag: "TÜRKİYE'NİN EN KAPSAMLI SERAMİK DİZİNİ",
     highlight: "Fiyatları Karşılaştırın"
@@ -7706,7 +7706,7 @@ export default function Home() {
               <span className="logo-text">SeramikBak</span>
             </div>
             <p className="footer-tagline">
-              Türkiye'nin ilk ve lider seramik arama motoru. 100+ markayı karşılaştırın, 3D sanal stüdyoda odanızı tasarlayın ve en yakın yetkili bayiden anında teklif alın.
+              Türkiye'nin ilk ve lider seramik arama motoru. 17 lider markayı karşılaştırın, 3D sanal stüdyoda odanızı tasarlayın ve en yakın yetkili bayiden anında teklif alın.
             </p>
             <div className="footer-socials">
               <a href="#" className="social-icon-btn" title="Web Sitesi" onClick={(e) => e.preventDefault()}><Globe size={16} /></a>

@@ -18,7 +18,7 @@ export async function GET() {
       mission: 'Tüm yerel ve küresel markaların kataloglarını zengin detaylarla tek bir arama motorunda birleştirmek; bayilerin potansiyel müşterilere zahmetsizce ulaşabileceği B2B SaaS araçları sunmak ve tüketicilerin hayallerindeki mimari tasarımları hızlı fiyat teklifleriyle gerçeğe dönüştürmelerini sağlamak.',
       vision: 'Geleneksel ve zahmetli olan seramik alışverişi sürecini, fiziksel mağazalarda kaybolmadan, tamamen dijital, şeffaf ve kusursuz bir deneyime dönüştürmek. Üç boyutlu modelleme ve yapay zeka ile müşterilerin yaşam alanlarında seramikleri canlı olarak deneyimlemesini sağlayarak sektörün dijital lideri olmak.',
       stats: [
-        { num: '100+', label: 'Karşılaştırılan Marka & Üretici' },
+        { num: '17', label: 'Karşılaştırılan Lider Marka & Üretici' },
         { num: '10,000+', label: 'Aktif Seramik & Karo Ürünü' },
         { num: '500+', label: 'Türkiye Genelinde Yetkili Bayi' },
         { num: '2.5 Saniye', label: 'AI Destekli Arama ve Öneri Hızı' }
