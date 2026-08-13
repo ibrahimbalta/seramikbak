@@ -6639,7 +6639,7 @@ export default function Home() {
                     className="btn-primary w-full-btn flex-center-btn detail-action-btn"
                   >
                     <Sparkles size={16} />
-                    <span>3D Sanal Stüdyoda Dene</span>
+                    <span style={{ whiteSpace: 'nowrap' }}>3D Sanal Stüdyoda Dene</span>
                   </button>
                   <button 
                     onClick={() => {
@@ -6649,7 +6649,7 @@ export default function Home() {
                     className="btn-secondary w-full-btn flex-center-btn detail-action-btn"
                   >
                     <Map size={16} />
-                    <span>Haritada Bayileri Gör</span>
+                    <span style={{ whiteSpace: 'nowrap' }}>Haritada Bayileri Gör & Teklif Al</span>
                   </button>
                   <button 
                     onClick={() => {
@@ -6681,12 +6681,12 @@ export default function Home() {
                       gap: '8px',
                       boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
                       width: '100%',
-                      marginTop: '8px',
+                      whiteSpace: 'nowrap',
                       transition: 'all 0.2s ease'
                     }}
                   >
                     <Truck size={18} />
-                    <span>🚚 1-Tıkla Adrese Ücretsiz Numune Karo İste</span>
+                    <span style={{ whiteSpace: 'nowrap' }}>🚚 1-Tıkla Adrese Ücretsiz Numune Karo İste</span>
                   </button>
                 </div>
 
@@ -12816,15 +12816,30 @@ export default function Home() {
 
         .detail-primary-actions {
           display: flex;
-          flex-direction: row;
-          gap: 12px;
-          margin-top: 6px;
+          flex-direction: column;
+          gap: 10px;
+          margin-top: 12px;
+          width: 100%;
         }
 
         .detail-primary-actions button {
-          flex: 1;
+          width: 100% !important;
+          flex: none !important;
           margin: 0 !important;
-          width: auto !important;
+          white-space: nowrap !important;
+          word-break: keep-all !important;
+          font-size: 0.88rem !important;
+          font-weight: 700 !important;
+          padding: 12px 18px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 8px !important;
+        }
+
+        .detail-primary-actions button span {
+          white-space: nowrap !important;
+          word-break: keep-all !important;
         }
 
         .detail-modal-content-premium .btn-primary {
@@ -14433,6 +14448,10 @@ export default function Home() {
             width: 100% !important;
             min-height: 44px !important;
             font-size: 0.82rem !important;
+            white-space: nowrap !important;
+          }
+          .detail-primary-actions button span {
+            white-space: nowrap !important;
           }
           .calc-inputs-row {
             grid-template-columns: 1fr !important;
