@@ -9,17 +9,29 @@ export function LanguageProvider({ children }) {
   const [lang, setLangState] = useState('tr');
 
   useEffect(() => {
-    // Detect saved language or browser language
+    // Detect saved language or automatic browser/country locale
     if (typeof window !== 'undefined') {
       const savedLang = localStorage.getItem('seramikbak_lang');
       if (savedLang && dictionaries[savedLang]) {
         setLangState(savedLang);
         applyLanguageSettings(savedLang);
       } else {
-        const browserLang = navigator.language?.slice(0, 2)?.toLowerCase();
-        if (browserLang && dictionaries[browserLang]) {
-          setLangState(browserLang);
-          applyLanguageSettings(browserLang);
+        // Smart Country & Browser Auto-Detection
+        const userLanguages = Array.from(navigator.languages || [navigator.language || '']);
+        let detected = 'tr';
+
+        for (const fullLang of userLanguages) {
+          const code = fullLang.toLowerCase().split('-')[0];
+          if (code === 'de' || code === 'at' || code === 'ch') { detected = 'de'; break; }
+          if (code === 'ar' || code === 'sa' || code === 'ae' || code === 'qa' || code === 'eg' || code === 'kw') { detected = 'ar'; break; }
+          if (code === 'ru' || code === 'by' || code === 'kz') { detected = 'ru'; break; }
+          if (code === 'en' || code === 'gb' || code === 'us' || code === 'ca' || code === 'au') { detected = 'en'; break; }
+          if (code === 'tr') { detected = 'tr'; break; }
+        }
+
+        if (dictionaries[detected]) {
+          setLangState(detected);
+          applyLanguageSettings(detected);
         }
       }
     }
