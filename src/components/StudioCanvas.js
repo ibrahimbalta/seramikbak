@@ -1710,6 +1710,51 @@ export default function StudioCanvas({
           box-shadow: 0 4px 12px rgba(0,0,0,0.15);
           text-align: right;
         }
+
+        @media (max-width: 768px) {
+          .canvas-overlay {
+            position: relative;
+            bottom: auto;
+            left: 0;
+            right: 0;
+            margin-top: 8px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 10px 12px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            pointer-events: auto;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+          }
+          .overlay-left-badges {
+            justify-content: flex-start;
+            gap: 4px;
+          }
+          .overlay-badge {
+            font-size: 0.68rem;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.05);
+          }
+          .overlay-right-actions {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 8px;
+          }
+          .overlay-action-btn {
+            padding: 7px 12px;
+            font-size: 0.72rem;
+            white-space: nowrap;
+          }
+          .overlay-instructions {
+            font-size: 0.68rem;
+            padding: 5px 8px;
+            text-align: right;
+          }
+        }
       `}</style>
     </div>
   );
