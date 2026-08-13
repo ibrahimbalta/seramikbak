@@ -1713,46 +1713,53 @@ export default function StudioCanvas({
 
         @media (max-width: 768px) {
           .canvas-overlay {
-            position: relative;
+            position: absolute;
+            top: 10px;
             bottom: auto;
-            left: 0;
-            right: 0;
-            margin-top: 8px;
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 14px;
-            padding: 10px 12px;
+            left: 10px;
+            right: 10px;
+            display: flex;
             flex-direction: column;
-            align-items: stretch;
-            gap: 8px;
-            pointer-events: auto;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            gap: 6px;
+            pointer-events: none;
+            z-index: 10;
           }
           .overlay-left-badges {
-            justify-content: flex-start;
+            display: flex;
+            flex-wrap: wrap;
             gap: 4px;
+            pointer-events: none;
           }
           .overlay-badge {
-            font-size: 0.68rem;
-            padding: 4px 8px;
-            background: rgba(255, 255, 255, 0.05);
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
           }
           .overlay-right-actions {
+            display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
             width: 100%;
-            gap: 8px;
+            gap: 6px;
+            pointer-events: auto;
           }
           .overlay-action-btn {
-            padding: 7px 12px;
-            font-size: 0.72rem;
+            padding: 5px 10px;
+            font-size: 0.68rem;
+            border-radius: 6px;
             white-space: nowrap;
           }
           .overlay-instructions {
-            font-size: 0.68rem;
-            padding: 5px 8px;
+            font-size: 0.64rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.85);
             text-align: right;
+            backdrop-filter: blur(8px);
           }
         }
       `}</style>
