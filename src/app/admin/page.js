@@ -30,7 +30,10 @@ import {
   Megaphone,
   Globe,
   Wrench,
-  Star
+  Star,
+  Mail,
+  MessageSquare,
+  RefreshCw
 } from 'lucide-react';
 import Link from 'next/link';
 import SecurityBackupTab from '@/components/admin/SecurityBackupTab';
@@ -59,6 +62,7 @@ export default function AdminPage() {
     if (isMobile) setSidebarOpen(false);
     if (tab === 'campaigns') { loadCampaigns(); loadAdminPodiumBids(); }
     if (tab === 'installers') loadAdminInstallers();
+    if (tab === 'contact_messages') loadContactMessages();
   }, [isMobile]);
 
   const tabLabels = {
@@ -72,6 +76,7 @@ export default function AdminPage() {
     campaigns: 'Sponsorlu Reklamlar',
     pages: 'Kurumsal Sayfalar',
     installers: 'Seramik Ustaları',
+    contact_messages: 'İletişim Mesajları',
     security: 'Güvenlik & Yedekleme'
   };
 
@@ -86,6 +91,7 @@ export default function AdminPage() {
     campaigns: Sparkles,
     pages: Globe,
     installers: Wrench,
+    contact_messages: Mail,
     security: ShieldCheck
   };
 
@@ -93,6 +99,7 @@ export default function AdminPage() {
   const [brands, setBrands] = useState([]);
   const [dealers, setDealers] = useState([]);
   const [leads, setLeads] = useState([]);
+  const [contactMessages, setContactMessages] = useState([]);
   const [projects, setProjects] = useState([]);
   const [saasConfigs, setSaasConfigs] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
@@ -407,6 +414,47 @@ export default function AdminPage() {
       }
     } catch (err) {
       console.error('Failed to load projects:', err);
+    }
+  };
+
+  const loadContactMessages = async () => {
+    try {
+      const res = await fetch('/api/admin/contact-messages');
+      if (res.ok) {
+        const data = await res.json();
+        setContactMessages(data);
+      }
+    } catch (err) {
+      console.error('Failed to load contact messages:', err);
+    }
+  };
+
+  const handleUpdateContactMessageStatus = async (id, status) => {
+    try {
+      const res = await fetch('/api/admin/contact-messages', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status })
+      });
+      if (res.ok) {
+        loadContactMessages();
+      }
+    } catch (err) {
+      console.error('Failed to update contact message status:', err);
+    }
+  };
+
+  const handleDeleteContactMessage = async (id) => {
+    if (!confirm('Bu iletişim mesajını silmek istediğinize emin misiniz?')) return;
+    try {
+      const res = await fetch(`/api/admin/contact-messages?id=${id}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        loadContactMessages();
+      }
+    } catch (err) {
+      console.error('Failed to delete contact message:', err);
     }
   };
 
@@ -905,6 +953,7 @@ export default function AdminPage() {
       loadAdminBrands();
       loadCampaigns();
       loadAdminInstallers();
+      loadContactMessages();
     }
   }, [isLoggedIn]);
 
@@ -2060,6 +2109,15 @@ export default function AdminPage() {
                   <Wrench size={16} />
                   <span>Seramik Ustaları</span>
                   {installerStats.pending > 0 && <span className="nav-badge" style={{ background: '#ef4444' }}>{installerStats.pending}</span>}
+                </button>
+                <button className={`nav-item ${activeTab === 'contact_messages' ? 'active' : ''}`} onClick={() => handleTabSelect('contact_messages')}>
+                  <Mail size={16} />
+                  <span>İletişim Mesajları</span>
+                  {contactMessages.filter(m => m.status === 'UNREAD').length > 0 && (
+                    <span className="nav-badge" style={{ background: '#ef4444' }}>
+                      {contactMessages.filter(m => m.status === 'UNREAD').length}
+                    </span>
+                  )}
                 </button>
               </div>
             )}
@@ -3356,6 +3414,155 @@ export default function AdminPage() {
                 {leads.length === 0 && (
                   <tr>
                     <td colSpan="7" style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>Henüz fiyat teklif talebi alınmamıştır.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* TAB: CONTACT MESSAGES (İLETİŞİM MESAJLARI) */}
+      {activeTab === 'contact_messages' && (
+        <div>
+          <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 4px 0' }}>Gelen İletişim & Destek Mesajları</h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
+                İletişim sayfasından gönderilen müşteri sorularını, destek taleplerini ve bildirimleri yönetin.
+              </p>
+            </div>
+            <button 
+              onClick={loadContactMessages}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-primary)',
+                padding: '8px 16px',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '0.85rem'
+              }}
+            >
+              <RefreshCw size={14} /> Yenile
+            </button>
+          </div>
+
+          {/* Stats Bar */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '16px',
+            marginBottom: '24px'
+          }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '20px' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Toplam Mesaj</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--text-primary)' }}>{contactMessages.length}</div>
+            </div>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(239, 68, 68, 0.25)', borderRadius: '16px', padding: '20px' }}>
+              <div style={{ fontSize: '0.8rem', color: '#ef4444', marginBottom: '4px' }}>Okunmamış Mesajlar</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#ef4444' }}>{contactMessages.filter(m => m.status === 'UNREAD').length}</div>
+            </div>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(34, 197, 94, 0.25)', borderRadius: '16px', padding: '20px' }}>
+              <div style={{ fontSize: '0.8rem', color: '#22c55e', marginBottom: '4px' }}>Yanıtlandı / İşlendi</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#22c55e' }}>{contactMessages.filter(m => m.status === 'REPLIED').length}</div>
+            </div>
+          </div>
+
+          <div className="table-responsive" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden' }}>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Tarih</th>
+                  <th>Gönderen</th>
+                  <th>İletişim</th>
+                  <th>Konu</th>
+                  <th>Mesaj İçeriği</th>
+                  <th>Durum</th>
+                  <th style={{ textAlign: 'right' }}>İşlem</th>
+                </tr>
+              </thead>
+              <tbody>
+                {contactMessages.map(m => (
+                  <tr key={m.id} style={{ background: m.status === 'UNREAD' ? 'rgba(239, 68, 68, 0.04)' : 'transparent' }}>
+                    <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                      {new Date(m.createdAt).toLocaleString('tr-TR')}
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{m.name}</div>
+                    </td>
+                    <td>
+                      <div style={{ fontSize: '0.82rem', color: 'var(--text-primary)' }}>{m.email}</div>
+                      {m.phone && <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{m.phone}</div>}
+                    </td>
+                    <td>
+                      <span style={{
+                        display: 'inline-block',
+                        background: 'rgba(255, 255, 255, 0.06)',
+                        border: '1px solid var(--border-color)',
+                        padding: '4px 10px',
+                        borderRadius: '8px',
+                        fontSize: '0.78rem',
+                        fontWeight: '600'
+                      }}>{m.subject || 'Genel Destek'}</span>
+                    </td>
+                    <td style={{ maxWidth: '320px' }}>
+                      <div style={{
+                        fontSize: '0.84rem',
+                        color: 'var(--text-primary)',
+                        lineHeight: '1.45',
+                        background: 'rgba(0,0,0,0.2)',
+                        border: '1px solid var(--border-color)',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        maxHeight: '110px',
+                        overflowY: 'auto',
+                        whiteSpace: 'pre-wrap'
+                      }}>
+                        {m.message}
+                      </div>
+                    </td>
+                    <td>
+                      <select 
+                        value={m.status} 
+                        onChange={(e) => handleUpdateContactMessageStatus(m.id, e.target.value)}
+                        style={{
+                          background: m.status === 'UNREAD' ? 'rgba(239, 68, 68, 0.15)' : m.status === 'REPLIED' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255,255,255,0.08)',
+                          color: m.status === 'UNREAD' ? '#ef4444' : m.status === 'REPLIED' ? '#22c55e' : '#cbd5e1',
+                          border: '1px solid rgba(255,255,255,0.15)',
+                          borderRadius: '8px',
+                          padding: '6px 10px',
+                          fontSize: '0.78rem',
+                          fontWeight: '700',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <option value="UNREAD" style={{ background: '#0f172a', color: '#ef4444' }}>🔴 Okunmadı</option>
+                        <option value="READ" style={{ background: '#0f172a', color: '#cbd5e1' }}>🟡 İnceleniyor</option>
+                        <option value="REPLIED" style={{ background: '#0f172a', color: '#22c55e' }}>🟢 Yanıtlandı</option>
+                      </select>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button 
+                        onClick={() => handleDeleteContactMessage(m.id)} 
+                        className="btn-action-delete" 
+                        title="Mesajı Sil"
+                        style={{ background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '6px 10px', borderRadius: '8px', cursor: 'pointer' }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {contactMessages.length === 0 && (
+                  <tr>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '36px', color: 'var(--text-muted)' }}>
+                      Henüz gelen iletişim mesajı bulunmamaktadır.
+                    </td>
                   </tr>
                 )}
               </tbody>

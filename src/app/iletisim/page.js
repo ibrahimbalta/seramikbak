@@ -65,7 +65,7 @@ export default function ContactAndFaqPage() {
       .catch(err => console.error('Failed to load contact settings:', err));
   }, []);
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!kvkkAccepted) {
       alert('Lütfen KVKK Aydınlatma Metni\'ni okuyup onaylayınız.');
@@ -73,17 +73,31 @@ export default function ContactAndFaqPage() {
     }
     setIsSubmitting(true);
     
-    // Simulate API request
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, subject, message })
+      });
+      const data = await res.json();
+      
       setIsSubmitting(false);
-      setSubmitSuccess(true);
-      setName('');
-      setEmail('');
-      setPhone('');
-      setMessage('');
-      setKvkkAccepted(false);
-      setTimeout(() => setSubmitSuccess(false), 5000);
-    }, 1500);
+      if (res.ok && data.success) {
+        setSubmitSuccess(true);
+        setName('');
+        setEmail('');
+        setPhone('');
+        setMessage('');
+        setKvkkAccepted(false);
+        setTimeout(() => setSubmitSuccess(false), 5000);
+      } else {
+        alert(data.error || 'Mesaj gönderilemedi. Lütfen tekrar deneyiniz.');
+      }
+    } catch (error) {
+      console.error('Contact Form Submit Error:', error);
+      setIsSubmitting(false);
+      alert('Bağlantı hatası oluştu. Lütfen tekrar deneyiniz.');
+    }
   };
 
   const toggleFaq = (index) => {
