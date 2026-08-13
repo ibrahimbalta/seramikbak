@@ -12,26 +12,23 @@ import {
   Cpu, 
   Globe, 
   Search, 
-  Layers, 
-  ChevronRight, 
-  CheckCircle2,
-  Box,
-  TrendingUp,
-  BarChart3
+  Box, 
+  TrendingUp, 
+  BarChart3,
+  ArrowRight
 } from 'lucide-react';
 
 export default function AboutUsPage() {
   const [aboutData, setAboutData] = useState({
-    hero_title: 'Türk Seramik Sektörünü Yapay Zeka & 5 Dilde Global SEO Altyapımızla Dünya Pazarlarına Taşıyoruz',
-    hero_subtitle: 'SeramikBak; Türkiye’nin lider seramik üreticilerini, yetkili bayilerini ve uluslararası mimarlık bürolarını Web 3D, BIM/Revit şartname entegrasyonu ve 5 dilde dinamik arama motoru indekslemesiyle buluşturan yeni nesil küresel B2B dijital ekosistemdir.',
-    mission: 'Tüm yerel ve küresel üreticilerin seramik koleksiyonlarını 5 farklı dilde yapılandırarak tek bir akıllı arama motorunda birleştirmek; bayilerin potansiyel müşterilere zahmetsizce ulaşabileceği B2B SaaS araçları sunmak ve Türk seramiğini uluslararası mimarlık projelerinin ilk tercihi haline getirmek.',
-    vision: 'Geleneksel ve zahmetli seramik tedarik süreçlerini; yapay zeka destekli görsel arama, 3D oda simülasyonu ve çok dilli küresel SEO mimarisi ile tamamen şeffaf, dijital ve yüksek katma değerli bir ihracat ekosistemine dönüştürmek.',
+    hero_title: 'Seramik Seçimini Yeniden Tanımlıyoruz',
+    hero_subtitle: 'SeramikBak; üreticileri, bayileri ve tasarım severleri yapay zeka, Web 3D ve artırılmış gerçeklik teknolojileriyle bir araya getiren bağımsız, lüks bir dijital pazaryeri ve showroom ekosistemidir.',
+    mission: 'Tüm yerel ve küresel markaların kataloglarını zengin detaylarla tek bir arama motorunda birleştirmek; bayilerin potansiyel müşterilere zahmetsizce ulaşabileceği B2B SaaS araçları sunmak ve tüketicilerin hayallerindeki mimari tasarımları hızlı fiyat teklifleriyle gerçeğe dönüştürmelerini sağlamak.',
+    vision: 'Geleneksel ve zahmetli olan seramik alışverişi sürecini, fiziksel mağazalarda kaybolmadan, tamamen dijital, şeffaf ve kusursuz bir deneyime dönüştürmek. Üç boyutlu modelleme ve yapay zeka ile müşterilerin yaşam alanlarında seramikleri canlı olarak deneyimlemesini sağlayarak sektörün dijital lideri olmak.',
     stats: [
       { num: '100+', label: 'Karşılaştırılan Marka & Üretici' },
-      { num: '5 Dilde', label: 'Google Global & Yandex SEO İndeksi' },
+      { num: '10,000+', label: 'Aktif Seramik & Karo Ürünü' },
       { num: '500+', label: 'Türkiye Genelinde Yetkili Bayi' },
-      { num: '4K BIM / CAD', label: 'Revit Şartname Kaplama Nesnesi' },
-      { num: '2.5 Saniye', label: 'AI Görsel Arama & Öneri Hızı' }
+      { num: '2.5 Saniye', label: 'AI Destekli Arama ve Öneri Hızı' }
     ]
   });
 
@@ -40,7 +37,7 @@ export default function AboutUsPage() {
       .then(res => res.json())
       .then(data => {
         if (data && data.page_about_content) {
-          setAboutData(prev => ({ ...prev, ...data.page_about_content }));
+          setAboutData(data.page_about_content);
         }
       })
       .catch(err => console.error('Failed to load about settings:', err));
@@ -49,36 +46,36 @@ export default function AboutUsPage() {
   return (
     <main style={{
       minHeight: '100vh',
-      background: '#f8fafc',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
       fontFamily: 'var(--font-body, "Plus Jakarta Sans", system-ui, sans-serif)',
       color: '#0f172a',
       position: 'relative',
       overflowX: 'hidden'
     }}>
-      {/* Background ambient lighting */}
+      {/* Background patterns */}
       <div style={{
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
-        height: '500px',
-        background: 'radial-gradient(circle at 50% 0%, rgba(179, 142, 71, 0.12) 0%, rgba(15, 23, 42, 0) 70%)',
+        height: '400px',
+        background: 'radial-gradient(circle at top, rgba(179, 142, 71, 0.08) 0%, transparent 60%)',
         pointerEvents: 'none',
         zIndex: 0
       }} />
 
-      {/* Sticky Header / Navbar */}
+      {/* Header / Navbar */}
       <header style={{
-        background: 'rgba(255, 255, 255, 0.9)',
+        background: 'rgba(255, 255, 255, 0.85)',
         backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(226, 232, 240, 0.8)',
+        borderBottom: '1px solid rgba(0, 0, 0, 0.05)',
         position: 'sticky',
         top: 0,
         zIndex: 10,
-        boxShadow: '0 4px 20px rgba(15, 23, 42, 0.03)'
+        boxShadow: '0 4px 30px rgba(0,0,0,0.02)'
       }}>
         <div style={{
-          maxWidth: '1200px',
+          maxWidth: '1100px',
           margin: '0 auto',
           padding: '16px 24px',
           display: 'flex',
@@ -101,124 +98,106 @@ export default function AboutUsPage() {
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '9px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
               background: '#0f172a',
-              color: '#d4af37',
+              color: '#b38e47',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '900',
-              fontSize: '1rem',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              fontSize: '1rem'
             }}>SB</div>
-            <span style={{ fontSize: '1.15rem', fontWeight: '800', tracking: '-0.02em', color: '#0f172a' }}>SeramikBak</span>
+            <span style={{ fontSize: '1.1rem', fontWeight: '800', tracking: '-0.02em' }}>SeramikBak</span>
           </div>
         </div>
       </header>
 
-      {/* Main Container */}
+      {/* Main Content Container */}
       <div style={{
-        maxWidth: '1200px',
+        maxWidth: '1100px',
         margin: '0 auto',
-        padding: '50px 24px 100px 24px',
+        padding: '60px 24px 100px 24px',
         position: 'relative',
         zIndex: 1
       }}>
         
-        {/* Executive Hero Banner Section */}
-        <section style={{ textAlign: 'center', marginBottom: '60px' }}>
+        {/* Original Hero Section */}
+        <section style={{ textAlign: 'center', marginBottom: '80px' }}>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '8px',
+            gap: '6px',
             background: 'rgba(179, 142, 71, 0.1)',
-            border: '1px solid rgba(179, 142, 71, 0.3)',
-            color: '#b38e47',
-            padding: '6px 18px',
-            borderRadius: '30px',
-            fontSize: '0.78rem',
-            fontWeight: '800',
-            letterSpacing: '0.05em',
+            color: '#8c6b30',
+            padding: '6px 16px',
+            borderRadius: '20px',
+            fontSize: '0.75rem',
+            fontWeight: '700',
             textTransform: 'uppercase',
-            marginBottom: '24px'
+            letterSpacing: '0.05em',
+            marginBottom: '20px'
           }}>
-            <Globe size={14} />
-            <span>KÜRESEL DİJİTAL SHOWROOM & GLOBAL SEO MİMARİSİ</span>
+            <Sparkles size={12} />
+            <span>GELECEĞİN DİJİTAL SHOWROOM PLATFORMU</span>
           </div>
-
           <h1 style={{
-            fontSize: 'clamp(2.1rem, 4.5vw, 3.4rem)',
+            fontSize: 'clamp(2rem, 5vw, 3.2rem)',
             fontWeight: '900',
-            lineHeight: '1.2',
+            lineHeight: '1.15',
             letterSpacing: '-0.03em',
             color: '#0f172a',
-            maxWidth: '1000px',
-            margin: '0 auto 24px auto',
+            margin: '0 0 24px 0',
             fontFamily: 'var(--font-title, "Outfit", sans-serif)'
           }}>
-            Türk Seramik Koleksiyonlarını <span style={{
-              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}>5 Dilde SEO Altyapımızla</span> Dünya Pazarlarında Görünür Kılıyoruz
+            {aboutData.hero_title.includes('Yeniden Tanımlıyoruz') ? (
+              <>
+                Seramik Seçimini <span style={{
+                  background: 'linear-gradient(135deg, #b38e47 0%, #8c6b30 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}>Yeniden Tanımlıyoruz</span>
+              </>
+            ) : aboutData.hero_title}
           </h1>
-
           <p style={{
-            fontSize: '1.1rem',
-            lineHeight: '1.7',
+            fontSize: '1.15rem',
+            lineHeight: '1.6',
             color: '#475569',
-            maxWidth: '860px',
-            margin: '0 auto 36px auto',
-            fontWeight: '500'
+            maxWidth: '720px',
+            margin: '0 auto'
           }}>
             {aboutData.hero_subtitle}
           </p>
-
-          {/* 5 Language Badges Row */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '10px',
-            flexWrap: 'wrap'
-          }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#1e293b', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '6px 16px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>🇹🇷 Türkçe</span>
-            <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#1e293b', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '6px 16px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>🇬🇧 English</span>
-            <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#1e293b', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '6px 16px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>🇩🇪 Deutsch</span>
-            <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#1e293b', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '6px 16px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>🇸🇦 العربية</span>
-            <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#1e293b', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '6px 16px', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>🇷🇺 Русский</span>
-          </div>
         </section>
 
-        {/* Stats Grid Bar */}
+        {/* Original Stats Grid */}
         <section style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '20px',
-          marginBottom: '70px'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: '24px',
+          marginBottom: '80px'
         }}>
           {aboutData.stats && aboutData.stats.map((stat, idx) => (
             <div key={idx} style={{
               background: '#ffffff',
-              border: '1px solid #e2e8f0',
+              border: '1px solid rgba(0, 0, 0, 0.04)',
               borderRadius: '20px',
-              padding: '24px 20px',
+              padding: '30px 24px',
               textAlign: 'center',
-              boxShadow: '0 4px 16px rgba(15, 23, 42, 0.03)',
-              transition: 'transform 0.2s ease, boxShadow 0.2s ease'
-            }} className="stat-card-hover">
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.01)'
+            }}>
               <div style={{
-                fontSize: '1.9rem',
+                fontSize: '2.2rem',
                 fontWeight: '900',
                 color: '#b38e47',
-                marginBottom: '6px',
+                marginBottom: '8px',
                 fontFamily: 'var(--font-title, "Outfit", sans-serif)'
               }}>{stat.num}</div>
               <div style={{
-                fontSize: '0.82rem',
-                fontWeight: '700',
+                fontSize: '0.85rem',
+                fontWeight: '600',
                 color: '#64748b',
                 lineHeight: '1.4'
               }}>{stat.label}</div>
@@ -226,177 +205,75 @@ export default function AboutUsPage() {
           ))}
         </section>
 
-        {/* SPECIAL SECTION: Global SEO & Export Infrastructure (Showcase of Expertise) */}
-        <section style={{
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-          borderRadius: '28px',
-          padding: '48px 40px',
-          color: '#ffffff',
-          marginBottom: '70px',
-          boxShadow: '0 20px 48px rgba(15, 23, 42, 0.2)',
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            position: 'absolute',
-            top: '-100px',
-            right: '-100px',
-            width: '400px',
-            height: '400px',
-            background: 'radial-gradient(circle, rgba(179, 142, 71, 0.18) 0%, transparent 70%)',
-            pointerEvents: 'none'
-          }} />
-
-          <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 40px auto', position: 'relative', zIndex: 1 }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              background: 'rgba(212, 175, 55, 0.12)',
-              border: '1px solid rgba(212, 175, 55, 0.3)',
-              color: '#d4af37',
-              padding: '5px 14px',
-              borderRadius: '20px',
-              fontSize: '0.72rem',
-              fontWeight: '800',
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              marginBottom: '14px'
-            }}>
-              <TrendingUp size={13} />
-              <span>TEKNOLOJİK ÜSTÜNLÜK & İHRACAT MİMARİSİ</span>
-            </div>
-            
-            <h2 style={{ fontSize: '1.9rem', fontWeight: '900', color: '#ffffff', margin: '0 0 14px 0', letterSpacing: '-0.02em' }}>
-              Uluslararası Pazarlar İçin Geliştirdiğimiz Global SEO Teknolojimiz
-            </h2>
-            <p style={{ fontSize: '0.95rem', color: '#94a3b8', lineHeight: '1.6', margin: 0 }}>
-              SeramikBak sadece bir dijital katalog değil; Türkiye'deki seramik fabrikalarının ürünlerini küresel arama motorlarında ilk sıraya taşıyan gelişmiş bir B2B arama ve şartname altyapısıdır.
-            </p>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '20px',
-            position: 'relative',
-            zIndex: 1
-          }}>
-            <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '20px', padding: '24px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-                <Globe size={20} />
-              </div>
-              <h4 style={{ fontSize: '1rem', fontWeight: '800', margin: '0 0 8px 0', color: '#f8fafc' }}>5 Dilde Semantik SEO İndeksi</h4>
-              <p style={{ fontSize: '0.84rem', color: '#cbd5e1', margin: 0, lineHeight: '1.55' }}>
-                Ürün adları, ebatlar, renkler ve yüzey tipleri Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde yerel arama alışkanlıklarına göre indekslenir.
-              </p>
-            </div>
-
-            <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '20px', padding: '24px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-                <Search size={20} />
-              </div>
-              <h4 style={{ fontSize: '1rem', fontWeight: '800', margin: '0 0 8px 0', color: '#f8fafc' }}>Google Global & Yandex Sıralaması</h4>
-              <p style={{ fontSize: '0.84rem', color: '#cbd5e1', margin: 0, lineHeight: '1.55' }}>
-                Almanya, İngiltere, Körfez ülkeleri ve Rusya'daki B2B seramik ithalatçılarının aramalarında üst sırada çıkmanızı sağlayan dinamik SEO mimarisi.
-              </p>
-            </div>
-
-            <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '20px', padding: '24px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-                <Box size={20} />
-              </div>
-              <h4 style={{ fontSize: '1rem', fontWeight: '800', margin: '0 0 8px 0', color: '#f8fafc' }}>BIM & 4K Revit (.rfa) Şartnamesi</h4>
-              <p style={{ fontSize: '0.84rem', color: '#cbd5e1', margin: 0, lineHeight: '1.55' }}>
-                Yurt dışındaki uluslararası mimarlık bürolarının projelere seramiklerinizi dikişsiz 4K PBR kaplama ve Revit nesnesi olarak doğrudan eklemesini sağlar.
-              </p>
-            </div>
-
-            <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '20px', padding: '24px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-                <BarChart3 size={20} />
-              </div>
-              <h4 style={{ fontSize: '1rem', fontWeight: '800', margin: '0 0 8px 0', color: '#f8fafc' }}>Komisyonsuz Doğrudan B2B Eşleşme</h4>
-              <p style={{ fontSize: '0.84rem', color: '#cbd5e1', margin: 0, lineHeight: '1.55' }}>
-                Yüksek metrajlı toplu konut, otel ve ticari projelere aracı olmadan fabrika & ana bayi üzerinden doğrudan teklif sunma imkanı.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Vision & Mission Split */}
+        {/* Original Vision & Mission Split */}
         <section style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '24px',
-          marginBottom: '70px'
+          gap: '40px',
+          marginBottom: '80px'
         }}>
           <div style={{
             background: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid rgba(0, 0, 0, 0.04)',
             borderRadius: '24px',
-            padding: '36px 32px',
-            boxShadow: '0 4px 20px rgba(15, 23, 42, 0.03)'
+            padding: '40px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.01)'
           }}>
             <div style={{
-              width: '44px',
-              height: '44px',
+              width: '48px',
+              height: '48px',
               borderRadius: '12px',
               background: 'rgba(179, 142, 71, 0.1)',
               color: '#b38e47',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: '20px'
+              marginBottom: '24px'
             }}>
-              <Award size={22} />
+              <Award size={24} />
             </div>
-            <h3 style={{ fontSize: '1.35rem', fontWeight: '800', marginBottom: '14px', color: '#0f172a' }}>Vizyonumuz</h3>
-            <p style={{ fontSize: '0.92rem', lineHeight: '1.65', color: '#475569', margin: 0 }}>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '16px', color: '#0f172a' }}>Vizyonumuz</h3>
+            <p style={{ fontSize: '0.95rem', lineHeight: '1.6', color: '#475569', margin: 0 }}>
               {aboutData.vision}
             </p>
           </div>
 
           <div style={{
             background: '#ffffff',
-            border: '1px solid #e2e8f0',
+            border: '1px solid rgba(0, 0, 0, 0.04)',
             borderRadius: '24px',
-            padding: '36px 32px',
-            boxShadow: '0 4px 20px rgba(15, 23, 42, 0.03)'
+            padding: '40px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.01)'
           }}>
             <div style={{
-              width: '44px',
-              height: '44px',
+              width: '48px',
+              height: '48px',
               borderRadius: '12px',
               background: 'rgba(15, 23, 42, 0.06)',
               color: '#0f172a',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: '20px'
+              marginBottom: '24px'
             }}>
-              <Cpu size={22} />
+              <Cpu size={24} />
             </div>
-            <h3 style={{ fontSize: '1.35rem', fontWeight: '800', marginBottom: '14px', color: '#0f172a' }}>Misyonumuz</h3>
-            <p style={{ fontSize: '0.92rem', lineHeight: '1.65', color: '#475569', margin: 0 }}>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '16px', color: '#0f172a' }}>Misyonumuz</h3>
+            <p style={{ fontSize: '0.95rem', lineHeight: '1.6', color: '#475569', margin: 0 }}>
               {aboutData.mission}
             </p>
           </div>
         </section>
 
-        {/* Ecosystem Benefits */}
-        <section style={{ marginBottom: '70px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-            <h2 style={{
-              fontSize: '1.8rem',
-              fontWeight: '800',
-              color: '#0f172a',
-              margin: '0 0 10px 0'
-            }}>Kimin İçin Ne Sunuyoruz?</h2>
-            <p style={{ fontSize: '0.94rem', color: '#64748b', margin: 0 }}>
-              Üretici, bayi ve tüketicileri tek bir dijital platformda buluşturan şeffaf ekosistemimiz.
-            </p>
-          </div>
+        {/* Original Ecosystem Benefits (Kimin İçin Ne Sunuyoruz?) */}
+        <section style={{ marginBottom: '80px' }}>
+          <h2 style={{
+            fontSize: '1.75rem',
+            fontWeight: '800',
+            textAlign: 'center',
+            marginBottom: '40px',
+            color: '#0f172a'
+          }}>Kimin İçin Ne Sunuyoruz?</h2>
 
           <div style={{
             display: 'grid',
@@ -406,26 +283,26 @@ export default function AboutUsPage() {
             {[
               {
                 icon: <Heart size={20} />,
-                title: 'Tüketiciler & Mimar Adayları İçin',
-                desc: 'Yüzlerce mağazayı gezmeden tüm renk, ebat ve marka seçeneklerini saniyeler içinde karşılaştırın. 3D sanal stüdyomuzda banyonuzda canlı deneyip bölgenizdeki bayilerden hızlı teklif alın.'
+                title: 'Tüketiciler İçin',
+                desc: 'Yüzlerce bayiyi dolaşmak yerine tüm renk, ebat ve marka seçeneklerini saniyeler içinde karşılaştırın. 3D sanal stüdyo ile banyo veya mutfağınızda seramikleri canlı döşeyip deneyin ve doğrudan teklif isteyin.'
               },
               {
                 icon: <Building2 size={20} />,
                 title: 'Markalar & Üreticiler İçin',
-                desc: 'Ürün koleksiyonlarınızı 5 farklı dilde Google Global indeksine kaydedin. Bölgesel pazar trend analitiği ve B2B Marka Portalı ile uluslararası projelere şartname malzemesi verin.'
+                desc: 'Ürünlerinizi dijital ortamda en şık haliyle sergileyin. Akıllı arama önerileri ve B2B marka portalı ile tüketici trendlerini takip edin, hedefli reklam kampanyalarıyla en popüler ürünlerinizi öne çıkarın.'
               },
               {
                 icon: <ShieldCheck size={20} />,
-                title: 'Yetkili Bayiler & Showroomlar İçin',
-                desc: 'Showroomunuza kurumsal Teşhir Kiosk ekranı kurarak binlerce seramiği 3D sunun. Bölgenizden gelen gerçek satın alma taleplerini (lead) yanıtlayarak cironuzu artırın.'
+                title: 'Yetkili Bayiler İçin',
+                desc: 'Showroomunuza teşhir kiosk kurarak binlerce ürünü dev ekranda müşterilerinize sunun. Bölgenizden gelen satın alma taleplerini (lead) anında yanıtlayarak satışlarınızı ve kurumsal gücünüzü artırın.'
               }
             ].map((benefit, idx) => (
               <div key={idx} style={{
                 background: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid rgba(0, 0, 0, 0.04)',
                 borderRadius: '24px',
-                padding: '32px 28px',
-                boxShadow: '0 4px 16px rgba(15, 23, 42, 0.02)'
+                padding: '32px',
+                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.01)'
               }}>
                 <div style={{
                   display: 'flex',
@@ -434,9 +311,9 @@ export default function AboutUsPage() {
                   marginBottom: '16px'
                 }}>
                   <div style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '10px',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
                     background: idx === 0 ? 'rgba(239, 68, 68, 0.08)' : idx === 1 ? 'rgba(179, 142, 71, 0.08)' : 'rgba(34, 197, 94, 0.08)',
                     color: idx === 0 ? '#ef4444' : idx === 1 ? '#b38e47' : '#22c55e',
                     display: 'flex',
@@ -445,60 +322,184 @@ export default function AboutUsPage() {
                   }}>{benefit.icon}</div>
                   <h4 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>{benefit.title}</h4>
                 </div>
-                <p style={{ fontSize: '0.88rem', lineHeight: '1.6', color: '#64748b', margin: 0 }}>{benefit.desc}</p>
+                <p style={{ fontSize: '0.88rem', lineHeight: '1.55', color: '#64748b', margin: 0 }}>{benefit.desc}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* CTA Banner */}
+        {/* ADDED SPECIAL SECTION: Global SEO & İhracat Hizmeti Altyapımız */}
         <section style={{
           background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
           borderRadius: '28px',
-          padding: '50px 36px',
+          padding: '48px 36px',
+          color: '#ffffff',
+          marginBottom: '80px',
+          boxShadow: '0 20px 48px rgba(15, 23, 42, 0.18)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: '-100px',
+            right: '-100px',
+            width: '400px',
+            height: '400px',
+            background: 'radial-gradient(circle, rgba(179, 142, 71, 0.16) 0%, transparent 70%)',
+            pointerEvents: 'none'
+          }} />
+
+          <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 36px auto', position: 'relative', zIndex: 1 }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'rgba(212, 175, 55, 0.12)',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              color: '#d4af37',
+              padding: '5px 16px',
+              borderRadius: '20px',
+              fontSize: '0.74rem',
+              fontWeight: '800',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              marginBottom: '14px'
+            }}>
+              <Globe size={13} />
+              <span>ÇOK DİLLİ GLOBAL SEO & İHRACAT HİZMETİMİZ</span>
+            </div>
+            
+            <h2 style={{ fontSize: '1.85rem', fontWeight: '900', color: '#ffffff', margin: '0 0 14px 0', letterSpacing: '-0.02em' }}>
+              Türk Seramiklerini 5 Dilde SEO Altyapımızla Uluslararası Pazarlara İhraç Ediyoruz
+            </h2>
+            <p style={{ fontSize: '0.94rem', color: '#cbd5e1', lineHeight: '1.65', margin: 0 }}>
+              SeramikBak Global SEO Altyapısı; Türkiye'deki seramik üreticilerinin tüm koleksiyonlarını Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde Google Global ve Yandex arama motorlarında indeksleyerek B2B distribütörler, mimarlık büroları ve yüksek metrajlı projeler ile buluşturur.
+            </p>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '20px',
+            position: 'relative',
+            zIndex: 1,
+            marginBottom: '32px'
+          }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '20px', padding: '24px' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
+                <Globe size={18} />
+              </div>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 6px 0', color: '#f8fafc' }}>5 Dilde SEO İndeksleme</h4>
+              <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: 0, lineHeight: '1.5' }}>
+                Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde hedef ülkelere özel içerik mimarisi ve üst sıra görünürlüğü.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '20px', padding: '24px' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
+                <Search size={18} />
+              </div>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 6px 0', color: '#f8fafc' }}>Google Global & Yandex</h4>
+              <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: 0, lineHeight: '1.5' }}>
+                Almanya, İngiltere, Körfez ülkeleri ve Rusya'daki B2B seramik ithalatçılarının aramalarında üst sıra konumlandırma.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '20px', padding: '24px' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
+                <Box size={18} />
+              </div>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 6px 0', color: '#f8fafc' }}>BIM & 4K Revit (.rfa) Şartnamesi</h4>
+              <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: 0, lineHeight: '1.5' }}>
+                Uluslararası mimarlık bürolarının projelerine seramikleri 4K dikişsiz PBR kaplama ve Revit nesnesi olarak eklemesi.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '20px', padding: '24px' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(34, 197, 94, 0.15)', color: '#4ade80', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
+                <BarChart3 size={18} />
+              </div>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 6px 0', color: '#f8fafc' }}>Doğrudan B2B İhracat Talepleri</h4>
+              <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: 0, lineHeight: '1.5' }}>
+                Yüksek metrajlı toplu konut, otel ve ticari projelere aracı olmadan fabrika & ana bayi üzerinden doğrudan teklif imkanı.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+            <Link 
+              href="/global-tanitim#brand-apply-form" 
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                color: '#111827',
+                padding: '12px 26px',
+                borderRadius: '14px',
+                fontSize: '0.88rem',
+                fontWeight: '800',
+                textDecoration: 'none',
+                boxShadow: '0 6px 20px rgba(212, 175, 55, 0.25)',
+                transition: 'all 0.2s ease'
+              }}
+              className="cta-btn-hover"
+            >
+              <Building2 size={16} />
+              <span>Markanızı Global Tanıtıma Ekleyin</span>
+              <ArrowRight size={15} />
+            </Link>
+          </div>
+        </section>
+
+        {/* Original CTA Banner */}
+        <section style={{
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+          borderRadius: '30px',
+          padding: '60px 40px',
           textAlign: 'center',
           color: '#ffffff',
           boxShadow: '0 20px 40px rgba(15, 23, 42, 0.15)',
           position: 'relative',
           overflow: 'hidden'
         }}>
+          {/* Accent light in banner */}
           <div style={{
             position: 'absolute',
-            bottom: '-120px',
-            right: '-120px',
-            width: '280px',
-            height: '280px',
-            background: 'radial-gradient(circle, rgba(179, 142, 71, 0.18) 0%, transparent 70%)',
+            bottom: '-150px',
+            right: '-150px',
+            width: '300px',
+            height: '300px',
+            background: 'radial-gradient(circle, rgba(179, 142, 71, 0.15) 0%, transparent 70%)',
             pointerEvents: 'none'
           }} />
 
-          <h3 style={{ fontSize: '1.8rem', fontWeight: '800', margin: '0 0 14px 0', letterSpacing: '-0.02em' }}>
-            Markanızı ve Koleksiyonlarınızı Global İhracat Ağına Ekleyin
+          <h3 style={{ fontSize: '1.8rem', fontWeight: '800', margin: '0 0 16px 0', letterSpacing: '-0.02em' }}>
+            Yaşam Alanlarınızı Yenilemeye Hazır mısınız?
           </h3>
-          <p style={{ fontSize: '0.98rem', color: '#94a3b8', maxWidth: '640px', margin: '0 auto 30px auto', lineHeight: '1.6' }}>
-            5 dilde SEO altyapımızla ürünlerinizi küresel mimarlık projelerine şartname olarak kaydedin, doğrudan B2B ihracat talepleri toplayın.
+          <p style={{ fontSize: '1rem', color: '#94a3b8', maxWidth: '600px', margin: '0 auto 32px auto', lineHeight: '1.5' }}>
+            Hemen arama motorumuzu kullanmaya başlayın, tarzınıza en uygun seramiği bulup 3D sanal stüdyomuzda canlı olarak test edin.
           </p>
-
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/global-tanitim#brand-apply-form" style={{
-              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-              color: '#111827',
-              padding: '14px 30px',
-              borderRadius: '14px',
-              fontWeight: '800',
+            <Link href="/" style={{
+              background: 'linear-gradient(135deg, #b38e47 0%, #8c6b30 100%)',
+              color: '#ffffff',
+              padding: '14px 32px',
+              borderRadius: '30px',
+              fontWeight: '700',
               fontSize: '0.9rem',
               textDecoration: 'none',
               transition: 'transform 0.2s, box-shadow 0.2s',
-              boxShadow: '0 8px 24px rgba(212, 175, 55, 0.25)'
+              boxShadow: '0 4px 15px rgba(179, 142, 71, 0.3)'
             }} className="cta-btn-hover">
-              Markanızı Global Tanıtıma Ekleyin
+              Showroom'u Keşfet
             </Link>
             <Link href="/iletisim" style={{
               background: 'rgba(255, 255, 255, 0.08)',
               border: '1px solid rgba(255, 255, 255, 0.15)',
               color: '#ffffff',
-              padding: '14px 30px',
-              borderRadius: '14px',
+              padding: '14px 32px',
+              borderRadius: '30px',
               fontWeight: '700',
               fontSize: '0.9rem',
               textDecoration: 'none',
@@ -511,19 +512,15 @@ export default function AboutUsPage() {
 
       </div>
 
-      {/* Global hover styles */}
+      {/* Styled JSX for animations */}
       <style jsx global>{`
         .back-link-hover:hover {
           color: #b38e47 !important;
           transform: translateX(-3px);
         }
-        .stat-card-hover:hover {
-          transform: translateY(-2px);
-          border-color: #cbd5e1 !important;
-        }
         .cta-btn-hover:hover {
           transform: translateY(-2px);
-          box-shadow: 0 10px 28px rgba(212, 175, 55, 0.35) !important;
+          box-shadow: 0 6px 20px rgba(179, 142, 71, 0.4) !important;
         }
       `}</style>
     </main>
