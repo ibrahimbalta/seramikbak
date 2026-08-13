@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
 import LanguageSelector from '@/components/LanguageSelector';
-import CurrencySelector from '@/components/CurrencySelector';
 import GlobalExportHub from '@/components/GlobalExportHub';
 import { useLanguage } from '@/lib/languageContext';
 
@@ -3424,7 +3423,6 @@ export default function Home() {
                 )}
               </>
             )}
-            <CurrencySelector />
             <LanguageSelector />
           </div>
           <button className="hamburger-menu-btn" onClick={() => setShowMobileMenu(!showMobileMenu)} aria-label="Menü">
