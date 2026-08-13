@@ -7762,7 +7762,6 @@ export default function Home() {
               <li><Link href="/bayi?tab=register">Bayimiz Olun (B2B Başvuru)</Link></li>
               <li><Link href="/bayi">Bayi Giriş Portalı</Link></li>
               <li><Link href="/marka">B2B Marka Portalı</Link></li>
-              <li><Link href="/global-tanitim" style={{ color: '#d4af37', fontWeight: '800' }}>🌍 Global Tanıtım Portalı</Link></li>
             </ul>
           </div>
 
