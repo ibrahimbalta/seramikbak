@@ -52,7 +52,9 @@ import {
   Copy,
   ShoppingBag,
   RefreshCw,
-  ExternalLink
+  ExternalLink,
+  Truck,
+  Package
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -825,6 +827,63 @@ export default function Home() {
     });
   };
 
+
+  // Sample Order Modal States
+  const [showSampleModal, setShowSampleModal] = useState(false);
+  const [sampleProduct, setSampleProduct] = useState(null);
+  const [sampleDealer, setSampleDealer] = useState(null);
+  const [sampleName, setSampleName] = useState('');
+  const [samplePhone, setSamplePhone] = useState('');
+  const [sampleEmail, setSampleEmail] = useState('');
+  const [sampleCity, setSampleCity] = useState('');
+  const [sampleDistrict, setSampleDistrict] = useState('');
+  const [sampleAddress, setSampleAddress] = useState('');
+  const [sampleNotes, setSampleNotes] = useState('');
+  const [sampleSubmitting, setSampleSubmitting] = useState(false);
+  const [sampleSuccessMsg, setSampleSuccessMsg] = useState('');
+  const [sampleErrorMsg, setSampleErrorMsg] = useState('');
+
+  const handleSampleSubmit = async (e) => {
+    e.preventDefault();
+    if (!sampleName || !samplePhone || !sampleEmail || !sampleCity || !sampleAddress) {
+      setSampleErrorMsg('Lütfen ad soyad, telefon, e-posta, şehir ve teslimat adresini eksiksiz doldurunuz.');
+      return;
+    }
+    setSampleSubmitting(true);
+    setSampleErrorMsg('');
+    try {
+      const res = await fetch('/api/sample-orders/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: sampleProduct?.id,
+          dealerId: sampleDealer?.id || null,
+          clientName: sampleName,
+          clientPhone: samplePhone,
+          clientEmail: sampleEmail,
+          city: sampleCity,
+          district: sampleDistrict,
+          address: sampleAddress,
+          notes: sampleNotes
+        })
+      });
+      const data = await res.json();
+      setSampleSubmitting(false);
+      if (res.ok && data.success) {
+        setSampleSuccessMsg(data.message || 'Numune talebiniz başarıyla alındı!');
+        setTimeout(() => {
+          setShowSampleModal(false);
+          setSampleSuccessMsg('');
+        }, 3500);
+      } else {
+        setSampleErrorMsg(data.error || 'Numune talebi iletilemedi.');
+      }
+    } catch (err) {
+      console.error('Sample submit error:', err);
+      setSampleSubmitting(false);
+      setSampleErrorMsg('Bağlantı hatası oluştu. Lütfen tekrar deneyiniz.');
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -6592,6 +6651,43 @@ export default function Home() {
                     <Map size={16} />
                     <span>Haritada Bayileri Gör</span>
                   </button>
+                  <button 
+                    onClick={() => {
+                      setSampleProduct(detailProduct);
+                      setSampleDealer(detailDealers && detailDealers.length > 0 ? detailDealers[0] : null);
+                      setSampleName('');
+                      setSamplePhone('');
+                      setSampleEmail('');
+                      setSampleCity('');
+                      setSampleDistrict('');
+                      setSampleAddress('');
+                      setSampleNotes('');
+                      setSampleSuccessMsg('');
+                      setSampleErrorMsg('');
+                      setShowSampleModal(true);
+                    }}
+                    style={{
+                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                      color: '#0f172a',
+                      border: 'none',
+                      padding: '12px 18px',
+                      borderRadius: '12px',
+                      fontWeight: '800',
+                      fontSize: '0.88rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
+                      width: '100%',
+                      marginTop: '8px',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Truck size={18} />
+                    <span>🚚 1-Tıkla Adrese Ücretsiz Numune Karo İste</span>
+                  </button>
                 </div>
 
                 {/* MİMAR VE TASARIMCILAR İÇİN DOKU PORTALI */}
@@ -7324,6 +7420,121 @@ export default function Home() {
 
                 <button type="submit" className="btn-primary w-full-btn" style={{ marginTop: '10px' }} disabled={isUploadingPhoto || isSubmittingLead}>
                   {isUploadingPhoto ? 'Görsel Yükleniyor...' : isSubmittingLead ? 'Teklif Gönderiliyor...' : 'Teklifi Gönder'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* SAMPLE ORDER (NUMUNE KARO TALEBİ) MODAL */}
+      {showSampleModal && sampleProduct && (
+        <div className="modal-overlay animate-fade-in" onClick={() => setShowSampleModal(false)}>
+          <div className="modal-content glass-panel-gold" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '560px', width: '92%' }}>
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Truck size={20} className="gold-icon" />
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>Adrese Ücretsiz Numune Karo İste</h3>
+              </div>
+              <button onClick={() => setShowSampleModal(false)} className="close-modal-btn">✕</button>
+            </div>
+
+            {sampleErrorMsg && (
+              <div className="alert-box error" style={{ margin: '12px 0 0 0', padding: '10px 14px', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', fontSize: '0.85rem' }}>
+                ⚠️ {sampleErrorMsg}
+              </div>
+            )}
+
+            {sampleSuccessMsg ? (
+              <div className="modal-success-state" style={{ textAlign: 'center', padding: '30px 20px' }}>
+                <CheckCircle size={54} className="success-icon" style={{ color: '#34d399', marginBottom: '16px' }} />
+                <h4 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 8px 0', color: '#ffffff' }}>Numune Karo Talebiniz Alındı!</h4>
+                <p style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.5' }}>{sampleSuccessMsg}</p>
+                <button onClick={() => setShowSampleModal(false)} className="btn-primary" style={{ marginTop: '20px', padding: '10px 24px', borderRadius: '10px' }}>Kapat</button>
+              </div>
+            ) : (
+              <form onSubmit={handleSampleSubmit} className="modal-form" style={{ marginTop: '16px' }}>
+                {/* Product Summary Box */}
+                <div className="modal-product-summary" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '12px 16px', display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
+                  <div className="m-pic" style={{ width: '50px', height: '50px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0 }}>
+                    <TileVisualPreview style={sampleProduct.style} color={sampleProduct.color} finish={sampleProduct.finish} width={sampleProduct.width} height={sampleProduct.height} imageUrl={sampleProduct.imageUrl} />
+                  </div>
+                  <div>
+                    <strong style={{ fontSize: '0.92rem', color: '#ffffff', display: 'block' }}>{sampleProduct.brand?.name} - {sampleProduct.name}</strong>
+                    <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{sampleProduct.width}x{sampleProduct.height} cm • {sampleProduct.finish}</span>
+                    {sampleDealer && <p style={{ fontSize: '0.75rem', color: '#38bdf8', margin: '2px 0 0 0' }}>Yetkili Bayi: {sampleDealer.name}</p>}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>Adınız Soyadınız *</label>
+                  <input type="text" className="form-input" value={sampleName} onChange={(e) => setSampleName(e.target.value)} required placeholder="Ahmet Yılmaz" />
+                </div>
+
+                <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div className="form-group">
+                    <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>Telefon *</label>
+                    <input type="tel" className="form-input" value={samplePhone} onChange={(e) => setSamplePhone(e.target.value)} required placeholder="0555 123 4567" />
+                  </div>
+                  <div className="form-group">
+                    <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>E-Posta *</label>
+                    <input type="email" className="form-input" value={sampleEmail} onChange={(e) => setSampleEmail(e.target.value)} required placeholder="ahmet@example.com" />
+                  </div>
+                </div>
+
+                <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div className="form-group">
+                    <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>İl / Şehir *</label>
+                    <input type="text" className="form-input" value={sampleCity} onChange={(e) => setSampleCity(e.target.value)} required placeholder="İstanbul" />
+                  </div>
+                  <div className="form-group">
+                    <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>İlçe</label>
+                    <input type="text" className="form-input" value={sampleDistrict} onChange={(e) => setSampleDistrict(e.target.value)} placeholder="Kadıköy" />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>Kargo Teslimat Adresi *</label>
+                  <textarea className="form-input form-textarea" value={sampleAddress} onChange={(e) => setSampleAddress(e.target.value)} required placeholder="Mahalle, cadde, sokak, bina ve daire no..." rows={2} />
+                </div>
+
+                <div className="form-group">
+                  <label style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600' }}>Özel Not / Proje Detayı (Opsiyonel)</label>
+                  <input type="text" className="form-input" value={sampleNotes} onChange={(e) => setSampleNotes(e.target.value)} placeholder="Örn: 100 m² banyo yenileme projemiz için renk kontrolü yapacağım." />
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="btn-primary w-full-btn" 
+                  disabled={sampleSubmitting}
+                  style={{
+                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    color: '#0f172a',
+                    fontWeight: '800',
+                    fontSize: '0.92rem',
+                    padding: '13px',
+                    borderRadius: '12px',
+                    marginTop: '12px',
+                    width: '100%',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  {sampleSubmitting ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Numune Talebi Gönderiliyor...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Truck size={16} />
+                      <span>Numune Karo Talebini Tamamla</span>
+                    </>
+                  )}
                 </button>
               </form>
             )}

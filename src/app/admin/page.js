@@ -33,7 +33,8 @@ import {
   Star,
   Mail,
   MessageSquare,
-  RefreshCw
+  RefreshCw,
+  Truck
 } from 'lucide-react';
 import Link from 'next/link';
 import SecurityBackupTab from '@/components/admin/SecurityBackupTab';
@@ -63,6 +64,7 @@ export default function AdminPage() {
     if (tab === 'campaigns') { loadCampaigns(); loadAdminPodiumBids(); }
     if (tab === 'installers') loadAdminInstallers();
     if (tab === 'contact_messages') loadContactMessages();
+    if (tab === 'sample_orders') loadSampleOrders();
   }, [isMobile]);
 
   const tabLabels = {
@@ -77,6 +79,7 @@ export default function AdminPage() {
     pages: 'Kurumsal Sayfalar',
     installers: 'Seramik Ustaları',
     contact_messages: 'İletişim Mesajları',
+    sample_orders: 'Numune Talepleri',
     security: 'Güvenlik & Yedekleme'
   };
 
@@ -92,6 +95,7 @@ export default function AdminPage() {
     pages: Globe,
     installers: Wrench,
     contact_messages: Mail,
+    sample_orders: Truck,
     security: ShieldCheck
   };
 
@@ -100,6 +104,7 @@ export default function AdminPage() {
   const [dealers, setDealers] = useState([]);
   const [leads, setLeads] = useState([]);
   const [contactMessages, setContactMessages] = useState([]);
+  const [sampleOrders, setSampleOrders] = useState([]);
   const [projects, setProjects] = useState([]);
   const [saasConfigs, setSaasConfigs] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
@@ -455,6 +460,47 @@ export default function AdminPage() {
       }
     } catch (err) {
       console.error('Failed to delete contact message:', err);
+    }
+  };
+
+  const loadSampleOrders = async () => {
+    try {
+      const res = await fetch('/api/admin/sample-orders');
+      if (res.ok) {
+        const data = await res.json();
+        setSampleOrders(data);
+      }
+    } catch (err) {
+      console.error('Failed to load sample orders:', err);
+    }
+  };
+
+  const handleUpdateSampleOrderStatus = async (id, status, cargoCompany, trackingNumber) => {
+    try {
+      const res = await fetch('/api/admin/sample-orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status, cargoCompany, trackingNumber })
+      });
+      if (res.ok) {
+        loadSampleOrders();
+      }
+    } catch (err) {
+      console.error('Failed to update sample order status:', err);
+    }
+  };
+
+  const handleDeleteSampleOrder = async (id) => {
+    if (!confirm('Bu numune talebini silmek istediğinize emin misiniz?')) return;
+    try {
+      const res = await fetch(`/api/admin/sample-orders?id=${id}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        loadSampleOrders();
+      }
+    } catch (err) {
+      console.error('Failed to delete sample order:', err);
     }
   };
 
@@ -954,6 +1000,7 @@ export default function AdminPage() {
       loadCampaigns();
       loadAdminInstallers();
       loadContactMessages();
+      loadSampleOrders();
     }
   }, [isLoggedIn]);
 
@@ -2116,6 +2163,15 @@ export default function AdminPage() {
                   {contactMessages.filter(m => m.status === 'UNREAD').length > 0 && (
                     <span className="nav-badge" style={{ background: '#ef4444' }}>
                       {contactMessages.filter(m => m.status === 'UNREAD').length}
+                    </span>
+                  )}
+                </button>
+                <button className={`nav-item ${activeTab === 'sample_orders' ? 'active' : ''}`} onClick={() => handleTabSelect('sample_orders')}>
+                  <Truck size={16} />
+                  <span>Numune Talepleri</span>
+                  {sampleOrders.filter(o => o.status === 'PENDING').length > 0 && (
+                    <span className="nav-badge" style={{ background: '#f59e0b', color: '#0f172a' }}>
+                      {sampleOrders.filter(o => o.status === 'PENDING').length}
                     </span>
                   )}
                 </button>
@@ -3562,6 +3618,169 @@ export default function AdminPage() {
                   <tr>
                     <td colSpan="7" style={{ textAlign: 'center', padding: '36px', color: 'var(--text-muted)' }}>
                       Henüz gelen iletişim mesajı bulunmamaktadır.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* TAB: SAMPLE ORDERS (NUMUNE TALEPLERİ) */}
+      {activeTab === 'sample_orders' && (
+        <div>
+          <div className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <div>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 4px 0' }}>Numune Karo Sipariş Talepleri</h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
+                Müşterilerin adreslerine talep ettikleri ücretsiz numune karoları ve kargo takip numaralarını yönetin.
+              </p>
+            </div>
+            <button 
+              onClick={loadSampleOrders}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-primary)',
+                padding: '8px 16px',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '0.85rem'
+              }}
+            >
+              <RefreshCw size={14} /> Yenile
+            </button>
+          </div>
+
+          {/* Stats Bar */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '16px',
+            marginBottom: '24px'
+          }}>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '20px' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Toplam Numune Talebi</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--text-primary)' }}>{sampleOrders.length}</div>
+            </div>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '16px', padding: '20px' }}>
+              <div style={{ fontSize: '0.8rem', color: '#f59e0b', marginBottom: '4px' }}>Bekleyen Talepler</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#f59e0b' }}>{sampleOrders.filter(o => o.status === 'PENDING').length}</div>
+            </div>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(59, 130, 246, 0.25)', borderRadius: '16px', padding: '20px' }}>
+              <div style={{ fontSize: '0.8rem', color: '#3b82f6', marginBottom: '4px' }}>Kargolanan Numuneler</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#3b82f6' }}>{sampleOrders.filter(o => o.status === 'SHIPPED').length}</div>
+            </div>
+            <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(34, 197, 94, 0.25)', borderRadius: '16px', padding: '20px' }}>
+              <div style={{ fontSize: '0.8rem', color: '#22c55e', marginBottom: '4px' }}>Teslim Edilenler</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#22c55e' }}>{sampleOrders.filter(o => o.status === 'DELIVERED').length}</div>
+            </div>
+          </div>
+
+          <div className="table-responsive" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden' }}>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Tarih</th>
+                  <th>Talep Edilen Ürün</th>
+                  <th>Müşteri Bilgileri</th>
+                  <th>Teslimat Adresi</th>
+                  <th>Bayi</th>
+                  <th>Kargo Takip Bilgisi</th>
+                  <th>Durum</th>
+                  <th style={{ textAlign: 'right' }}>İşlem</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sampleOrders.map(o => (
+                  <tr key={o.id} style={{ background: o.status === 'PENDING' ? 'rgba(245, 158, 11, 0.04)' : 'transparent' }}>
+                    <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                      {new Date(o.createdAt).toLocaleString('tr-TR')}
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {o.product?.imageUrl && (
+                          <img src={o.product.imageUrl} alt={o.product.name} style={{ width: '42px', height: '42px', borderRadius: '8px', objectFit: 'cover' }} />
+                        )}
+                        <div>
+                          <div style={{ fontWeight: '700', color: 'var(--text-primary)', fontSize: '0.88rem' }}>{o.product?.brand?.name} - {o.product?.name}</div>
+                          <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>{o.product?.width}x{o.product?.height} cm • {o.product?.finish}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: '700', color: 'var(--text-primary)' }}>{o.clientName}</div>
+                      <div style={{ fontSize: '0.82rem', color: 'var(--text-primary)' }}>{o.clientPhone}</div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{o.clientEmail}</div>
+                    </td>
+                    <td style={{ maxWidth: '240px' }}>
+                      <div style={{ fontSize: '0.84rem', fontWeight: '700', color: 'var(--text-primary)' }}>{o.city} / {o.district}</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: '1.4', marginTop: '2px' }}>{o.address}</div>
+                      {o.notes && <div style={{ fontSize: '0.75rem', color: '#fbbf24', fontStyle: 'italic', marginTop: '4px' }}>Not: {o.notes}</div>}
+                    </td>
+                    <td>
+                      <span style={{ fontSize: '0.82rem', color: 'var(--accent-blue)' }}>{o.dealer?.name || 'Genel Merkez'}</span>
+                    </td>
+                    <td style={{ minWidth: '180px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <input 
+                          type="text" 
+                          placeholder="Kargo Firması (Örn: Yurtiçi)" 
+                          defaultValue={o.cargoCompany || ''}
+                          onBlur={(e) => handleUpdateSampleOrderStatus(o.id, undefined, e.target.value, undefined)}
+                          style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', padding: '4px 8px', borderRadius: '6px', fontSize: '0.76rem' }}
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="Takip Kodu" 
+                          defaultValue={o.trackingNumber || ''}
+                          onBlur={(e) => handleUpdateSampleOrderStatus(o.id, undefined, undefined, e.target.value)}
+                          style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', padding: '4px 8px', borderRadius: '6px', fontSize: '0.76rem' }}
+                        />
+                      </div>
+                    </td>
+                    <td>
+                      <select 
+                        value={o.status} 
+                        onChange={(e) => handleUpdateSampleOrderStatus(o.id, e.target.value, undefined, undefined)}
+                        style={{
+                          background: o.status === 'PENDING' ? 'rgba(245, 158, 11, 0.15)' : o.status === 'SHIPPED' ? 'rgba(59, 130, 246, 0.15)' : o.status === 'DELIVERED' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                          color: o.status === 'PENDING' ? '#f59e0b' : o.status === 'SHIPPED' ? '#3b82f6' : o.status === 'DELIVERED' ? '#22c55e' : '#ef4444',
+                          border: '1px solid rgba(255,255,255,0.15)',
+                          borderRadius: '8px',
+                          padding: '6px 10px',
+                          fontSize: '0.78rem',
+                          fontWeight: '700',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <option value="PENDING" style={{ background: '#0f172a', color: '#f59e0b' }}>🟡 Beklemede</option>
+                        <option value="SHIPPED" style={{ background: '#0f172a', color: '#3b82f6' }}>🚚 Kargolandı</option>
+                        <option value="DELIVERED" style={{ background: '#0f172a', color: '#22c55e' }}>🟢 Teslim Edildi</option>
+                        <option value="CANCELLED" style={{ background: '#0f172a', color: '#ef4444' }}>🔴 İptal</option>
+                      </select>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button 
+                        onClick={() => handleDeleteSampleOrder(o.id)} 
+                        className="btn-action-delete" 
+                        title="Sil"
+                        style={{ background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '6px 10px', borderRadius: '8px', cursor: 'pointer' }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {sampleOrders.length === 0 && (
+                  <tr>
+                    <td colSpan="8" style={{ textAlign: 'center', padding: '36px', color: 'var(--text-muted)' }}>
+                      Henüz numune karo talebi oluşturulmamıştır.
                     </td>
                   </tr>
                 )}

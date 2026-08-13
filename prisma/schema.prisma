@@ -58,6 +58,7 @@ model Product {
   campaigns  AdCampaign[]
   analytics  AnalyticsLog[]
   favorites  Favorite[]
+  sampleOrders SampleOrder[]
   dealerInventories DealerInventory[]
   outletListings OutletListing[]
   podiumBids PodiumBid[]
@@ -92,6 +93,7 @@ model Dealer {
   lat       Float
   lng       Float
   leads     Lead[]
+  sampleOrders SampleOrder[]
   saas      DealerSaaSConfig[]
   inventories DealerInventory[]
   xmlFeedUrl  String?
@@ -379,3 +381,24 @@ model ContactMessage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model SampleOrder {
+  id             String   @id @default(uuid())
+  productId      String
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  dealerId       String?
+  dealer         Dealer?  @relation(fields: [dealerId], references: [id], onDelete: SetNull)
+  clientName     String
+  clientPhone    String
+  clientEmail    String
+  city           String
+  district       String
+  address        String
+  notes          String?
+  status         String   @default("PENDING") // PENDING, SHIPPED, DELIVERED, CANCELLED
+  trackingNumber String?
+  cargoCompany   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
