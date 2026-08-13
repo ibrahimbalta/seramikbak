@@ -93,7 +93,6 @@ import BathroomMockupPreview from '@/components/BathroomMockupPreview';
 import ProductCard from '@/components/ProductCard';
 import TileCalculatorWidget from '@/components/TileCalculatorWidget';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
-import GlobalSearchPreviewCard from '@/components/GlobalSearchPreviewCard';
 import ProductSchemaJsonLd from '@/components/ProductSchemaJsonLd';
 
 function enrichProductData(p) {
@@ -4126,11 +4125,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* RIGHT COLUMN: Live Interactive Global Search & BIM Spec Integration Card */}
-                  <GlobalSearchPreviewCard onOpenStudio={() => {
-                    const el = document.getElementById('studio3d-anchor');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }} />
+
 
                 </div>
 
