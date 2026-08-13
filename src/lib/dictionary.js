@@ -65,6 +65,8 @@ export const dictionaries = {
     inFavorites: 'Favorilerinizde',
     comparePrices: 'Bayi Fiyatlarını Karşılaştır',
     premiumQuality: '1. Kalite Porselen',
+    getDealerQuotes: 'Bayilerden Teklif Al',
+    calcTitle: 'Projenizin Malzeme ve Kutu İhtiyacını Anında Hesaplayın',
 
     // B2B & RFQ Form
     b2bFormTitle: 'Bölgenizdeki Bayilerden Toplu Fiyat Teklifi Toplayın',
@@ -75,9 +77,11 @@ export const dictionaries = {
     district: 'İlçe',
     submitRfq: 'Toplu Teklif İsteğini Gönder',
 
-    // Footer
+    // Footer & Global
     footerRights: 'Tüm hakları saklıdır. Türkiye\'nin Seramik Portalı.',
-    tagline: 'Türk Seramiklerini Dünya ile Buluşturuyoruz.'
+    tagline: 'Türk Seramiklerini Dünya ile Buluşturuyoruz.',
+    liveAnalytics: 'Canlı Analitik',
+    liveStatsHeading: 'Türkiye Geneli Platform Hareketleri'
   },
 
   en: {
@@ -141,6 +145,8 @@ export const dictionaries = {
     inFavorites: 'In Wishlist',
     comparePrices: 'Compare Dealer Prices',
     premiumQuality: '1st Grade Porcelain',
+    getDealerQuotes: 'Get Dealer Quotes',
+    calcTitle: 'Instantly Calculate Material & Box Coverage for Your Project',
 
     // B2B & RFQ Form
     b2bFormTitle: 'Request Wholesale B2B Tile Quotations',
@@ -151,9 +157,11 @@ export const dictionaries = {
     district: 'District',
     submitRfq: 'Submit RFQ Request',
 
-    // Footer
+    // Footer & Global
     footerRights: 'All rights reserved. Global Portal for Turkish Ceramics.',
-    tagline: 'Exporting Premium Turkish Ceramics Worldwide.'
+    tagline: 'Exporting Premium Turkish Ceramics Worldwide.',
+    liveAnalytics: 'Live Analytics',
+    liveStatsHeading: 'Platform Activity Across Turkey'
   },
 
   de: {
@@ -217,6 +225,8 @@ export const dictionaries = {
     inFavorites: 'Gemerkt',
     comparePrices: 'Preise Vergleichen',
     premiumQuality: '1. Wahl Feinsteinzeug',
+    getDealerQuotes: 'Angebote von Händlern Einholen',
+    calcTitle: 'Berechnen Sie Sofort den Material- und Kartonbedarf für Ihr Projekt',
 
     // B2B & RFQ Form
     b2bFormTitle: 'B2B Großhandelsangebot Für Fliesen Anfordern',
@@ -227,9 +237,11 @@ export const dictionaries = {
     district: 'Bezirk',
     submitRfq: 'Anfrage Absenden',
 
-    // Footer
+    // Footer & Global
     footerRights: 'Alle Rechte vorbehalten. Portal für Türkische Keramik.',
-    tagline: 'Türkische Qualitätskeramik Für Weltweite Projekte.'
+    tagline: 'Türkische Qualitätskeramik Für Weltweite Projekte.',
+    liveAnalytics: 'Live-Analytik',
+    liveStatsHeading: 'Plattformaktivitäten In Der Türkei'
   },
 
   ar: {
@@ -293,6 +305,8 @@ export const dictionaries = {
     inFavorites: 'في المفضلة',
     comparePrices: 'مقارنة أسعار الموزعين',
     premiumQuality: 'بورسلين نخب أول ممتاز',
+    getDealerQuotes: 'الحصول على عروض أسعار الموزعين',
+    calcTitle: 'احسب احتياجات مشروعك من المواد والكراتين فوراً',
 
     // B2B & RFQ Form
     b2bFormTitle: 'طلب عروض أسعار للمشاريع بالجملة (B2B)',
@@ -303,9 +317,11 @@ export const dictionaries = {
     district: 'الحي',
     submitRfq: 'إرسال طلب السعر',
 
-    // Footer
+    // Footer & Global
     footerRights: 'جميع الحقوق محفوظة. المنصة العالمية للسيراميك التركي.',
-    tagline: 'تصدير أجود أنواع السيراميك والبورسلين التركي لجميع أنحاء العالم.'
+    tagline: 'تصدير أجود أنواع السيراميك والبورسلين التركي لجميع أنحاء العالم.',
+    liveAnalytics: 'تحليلات مباشرة',
+    liveStatsHeading: 'نشاط المنصة في جميع أنحاء تركيا'
   },
 
   ru: {
@@ -369,6 +385,8 @@ export const dictionaries = {
     inFavorites: 'В Избранном',
     comparePrices: 'Сравнить Цены Дилеров',
     premiumQuality: 'Керамогранит 1 Сорта',
+    getDealerQuotes: 'Получить Предложения Дилеров',
+    calcTitle: 'Мгновенный Расчет Материала и Коробок Для Вашего Проекта',
 
     // B2B & RFQ Form
     b2bFormTitle: 'Запрос Оптовых Цен Для Проектов (B2B)',
@@ -379,8 +397,10 @@ export const dictionaries = {
     district: 'Район',
     submitRfq: 'Отправить Запрос',
 
-    // Footer
+    // Footer & Global
     footerRights: 'Все права защищены. Портал Турецкой Керамики.',
-    tagline: 'Экспорт Качественного Турецкого Керамогранита по Всему Миру.'
+    tagline: 'Экспорт Качественного Турецкого Керамогранита по Всему Миру.',
+    liveAnalytics: 'Живая Аналитика',
+    liveStatsHeading: 'Активность Платформы по Всей Турции'
   }
 };

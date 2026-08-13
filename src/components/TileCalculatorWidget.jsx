@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { Calculator, ArrowRight, ShieldCheck, Bath, Utensils, Sofa, Home, ChevronDown } from 'lucide-react';
+import { useLanguage } from '@/lib/languageContext';
 
 export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }) {
+  const { t } = useLanguage();
   const [roomType, setRoomType] = useState('banyo');
   const [areaM2, setAreaM2] = useState(25);
   const [tileSize, setTileSize] = useState('60x120');
@@ -87,7 +89,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         </div>
 
         <h3 className="tile-calc-title">
-          Projenizin Malzeme ve Kutu İhtiyacını Anında Hesaplayın
+          {t('calcTitle')}
         </h3>
       </div>
 
@@ -196,7 +198,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           </div>
 
           <button onClick={handleRequestQuote} className="calc-cta-button">
-            <span>Bayilerden Teklif Al</span>
+            <span>{t('getDealerQuotes')}</span>
             <ArrowRight size={15} />
           </button>
         </div>
