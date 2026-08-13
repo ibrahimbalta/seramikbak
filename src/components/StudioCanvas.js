@@ -1714,52 +1714,57 @@ export default function StudioCanvas({
         @media (max-width: 768px) {
           .canvas-overlay {
             position: absolute;
-            top: 10px;
-            bottom: auto;
-            left: 10px;
-            right: 10px;
+            bottom: 6px;
+            left: 6px;
+            right: 6px;
+            top: auto;
             display: flex;
-            flex-direction: column;
-            gap: 6px;
+            justify-content: space-between;
+            align-items: flex-end;
             pointer-events: none;
+            gap: 6px;
             z-index: 10;
           }
           .overlay-left-badges {
             display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 3px;
+            max-width: 48%;
             pointer-events: none;
           }
           .overlay-badge {
-            font-size: 0.65rem;
-            padding: 3px 8px;
+            font-size: 0.62rem;
+            padding: 3px 6px;
             border-radius: 6px;
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(8px);
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
           }
           .overlay-right-actions {
             display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            gap: 6px;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            max-width: 50%;
             pointer-events: auto;
           }
           .overlay-action-btn {
-            padding: 5px 10px;
-            font-size: 0.68rem;
+            padding: 5px 9px;
+            font-size: 0.64rem;
             border-radius: 6px;
             white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
           }
           .overlay-instructions {
-            font-size: 0.64rem;
-            padding: 4px 8px;
+            font-size: 0.60rem;
+            padding: 3px 6px;
             border-radius: 6px;
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.92);
             text-align: right;
-            backdrop-filter: blur(8px);
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
           }
         }
       `}</style>
