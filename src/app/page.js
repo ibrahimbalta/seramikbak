@@ -7998,40 +7998,7 @@ export default function Home() {
 
         </div>
 
-        {/* INTERNATIONAL GLOBAL SEO & EXPORT PORTAL SECTION */}
-        <div className="footer-global-seo-box" style={{
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          padding: '18px 0',
-          margin: '20px 0',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--accent-gold, #c5a059)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              🌐 Uluslararası Seramik İhracat & Global Arama Portalı | Global Ceramic Tile Network
-            </span>
-            <div style={{ display: 'flex', gap: '12px', fontSize: '0.75rem', color: '#94a3b8' }}>
-              <span title="Turkey">🇹🇷 Türkiye</span>
-              <span title="Global / USA / UK">🇬🇧 Global / USA</span>
-              <span title="Germany / EU">🇩🇪 Deutschland / EU</span>
-              <span title="Middle East / Gulf">🇸🇦 الشرق الأوسط</span>
-              <span title="Russia / CIS">🇷🇺 Россия / СНГ</span>
-            </div>
-          </div>
-          <p style={{ fontSize: '0.68rem', color: '#64748b', margin: 0, lineHeight: '1.4' }}>
-            SeramikBak connects Turkish ceramic tile manufacturers (Kütahya, Bien, Ege, Güral, Vitra) with global architects, international dealers, and homeowners worldwide. Featuring Web 3D Room Visualizer, AR integration, and multi-lingual global search engine indexing in English, German, Arabic, Russian, and Turkish.
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', fontSize: '0.62rem', color: '#475569' }}>
-            <span style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '2px 8px', borderRadius: '4px' }}>Ceramic Tiles Export</span>
-            <span style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '2px 8px', borderRadius: '4px' }}>Porcelain Slabs Wholesale</span>
-            <span style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '2px 8px', borderRadius: '4px' }}>Keramikfliesen Deutschland</span>
-            <span style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '2px 8px', borderRadius: '4px' }}>سيراميك وبورسلين فاخر</span>
-            <span style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '2px 8px', borderRadius: '4px' }}>Турецкая керамическая плитка</span>
-            <span style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '2px 8px', borderRadius: '4px' }}>3D Tile Room Simulator</span>
-          </div>
-        </div>
+
 
         {/* Footer Bottom Bar */}
         <div className="footer-bottom">
