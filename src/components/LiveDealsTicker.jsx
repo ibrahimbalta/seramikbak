@@ -2,40 +2,80 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Activity, ArrowUpRight } from 'lucide-react';
+import { Activity, ArrowUpRight, Flame, ShoppingBag, Truck, FileCode, Tag } from 'lucide-react';
 
 export default function LiveDealsTicker() {
-  const [deals, setDeals] = useState([
-    { id: 1, brand: 'VitrA', name: 'Calacatta Gold 60x120', dealer: 'Kadıköy Bayi', discount: '%35 İndirim', price: '₺490 / m²', city: 'İstanbul' },
-    { id: 2, brand: 'NG Kütahya', name: 'Albatros Antrasit 80x80', dealer: 'Çankaya Showroom', discount: '%40 İndirim', price: '₺420 / m²', city: 'Ankara' },
-    { id: 3, brand: 'Qua Seramik', name: 'Pulpis Grey 60x120', dealer: 'Alsancak Konsept Store', discount: '%30 İndirim', price: '₺450 / m²', city: 'İzmir' },
-    { id: 4, brand: 'Bien Seramik', name: 'Travertino 120x240 Plaka', dealer: 'Nilüfer Bayi', discount: '%45 İndirim', price: '₺890 / m²', city: 'Bursa' },
-    { id: 5, brand: 'Kütahya Seramik', name: 'Verso Mermer 60x120', dealer: 'Akdeniz Showroom', discount: '%38 İndirim', price: '₺510 / m²', city: 'Antalya' },
-    { id: 6, brand: 'Graniser', name: 'Beton Gri 60x60 Outlet', dealer: 'Gebze Stok Depo', discount: '%50 Fırsat', price: '₺290 / m²', city: 'Kocaeli' }
+  const [events, setEvents] = useState([
+    {
+      id: 1,
+      badge: 'TEKLİF TALEBİ',
+      color: '#60a5fa',
+      bg: 'rgba(59, 130, 246, 0.1)',
+      border: 'rgba(59, 130, 246, 0.3)',
+      time: '2 dk önce',
+      location: 'İzmir / Karşıyaka',
+      text: 'Bir müşteri 60x120 Mermer Serisi için 3 bayiden teklif istedi',
+      link: '/teklif-al'
+    },
+    {
+      id: 2,
+      badge: 'STOK İNDİRİMİ',
+      color: '#fbbf24',
+      bg: 'rgba(245, 158, 11, 0.1)',
+      border: 'rgba(245, 158, 11, 0.3)',
+      time: '4 dk önce',
+      location: 'İstanbul / Kadıköy',
+      text: 'VitrA Yetkili Bayisi 50 m² stok fazlası Calacatta porselende %35 indirim tanımladı',
+      link: '/outlet'
+    },
+    {
+      id: 3,
+      badge: 'NUMUNE KARGO',
+      color: '#34d399',
+      bg: 'rgba(16, 185, 129, 0.1)',
+      border: 'rgba(16, 185, 129, 0.3)',
+      time: '5 dk önce',
+      location: 'Ankara / Çankaya',
+      text: 'Kütahya Seramik Bayisi adrese ücretsiz numune karo gönderimi başlattı',
+      link: '/numune-talep'
+    },
+    {
+      id: 4,
+      badge: 'MİMARİ DOKU',
+      color: '#c084fc',
+      bg: 'rgba(168, 85, 247, 0.1)',
+      border: 'rgba(168, 85, 247, 0.3)',
+      time: '8 dk önce',
+      location: 'Bursa / Nilüfer',
+      text: 'Bir mimarlık ofisi otel projesi için DWG ve 3D doku ZIP paketini indirdi',
+      link: '/mimar-portali'
+    },
+    {
+      id: 5,
+      badge: 'TEKLİF TALEBİ',
+      color: '#60a5fa',
+      bg: 'rgba(59, 130, 246, 0.1)',
+      border: 'rgba(59, 130, 246, 0.3)',
+      time: '12 dk önce',
+      location: 'Antalya / Muratpaşa',
+      text: 'Bien Seramik 120x240 Traverten Plaka için toplu metraj fiyatı sorgulandı',
+      link: '/teklif-al'
+    }
   ]);
 
   const [stats, setStats] = useState(null);
 
-  // Fetch real live outlet deals & system stats from API
+  // Fetch real live stats & marketplace events from API
   useEffect(() => {
-    fetch('/api/outlet?limit=12')
+    fetch('/api/stats/live-ticker')
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.data) && data.data.length > 0) {
-          const formatted = data.data.map((item, idx) => ({
-            id: item.id || idx,
-            brand: item.brand?.name || item.badgeTag || 'Outlet',
-            name: item.title || item.dimensions || 'Seramik Ürün',
-            dealer: item.dealer?.name || 'Yetkili Bayi',
-            discount: item.discountBadge || item.category || 'Outlet Fırsatı',
-            price: item.pricePerM2 ? `₺${item.pricePerM2} / m²` : 'Özel Fiyat',
-            city: item.dealer?.city || 'Türkiye'
-          }));
-          setDeals(formatted);
+          setEvents(data.data);
         }
       })
       .catch((err) => {
-        console.warn('LiveDealsTicker: using default deals list', err);
+        console.warn('LiveDealsTicker: live-ticker API fetch error', err);
       });
 
     fetch('/api/stats/ticker')
@@ -50,57 +90,73 @@ export default function LiveDealsTicker() {
       });
   }, []);
 
-  // Quadruple the deals array for an unbroken, 100% seamless infinite loop across wide screens
-  const tickerDeals = [...deals, ...deals, ...deals, ...deals];
+  // Quadruple the events array for smooth infinite endless scrolling track
+  const tickerItems = [...events, ...events, ...events, ...events];
+
+  const getEventIcon = (badge) => {
+    if (badge.includes('NUMUNE')) return <Truck size={12} />;
+    if (badge.includes('TEKLİF')) return <ShoppingBag size={12} />;
+    if (badge.includes('MİMARİ')) return <FileCode size={12} />;
+    if (badge.includes('STOK') || badge.includes('FIRSAT')) return <Tag size={12} />;
+    return <Flame size={12} />;
+  };
 
   return (
-    <div className="outlet-radar-fullwidth-wrapper">
-      <div className="outlet-radar-ticker-bar">
-        {/* Fixed Left Live Badge */}
-        <Link href="/outlet" className="live-badge-link" title="Tüm Outlet ve Stoklu İndirimleri Gör">
+    <div className="live-ticker-fullwidth-wrapper">
+      <div className="live-ticker-bar">
+        {/* Fixed Left Live Radar Badge */}
+        <Link href="/outlet" className="live-badge-link" title="Canlı Pazaryeri Hareketleri">
           <div className="live-badge-content">
             <span className="live-pulse-dot" />
-            <span>Outlet</span>
+            <span>CANLI PAZARYERİ</span>
           </div>
         </Link>
 
-        {/* Viewport with min-width: 0 & Endless Ticker Track */}
-        <div className="outlet-radar-viewport">
-          <div className="outlet-radar-track">
-            {tickerDeals.map((deal, idx) => (
+        {/* Endless Moving Track Viewport */}
+        <div className="live-ticker-viewport">
+          <div className="live-ticker-track">
+            {tickerItems.map((item, idx) => (
               <Link
-                key={`${deal.id}-${idx}`}
-                href="/outlet"
-                className="ticker-deal-card"
-                title={`${deal.brand} ${deal.name} - Outlet İlanına Git`}
+                key={`${item.id}-${idx}`}
+                href={item.link || '/outlet'}
+                className="ticker-event-card"
+                title={`${item.location} - ${item.text}`}
               >
-                <span className="deal-brand">[{deal.brand}]</span>
-                <span className="deal-name">{deal.name}</span>
-                <span className="deal-discount">{deal.discount}</span>
-                <span className="deal-price">{deal.price}</span>
-                <span className="deal-dealer">• {deal.dealer} ({deal.city})</span>
-                <ArrowUpRight size={13} className="deal-arrow" />
+                <span 
+                  className="event-badge-tag"
+                  style={{
+                    color: item.color || '#fbbf24',
+                    background: item.bg || 'rgba(245, 158, 11, 0.1)',
+                    borderColor: item.border || 'rgba(245, 158, 11, 0.3)'
+                  }}
+                >
+                  {getEventIcon(item.badge || '')}
+                  {item.badge}
+                </span>
+                <span className="event-location">[{item.location}]</span>
+                <span className="event-text">{item.text}</span>
+                <span className="event-time">• {item.time}</span>
+                <ArrowUpRight size={13} className="event-arrow" />
               </Link>
             ))}
           </div>
         </div>
 
-        {/* Fixed Right Social Proof (Desktop Only - 100% Real Live Database Metrics) */}
+        {/* Fixed Right Social Proof Badge */}
         <div className="ticker-social-proof">
-          <Activity size={14} style={{ color: '#0284c7' }} />
-          {stats && stats.outletCount > 0 ? (
-            <span>Sistemde <strong>{stats.outletCount} aktif outlet fırsatı</strong> ve <strong>{stats.dealerCount} bayi</strong> yayında</span>
-          ) : stats && stats.todayLogsCount > 0 ? (
-            <span>Bugün <strong>{stats.todayLogsCount} canlı arama & teklif</strong> kaydedildi</span>
+          <Activity size={14} style={{ color: '#fbbf24' }} />
+          {stats && stats.todayLogsCount > 0 ? (
+            <span>Bugün <strong>{stats.todayLogsCount} canlı arama & teklif</strong> gerçekleşti</span>
+          ) : stats && stats.outletCount > 0 ? (
+            <span>Sistemde <strong>{stats.outletCount} aktif fırsat</strong> ve <strong>{stats.dealerCount} bayi</strong> canlı</span>
           ) : (
-            <span>Canlı Türkiye <strong>Bayi & Stok Fırsatları</strong> Radarı</span>
+            <span>Türkiye Seramik Bayileri <strong>Canlı Pazar Akışı</strong></span>
           )}
         </div>
       </div>
 
       <style jsx>{`
-        /* Full-Bleed 100vw Breakout Wrapper: Spans 100% full screen width edge-to-edge */
-        .outlet-radar-fullwidth-wrapper {
+        .live-ticker-fullwidth-wrapper {
           width: 100vw;
           position: relative;
           left: 50%;
@@ -110,21 +166,20 @@ export default function LiveDealsTicker() {
           margin-top: 14px;
           margin-bottom: 20px;
           overflow: hidden;
-          z-index: 100;
+          z-index: 90;
         }
 
-        /* Soft Warm Light Luxury Glass Styling - Harmonious with Page Header */
-        .outlet-radar-ticker-bar {
+        .live-ticker-bar {
           width: 100vw;
-          background: linear-gradient(90deg, #fbf9f5 0%, #ffffff 50%, #fbf9f5 100%);
-          border-top: 1px solid rgba(179, 142, 71, 0.18);
-          border-bottom: 1px solid rgba(179, 142, 71, 0.18);
-          padding: 10px 24px;
+          background: linear-gradient(90deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+          border-top: 1px solid rgba(245, 158, 11, 0.25);
+          border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+          padding: 8px 24px;
           display: flex;
           align-items: center;
-          gap: 20px;
+          gap: 16px;
           position: relative;
-          box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
           box-sizing: border-box;
           overflow: hidden;
         }
@@ -139,50 +194,49 @@ export default function LiveDealsTicker() {
           display: flex;
           align-items: center;
           gap: 8px;
-          padding: 6px 14px;
+          padding: 6px 13px;
           border-radius: 20px;
-          background: rgba(239, 68, 68, 0.08);
-          border: 1px solid rgba(239, 68, 68, 0.28);
-          color: #dc2626;
-          font-size: 0.78rem;
+          background: rgba(245, 158, 11, 0.12);
+          border: 1px solid rgba(245, 158, 11, 0.4);
+          color: #fbbf24;
+          font-size: 0.76rem;
           font-weight: 800;
           white-space: nowrap;
-          box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+          box-shadow: 0 2px 10px rgba(245, 158, 11, 0.15);
           transition: transform 0.2s ease, background 0.2s ease;
         }
 
         .live-badge-content:hover {
           transform: scale(1.03);
-          background: rgba(239, 68, 68, 0.14);
+          background: rgba(245, 158, 11, 0.2);
         }
 
         .live-pulse-dot {
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background: #ef4444;
+          background: #fbbf24;
           display: inline-block;
-          box-shadow: 0 0 8px #ef4444;
+          box-shadow: 0 0 8px #fbbf24;
           animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
           0% {
             transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
           }
           70% {
             transform: scale(1);
-            box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+            box-shadow: 0 0 0 6px rgba(251, 191, 36, 0);
           }
           100% {
             transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
           }
         }
 
-        /* Viewport MUST have min-width: 0 to prevent flexbox item collapsing */
-        .outlet-radar-viewport {
+        .live-ticker-viewport {
           flex: 1;
           min-width: 0;
           overflow: hidden;
@@ -191,15 +245,15 @@ export default function LiveDealsTicker() {
           -webkit-mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
         }
 
-        .outlet-radar-track {
+        .live-ticker-track {
           display: flex;
           align-items: center;
-          gap: 20px;
+          gap: 18px;
           width: max-content;
-          animation: tickerSlide 75s linear infinite;
+          animation: tickerSlide 70s linear infinite;
         }
 
-        .outlet-radar-track:hover {
+        .live-ticker-track:hover {
           animation-play-state: paused;
         }
 
@@ -212,68 +266,68 @@ export default function LiveDealsTicker() {
           }
         }
 
-        :global(a.ticker-deal-card) {
+        :global(a.ticker-event-card) {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
-          background: #ffffff !important;
-          padding: 7px 16px !important;
+          background: rgba(30, 41, 59, 0.8) !important;
+          backdrop-filter: blur(8px) !important;
+          padding: 6px 14px !important;
           border-radius: 12px !important;
-          border: 1px solid rgba(0, 0, 0, 0.07) !important;
-          font-size: 0.82rem !important;
+          border: 1px solid rgba(255, 255, 255, 0.08) !important;
+          font-size: 0.80rem !important;
           white-space: nowrap !important;
           text-decoration: none !important;
-          color: #1e293b !important;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+          color: #f1f5f9 !important;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
           flex-shrink: 0 !important;
         }
 
-        :global(a.ticker-deal-card:hover) {
-          background: #ffffff !important;
-          border-color: rgba(179, 142, 71, 0.35) !important;
+        :global(a.ticker-event-card:hover) {
+          background: rgba(30, 41, 59, 0.95) !important;
+          border-color: rgba(245, 158, 11, 0.4) !important;
           transform: translateY(-1px) !important;
-          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.12) !important;
+          box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2) !important;
         }
 
-        .deal-brand {
-          font-weight: 800;
-          color: #b38e47;
-        }
-
-        .deal-name {
-          color: #1e293b;
-          font-weight: 600;
-        }
-
-        .deal-discount {
+        .event-badge-tag {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
           padding: 2px 7px;
           border-radius: 6px;
-          background: rgba(16, 185, 129, 0.08);
-          border: 1px solid rgba(16, 185, 129, 0.25);
-          color: #059669;
+          font-size: 0.66rem;
           font-weight: 800;
-          font-size: 0.74rem;
+          letter-spacing: 0.04em;
+          border: 1px solid transparent;
+          text-transform: uppercase;
         }
 
-        .deal-price {
-          font-weight: 900;
-          color: #0f172a;
-        }
-
-        .deal-dealer {
-          color: #334155;
-          font-weight: 600;
+        .event-location {
+          color: #94a3b8;
+          font-weight: 700;
           font-size: 0.76rem;
         }
 
-        :global(.deal-arrow) {
-          color: #b38e47;
+        .event-text {
+          color: #f8fafc;
+          font-weight: 600;
+        }
+
+        .event-time {
+          color: #64748b;
+          font-size: 0.72rem;
+          font-weight: 500;
+        }
+
+        :global(.event-arrow) {
+          color: #fbbf24;
           opacity: 0.7;
           transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
-        :global(a.ticker-deal-card:hover .deal-arrow) {
+        :global(a.ticker-event-card:hover .event-arrow) {
           opacity: 1;
           transform: translate(2px, -2px);
         }
@@ -283,23 +337,24 @@ export default function LiveDealsTicker() {
           align-items: center;
           gap: 8px;
           font-size: 0.78rem;
-          color: #475569;
+          color: #cbd5e1;
           white-space: nowrap;
-          border-left: 1px solid rgba(0, 0, 0, 0.08);
+          border-left: 1px solid rgba(255, 255, 255, 0.1);
           padding-left: 16px;
           flex-shrink: 0;
           z-index: 5;
         }
 
         .ticker-social-proof strong {
-          color: #0f172a;
+          color: #fbbf24;
+          font-weight: 800;
         }
 
         @media (max-width: 960px) {
           .ticker-social-proof {
             display: none;
           }
-          .outlet-radar-ticker-bar {
+          .live-ticker-bar {
             padding: 8px 12px;
             gap: 12px;
           }

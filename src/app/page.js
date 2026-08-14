@@ -94,6 +94,7 @@ import BathroomMockupPreview from '@/components/BathroomMockupPreview';
 import ProductCard from '@/components/ProductCard';
 import TileCalculatorWidget from '@/components/TileCalculatorWidget';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
+import LocalDealerRadarBar from '@/components/LocalDealerRadarBar';
 import ProductSchemaJsonLd from '@/components/ProductSchemaJsonLd';
 
 function enrichProductData(p) {
@@ -3941,6 +3942,26 @@ export default function Home() {
             </div>
 
 
+
+            {/* LOCAL DEALER & SAMPLE RADAR BAR */}
+            <LocalDealerRadarBar 
+              onOpenSampleModal={() => {
+                if (products && products.length > 0) {
+                  setSampleProduct(products[0]);
+                  setShowSampleModal(true);
+                } else {
+                  window.location.href = '/numune-talep';
+                }
+              }}
+              onScrollToMap={() => {
+                const mapEl = document.getElementById('dealers-map-section');
+                if (mapEl) {
+                  mapEl.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  window.location.href = '/bayiler';
+                }
+              }}
+            />
 
             {/* Categories & 3D Showcase Section */}
             <div className="categories-showcase-container">
