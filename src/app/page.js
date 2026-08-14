@@ -4018,14 +4018,22 @@ export default function Home() {
               </div>
 
               {/* 3D Sanal Stüdyo Promo Banner Card */}
-              <div className="studio-promo-card-banner glass-panel" onClick={() => setActiveTab('studio')} style={{ cursor: 'pointer' }}>
+              <div className="studio-promo-card-banner" onClick={() => setActiveTab('studio')} style={{ cursor: 'pointer' }}>
                 <div className="promo-text-column">
+                  <div className="promo-top-badge">
+                    <Sparkles size={11} className="promo-sparkle-icon" />
+                    <span>AI 3D MEKAN</span>
+                  </div>
                   <h5>3D Sanal Stüdyo</h5>
-                  <p>Seramiklerinizi mekanınızda görselleştirin</p>
-                  <button className="promo-action-btn-gold">Hemen Deneyin</button>
+                  <p>Seramiklerinizi mekanınızda canlı görün</p>
+                  <button className="promo-action-btn-gold">
+                    <span>Hemen Deneyin</span>
+                    <ArrowRight size={12} />
+                  </button>
                 </div>
                 <div className="promo-image-column">
                   <img src="/hero/hero_ceramics.jpg" alt="3D Studio Preview" />
+                  <div className="promo-image-badge">3D</div>
                 </div>
               </div>
             </div>
@@ -10834,16 +10842,36 @@ export default function Home() {
 
         /* 3D Studio Promo card on right */
         .studio-promo-card-banner {
-          width: 320px;
-          height: 72px;
-          border-radius: var(--border-radius-md);
+          width: 340px;
+          min-height: 84px;
+          border-radius: 16px;
           display: flex;
           overflow: hidden;
-          background: #ffffff;
-          padding: 8px 12px;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+          border: 1px solid rgba(245, 158, 11, 0.45);
+          padding: 10px 14px;
           align-items: center;
           gap: 12px;
-          box-shadow: var(--glass-shadow);
+          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25), 0 0 20px rgba(245, 158, 11, 0.15);
+          position: relative;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .studio-promo-card-banner::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 60%);
+          pointer-events: none;
+        }
+
+        .studio-promo-card-banner:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 14px 35px rgba(15, 23, 42, 0.35), 0 0 28px rgba(245, 158, 11, 0.3);
+          border-color: rgba(251, 191, 36, 0.7);
         }
 
         .promo-text-column {
@@ -10851,43 +10879,103 @@ export default function Home() {
           flex-direction: column;
           align-items: flex-start;
           flex-grow: 1;
+          z-index: 1;
+        }
+
+        .promo-top-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 0.58rem;
+          font-weight: 800;
+          color: #fbbf24;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          margin-bottom: 2px;
+          background: rgba(245, 158, 11, 0.12);
+          padding: 2px 6px;
+          border-radius: 4px;
+          border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        .promo-sparkle-icon {
+          color: #fbbf24;
         }
 
         .promo-text-column h5 {
-          font-size: 0.8rem;
-          color: var(--text-primary);
-          font-weight: 700;
+          font-size: 0.88rem;
+          color: #ffffff;
+          font-weight: 800;
+          letter-spacing: -0.01em;
+          line-height: 1.2;
+          margin: 0;
         }
 
         .promo-text-column p {
-          font-size: 0.65rem;
-          color: var(--text-secondary);
-          margin-bottom: 4px;
+          font-size: 0.68rem;
+          color: #94a3b8;
+          margin: 2px 0 6px 0;
+          line-height: 1.2;
         }
 
         .promo-action-btn-gold {
-          background: var(--accent-gold);
-          color: #fff;
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+          color: #0f172a;
           border: none;
           font-family: var(--font-title);
-          font-weight: 600;
-          font-size: 0.65rem;
-          padding: 2px 10px;
-          border-radius: 12px;
+          font-weight: 800;
+          font-size: 0.70rem;
+          padding: 5px 12px;
+          border-radius: 20px;
           cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+          transition: all 0.2s ease;
+        }
+
+        .studio-promo-card-banner:hover .promo-action-btn-gold {
+          background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+          transform: translateX(2px);
+          box-shadow: 0 6px 16px rgba(245, 158, 11, 0.45);
         }
 
         .promo-image-column {
-          width: 68px;
-          height: 56px;
-          border-radius: 6px;
+          width: 76px;
+          height: 64px;
+          border-radius: 10px;
           overflow: hidden;
+          position: relative;
+          flex-shrink: 0;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+          z-index: 1;
         }
 
         .promo-image-column img {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          transition: transform 0.4s ease;
+        }
+
+        .studio-promo-card-banner:hover .promo-image-column img {
+          transform: scale(1.08);
+        }
+
+        .promo-image-badge {
+          position: absolute;
+          bottom: 4px;
+          right: 4px;
+          background: rgba(15, 23, 42, 0.85);
+          color: #fbbf24;
+          font-size: 0.55rem;
+          font-weight: 800;
+          padding: 1px 4px;
+          border-radius: 3px;
+          border: 1px solid rgba(245, 158, 11, 0.4);
+          backdrop-filter: blur(4px);
         }
 
         /* MAIN SEARCH AND RESULTS GRID LAYOUT */
