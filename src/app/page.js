@@ -6637,95 +6637,56 @@ export default function Home() {
                       navigateTo3DStudio(detailProduct);
                     }}
                     className="detail-action-btn btn-action-studio"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.18) 0%, rgba(180, 140, 50, 0.28) 100%)',
-                      border: '1px solid rgba(212, 175, 55, 0.45)',
-                      color: '#fbbf24',
-                      padding: '11px 18px',
-                      borderRadius: '10px',
-                      fontWeight: '700',
-                      fontSize: '0.84rem',
-                      letterSpacing: '0.2px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      boxShadow: '0 4px 16px rgba(212, 175, 55, 0.12)',
-                      width: '100%',
-                      whiteSpace: 'nowrap',
-                      transition: 'all 0.25s ease'
-                    }}
                   >
-                    <Sparkles size={16} style={{ color: '#fbbf24' }} />
-                    <span style={{ whiteSpace: 'nowrap' }}>3D Sanal Stüdyoda Dene</span>
+                    <div className="btn-icon-pulse">
+                      <Sparkles size={18} />
+                    </div>
+                    <div className="btn-text-group">
+                      <span className="btn-title">3D Sanal Stüdyoda Dene</span>
+                      <span className="btn-subtext">Canlı Mekan Simülasyonu</span>
+                    </div>
+                    <span className="btn-hero-tag">AI STÜDYO</span>
                   </button>
 
-                  <button 
-                    onClick={() => {
-                      setShowDetailModal(false);
-                      navigateToDealers(detailProduct);
-                    }}
-                    className="detail-action-btn btn-action-dealer"
-                    style={{
-                      background: 'rgba(30, 41, 59, 0.5)',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
-                      color: '#cbd5e1',
-                      padding: '11px 18px',
-                      borderRadius: '10px',
-                      fontWeight: '600',
-                      fontSize: '0.84rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      width: '100%',
-                      whiteSpace: 'nowrap',
-                      transition: 'all 0.25s ease'
-                    }}
-                  >
-                    <MapPin size={16} style={{ color: '#60a5fa' }} />
-                    <span style={{ whiteSpace: 'nowrap' }}>Haritada Bayileri Gör & Teklif Al</span>
-                  </button>
+                  <div className="detail-secondary-actions-grid">
+                    <button 
+                      onClick={() => {
+                        setShowDetailModal(false);
+                        navigateToDealers(detailProduct);
+                      }}
+                      className="detail-action-btn btn-action-dealer"
+                    >
+                      <MapPin size={17} className="icon-dealer" />
+                      <div className="btn-text-group">
+                        <span className="btn-title">Bayiler & Teklif Al</span>
+                        <span className="btn-subtext">Haritada Gör</span>
+                      </div>
+                    </button>
 
-                  <button 
-                    onClick={() => {
-                      setSampleProduct(detailProduct);
-                      setSampleDealer(detailDealers && detailDealers.length > 0 ? detailDealers[0] : null);
-                      setSampleName('');
-                      setSamplePhone('');
-                      setSampleEmail('');
-                      setSampleCity('');
-                      setSampleDistrict('');
-                      setSampleAddress('');
-                      setSampleNotes('');
-                      setSampleSuccessMsg('');
-                      setSampleErrorMsg('');
-                      setShowSampleModal(true);
-                    }}
-                    className="detail-action-btn btn-action-sample"
-                    style={{
-                      background: 'rgba(245, 158, 11, 0.08)',
-                      border: '1px solid rgba(245, 158, 11, 0.35)',
-                      color: '#fbbf24',
-                      padding: '11px 18px',
-                      borderRadius: '10px',
-                      fontWeight: '700',
-                      fontSize: '0.84rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      width: '100%',
-                      whiteSpace: 'nowrap',
-                      transition: 'all 0.25s ease'
-                    }}
-                  >
-                    <Truck size={16} style={{ color: '#fbbf24' }} />
-                    <span style={{ whiteSpace: 'nowrap' }}>1-Tıkla Adrese Ücretsiz Numune Karo İste</span>
-                  </button>
+                    <button 
+                      onClick={() => {
+                        setSampleProduct(detailProduct);
+                        setSampleDealer(detailDealers && detailDealers.length > 0 ? detailDealers[0] : null);
+                        setSampleName('');
+                        setSamplePhone('');
+                        setSampleEmail('');
+                        setSampleCity('');
+                        setSampleDistrict('');
+                        setSampleAddress('');
+                        setSampleNotes('');
+                        setSampleSuccessMsg('');
+                        setSampleErrorMsg('');
+                        setShowSampleModal(true);
+                      }}
+                      className="detail-action-btn btn-action-sample"
+                    >
+                      <Truck size={17} className="icon-sample" />
+                      <div className="btn-text-group">
+                        <span className="btn-title">Ücretsiz Numune İste</span>
+                        <span className="btn-subtext">1-Tıkla Adrese</span>
+                      </div>
+                    </button>
+                  </div>
                 </div>
 
                 {/* MİMAR VE TASARIMCILAR İÇİN DOKU PORTALI */}
@@ -12856,28 +12817,201 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 10px;
-          margin-top: 12px;
+          margin-top: 14px;
           width: 100%;
         }
 
-        .detail-primary-actions button {
-          width: 100% !important;
-          flex: none !important;
-          margin: 0 !important;
-          white-space: nowrap !important;
-          word-break: keep-all !important;
-          font-size: 0.88rem !important;
-          font-weight: 700 !important;
-          padding: 12px 18px !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          gap: 8px !important;
+        .btn-action-studio {
+          width: 100%;
+          padding: 12px 18px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+          border: 1px solid rgba(254, 240, 138, 0.4);
+          color: #0f172a;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+          position: relative;
+          overflow: hidden;
+          transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .detail-primary-actions button span {
-          white-space: nowrap !important;
-          word-break: keep-all !important;
+        .btn-action-studio::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: linear-gradient(
+            45deg,
+            transparent 45%,
+            rgba(255, 255, 255, 0.28) 50%,
+            transparent 55%
+          );
+          transform: rotate(30deg);
+          transition: transform 0.6s ease;
+          pointer-events: none;
+        }
+
+        .btn-action-studio:hover::before {
+          transform: rotate(30deg) translate(30%, 30%);
+        }
+
+        .btn-action-studio:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 26px rgba(245, 158, 11, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+          background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 50%, #ea580c 100%);
+        }
+
+        .btn-action-studio:active {
+          transform: translateY(0) scale(0.99);
+        }
+
+        .btn-icon-pulse {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          background: rgba(15, 23, 42, 0.15);
+          color: #0f172a;
+          flex-shrink: 0;
+        }
+
+        .btn-text-group {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          text-align: left;
+          flex: 1;
+          min-width: 0;
+        }
+
+        .btn-action-studio .btn-title {
+          font-size: 0.92rem;
+          font-weight: 800;
+          letter-spacing: 0.01em;
+          color: #0f172a;
+          line-height: 1.2;
+          white-space: nowrap;
+        }
+
+        .btn-action-studio .btn-subtext {
+          font-size: 0.70rem;
+          font-weight: 600;
+          color: rgba(15, 23, 42, 0.8);
+          margin-top: 1px;
+          white-space: nowrap;
+        }
+
+        .btn-hero-tag {
+          font-size: 0.60rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          padding: 3px 8px;
+          border-radius: 6px;
+          background: #0f172a;
+          color: #fbbf24;
+          text-transform: uppercase;
+          flex-shrink: 0;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .detail-secondary-actions-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          width: 100%;
+        }
+
+        .btn-action-dealer, .btn-action-sample {
+          padding: 10px 12px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
+          backdrop-filter: blur(10px);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+          position: relative;
+          overflow: hidden;
+          text-align: left;
+        }
+
+        .btn-action-dealer {
+          border: 1px solid rgba(96, 165, 250, 0.35);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-action-dealer .icon-dealer {
+          color: #60a5fa;
+          flex-shrink: 0;
+          filter: drop-shadow(0 0 6px rgba(96, 165, 250, 0.4));
+        }
+
+        .btn-action-dealer .btn-title {
+          font-size: 0.82rem;
+          font-weight: 700;
+          color: #f1f5f9;
+          line-height: 1.2;
+          white-space: nowrap;
+        }
+
+        .btn-action-dealer .btn-subtext {
+          font-size: 0.68rem;
+          font-weight: 500;
+          color: #94a3b8;
+          white-space: nowrap;
+        }
+
+        .btn-action-dealer:hover {
+          background: linear-gradient(135deg, rgba(30, 58, 138, 0.35) 0%, rgba(15, 23, 42, 0.9) 100%);
+          border-color: rgba(96, 165, 250, 0.7);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-action-sample {
+          border: 1px solid rgba(52, 211, 153, 0.35);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-action-sample .icon-sample {
+          color: #34d399;
+          flex-shrink: 0;
+          filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.4));
+        }
+
+        .btn-action-sample .btn-title {
+          font-size: 0.82rem;
+          font-weight: 700;
+          color: #f1f5f9;
+          line-height: 1.2;
+          white-space: nowrap;
+        }
+
+        .btn-action-sample .btn-subtext {
+          font-size: 0.68rem;
+          font-weight: 500;
+          color: #94a3b8;
+          white-space: nowrap;
+        }
+
+        .btn-action-sample:hover {
+          background: linear-gradient(135deg, rgba(6, 78, 59, 0.35) 0%, rgba(15, 23, 42, 0.9) 100%);
+          border-color: rgba(52, 211, 153, 0.7);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-action-dealer:active, .btn-action-sample:active {
+          transform: translateY(0) scale(0.98);
         }
 
         .detail-modal-content-premium .btn-primary {
@@ -14479,17 +14613,22 @@ export default function Home() {
             font-size: 0.72rem !important;
           }
           .detail-primary-actions {
-            flex-direction: column !important;
-            gap: 8px !important;
+            gap: 10px !important;
           }
-          .detail-primary-actions button {
-            width: 100% !important;
-            min-height: 44px !important;
-            font-size: 0.82rem !important;
-            white-space: nowrap !important;
-          }
-          .detail-primary-actions button span {
-            white-space: nowrap !important;
+          @media (max-width: 540px) {
+            .detail-secondary-actions-grid {
+              grid-template-columns: 1fr !important;
+              gap: 8px !important;
+            }
+            .btn-action-studio {
+              padding: 10px 14px !important;
+            }
+            .btn-action-studio .btn-title {
+              font-size: 0.84rem !important;
+            }
+            .btn-hero-tag {
+              display: none !important;
+            }
           }
           .calc-inputs-row {
             grid-template-columns: 1fr !important;
