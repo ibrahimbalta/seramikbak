@@ -323,11 +323,12 @@ export default function StudioCanvas({
     scene.add(backWallMesh);
     backWallMeshRef.current = backWallMesh;
 
-    // Accent Wall Panel (Feature Wall / Vanity Center)
-    const accentWallGeo = new THREE.PlaneGeometry(1.2, ROOM_HEIGHT);
+    // Accent Wall Panel (Lavabo & Banyo Dolabı Arkası Vurgu Duvarı)
+    const accentWallGeo = new THREE.PlaneGeometry(1.3, ROOM_HEIGHT);
     const accentWallMat = new THREE.MeshStandardMaterial({ color: '#1a1e26', roughness: 0.85 });
     const accentWallMesh = new THREE.Mesh(accentWallGeo, accentWallMat);
-    accentWallMesh.position.set(-ROOM_WIDTH / 2 + 0.6, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2 + 0.004);
+    accentWallMesh.rotation.y = Math.PI / 2;
+    accentWallMesh.position.set(-ROOM_WIDTH / 2 + 0.008, ROOM_HEIGHT / 2, 0);
     accentWallMesh.receiveShadow = true;
     scene.add(accentWallMesh);
     accentWallMeshRef.current = accentWallMesh;
@@ -360,12 +361,12 @@ export default function StudioCanvas({
     scene.add(toiletWallMesh);
     toiletWallMeshRef.current = toiletWallMesh;
 
-    // Left Wall Accent Panel (Sol Yan Duvar Özel Ara Seramik Bölgesi)
-    const leftWallAccentGeo = new THREE.PlaneGeometry(1.2, ROOM_HEIGHT);
+    // Left Wall Accent Panel (Sol Yan Duvar Ön Bölge Özel Ara Seramik Bölgesi)
+    const leftWallAccentGeo = new THREE.PlaneGeometry(1.1, ROOM_HEIGHT);
     const leftWallAccentMat = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     const leftWallAccentMesh = new THREE.Mesh(leftWallAccentGeo, leftWallAccentMat);
     leftWallAccentMesh.rotation.y = Math.PI / 2;
-    leftWallAccentMesh.position.set(-ROOM_WIDTH / 2 + 0.006, ROOM_HEIGHT / 2, 0.4);
+    leftWallAccentMesh.position.set(-ROOM_WIDTH / 2 + 0.006, ROOM_HEIGHT / 2, 1.2);
     leftWallAccentMesh.receiveShadow = true;
     scene.add(leftWallAccentMesh);
     leftWallAccentMeshRef.current = leftWallAccentMesh;
@@ -1497,7 +1498,7 @@ export default function StudioCanvas({
 
       const applyAccentTexture = (sourceImageOrCanvas) => {
         const texture = generateGroutOverlay(sourceImageOrCanvas, accentProduct, groutWidth, groutColor, tileRotation, layPattern);
-        texture.repeat.set(1.2 / w_m, ROOM_HEIGHT / h_m);
+        texture.repeat.set(1.3 / w_m, ROOM_HEIGHT / h_m);
         texture.colorSpace = THREE.SRGBColorSpace;
         accentWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
           map: texture,
