@@ -5635,6 +5635,7 @@ export default function Home() {
                         <>
                           <Loader2 className="animate-spin" size={16} />
                           Yükleniyor...
+                        </>
                       ) : (
                         'Daha Fazla Ürün Göster'
                       )}
