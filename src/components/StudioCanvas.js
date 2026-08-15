@@ -7,6 +7,7 @@ export default function StudioCanvas({
   wallProduct,
   accentProduct,
   showerProduct,
+  showerFloorProduct,
   toiletWallProduct,
   leftWallAccentProduct,
   stripeWallProduct,
@@ -15,6 +16,7 @@ export default function StudioCanvas({
   applyWalls = true, 
   applyAccent = false,
   applyShower = false,
+  applyShowerFloor = false,
   applyToiletWall = false,
   applyLeftWallAccent = false,
   applyStripeWall = false,
@@ -40,6 +42,7 @@ export default function StudioCanvas({
   const accentWallMeshRef = useRef(null);
   const showerBackWallMeshRef = useRef(null);
   const showerSideWallMeshRef = useRef(null);
+  const showerFloorMeshRef = useRef(null);
   const toiletWallMeshRef = useRef(null);
   const leftWallAccentMeshRef = useRef(null);
   const stripeWallMeshRef = useRef(null);
@@ -314,6 +317,16 @@ export default function StudioCanvas({
     scene.add(floorMesh);
     floorMeshRef.current = floorMesh;
 
+    // Shower Floor / Tray Panel (Duşakabin Tabanı)
+    const showerFloorGeo = new THREE.PlaneGeometry(1.15, 1.15);
+    const showerFloorMat = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+    const showerFloorMesh = new THREE.Mesh(showerFloorGeo, showerFloorMat);
+    showerFloorMesh.rotation.x = -Math.PI / 2;
+    showerFloorMesh.position.set(-ROOM_WIDTH / 2 + 0.575, 0.004, -ROOM_DEPTH / 2 + 0.575);
+    showerFloorMesh.receiveShadow = true;
+    scene.add(showerFloorMesh);
+    showerFloorMeshRef.current = showerFloorMesh;
+
     // Back Wall (facing camera)
     const backWallGeo = new THREE.PlaneGeometry(ROOM_WIDTH, ROOM_HEIGHT);
     const backWallMat = new THREE.MeshStandardMaterial({ color: '#23272f', roughness: 0.9 });
@@ -449,6 +462,7 @@ export default function StudioCanvas({
 
       const targets = [];
       if (floorMeshRef.current) targets.push(floorMeshRef.current);
+      if (showerFloorMeshRef.current) targets.push(showerFloorMeshRef.current);
       if (showerBackWallMeshRef.current) targets.push(showerBackWallMeshRef.current);
       if (showerSideWallMeshRef.current) targets.push(showerSideWallMeshRef.current);
       if (toiletWallMeshRef.current) targets.push(toiletWallMeshRef.current);
@@ -462,7 +476,9 @@ export default function StudioCanvas({
       const intersects = raycaster.intersectObjects(targets);
       if (intersects.length > 0) {
         const hit = intersects[0].object;
-        if (hit === floorMeshRef.current) {
+        if (hit === showerFloorMeshRef.current) {
+          if (onToggleTargetRef.current) onToggleTargetRef.current('showerFloor');
+        } else if (hit === floorMeshRef.current) {
           if (onToggleTargetRef.current) onToggleTargetRef.current('floor');
         } else if (hit === showerBackWallMeshRef.current || hit === showerSideWallMeshRef.current) {
           if (onToggleTargetRef.current) onToggleTargetRef.current('shower');
@@ -1693,7 +1709,42 @@ export default function StudioCanvas({
       }
     }
 
-  }, [floorProduct, wallProduct, accentProduct, showerProduct, toiletWallProduct, leftWallAccentProduct, stripeWallProduct, applyFloor, applyWalls, applyAccent, applyShower, applyToiletWall, applyLeftWallAccent, applyStripeWall, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
+    // 8. SHOWER FLOOR / TRAY (DUŞ TABANI / DUŞ TEKNESİ ZEMİNİ) LOGIC
+    if (showerFloorMeshRef.current) {
+      showerFloorMeshRef.current.visible = !!applyShowerFloor;
+    }
+    if (applyShowerFloor && showerFloorMeshRef.current) {
+      if (showerFloorProduct) {
+        const w_m = showerFloorProduct.width / 100;
+        const h_m = showerFloorProduct.height / 100;
+
+        const applyShowerFloorTexture = (sourceImageOrCanvas) => {
+          const texture = generateGroutOverlay(sourceImageOrCanvas, showerFloorProduct, groutWidth, groutColor, tileRotation, layPattern);
+          texture.repeat.set(1.15 / w_m, 1.15 / h_m);
+          texture.colorSpace = THREE.SRGBColorSpace;
+          if (showerFloorMeshRef.current) {
+            showerFloorMeshRef.current.material = new THREE.MeshPhysicalMaterial({
+              map: texture,
+              roughness: showerFloorProduct.finish === 'Parlak' ? 0.08 : 0.85,
+              clearcoat: showerFloorProduct.finish === 'Parlak' ? 1.0 : 0.0
+            });
+          }
+        };
+
+        const realUrl = showerFloorProduct.textureUrl || showerFloorProduct.imageUrl;
+        if (realUrl) {
+          const isAbsolute = realUrl.startsWith('http://') || realUrl.startsWith('https://') || realUrl.startsWith('//');
+          const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realUrl)}` : realUrl;
+          loader.load(finalUrl, (loaded) => applyShowerFloorTexture(loaded.image), undefined, () => applyShowerFloorTexture(generateProceduralTexture(showerFloorProduct)));
+        } else {
+          applyShowerFloorTexture(generateProceduralTexture(showerFloorProduct));
+        }
+      } else {
+        showerFloorMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+      }
+    }
+
+  }, [floorProduct, wallProduct, accentProduct, showerProduct, showerFloorProduct, toiletWallProduct, leftWallAccentProduct, stripeWallProduct, applyFloor, applyWalls, applyAccent, applyShower, applyShowerFloor, applyToiletWall, applyLeftWallAccent, applyStripeWall, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
 
   const downloadSnapshot = () => {
     if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return;

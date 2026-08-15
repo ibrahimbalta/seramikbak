@@ -1075,11 +1075,12 @@ export default function Home() {
   const [visualSearchMatches, setVisualSearchMatches] = useState(null);
 
   // 3D Studio Options
-  const [studioTarget, setStudioTarget] = useState('floor'); // floor, walls, accent, shower, toilet, leftWallAccent, stripe
+  const [studioTarget, setStudioTarget] = useState('floor'); // floor, walls, accent, shower, showerFloor, toilet, leftWallAccent, stripe
   const [studioApplyFloor, setStudioApplyFloor] = useState(true);
   const [studioApplyWalls, setStudioApplyWalls] = useState(true);
   const [studioApplyAccent, setStudioApplyAccent] = useState(false);
   const [studioApplyShower, setStudioApplyShower] = useState(false);
+  const [studioApplyShowerFloor, setStudioApplyShowerFloor] = useState(false);
   const [studioApplyToiletWall, setStudioApplyToiletWall] = useState(false);
   const [studioApplyLeftWallAccent, setStudioApplyLeftWallAccent] = useState(false);
   const [studioApplyStripeWall, setStudioApplyStripeWall] = useState(false);
@@ -1088,6 +1089,7 @@ export default function Home() {
   const [studioWallProduct, setStudioWallProduct] = useState(null);
   const [studioAccentProduct, setStudioAccentProduct] = useState(null);
   const [studioShowerProduct, setStudioShowerProduct] = useState(null);
+  const [studioShowerFloorProduct, setStudioShowerFloorProduct] = useState(null);
   const [studioToiletWallProduct, setStudioToiletWallProduct] = useState(null);
   const [studioLeftWallAccentProduct, setStudioLeftWallAccentProduct] = useState(null);
   const [studioStripeWallProduct, setStudioStripeWallProduct] = useState(null);
@@ -5755,6 +5757,22 @@ export default function Home() {
                       🚿 Duş İçi (2 Yüzey)
                     </button>
                     <button 
+                      className={studioApplyShowerFloor ? 'active' : ''} 
+                      onClick={() => {
+                        setStudioTarget('showerFloor');
+                        const nextState = !studioApplyShowerFloor;
+                        setStudioApplyShowerFloor(nextState);
+                        if (nextState && activeProduct) {
+                          setStudioShowerFloorProduct(activeProduct);
+                          logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
+                        }
+                      }}
+                      style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                      title="Duşakabin Tabanı / Duş Teknesi Zemin Seramiği"
+                    >
+                      🚿 Duş Tabanı
+                    </button>
+                    <button 
                       className={studioApplyLeftWallAccent ? 'active' : ''} 
                       onClick={() => {
                         setStudioTarget('leftWallAccent');
@@ -5781,10 +5799,10 @@ export default function Home() {
                           logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
                         }
                       }}
-                      style={{ gridColumn: 'span 2', padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                      style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
                       title="Ana Duvar Ortası Yatay Bordür / Şerit Kuşağı"
                     >
-                      ➖ Yatay Bordür / Şerit Kuşağı
+                      ➖ Yatay Bordür
                     </button>
                   </div>
                   
@@ -5847,6 +5865,19 @@ export default function Home() {
                             {studioShowerProduct.name.split(' ')[0]} {studioShowerProduct.code}
                           </span>
                           <button onClick={() => setStudioApplyShower(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
+                        </div>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Duş Tabanı:</span>
+                      {studioApplyShowerFloor && studioShowerFloorProduct ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontWeight: '600', color: '#06b6d4' }}>
+                            {studioShowerFloorProduct.name.split(' ')[0]} {studioShowerFloorProduct.code}
+                          </span>
+                          <button onClick={() => setStudioApplyShowerFloor(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
                         </div>
                       ) : (
                         <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
@@ -6050,6 +6081,7 @@ export default function Home() {
                     wallProduct={studioWallProduct}
                     accentProduct={studioAccentProduct}
                     showerProduct={studioShowerProduct}
+                    showerFloorProduct={studioShowerFloorProduct}
                     toiletWallProduct={studioToiletWallProduct}
                     leftWallAccentProduct={studioLeftWallAccentProduct}
                     stripeWallProduct={studioStripeWallProduct}
@@ -6058,6 +6090,7 @@ export default function Home() {
                     applyWalls={studioApplyWalls} 
                     applyAccent={studioApplyAccent}
                     applyShower={studioApplyShower}
+                    applyShowerFloor={studioApplyShowerFloor}
                     applyToiletWall={studioApplyToiletWall}
                     applyLeftWallAccent={studioApplyLeftWallAccent}
                     applyStripeWall={studioApplyStripeWall}
@@ -6087,6 +6120,14 @@ export default function Home() {
                         } else {
                           setStudioShowerProduct(activeProduct);
                           setStudioApplyShower(true);
+                        }
+                      }
+                      if (target === 'showerFloor') {
+                        if (studioApplyShowerFloor && studioShowerFloorProduct?.id === activeProduct?.id) {
+                          setStudioApplyShowerFloor(false);
+                        } else {
+                          setStudioShowerFloorProduct(activeProduct);
+                          setStudioApplyShowerFloor(true);
                         }
                       }
                       if (target === 'toilet') {
