@@ -1075,17 +1075,22 @@ export default function Home() {
   const [visualSearchMatches, setVisualSearchMatches] = useState(null);
 
   // 3D Studio Options
-  const [studioTarget, setStudioTarget] = useState('floor'); // floor, walls, accent, shower, toilet
+  const [studioTarget, setStudioTarget] = useState('floor'); // floor, walls, accent, shower, toilet, leftWallAccent, stripe
   const [studioApplyFloor, setStudioApplyFloor] = useState(true);
   const [studioApplyWalls, setStudioApplyWalls] = useState(true);
   const [studioApplyAccent, setStudioApplyAccent] = useState(false);
   const [studioApplyShower, setStudioApplyShower] = useState(false);
   const [studioApplyToiletWall, setStudioApplyToiletWall] = useState(false);
+  const [studioApplyLeftWallAccent, setStudioApplyLeftWallAccent] = useState(false);
+  const [studioApplyStripeWall, setStudioApplyStripeWall] = useState(false);
+
   const [studioFloorProduct, setStudioFloorProduct] = useState(null);
   const [studioWallProduct, setStudioWallProduct] = useState(null);
   const [studioAccentProduct, setStudioAccentProduct] = useState(null);
   const [studioShowerProduct, setStudioShowerProduct] = useState(null);
   const [studioToiletWallProduct, setStudioToiletWallProduct] = useState(null);
+  const [studioLeftWallAccentProduct, setStudioLeftWallAccentProduct] = useState(null);
+  const [studioStripeWallProduct, setStudioStripeWallProduct] = useState(null);
   const [studioComparisonMode, setStudioComparisonMode] = useState(false);
   const [studioComparisonProduct, setStudioComparisonProduct] = useState(null);
   const [studioComparisonSplit, setStudioComparisonSplit] = useState(50);
@@ -5630,7 +5635,6 @@ export default function Home() {
                         <>
                           <Loader2 className="animate-spin" size={16} />
                           Yükleniyor...
-                        </>
                       ) : (
                         'Daha Fazla Ürün Göster'
                       )}
@@ -5669,7 +5673,7 @@ export default function Home() {
                 )}
 
                 <div className="control-group">
-                  <label>Seramik Giydirme Bölgesi</label>
+                  <label>Seramik Giydirme & Ara Seramik Bölgeleri</label>
                   <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', padding: '4px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px' }}>
                     <button 
                       className={studioApplyFloor && studioFloorProduct?.id === activeProduct?.id ? 'active' : ''} 
@@ -5702,20 +5706,20 @@ export default function Home() {
                       🧱 Ana Duvarlar
                     </button>
                     <button 
-                      className={studioApplyShower && studioShowerProduct?.id === activeProduct?.id ? 'active' : ''} 
+                      className={studioApplyAccent && studioAccentProduct?.id === activeProduct?.id ? 'active' : ''} 
                       onClick={() => {
-                        if (studioApplyShower && studioShowerProduct?.id === activeProduct?.id) {
-                          setStudioApplyShower(false);
+                        if (studioApplyAccent && studioAccentProduct?.id === activeProduct?.id) {
+                          setStudioApplyAccent(false);
                         } else {
-                          setStudioShowerProduct(activeProduct);
-                          setStudioApplyShower(true);
+                          setStudioAccentProduct(activeProduct);
+                          setStudioApplyAccent(true);
                           if (activeProduct) logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
                         }
                       }}
                       style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
-                      title="Duşakabin İki Tarafı (Arka & Yan Duvar)"
+                      title="Lavabo / Ayna Arkası Vurgu Seramiği"
                     >
-                      🚿 Duş İçi (2 Yüzey)
+                      🪞 Lavabo Arkası
                     </button>
                     <button 
                       className={studioApplyToiletWall && studioToiletWallProduct?.id === activeProduct?.id ? 'active' : ''} 
@@ -5732,6 +5736,54 @@ export default function Home() {
                       title="Klozet Arkası Vurgu Duvarı"
                     >
                       🚾 Klozet Arkası
+                    </button>
+                    <button 
+                      className={studioApplyShower && studioShowerProduct?.id === activeProduct?.id ? 'active' : ''} 
+                      onClick={() => {
+                        if (studioApplyShower && studioShowerProduct?.id === activeProduct?.id) {
+                          setStudioApplyShower(false);
+                        } else {
+                          setStudioShowerProduct(activeProduct);
+                          setStudioApplyShower(true);
+                          if (activeProduct) logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
+                        }
+                      }}
+                      style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                      title="Duşakabin İki Tarafı (Arka & Yan Duvar)"
+                    >
+                      🚿 Duş İçi (2 Yüzey)
+                    </button>
+                    <button 
+                      className={studioApplyLeftWallAccent && studioLeftWallAccentProduct?.id === activeProduct?.id ? 'active' : ''} 
+                      onClick={() => {
+                        if (studioApplyLeftWallAccent && studioLeftWallAccentProduct?.id === activeProduct?.id) {
+                          setStudioApplyLeftWallAccent(false);
+                        } else {
+                          setStudioLeftWallAccentProduct(activeProduct);
+                          setStudioApplyLeftWallAccent(true);
+                          if (activeProduct) logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
+                        }
+                      }}
+                      style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                      title="Sol Yan Duvar Özel Ara Seramik Bölgesi"
+                    >
+                      📐 Sol Duvar Ara
+                    </button>
+                    <button 
+                      className={studioApplyStripeWall && studioStripeWallProduct?.id === activeProduct?.id ? 'active' : ''} 
+                      onClick={() => {
+                        if (studioApplyStripeWall && studioStripeWallProduct?.id === activeProduct?.id) {
+                          setStudioApplyStripeWall(false);
+                        } else {
+                          setStudioStripeWallProduct(activeProduct);
+                          setStudioApplyStripeWall(true);
+                          if (activeProduct) logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
+                        }
+                      }}
+                      style={{ gridColumn: 'span 2', padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                      title="Ana Duvar Ortası Yatay Bordür / Şerit Kuşağı"
+                    >
+                      ➖ Yatay Bordür / Şerit Kuşağı
                     </button>
                   </div>
                   
@@ -5774,6 +5826,19 @@ export default function Home() {
                       )}
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Lavabo Arkası Vurgu:</span>
+                      {studioApplyAccent && studioAccentProduct ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontWeight: '600', color: '#38bdf8' }}>
+                            {studioAccentProduct.name.split(' ')[0]} {studioAccentProduct.code}
+                          </span>
+                          <button onClick={() => setStudioApplyAccent(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
+                        </div>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Duş İçi (2 Yüzey):</span>
                       {studioApplyShower && studioShowerProduct ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -5794,6 +5859,32 @@ export default function Home() {
                             {studioToiletWallProduct.name.split(' ')[0]} {studioToiletWallProduct.code}
                           </span>
                           <button onClick={() => setStudioApplyToiletWall(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
+                        </div>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Sol Duvar Ara:</span>
+                      {studioApplyLeftWallAccent && studioLeftWallAccentProduct ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontWeight: '600', color: '#fbbf24' }}>
+                            {studioLeftWallAccentProduct.name.split(' ')[0]} {studioLeftWallAccentProduct.code}
+                          </span>
+                          <button onClick={() => setStudioApplyLeftWallAccent(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
+                        </div>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Yatay Bordür Kuşağı:</span>
+                      {studioApplyStripeWall && studioStripeWallProduct ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontWeight: '600', color: '#f43f5e' }}>
+                            {studioStripeWallProduct.name.split(' ')[0]} {studioStripeWallProduct.code}
+                          </span>
+                          <button onClick={() => setStudioApplyStripeWall(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
                         </div>
                       ) : (
                         <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
@@ -5959,12 +6050,16 @@ export default function Home() {
                     accentProduct={studioAccentProduct}
                     showerProduct={studioShowerProduct}
                     toiletWallProduct={studioToiletWallProduct}
+                    leftWallAccentProduct={studioLeftWallAccentProduct}
+                    stripeWallProduct={studioStripeWallProduct}
                     comparisonProduct={studioComparisonProduct}
                     applyFloor={studioApplyFloor} 
                     applyWalls={studioApplyWalls} 
                     applyAccent={studioApplyAccent}
                     applyShower={studioApplyShower}
                     applyToiletWall={studioApplyToiletWall}
+                    applyLeftWallAccent={studioApplyLeftWallAccent}
+                    applyStripeWall={studioApplyStripeWall}
                     comparisonMode={studioComparisonMode}
                     comparisonSplit={studioComparisonSplit}
                     walkthroughMode={studioWalkthroughMode}
@@ -6007,6 +6102,22 @@ export default function Home() {
                         } else {
                           setStudioAccentProduct(activeProduct);
                           setStudioApplyAccent(true);
+                        }
+                      }
+                      if (target === 'leftWallAccent') {
+                        if (studioApplyLeftWallAccent && studioLeftWallAccentProduct?.id === activeProduct?.id) {
+                          setStudioApplyLeftWallAccent(false);
+                        } else {
+                          setStudioLeftWallAccentProduct(activeProduct);
+                          setStudioApplyLeftWallAccent(true);
+                        }
+                      }
+                      if (target === 'stripe') {
+                        if (studioApplyStripeWall && studioStripeWallProduct?.id === activeProduct?.id) {
+                          setStudioApplyStripeWall(false);
+                        } else {
+                          setStudioStripeWallProduct(activeProduct);
+                          setStudioApplyStripeWall(true);
                         }
                       }
                     }}
