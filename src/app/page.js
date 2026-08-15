@@ -5676,76 +5676,116 @@ export default function Home() {
                 <div className="control-group">
                   <label>Seramik Giydirme & Ara Seramik Bölgeleri</label>
                   <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', padding: '4px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px' }}>
-                    {[
-                      { key: 'floor', label: '🏠 Zemin', isApplied: studioApplyFloor, prod: studioFloorProduct, setApply: setStudioApplyFloor, setProd: setStudioFloorProduct, title: 'Zemin Seramiği' },
-                      { key: 'walls', label: '🧱 Ana Duvarlar', isApplied: studioApplyWalls, prod: studioWallProduct, setApply: setStudioApplyWalls, setProd: setStudioWallProduct, title: 'Ana Duvar Seramikleri' },
-                      { key: 'accent', label: '🪞 Lavabo Arkası', isApplied: studioApplyAccent, prod: studioAccentProduct, setApply: setStudioApplyAccent, setProd: setStudioAccentProduct, title: 'Lavabo / Ayna Arkası Vurgu Seramiği' },
-                      { key: 'toilet', label: '🚾 Klozet Arkası', isApplied: studioApplyToiletWall, prod: studioToiletWallProduct, setApply: setStudioApplyToiletWall, setProd: setStudioToiletWallProduct, title: 'Klozet Arkası Vurgu Duvarı' },
-                      { key: 'shower', label: '🚿 Duş İçi (2 Yüzey)', isApplied: studioApplyShower, prod: studioShowerProduct, setApply: setStudioApplyShower, setProd: setStudioShowerProduct, title: 'Duşakabin İki Tarafı (Arka & Yan Duvar)' },
-                      { key: 'leftWallAccent', label: '📐 Sol Duvar Ara', isApplied: studioApplyLeftWallAccent, prod: studioLeftWallAccentProduct, setApply: setStudioApplyLeftWallAccent, setProd: setStudioLeftWallAccentProduct, title: 'Sol Yan Duvar Özel Ara Seramik Bölgesi' },
-                      { key: 'stripe', label: '➖ Yatay Bordür / Şerit Kuşağı', isApplied: studioApplyStripeWall, prod: studioStripeWallProduct, setApply: setStudioApplyStripeWall, setProd: setStudioStripeWallProduct, title: 'Ana Duvar Ortası Yatay Bordür / Şerit Kuşağı', span2: true }
-                    ].map((zone) => {
-                      const isTarget = studioTarget === zone.key;
-                      
-                      let btnStyle = {
-                        padding: '8px 10px',
-                        fontSize: '0.75rem',
-                        fontWeight: isTarget ? '800' : '600',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        gap: '4px',
-                        gridColumn: zone.span2 ? 'span 2' : 'span 1'
-                      };
-
-                      if (isTarget) {
-                        btnStyle.background = 'linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(245, 158, 11, 0.2) 100%)';
-                        btnStyle.border = '2px solid #d4af37';
-                        btnStyle.color = '#ffffff';
-                        btnStyle.boxShadow = '0 0 10px rgba(212, 175, 55, 0.35)';
-                      } else if (zone.isApplied) {
-                        btnStyle.background = 'rgba(30, 41, 59, 0.8)';
-                        btnStyle.border = '1px solid rgba(245, 158, 11, 0.45)';
-                        btnStyle.color = '#f8fafc';
-                      } else {
-                        btnStyle.background = 'rgba(255, 255, 255, 0.03)';
-                        btnStyle.border = '1px solid rgba(255, 255, 255, 0.08)';
-                        btnStyle.color = '#94a3b8';
-                      }
-
-                      return (
-                        <button 
-                          key={zone.key}
-                          title={zone.title}
-                          style={btnStyle}
-                          onClick={() => {
-                            setStudioTarget(zone.key);
-                            if (zone.isApplied && zone.prod?.id === activeProduct?.id) {
-                              zone.setApply(false);
-                            } else {
-                              zone.setProd(activeProduct);
-                              zone.setApply(true);
-                              if (activeProduct) logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
-                            }
-                          }}
-                        >
-                          <span>{zone.label}</span>
-                          {zone.isApplied && (
-                            <span style={{
-                              fontSize: '0.68rem',
-                              padding: '1px 5px',
-                              borderRadius: '4px',
-                              background: isTarget ? 'var(--accent-gold)' : 'rgba(245, 158, 11, 0.25)',
-                              color: isTarget ? '#000' : '#fbbf24',
-                              fontWeight: '700'
-                            }}>✓</span>
-                          )}
-                        </button>
-                      );
-                    })}
+                    <button 
+                      className={studioApplyFloor ? 'active' : ''} 
+                      onClick={() => {
+                        setStudioTarget('floor');
+                        const nextState = !studioApplyFloor;
+                        setStudioApplyFloor(nextState);
+                        if (nextState && activeProduct) {
+                          setStudioFloorProduct(activeProduct);
+                          logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
+                        }
+                      }}
+                      style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                    >
+                      🏠 Zemin
+                    </button>
+                    <button 
+                      className={studioApplyWalls ? 'active' : ''} 
+                      onClick={() => {
+                        setStudioTarget('walls');
+                        const nextState = !studioApplyWalls;
+                        setStudioApplyWalls(nextState);
+                        if (nextState && activeProduct) {
+                          setStudioWallProduct(activeProduct);
+                          logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
+                        }
+                      }}
+                      style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                    >
+                      🧱 Ana Duvarlar
+                    </button>
+                    <button 
+                      className={studioApplyAccent ? 'active' : ''} 
+                      onClick={() => {
+                        setStudioTarget('accent');
+                        const nextState = !studioApplyAccent;
+                        setStudioApplyAccent(nextState);
+                        if (nextState && activeProduct) {
+                          setStudioAccentProduct(activeProduct);
+                          logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
+                        }
+                      }}
+                      style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                      title="Lavabo / Ayna Arkası Vurgu Seramiği"
+                    >
+                      🪞 Lavabo Arkası
+                    </button>
+                    <button 
+                      className={studioApplyToiletWall ? 'active' : ''} 
+                      onClick={() => {
+                        setStudioTarget('toilet');
+                        const nextState = !studioApplyToiletWall;
+                        setStudioApplyToiletWall(nextState);
+                        if (nextState && activeProduct) {
+                          setStudioToiletWallProduct(activeProduct);
+                          logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
+                        }
+                      }}
+                      style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                      title="Klozet Arkası Vurgu Duvarı"
+                    >
+                      🚾 Klozet Arkası
+                    </button>
+                    <button 
+                      className={studioApplyShower ? 'active' : ''} 
+                      onClick={() => {
+                        setStudioTarget('shower');
+                        const nextState = !studioApplyShower;
+                        setStudioApplyShower(nextState);
+                        if (nextState && activeProduct) {
+                          setStudioShowerProduct(activeProduct);
+                          logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
+                        }
+                      }}
+                      style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                      title="Duşakabin İki Tarafı (Arka & Yan Duvar)"
+                    >
+                      🚿 Duş İçi (2 Yüzey)
+                    </button>
+                    <button 
+                      className={studioApplyLeftWallAccent ? 'active' : ''} 
+                      onClick={() => {
+                        setStudioTarget('leftWallAccent');
+                        const nextState = !studioApplyLeftWallAccent;
+                        setStudioApplyLeftWallAccent(nextState);
+                        if (nextState && activeProduct) {
+                          setStudioLeftWallAccentProduct(activeProduct);
+                          logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
+                        }
+                      }}
+                      style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                      title="Sol Yan Duvar Özel Ara Seramik Bölgesi"
+                    >
+                      📐 Sol Duvar Ara
+                    </button>
+                    <button 
+                      className={studioApplyStripeWall ? 'active' : ''} 
+                      onClick={() => {
+                        setStudioTarget('stripe');
+                        const nextState = !studioApplyStripeWall;
+                        setStudioApplyStripeWall(nextState);
+                        if (nextState && activeProduct) {
+                          setStudioStripeWallProduct(activeProduct);
+                          logInteraction('STUDIO_TRY', activeProduct.id, activeProduct.brandId);
+                        }
+                      }}
+                      style={{ gridColumn: 'span 2', padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
+                      title="Ana Duvar Ortası Yatay Bordür / Şerit Kuşağı"
+                    >
+                      ➖ Yatay Bordür / Şerit Kuşağı
+                    </button>
                   </div>
                   
                   {/* Applied Products Summary Box */}
