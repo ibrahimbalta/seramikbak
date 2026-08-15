@@ -43,6 +43,7 @@ export default function StudioCanvas({
   const toiletWallMeshRef = useRef(null);
   const leftWallAccentMeshRef = useRef(null);
   const stripeWallMeshRef = useRef(null);
+  const leftStripeWallMeshRef = useRef(null);
 
   // References to lights & meshes
   const floorMeshRef = useRef(null);
@@ -378,6 +379,16 @@ export default function StudioCanvas({
     scene.add(stripeWallMesh);
     stripeWallMeshRef.current = stripeWallMesh;
 
+    // Horizontal Accent Stripe Band - Left Wall Continuation (Sol Duvar Yatay Bordür Kuşağı)
+    const leftStripeWallGeo = new THREE.PlaneGeometry(ROOM_DEPTH, 0.6);
+    const leftStripeWallMat = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+    const leftStripeWallMesh = new THREE.Mesh(leftStripeWallGeo, leftStripeWallMat);
+    leftStripeWallMesh.rotation.y = Math.PI / 2;
+    leftStripeWallMesh.position.set(-ROOM_WIDTH / 2 + 0.012, ROOM_HEIGHT / 2, 0);
+    leftStripeWallMesh.receiveShadow = true;
+    scene.add(leftStripeWallMesh);
+    leftStripeWallMeshRef.current = leftStripeWallMesh;
+
     // Left Wall (side wall)
     const leftWallGeo = new THREE.PlaneGeometry(ROOM_DEPTH, ROOM_HEIGHT);
     const leftWallMat = new THREE.MeshStandardMaterial({ color: '#1f2229', roughness: 0.9 });
@@ -443,6 +454,7 @@ export default function StudioCanvas({
       if (accentWallMeshRef.current) targets.push(accentWallMeshRef.current);
       if (leftWallAccentMeshRef.current) targets.push(leftWallAccentMeshRef.current);
       if (stripeWallMeshRef.current) targets.push(stripeWallMeshRef.current);
+      if (leftStripeWallMeshRef.current) targets.push(leftStripeWallMeshRef.current);
       if (backWallMeshRef.current) targets.push(backWallMeshRef.current);
       if (leftWallMeshRef.current) targets.push(leftWallMeshRef.current);
 
@@ -459,7 +471,7 @@ export default function StudioCanvas({
           if (onToggleTargetRef.current) onToggleTargetRef.current('accent');
         } else if (hit === leftWallAccentMeshRef.current) {
           if (onToggleTargetRef.current) onToggleTargetRef.current('leftWallAccent');
-        } else if (hit === stripeWallMeshRef.current) {
+        } else if (hit === stripeWallMeshRef.current || hit === leftStripeWallMeshRef.current) {
           if (onToggleTargetRef.current) onToggleTargetRef.current('stripe');
         } else {
           if (onToggleTargetRef.current) onToggleTargetRef.current('walls');
@@ -1603,20 +1615,39 @@ export default function StudioCanvas({
       leftWallAccentMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
-    // 7. HORIZONTAL STRIPE ACCENT BAND (YATAY BORDÜR / ŞERİT KUŞAĞI) LOGIC
-    if (applyStripeWall && stripeWallProduct && stripeWallMeshRef.current) {
+    // 7. HORIZONTAL STRIPE ACCENT BAND (YATAY BORDÜR / ŞERİT KUŞAĞI - DUVARLARI SARAN BANT) LOGIC
+    if (applyStripeWall && stripeWallProduct && (stripeWallMeshRef.current || leftStripeWallMeshRef.current)) {
       const w_m = stripeWallProduct.width / 100;
       const h_m = stripeWallProduct.height / 100;
 
       const applyStripeTexture = (sourceImageOrCanvas) => {
         const texture = generateGroutOverlay(sourceImageOrCanvas, stripeWallProduct, groutWidth, groutColor, tileRotation, layPattern);
-        texture.repeat.set(ROOM_WIDTH / w_m, 0.6 / h_m);
         texture.colorSpace = THREE.SRGBColorSpace;
-        stripeWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
-          map: texture,
-          roughness: stripeWallProduct.finish === 'Parlak' ? 0.08 : 0.85,
-          clearcoat: stripeWallProduct.finish === 'Parlak' ? 1.0 : 0.0
-        });
+
+        const roughness = stripeWallProduct.finish === 'Parlak' ? 0.08 : 0.85;
+        const clearcoat = stripeWallProduct.finish === 'Parlak' ? 1.0 : 0.0;
+
+        // Back Wall Stripe
+        if (stripeWallMeshRef.current) {
+          const backTex = texture.clone();
+          backTex.repeat.set(ROOM_WIDTH / w_m, 0.6 / h_m);
+          stripeWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
+            map: backTex,
+            roughness: roughness,
+            clearcoat: clearcoat
+          });
+        }
+
+        // Left Wall Stripe
+        if (leftStripeWallMeshRef.current) {
+          const leftTex = texture.clone();
+          leftTex.repeat.set(ROOM_DEPTH / w_m, 0.6 / h_m);
+          leftStripeWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
+            map: leftTex,
+            roughness: roughness,
+            clearcoat: clearcoat
+          });
+        }
       };
 
       const realUrl = stripeWallProduct.textureUrl || stripeWallProduct.imageUrl;
@@ -1627,8 +1658,13 @@ export default function StudioCanvas({
       } else {
         applyStripeTexture(generateProceduralTexture(stripeWallProduct));
       }
-    } else if (stripeWallMeshRef.current) {
-      stripeWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+    } else {
+      if (stripeWallMeshRef.current) {
+        stripeWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+      }
+      if (leftStripeWallMeshRef.current) {
+        leftStripeWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+      }
     }
 
   }, [floorProduct, wallProduct, accentProduct, showerProduct, toiletWallProduct, leftWallAccentProduct, stripeWallProduct, applyFloor, applyWalls, applyAccent, applyShower, applyToiletWall, applyLeftWallAccent, applyStripeWall, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
