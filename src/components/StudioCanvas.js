@@ -375,7 +375,7 @@ export default function StudioCanvas({
     const stripeWallGeo = new THREE.PlaneGeometry(ROOM_WIDTH, 0.6);
     const stripeWallMat = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     const stripeWallMesh = new THREE.Mesh(stripeWallGeo, stripeWallMat);
-    stripeWallMesh.position.set(0, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2 + 0.012);
+    stripeWallMesh.position.set(0, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2 + 0.004);
     stripeWallMesh.receiveShadow = true;
     scene.add(stripeWallMesh);
     stripeWallMeshRef.current = stripeWallMesh;
@@ -385,7 +385,7 @@ export default function StudioCanvas({
     const leftStripeWallMat = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     const leftStripeWallMesh = new THREE.Mesh(leftStripeWallGeo, leftStripeWallMat);
     leftStripeWallMesh.rotation.y = Math.PI / 2;
-    leftStripeWallMesh.position.set(-ROOM_WIDTH / 2 + 0.012, ROOM_HEIGHT / 2, 0);
+    leftStripeWallMesh.position.set(-ROOM_WIDTH / 2 + 0.004, ROOM_HEIGHT / 2, 0);
     leftStripeWallMesh.receiveShadow = true;
     scene.add(leftStripeWallMesh);
     leftStripeWallMeshRef.current = leftStripeWallMesh;
@@ -1491,7 +1491,10 @@ export default function StudioCanvas({
       }
     }
 
-    // 3. ACCENT WALL TILING LOGIC
+    // 3. ACCENT WALL TILING LOGIC (LAVABO & BANYO DOLABI ARKASI)
+    if (accentWallMeshRef.current) {
+      accentWallMeshRef.current.visible = !!(applyAccent && accentProduct);
+    }
     if (applyAccent && accentProduct && accentWallMeshRef.current) {
       const w_m = accentProduct.width / 100;
       const h_m = accentProduct.height / 100;
@@ -1515,11 +1518,11 @@ export default function StudioCanvas({
       } else {
         applyAccentTexture(generateProceduralTexture(accentProduct));
       }
-    } else if (accentWallMeshRef.current) {
-      accentWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#1a1e26', roughness: 0.85 });
     }
 
     // 4. SHOWER CABIN WALLS (DUŞAKABİN İKİ TARAF) LOGIC
+    if (showerBackWallMeshRef.current) showerBackWallMeshRef.current.visible = !!(applyShower && showerProduct);
+    if (showerSideWallMeshRef.current) showerSideWallMeshRef.current.visible = !!(applyShower && showerProduct);
     if (applyShower && showerProduct && (showerBackWallMeshRef.current || showerSideWallMeshRef.current)) {
       const w_m = showerProduct.width / 100;
       const h_m = showerProduct.height / 100;
@@ -1555,12 +1558,10 @@ export default function StudioCanvas({
       } else {
         applyShowerTexture(generateProceduralTexture(showerProduct));
       }
-    } else {
-      if (showerBackWallMeshRef.current) showerBackWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
-      if (showerSideWallMeshRef.current) showerSideWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
     // 5. TOILET BACK WALL (KLOZET ARKASI VURGU DUVARI) LOGIC
+    if (toiletWallMeshRef.current) toiletWallMeshRef.current.visible = !!(applyToiletWall && toiletWallProduct);
     if (applyToiletWall && toiletWallProduct && toiletWallMeshRef.current) {
       const w_m = toiletWallProduct.width / 100;
       const h_m = toiletWallProduct.height / 100;
@@ -1584,18 +1585,17 @@ export default function StudioCanvas({
       } else {
         applyToiletTexture(generateProceduralTexture(toiletWallProduct));
       }
-    } else if (toiletWallMeshRef.current) {
-      toiletWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
     // 6. LEFT WALL ACCENT PANEL (SOL YAN DUVAR VURGU BÖLGESİ) LOGIC
+    if (leftWallAccentMeshRef.current) leftWallAccentMeshRef.current.visible = !!(applyLeftWallAccent && leftWallAccentProduct);
     if (applyLeftWallAccent && leftWallAccentProduct && leftWallAccentMeshRef.current) {
       const w_m = leftWallAccentProduct.width / 100;
       const h_m = leftWallAccentProduct.height / 100;
 
       const applyLeftAccentTexture = (sourceImageOrCanvas) => {
         const texture = generateGroutOverlay(sourceImageOrCanvas, leftWallAccentProduct, groutWidth, groutColor, tileRotation, layPattern);
-        texture.repeat.set(1.2 / w_m, ROOM_HEIGHT / h_m);
+        texture.repeat.set(1.1 / w_m, ROOM_HEIGHT / h_m);
         texture.colorSpace = THREE.SRGBColorSpace;
         leftWallAccentMeshRef.current.material = new THREE.MeshPhysicalMaterial({
           map: texture,
@@ -1612,11 +1612,11 @@ export default function StudioCanvas({
       } else {
         applyLeftAccentTexture(generateProceduralTexture(leftWallAccentProduct));
       }
-    } else if (leftWallAccentMeshRef.current) {
-      leftWallAccentMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
     // 7. HORIZONTAL STRIPE ACCENT BAND (YATAY BORDÜR / ŞERİT KUŞAĞI - DUVARLARI SARAN BANT) LOGIC
+    if (stripeWallMeshRef.current) stripeWallMeshRef.current.visible = !!(applyStripeWall && stripeWallProduct);
+    if (leftStripeWallMeshRef.current) leftStripeWallMeshRef.current.visible = !!(applyStripeWall && stripeWallProduct);
     if (applyStripeWall && stripeWallProduct && (stripeWallMeshRef.current || leftStripeWallMeshRef.current)) {
       const w_m = stripeWallProduct.width / 100;
       const h_m = stripeWallProduct.height / 100;
@@ -1658,13 +1658,6 @@ export default function StudioCanvas({
         loader.load(finalUrl, (loaded) => applyStripeTexture(loaded.image), undefined, () => applyStripeTexture(generateProceduralTexture(stripeWallProduct)));
       } else {
         applyStripeTexture(generateProceduralTexture(stripeWallProduct));
-      }
-    } else {
-      if (stripeWallMeshRef.current) {
-        stripeWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
-      }
-      if (leftStripeWallMeshRef.current) {
-        leftStripeWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
       }
     }
 
