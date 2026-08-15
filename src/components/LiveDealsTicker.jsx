@@ -250,7 +250,7 @@ export default function LiveDealsTicker() {
           align-items: center;
           gap: 18px;
           width: max-content;
-          animation: tickerSlide 70s linear infinite;
+          animation: tickerSlide 180s linear infinite;
         }
 
         .live-ticker-track:hover {

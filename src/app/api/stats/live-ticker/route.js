@@ -101,18 +101,22 @@ export async function GET() {
     ];
 
     // Combine real DB listings if available
-    const realOutletEvents = outletListings.map((item) => ({
-      id: `db-out-${item.id}`,
-      type: 'OUTLET_DEAL',
-      badge: 'STOK İNDİRİMİ',
-      color: '#fbbf24',
-      bg: 'rgba(245, 158, 11, 0.1)',
-      border: 'rgba(245, 158, 11, 0.3)',
-      time: 'Canlı Fırsat',
-      location: item.dealer?.city || 'Türkiye',
-      text: `${item.brand?.name || 'Yetkili Bayi'} ${item.title} - ₺${item.pricePerM2}/m²`,
-      link: '/outlet'
-    }));
+    const realOutletEvents = outletListings.map((item) => {
+      const displayPrice = item.unitPrice ?? item.pricePerM2 ?? item.price;
+      const priceText = displayPrice !== undefined && displayPrice !== null ? ` - ₺${displayPrice}/m²` : '';
+      return {
+        id: `db-out-${item.id}`,
+        type: 'OUTLET_DEAL',
+        badge: item.badgeTag || 'STOK İNDİRİMİ',
+        color: '#fbbf24',
+        bg: 'rgba(245, 158, 11, 0.1)',
+        border: 'rgba(245, 158, 11, 0.3)',
+        time: 'Canlı Fırsat',
+        location: item.dealer?.city || 'Türkiye',
+        text: `${item.brand?.name || 'Yetkili Bayi'} ${item.title}${priceText}`,
+        link: '/outlet'
+      };
+    });
 
     const realLeadEvents = recentLeads.map((item) => ({
       id: `db-lead-${item.id}`,
