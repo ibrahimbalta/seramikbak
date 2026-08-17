@@ -7195,16 +7195,18 @@ export default function Home() {
                               background: isLowest ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.05)',
                               border: isLowest ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.1)',
                               opacity: hasRealPrice ? 1 : 0.9,
-                              transition: 'all 0.2s ease'
+                              transition: 'all 0.2s ease',
+                              flexWrap: 'wrap',
+                              gap: '8px 12px'
                             }}
                           >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                               <span 
                                 style={{ 
                                   fontWeight: '800', 
                                   fontSize: '0.85rem', 
                                   color: v.color,
-                                  minWidth: '92px',
+                                  minWidth: '80px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   gap: '4px'
@@ -7238,14 +7240,15 @@ export default function Home() {
                               )}
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', justifyContent: 'flex-end', flex: 1, minWidth: '150px' }}>
                               {hasRealPrice ? (
                                 <>
                                   <strong style={{ 
                                     fontSize: isLowest ? '0.98rem' : '0.92rem', 
                                     fontWeight: '800', 
                                     color: isLowest ? '#34d399' : '#ffffff',
-                                    textShadow: isLowest ? '0 0 8px rgba(52, 211, 153, 0.3)' : 'none'
+                                    textShadow: isLowest ? '0 0 8px rgba(52, 211, 153, 0.3)' : 'none',
+                                    whiteSpace: 'nowrap'
                                   }}>
                                     ₺{v.price.toLocaleString('tr-TR')} <span style={{ fontSize: '0.74rem', fontWeight: '400', color: '#cbd5e1' }}>/ m²</span>
                                   </strong>
@@ -7267,7 +7270,8 @@ export default function Home() {
                                         alignItems: 'center',
                                         gap: '4px',
                                         textDecoration: 'none',
-                                        transition: 'all 0.2s ease'
+                                        transition: 'all 0.2s ease',
+                                        whiteSpace: 'nowrap'
                                       }}
                                       onClick={(e) => e.stopPropagation()}
                                     >
@@ -7275,7 +7279,7 @@ export default function Home() {
                                       <ExternalLink size={12} style={{ color: '#ffffff' }} />
                                     </a>
                                   ) : (
-                                    <span style={{ fontSize: '0.72rem', color: '#64748b', fontStyle: 'italic', padding: '4px 6px' }}>Satışta Değil</span>
+                                    <span style={{ fontSize: '0.72rem', color: '#64748b', fontStyle: 'italic', padding: '4px 6px', whiteSpace: 'nowrap' }}>Satışta Değil</span>
                                   )}
                                 </>
                               ) : (
@@ -7315,15 +7319,16 @@ export default function Home() {
                                     gap: '6px',
                                     cursor: 'pointer',
                                     boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)',
-                                    transition: 'all 0.2s ease'
+                                    transition: 'all 0.2s ease',
+                                    whiteSpace: 'nowrap'
                                   }}
                                   title="Konumunuzdaki en yakın yetkili bayiden canlı fiyat teklifi alın"
                                 >
-                                  <MapPin size={13} style={{ color: '#60a5fa' }} />
+                                  <MapPin size={13} style={{ color: '#60a5fa', flexShrink: 0 }} />
                                   <span>
                                     {detailDealers && detailDealers.length > 0 
-                                      ? `En Yakın Bayiden Teklif Al (${detailDealers[0].distanceKm} km)` 
-                                      : `En Yakın Bayiye Sor / Teklif Al`}
+                                      ? `Teklif Al (${detailDealers[0].distanceKm} km)` 
+                                      : `Bayiye Sor / Teklif Al`}
                                   </span>
                                 </button>
                               )}
@@ -12950,20 +12955,36 @@ export default function Home() {
           flex: 1;
           overflow-y: auto;
           overflow-x: hidden;
-          padding-right: 0px;
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE 10+ */
+          padding-right: 8px;
+          padding-bottom: 28px;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(197, 160, 89, 0.5) rgba(255, 255, 255, 0.03);
         }
 
-        /* Hide Scrollbars completely */
+        /* Custom Elegant Visible Scrollbar for Desktop & Webkit */
         .detail-modal-body::-webkit-scrollbar {
-          display: none; /* Safari and Chrome */
+          width: 6px;
+          display: block;
         }
 
-        @media (max-width: 768px) {
+        .detail-modal-body::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.03);
+          border-radius: 4px;
+        }
+
+        .detail-modal-body::-webkit-scrollbar-thumb {
+          background: rgba(197, 160, 89, 0.45);
+          border-radius: 4px;
+        }
+
+        .detail-modal-body::-webkit-scrollbar-thumb:hover {
+          background: rgba(197, 160, 89, 0.75);
+        }
+
+        @media (max-width: 1024px) {
           .detail-modal-body {
             grid-template-columns: 1fr;
-            max-height: 70vh;
+            gap: 18px;
           }
         }
 
