@@ -26,12 +26,17 @@ export default function TileVisualPreview({ style, color, finish, width, height,
 
   // If a real image path exists and has loaded successfully, render it!
   if (imageUrl && !imageError) {
+    const displaySrc = (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))
+      ? `/api/proxy?url=${encodeURIComponent(imageUrl)}`
+      : imageUrl;
+
     return (
       <div className="tile-preview-container" style={{ backgroundColor: bgColor }} title={seoAltString} aria-label={seoAltString}>
         <img 
-          src={imageUrl} 
+          src={displaySrc} 
           alt={seoAltString}
           title={seoAltString}
+          referrerPolicy="no-referrer"
           onError={() => setImageError(true)} 
           loading="lazy"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
