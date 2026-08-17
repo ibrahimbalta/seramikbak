@@ -7111,7 +7111,7 @@ export default function Home() {
                   padding: '16px',
                   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
                     <h4 className="channel-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <ShoppingBag size={18} style={{ color: '#fbbf24' }} />
                       <span style={{ color: '#fbbf24', fontSize: '0.92rem', fontWeight: '800', letterSpacing: '0.3px' }}>Pazaryeri & Yapı Market Fiyatları</span>
@@ -12874,10 +12874,10 @@ export default function Home() {
 
         /* Detail Modal Styles */
         .detail-modal-content-premium {
-          max-width: 1080px;
-          width: 95%;
-          max-height: 92vh;
-          padding: 24px;
+          max-width: 1260px;
+          width: 96%;
+          max-height: 94vh;
+          padding: 20px 24px;
           border-radius: 20px;
           background: rgba(30, 34, 42, 0.98);
           border: 1px solid rgba(197, 160, 89, 0.45);
@@ -12949,7 +12949,7 @@ export default function Home() {
 
         .detail-modal-body {
           display: grid;
-          grid-template-columns: 1fr 1.15fr;
+          grid-template-columns: 0.8fr 1.2fr;
           gap: 24px;
           margin-top: 6px;
           flex: 1;
@@ -12992,6 +12992,15 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 16px;
+          min-width: 0;
+        }
+
+        .detail-right-column {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          min-width: 0;
+          width: 100%;
         }
 
         .detail-visual-box {
