@@ -7283,54 +7283,18 @@ export default function Home() {
                                   )}
                                 </>
                               ) : (
-                                <button 
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const dealerSec = document.getElementById('resmi-yetkili-bayiler-section');
-                                    if (dealerSec) {
-                                      dealerSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    }
-                                    if (detailDealers && detailDealers.length > 0) {
-                                      const nearestDealer = detailDealers[0];
-                                      setLeadProduct(detailProduct);
-                                      setLeadDealer(nearestDealer);
-                                      setLeadName('');
-                                      setLeadPhone('');
-                                      setLeadEmail('');
-                                      setLeadNotes(`Bana 50 metrekare bu ${detailProduct.brand?.name || ''} ${detailProduct.name} ürününden lazım (${v.name} pazaryerinde stok görünmediği için doğrudan en yakın bayinizden fiyat teklifi rica ediyorum).`);
-                                      setLeadSuccessMsg('');
-                                      setLeadErrorMsg('');
-                                      setShowLeadModal(true);
-                                    } else {
-                                      const waText = encodeURIComponent(`Merhaba, SeramikBak üzerinden "${detailProduct.brand?.name || ''} ${detailProduct.name}" (${v.name}) ürünü için konumuma en yakın yetkili bayinizden palet / m² fiyat teklifi ve stok bilgisi almak istiyorum.`);
-                                      window.open(`https://wa.me/908501234567?text=${waText}`, '_blank', 'noopener,noreferrer');
-                                    }
-                                  }}
-                                  style={{
-                                    fontSize: '0.74rem',
-                                    fontWeight: '700',
-                                    padding: '6px 12px',
-                                    borderRadius: '6px',
-                                    border: '1px solid rgba(59, 130, 246, 0.4)',
-                                    background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(29, 78, 216, 0.35) 100%)',
-                                    color: '#60a5fa',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)',
-                                    transition: 'all 0.2s ease',
-                                    whiteSpace: 'nowrap'
-                                  }}
-                                  title="Konumunuzdaki en yakın yetkili bayiden canlı fiyat teklifi alın"
-                                >
-                                  <MapPin size={13} style={{ color: '#60a5fa', flexShrink: 0 }} />
-                                  <span>
-                                    {detailDealers && detailDealers.length > 0 
-                                      ? `Teklif Al (${detailDealers[0].distanceKm} km)` 
-                                      : `Bayiye Sor / Teklif Al`}
-                                  </span>
-                                </button>
+                                <span style={{ 
+                                  fontSize: '0.74rem', 
+                                  fontWeight: '600', 
+                                  color: '#94a3b8', 
+                                  background: 'rgba(255, 255, 255, 0.05)', 
+                                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                                  padding: '5px 12px', 
+                                  borderRadius: '6px',
+                                  whiteSpace: 'nowrap'
+                                }}>
+                                  Ürün Yok
+                                </span>
                               )}
                             </div>
                           </div>
