@@ -103,7 +103,7 @@ export default function QuotePDFTemplate({ quote, onClose }) {
             <div className="quote-title">RESMİ FİYAT TEKLİFİ</div>
             <div className="meta-row"><strong>Teklif No:</strong> {id}</div>
             <div className="meta-row"><strong>Tarih:</strong> {createdAt ? new Date(createdAt).toLocaleDateString('tr-TR') : new Date().toLocaleDateString('tr-TR')}</div>
-            <div className="meta-row"><strong>Geçerlilik:</strong> {expiresAt ? new Date(expiresAt).toLocaleDateString('tr-TR') : new Date(Date.now() + 15 * 86400000).toLocaleDateString('tr-TR')} (15 Gün)</div>
+            <div className="meta-row"><strong>Geçerlilik:</strong> {expiresAt ? new Date(expiresAt).toLocaleDateString('tr-TR') : '15 Gün'}</div>
           </div>
         </header>
 

@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // GET /api/admin/sample-orders - Fetch all sample orders with relations
-export async function GET() {
+export async function GET(req) {
   try {
+    const auth = await verifyAuth(req, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const orders = await prisma.sampleOrder.findMany({
       include: {
         product: {
@@ -35,6 +38,10 @@ export async function GET() {
 // PATCH /api/admin/sample-orders - Update status and shipping details
 export async function PATCH(req) {
   try {
+    const auth = await verifyAuth(req, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const { id, status, cargoCompany, trackingNumber } = await req.json();
 
     if (!id) {
@@ -65,6 +72,10 @@ export async function PATCH(req) {
 // DELETE /api/admin/sample-orders?id=... - Delete sample order
 export async function DELETE(req) {
   try {
+    const auth = await verifyAuth(req, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 

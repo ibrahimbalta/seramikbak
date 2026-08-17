@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // GET /api/admin/contact-messages - Fetch all submitted contact messages
-export async function GET() {
+export async function GET(req) {
   try {
+    const auth = await verifyAuth(req, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const messages = await prisma.contactMessage.findMany({
       orderBy: { createdAt: 'desc' }
     });
@@ -19,6 +22,10 @@ export async function GET() {
 // PATCH /api/admin/contact-messages - Update status (UNREAD, READ, REPLIED)
 export async function PATCH(req) {
   try {
+    const auth = await verifyAuth(req, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const { id, status } = await req.json();
     if (!id || !status) {
       return NextResponse.json({ error: 'ID ve Statü zorunludur.' }, { status: 400 });
@@ -39,6 +46,10 @@ export async function PATCH(req) {
 // DELETE /api/admin/contact-messages?id=... - Delete message
 export async function DELETE(req) {
   try {
+    const auth = await verifyAuth(req, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 

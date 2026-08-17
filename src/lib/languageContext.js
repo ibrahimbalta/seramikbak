@@ -8,6 +8,18 @@ const LanguageContext = createContext();
 export function LanguageProvider({ children }) {
   const [lang, setLangState] = useState('tr');
 
+  const applyLanguageSettings = (selectedLang) => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = selectedLang;
+      document.documentElement.dir = selectedLang === 'ar' ? 'rtl' : 'ltr';
+      if (selectedLang === 'ar') {
+        document.body.classList.add('rtl-mode');
+      } else {
+        document.body.classList.remove('rtl-mode');
+      }
+    }
+  };
+
   useEffect(() => {
     // Detect saved language or automatic browser/country locale
     if (typeof window !== 'undefined') {
@@ -36,18 +48,6 @@ export function LanguageProvider({ children }) {
       }
     }
   }, []);
-
-  const applyLanguageSettings = (selectedLang) => {
-    if (typeof document !== 'undefined') {
-      document.documentElement.lang = selectedLang;
-      document.documentElement.dir = selectedLang === 'ar' ? 'rtl' : 'ltr';
-      if (selectedLang === 'ar') {
-        document.body.classList.add('rtl-mode');
-      } else {
-        document.body.classList.remove('rtl-mode');
-      }
-    }
-  };
 
   const setLang = (newLang) => {
     if (dictionaries[newLang]) {

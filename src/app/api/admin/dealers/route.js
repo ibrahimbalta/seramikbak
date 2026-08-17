@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
+import { verifyAuth } from '@/lib/auth-check';
 
-export async function GET() {
+export async function GET(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const dealers = await prisma.dealer.findMany({
       include: {
         brand: {
@@ -21,6 +26,10 @@ export async function GET() {
 
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const body = await request.json();
     const { name, brandId, phone, address, city, district, lat, lng } = body;
 
@@ -58,6 +67,10 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
@@ -78,6 +91,10 @@ export async function DELETE(request) {
 
 export async function PUT(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
     const body = await request.json();
     const { 
       id, 
