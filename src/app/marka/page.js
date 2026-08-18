@@ -38,7 +38,8 @@ import {
   Trash2,
   Globe,
   Download,
-  BarChart3
+  BarChart3,
+  Clock
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -248,16 +249,32 @@ export default function BrandPortalPage() {
   const requestedPlan = b2bStats?.saas?.status === 'PENDING_APPROVAL' ? b2bStats.saas.plan : (b2bStats?.saas?.pendingStatus === 'PENDING_APPROVAL' ? b2bStats.saas.pendingPlan : null);
   const isRejected = b2bStats?.saas?.status === 'REJECTED' || b2bStats?.saas?.pendingStatus === 'REJECTED';
 
-  // Restore session & bids from localStorage on mount
+  // Inactivity / Auto-Logout states (15 min inactivity limit)
+  const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000;
+  const WARNING_BUFFER_MS = 60 * 1000;
+  const [showInactivityWarning, setShowInactivityWarning] = useState(false);
+  const [inactivityCountdown, setInactivityCountdown] = useState(60);
+  const [inactivityLogoutReason, setInactivityLogoutReason] = useState('');
+
+  // Restore session & bids from localStorage on mount with inactivity check
   useEffect(() => {
     const savedSession = localStorage.getItem('sb_brand_session');
+    const lastActivity = Number(localStorage.getItem('sb_brand_last_activity') || 0);
+
     if (savedSession) {
-      try {
-        const session = JSON.parse(savedSession);
-        setBrandInfo(session);
-        setIsLoggedIn(true);
-      } catch (err) {
-        console.error('Session restore failed:', err);
+      if (lastActivity > 0 && (Date.now() - lastActivity > INACTIVITY_TIMEOUT_MS)) {
+        localStorage.removeItem('sb_brand_session');
+        localStorage.removeItem('sb_brand_last_activity');
+        setInactivityLogoutReason('Son oturumunuz 15 dakikalık hareketsizlik nedeniyle otomatik kapatılmıştır. Lütfen tekrar giriş yapın.');
+      } else {
+        try {
+          const session = JSON.parse(savedSession);
+          setBrandInfo(session);
+          setIsLoggedIn(true);
+          localStorage.setItem('sb_brand_last_activity', String(Date.now()));
+        } catch (err) {
+          console.error('Session restore failed:', err);
+        }
       }
     }
 
@@ -270,6 +287,56 @@ export default function BrandPortalPage() {
       }
     }
   }, []);
+
+  // Live activity tracking & periodic inactivity timer
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    const resetActivity = () => {
+      localStorage.setItem('sb_brand_last_activity', String(Date.now()));
+      setShowInactivityWarning(false);
+    };
+
+    const events = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    let lastRecorded = 0;
+    const throttledReset = () => {
+      const now = Date.now();
+      if (now - lastRecorded > 2000) {
+        lastRecorded = now;
+        resetActivity();
+      }
+    };
+
+    events.forEach(evt => window.addEventListener(evt, throttledReset, { passive: true }));
+
+    const interval = setInterval(() => {
+      const lastAct = Number(localStorage.getItem('sb_brand_last_activity') || Date.now());
+      const elapsed = Date.now() - lastAct;
+
+      if (elapsed >= INACTIVITY_TIMEOUT_MS) {
+        localStorage.removeItem('sb_brand_session');
+        localStorage.removeItem('sb_brand_last_activity');
+        setIsLoggedIn(false);
+        setBrandInfo(null);
+        setB2bStats(null);
+        setBrandProducts([]);
+        setDealers([]);
+        setShowInactivityWarning(false);
+        setInactivityLogoutReason('Güvenliğiniz için 15 dakika boyunca herhangi bir işlem yapılmadığından oturumunuz otomatik olarak sonlandırılmıştır.');
+      } else if (elapsed >= (INACTIVITY_TIMEOUT_MS - WARNING_BUFFER_MS)) {
+        const remaining = Math.max(0, Math.ceil((INACTIVITY_TIMEOUT_MS - elapsed) / 1000));
+        setInactivityCountdown(remaining);
+        setShowInactivityWarning(true);
+      } else {
+        setShowInactivityWarning(false);
+      }
+    }, 1000);
+
+    return () => {
+      events.forEach(evt => window.removeEventListener(evt, throttledReset));
+      clearInterval(interval);
+    };
+  }, [isLoggedIn]);
 
   // Fetch stats, products, and dealers once logged in
   useEffect(() => {
@@ -560,6 +627,7 @@ export default function BrandPortalPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
+    setInactivityLogoutReason('');
     setLoginLoading(true);
 
     try {
@@ -573,6 +641,7 @@ export default function BrandPortalPage() {
       if (res.ok && data.success) {
         setBrandInfo(data.brand);
         localStorage.setItem('sb_brand_session', JSON.stringify(data.brand));
+        localStorage.setItem('sb_brand_last_activity', String(Date.now()));
         setIsLoggedIn(true);
       } else {
         setLoginError(data.error || 'Giriş başarısız oldu.');
@@ -587,6 +656,7 @@ export default function BrandPortalPage() {
 
   const handleLogout = () => {
     localStorage.removeItem('sb_brand_session');
+    localStorage.removeItem('sb_brand_last_activity');
     setIsLoggedIn(false);
     setBrandInfo(null);
     setB2bStats(null);
@@ -594,6 +664,8 @@ export default function BrandPortalPage() {
     setDealers([]);
     setUsername('');
     setPassword('');
+    setShowInactivityWarning(false);
+    setInactivityLogoutReason('');
     setActivePortalTab('dashboard');
   };
 
@@ -1008,6 +1080,25 @@ export default function BrandPortalPage() {
           {/* TAB 1: LOGIN FORM */}
           {registerTab === 'login' && (
             <form onSubmit={handleLogin} className="login-form" style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              {inactivityLogoutReason && (
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  color: '#f87171',
+                  fontSize: '0.82rem',
+                  fontWeight: '600',
+                  lineHeight: '1.5'
+                }}>
+                  <AlertCircle size={20} style={{ flexShrink: 0 }} />
+                  <span>{inactivityLogoutReason}</span>
+                </div>
+              )}
+
               {loginError && (
                 <div className="error-alert" style={{
                   background: 'rgba(239, 68, 68, 0.1)',
@@ -4906,6 +4997,100 @@ export default function BrandPortalPage() {
               </div>
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Inactivity Warning Modal */}
+      {showInactivityWarning && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(9, 13, 22, 0.85)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            background: 'linear-gradient(145deg, #111827 0%, #0d131f 100%)',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            borderRadius: '24px',
+            padding: '32px 28px',
+            maxWidth: '440px',
+            width: '100%',
+            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 175, 55, 0.1)',
+            textAlign: 'center',
+            boxSizing: 'border-box'
+          }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              background: 'rgba(212, 175, 55, 0.12)',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px auto',
+              color: '#d4af37'
+            }}>
+              <Clock size={32} />
+            </div>
+
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#fff', margin: '0 0 10px 0', fontFamily: 'var(--font-title)' }}>
+              Oturum Zaman Aşımı Uyarısı
+            </h3>
+
+            <p style={{ fontSize: '0.88rem', color: '#94a3b8', lineHeight: '1.6', margin: '0 0 24px 0' }}>
+              Uzun süredir herhangi bir işlem yapmadınız. Güvenliğiniz için oturumunuz <span style={{ color: '#ef4444', fontWeight: '800', fontSize: '1.05rem' }}>{inactivityCountdown} saniye</span> içinde otomatik olarak kapatılacaktır.
+            </p>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  localStorage.setItem('sb_brand_last_activity', String(Date.now()));
+                  setShowInactivityWarning(false);
+                }}
+                style={{
+                  flex: 1,
+                  padding: '14px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                  color: '#090d16',
+                  fontSize: '0.9rem',
+                  fontWeight: '800',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
+                }}
+              >
+                Oturumu Açık Tut
+              </button>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                style={{
+                  padding: '14px 20px',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  color: '#cbd5e1',
+                  fontSize: '0.9rem',
+                  fontWeight: '700',
+                  cursor: 'pointer'
+                }}
+              >
+                Çıkış Yap
+              </button>
+            </div>
           </div>
         </div>
       )}
