@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { cropWhiteBorders } from '../utils/imageTextureUtils';
 
 export default function StudioCanvas({ 
   activeProduct, 
@@ -192,6 +193,8 @@ export default function StudioCanvas({
 
   // Helper to generate a CanvasTexture dynamically injecting grout border overlays, tile patterns (Herringbone, Staggered) and rotation
   const generateGroutOverlay = (sourceCanvasOrImage, product, gWidth, gColor, rotation, pattern) => {
+    const cleanSource = cropWhiteBorders(sourceCanvasOrImage);
+
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 512;
@@ -208,34 +211,34 @@ export default function StudioCanvas({
       const pw = 250 - borderPx;
       const ph = 120 - borderPx;
 
-      ctx.drawImage(sourceCanvasOrImage, 10, 10, pw, ph);
-      ctx.drawImage(sourceCanvasOrImage, 260, 10, pw, ph);
+      ctx.drawImage(cleanSource, 10, 10, pw, ph);
+      ctx.drawImage(cleanSource, 260, 10, pw, ph);
       
       ctx.save();
       ctx.translate(135, 380);
       ctx.rotate(Math.PI / 2);
-      ctx.drawImage(sourceCanvasOrImage, -ph/2, -pw/2, ph, pw);
+      ctx.drawImage(cleanSource, -ph/2, -pw/2, ph, pw);
       ctx.restore();
 
       ctx.save();
       ctx.translate(385, 380);
       ctx.rotate(Math.PI / 2);
-      ctx.drawImage(sourceCanvasOrImage, -ph/2, -pw/2, ph, pw);
+      ctx.drawImage(cleanSource, -ph/2, -pw/2, ph, pw);
       ctx.restore();
     } 
     else if (pattern === 'staggered_50' || pattern === 'staggered_33') {
       const rowH = 256 - borderPx;
       const offsetRatio = pattern === 'staggered_50' ? 0.5 : 0.33;
 
-      ctx.drawImage(sourceCanvasOrImage, 0, 0, 512 - borderPx, rowH);
+      ctx.drawImage(cleanSource, 0, 0, 512 - borderPx, rowH);
       const offsetPx = 512 * offsetRatio;
-      ctx.drawImage(sourceCanvasOrImage, offsetPx, 256, 512 - borderPx, rowH);
-      ctx.drawImage(sourceCanvasOrImage, offsetPx - 512, 256, 512 - borderPx, rowH);
+      ctx.drawImage(cleanSource, offsetPx, 256, 512 - borderPx, rowH);
+      ctx.drawImage(cleanSource, offsetPx - 512, 256, 512 - borderPx, rowH);
     } 
     else {
       const tileW = 512 - borderPx;
       const tileH = 512 - borderPx;
-      ctx.drawImage(sourceCanvasOrImage, 0, 0, tileW, tileH);
+      ctx.drawImage(cleanSource, 0, 0, tileW, tileH);
     }
 
     const texture = new THREE.CanvasTexture(canvas);

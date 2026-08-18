@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Eye, Sparkles, Layers, Maximize2 } from 'lucide-react';
+import { cropWhiteBorders } from '../utils/imageTextureUtils';
 
 export default function BathroomMockupPreview({ product, onOpenStudio }) {
   const [viewMode, setViewMode] = useState('full'); // 'full' | 'wall' | 'floor'
@@ -25,7 +26,8 @@ export default function BathroomMockupPreview({ product, onOpenStudio }) {
     img.src = proxyUrl;
 
     img.onload = () => {
-      setTextureImg(img);
+      const cleaned = cropWhiteBorders(img);
+      setTextureImg(cleaned);
       setIsLoaded(true);
     };
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Camera, Image as ImageIcon, RotateCw, ZoomIn, Download, RefreshCw, Sparkles, HelpCircle } from 'lucide-react';
+import { cropWhiteBorders } from '../utils/imageTextureUtils';
 
 // Room Presets with empty floors/walls and pre-mapped perspective coordinates
 const ROOM_PRESETS = [
@@ -79,7 +80,8 @@ export default function PhotoVisualizer({ activeProduct }) {
     // Proxy URL to prevent CORS canvas tainting in production
     img.src = textureUrl.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(textureUrl)}` : textureUrl;
     img.onload = () => {
-      setTileImage(img);
+      const cleaned = cropWhiteBorders(img);
+      setTileImage(cleaned);
     };
   }, [activeProduct]);
 

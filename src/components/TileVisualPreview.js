@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { cropWhiteBorders } from '../utils/imageTextureUtils';
 
 // ----------------------------------------------------------------------
 // PROCEDURAL TILE VISUAL PREVIEW COMPONENT
@@ -24,6 +25,38 @@ export default function TileVisualPreview({ style, color, finish, width, height,
     bgColor = isBeige ? '#e3d6c3' : '#a0a4ab'; // Beige/Grey concrete
   }
 
+  const [cleanedSrc, setCleanedSrc] = useState(null);
+
+  useEffect(() => {
+    if (!imageUrl || imageError) return;
+    const rawSrc = (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))
+      ? `/api/proxy?url=${encodeURIComponent(imageUrl)}`
+      : imageUrl;
+    
+    let active = true;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      if (!active) return;
+      const cropped = cropWhiteBorders(img);
+      if (cropped && cropped instanceof HTMLCanvasElement) {
+        try {
+          setCleanedSrc(cropped.toDataURL());
+        } catch (e) {
+          setCleanedSrc(rawSrc);
+        }
+      } else {
+        setCleanedSrc(rawSrc);
+      }
+    };
+    img.onerror = () => {
+      if (active) setCleanedSrc(rawSrc);
+    };
+    img.src = rawSrc;
+
+    return () => { active = false; };
+  }, [imageUrl, imageError]);
+
   // If a real image path exists and has loaded successfully, render it!
   if (imageUrl && !imageError) {
     const displaySrc = (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))
@@ -33,7 +66,7 @@ export default function TileVisualPreview({ style, color, finish, width, height,
     return (
       <div className="tile-preview-container" style={{ backgroundColor: bgColor }} title={seoAltString} aria-label={seoAltString}>
         <img 
-          src={displaySrc} 
+          src={cleanedSrc || displaySrc} 
           alt={seoAltString}
           title={seoAltString}
           referrerPolicy="no-referrer"

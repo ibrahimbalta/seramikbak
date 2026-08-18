@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Camera, Sparkles, QrCode, X, ExternalLink, Layers, Smartphone, Maximize2 } from 'lucide-react';
 import * as THREE from 'three';
+import { cropWhiteBorders } from '../utils/imageTextureUtils';
 
 export default function ModelViewerAR({ product, onClose }) {
   const [modelViewerLoaded, setModelViewerLoaded] = useState(false);
@@ -47,7 +48,17 @@ export default function ModelViewerAR({ product, onClose }) {
           const imgPath = product.textureUrl || product.imageUrl;
           const src = imgPath.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(imgPath)}` : imgPath;
           texture = await new Promise((resolve) => {
-            loader.load(src, (tex) => resolve(tex), undefined, () => resolve(null));
+            loader.load(src, (tex) => {
+              if (tex && tex.image) {
+                const cleanImg = cropWhiteBorders(tex.image);
+                const canvasTex = new THREE.CanvasTexture(cleanImg);
+                canvasTex.wrapS = THREE.RepeatWrapping;
+                canvasTex.wrapT = THREE.RepeatWrapping;
+                resolve(canvasTex);
+              } else {
+                resolve(tex);
+              }
+            }, undefined, () => resolve(null));
           });
         }
 
