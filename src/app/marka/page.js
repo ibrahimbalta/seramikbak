@@ -39,7 +39,8 @@ import {
   Globe,
   Download,
   BarChart3,
-  Clock
+  Clock,
+  RefreshCw
 } from 'lucide-react';
 import Link from 'next/link';
 
