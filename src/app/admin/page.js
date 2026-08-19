@@ -34,7 +34,11 @@ import {
   Mail,
   MessageSquare,
   RefreshCw,
-  Truck
+  Truck,
+  Key,
+  Pencil,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import Link from 'next/link';
 import SecurityBackupTab from '@/components/admin/SecurityBackupTab';
@@ -155,6 +159,8 @@ export default function AdminPage() {
   const [newDealerName, setNewDealerName] = useState('');
   const [newDealerBrandId, setNewDealerBrandId] = useState('');
   const [newDealerPhone, setNewDealerPhone] = useState('');
+  const [newDealerEmail, setNewDealerEmail] = useState('');
+  const [newDealerPassword, setNewDealerPassword] = useState('');
   const [newDealerAddress, setNewDealerAddress] = useState('');
   const [newDealerCity, setNewDealerCity] = useState('İstanbul');
   const [newDealerDistrict, setNewDealerDistrict] = useState('');
@@ -164,6 +170,21 @@ export default function AdminPage() {
   const [dealerSuccess, setDealerSuccess] = useState('');
   const [dealerError, setDealerError] = useState('');
   const [dealerSubTab, setDealerSubTab] = useState('active'); // active, pending
+
+  // Dealer Credentials Editing State (Modal/Panel)
+  const [editingDealerModalOpen, setEditingDealerModalOpen] = useState(false);
+  const [editingDealerId, setEditingDealerId] = useState('');
+  const [editingDealerName, setEditingDealerName] = useState('');
+  const [editingDealerEmail, setEditingDealerEmail] = useState('');
+  const [editingDealerPhone, setEditingDealerPhone] = useState('');
+  const [editingDealerPassword, setEditingDealerPassword] = useState('');
+  const [editingDealerCity, setEditingDealerCity] = useState('');
+  const [editingDealerDistrict, setEditingDealerDistrict] = useState('');
+  const [editingDealerAddress, setEditingDealerAddress] = useState('');
+  const [isSavingDealerEdit, setIsSavingDealerEdit] = useState(false);
+  const [dealerEditSuccess, setDealerEditSuccess] = useState('');
+  const [dealerEditError, setDealerEditError] = useState('');
+  const [visibleDealerPassword, setVisibleDealerPassword] = useState(false);
 
   // SaaS Form State
   const [saasBrandId, setSaasBrandId] = useState('');
@@ -1392,6 +1413,8 @@ export default function AdminPage() {
           name: newDealerName,
           brandId: newDealerBrandId,
           phone: newDealerPhone,
+          email: newDealerEmail,
+          password: newDealerPassword,
           address: newDealerAddress,
           city: newDealerCity,
           district: newDealerDistrict,
@@ -1405,6 +1428,8 @@ export default function AdminPage() {
         setDealerSuccess('Yeni yetkili bayi başarıyla sisteme kaydedildi.');
         setNewDealerName('');
         setNewDealerPhone('');
+        setNewDealerEmail('');
+        setNewDealerPassword('');
         setNewDealerAddress('');
         setNewDealerDistrict('');
         loadDealers();
@@ -1415,6 +1440,70 @@ export default function AdminPage() {
       setDealerError('API bağlantı hatası.');
     } finally {
       setIsAddingDealer(false);
+    }
+  };
+
+  // Open Edit Dealer Credentials Modal handler
+  const handleOpenEditDealerModal = (dealer) => {
+    setEditingDealerId(dealer.id);
+    setEditingDealerName(dealer.name || '');
+    setEditingDealerEmail(dealer.email || '');
+    setEditingDealerPhone(dealer.phone || '');
+    setEditingDealerPassword(''); // Blank unless admin wants to change password
+    setEditingDealerCity(dealer.city || 'İstanbul');
+    setEditingDealerDistrict(dealer.district || '');
+    setEditingDealerAddress(dealer.address || '');
+    setDealerEditSuccess('');
+    setDealerEditError('');
+    setVisibleDealerPassword(false);
+    setEditingDealerModalOpen(true);
+  };
+
+  // Generate random dealer password
+  const handleGenerateRandomDealerPassword = () => {
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    setEditingDealerPassword(`bayi${randomNum}`);
+  };
+
+  // Save Dealer Credentials & Info handler
+  const handleSaveDealerCredentials = async (e) => {
+    e.preventDefault();
+    if (!editingDealerId) return;
+    setIsSavingDealerEdit(true);
+    setDealerEditSuccess('');
+    setDealerEditError('');
+
+    try {
+      const res = await fetch('/api/admin/dealers', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingDealerId,
+          name: editingDealerName,
+          email: editingDealerEmail,
+          phone: editingDealerPhone,
+          password: editingDealerPassword,
+          city: editingDealerCity,
+          district: editingDealerDistrict,
+          address: editingDealerAddress
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setDealerEditSuccess('Bayi giriş bilgileri ve şifresi başarıyla güncellendi!');
+        loadDealers();
+        setTimeout(() => {
+          setEditingDealerModalOpen(false);
+        }, 1200);
+      } else {
+        setDealerEditError(data.error || 'Güncelleme yapılırken bir hata oluştu.');
+      }
+    } catch (err) {
+      console.error(err);
+      setDealerEditError('Sunucu bağlantı hatası.');
+    } finally {
+      setIsSavingDealerEdit(false);
     }
   };
 
@@ -3174,14 +3263,37 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              <div className="form-group-row">
+                <div className="form-group">
+                  <label>İletişim Telefonu (Kullanıcı Adı)</label>
+                  <input 
+                    type="tel" 
+                    value={newDealerPhone} 
+                    onChange={(e) => setNewDealerPhone(e.target.value)} 
+                    required 
+                    placeholder="0216 123 4567" 
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>E-posta (Kullanıcı Adı)</label>
+                  <input 
+                    type="email" 
+                    value={newDealerEmail} 
+                    onChange={(e) => setNewDealerEmail(e.target.value)} 
+                    placeholder="bayi@firma.com" 
+                    className="form-input"
+                  />
+                </div>
+              </div>
+
               <div className="form-group">
-                <label>İletişim Telefonu</label>
+                <label>Giriş Şifresi (Opsiyonel)</label>
                 <input 
-                  type="tel" 
-                  value={newDealerPhone} 
-                  onChange={(e) => setNewDealerPhone(e.target.value)} 
-                  required 
-                  placeholder="0216 123 4567" 
+                  type="text" 
+                  value={newDealerPassword} 
+                  onChange={(e) => setNewDealerPassword(e.target.value)} 
+                  placeholder="Boş bırakılırsa varsayılan: bayi123" 
                   className="form-input"
                 />
               </div>
@@ -3316,7 +3428,29 @@ export default function AdminPage() {
                           <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{d.email || '-'}</div>
                         </td>
                         <td>
-                          <div style={{ display: 'flex', gap: '6px' }}>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button 
+                              type="button" 
+                              onClick={() => handleOpenEditDealerModal(d)} 
+                              className="btn-action-edit" 
+                              title="Giriş Bilgilerini ve Şifreyi Güncelle"
+                              style={{
+                                padding: '4px 8px',
+                                fontSize: '0.7rem',
+                                background: 'rgba(212, 175, 55, 0.12)',
+                                color: '#b48811',
+                                border: '1px solid rgba(212, 175, 55, 0.4)',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: '600',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}
+                            >
+                              <Key size={13} />
+                              <span>Şifre/Bilgi</span>
+                            </button>
                             <button 
                               type="button"
                               onClick={() => handleUpdateDealerStatus(d.id, 'APPROVED')} 
@@ -3371,7 +3505,7 @@ export default function AdminPage() {
                       <th>Bayi Adı</th>
                       <th>Marka</th>
                       <th>Bölge</th>
-                      <th>Telefon</th>
+                      <th>Telefon / E-posta</th>
                       <th>İşlem</th>
                     </tr>
                   </thead>
@@ -3384,11 +3518,38 @@ export default function AdminPage() {
                         </td>
                         <td><span className="badge-brand">{d.brand?.name}</span></td>
                         <td>{d.district}, {d.city}</td>
-                        <td>{d.phone}</td>
                         <td>
-                          <button onClick={() => handleDeleteDealer(d.id)} className="btn-action-delete" title="Sil">
-                            <Trash2 size={14} />
-                          </button>
+                          <div style={{ fontWeight: '600' }}>{d.phone}</div>
+                          <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.email || <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>E-posta yok</span>}</div>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button 
+                              type="button" 
+                              onClick={() => handleOpenEditDealerModal(d)} 
+                              className="btn-action-edit" 
+                              title="Giriş Bilgilerini ve Şifreyi Güncelle"
+                              style={{
+                                padding: '4px 8px',
+                                fontSize: '0.7rem',
+                                background: 'rgba(212, 175, 55, 0.12)',
+                                color: '#b48811',
+                                border: '1px solid rgba(212, 175, 55, 0.4)',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: '600',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}
+                            >
+                              <Key size={13} />
+                              <span>Şifre/Bilgi</span>
+                            </button>
+                            <button onClick={() => handleDeleteDealer(d.id)} className="btn-action-delete" title="Sil">
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -7377,6 +7538,339 @@ export default function AdminPage() {
           }
         }
       `}</style>
+      {/* DEALER CREDENTIALS & PROFILE EDIT MODAL */}
+      {editingDealerModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '16px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            width: '100%',
+            maxWidth: '560px',
+            overflow: 'hidden',
+            border: '1px solid var(--border-color)',
+            animation: 'fadeIn 0.2s ease-out'
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '18px 24px',
+              borderBottom: '1px solid #f1f5f9',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: '#f8fafc'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  padding: '8px',
+                  borderRadius: '10px',
+                  background: 'rgba(212, 175, 55, 0.15)',
+                  color: 'var(--accent-gold)'
+                }}>
+                  <Key size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800', color: '#0f172a' }}>
+                    Bayi Giriş Bilgileri & Şifre Güncelle
+                  </h3>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: '#64748b' }}>
+                    {editingDealerName} bayisinin kullanıcı adı ve şifresini yenileyin.
+                  </p>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setEditingDealerModalOpen(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '6px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Form Content */}
+            <form onSubmit={handleSaveDealerCredentials} style={{ padding: '24px' }}>
+              {dealerEditSuccess && (
+                <div style={{
+                  padding: '12px 16px',
+                  background: '#e6f7ed',
+                  color: '#10b981',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: '600',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <CheckCircle size={18} />
+                  <span>{dealerEditSuccess}</span>
+                </div>
+              )}
+
+              {dealerEditError && (
+                <div style={{
+                  padding: '12px 16px',
+                  background: '#fee2e2',
+                  color: '#ef4444',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: '600',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <AlertCircle size={18} />
+                  <span>{dealerEditError}</span>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '750', color: '#334155', marginBottom: '6px' }}>
+                    Bayi / Showroom Adı
+                  </label>
+                  <input 
+                    type="text" 
+                    value={editingDealerName} 
+                    onChange={(e) => setEditingDealerName(e.target.value)} 
+                    required 
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.88rem'
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '750', color: '#334155', marginBottom: '6px' }}>
+                      E-posta Adresi (Kullanıcı Adı)
+                    </label>
+                    <input 
+                      type="email" 
+                      value={editingDealerEmail} 
+                      onChange={(e) => setEditingDealerEmail(e.target.value)} 
+                      placeholder="ornek@bayi.com"
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.88rem'
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '750', color: '#334155', marginBottom: '6px' }}>
+                      Giriş Telefonu (Kullanıcı Adı)
+                    </label>
+                    <input 
+                      type="tel" 
+                      value={editingDealerPhone} 
+                      onChange={(e) => setEditingDealerPhone(e.target.value)} 
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.88rem'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={{ fontSize: '0.78rem', fontWeight: '750', color: '#334155' }}>
+                      Yeni Şifre
+                    </label>
+                    <button 
+                      type="button" 
+                      onClick={handleGenerateRandomDealerPassword}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--accent-gold)',
+                        fontSize: '0.73rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      ⚡ Otomatik Rastgele Şifre Üret
+                    </button>
+                  </div>
+                  <div style={{ position: 'relative' }}>
+                    <input 
+                      type={visibleDealerPassword ? "text" : "password"} 
+                      value={editingDealerPassword} 
+                      onChange={(e) => setEditingDealerPassword(e.target.value)} 
+                      placeholder="Şifreyi değiştirmek istemiyorsanız boş bırakın"
+                      style={{
+                        width: '100%',
+                        padding: '10px 40px 10px 14px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.88rem'
+                      }}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => setVisibleDealerPassword(!visibleDealerPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '12px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: '#64748b',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {visibleDealerPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px' }}>
+                    * Bayi, giriş yaparken <strong>e-posta adresini</strong> veya <strong>telefon numarasını</strong> kullanıcı adı olarak kullanabilir.
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '750', color: '#334155', marginBottom: '6px' }}>
+                      İl
+                    </label>
+                    <input 
+                      type="text" 
+                      value={editingDealerCity} 
+                      onChange={(e) => setEditingDealerCity(e.target.value)} 
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.88rem'
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '750', color: '#334155', marginBottom: '6px' }}>
+                      İlçe
+                    </label>
+                    <input 
+                      type="text" 
+                      value={editingDealerDistrict} 
+                      onChange={(e) => setEditingDealerDistrict(e.target.value)} 
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.88rem'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '750', color: '#334155', marginBottom: '6px' }}>
+                    Açık Adres
+                  </label>
+                  <textarea 
+                    value={editingDealerAddress} 
+                    onChange={(e) => setEditingDealerAddress(e.target.value)} 
+                    rows={2}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.88rem'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
+                <button 
+                  type="button" 
+                  onClick={() => setEditingDealerModalOpen(false)}
+                  style={{
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    background: '#ffffff',
+                    color: '#475569',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  İptal
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isSavingDealerEdit}
+                  className="btn-primary"
+                  style={{
+                    padding: '10px 24px',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    fontWeight: '700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  {isSavingDealerEdit ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Kaydediliyor...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle size={16} />
+                      <span>Güncelle ve Kaydet</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

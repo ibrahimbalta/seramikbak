@@ -31,7 +31,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
     }
     const body = await request.json();
-    const { name, brandId, phone, address, city, district, lat, lng } = body;
+    const { name, brandId, phone, email, password, address, city, district, lat, lng } = body;
 
     if (!name || !brandId || !phone || !address || !city || !district) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -40,11 +40,17 @@ export async function POST(request) {
     const latitude = parseFloat(lat) || 40.9901;
     const longitude = parseFloat(lng) || 29.0278;
 
+    const initialPassword = password && password.trim() !== '' 
+      ? (password.includes(':') ? password : hashPassword(password)) 
+      : hashPassword('bayi123');
+
     const newDealer = await prisma.dealer.create({
       data: {
         name,
         brandId,
         phone,
+        email: email || null,
+        password: initialPassword,
         address,
         city,
         district,
@@ -98,9 +104,13 @@ export async function PUT(request) {
     const body = await request.json();
     const { 
       id, 
+      name,
       status, 
       phone, 
+      email,
       address, 
+      city,
+      district,
       password, 
       lat, 
       lng, 
@@ -127,10 +137,14 @@ export async function PUT(request) {
     }
 
     const updateData = {};
+    if (name !== undefined) updateData.name = name;
     if (status !== undefined) updateData.status = status;
     if (phone !== undefined) updateData.phone = phone;
+    if (email !== undefined) updateData.email = email || null;
     if (address !== undefined) updateData.address = address;
-    if (password !== undefined) {
+    if (city !== undefined) updateData.city = city;
+    if (district !== undefined) updateData.district = district;
+    if (password !== undefined && password.trim() !== '') {
       updateData.password = password.includes(':') ? password : hashPassword(password);
     }
     if (lat !== undefined) updateData.lat = parseFloat(lat);
