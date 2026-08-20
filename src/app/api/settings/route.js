@@ -57,28 +57,174 @@ export async function GET() {
       }
     ];
 
-    // 4. Default Inspiration Gallery
+    // 4. Default Inspiration Gallery (16 Rich Architectural Models)
     const defaultIlham = [
+      // BANYO MODELLERİ
       {
-        title: 'İskandinav Ahşap Zarafeti',
-        desc: 'Banyo ve mutfaklarda sıcacık, doğal bir doku.',
-        style: 'Ahşap',
-        tag: 'Minimalist',
-        img: '/hero/scandinavian_kitchen.png'
-      },
-      {
-        title: 'Lüks Calacatta Mermer',
-        desc: 'Geniş banyolarda kesintisiz ve camsı parlak yansımalar.',
+        id: 1,
+        title: 'Lüks Calacatta Camsı Banyo',
+        desc: 'Geniş banyolarda kesintisiz damarlı mermer yansımaları ve lüks fırçalanmış pirinç detaylar.',
         style: 'Mermer',
+        room: 'Banyo',
         tag: 'Premium Luxury',
-        img: '/hero/luxury_bathroom.png'
+        img: '/hero/luxury_bathroom.png',
+        tileRecommendation: 'Calacatta Gold Full Lappato 60x120 cm'
       },
       {
-        title: 'Endüstriyel Beton & Loft',
-        desc: 'Salon ve koridorlarda modern brütist gri tonlar.',
+        id: 2,
+        title: 'Japandi Zen & Traverten Spa Banyo',
+        desc: 'Toprak ve kemik tonlarında sıcak traverten dokulu seramikler ile banyoda huzurlu spa ortamı.',
+        style: 'Traverten',
+        room: 'Banyo',
+        tag: 'Japandi Spa',
+        img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80',
+        tileRecommendation: 'Travertino Bej Mat R10 60x120 cm'
+      },
+      {
+        id: 3,
+        title: 'Akdeniz Terrazzo & Pastel Banyo',
+        desc: 'İtalyan terrazzo parçacıklı eğlenceli ve dinamik banyo duvar ve zemin kaplamaları.',
+        style: 'Terrazzo',
+        room: 'Banyo',
+        tag: 'Mediterranean',
+        img: 'https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=800&q=80',
+        tileRecommendation: 'Terrazzo Veneziano Pastel 60x60 cm'
+      },
+      {
+        id: 4,
+        title: 'Mat Antrasit & Siyah Minimalist Banyo',
+        desc: 'Koyu gri ve antrasit bazalt dokusuyla lüks otel suitleri havasında modern tasarım.',
         style: 'Beton',
-        tag: 'Modern',
-        img: '/hero/modern_living.png'
+        room: 'Banyo',
+        tag: 'Dark Luxury',
+        img: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=800&q=80',
+        tileRecommendation: 'Basalt Black Mat R10 60x120 cm'
+      },
+
+      // MUTFAK MODELLERİ
+      {
+        id: 5,
+        title: 'İskandinav Meşe & Sıcak Mutfak',
+        desc: 'Doğal ahşap dokulu porselen karolar ile mutfağınızda sıcacık ve davetkar bir atmosfer oluşturun.',
+        style: 'Ahşap',
+        room: 'Mutfak',
+        tag: 'Minimalist',
+        img: '/hero/scandinavian_kitchen.png',
+        tileRecommendation: 'Meşe Mat Porselen 20x120 cm'
+      },
+      {
+        id: 6,
+        title: 'Statuario Beyaz Mutfak Adası',
+        desc: 'Geniş mutfak adalarında kesintisiz dev porselen plakalar ile leke tutmaz hijyenik yüzeyler.',
+        style: 'Mermer',
+        room: 'Mutfak',
+        tag: 'Modern Chic',
+        img: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80',
+        tileRecommendation: 'Statuario Extra Camsı Plaka 120x240 cm'
+      },
+      {
+        id: 7,
+        title: 'Rustic Doğal Taş Mutfak & Cotto',
+        desc: 'Köy evi ve taş ev konseptine uygun pişmiş toprak görünümlü sıcak zemin karoları.',
+        style: 'Doğal Taş',
+        room: 'Mutfak',
+        tag: 'Rustic Farmhouse',
+        img: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80',
+        tileRecommendation: 'Cotto Natural Mat 30x60 cm'
+      },
+      {
+        id: 8,
+        title: 'Zümrüt Yeşil Balıksırtı Backsplash',
+        desc: 'Mutfak tezgah arkasında parlak rölyefli zümrüt yeşili metro seramiklerin zamansız şıklığı.',
+        style: 'Dekoratif',
+        room: 'Mutfak',
+        tag: 'Art Deco',
+        img: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
+        tileRecommendation: 'Chevron Emerald Green 10x30 cm'
+      },
+
+      // SALON MODELLERİ
+      {
+        id: 9,
+        title: 'Endüstriyel Beton Loft Salon',
+        desc: 'Geniş açık alanlarda brütist beton görünüm ve modern minimalist mobilya kombinasyonu.',
+        style: 'Beton',
+        room: 'Salon',
+        tag: 'Modern Loft',
+        img: '/hero/modern_living.png',
+        tileRecommendation: 'Concrete Touch Antrasit Mat 80x80 cm'
+      },
+      {
+        id: 10,
+        title: 'Emperador Kahve Villa Girişi & Antre',
+        desc: 'Zengin kahve ve bronz mermer damarlarıyla gösterişli villa ve antre zeminleri.',
+        style: 'Mermer',
+        room: 'Salon',
+        tag: 'Executive Luxury',
+        img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+        tileRecommendation: 'Emperador Dark Parlak 80x160 cm'
+      },
+      {
+        id: 11,
+        title: 'Ceviz Parke Görünümlü Sıcak Salon',
+        desc: 'Yerden ısıtmaya %100 uyumlu, çizilmeyen ve solmayan ceviz desenli derzsiz porselen.',
+        style: 'Ahşap',
+        room: 'Salon',
+        tag: 'Warm Home',
+        img: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=800&q=80',
+        tileRecommendation: 'Walnut Natural Mat 20x120 cm'
+      },
+      {
+        id: 12,
+        title: 'Bal Parıltılı Onyx Camsı Koridor',
+        desc: 'Işıklı arkadan aydınlatmaya uygun camsı bal rengi onyx seramik serisi.',
+        style: 'Onyx',
+        room: 'Salon',
+        tag: 'Glamour',
+        img: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80',
+        tileRecommendation: 'Onyx Amber High Gloss 120x120 cm'
+      },
+
+      // DIŞ MEKAN MODELLERİ
+      {
+        id: 13,
+        title: 'Sıcak Traverten Teras & Dış Mekan',
+        desc: 'R11 yüksek kaymazlık değerine sahip doğal traverten desenli karolar ile güvenli ve zamansız teraslar.',
+        style: 'Traverten',
+        room: 'Dış Mekan',
+        tag: 'Doğal Taş',
+        img: '/hero/hero_ceramics.jpg',
+        tileRecommendation: 'Travertino Bej R11 Kaymaz 60x120 cm'
+      },
+      {
+        id: 14,
+        title: 'Turkuaz Cam Mozaik Havuz İçi & Veranda',
+        desc: 'Güneş ışığında ışıl ışıl parıldayan %100 cam mozaik havuz ve süs havuzu kaplamaları.',
+        style: 'Mozaik',
+        room: 'Dış Mekan',
+        tag: 'Resort Pool',
+        img: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=800&q=80',
+        tileRecommendation: 'Ocean Blue Glass Mosaic 30x30 cm'
+      },
+      {
+        id: 15,
+        title: 'Kaymaz R11 Kayrak Taş Bahçe Yolu',
+        desc: 'Donmaya ve sert hava koşullarına dayanıklı 2 cm ekstra kalın kayrak görünümlü dış mekan karoları.',
+        style: 'Doğal Taş',
+        room: 'Dış Mekan',
+        tag: 'Heavy Duty',
+        img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+        tileRecommendation: 'Outdoor Slate R11 2cm 60x60 cm'
+      },
+      {
+        id: 16,
+        title: 'Modern Antrasit Dış Cephe Kaplama',
+        desc: 'Binaların dış cephelerinde ısı ve yağmura karşı koruyucu mekanik montajlı porselen plakalar.',
+        style: 'Beton',
+        room: 'Dış Mekan',
+        tag: 'Facade Design',
+        img: '/images/dealer-banner-default.jpg',
+        tileRecommendation: 'Facade Anthracite Porcelain 60x120 cm'
       }
     ];
 

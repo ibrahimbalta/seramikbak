@@ -312,8 +312,12 @@ export default function InspirationGalleryPage() {
       .then(res => res.json())
       .then(data => {
         if (data) {
-          if (data.page_ilham_list && Array.isArray(data.page_ilham_list) && data.page_ilham_list.length > 0) {
-            setGalleryItems(data.page_ilham_list);
+          if (data.page_ilham_list && Array.isArray(data.page_ilham_list) && data.page_ilham_list.length >= 4) {
+            // Ensure items have room tags
+            const valid = data.page_ilham_list.some(item => item.room);
+            if (valid) {
+              setGalleryItems(data.page_ilham_list);
+            }
           }
           if (data.page_blog_list && Array.isArray(data.page_blog_list) && data.page_blog_list.length > 0) {
             setArticles(data.page_blog_list);
