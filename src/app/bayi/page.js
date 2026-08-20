@@ -5575,38 +5575,44 @@ export default function DealerPortalPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
             {/* No Subscription Warning Banner */}
             {!saasInfo && (
-              <div style={{
-                background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-                border: '1px solid #fbbf24',
-                borderRadius: '16px',
-                padding: '20px 24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '16px',
-                flexWrap: 'wrap'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <AlertCircle size={22} style={{ color: '#92400e', flexShrink: 0 }} />
+              <div 
+                className="no-subscription-banner"
+                style={{
+                  background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                  border: '1.5px solid #f59e0b',
+                  borderRadius: '16px',
+                  padding: '20px 24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '16px',
+                  flexWrap: 'wrap',
+                  color: '#78350f',
+                  boxShadow: '0 4px 14px rgba(245, 158, 11, 0.15)'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <AlertCircle size={24} style={{ color: '#b45309', flexShrink: 0 }} />
                   <div>
-                    <h4 style={{ margin: '0 0 2px 0', fontSize: '0.9rem', fontWeight: '700', color: '#92400e' }}>Aktif Aboneliğiniz Bulunmuyor</h4>
-                    <p style={{ margin: 0, fontSize: '0.78rem', color: '#a16207' }}>Müşteri bilgilerine tam erişim için bir yıllık paket seçin.</p>
+                    <h4 style={{ margin: '0 0 2px 0', fontSize: '0.92rem', fontWeight: '900', color: '#78350f' }}>Aktif Aboneliğiniz Bulunmuyor</h4>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#92400e', fontWeight: '600' }}>Müşteri bilgilerine tam erişim için bir yıllık paket seçin.</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setActivePortalTab('subscription')}
                   style={{
-                    background: '#111',
-                    color: '#d4af37',
+                    background: '#0f172a',
+                    color: '#fbbf24',
                     border: 'none',
                     borderRadius: '10px',
                     padding: '10px 20px',
-                    fontWeight: '700',
+                    fontWeight: '800',
                     fontSize: '0.82rem',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                     whiteSpace: 'nowrap'
                   }}
                 >
@@ -6129,16 +6135,30 @@ export default function DealerPortalPage() {
         .dealer-main-content h3, 
         .dealer-main-content h4, 
         .dealer-main-content h5 {
-          color: #ffffff !important;
+          color: #ffffff;
           font-family: var(--font-title, "Outfit", sans-serif);
         }
 
         .dealer-main-content p {
-          color: #94a3b8 !important;
+          color: #94a3b8;
         }
 
         .dealer-main-content strong {
-          color: #ffffff !important;
+          color: #ffffff;
+        }
+
+        /* Specific light warning banner text contrast overrides */
+        .no-subscription-banner h4,
+        .dealer-main-content .no-subscription-banner h4 {
+          color: #78350f !important;
+        }
+        .no-subscription-banner p,
+        .dealer-main-content .no-subscription-banner p {
+          color: #92400e !important;
+        }
+        .no-subscription-banner strong,
+        .dealer-main-content .no-subscription-banner strong {
+          color: #78350f !important;
         }
 
         /* Tables styling */
