@@ -752,7 +752,7 @@ export default function InspirationGalleryPage() {
                       <span>{calcTileSize} cm Seramik Modellerini İncele</span>
                       <ChevronRight size={16} />
                     </Link>
-                    <Link href="/teklif-al" style={{
+                    <Link href={`/proje-talep?m2=${calcResult.totalAreaWithWaste}&size=${calcTileSize}`} style={{
                       background: '#ffffff',
                       color: '#0f172a',
                       border: '1px solid #cbd5e1',

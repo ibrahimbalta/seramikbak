@@ -52,7 +52,7 @@ export async function GET() {
       time: 'Yeni Teklif',
       location: item.dealer?.city || 'Şehir',
       text: `${item.product?.name || 'Seramik Ürün'} için bayi fiyat teklifi oluşturuldu`,
-      link: '/teklif-al'
+      link: '/proje-talep'
     }));
 
     const allEvents = [...realLeadEvents, ...realOutletEvents];

@@ -15,7 +15,7 @@ export default function LiveDealsTicker() {
       time: '2 dk önce',
       location: 'İzmir / Karşıyaka',
       text: 'Bir müşteri 60x120 Mermer Serisi için 3 bayiden teklif istedi',
-      link: '/teklif-al'
+      link: '/proje-talep'
     },
     {
       id: 2,
@@ -59,7 +59,7 @@ export default function LiveDealsTicker() {
       time: '12 dk önce',
       location: 'Antalya / Muratpaşa',
       text: 'Bien Seramik 120x240 Traverten Plaka için toplu metraj fiyatı sorgulandı',
-      link: '/teklif-al'
+      link: '/proje-talep'
     }
   ]);
 

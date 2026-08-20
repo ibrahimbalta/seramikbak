@@ -263,7 +263,7 @@ export default function BayilerPage() {
 
                 <div className="card-footer-actions">
                   <Link
-                    href={`/teklif-al?dealerId=${dealer.id}`}
+                    href={`/proje-talep?dealerId=${dealer.id}`}
                     className="btn-card-action primary"
                   >
                     <span>Fiyat Teklifi Al</span>
