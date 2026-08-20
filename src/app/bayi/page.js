@@ -5360,18 +5360,19 @@ export default function DealerPortalPage() {
                   )}
 
                   <div style={{
-                    background: 'linear-gradient(135deg, rgba(37, 211, 102, 0.08) 0%, rgba(16, 185, 129, 0.12) 100%)',
-                    border: '1px solid rgba(37, 211, 102, 0.3)',
+                    background: '#ecfdf5',
+                    border: '1.5px solid #6ee7b7',
                     borderRadius: '12px',
-                    padding: '10px 14px',
+                    padding: '12px 16px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '10px',
-                    marginBottom: '10px'
+                    gap: '12px',
+                    marginBottom: '14px',
+                    color: '#064e3b'
                   }}>
-                    <MessageSquare size={18} style={{ color: '#059669', flexShrink: 0 }} />
-                    <div style={{ fontSize: '0.78rem', color: '#166534', lineHeight: '1.4' }}>
-                      <strong>Otomatik WhatsApp Bildirimi:</strong> İlanınız yayınlandığında <strong>{dealerInfo?.city || 'bölgenizdeki'}</strong> WhatsApp fırsat takipçilerine anında bildirim eşleşmesi yapılacaktır.
+                    <MessageSquare size={20} style={{ color: '#047857', flexShrink: 0 }} />
+                    <div style={{ fontSize: '0.82rem', color: '#064e3b', lineHeight: '1.45', fontWeight: '500' }}>
+                      <strong style={{ color: '#047857', fontWeight: '900' }}>Otomatik WhatsApp Bildirimi:</strong> İlanınız yayınlandığında <strong style={{ color: '#047857', fontWeight: '900' }}>{dealerInfo?.city || 'bölgenizdeki'}</strong> WhatsApp fırsat takipçilerine anında bildirim eşleşmesi yapılacaktır.
                     </div>
                   </div>
 
