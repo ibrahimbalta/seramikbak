@@ -4447,45 +4447,36 @@ export default function BrandPortalPage() {
                         </div>
                       ) : (
                         (() => {
-                          const defaultBaseline = {
-                            topSizes: [
-                              { val: '60x120 cm', count: 185 },
-                              { val: '60x60 cm', count: 110 },
-                              { val: '30x60 cm', count: 75 },
-                              { val: '80x80 cm', count: 50 },
-                              { val: '20x120 cm', count: 40 }
-                            ],
-                            topStyles: [
-                              { val: 'Mermer', count: 160 },
-                              { val: 'Beton', count: 130 },
-                              { val: 'Ahşap', count: 85 },
-                              { val: 'Doğal Taş', count: 65 },
-                              { val: 'Modern', count: 50 }
-                            ],
-                            topColors: [
-                              { val: 'Gri', count: 142 },
-                              { val: 'Beyaz', count: 120 },
-                              { val: 'Antrasit', count: 98 },
-                              { val: 'Bej', count: 88 },
-                              { val: 'Kahverengi', count: 45 }
-                            ],
-                            topKeywords: [
-                              { val: 'calacatta', count: 95 },
-                              { val: 'rektifiyeli', count: 80 },
-                              { val: 'banyo fayans', count: 72 },
-                              { val: 'mutfak tezgah', count: 50 },
-                              { val: 'derzsiz', count: 42 }
-                            ]
+                          const cityTrends = trendsData?.trendsByCity?.[selectedTrendCity] || {
+                            topSizes: [],
+                            topStyles: [],
+                            topColors: [],
+                            topKeywords: []
                           };
-
-                          const cityTrends = (trendsData?.trendsByCity?.[selectedTrendCity] && trendsData.trendsByCity[selectedTrendCity].topSizes?.length > 0)
-                            ? trendsData.trendsByCity[selectedTrendCity] 
-                            : defaultBaseline;
 
                           const getMaxCount = (list) => {
                             if (!list || list.length === 0) return 1;
                             return Math.max(...list.map(item => item.count));
                           };
+
+                          const hasData = cityTrends.topSizes.length > 0 || 
+                                          cityTrends.topStyles.length > 0 || 
+                                          cityTrends.topColors.length > 0 || 
+                                          cityTrends.topKeywords.length > 0;
+
+                          if (!hasData) {
+                            return (
+                              <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '40px 20px', textAlign: 'center' }}>
+                                <BarChart3 size={36} style={{ color: '#b38e47', margin: '0 auto 12px auto' }} />
+                                <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#0f172a', margin: '0 0 6px 0' }}>
+                                  {selectedTrendCity} İçin Henüz Canlı Trend Verisi Bulunmuyor
+                                </h3>
+                                <p style={{ fontSize: '0.82rem', color: '#64748b', maxWidth: '500px', margin: '0 auto' }}>
+                                  Sitenize giren ziyaretçiler ve mimarlar {selectedTrendCity} bölgesinden seramik filtreledikçe ve arama yaptıkça veriler anlık olarak bu ekrana yansıyacaktır.
+                                </p>
+                              </div>
+                            );
+                          }
 
                           return (
                             <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '16px' : '24px' }} className="brand-campaign-grid">
@@ -4496,7 +4487,9 @@ export default function BrandPortalPage() {
                                   📐 En Çok Aranan Ebatlar
                                 </h3>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                  {cityTrends.topSizes.map((item, idx) => {
+                                  {cityTrends.topSizes.length === 0 ? (
+                                    <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Veri bulunmuyor</span>
+                                  ) : cityTrends.topSizes.map((item, idx) => {
                                     const percent = (item.count / getMaxCount(cityTrends.topSizes)) * 100;
                                     return (
                                       <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -4519,7 +4512,9 @@ export default function BrandPortalPage() {
                                   ✨ En Çok Tercih Edilen Stiller
                                 </h3>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                                  {cityTrends.topStyles.map((item, idx) => {
+                                  {cityTrends.topStyles.length === 0 ? (
+                                    <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Veri bulunmuyor</span>
+                                  ) : cityTrends.topStyles.map((item, idx) => {
                                     const percent = (item.count / getMaxCount(cityTrends.topStyles)) * 100;
                                     return (
                                       <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -4542,7 +4537,9 @@ export default function BrandPortalPage() {
                                   🎨 Popüler Renkler
                                 </h3>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                                  {cityTrends.topColors.map((item, idx) => {
+                                  {cityTrends.topColors.length === 0 ? (
+                                    <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Veri bulunmuyor</span>
+                                  ) : cityTrends.topColors.map((item, idx) => {
                                     const hexMap = {
                                       'Gri': '#8e939f',
                                       'Beyaz': '#ffffff',
@@ -4580,7 +4577,9 @@ export default function BrandPortalPage() {
                                   🔍 Popüler Arama Terimleri
                                 </h3>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '4px 0' }}>
-                                  {cityTrends.topKeywords.map((item, idx) => (
+                                  {cityTrends.topKeywords.length === 0 ? (
+                                    <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Henüz arama terimi bulunmuyor</span>
+                                  ) : cityTrends.topKeywords.map((item, idx) => (
                                     <div key={idx} style={{
                                       background: '#f8fafc',
                                       border: '1px solid #e2e8f0',
