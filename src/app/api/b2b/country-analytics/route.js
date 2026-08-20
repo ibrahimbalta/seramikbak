@@ -1,20 +1,20 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// Master country configuration with region mapping and baseline metrics
+// Master country configuration with region mapping
 const countryMasterList = [
-  { code: 'DE', country: 'Almanya', flag: '🇩🇪', region: 'Avrupa', baseViews: 3840, baseDownloads: 490, baseLeads: 42, growth: '+32%' },
-  { code: 'AE', country: 'Birleşik Arap Emirlikleri', flag: '🇦🇪', region: 'Orta Doğu', baseViews: 3120, baseDownloads: 410, baseLeads: 36, growth: '+45%' },
-  { code: 'GB', country: 'İngiltere', flag: '🇬🇧', region: 'Avrupa', baseViews: 2650, baseDownloads: 330, baseLeads: 28, growth: '+21%' },
-  { code: 'SA', country: 'Suudi Arabistan', flag: '🇸🇦', region: 'Orta Doğu', baseViews: 2380, baseDownloads: 295, baseLeads: 25, growth: '+38%' },
-  { code: 'US', country: 'Amerika Birleşik Devletleri', flag: '🇺🇸', region: 'Kuzey Amerika', baseViews: 2150, baseDownloads: 270, baseLeads: 22, growth: '+26%' },
-  { code: 'FR', country: 'Fransa', flag: '🇫🇷', region: 'Avrupa', baseViews: 1820, baseDownloads: 215, baseLeads: 18, growth: '+17%' },
-  { code: 'RU', country: 'Rusya', flag: '🇷🇺', region: 'Doğu Avrupa & BDT', baseViews: 1540, baseDownloads: 180, baseLeads: 14, growth: '+14%' },
-  { code: 'NL', country: 'Hollanda', flag: '🇳🇱', region: 'Avrupa', baseViews: 1390, baseDownloads: 160, baseLeads: 12, growth: '+29%' },
-  { code: 'IT', country: 'İtalya', flag: '🇮🇹', region: 'Avrupa', baseViews: 1210, baseDownloads: 140, baseLeads: 10, growth: '+18%' },
-  { code: 'AZ', country: 'Azerbaycan', flag: '🇦🇿', region: 'Kafkasya', baseViews: 980, baseDownloads: 110, baseLeads: 9, growth: '+35%' },
-  { code: 'IQ', country: 'Irak', flag: '🇮🇶', region: 'Orta Doğu', baseViews: 850, baseDownloads: 95, baseLeads: 8, growth: '+22%' },
-  { code: 'TR', country: 'Türkiye', flag: '🇹🇷', region: 'Yerel Pazar', baseViews: 6420, baseDownloads: 820, baseLeads: 94, growth: '+28%' }
+  { code: 'TR', country: 'Türkiye', flag: '🇹🇷', region: 'Yerel Pazar' },
+  { code: 'DE', country: 'Almanya', flag: '🇩🇪', region: 'Avrupa' },
+  { code: 'AE', country: 'Birleşik Arap Emirlikleri', flag: '🇦🇪', region: 'Orta Doğu' },
+  { code: 'GB', country: 'İngiltere', flag: '🇬🇧', region: 'Avrupa' },
+  { code: 'SA', country: 'Suudi Arabistan', flag: '🇸🇦', region: 'Orta Doğu' },
+  { code: 'US', country: 'Amerika Birleşik Devletleri', flag: '🇺🇸', region: 'Kuzey Amerika' },
+  { code: 'FR', country: 'Fransa', flag: '🇫🇷', region: 'Avrupa' },
+  { code: 'RU', country: 'Rusya', flag: '🇷🇺', region: 'Doğu Avrupa & BDT' },
+  { code: 'NL', country: 'Hollanda', flag: '🇳🇱', region: 'Avrupa' },
+  { code: 'IT', country: 'İtalya', flag: '🇮🇹', region: 'Avrupa' },
+  { code: 'AZ', country: 'Azerbaycan', flag: '🇦🇿', region: 'Kafkasya' },
+  { code: 'IQ', country: 'Irak', flag: '🇮🇶', region: 'Orta Doğu' }
 ];
 
 export async function GET(request) {
@@ -60,7 +60,7 @@ export async function GET(request) {
       dateFilter = { gte: d };
     }
 
-    // 1. Fetch real DB metrics for this brand
+    // Fetch ONLY 100% REAL DB metrics for this brand
     const [totalProducts, brandLeadsCount, brandLogs, brandProducts] = await Promise.all([
       prisma.product.count({ where: { brandId } }),
       prisma.lead.count({ 
@@ -86,52 +86,52 @@ export async function GET(request) {
       })
     ]);
 
-    // Period scaling multiplier for baseline aggregation
-    const periodMultiplier = period === '90d' ? 2.6 : period === '1y' ? 8.5 : period === 'all' ? 14.2 : 1.0;
+    // Aggregate country stats strictly from real database analytics logs
+    const countryStatsMap = {};
     
-    // Scale factor proportional to brand's catalog volume (relative to avg 300 products)
-    const catalogScaleFactor = Math.max(0.6, Math.min(2.5, totalProducts / 300));
-
-    // Aggregate country stats combining DB logs + brand-tailored metrics
-    const countryStats = countryMasterList.map((item, index) => {
-      // Filter live DB logs matching this country code
-      const countryLogs = brandLogs.filter(l => l.country === item.code);
-      const liveViews = countryLogs.filter(l => l.action === 'VIEW' || l.action === 'SEARCH' || l.action === 'STUDIO_TRY').length;
-      const liveDownloads = countryLogs.filter(l => l.action === 'PDF_DOWNLOAD' || l.action === 'BIM_DOWNLOAD').length;
-      const liveLeads = countryLogs.filter(l => l.action === 'LEAD').length;
-
-      // Unspecified location fallback allocation
-      const nullCountryViews = Math.round(brandLogs.filter(l => !l.country && (l.action === 'VIEW' || l.action === 'STUDIO_TRY')).length / countryMasterList.length);
-
-      const calculatedViews = Math.round((item.baseViews * periodMultiplier * catalogScaleFactor) + liveViews + nullCountryViews);
-      const calculatedDownloads = Math.round((item.baseDownloads * periodMultiplier * catalogScaleFactor) + liveDownloads);
-      const calculatedLeads = Math.round((item.baseLeads * periodMultiplier * catalogScaleFactor) + liveLeads);
-
-      // Select top actual product from brand's catalog
-      const topProductObj = brandProducts.length > 0 
-        ? brandProducts[index % brandProducts.length] 
-        : { name: `${brand.name} Özel Koleksiyon` };
-
-      return {
+    // Initialize map for all master countries
+    countryMasterList.forEach(item => {
+      countryStatsMap[item.code] = {
         country: item.country,
         code: item.code,
         flag: item.flag,
         region: item.region,
-        views: calculatedViews,
-        specDownloads: calculatedDownloads,
-        b2bLeads: calculatedLeads + (item.code === 'TR' ? brandLeadsCount : 0),
-        growth: item.growth,
-        topProduct: topProductObj.name,
+        views: 0,
+        specDownloads: 0,
+        b2bLeads: 0,
+        growth: '0%',
+        topProduct: brandProducts.length > 0 ? brandProducts[0].name : `${brand.name} Koleksiyonu`,
         sharePercent: 0
       };
     });
 
-    // Compute total sum metrics
+    // Populate actual DB log counts
+    brandLogs.forEach((log) => {
+      const countryCode = (log.country && countryStatsMap[log.country.toUpperCase()]) ? log.country.toUpperCase() : 'TR';
+      const targetObj = countryStatsMap[countryCode] || countryStatsMap['TR'];
+      
+      if (log.action === 'VIEW' || log.action === 'SEARCH' || log.action === 'STUDIO_TRY') {
+        targetObj.views += 1;
+      } else if (log.action === 'PDF_DOWNLOAD' || log.action === 'BIM_DOWNLOAD') {
+        targetObj.specDownloads += 1;
+      } else if (log.action === 'LEAD') {
+        targetObj.b2bLeads += 1;
+      }
+    });
+
+    // Add actual lead table count to TR
+    if (countryStatsMap['TR']) {
+      countryStatsMap['TR'].b2bLeads += brandLeadsCount;
+    }
+
+    const countryStats = Object.values(countryStatsMap);
+
+    // Compute total sum metrics from real data
     const totalViewsCount = countryStats.reduce((acc, c) => acc + c.views, 0);
     const totalDownloadsCount = countryStats.reduce((acc, c) => acc + c.specDownloads, 0);
     const totalLeadsCount = countryStats.reduce((acc, c) => acc + c.b2bLeads, 0);
 
-    // Compute percentage share per country
+    // Compute percentage share per country based on real views
     countryStats.forEach(c => {
       c.sharePercent = totalViewsCount > 0 ? Math.round((c.views / totalViewsCount) * 100) : 0;
     });
@@ -139,13 +139,13 @@ export async function GET(request) {
     // Sort by views descending
     countryStats.sort((a, b) => b.views - a.views);
 
-    // Top export market
-    const topMarket = countryStats[0];
-    const topGrowthMarket = countryStats.reduce((max, c) => 
-      parseInt(c.growth) > parseInt(max.growth) ? c : max, countryStats[0]
-    );
+    // Filter active countries with at least 1 view, download, or lead
+    const activeCountries = countryStats.filter(c => c.views > 0 || c.specDownloads > 0 || c.b2bLeads > 0);
 
-    // Group stats by region
+    // Top export market determination
+    const topMarket = activeCountries.length > 0 ? activeCountries[0] : null;
+
+    // Group stats by region strictly from real data
     const regionMap = {};
     countryStats.forEach(c => {
       if (!regionMap[c.region]) {
@@ -154,31 +154,39 @@ export async function GET(request) {
       regionMap[c.region].views += c.views;
       regionMap[c.region].downloads += c.specDownloads;
       regionMap[c.region].leads += c.b2bLeads;
-      regionMap[c.region].countriesCount += 1;
+      if (c.views > 0 || c.specDownloads > 0 || c.b2bLeads > 0) {
+        regionMap[c.region].countriesCount += 1;
+      }
     });
     const regions = Object.values(regionMap).sort((a, b) => b.views - a.views);
 
-    // AI Actionable Export Insights tailored for this brand
-    const insights = [
-      {
-        id: 'insight-1',
-        type: 'high-demand',
-        title: `${topMarket.country} (${topMarket.flag}) Pazarında Yüksek B2B Şartname Trafiği`,
-        desc: `${brand.name} ürünleri ${topMarket.country} bölgesinden ${topMarket.views.toLocaleString('tr-TR')} gösterim ve ${topMarket.b2bLeads} doğrudan B2B teklif şartnamesi aldı. Bu pazarda B2B sponsorlu görünürlüğünüzü artırarak talepleri 2 katına çıkarabilirsiniz.`
-      },
-      {
+    // Real AI Actionable Export Insights tailored strictly to real DB metrics
+    const insights = [];
+
+    if (totalViewsCount > 0) {
+      if (topMarket) {
+        insights.push({
+          id: 'insight-1',
+          type: 'high-demand',
+          title: `${topMarket.country} (${topMarket.flag}) Pazarında Gerçek İnceleme Trafiği`,
+          desc: `${brand.name} ürünleri ${topMarket.country} bölgesinden toplam ${topMarket.views.toLocaleString('tr-TR')} canlı gösterim ve ${topMarket.b2bLeads} doğrudan B2B teklif talebi aldı.`
+        });
+      }
+
+      insights.push({
         id: 'insight-2',
-        type: 'fastest-growth',
-        title: `${topGrowthMarket.country} (${topGrowthMarket.flag}) Bölgesinde ${topGrowthMarket.growth} İhracat Artışı`,
-        desc: `Son dönemde ${topGrowthMarket.country} mimarlık ve inşaat ofisleri tarafından en çok aranan ve incelenen modeliniz "${topGrowthMarket.topProduct}" oldu. Katalog ve numune stoklarınızı bu bölgeye yönlendirmeniz önerilir.`
-      },
-      {
-        id: 'insight-3',
         type: 'bim-cad-demand',
         title: '3D BIM / CAD & Revit Şartname İndirmeleri',
-        desc: `Küresel mimarlar tarafından toplam ${totalDownloadsCount.toLocaleString('tr-TR')} adet 4K PBR kaplama ve Revit nesnesi indirildi. ${totalProducts} adet kayıtlı ürününüz uluslararası projelerin şartnamelerinde yer almaktadır.`
-      }
-    ];
+        desc: `Sistemde mimarlar tarafından toplam ${totalDownloadsCount.toLocaleString('tr-TR')} adet 4K PBR kaplama ve Revit nesnesi indirildi.`
+      });
+    } else {
+      insights.push({
+        id: 'insight-empty',
+        type: 'info',
+        title: 'Canlı Veritabanı Analizi Bekleniyor',
+        desc: `${brand.name} ürünlerinize ait henüz kaydedilmiş canlı küresel arama ve BIM indirme logu bulunmamaktadır. Mimarlar ürünlerinizi inceledikçe anlık olarak burada listelenecektir.`
+      });
+    }
 
     return NextResponse.json({
       success: true,
@@ -192,8 +200,8 @@ export async function GET(request) {
         totalGlobalViews: totalViewsCount,
         totalBimDownloads: totalDownloadsCount,
         totalB2bLeads: totalLeadsCount,
-        activeCountriesCount: countryStats.length,
-        topExportMarket: `${topMarket.country} ${topMarket.flag}`
+        activeCountriesCount: activeCountries.length,
+        topExportMarket: topMarket ? `${topMarket.country} ${topMarket.flag}` : 'Henüz Veri Yok'
       },
       countries: countryStats,
       regions,

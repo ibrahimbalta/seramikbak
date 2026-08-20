@@ -107,14 +107,7 @@ export async function GET() {
       }
     });
 
-    // Fallback activities if DB logs are sparse
-    if (formattedActivities.length === 0) {
-      formattedActivities.push(
-        { id: 'def-1', text: "İstanbul Kadıköy'den bir kullanıcı 3D Sanal Stüdyo'da mermer desenli seramik inceledi", time: "1 dk önce", type: "3d" },
-        { id: 'def-2', text: "Ankara Yetkili Bayisi güncel ürün stok durumunu ve kataloglarını doğruladı", time: "3 dk önce", type: "dealer" },
-        { id: 'def-3', text: "İzmir Konak projesi için 120x240cm porselen karo teklif talebi oluşturuldu", time: "6 dk önce", type: "lead" }
-      );
-    }
+    // Return formatted real activities strictly from database
 
     return NextResponse.json({
       success: true,

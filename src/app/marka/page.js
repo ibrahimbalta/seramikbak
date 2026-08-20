@@ -87,6 +87,7 @@ export default function BrandPortalPage() {
   const [countryAnalytics, setCountryAnalytics] = useState(null);
   const [countryPeriod, setCountryPeriod] = useState('30d');
   const [countryLoading, setCountryLoading] = useState(false);
+  const [countryRefreshMsg, setCountryRefreshMsg] = useState('');
 
   useEffect(() => {
     const handleResize = () => {
@@ -524,15 +525,25 @@ export default function BrandPortalPage() {
 
   const fetchCountryAnalytics = async (brandId, period = '30d') => {
     setCountryLoading(true);
+    setCountryRefreshMsg('');
+    const startTime = Date.now();
     try {
-      const res = await fetch(`/api/b2b/country-analytics?brandId=${brandId}&period=${period}`);
+      const targetBrandId = brandId || brandInfo?.id;
+      if (!targetBrandId) return;
+      const res = await fetch(`/api/b2b/country-analytics?brandId=${targetBrandId}&period=${period}&_t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         setCountryAnalytics(data);
+        setCountryRefreshMsg('Veriler Güncellendi ✓');
+        setTimeout(() => setCountryRefreshMsg(''), 3000);
       }
     } catch (err) {
       console.error('Failed to load country analytics:', err);
     } finally {
+      const elapsed = Date.now() - startTime;
+      if (elapsed < 350) {
+        await new Promise(resolve => setTimeout(resolve, 350 - elapsed));
+      }
       setCountryLoading(false);
     }
   };
@@ -4051,28 +4062,33 @@ export default function BrandPortalPage() {
 
                     {/* Period Buttons & Refresh */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <button
-                        onClick={() => {
-                          if (brandInfo) fetchCountryAnalytics(brandInfo.id, countryPeriod);
-                        }}
-                        title="Verileri Yenile"
-                        style={{
-                          padding: '8px 12px',
-                          borderRadius: '10px',
-                          border: '1px solid #cbd5e1',
-                          background: '#ffffff',
-                          color: '#475569',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          fontSize: '0.78rem',
-                          fontWeight: '600'
-                        }}
-                      >
-                        <RefreshCw size={14} className={countryLoading ? "animate-spin" : ""} />
-                        <span>Tazele</span>
-                      </button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <button
+                          disabled={countryLoading}
+                          onClick={() => {
+                            if (brandInfo) fetchCountryAnalytics(brandInfo.id, countryPeriod);
+                          }}
+                          title="Verileri Yenile"
+                          style={{
+                            padding: '8px 14px',
+                            borderRadius: '10px',
+                            border: countryRefreshMsg ? '1px solid #10b981' : '1px solid #cbd5e1',
+                            background: countryRefreshMsg ? '#ecfdf5' : '#ffffff',
+                            color: countryRefreshMsg ? '#047857' : '#475569',
+                            cursor: countryLoading ? 'not-allowed' : 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            fontSize: '0.78rem',
+                            fontWeight: '700',
+                            transition: 'all 0.2s ease',
+                            opacity: countryLoading ? 0.7 : 1
+                          }}
+                        >
+                          <RefreshCw size={14} className={countryLoading ? "animate-spin" : ""} style={{ color: countryRefreshMsg ? '#10b981' : '#64748b' }} />
+                          <span>{countryRefreshMsg || 'Tazele'}</span>
+                        </button>
+                      </div>
 
                       <div style={{ display: 'flex', gap: '4px', background: '#f8fafc', padding: '4px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                         {[
@@ -4112,15 +4128,15 @@ export default function BrandPortalPage() {
                     <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
                       <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Toplam Küresel Gösterim</span>
                       <div style={{ fontSize: '1.7rem', fontWeight: '900', color: '#0f172a', margin: '6px 0 2px 0' }}>
-                        {countryAnalytics?.summary?.totalGlobalViews ? countryAnalytics.summary.totalGlobalViews.toLocaleString('tr-TR') : '14,850'}
+                        {(countryAnalytics?.summary?.totalGlobalViews ?? 0).toLocaleString('tr-TR')}
                       </div>
-                      <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>🌍 {countryAnalytics?.summary?.activeCountriesCount || 12} Hedef İhracat Pazarı</span>
+                      <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>🌍 {countryAnalytics?.summary?.activeCountriesCount ?? 0} Hedef İhracat Pazarı</span>
                     </div>
 
                     <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
                       <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>En Aktif İhracat Pazarı</span>
                       <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47', margin: '6px 0 2px 0' }}>
-                        {countryAnalytics?.summary?.topExportMarket || 'Almanya 🇩🇪'}
+                        {countryAnalytics?.summary?.topExportMarket || 'Henüz Veri Yok'}
                       </div>
                       <span style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: '700' }}>⚡ En Yüksek B2B Şartname Trafiği</span>
                     </div>
@@ -4128,7 +4144,7 @@ export default function BrandPortalPage() {
                     <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
                       <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>3D BIM / CAD İndirmeleri</span>
                       <div style={{ fontSize: '1.7rem', fontWeight: '900', color: '#2563eb', margin: '6px 0 2px 0' }}>
-                        {countryAnalytics?.summary?.totalBimDownloads ? countryAnalytics.summary.totalBimDownloads.toLocaleString('tr-TR') : '1,420'}
+                        {(countryAnalytics?.summary?.totalBimDownloads ?? 0).toLocaleString('tr-TR')}
                       </div>
                       <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>📐 4K PBR Dokuları & Revit (.rfa)</span>
                     </div>
@@ -4136,7 +4152,7 @@ export default function BrandPortalPage() {
                     <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
                       <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>B2B İhracat Talepleri</span>
                       <div style={{ fontSize: '1.7rem', fontWeight: '900', color: '#10b981', margin: '6px 0 2px 0' }}>
-                        {countryAnalytics?.summary?.totalB2bLeads || '128'}
+                        {(countryAnalytics?.summary?.totalB2bLeads ?? 0).toLocaleString('tr-TR')}
                       </div>
                       <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>📋 Doğrulanmış Proje Şartnameleri</span>
                     </div>
