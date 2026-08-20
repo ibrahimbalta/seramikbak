@@ -7,6 +7,12 @@ const nextConfig = {
   // SEO: www redirect ve trailing slash normalizasyonu
   async redirects() {
     return [
+      // /teklif-al -> /proje-talep redirect
+      {
+        source: '/teklif-al',
+        destination: '/proje-talep',
+        permanent: true,
+      },
       // non-www → www redirect
       {
         source: '/:path*',
