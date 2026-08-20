@@ -5,64 +5,7 @@ import Link from 'next/link';
 import { Activity, ArrowUpRight, Flame, ShoppingBag, Truck, FileCode, Tag } from 'lucide-react';
 
 export default function LiveDealsTicker() {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      badge: 'TEKLİF TALEBİ',
-      color: '#60a5fa',
-      bg: 'rgba(59, 130, 246, 0.1)',
-      border: 'rgba(59, 130, 246, 0.3)',
-      time: '2 dk önce',
-      location: 'İzmir / Karşıyaka',
-      text: 'Bir müşteri 60x120 Mermer Serisi için 3 bayiden teklif istedi',
-      link: '/proje-talep'
-    },
-    {
-      id: 2,
-      badge: 'STOK İNDİRİMİ',
-      color: '#fbbf24',
-      bg: 'rgba(245, 158, 11, 0.1)',
-      border: 'rgba(245, 158, 11, 0.3)',
-      time: '4 dk önce',
-      location: 'İstanbul / Kadıköy',
-      text: 'VitrA Yetkili Bayisi 50 m² stok fazlası Calacatta porselende %35 indirim tanımladı',
-      link: '/outlet'
-    },
-    {
-      id: 3,
-      badge: 'NUMUNE KARGO',
-      color: '#34d399',
-      bg: 'rgba(16, 185, 129, 0.1)',
-      border: 'rgba(16, 185, 129, 0.3)',
-      time: '5 dk önce',
-      location: 'Ankara / Çankaya',
-      text: 'Kütahya Seramik Bayisi adrese ücretsiz numune karo gönderimi başlattı',
-      link: '/numune-talep'
-    },
-    {
-      id: 4,
-      badge: 'MİMARİ DOKU',
-      color: '#c084fc',
-      bg: 'rgba(168, 85, 247, 0.1)',
-      border: 'rgba(168, 85, 247, 0.3)',
-      time: '8 dk önce',
-      location: 'Bursa / Nilüfer',
-      text: 'Bir mimarlık ofisi otel projesi için DWG ve 3D doku ZIP paketini indirdi',
-      link: '/mimar-portali'
-    },
-    {
-      id: 5,
-      badge: 'TEKLİF TALEBİ',
-      color: '#60a5fa',
-      bg: 'rgba(59, 130, 246, 0.1)',
-      border: 'rgba(59, 130, 246, 0.3)',
-      time: '12 dk önce',
-      location: 'Antalya / Muratpaşa',
-      text: 'Bien Seramik 120x240 Traverten Plaka için toplu metraj fiyatı sorgulandı',
-      link: '/proje-talep'
-    }
-  ]);
-
+  const [events, setEvents] = useState([]);
   const [stats, setStats] = useState(null);
 
   // Fetch real live stats & marketplace events from API
@@ -70,7 +13,7 @@ export default function LiveDealsTicker() {
     fetch('/api/stats/live-ticker')
       .then((res) => res.json())
       .then((data) => {
-        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+        if (data.success && Array.isArray(data.data)) {
           setEvents(data.data);
         }
       })
@@ -90,8 +33,22 @@ export default function LiveDealsTicker() {
       });
   }, []);
 
-  // Quadruple the events array for smooth infinite endless scrolling track
-  const tickerItems = [...events, ...events, ...events, ...events];
+  // Format ticker items: if real events exist, quadruple for smooth infinite loop; otherwise show live status
+  const tickerItems = events.length > 0
+    ? [...events, ...events, ...events, ...events]
+    : [
+        {
+          id: 'real-status-1',
+          badge: 'CANLI BİLGİ',
+          color: '#fbbf24',
+          bg: 'rgba(245, 158, 11, 0.1)',
+          border: 'rgba(245, 158, 11, 0.3)',
+          time: 'Canlı',
+          location: 'Türkiye',
+          text: 'SeramikBak Canlı Pazaryeri: Aktif bayi teklifleri ve müşteri aramaları anlık takip edilmektedir',
+          link: '/proje-talep'
+        }
+      ];
 
   const getEventIcon = (badge) => {
     if (badge.includes('NUMUNE')) return <Truck size={12} />;
