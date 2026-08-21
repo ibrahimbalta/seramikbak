@@ -5652,81 +5652,10 @@ export default function Home() {
           </div>
         )}
 
-        {/* TAB 2: 3D VIRTUAL STUDIO & AI PHOTO RE-TILER */}
+        {/* TAB 2: 3D VIRTUAL STUDIO */}
         {activeTab === 'studio' && (
           <div className="studio-portal animate-fade-in">
-
-            {/* Sub-tab Mode Selector */}
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              marginBottom: '24px',
-              background: 'rgba(15, 23, 42, 0.7)',
-              padding: '8px',
-              borderRadius: '16px',
-              border: '1px solid rgba(212, 175, 55, 0.2)',
-              flexWrap: 'wrap'
-            }}>
-              <button
-                onClick={() => setStudioSubTab('photo')}
-                style={{
-                  flex: 1,
-                  minWidth: '220px',
-                  padding: '12px 20px',
-                  borderRadius: '12px',
-                  border: studioSubTab === 'photo' ? '2px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.08)',
-                  background: studioSubTab === 'photo' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255,255,255,0.02)',
-                  color: studioSubTab === 'photo' ? 'var(--accent-gold, #d4af37)' : '#ffffff',
-                  fontWeight: '800',
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px'
-                }}
-              >
-                <Sparkles size={18} />
-                <span>📸 Fotoğraftan AI Kaplama & Öncesi/Sonrası Sürgüsü</span>
-              </button>
-
-              <button
-                onClick={() => setStudioSubTab('3d')}
-                style={{
-                  flex: 1,
-                  minWidth: '220px',
-                  padding: '12px 20px',
-                  borderRadius: '12px',
-                  border: studioSubTab === '3d' ? '2px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.08)',
-                  background: studioSubTab === '3d' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255,255,255,0.02)',
-                  color: studioSubTab === '3d' ? 'var(--accent-gold, #d4af37)' : '#ffffff',
-                  fontWeight: '800',
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px'
-                }}
-              >
-                <Palette size={18} />
-                <span>🎮 3D İnteraktif Sanal Oda</span>
-              </button>
-            </div>
-
-            {studioSubTab === 'photo' ? (
-              <div className="glass-panel" style={{ padding: '24px', borderRadius: '20px' }}>
-                <div style={{ marginBottom: '20px' }}>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#fff' }}>Fotoğraftan 3D Seramik Kaplama & Yapay Zeka Karşılaştırma</h3>
-                  <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
-                    Kendi banyo fotoğrafınızı yükleyin veya hazır boş oda şablonunu seçin. **✨ Yapay Zeka ile Baştan Oluştur** butonuna basarak banyonuzun tamamını fotogerçekçi olarak yenileyin ve **Öncesi / Sonrası** sürgüsüyle kıyaslayın.
-                  </p>
-                </div>
-                <PhotoVisualizer activeProduct={activeProduct} />
-              </div>
-            ) : (
-              <>
-                <div className="studio-layout">
+            <div className="studio-layout">
               <div className="studio-control-panel glass-panel">
                 <h3>3D Sanal Stüdyo</h3>
                 <p className="desc">Seçili seramiği banyo/mutfak sahnesine giydirerek specula (parlaklık) ve döşeme etkisini inceleyin.</p>
@@ -6276,10 +6205,8 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          </>
+          </div>
         )}
-      </div>
-    )}
 
         {/* TAB 3: DEALER FINDER */}
         {activeTab === 'dealers' && (() => {
