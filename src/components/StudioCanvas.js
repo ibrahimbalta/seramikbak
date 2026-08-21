@@ -25,7 +25,6 @@ export default function StudioCanvas({
   comparisonSplit = 50,
   walkthroughMode = false,
   onToggleTarget,
-  onSelectRoomPreset,
   roomType = 'bathroom',
   groutWidth = '2',
   groutColor = '#888888',
@@ -68,7 +67,6 @@ export default function StudioCanvas({
   // Tracks loading state and type
   const [textureStatus, setTextureStatus] = useState('Procedural (Fallback)');
   const [isSceneReady, setIsSceneReady] = useState(false);
-  const [selectedPresetId, setSelectedPresetId] = useState('master');
 
   // Dimensions of room in meters
   const ROOM_WIDTH = 3.6; 
@@ -685,232 +683,100 @@ export default function StudioCanvas({
     const cabWoodMat = new THREE.MeshStandardMaterial({ color: cabHex, roughness: cabinetColor === 'white' ? 0.25 : 0.6 });
     // Populate furnishings group depending on selected roomType
     if (roomType === 'bathroom') {
-      if (selectedPresetId === 'compact') {
-        // =========================================================
-        // PRESET 2: MINIMALIST DAIRE BANYOSU (GÖMME KLOZET NİŞ DUVARI)
-        // =========================================================
-        
-        // 1. Gömme Rezervuar Pano Duvar Protrusion (Recessed Flush Wall Box)
-        const flushWallGeo = new THREE.BoxGeometry(1.4, 1.3, 0.28);
-        const flushWallMat = new THREE.MeshStandardMaterial({ color: '#22252c', roughness: 0.7 });
-        const flushWallBox = new THREE.Mesh(flushWallGeo, flushWallMat);
-        flushWallBox.position.set(0.7, 0.65, -ROOM_DEPTH / 2 + 0.14);
-        flushWallBox.castShadow = true;
-        flushWallBox.receiveShadow = true;
-        group.add(flushWallBox);
+      // --- 1. SINK VANITY UNIT ---
+      const cabGeo = new THREE.BoxGeometry(0.7, 0.6, 1.3);
+      const cabinet = new THREE.Mesh(cabGeo, cabWoodMat);
+      cabinet.position.set(-ROOM_WIDTH / 2 + 0.35, 0.3, 0); 
+      cabinet.castShadow = true;
+      cabinet.receiveShadow = true;
+      group.add(cabinet);
 
-        // LED Strip Niche Shelf Top
-        const shelfGeo = new THREE.BoxGeometry(1.42, 0.03, 0.3);
-        const shelfMat = new THREE.MeshStandardMaterial({ color: '#d4af37', metalness: 0.8, roughness: 0.2 });
-        const shelf = new THREE.Mesh(shelfGeo, shelfMat);
-        shelf.position.set(0.7, 1.3 + 0.015, -ROOM_DEPTH / 2 + 0.15);
-        group.add(shelf);
+      const drawerGeo = new THREE.BoxGeometry(0.02, 0.52, 1.22);
+      const drawerPanel = new THREE.Mesh(drawerGeo, cabWoodMat);
+      drawerPanel.position.set(-ROOM_WIDTH / 2 + 0.36, 0.3, 0);
+      drawerPanel.castShadow = true;
+      group.add(drawerPanel);
 
-        const nicheGlow = new THREE.PointLight('#ffae34', 1.2, 3.5);
-        nicheGlow.position.set(0.7, 1.35, -ROOM_DEPTH / 2 + 0.2);
-        group.add(nicheGlow);
+      const basinGeo = new THREE.BoxGeometry(0.5, 0.12, 0.9);
+      const basin = new THREE.Mesh(basinGeo, porcelainMat);
+      basin.position.set(-ROOM_WIDTH / 2 + 0.35, 0.6 + 0.06, 0);
+      basin.castShadow = true;
+      group.add(basin);
 
-        // Floating Wall-Hung Porcelain Toilet Bowl
-        const toiletGeo = new THREE.BoxGeometry(0.36, 0.38, 0.52);
-        const toilet = new THREE.Mesh(toiletGeo, porcelainMat);
-        toilet.position.set(0.7, 0.35, -ROOM_DEPTH / 2 + 0.28 + 0.26);
-        toilet.castShadow = true;
-        group.add(toilet);
+      const faucetBaseGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.22);
+      const faucetBase = new THREE.Mesh(faucetBaseGeo, activeFaucetMat);
+      faucetBase.position.set(-ROOM_WIDTH / 2 + 0.16, 0.6 + 0.22, 0);
+      faucetBase.castShadow = true;
+      group.add(faucetBase);
 
-        // Chrome Flush Control Button Plate
-        const buttonPlateGeo = new THREE.BoxGeometry(0.24, 0.15, 0.02);
-        const plate = new THREE.Mesh(buttonPlateGeo, activeFaucetMat);
-        plate.position.set(0.7, 0.95, -ROOM_DEPTH / 2 + 0.29);
-        group.add(plate);
+      const spoutGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.14);
+      const spout = new THREE.Mesh(spoutGeo, activeFaucetMat);
+      spout.rotation.z = Math.PI / 2.3;
+      spout.position.set(-ROOM_WIDTH / 2 + 0.21, 0.6 + 0.31, 0);
+      spout.castShadow = true;
+      group.add(spout);
 
-        // Floating Compact Anthracite Vanity
-        const cabGeo = new THREE.BoxGeometry(0.65, 0.5, 0.95);
-        const cabinet = new THREE.Mesh(cabGeo, cabWoodMat);
-        cabinet.position.set(-ROOM_WIDTH / 2 + 0.35, 0.35, -0.2);
-        cabinet.castShadow = true;
-        group.add(cabinet);
+      // Backlit LED Mirror
+      const mirrorFrameGeo = new THREE.BoxGeometry(0.02, 0.95, 1.15);
+      const mirrorFrame = new THREE.Mesh(mirrorFrameGeo, brassMat);
+      mirrorFrame.position.set(-ROOM_WIDTH / 2 + 0.01, 1.5, 0);
+      group.add(mirrorFrame);
 
-        // Round Vessel Sink Basin
-        const vesselGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.14, 32);
-        const vessel = new THREE.Mesh(vesselGeo, porcelainMat);
-        vessel.position.set(-ROOM_WIDTH / 2 + 0.35, 0.6 + 0.07, -0.2);
-        vessel.castShadow = true;
-        group.add(vessel);
+      const mirrorPaneGeo = new THREE.PlaneGeometry(1.1, 0.9);
+      const mirrorPaneMat = new THREE.MeshStandardMaterial({ color: '#999999', metalness: 0.98, roughness: 0.02 });
+      const mirrorPane = new THREE.Mesh(mirrorPaneGeo, mirrorPaneMat);
+      mirrorPane.rotation.y = Math.PI / 2;
+      mirrorPane.position.set(-ROOM_WIDTH / 2 + 0.021, 1.5, 0);
+      group.add(mirrorPane);
 
-        // Tall Mixer Faucet
-        const faucetBaseGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.32);
-        const faucetBase = new THREE.Mesh(faucetBaseGeo, activeFaucetMat);
-        faucetBase.position.set(-ROOM_WIDTH / 2 + 0.16, 0.6 + 0.16, -0.2);
-        group.add(faucetBase);
+      const mirrorGlow = new THREE.PointLight('#ffe699', 0.8, 3.5);
+      mirrorGlow.position.set(-ROOM_WIDTH / 2 + 0.05, 1.5, 0);
+      group.add(mirrorGlow);
 
-        // Round Backlit Halo Mirror
-        const haloMirrorGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.02, 32);
-        const mirrorPaneMat = new THREE.MeshStandardMaterial({ color: '#999999', metalness: 0.98, roughness: 0.02 });
-        const haloMirror = new THREE.Mesh(haloMirrorGeo, mirrorPaneMat);
-        haloMirror.rotation.z = Math.PI / 2;
-        haloMirror.position.set(-ROOM_WIDTH / 2 + 0.02, 1.45, -0.2);
-        group.add(haloMirror);
+      // --- 2. GLASS SHOWER CABIN ---
+      const glassCabGeo = new THREE.BoxGeometry(0.02, 2.0, 1.15);
+      const glassCab1 = new THREE.Mesh(glassCabGeo, glassMat);
+      glassCab1.position.set(-ROOM_WIDTH / 2 + 1.15, 1.0, -ROOM_DEPTH / 2 + 0.575);
+      group.add(glassCab1);
 
-      } else if (selectedPresetId === 'villa') {
-        // =========================================================
-        // PRESET 3: GENİŞ SPA & VİLLA BANYOSU (FREESTANDING KÜVETLİ)
-        // =========================================================
-        
-        // 1. Freestanding Luxury Bathtub (Serbest Duran Lüks Küvet)
-        const tubOuterGeo = new THREE.CylinderGeometry(0.55, 0.48, 0.58, 32);
-        const tub = new THREE.Mesh(tubOuterGeo, porcelainMat);
-        tub.scale.set(1.4, 1.0, 0.8);
-        tub.position.set(-ROOM_WIDTH / 2 + 1.2, 0.29, -ROOM_DEPTH / 2 + 0.9);
-        tub.castShadow = true;
-        tub.receiveShadow = true;
-        group.add(tub);
+      const glassCabGeo2 = new THREE.BoxGeometry(1.15, 2.0, 0.02);
+      const glassCab2 = new THREE.Mesh(glassCabGeo2, glassMat);
+      glassCab2.position.set(-ROOM_WIDTH / 2 + 0.575, 1.0, -ROOM_DEPTH / 2 + 1.15);
+      group.add(glassCab2);
 
-        const tubInnerGeo = new THREE.CylinderGeometry(0.51, 0.44, 0.56, 32);
-        const tubInnerMat = new THREE.MeshPhysicalMaterial({ color: '#f0f4f8', roughness: 0.02, clearcoat: 1.0 });
-        const tubInner = new THREE.Mesh(tubInnerGeo, tubInnerMat);
-        tubInner.scale.set(1.36, 1.0, 0.76);
-        tubInner.position.set(-ROOM_WIDTH / 2 + 1.2, 0.31, -ROOM_DEPTH / 2 + 0.9);
-        group.add(tubInner);
+      const frameGeo = new THREE.BoxGeometry(0.04, 2.0, 0.04);
+      const profileCorner = new THREE.Mesh(frameGeo, activeFaucetMat);
+      profileCorner.position.set(-ROOM_WIDTH / 2 + 1.15, 1.0, -ROOM_DEPTH / 2 + 1.15);
+      group.add(profileCorner);
 
-        // Tall Floor-Standing Gold Swan-Neck Bath Filler Spout
-        const floorPillarGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.95);
-        const floorPillar = new THREE.Mesh(floorPillarGeo, brassMat);
-        floorPillar.position.set(-ROOM_WIDTH / 2 + 0.35, 0.475, -ROOM_DEPTH / 2 + 0.9);
-        group.add(floorPillar);
+      const colGeo = new THREE.CylinderGeometry(0.012, 0.012, 1.7);
+      const column = new THREE.Mesh(colGeo, activeFaucetMat);
+      column.position.set(-ROOM_WIDTH / 2 + 0.1, 1.25, -ROOM_DEPTH / 2 + 0.1);
+      group.add(column);
 
-        const swanSpoutGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.25);
-        const swanSpout = new THREE.Mesh(swanSpoutGeo, brassMat);
-        swanSpout.rotation.z = Math.PI / 2.5;
-        swanSpout.position.set(-ROOM_WIDTH / 2 + 0.44, 0.95, -ROOM_DEPTH / 2 + 0.9);
-        group.add(swanSpout);
+      const showerHeadGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.015, 16);
+      const showerHead = new THREE.Mesh(showerHeadGeo, activeFaucetMat);
+      showerHead.rotation.x = Math.PI / 2;
+      showerHead.position.set(-ROOM_WIDTH / 2 + 0.28, 2.0, -ROOM_DEPTH / 2 + 0.1);
+      showerHead.castShadow = true;
+      group.add(showerHead);
 
-        // Full-Height Arch Mirror & Brass Framed Glass Partition
-        const partitionGeo = new THREE.BoxGeometry(0.03, 2.6, 1.4);
-        const partition = new THREE.Mesh(partitionGeo, glassMat);
-        partition.position.set(0.2, 1.3, -ROOM_DEPTH / 2 + 0.7);
-        group.add(partition);
+      // --- 3. TOILET ---
+      const toiletGeo = new THREE.BoxGeometry(0.38, 0.42, 0.55);
+      const toilet = new THREE.Mesh(toiletGeo, porcelainMat);
+      toilet.position.set(0.9, 0.32, -ROOM_DEPTH / 2 + 0.275);
+      toilet.castShadow = true;
+      group.add(toilet);
 
-        const brassFrameGeo = new THREE.BoxGeometry(0.05, 2.62, 0.05);
-        const framePillar = new THREE.Mesh(brassFrameGeo, brassMat);
-        framePillar.position.set(0.2, 1.3, -ROOM_DEPTH / 2 + 1.4);
-        group.add(framePillar);
+      const buttonPlateGeo = new THREE.BoxGeometry(0.25, 0.16, 0.015);
+      const plate = new THREE.Mesh(buttonPlateGeo, activeFaucetMat);
+      plate.position.set(0.9, 1.05, -ROOM_DEPTH / 2 + 0.01);
+      group.add(plate);
 
-        // White High-Gloss Lake Vanity Unit
-        const cabGeo = new THREE.BoxGeometry(0.68, 0.62, 1.4);
-        const cabinet = new THREE.Mesh(cabGeo, cabWoodMat);
-        cabinet.position.set(ROOM_WIDTH / 2 - 0.35, 0.31, 0.3);
-        cabinet.castShadow = true;
-        group.add(cabinet);
-
-        // Dual Gold Vessel Sinks
-        for (let zOffset of [-0.35, 0.35]) {
-          const goldSinkGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.12, 32);
-          const goldSink = new THREE.Mesh(goldSinkGeo, brassMat);
-          goldSink.position.set(ROOM_WIDTH / 2 - 0.35, 0.62 + 0.06, 0.3 + zOffset);
-          goldSink.castShadow = true;
-          group.add(goldSink);
-        }
-
-      } else {
-        // =========================================================
-        // PRESET 1: LÜKS EBEVEYN BANYOSU (DUŞ KABİNLİ & ÇİFT LAVABOLU)
-        // =========================================================
-        
-        // 1. SINK VANITY UNIT
-        const cabGeo = new THREE.BoxGeometry(0.7, 0.6, 1.3);
-        const cabinet = new THREE.Mesh(cabGeo, cabWoodMat);
-        cabinet.position.set(-ROOM_WIDTH / 2 + 0.35, 0.3, 0); 
-        cabinet.castShadow = true;
-        cabinet.receiveShadow = true;
-        group.add(cabinet);
-
-        const drawerGeo = new THREE.BoxGeometry(0.02, 0.52, 1.22);
-        const drawerPanel = new THREE.Mesh(drawerGeo, cabWoodMat);
-        drawerPanel.position.set(-ROOM_WIDTH / 2 + 0.36, 0.3, 0);
-        drawerPanel.castShadow = true;
-        group.add(drawerPanel);
-
-        const basinGeo = new THREE.BoxGeometry(0.5, 0.12, 0.9);
-        const basin = new THREE.Mesh(basinGeo, porcelainMat);
-        basin.position.set(-ROOM_WIDTH / 2 + 0.35, 0.6 + 0.06, 0);
-        basin.castShadow = true;
-        group.add(basin);
-
-        const faucetBaseGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.22);
-        const faucetBase = new THREE.Mesh(faucetBaseGeo, activeFaucetMat);
-        faucetBase.position.set(-ROOM_WIDTH / 2 + 0.16, 0.6 + 0.22, 0);
-        faucetBase.castShadow = true;
-        group.add(faucetBase);
-
-        const spoutGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.14);
-        const spout = new THREE.Mesh(spoutGeo, activeFaucetMat);
-        spout.rotation.z = Math.PI / 2.3;
-        spout.position.set(-ROOM_WIDTH / 2 + 0.21, 0.6 + 0.31, 0);
-        spout.castShadow = true;
-        group.add(spout);
-
-        // Backlit LED Mirror
-        const mirrorFrameGeo = new THREE.BoxGeometry(0.02, 0.95, 1.15);
-        const mirrorFrame = new THREE.Mesh(mirrorFrameGeo, brassMat);
-        mirrorFrame.position.set(-ROOM_WIDTH / 2 + 0.01, 1.5, 0);
-        group.add(mirrorFrame);
-
-        const mirrorPaneGeo = new THREE.PlaneGeometry(1.1, 0.9);
-        const mirrorPaneMat = new THREE.MeshStandardMaterial({ color: '#999999', metalness: 0.98, roughness: 0.02 });
-        const mirrorPane = new THREE.Mesh(mirrorPaneGeo, mirrorPaneMat);
-        mirrorPane.rotation.y = Math.PI / 2;
-        mirrorPane.position.set(-ROOM_WIDTH / 2 + 0.021, 1.5, 0);
-        group.add(mirrorPane);
-
-        const mirrorGlow = new THREE.PointLight('#ffe699', 0.8, 3.5);
-        mirrorGlow.position.set(-ROOM_WIDTH / 2 + 0.05, 1.5, 0);
-        group.add(mirrorGlow);
-
-        // 2. GLASS SHOWER CABIN
-        const glassCabGeo = new THREE.BoxGeometry(0.02, 2.0, 1.15);
-        const glassCab1 = new THREE.Mesh(glassCabGeo, glassMat);
-        glassCab1.position.set(-ROOM_WIDTH / 2 + 1.15, 1.0, -ROOM_DEPTH / 2 + 0.575);
-        group.add(glassCab1);
-
-        const glassCabGeo2 = new THREE.BoxGeometry(1.15, 2.0, 0.02);
-        const glassCab2 = new THREE.Mesh(glassCabGeo2, glassMat);
-        glassCab2.position.set(-ROOM_WIDTH / 2 + 0.575, 1.0, -ROOM_DEPTH / 2 + 1.15);
-        group.add(glassCab2);
-
-        const frameGeo = new THREE.BoxGeometry(0.04, 2.0, 0.04);
-        const profileCorner = new THREE.Mesh(frameGeo, activeFaucetMat);
-        profileCorner.position.set(-ROOM_WIDTH / 2 + 1.15, 1.0, -ROOM_DEPTH / 2 + 1.15);
-        group.add(profileCorner);
-
-        const colGeo = new THREE.CylinderGeometry(0.012, 0.012, 1.7);
-        const column = new THREE.Mesh(colGeo, activeFaucetMat);
-        column.position.set(-ROOM_WIDTH / 2 + 0.1, 1.25, -ROOM_DEPTH / 2 + 0.1);
-        group.add(column);
-
-        const showerHeadGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.015, 16);
-        const showerHead = new THREE.Mesh(showerHeadGeo, activeFaucetMat);
-        showerHead.rotation.x = Math.PI / 2;
-        showerHead.position.set(-ROOM_WIDTH / 2 + 0.28, 2.0, -ROOM_DEPTH / 2 + 0.1);
-        showerHead.castShadow = true;
-        group.add(showerHead);
-
-        // 3. TOILET
-        const toiletGeo = new THREE.BoxGeometry(0.38, 0.42, 0.55);
-        const toilet = new THREE.Mesh(toiletGeo, porcelainMat);
-        toilet.position.set(0.9, 0.32, -ROOM_DEPTH / 2 + 0.275);
-        toilet.castShadow = true;
-        group.add(toilet);
-
-        const buttonPlateGeo = new THREE.BoxGeometry(0.25, 0.16, 0.015);
-        const plate = new THREE.Mesh(buttonPlateGeo, activeFaucetMat);
-        plate.position.set(0.9, 1.05, -ROOM_DEPTH / 2 + 0.01);
-        group.add(plate);
-
-        const vanitySpot = new THREE.SpotLight('#ffffff', 0.65, 6, Math.PI / 4, 0.5, 1);
-        vanitySpot.position.set(-ROOM_WIDTH / 2 + 0.6, ROOM_HEIGHT - 0.2, 0);
-        vanitySpot.target = cabinet;
-        group.add(vanitySpot);
-      }
+      const vanitySpot = new THREE.SpotLight('#ffffff', 0.65, 6, Math.PI / 4, 0.5, 1);
+      vanitySpot.position.set(-ROOM_WIDTH / 2 + 0.6, ROOM_HEIGHT - 0.2, 0);
+      vanitySpot.target = cabinet;
+      group.add(vanitySpot);
     } else if (roomType === 'livingroom') {
       // --- 1. SECTIONAL COUCH ---
       const sofaBaseGeo = new THREE.BoxGeometry(1.2, 0.12, 2.2);
@@ -1927,98 +1793,10 @@ export default function StudioCanvas({
             fontSize: '0.7rem',
             fontWeight: '800',
             whiteSpace: 'nowrap',
-            boxShadow: '0 4px 14px rgba(0,0,0,0.4)'
-          }}>
             ◀ Kıyasla ▶
           </div>
         </div>
       )}
-
-      {/* TOP-LEFT 3D ROOM MODEL SELECTOR */}
-      <div style={{
-        position: 'absolute',
-        top: '16px',
-        left: '16px',
-        zIndex: 35,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        background: 'rgba(15, 23, 42, 0.88)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(212, 175, 55, 0.35)',
-        borderRadius: '12px',
-        padding: '6px 12px',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
-        pointerEvents: 'auto'
-      }}>
-        <span style={{ fontSize: '0.74rem', fontWeight: '800', color: 'var(--accent-gold, #d4af37)', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
-          <span>3D Banyo Modeli:</span>
-        </span>
-        <div style={{ display: 'flex', gap: '5px' }}>
-          <button
-            onClick={() => {
-              setSelectedPresetId('master');
-              if (onSelectRoomPreset) onSelectRoomPreset('master');
-            }}
-            style={{
-              fontSize: '0.7rem',
-              fontWeight: '800',
-              padding: '6px 12px',
-              borderRadius: '8px',
-              border: selectedPresetId === 'master' ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.1)',
-              background: selectedPresetId === 'master' ? 'rgba(212, 175, 55, 0.25)' : 'rgba(255,255,255,0.04)',
-              color: selectedPresetId === 'master' ? 'var(--accent-gold, #d4af37)' : '#ffffff',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            🛁 Örnek 1 (Duş Kabinli)
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedPresetId('compact');
-              if (onSelectRoomPreset) onSelectRoomPreset('compact');
-            }}
-            style={{
-              fontSize: '0.7rem',
-              fontWeight: '800',
-              padding: '6px 12px',
-              borderRadius: '8px',
-              border: selectedPresetId === 'compact' ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.1)',
-              background: selectedPresetId === 'compact' ? 'rgba(212, 175, 55, 0.25)' : 'rgba(255,255,255,0.04)',
-              color: selectedPresetId === 'compact' ? 'var(--accent-gold, #d4af37)' : '#ffffff',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            🚽 Örnek 2 (Gömme Klozetli)
-          </button>
-
-          <button
-            onClick={() => {
-              setSelectedPresetId('villa');
-              if (onSelectRoomPreset) onSelectRoomPreset('villa');
-            }}
-            style={{
-              fontSize: '0.7rem',
-              fontWeight: '800',
-              padding: '6px 12px',
-              borderRadius: '8px',
-              border: selectedPresetId === 'villa' ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.1)',
-              background: selectedPresetId === 'villa' ? 'rgba(212, 175, 55, 0.25)' : 'rgba(255,255,255,0.04)',
-              color: selectedPresetId === 'villa' ? 'var(--accent-gold, #d4af37)' : '#ffffff',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            🚿 Örnek 3 (Spa & Villa)
-          </button>
-        </div>
-      </div>
 
       {/* Information Overlay */}
       <div className="canvas-overlay">
