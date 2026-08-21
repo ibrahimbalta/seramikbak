@@ -6100,6 +6100,35 @@ export default function Home() {
                     comparisonMode={studioComparisonMode}
                     comparisonSplit={studioComparisonSplit}
                     walkthroughMode={studioWalkthroughMode}
+                    onSelectRoomPreset={(presetId) => {
+                      if (presetId === 'master') {
+                        setStudioApplyFloor(true);
+                        setStudioApplyWalls(true);
+                        setStudioApplyShower(true);
+                        setStudioApplyAccent(true);
+                        setStudioApplyToiletWall(false);
+                        setStudioApplyStripeWall(false);
+                        setStudioCabinetColor('oak');
+                        setStudioFaucetColor('chrome');
+                      } else if (presetId === 'compact') {
+                        setStudioApplyFloor(true);
+                        setStudioApplyWalls(true);
+                        setStudioApplyToiletWall(true);
+                        setStudioApplyShower(false);
+                        setStudioApplyAccent(false);
+                        setStudioApplyStripeWall(false);
+                        setStudioCabinetColor('anthracite');
+                        setStudioFaucetColor('black');
+                      } else if (presetId === 'villa') {
+                        setStudioApplyFloor(true);
+                        setStudioApplyWalls(true);
+                        setStudioApplyStripeWall(true);
+                        setStudioApplyLeftWallAccent(true);
+                        setStudioApplyShower(true);
+                        setStudioCabinetColor('white');
+                        setStudioFaucetColor('gold');
+                      }
+                    }}
                     onToggleTarget={(target) => {
                       if (target === 'floor') {
                         if (studioApplyFloor && studioFloorProduct?.id === activeProduct?.id) {

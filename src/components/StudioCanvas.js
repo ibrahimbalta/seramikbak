@@ -25,6 +25,7 @@ export default function StudioCanvas({
   comparisonSplit = 50,
   walkthroughMode = false,
   onToggleTarget,
+  onSelectRoomPreset,
   roomType = 'bathroom',
   groutWidth = '2',
   groutColor = '#888888',
@@ -67,6 +68,7 @@ export default function StudioCanvas({
   // Tracks loading state and type
   const [textureStatus, setTextureStatus] = useState('Procedural (Fallback)');
   const [isSceneReady, setIsSceneReady] = useState(false);
+  const [selectedPresetId, setSelectedPresetId] = useState('master');
 
   // Dimensions of room in meters
   const ROOM_WIDTH = 3.6; 
@@ -1801,6 +1803,92 @@ export default function StudioCanvas({
           </div>
         </div>
       )}
+
+      {/* TOP-LEFT 3D ROOM MODEL SELECTOR */}
+      <div style={{
+        position: 'absolute',
+        top: '16px',
+        left: '16px',
+        zIndex: 35,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        background: 'rgba(15, 23, 42, 0.88)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(212, 175, 55, 0.35)',
+        borderRadius: '12px',
+        padding: '6px 12px',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
+        pointerEvents: 'auto'
+      }}>
+        <span style={{ fontSize: '0.74rem', fontWeight: '800', color: 'var(--accent-gold, #d4af37)', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+          <span>3D Banyo Modeli:</span>
+        </span>
+        <div style={{ display: 'flex', gap: '5px' }}>
+          <button
+            onClick={() => {
+              setSelectedPresetId('master');
+              if (onSelectRoomPreset) onSelectRoomPreset('master');
+            }}
+            style={{
+              fontSize: '0.7rem',
+              fontWeight: '800',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              border: selectedPresetId === 'master' ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.1)',
+              background: selectedPresetId === 'master' ? 'rgba(212, 175, 55, 0.25)' : 'rgba(255,255,255,0.04)',
+              color: selectedPresetId === 'master' ? 'var(--accent-gold, #d4af37)' : '#ffffff',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            🛁 Örnek 1 (Duş Kabinli)
+          </button>
+
+          <button
+            onClick={() => {
+              setSelectedPresetId('compact');
+              if (onSelectRoomPreset) onSelectRoomPreset('compact');
+            }}
+            style={{
+              fontSize: '0.7rem',
+              fontWeight: '800',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              border: selectedPresetId === 'compact' ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.1)',
+              background: selectedPresetId === 'compact' ? 'rgba(212, 175, 55, 0.25)' : 'rgba(255,255,255,0.04)',
+              color: selectedPresetId === 'compact' ? 'var(--accent-gold, #d4af37)' : '#ffffff',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            🚽 Örnek 2 (Gömme Klozetli)
+          </button>
+
+          <button
+            onClick={() => {
+              setSelectedPresetId('villa');
+              if (onSelectRoomPreset) onSelectRoomPreset('villa');
+            }}
+            style={{
+              fontSize: '0.7rem',
+              fontWeight: '800',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              border: selectedPresetId === 'villa' ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.1)',
+              background: selectedPresetId === 'villa' ? 'rgba(212, 175, 55, 0.25)' : 'rgba(255,255,255,0.04)',
+              color: selectedPresetId === 'villa' ? 'var(--accent-gold, #d4af37)' : '#ffffff',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            🚿 Örnek 3 (Spa & Villa)
+          </button>
+        </div>
+      </div>
 
       {/* Information Overlay */}
       <div className="canvas-overlay">
