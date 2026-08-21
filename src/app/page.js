@@ -95,6 +95,9 @@ import ProductCard from '@/components/ProductCard';
 import TileCalculatorWidget from '@/components/TileCalculatorWidget';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
 import ProductSchemaJsonLd from '@/components/ProductSchemaJsonLd';
+import SmartBathroomAssistantModal from '@/components/SmartBathroomAssistantModal';
+
+const PhotoVisualizer = dynamic(() => import('@/components/PhotoVisualizer'), { ssr: false });
 
 function enrichProductData(p) {
   const basePrice = p.width * p.height * 0.08 + (p.finish === 'Parlak' ? 120 : 0) + (p.style === 'Mermer' ? 150 : 80);
@@ -748,6 +751,8 @@ export default function Home() {
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedMoodIndex, setSelectedMoodIndex] = useState(0);
+  const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
+  const [studioSubTab, setStudioSubTab] = useState('photo');
   const [moodboardCombos, setMoodboardCombos] = useState(DEFAULT_MOODBOARD_COMBOS);
   const [moodboardCategory, setMoodboardCategory] = useState('all');
   const [aiGeneratingCombo, setAiGeneratingCombo] = useState(false);
@@ -3419,6 +3424,19 @@ export default function Home() {
                 <SearchIcon size={14} />
                 <span>{t('products')}</span>
               </button>
+              <button 
+                className="nav-link" 
+                onClick={() => setIsAiAssistantOpen(true)}
+                style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.08))',
+                  border: '1px solid var(--accent-gold, #d4af37)',
+                  color: 'var(--accent-gold, #d4af37)',
+                  fontWeight: '800'
+                }}
+              >
+                <Sparkles size={14} />
+                <span>⚡ 30-Sn Banyo Tasarla</span>
+              </button>
               <button className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); }}>
                 <Palette size={14} />
                 <span>{t('studio3d')}</span>
@@ -5649,10 +5667,80 @@ export default function Home() {
           </div>
         )}
 
-        {/* TAB 2: 3D VIRTUAL STUDIO */}
+        {/* TAB 2: 3D VIRTUAL STUDIO & AI PHOTO RE-TILER */}
         {activeTab === 'studio' && (
           <div className="studio-portal animate-fade-in">
-            <div className="studio-layout">
+
+            {/* Sub-tab Mode Selector */}
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              marginBottom: '24px',
+              background: 'rgba(15, 23, 42, 0.7)',
+              padding: '8px',
+              borderRadius: '16px',
+              border: '1px solid rgba(212, 175, 55, 0.2)',
+              flexWrap: 'wrap'
+            }}>
+              <button
+                onClick={() => setStudioSubTab('photo')}
+                style={{
+                  flex: 1,
+                  minWidth: '220px',
+                  padding: '12px 20px',
+                  borderRadius: '12px',
+                  border: studioSubTab === 'photo' ? '2px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.08)',
+                  background: studioSubTab === 'photo' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255,255,255,0.02)',
+                  color: studioSubTab === 'photo' ? 'var(--accent-gold, #d4af37)' : '#ffffff',
+                  fontWeight: '800',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Sparkles size={18} />
+                <span>📸 Fotoğraftan AI Kaplama & Öncesi/Sonrası Sürgüsü</span>
+              </button>
+
+              <button
+                onClick={() => setStudioSubTab('3d')}
+                style={{
+                  flex: 1,
+                  minWidth: '220px',
+                  padding: '12px 20px',
+                  borderRadius: '12px',
+                  border: studioSubTab === '3d' ? '2px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.08)',
+                  background: studioSubTab === '3d' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255,255,255,0.02)',
+                  color: studioSubTab === '3d' ? 'var(--accent-gold, #d4af37)' : '#ffffff',
+                  fontWeight: '800',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Palette size={18} />
+                <span>🎮 3D İnteraktif Sanal Oda</span>
+              </button>
+            </div>
+
+            {studioSubTab === 'photo' ? (
+              <div className="glass-panel" style={{ padding: '24px', borderRadius: '20px' }}>
+                <div style={{ marginBottom: '20px' }}>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#fff' }}>Fotoğraftan 3D Seramik Kaplama & Yapay Zeka Karşılaştırma</h3>
+                  <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
+                    Kendi banyo fotoğrafınızı yükleyin veya hazır boş oda şablonunu seçin. **✨ Yapay Zeka ile Baştan Oluştur** butonuna basarak banyonuzun tamamını fotogerçekçi olarak yenileyin ve **Öncesi / Sonrası** sürgüsüyle kıyaslayın.
+                  </p>
+                </div>
+                <PhotoVisualizer activeProduct={activeProduct} />
+              </div>
+            ) : (
+              <div className="studio-layout">
               <div className="studio-control-panel glass-panel">
                 <h3>3D Sanal Stüdyo</h3>
                 <p className="desc">Seçili seramiği banyo/mutfak sahnesine giydirerek specula (parlaklık) ve döşeme etkisini inceleyin.</p>
@@ -6202,8 +6290,9 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
         {/* TAB 3: DEALER FINDER */}
         {activeTab === 'dealers' && (() => {
@@ -8188,6 +8277,45 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* 30-SECOND SMART BATHROOM ASSISTANT MODAL */}
+      <SmartBathroomAssistantModal 
+        isOpen={isAiAssistantOpen} 
+        onClose={() => setIsAiAssistantOpen(false)} 
+        onSelectProduct={(p) => { setActiveProduct(p); }} 
+        onOpenStudio={(p) => { setActiveProduct(p); setActiveTab('studio'); }} 
+      />
+
+      {/* ALWAYS-VISIBLE FLOATING AI ASSISTANT BUTTON */}
+      <div style={{
+        position: 'fixed',
+        bottom: '30px',
+        right: '30px',
+        zIndex: 99990,
+        display: 'flex',
+        alignItems: 'center'
+      }}>
+        <button
+          onClick={() => setIsAiAssistantOpen(true)}
+          style={{
+            background: 'linear-gradient(135deg, #d4af37, #b8860b)',
+            color: '#0f172a',
+            border: '2px solid #ffffff',
+            borderRadius: '50px',
+            padding: '14px 24px',
+            fontSize: '0.9rem',
+            fontWeight: '900',
+            cursor: 'pointer',
+            boxShadow: '0 10px 35px rgba(212, 175, 55, 0.6), 0 4px 15px rgba(0, 0, 0, 0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}
+        >
+          <Sparkles size={22} />
+          <span>⚡ 30-Sn Banyo Tasarla</span>
+        </button>
+      </div>
 
       {/* COMPARISON MODAL */}
       {showComparisonModal && (

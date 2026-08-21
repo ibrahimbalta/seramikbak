@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Camera, Image as ImageIcon, RotateCw, ZoomIn, Download, RefreshCw, Sparkles, HelpCircle } from 'lucide-react';
+import { Camera, Image as ImageIcon, RotateCw, ZoomIn, Download, RefreshCw, Sparkles, HelpCircle, Loader2, Sliders } from 'lucide-react';
 import { cropWhiteBorders } from '../utils/imageTextureUtils';
 
 // Room Presets with empty floors/walls and pre-mapped perspective coordinates
@@ -11,10 +11,10 @@ const ROOM_PRESETS = [
     name: 'Modern Boş Banyo (Duvar)',
     url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80',
     pins: [
-      { x: 0.02, y: 0.35 }, // Top-Left (Duvarın sol üstü)
-      { x: 0.36, y: 0.31 }, // Top-Right (Duvarın sağ üstü - cam panel hizası)
-      { x: 0.36, y: 0.81 }, // Bottom-Right (Duvarın sağ altı)
-      { x: 0.02, y: 0.83 }  // Bottom-Left (Duvarın sol altı)
+      { x: 0.02, y: 0.35 }, // Top-Left
+      { x: 0.36, y: 0.31 }, // Top-Right
+      { x: 0.36, y: 0.81 }, // Bottom-Right
+      { x: 0.02, y: 0.83 }  // Bottom-Left
     ]
   },
   {
@@ -22,10 +22,10 @@ const ROOM_PRESETS = [
     name: 'Geniş Boş Salon (Zemin)',
     url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     pins: [
-      { x: 0.12, y: 0.58 }, // Top-Left (Uzak zemin sol)
-      { x: 0.88, y: 0.58 }, // Top-Right (Uzak zemin sağ)
-      { x: 0.98, y: 0.98 }, // Bottom-Right (Yakın zemin sağ)
-      { x: 0.02, y: 0.98 }  // Bottom-Left (Yakın zemin sol)
+      { x: 0.12, y: 0.58 },
+      { x: 0.88, y: 0.58 },
+      { x: 0.98, y: 0.98 },
+      { x: 0.02, y: 0.98 }
     ]
   },
   {
@@ -33,10 +33,10 @@ const ROOM_PRESETS = [
     name: 'Minimal Mutfak (Tezgah Üstü)',
     url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80',
     pins: [
-      { x: 0.02, y: 0.35 }, // Top-Left (Tezgah arası sol üst)
-      { x: 0.98, y: 0.35 }, // Top-Right (Tezgah arası sağ üst)
-      { x: 0.98, y: 0.62 }, // Bottom-Right (Tezgah hizası sağ)
-      { x: 0.02, y: 0.62 }  // Bottom-Left (Tezgah hizası sol)
+      { x: 0.02, y: 0.35 },
+      { x: 0.98, y: 0.35 },
+      { x: 0.98, y: 0.62 },
+      { x: 0.02, y: 0.62 }
     ]
   }
 ];
@@ -47,6 +47,12 @@ export default function PhotoVisualizer({ activeProduct }) {
   const [tileImage, setTileImage] = useState(null);
   const [pins, setPins] = useState(ROOM_PRESETS[0].pins);
   const [draggingPinIndex, setDraggingPinIndex] = useState(null);
+
+  // Generative AI States
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiResultImgObj, setAiResultImgObj] = useState(null);
+  const [isCompareMode, setIsCompareMode] = useState(false);
+  const [sliderPos, setSliderPos] = useState(50); // 0 to 100%
 
   // Tiling Settings
   const [tileScale, setTileScale] = useState(0.8);
@@ -68,6 +74,7 @@ export default function PhotoVisualizer({ activeProduct }) {
     img.onload = () => {
       setBackgroundImage(img);
       setPins(selectedPreset.pins);
+      setAiResultImgObj(null);
     };
   }, [selectedPreset]);
 
@@ -88,7 +95,44 @@ export default function PhotoVisualizer({ activeProduct }) {
   // Redraw Visualizer Canvas
   useEffect(() => {
     draw();
-  }, [backgroundImage, tileImage, pins, tileScale, tileRotation, studioLayPattern, studioGroutWidth, studioGroutColor]);
+  }, [backgroundImage, tileImage, pins, tileScale, tileRotation, studioLayPattern, studioGroutWidth, studioGroutColor, aiResultImgObj, isCompareMode, sliderPos]);
+
+  // Generative AI API Call Handler
+  const handleGenerateAiReTile = async () => {
+    setAiGenerating(true);
+    try {
+      const response = await fetch('/api/ai/re-tile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productName: activeProduct?.name || 'Calacatta Gold',
+          productCode: activeProduct?.code || 'CLM-60120',
+          style: activeProduct?.style || 'Mermer',
+          color: activeProduct?.color || 'Beyaz',
+          finish: activeProduct?.finish || 'Parlak',
+          width: activeProduct?.width || 60,
+          height: activeProduct?.height || 120
+        })
+      });
+
+      const data = await response.json();
+      if (data.success && data.imageUrl) {
+        const img = new Image();
+        img.src = data.imageUrl;
+        img.onload = () => {
+          setAiResultImgObj(img);
+          setIsCompareMode(true);
+          setAiGenerating(false);
+        };
+      } else {
+        throw new Error(data.error || 'AI yanıtı alınamadı.');
+      }
+    } catch (err) {
+      console.error('AI error:', err);
+      setAiGenerating(false);
+      alert('Yapay zeka banyo görseli oluşturulamadı. Yerel perspektif kaplama görüntülenecektir.');
+    }
+  };
 
   // Homography Affine Triangle Warping Engine
   const drawTriangleTexture = (ctx, texture, x0, y0, x1, y1, x2, y2, u0, u1, u2, v0, v1, v2) => {
@@ -124,46 +168,40 @@ export default function PhotoVisualizer({ activeProduct }) {
     if (!canvas || !backgroundImage) return;
 
     const ctx = canvas.getContext('2d');
-    const width = containerRef.current.clientWidth || 800;
+    const width = containerRef.current?.clientWidth || 800;
     const height = Math.min(width * (backgroundImage.naturalHeight / backgroundImage.naturalWidth), 550);
 
     canvas.width = width;
     canvas.height = height;
 
-    // 1. Draw Background Room Image
+    // 1. Draw Original Room Background Image
     ctx.drawImage(backgroundImage, 0, 0, width, height);
 
-    // 2. Generate repeating tile pattern on offscreen canvas
+    // 2. Render Re-Tiled Layer
     if (tileImage) {
       const offscreen = document.createElement('canvas');
       offscreen.width = 1800;
       offscreen.height = 1800;
       const oCtx = offscreen.getContext('2d');
 
-      // Grout Color
       oCtx.fillStyle = studioGroutColor;
       oCtx.fillRect(0, 0, offscreen.width, offscreen.height);
 
-      // Tile Dimensions (scaled according to scale factor and product specs)
       const baseW = (activeProduct?.width || 60) * 1.5;
       const baseH = (activeProduct?.height || 120) * 1.5;
       const tileW = baseW * tileScale;
       const tileH = baseH * tileScale;
 
       oCtx.save();
-      // Apply rotation / layout pattern
       oCtx.translate(offscreen.width / 2, offscreen.height / 2);
       let rotationAngle = (tileRotation * Math.PI) / 180;
-      if (studioLayPattern === 'diagonal') {
-        rotationAngle += Math.PI / 4;
-      }
+      if (studioLayPattern === 'diagonal') rotationAngle += Math.PI / 4;
       oCtx.rotate(rotationAngle);
       oCtx.translate(-offscreen.width / 2, -offscreen.height / 2);
 
       const stepX = tileW + parseInt(studioGroutWidth, 10);
       const stepY = tileH + parseInt(studioGroutWidth, 10);
 
-      // Draw repeating grids
       for (let x = -tileW * 2; x < offscreen.width + tileW * 2; x += stepX) {
         for (let y = -tileH * 2; y < offscreen.height + tileH * 2; y += stepY) {
           oCtx.drawImage(tileImage, x, y, tileW, tileH);
@@ -171,18 +209,16 @@ export default function PhotoVisualizer({ activeProduct }) {
       }
       oCtx.restore();
 
-      // 3. Warp offscreen tiling onto perspective quad
       const p0 = { x: pins[0].x * width, y: pins[0].y * height };
       const p1 = { x: pins[1].x * width, y: pins[1].y * height };
       const p2 = { x: pins[2].x * width, y: pins[2].y * height };
       const p3 = { x: pins[3].x * width, y: pins[3].y * height };
 
-      // Triangle 1: Source (0,0)-(1800,0)-(0,1800) -> Target p0-p1-p3
+      // Perspective Warping Triangles
       drawTriangleTexture(ctx, offscreen, p0.x, p0.y, p1.x, p1.y, p3.x, p3.y, 0, 1800, 0, 0, 0, 1800);
-      // Triangle 2: Source (1800,0)-(1800,1800)-(0,1800) -> Target p1-p2-p3
       drawTriangleTexture(ctx, offscreen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, 1800, 1800, 0, 0, 1800, 1800);
 
-      // 3.1 Overlay original shadows and lighting using multiply blend operation
+      // Light & Shadow Layer Multiply Composite Blend
       ctx.save();
       ctx.beginPath();
       ctx.moveTo(p0.x, p0.y);
@@ -192,45 +228,83 @@ export default function PhotoVisualizer({ activeProduct }) {
       ctx.closePath();
       ctx.clip();
       ctx.globalCompositeOperation = 'multiply';
-      ctx.globalAlpha = 0.7; // Sweet spot for shadow blending
+      ctx.globalAlpha = 0.7;
       ctx.drawImage(backgroundImage, 0, 0, width, height);
       ctx.restore();
     }
 
-    // 4. Draw Helper Polygon Border and Draggable Anchor Pins
-    ctx.strokeStyle = 'rgba(197, 160, 89, 0.7)';
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.moveTo(pins[0].x * width, pins[0].y * height);
-    for (let i = 1; i < 4; i++) {
-      ctx.lineTo(pins[i].x * width, pins[i].y * height);
-    }
-    ctx.closePath();
-    ctx.stroke();
-
-    // Draw handles
-    pins.forEach((pin, index) => {
-      const px = pin.x * width;
-      const py = pin.y * height;
-
-      // Circle Handle
-      ctx.fillStyle = index === draggingPinIndex ? '#ffffff' : 'var(--accent-gold)';
-      ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 2;
+    // 3. Render AI Result Image Over Right Split (If AI Image Available or Compare Mode)
+    const splitX = (sliderPos / 100) * width;
+    if (isCompareMode) {
+      ctx.save();
       ctx.beginPath();
-      ctx.arc(px, py, 9, 0, Math.PI * 2);
+      ctx.rect(splitX, 0, width - splitX, height);
+      ctx.clip();
+
+      if (aiResultImgObj) {
+        ctx.drawImage(aiResultImgObj, 0, 0, width, height);
+      } else {
+        // Render homography re-tiled version on the right
+        ctx.drawImage(backgroundImage, 0, 0, width, height);
+      }
+      ctx.restore();
+
+      // Draw Vertical Slider Line & Knob
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(splitX, 0);
+      ctx.lineTo(splitX, height);
+      ctx.stroke();
+
+      // Circular Slider Knob
+      ctx.fillStyle = '#d4af37';
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(splitX, height / 2, 18, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
-      // Inner dot
       ctx.fillStyle = '#0f172a';
+      ctx.font = '900 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('↔', splitX, height / 2 + 4);
+    }
+
+    // 4. Draw Anchor Pins if not in full comparison mode
+    if (!isCompareMode) {
+      ctx.strokeStyle = 'rgba(197, 160, 89, 0.7)';
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.arc(px, py, 3, 0, Math.PI * 2);
-      ctx.fill();
-    });
+      ctx.moveTo(pins[0].x * width, pins[0].y * height);
+      for (let i = 1; i < 4; i++) {
+        ctx.lineTo(pins[i].x * width, pins[i].y * height);
+      }
+      ctx.closePath();
+      ctx.stroke();
+
+      pins.forEach((pin, index) => {
+        const px = pin.x * width;
+        const py = pin.y * height;
+
+        ctx.fillStyle = index === draggingPinIndex ? '#ffffff' : 'var(--accent-gold, #d4af37)';
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(px, py, 9, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(px, py, 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
   };
 
-  // Canvas Interactions: Dragging pins
+  // Canvas Mouse / Touch Pin & Slider Interaction
   const handleMouseDown = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -238,16 +312,21 @@ export default function PhotoVisualizer({ activeProduct }) {
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-
     const width = canvas.width;
     const height = canvas.height;
 
-    // Find if clicked near any pin (15px radius threshold)
+    if (isCompareMode) {
+      const splitX = (sliderPos / 100) * width;
+      if (Math.abs(mouseX - splitX) < 30) {
+        setDraggingPinIndex('slider');
+      }
+      return;
+    }
+
     const clickedIndex = pins.findIndex(pin => {
       const px = pin.x * width;
       const py = pin.y * height;
-      const dist = Math.sqrt((mouseX - px) ** 2 + (mouseY - py) ** 2);
-      return dist < 16;
+      return Math.sqrt((mouseX - px) ** 2 + (mouseY - py) ** 2) < 18;
     });
 
     if (clickedIndex !== -1) {
@@ -257,18 +336,21 @@ export default function PhotoVisualizer({ activeProduct }) {
 
   const handleMouseMove = (e) => {
     if (draggingPinIndex === null) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-
     const width = canvas.width;
     const height = canvas.height;
 
-    // Normalize coordinates back to ratios (0 to 1) and clamp within boundaries
+    if (draggingPinIndex === 'slider') {
+      const newPos = Math.max(5, Math.min(95, (mouseX / width) * 100));
+      setSliderPos(newPos);
+      return;
+    }
+
     const newX = Math.max(0, Math.min(1, mouseX / width));
     const newY = Math.max(0, Math.min(1, mouseY / height));
 
@@ -277,24 +359,8 @@ export default function PhotoVisualizer({ activeProduct }) {
     setPins(updatedPins);
   };
 
-  const handleMouseUp = () => {
-    setDraggingPinIndex(null);
-  };
+  const handleMouseUp = () => setDraggingPinIndex(null);
 
-  // Support for mobile touch drag events
-  const handleTouchStart = (e) => {
-    if (e.touches.length !== 1) return;
-    const touch = e.touches[0];
-    handleMouseDown({ clientX: touch.clientX, clientY: touch.clientY });
-  };
-
-  const handleTouchMove = (e) => {
-    if (e.touches.length !== 1) return;
-    const touch = e.touches[0];
-    handleMouseMove({ clientX: touch.clientX, clientY: touch.clientY });
-  };
-
-  // Custom User Image Upload Handler
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -306,7 +372,7 @@ export default function PhotoVisualizer({ activeProduct }) {
       img.onload = () => {
         setSelectedPreset(null);
         setBackgroundImage(img);
-        // Reset pins to default center quad
+        setAiResultImgObj(null);
         setPins([
           { x: 0.25, y: 0.45 },
           { x: 0.75, y: 0.45 },
@@ -318,92 +384,78 @@ export default function PhotoVisualizer({ activeProduct }) {
     reader.readAsDataURL(file);
   };
 
-  // Reset visualizer coordinates
-  const handleReset = () => {
-    if (selectedPreset) {
-      setPins(selectedPreset.pins);
-    } else {
-      setPins([
-        { x: 0.25, y: 0.45 },
-        { x: 0.75, y: 0.45 },
-        { x: 0.85, y: 0.85 },
-        { x: 0.15, y: 0.85 }
-      ]);
-    }
-  };
-
-  // Download resulting layout composition
+  // Download resulting layout
   const handleDownload = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    // Draw a clean final canvas without anchor points for download
-    const cleanCanvas = document.createElement('canvas');
-    cleanCanvas.width = canvas.width;
-    cleanCanvas.height = canvas.height;
-    const cleanCtx = cleanCanvas.getContext('2d');
-
-    // Draw background
-    cleanCtx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-
-    // Draw warped tiles
-    if (tileImage) {
-      const offscreen = document.createElement('canvas');
-      offscreen.width = 1800;
-      offscreen.height = 1800;
-      const oCtx = offscreen.getContext('2d');
-
-      oCtx.fillStyle = studioGroutColor;
-      oCtx.fillRect(0, 0, 1800, 1800);
-
-      const baseW = (activeProduct?.width || 60) * 1.5;
-      const baseH = (activeProduct?.height || 120) * 1.5;
-      const tileW = baseW * tileScale;
-      const tileH = baseH * tileScale;
-
-      oCtx.save();
-      oCtx.translate(900, 900);
-      let rotationAngle = (tileRotation * Math.PI) / 180;
-      if (studioLayPattern === 'diagonal') rotationAngle += Math.PI / 4;
-      oCtx.rotate(rotationAngle);
-      oCtx.translate(-900, -900);
-
-      const stepX = tileW + parseInt(studioGroutWidth, 10);
-      const stepY = tileH + parseInt(studioGroutWidth, 10);
-
-      for (let x = -tileW * 2; x < 1800 + tileW * 2; x += stepX) {
-        for (let y = -tileH * 2; y < 1800 + tileH * 2; y += stepY) {
-          oCtx.drawImage(tileImage, x, y, tileW, tileH);
-        }
-      }
-      oCtx.restore();
-
-      const p0 = { x: pins[0].x * canvas.width, y: pins[0].y * canvas.height };
-      const p1 = { x: pins[1].x * canvas.width, y: pins[1].y * canvas.height };
-      const p2 = { x: pins[2].x * canvas.width, y: pins[2].y * canvas.height };
-      const p3 = { x: pins[3].x * canvas.width, y: pins[3].y * canvas.height };
-
-      drawTriangleTexture(cleanCtx, offscreen, p0.x, p0.y, p1.x, p1.y, p3.x, p3.y, 0, 1800, 0, 0, 0, 1800);
-      drawTriangleTexture(cleanCtx, offscreen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, 1800, 1800, 0, 0, 1800, 1800);
-
-      // Overlay original shadows and lighting for clean download
-      cleanCtx.save();
-      cleanCtx.beginPath();
-      cleanCtx.moveTo(p0.x, p0.y);
-      cleanCtx.lineTo(p1.x, p1.y);
-      cleanCtx.lineTo(p2.x, p2.y);
-      cleanCtx.lineTo(p3.x, p3.y);
-      cleanCtx.closePath();
-      cleanCtx.clip();
-      cleanCtx.globalCompositeOperation = 'multiply';
-      cleanCtx.globalAlpha = 0.7;
-      cleanCtx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-      cleanCtx.restore();
-    }
-
-    const dataUrl = cleanCanvas.toDataURL('image/jpeg', 0.95);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
     const link = document.createElement('a');
     link.download = `seramikbak_${activeProduct?.code || 'tasarim'}.jpg`;
+    link.href = dataUrl;
+    link.click();
+  };
+
+  // Export to Instagram Story (9:16 format)
+  const handleExportInstagramStory = () => {
+    const canvas = canvasRef.current;
+    if (!canvas || !backgroundImage) return;
+
+    const storyCanvas = document.createElement('canvas');
+    storyCanvas.width = 1080;
+    storyCanvas.height = 1920;
+    const sCtx = storyCanvas.getContext('2d');
+
+    const bgGradient = sCtx.createLinearGradient(0, 0, 0, 1920);
+    bgGradient.addColorStop(0, '#090d16');
+    bgGradient.addColorStop(0.5, '#0f172a');
+    bgGradient.addColorStop(1, '#020617');
+    sCtx.fillStyle = bgGradient;
+    sCtx.fillRect(0, 0, 1080, 1920);
+
+    sCtx.fillStyle = '#d4af37';
+    sCtx.font = '900 48px "Outfit", sans-serif';
+    sCtx.textAlign = 'center';
+    sCtx.fillText('SERAMİKBAK AI STÜDYO', 540, 140);
+
+    sCtx.fillStyle = '#94a3b8';
+    sCtx.font = '500 28px "Plus Jakarta Sans", sans-serif';
+    sCtx.fillText('Fotoğraftan 3D Seramik Kaplama Dönüşümü', 540, 190);
+
+    const targetW = 960;
+    const targetH = Math.min(1100, Math.round(targetW * (canvas.height / canvas.width)));
+    const targetX = (1080 - targetW) / 2;
+    const targetY = 260;
+
+    sCtx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+    sCtx.lineWidth = 4;
+    sCtx.strokeRect(targetX - 4, targetY - 4, targetW + 8, targetH + 8);
+    sCtx.drawImage(canvas, targetX, targetY, targetW, targetH);
+
+    const badgeY = targetY + targetH + 60;
+    sCtx.fillStyle = 'rgba(30, 41, 59, 0.9)';
+    sCtx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    sCtx.lineWidth = 2;
+    sCtx.beginPath();
+    sCtx.roundRect(targetX, badgeY, targetW, 280, 24);
+    sCtx.fill();
+    sCtx.stroke();
+
+    sCtx.fillStyle = '#ffffff';
+    sCtx.font = '800 36px "Outfit", sans-serif';
+    sCtx.textAlign = 'left';
+    sCtx.fillText(activeProduct?.name || 'Özel Tasarım Seramik', targetX + 40, badgeY + 70);
+
+    sCtx.fillStyle = '#d4af37';
+    sCtx.font = '600 28px "Plus Jakarta Sans", sans-serif';
+    sCtx.fillText(`${activeProduct?.width || 60}x${activeProduct?.height || 120} cm • ${activeProduct?.finish || 'Parlak'} • ${activeProduct?.style || 'Mermer'}`, targetX + 40, badgeY + 120);
+
+    sCtx.fillStyle = '#94a3b8';
+    sCtx.font = '400 24px "Plus Jakarta Sans", sans-serif';
+    sCtx.fillText('Sen de Kendi Banyonu Canlı Dönüştür ➔ seramikbak.com', targetX + 40, badgeY + 180);
+
+    const dataUrl = storyCanvas.toDataURL('image/jpeg', 0.92);
+    const link = document.createElement('a');
+    link.download = `seramikbak_instagram_story_${activeProduct?.code || 'banyo'}.jpg`;
     link.href = dataUrl;
     link.click();
   };
@@ -411,7 +463,7 @@ export default function PhotoVisualizer({ activeProduct }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
-      {/* Top Banner Control Panel */}
+      {/* Top Banner Control Bar */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -423,24 +475,23 @@ export default function PhotoVisualizer({ activeProduct }) {
         flexWrap: 'wrap',
         gap: '12px'
       }}>
-        {/* Preset Rooms Selection */}
+        {/* Presets */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--accent-gold)' }}>Hazır Odalar:</span>
+          <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--accent-gold, #d4af37)' }}>Hazır Odalar:</span>
           <div style={{ display: 'flex', gap: '6px' }}>
             {ROOM_PRESETS.map(preset => (
               <button
                 key={preset.id}
-                onClick={() => setSelectedPreset(preset)}
+                onClick={() => { setSelectedPreset(preset); setIsCompareMode(false); }}
                 style={{
                   fontSize: '0.72rem',
                   padding: '6px 12px',
                   borderRadius: '6px',
-                  border: selectedPreset?.id === preset.id ? '1px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.1)',
+                  border: selectedPreset?.id === preset.id ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.1)',
                   background: selectedPreset?.id === preset.id ? 'rgba(197, 160, 89, 0.15)' : 'rgba(255,255,255,0.02)',
-                  color: selectedPreset?.id === preset.id ? 'var(--accent-gold)' : 'var(--text-secondary)',
+                  color: selectedPreset?.id === preset.id ? 'var(--accent-gold, #d4af37)' : 'var(--text-secondary, #94a3b8)',
                   cursor: 'pointer',
-                  fontWeight: '700',
-                  transition: 'all 0.2s ease'
+                  fontWeight: '700'
                 }}
               >
                 {preset.name}
@@ -449,8 +500,50 @@ export default function PhotoVisualizer({ activeProduct }) {
           </div>
         </div>
 
-        {/* Custom Image Upload Button */}
-        <div style={{ display: 'flex', gap: '8px' }}>
+        {/* Action Controls: Generative AI & Compare */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button
+            onClick={handleGenerateAiReTile}
+            disabled={aiGenerating}
+            style={{
+              fontSize: '0.75rem',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              background: 'linear-gradient(135deg, var(--accent-gold, #d4af37), #b8860b)',
+              color: '#0f172a',
+              cursor: 'pointer',
+              fontWeight: '900',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 4px 14px rgba(212, 175, 55, 0.3)'
+            }}
+          >
+            {aiGenerating ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+            <span>{aiGenerating ? 'AI Banyonuzu Üretiyor...' : '✨ Yapay Zeka ile Baştan Oluştur'}</span>
+          </button>
+
+          <button
+            onClick={() => setIsCompareMode(!isCompareMode)}
+            style={{
+              fontSize: '0.72rem',
+              padding: '6px 14px',
+              borderRadius: '8px',
+              border: isCompareMode ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.15)',
+              background: isCompareMode ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255,255,255,0.05)',
+              color: isCompareMode ? 'var(--accent-gold, #d4af37)' : '#ffffff',
+              cursor: 'pointer',
+              fontWeight: '700',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <Sliders size={14} />
+            <span>{isCompareMode ? 'Kaplama Moduna Dön' : 'Öncesi / Sonrası Sürgüsü'}</span>
+          </button>
+
           <input
             type="file"
             ref={fileInputRef}
@@ -463,12 +556,12 @@ export default function PhotoVisualizer({ activeProduct }) {
             style={{
               fontSize: '0.72rem',
               padding: '6px 14px',
-              borderRadius: '6px',
+              borderRadius: '8px',
               border: '1px solid rgba(255,255,255,0.15)',
-              background: 'var(--accent-gold)',
-              color: '#0f172a',
+              background: 'rgba(255,255,255,0.08)',
+              color: '#ffffff',
               cursor: 'pointer',
-              fontWeight: '800',
+              fontWeight: '700',
               display: 'flex',
               alignItems: 'center',
               gap: '6px'
@@ -480,7 +573,7 @@ export default function PhotoVisualizer({ activeProduct }) {
         </div>
       </div>
 
-      {/* Editor Main Section Split */}
+      {/* Editor Grid Split */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'minmax(0, 1fr) 260px',
@@ -510,8 +603,8 @@ export default function PhotoVisualizer({ activeProduct }) {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
+            onTouchStart={(e) => e.touches.length === 1 && handleMouseDown({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY })}
+            onTouchMove={(e) => e.touches.length === 1 && handleMouseMove({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY })}
             onTouchEnd={handleMouseUp}
             style={{
               display: 'block',
@@ -520,7 +613,7 @@ export default function PhotoVisualizer({ activeProduct }) {
             }}
           />
 
-          {/* Interactive Help Box */}
+          {/* Interactive Tooltips */}
           <div style={{
             position: 'absolute',
             top: '12px',
@@ -537,8 +630,10 @@ export default function PhotoVisualizer({ activeProduct }) {
             gap: '6px',
             pointerEvents: 'none'
           }}>
-            <HelpCircle size={12} style={{ color: 'var(--accent-gold)' }} />
-            <span>Köşelerdeki altın pinleri sürükleyerek döşeme alanını belirleyin.</span>
+            <HelpCircle size={12} style={{ color: 'var(--accent-gold, #d4af37)' }} />
+            <span>
+              {isCompareMode ? 'Sürgüyü sağa-sola kaydırarak Öncesi/Sonrası kıyaslamasını inceleyin.' : 'Köşelerdeki altın pinleri sürükleyerek döşeme alanını belirleyin.'}
+            </span>
           </div>
         </div>
 
@@ -559,9 +654,9 @@ export default function PhotoVisualizer({ activeProduct }) {
             border: '1px solid rgba(197, 160, 89, 0.2)',
             borderRadius: '10px'
           }}>
-            <span style={{ fontSize: '0.62rem', fontWeight: '800', color: 'var(--accent-gold)', display: 'block', textTransform: 'uppercase' }}>Seçili Karolar</span>
-            <strong style={{ fontSize: '0.78rem', color: '#fff', display: 'block', margin: '2px 0' }}>{activeProduct?.name || 'Seramik'}</strong>
-            <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>{activeProduct?.width}x{activeProduct?.height} cm • {activeProduct?.finish}</span>
+            <span style={{ fontSize: '0.62rem', fontWeight: '800', color: 'var(--accent-gold, #d4af37)', display: 'block', textTransform: 'uppercase' }}>Seçili Karo</span>
+            <strong style={{ fontSize: '0.78rem', color: '#fff', display: 'block', margin: '2px 0' }}>{activeProduct?.name || 'Calacatta Gold'}</strong>
+            <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>{activeProduct?.width || 60}x{activeProduct?.height || 120} cm • {activeProduct?.finish || 'Parlak'}</span>
           </div>
 
           {/* Scale Slider */}
@@ -577,7 +672,7 @@ export default function PhotoVisualizer({ activeProduct }) {
               step="0.05"
               value={tileScale}
               onChange={(e) => setTileScale(parseFloat(e.target.value))}
-              style={{ width: '100%', accentColor: 'var(--accent-gold)' }}
+              style={{ width: '100%', accentColor: 'var(--accent-gold, #d4af37)' }}
             />
           </div>
 
@@ -591,9 +686,9 @@ export default function PhotoVisualizer({ activeProduct }) {
                   fontSize: '0.68rem',
                   padding: '6px',
                   borderRadius: '6px',
-                  border: tileRotation === 0 ? '1px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.06)',
+                  border: tileRotation === 0 ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.06)',
                   background: tileRotation === 0 ? 'rgba(197, 160, 89, 0.15)' : 'rgba(255,255,255,0.02)',
-                  color: tileRotation === 0 ? 'var(--accent-gold)' : '#94a3b8',
+                  color: tileRotation === 0 ? 'var(--accent-gold, #d4af37)' : '#94a3b8',
                   cursor: 'pointer',
                   fontWeight: '700'
                 }}
@@ -606,9 +701,9 @@ export default function PhotoVisualizer({ activeProduct }) {
                   fontSize: '0.68rem',
                   padding: '6px',
                   borderRadius: '6px',
-                  border: tileRotation === 90 ? '1px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.06)',
+                  border: tileRotation === 90 ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.06)',
                   background: tileRotation === 90 ? 'rgba(197, 160, 89, 0.15)' : 'rgba(255,255,255,0.02)',
-                  color: tileRotation === 90 ? 'var(--accent-gold)' : '#94a3b8',
+                  color: tileRotation === 90 ? 'var(--accent-gold, #d4af37)' : '#94a3b8',
                   cursor: 'pointer',
                   fontWeight: '700'
                 }}
@@ -628,9 +723,9 @@ export default function PhotoVisualizer({ activeProduct }) {
                   fontSize: '0.68rem',
                   padding: '6px',
                   borderRadius: '6px',
-                  border: studioLayPattern === 'flat' ? '1px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.06)',
+                  border: studioLayPattern === 'flat' ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.06)',
                   background: studioLayPattern === 'flat' ? 'rgba(197, 160, 89, 0.15)' : 'rgba(255,255,255,0.02)',
-                  color: studioLayPattern === 'flat' ? 'var(--accent-gold)' : '#94a3b8',
+                  color: studioLayPattern === 'flat' ? 'var(--accent-gold, #d4af37)' : '#94a3b8',
                   cursor: 'pointer',
                   fontWeight: '700'
                 }}
@@ -643,69 +738,15 @@ export default function PhotoVisualizer({ activeProduct }) {
                   fontSize: '0.68rem',
                   padding: '6px',
                   borderRadius: '6px',
-                  border: studioLayPattern === 'diagonal' ? '1px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.06)',
+                  border: studioLayPattern === 'diagonal' ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.06)',
                   background: studioLayPattern === 'diagonal' ? 'rgba(197, 160, 89, 0.15)' : 'rgba(255,255,255,0.02)',
-                  color: studioLayPattern === 'diagonal' ? 'var(--accent-gold)' : '#94a3b8',
+                  color: studioLayPattern === 'diagonal' ? 'var(--accent-gold, #d4af37)' : '#94a3b8',
                   cursor: 'pointer',
                   fontWeight: '700'
                 }}
               >
                 Çapraz (45°)
               </button>
-            </div>
-          </div>
-
-          {/* Grout Width */}
-          <div>
-            <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Derz Kalınlığı</span>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
-              {['1', '2', '3', '5'].map(w => (
-                <button
-                  key={w}
-                  onClick={() => setStudioGroutWidth(parseInt(w, 10))}
-                  style={{
-                    fontSize: '0.65rem',
-                    padding: '4px',
-                    borderRadius: '4px',
-                    border: studioGroutWidth === parseInt(w, 10) ? '1px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.06)',
-                    background: studioGroutWidth === parseInt(w, 10) ? 'rgba(197, 160, 89, 0.15)' : 'rgba(255,255,255,0.02)',
-                    color: studioGroutWidth === parseInt(w, 10) ? 'var(--accent-gold)' : '#94a3b8',
-                    cursor: 'pointer',
-                    fontWeight: '700'
-                  }}
-                >
-                  {w}mm
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Grout Color */}
-          <div>
-            <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Derz Rengi</span>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {[
-                { name: 'Beyaz', color: '#ffffff' },
-                { name: 'Açık Gri', color: '#c0c0c0' },
-                { name: 'Koyu Gri', color: '#555555' },
-                { name: 'Krem', color: '#e8dcba' },
-                { name: 'Siyah', color: '#111111' }
-              ].map(c => (
-                <button
-                  key={c.color}
-                  onClick={() => setStudioGroutColor(c.color)}
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '50%',
-                    backgroundColor: c.color,
-                    border: studioGroutColor === c.color ? '2px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.2)',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease'
-                  }}
-                  title={c.name}
-                />
-              ))}
             </div>
           </div>
 
@@ -717,10 +758,9 @@ export default function PhotoVisualizer({ activeProduct }) {
                 width: '100%',
                 padding: '10px',
                 borderRadius: '8px',
-                border: 'none',
                 background: 'rgba(197, 160, 89, 0.15)',
-                color: 'var(--accent-gold)',
-                border: '1px solid var(--accent-gold)',
+                color: 'var(--accent-gold, #d4af37)',
+                border: '1px solid var(--accent-gold, #d4af37)',
                 fontSize: '0.78rem',
                 fontWeight: '800',
                 cursor: 'pointer',
@@ -733,8 +773,34 @@ export default function PhotoVisualizer({ activeProduct }) {
               <Download size={14} />
               <span>Görseli İndir</span>
             </button>
+
             <button
-              onClick={handleReset}
+              onClick={handleExportInstagramStory}
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, rgba(225, 48, 108, 0.2), rgba(225, 48, 108, 0.05))',
+                color: '#f472b6',
+                border: '1px solid rgba(225, 48, 108, 0.4)',
+                fontSize: '0.78rem',
+                fontWeight: '800',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px'
+              }}
+            >
+              <Sparkles size={14} />
+              <span>Instagram Story İndir (9:16)</span>
+            </button>
+
+            <button
+              onClick={() => {
+                if (selectedPreset) setPins(selectedPreset.pins);
+                else setPins([{ x: 0.25, y: 0.45 }, { x: 0.75, y: 0.45 }, { x: 0.85, y: 0.85 }, { x: 0.15, y: 0.85 }]);
+              }}
               style={{
                 width: '100%',
                 padding: '10px',
