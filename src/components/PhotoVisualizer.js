@@ -11,12 +11,12 @@ const ROOM_PRESETS = [
     name: 'Banyo Tüm Alanlar (Lavabo Arkası + Duş Kabini + Zemin)',
     url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80',
     regions: [
-      // Region 1: Lavabo Arkası Duvar (Mirror Wall)
-      [ { x: 0.0, y: 0.30 }, { x: 0.64, y: 0.30 }, { x: 0.64, y: 0.76 }, { x: 0.0, y: 0.88 } ],
-      // Region 2: Duş Kabini İç Duvarı (Shower Cabin Interior)
-      [ { x: 0.64, y: 0.12 }, { x: 1.0, y: 0.12 }, { x: 1.0, y: 0.74 }, { x: 0.64, y: 0.76 } ],
-      // Region 3: Banyo Zemin Kaplama (Bathroom Floor)
-      [ { x: 0.0, y: 0.76 }, { x: 1.0, y: 0.74 }, { x: 1.0, y: 1.0 }, { x: 0.0, y: 1.0 } ]
+      // Region 1: Lavabo Arkası Duvar (Ayna Altı & Lavabo Arkası Pano - Tezgah ve Lavaboya Taşmaz)
+      [ { x: 0.0, y: 0.46 }, { x: 0.48, y: 0.46 }, { x: 0.48, y: 0.76 }, { x: 0.0, y: 0.86 } ],
+      // Region 2: Duş Kabini İç Duvarı (Cam Duş Kabini İç Tarafı)
+      [ { x: 0.78, y: 0.18 }, { x: 0.98, y: 0.18 }, { x: 0.98, y: 0.84 }, { x: 0.78, y: 0.84 } ],
+      // Region 3: Banyo Zemin Kaplama (Kapı Eşiği ve Zemin)
+      [ { x: 0.45, y: 0.76 }, { x: 0.78, y: 0.76 }, { x: 0.78, y: 1.0 }, { x: 0.45, y: 1.0 } ]
     ]
   },
   {
@@ -24,8 +24,8 @@ const ROOM_PRESETS = [
     name: 'Lavabo Arkası & Duş Kabini Duvarları',
     url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80',
     regions: [
-      [ { x: 0.0, y: 0.30 }, { x: 0.64, y: 0.30 }, { x: 0.64, y: 0.76 }, { x: 0.0, y: 0.88 } ],
-      [ { x: 0.64, y: 0.12 }, { x: 1.0, y: 0.12 }, { x: 1.0, y: 0.74 }, { x: 0.64, y: 0.76 } ]
+      [ { x: 0.0, y: 0.46 }, { x: 0.48, y: 0.46 }, { x: 0.48, y: 0.76 }, { x: 0.0, y: 0.86 } ],
+      [ { x: 0.78, y: 0.18 }, { x: 0.98, y: 0.18 }, { x: 0.98, y: 0.84 }, { x: 0.78, y: 0.84 } ]
     ]
   },
   {
@@ -33,7 +33,7 @@ const ROOM_PRESETS = [
     name: 'Sadece Banyo Zemin Kaplama',
     url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
     regions: [
-      [ { x: 0.0, y: 0.58 }, { x: 1.0, y: 0.58 }, { x: 1.0, y: 1.0 }, { x: 0.0, y: 1.0 } ]
+      [ { x: 0.45, y: 0.76 }, { x: 0.78, y: 0.76 }, { x: 0.78, y: 1.0 }, { x: 0.45, y: 1.0 } ]
     ]
   }
 ];
@@ -49,12 +49,12 @@ export default function PhotoVisualizer({ activeProduct }) {
   const [sliderPos, setSliderPos] = useState(50); // 0 to 100%
   const [isDraggingSlider, setIsDraggingSlider] = useState(false);
 
-  // Tiling Settings
-  const [tileScale, setTileScale] = useState(0.8);
+  // Tiling Settings (Defaulted for large format luxury slabs with fine 1px grout)
+  const [tileScale, setTileScale] = useState(1.2);
   const [tileRotation, setStudioTileRotation] = useState(0);
   const [studioLayPattern, setStudioLayPattern] = useState('flat'); // flat, diagonal
-  const [studioGroutWidth, setStudioGroutWidth] = useState(2); // in px
-  const [studioGroutColor, setStudioGroutColor] = useState('#888888');
+  const [studioGroutWidth, setStudioGroutWidth] = useState(1); // 1px subtle grout
+  const [studioGroutColor, setStudioGroutColor] = useState('#e5e7eb'); // light grey grout
 
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -135,7 +135,7 @@ export default function PhotoVisualizer({ activeProduct }) {
     canvas.height = height;
 
     // -------------------------------------------------------------
-    // STEP A: Render User's Raw Original Photo (Unmodified)
+    // STEP A: Render User's Raw Original Photo (Left Side)
     // -------------------------------------------------------------
     ctx.drawImage(backgroundImageObj, 0, 0, width, height);
 
@@ -192,7 +192,7 @@ export default function PhotoVisualizer({ activeProduct }) {
         drawTriangleTexture(tCtx, offscreen, p0.x, p0.y, p1.x, p1.y, p3.x, p3.y, 0, 1800, 0, 0, 0, 1800);
         drawTriangleTexture(tCtx, offscreen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, 1800, 1800, 0, 0, 1800, 1800);
 
-        // Multiply ambient shadow & overlay specular pass
+        // Light ambient shadow pass for photorealistic realistic finish
         tCtx.save();
         tCtx.beginPath();
         tCtx.moveTo(p0.x, p0.y);
@@ -202,11 +202,11 @@ export default function PhotoVisualizer({ activeProduct }) {
         tCtx.closePath();
         tCtx.clip();
         tCtx.globalCompositeOperation = 'multiply';
-        tCtx.globalAlpha = 0.72;
+        tCtx.globalAlpha = 0.22;
         tCtx.drawImage(backgroundImageObj, 0, 0, width, height);
 
         tCtx.globalCompositeOperation = 'overlay';
-        tCtx.globalAlpha = 0.35;
+        tCtx.globalAlpha = 0.15;
         tCtx.drawImage(backgroundImageObj, 0, 0, width, height);
         tCtx.restore();
       });
@@ -281,10 +281,11 @@ export default function PhotoVisualizer({ activeProduct }) {
     reader.onload = (event) => {
       setUserUploadedImageUrl(event.target.result);
       setSelectedPreset(null);
-      // Custom uploaded photo multi-surface bounds
+      // Segment boundaries excluding vanity basin, mirror, door and radiator
       setActiveRegions([
-        [ { x: 0.0, y: 0.25 }, { x: 1.0, y: 0.25 }, { x: 1.0, y: 0.75 }, { x: 0.0, y: 0.88 } ],
-        [ { x: 0.0, y: 0.75 }, { x: 1.0, y: 0.75 }, { x: 1.0, y: 1.0 }, { x: 0.0, y: 1.0 } ]
+        [ { x: 0.0, y: 0.46 }, { x: 0.48, y: 0.46 }, { x: 0.48, y: 0.76 }, { x: 0.0, y: 0.86 } ],
+        [ { x: 0.78, y: 0.18 }, { x: 0.98, y: 0.18 }, { x: 0.98, y: 0.84 }, { x: 0.78, y: 0.84 } ],
+        [ { x: 0.45, y: 0.76 }, { x: 0.78, y: 0.76 }, { x: 0.78, y: 1.0 }, { x: 0.45, y: 1.0 } ]
       ]);
     };
     reader.readAsDataURL(file);
@@ -463,7 +464,7 @@ export default function PhotoVisualizer({ activeProduct }) {
             </span>
           </div>
           <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
-            *Katalogdan başka seramความ seçtiğinizde burası anında güncellenir.
+            *Katalogdan başka seramik seçtiğinizde burası anında güncellenir.
           </span>
         </div>
       </div>
