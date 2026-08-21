@@ -5,8 +5,8 @@ export async function POST(req) {
     const body = await req.json();
     const { image, productName, productCode, style, color, finish, width, height } = body;
 
-    // Construct high-detail prompt for interior design AI room re-tiling
-    const prompt = `A modern high-end architectural photorealistic bathroom interior, walls and floor completely tiled with ${color || 'white'} ${style || 'Marble'} ceramic tiles (${productName || 'Calacatta'}, ${width || 60}x${height || 120} cm, ${finish || 'polished'} finish) with clean grout lines, realistic ambient lighting, luxury bathroom fixtures, mirror, vanity, shower glass, 8k resolution, cinematic lighting`;
+    // Construct high-precision architectural AI room prompt
+    const prompt = `Architectural digest photorealistic luxury bathroom interior transformation, wall behind vanity sink under mirror, wall inside glass shower cabin, and bathroom floor seamlessly tiled with ${color || 'white'} ${style || 'Marble'} ceramic tiles (${productName || 'Calacatta Gold'}, ${width || 60}x${height || 120} cm, ${finish || 'polished'} finish, elegant grey marble vein patterns), preserving original vanity sink basin, faucet, mirror frame, towel radiator, glass shower enclosure, 8k resolution, cinematic studio lighting`;
 
     const encodedPrompt = encodeURIComponent(prompt);
     const randomSeed = Math.floor(Math.random() * 1000000);

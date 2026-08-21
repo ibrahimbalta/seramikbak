@@ -4,50 +4,36 @@ import { useState, useEffect, useRef } from 'react';
 import { Camera, Image as ImageIcon, RotateCw, ZoomIn, Download, RefreshCw, Sparkles, HelpCircle, Loader2, Sliders, Eye, EyeOff, Check } from 'lucide-react';
 import { cropWhiteBorders } from '../utils/imageTextureUtils';
 
-// Room Presets with full natural wall & floor boundaries
+// Multi-Region Room Presets matching real bathroom zones (Mirror Wall + Shower Cabin + Floor)
 const ROOM_PRESETS = [
   {
-    id: 'full_wall',
-    name: 'Tüm Arka & Duş Duvarı',
+    id: 'full_bathroom_transform',
+    name: 'Banyo Tüm Alanlar (Lavabo Arkası + Duş Kabini + Zemin)',
     url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80',
-    pins: [
-      { x: 0.0, y: 0.0 },   // Top-Left (Tam sol üst köşe)
-      { x: 0.64, y: 0.0 },  // Top-Right (Ayna hizasına kadar üst duvar)
-      { x: 0.64, y: 0.76 }, // Bottom-Right (Tezgah & zemin birleşimi)
-      { x: 0.0, y: 0.95 }   // Bottom-Left (Sol alt zemin süpürgelik hizası)
+    regions: [
+      // Region 1: Lavabo Arkası Duvar (Mirror Wall)
+      [ { x: 0.0, y: 0.30 }, { x: 0.64, y: 0.30 }, { x: 0.64, y: 0.76 }, { x: 0.0, y: 0.88 } ],
+      // Region 2: Duş Kabini İç Duvarı (Shower Cabin Interior)
+      [ { x: 0.64, y: 0.12 }, { x: 1.0, y: 0.12 }, { x: 1.0, y: 0.74 }, { x: 0.64, y: 0.76 } ],
+      // Region 3: Banyo Zemin Kaplama (Bathroom Floor)
+      [ { x: 0.0, y: 0.76 }, { x: 1.0, y: 0.74 }, { x: 1.0, y: 1.0 }, { x: 0.0, y: 1.0 } ]
     ]
   },
   {
-    id: 'whole_room',
-    name: 'Tüm Banyo Duvarları (Komple)',
+    id: 'walls_only',
+    name: 'Lavabo Arkası & Duş Kabini Duvarları',
     url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80',
-    pins: [
-      { x: 0.0, y: 0.0 },   // Top-Left
-      { x: 1.0, y: 0.0 },   // Top-Right
-      { x: 1.0, y: 0.74 },  // Bottom-Right
-      { x: 0.0, y: 0.95 }   // Bottom-Left
+    regions: [
+      [ { x: 0.0, y: 0.30 }, { x: 0.64, y: 0.30 }, { x: 0.64, y: 0.76 }, { x: 0.0, y: 0.88 } ],
+      [ { x: 0.64, y: 0.12 }, { x: 1.0, y: 0.12 }, { x: 1.0, y: 0.74 }, { x: 0.64, y: 0.76 } ]
     ]
   },
   {
-    id: 'vanity_wall',
-    name: 'Ayna & Tezgah Duvarı (Sağ)',
-    url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80',
-    pins: [
-      { x: 0.64, y: 0.0 },  // Top-Left
-      { x: 1.0, y: 0.0 },   // Top-Right
-      { x: 1.0, y: 0.74 },  // Bottom-Right
-      { x: 0.64, y: 0.76 }  // Bottom-Left
-    ]
-  },
-  {
-    id: 'floor_tile',
-    name: 'Banyo Zemin Kaplama',
+    id: 'floor_only',
+    name: 'Sadece Banyo Zemin Kaplama',
     url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
-    pins: [
-      { x: 0.0, y: 0.58 },  // Top-Left (Uzak zemin)
-      { x: 1.0, y: 0.58 },  // Top-Right (Uzak zemin)
-      { x: 1.0, y: 1.0 },   // Bottom-Right (Yakın zemin)
-      { x: 0.0, y: 1.0 }    // Bottom-Left (Yakın zemin)
+    regions: [
+      [ { x: 0.0, y: 0.58 }, { x: 1.0, y: 0.58 }, { x: 1.0, y: 1.0 }, { x: 0.0, y: 1.0 } ]
     ]
   }
 ];
@@ -56,8 +42,7 @@ export default function PhotoVisualizer({ activeProduct }) {
   const [selectedPreset, setSelectedPreset] = useState(ROOM_PRESETS[0]);
   const [backgroundImage, setBackgroundImage] = useState(null);
   const [tileImage, setTileImage] = useState(null);
-  const [pins, setPins] = useState(ROOM_PRESETS[0].pins);
-  const [draggingPinIndex, setDraggingPinIndex] = useState(null);
+  const [activeRegions, setActiveRegions] = useState(ROOM_PRESETS[0].regions);
   const [showPins, setShowPins] = useState(false); // Pin handles hidden by default for photorealistic visual
 
   // Generative AI States
@@ -85,7 +70,7 @@ export default function PhotoVisualizer({ activeProduct }) {
     img.src = selectedPreset.url;
     img.onload = () => {
       setBackgroundImage(img);
-      setPins(selectedPreset.pins);
+      setActiveRegions(selectedPreset.regions);
       setAiResultImgObj(null);
     };
   }, [selectedPreset]);
@@ -107,7 +92,7 @@ export default function PhotoVisualizer({ activeProduct }) {
   // Redraw Visualizer Canvas
   useEffect(() => {
     draw();
-  }, [backgroundImage, tileImage, pins, tileScale, tileRotation, studioLayPattern, studioGroutWidth, studioGroutColor, aiResultImgObj, isCompareMode, sliderPos, showPins]);
+  }, [backgroundImage, tileImage, activeRegions, tileScale, tileRotation, studioLayPattern, studioGroutWidth, studioGroutColor, aiResultImgObj, isCompareMode, sliderPos, showPins]);
 
   // Generative AI API Call Handler
   const handleGenerateAiReTile = async () => {
@@ -189,8 +174,8 @@ export default function PhotoVisualizer({ activeProduct }) {
     // 1. Draw Original Room Background Image
     ctx.drawImage(backgroundImage, 0, 0, width, height);
 
-    // 2. Render Re-Tiled Wall Layer
-    if (tileImage) {
+    // 2. Render Re-Tiled Layers For All Active Room Regions (Mirror Wall + Shower Cabin + Floor)
+    if (tileImage && activeRegions) {
       const offscreen = document.createElement('canvas');
       offscreen.width = 1800;
       offscreen.height = 1800;
@@ -221,34 +206,35 @@ export default function PhotoVisualizer({ activeProduct }) {
       }
       oCtx.restore();
 
-      const p0 = { x: pins[0].x * width, y: pins[0].y * height };
-      const p1 = { x: pins[1].x * width, y: pins[1].y * height };
-      const p2 = { x: pins[2].x * width, y: pins[2].y * height };
-      const p3 = { x: pins[3].x * width, y: pins[3].y * height };
+      // Render Each Room Zone (Lavabo Arkası + Duş İçi + Zemin)
+      activeRegions.forEach((pins) => {
+        const p0 = { x: pins[0].x * width, y: pins[0].y * height };
+        const p1 = { x: pins[1].x * width, y: pins[1].y * height };
+        const p2 = { x: pins[2].x * width, y: pins[2].y * height };
+        const p3 = { x: pins[3].x * width, y: pins[3].y * height };
 
-      // Perspective Warping Triangles
-      drawTriangleTexture(ctx, offscreen, p0.x, p0.y, p1.x, p1.y, p3.x, p3.y, 0, 1800, 0, 0, 0, 1800);
-      drawTriangleTexture(ctx, offscreen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, 1800, 1800, 0, 0, 1800, 1800);
+        // Perspective Warping Triangles
+        drawTriangleTexture(ctx, offscreen, p0.x, p0.y, p1.x, p1.y, p3.x, p3.y, 0, 1800, 0, 0, 0, 1800);
+        drawTriangleTexture(ctx, offscreen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, 1800, 1800, 0, 0, 1800, 1800);
 
-      // Multi-pass Photorealistic Composite Blending:
-      // Pass A: Multiply Ambient Shadow Blend (makes shower head, glass edges, towel bars shine through)
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(p0.x, p0.y);
-      ctx.lineTo(p1.x, p1.y);
-      ctx.lineTo(p2.x, p2.y);
-      ctx.lineTo(p3.x, p3.y);
-      ctx.closePath();
-      ctx.clip();
-      ctx.globalCompositeOperation = 'multiply';
-      ctx.globalAlpha = 0.72;
-      ctx.drawImage(backgroundImage, 0, 0, width, height);
+        // Photorealistic Ambient Multiply & Soft-Light Blend
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.lineTo(p3.x, p3.y);
+        ctx.closePath();
+        ctx.clip();
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.globalAlpha = 0.72;
+        ctx.drawImage(backgroundImage, 0, 0, width, height);
 
-      // Pass B: Soft-Light / Overlay gloss pass for specular highlights
-      ctx.globalCompositeOperation = 'overlay';
-      ctx.globalAlpha = 0.35;
-      ctx.drawImage(backgroundImage, 0, 0, width, height);
-      ctx.restore();
+        ctx.globalCompositeOperation = 'overlay';
+        ctx.globalAlpha = 0.35;
+        ctx.drawImage(backgroundImage, 0, 0, width, height);
+        ctx.restore();
+      });
     }
 
     // 3. Render AI Result Image Over Right Split (If AI Image Available or Compare Mode)
@@ -290,95 +276,33 @@ export default function PhotoVisualizer({ activeProduct }) {
     }
 
     // 4. Draw Anchor Pins ONLY IF showPins is enabled
-    if (showPins && !isCompareMode) {
-      ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.moveTo(pins[0].x * width, pins[0].y * height);
-      for (let i = 1; i < 4; i++) {
-        ctx.lineTo(pins[i].x * width, pins[i].y * height);
-      }
-      ctx.closePath();
-      ctx.stroke();
-
-      pins.forEach((pin, index) => {
-        const px = pin.x * width;
-        const py = pin.y * height;
-
-        ctx.fillStyle = index === draggingPinIndex ? '#ffffff' : '#d4af37';
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 2;
+    if (showPins && !isCompareMode && activeRegions) {
+      activeRegions.forEach((pins) => {
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.9)';
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.arc(px, py, 9, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.moveTo(pins[0].x * width, pins[0].y * height);
+        for (let i = 1; i < 4; i++) {
+          ctx.lineTo(pins[i].x * width, pins[i].y * height);
+        }
+        ctx.closePath();
         ctx.stroke();
 
-        ctx.fillStyle = '#0f172a';
-        ctx.beginPath();
-        ctx.arc(px, py, 3, 0, Math.PI * 2);
-        ctx.fill();
+        pins.forEach((pin) => {
+          const px = pin.x * width;
+          const py = pin.y * height;
+
+          ctx.fillStyle = '#d4af37';
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(px, py, 8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        });
       });
     }
   };
-
-  // Mouse & Touch Interaction
-  const handleMouseDown = (e) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const width = canvas.width;
-    const height = canvas.height;
-
-    if (isCompareMode) {
-      const splitX = (sliderPos / 100) * width;
-      if (Math.abs(mouseX - splitX) < 30) {
-        setDraggingPinIndex('slider');
-      }
-      return;
-    }
-
-    if (!showPins) return;
-
-    const clickedIndex = pins.findIndex(pin => {
-      const px = pin.x * width;
-      const py = pin.y * height;
-      return Math.sqrt((mouseX - px) ** 2 + (mouseY - py) ** 2) < 22;
-    });
-
-    if (clickedIndex !== -1) {
-      setDraggingPinIndex(clickedIndex);
-    }
-  };
-
-  const handleMouseMove = (e) => {
-    if (draggingPinIndex === null) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const width = canvas.width;
-    const height = canvas.height;
-
-    if (draggingPinIndex === 'slider') {
-      const newPos = Math.max(5, Math.min(95, (mouseX / width) * 100));
-      setSliderPos(newPos);
-      return;
-    }
-
-    const newX = Math.max(0, Math.min(1, mouseX / width));
-    const newY = Math.max(0, Math.min(1, mouseY / height));
-
-    const updatedPins = [...pins];
-    updatedPins[draggingPinIndex] = { x: newX, y: newY };
-    setPins(updatedPins);
-  };
-
-  const handleMouseUp = () => setDraggingPinIndex(null);
 
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
@@ -392,12 +316,10 @@ export default function PhotoVisualizer({ activeProduct }) {
         setSelectedPreset(null);
         setBackgroundImage(img);
         setAiResultImgObj(null);
-        // Default full wall coverage for custom upload
-        setPins([
-          { x: 0.0, y: 0.0 },
-          { x: 1.0, y: 0.0 },
-          { x: 1.0, y: 0.8 },
-          { x: 0.0, y: 0.95 }
+        // Custom upload multi-surface bounds
+        setActiveRegions([
+          [ { x: 0.0, y: 0.0 }, { x: 1.0, y: 0.0 }, { x: 1.0, y: 0.75 }, { x: 0.0, y: 0.88 } ],
+          [ { x: 0.0, y: 0.75 }, { x: 1.0, y: 0.75 }, { x: 1.0, y: 1.0 }, { x: 0.0, y: 1.0 } ]
         ]);
       };
     };
@@ -579,7 +501,7 @@ export default function PhotoVisualizer({ activeProduct }) {
             }}
           >
             {showPins ? <EyeOff size={14} /> : <Eye size={14} />}
-            <span>{showPins ? 'Köşeleri Gizle' : 'Köşe İnce Ayarı'}</span>
+            <span>{showPins ? 'Alan Sınırlarını Gizle' : 'Alan Sınırlarını Göster'}</span>
           </button>
 
           <input
@@ -637,16 +559,8 @@ export default function PhotoVisualizer({ activeProduct }) {
         >
           <canvas
             ref={canvasRef}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            onTouchStart={(e) => e.touches.length === 1 && handleMouseDown({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY })}
-            onTouchMove={(e) => e.touches.length === 1 && handleMouseMove({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY })}
-            onTouchEnd={handleMouseUp}
             style={{
               display: 'block',
-              cursor: draggingPinIndex !== null ? 'grabbing' : 'default',
               maxWidth: '100%'
             }}
           />
@@ -836,8 +750,7 @@ export default function PhotoVisualizer({ activeProduct }) {
 
             <button
               onClick={() => {
-                if (selectedPreset) setPins(selectedPreset.pins);
-                else setPins([{ x: 0.0, y: 0.0 }, { x: 1.0, y: 0.0 }, { x: 1.0, y: 0.8 }, { x: 0.0, y: 0.95 }]);
+                if (selectedPreset) setActiveRegions(selectedPreset.regions);
               }}
               style={{
                 width: '100%',
@@ -856,7 +769,7 @@ export default function PhotoVisualizer({ activeProduct }) {
               }}
             >
               <RefreshCw size={14} />
-              <span>Köşeleri Sıfırla</span>
+              <span>Görünümü Sıfırla</span>
             </button>
           </div>
 
