@@ -1,39 +1,60 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Camera, Image as ImageIcon, Download, Sparkles, HelpCircle, Loader2, Sliders, RefreshCw, Upload, CheckCircle2 } from 'lucide-react';
+import { Camera, Download, Sparkles, HelpCircle, Sliders, Upload, RefreshCw } from 'lucide-react';
 import { cropWhiteBorders } from '../utils/imageTextureUtils';
 
-// Preset Bathroom Photos for quick testing
-const PRESET_BATHROOMS = [
+// Multi-Region Room Presets matching real bathroom zones (Mirror Wall + Shower Cabin + Floor)
+const ROOM_PRESETS = [
   {
-    id: 'preset_1',
-    name: 'Modern Ferah Banyo (Örnek 1)',
-    url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80'
+    id: 'banyo_tam_kaplama',
+    name: 'Banyo Tüm Alanlar (Lavabo Arkası + Duş Kabini + Zemin)',
+    url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80',
+    regions: [
+      // Region 1: Lavabo Arkası Duvar (Mirror Wall)
+      [ { x: 0.0, y: 0.30 }, { x: 0.64, y: 0.30 }, { x: 0.64, y: 0.76 }, { x: 0.0, y: 0.88 } ],
+      // Region 2: Duş Kabini İç Duvarı (Shower Cabin Interior)
+      [ { x: 0.64, y: 0.12 }, { x: 1.0, y: 0.12 }, { x: 1.0, y: 0.74 }, { x: 0.64, y: 0.76 } ],
+      // Region 3: Banyo Zemin Kaplama (Bathroom Floor)
+      [ { x: 0.0, y: 0.76 }, { x: 1.0, y: 0.74 }, { x: 1.0, y: 1.0 }, { x: 0.0, y: 1.0 } ]
+    ]
   },
   {
-    id: 'preset_2',
-    name: 'Geniş Lüks Banyo (Örnek 2)',
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80'
+    id: 'walls_only',
+    name: 'Lavabo Arkası & Duş Kabini Duvarları',
+    url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80',
+    regions: [
+      [ { x: 0.0, y: 0.30 }, { x: 0.64, y: 0.30 }, { x: 0.64, y: 0.76 }, { x: 0.0, y: 0.88 } ],
+      [ { x: 0.64, y: 0.12 }, { x: 1.0, y: 0.12 }, { x: 1.0, y: 0.74 }, { x: 0.64, y: 0.76 } ]
+    ]
   },
   {
-    id: 'preset_3',
-    name: 'Minimal Banyo & Duş (Örnek 3)',
-    url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80'
+    id: 'floor_only',
+    name: 'Sadece Banyo Zemin Kaplama',
+    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+    regions: [
+      [ { x: 0.0, y: 0.58 }, { x: 1.0, y: 0.58 }, { x: 1.0, y: 1.0 }, { x: 0.0, y: 1.0 } ]
+    ]
   }
 ];
 
 export default function PhotoVisualizer({ activeProduct }) {
-  const [selectedPreset, setSelectedPreset] = useState(PRESET_BATHROOMS[0]);
+  const [selectedPreset, setSelectedPreset] = useState(ROOM_PRESETS[0]);
   const [userUploadedImageUrl, setUserUploadedImageUrl] = useState(null);
   const [backgroundImageObj, setBackgroundImageObj] = useState(null);
+  const [tileImageObj, setTileImageObj] = useState(null);
+  const [activeRegions, setActiveRegions] = useState(ROOM_PRESETS[0].regions);
 
-  // Generative AI States
-  const [aiGenerating, setAiGenerating] = useState(false);
-  const [aiResultImageObj, setAiResultImageObj] = useState(null);
-  const [isCompareMode, setIsCompareMode] = useState(false);
+  // Before/After Split Slider
   const [sliderPos, setSliderPos] = useState(50); // 0 to 100%
   const [isDraggingSlider, setIsDraggingSlider] = useState(false);
+
+  // Tiling Settings
+  const [tileScale, setTileScale] = useState(0.8);
+  const [tileRotation, setStudioTileRotation] = useState(0);
+  const [studioLayPattern, setStudioLayPattern] = useState('flat'); // flat, diagonal
+  const [studioGroutWidth, setStudioGroutWidth] = useState(2); // in px
+  const [studioGroutColor, setStudioGroutColor] = useState('#888888');
 
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -50,52 +71,56 @@ export default function PhotoVisualizer({ activeProduct }) {
     img.src = currentRoomPhotoUrl;
     img.onload = () => {
       setBackgroundImageObj(img);
-      setAiResultImageObj(null);
-      setIsCompareMode(false);
+      if (selectedPreset) setActiveRegions(selectedPreset.regions);
     };
-  }, [currentRoomPhotoUrl]);
+  }, [currentRoomPhotoUrl, selectedPreset]);
+
+  // Load Active Ceramic Tile Image
+  useEffect(() => {
+    if (!activeProduct) return;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    const textureUrl = activeProduct.textureUrl || activeProduct.imageUrl;
+    // Proxy URL to prevent CORS canvas tainting in production
+    img.src = textureUrl.startsWith('http') ? `/api/proxy?url=${encodeURIComponent(textureUrl)}` : textureUrl;
+    img.onload = () => {
+      const cleaned = cropWhiteBorders(img);
+      setTileImageObj(cleaned);
+    };
+  }, [activeProduct]);
 
   // Redraw Visualizer Canvas
   useEffect(() => {
     draw();
-  }, [backgroundImageObj, aiResultImageObj, isCompareMode, sliderPos]);
+  }, [backgroundImageObj, tileImageObj, activeRegions, tileScale, tileRotation, studioLayPattern, studioGroutWidth, studioGroutColor, sliderPos]);
 
-  // ChatGPT-Style Generative AI Re-Tiling Call
-  const handleGenerateAiReTile = async () => {
-    setAiGenerating(true);
-    try {
-      const response = await fetch('/api/ai/re-tile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image: currentRoomPhotoUrl,
-          productName: activeProduct?.name || 'Calacatta Gold',
-          productCode: activeProduct?.code || 'CLM-60120',
-          style: activeProduct?.style || 'Mermer',
-          color: activeProduct?.color || 'Beyaz',
-          finish: activeProduct?.finish || 'Parlak',
-          width: activeProduct?.width || 60,
-          height: activeProduct?.height || 120
-        })
-      });
+  // Homography Affine Triangle Warping Engine
+  const drawTriangleTexture = (ctx, texture, x0, y0, x1, y1, x2, y2, u0, u1, u2, v0, v1, v2) => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.closePath();
+    ctx.clip();
 
-      const data = await response.json();
-      if (data.success && data.imageUrl) {
-        const img = new Image();
-        img.src = data.imageUrl;
-        img.onload = () => {
-          setAiResultImageObj(img);
-          setIsCompareMode(true);
-          setAiGenerating(false);
-        };
-      } else {
-        throw new Error(data.error || 'AI görsel yanıtı alınamadı.');
-      }
-    } catch (err) {
-      console.error('AI error:', err);
-      setAiGenerating(false);
-      alert('Yapay zeka banyo kaplama görseli oluşturulurken sunucu yanıt vermedi. Lütfen tekrar deneyin.');
+    const den = u0 * (v1 - v2) - v0 * (u1 - u2) + (u1 * v2 - u2 * v1);
+    if (Math.abs(den) < 0.0001) {
+      ctx.restore();
+      return;
     }
+
+    const a = (x0 * (v1 - v2) - v0 * (x1 - x2) + (x1 * v2 - x2 * v1)) / den;
+    const b = (u0 * (x1 - x2) - x0 * (u1 - u2) + (u1 * x2 - u2 * x1)) / den;
+    const c = (u0 * (v1 * x2 - v2 * x1) - v0 * (u1 * x2 - u2 * x1) + x0 * (u1 * v2 - u2 * v1)) / den;
+
+    const d = (y0 * (v1 - v2) - v0 * (y1 - y2) + (y1 * v2 - y2 * v1)) / den;
+    const e = (u0 * (y1 - y2) - y0 * (u1 - u2) + (u1 * y2 - u2 * y1)) / den;
+    const f = (u0 * (v1 * y2 - v2 * y1) - v0 * (u1 * y2 - u2 * y1) + y0 * (u1 * v2 - u2 * v1)) / den;
+
+    ctx.transform(a, d, b, e, c, f);
+    ctx.drawImage(texture, 0, 0);
+    ctx.restore();
   };
 
   const draw = () => {
@@ -109,45 +134,118 @@ export default function PhotoVisualizer({ activeProduct }) {
     canvas.width = width;
     canvas.height = height;
 
-    // 1. Draw Uploaded Original Bathroom Photo (Left side or Full background)
+    // -------------------------------------------------------------
+    // STEP A: Render User's Raw Original Photo (Unmodified)
+    // -------------------------------------------------------------
     ctx.drawImage(backgroundImageObj, 0, 0, width, height);
 
-    // 2. Draw Transformed AI Room (If AI image loaded or compare mode active)
-    const activeResultImg = aiResultImageObj || backgroundImageObj;
+    // -------------------------------------------------------------
+    // STEP B: Render Transformed Photo (User's Photo WITH Tile Applied)
+    // -------------------------------------------------------------
+    const tiledCanvas = document.createElement('canvas');
+    tiledCanvas.width = width;
+    tiledCanvas.height = height;
+    const tCtx = tiledCanvas.getContext('2d');
 
-    if (isCompareMode || aiResultImageObj) {
-      const splitX = (sliderPos / 100) * width;
+    // 1. Draw base photo
+    tCtx.drawImage(backgroundImageObj, 0, 0, width, height);
 
-      // Draw AI Transformed Image on the Right Split
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(splitX, 0, width - splitX, height);
-      ctx.clip();
-      ctx.drawImage(activeResultImg, 0, 0, width, height);
-      ctx.restore();
+    // 2. Tile selected ceramic pattern onto room regions
+    if (tileImageObj && activeRegions) {
+      const offscreen = document.createElement('canvas');
+      offscreen.width = 1800;
+      offscreen.height = 1800;
+      const oCtx = offscreen.getContext('2d');
 
-      // Draw Split Line Divider
-      ctx.strokeStyle = '#d4af37';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(splitX, 0);
-      ctx.lineTo(splitX, height);
-      ctx.stroke();
+      oCtx.fillStyle = studioGroutColor;
+      oCtx.fillRect(0, 0, offscreen.width, offscreen.height);
 
-      // Circular Slider Handle Knob
-      ctx.fillStyle = '#d4af37';
-      ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(splitX, height / 2, 18, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
+      const baseW = (activeProduct?.width || 60) * 1.5;
+      const baseH = (activeProduct?.height || 120) * 1.5;
+      const tileW = baseW * tileScale;
+      const tileH = baseH * tileScale;
 
-      ctx.fillStyle = '#0f172a';
-      ctx.font = '900 12px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('↔', splitX, height / 2 + 4);
+      oCtx.save();
+      oCtx.translate(offscreen.width / 2, offscreen.height / 2);
+      let rotationAngle = (tileRotation * Math.PI) / 180;
+      if (studioLayPattern === 'diagonal') rotationAngle += Math.PI / 4;
+      oCtx.rotate(rotationAngle);
+      oCtx.translate(-offscreen.width / 2, -offscreen.height / 2);
+
+      const stepX = tileW + parseInt(studioGroutWidth, 10);
+      const stepY = tileH + parseInt(studioGroutWidth, 10);
+
+      for (let x = -tileW * 2; x < offscreen.width + tileW * 2; x += stepX) {
+        for (let y = -tileH * 2; y < offscreen.height + tileH * 2; y += stepY) {
+          oCtx.drawImage(tileImageObj, x, y, tileW, tileH);
+        }
+      }
+      oCtx.restore();
+
+      // Warp tile pattern onto each room zone
+      activeRegions.forEach((pins) => {
+        const p0 = { x: pins[0].x * width, y: pins[0].y * height };
+        const p1 = { x: pins[1].x * width, y: pins[1].y * height };
+        const p2 = { x: pins[2].x * width, y: pins[2].y * height };
+        const p3 = { x: pins[3].x * width, y: pins[3].y * height };
+
+        drawTriangleTexture(tCtx, offscreen, p0.x, p0.y, p1.x, p1.y, p3.x, p3.y, 0, 1800, 0, 0, 0, 1800);
+        drawTriangleTexture(tCtx, offscreen, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, 1800, 1800, 0, 0, 1800, 1800);
+
+        // Multiply ambient shadow & overlay specular pass
+        tCtx.save();
+        tCtx.beginPath();
+        tCtx.moveTo(p0.x, p0.y);
+        tCtx.lineTo(p1.x, p1.y);
+        tCtx.lineTo(p2.x, p2.y);
+        tCtx.lineTo(p3.x, p3.y);
+        tCtx.closePath();
+        tCtx.clip();
+        tCtx.globalCompositeOperation = 'multiply';
+        tCtx.globalAlpha = 0.72;
+        tCtx.drawImage(backgroundImageObj, 0, 0, width, height);
+
+        tCtx.globalCompositeOperation = 'overlay';
+        tCtx.globalAlpha = 0.35;
+        tCtx.drawImage(backgroundImageObj, 0, 0, width, height);
+        tCtx.restore();
+      });
     }
+
+    // -------------------------------------------------------------
+    // STEP C: Render Before / After Split View Over Canvas
+    // -------------------------------------------------------------
+    const splitX = (sliderPos / 100) * width;
+
+    // Draw Transformed Photo on Right Half of Split
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(splitX, 0, width - splitX, height);
+    ctx.clip();
+    ctx.drawImage(tiledCanvas, 0, 0, width, height);
+    ctx.restore();
+
+    // Vertical Split Line
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(splitX, 0);
+    ctx.lineTo(splitX, height);
+    ctx.stroke();
+
+    // Split Handle Knob
+    ctx.fillStyle = '#d4af37';
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(splitX, height / 2, 18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '900 12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('↔', splitX, height / 2 + 4);
   };
 
   // Split Slider Drag Interaction
@@ -158,7 +256,7 @@ export default function PhotoVisualizer({ activeProduct }) {
     const mouseX = e.clientX - rect.left;
     const splitX = (sliderPos / 100) * canvas.width;
 
-    if (Math.abs(mouseX - splitX) < 35) {
+    if (Math.abs(mouseX - splitX) < 40) {
       setIsDraggingSlider(true);
     }
   };
@@ -183,6 +281,11 @@ export default function PhotoVisualizer({ activeProduct }) {
     reader.onload = (event) => {
       setUserUploadedImageUrl(event.target.result);
       setSelectedPreset(null);
+      // Custom uploaded photo multi-surface bounds
+      setActiveRegions([
+        [ { x: 0.0, y: 0.25 }, { x: 1.0, y: 0.25 }, { x: 1.0, y: 0.75 }, { x: 0.0, y: 0.88 } ],
+        [ { x: 0.0, y: 0.75 }, { x: 1.0, y: 0.75 }, { x: 1.0, y: 1.0 }, { x: 0.0, y: 1.0 } ]
+      ]);
     };
     reader.readAsDataURL(file);
   };
@@ -192,7 +295,7 @@ export default function PhotoVisualizer({ activeProduct }) {
     if (!canvas) return;
     const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
     const link = document.createElement('a');
-    link.download = `seramikbak_ai_banyo_${activeProduct?.code || 'tasarim'}.jpg`;
+    link.download = `seramikbak_dosenmis_banyo_${activeProduct?.code || 'tasarim'}.jpg`;
     link.href = dataUrl;
     link.click();
   };
@@ -220,7 +323,7 @@ export default function PhotoVisualizer({ activeProduct }) {
 
     sCtx.fillStyle = '#94a3b8';
     sCtx.font = '500 28px "Plus Jakarta Sans", sans-serif';
-    sCtx.fillText('Fotoğraftan ChatGPT Tarzı Seramik Dönüşümü', 540, 190);
+    sCtx.fillText('Fotoğraftan Gerçekçi Seramik Döşeme', 540, 190);
 
     const targetW = 960;
     const targetH = Math.min(1100, Math.round(targetW * (canvas.height / canvas.width)));
@@ -264,25 +367,25 @@ export default function PhotoVisualizer({ activeProduct }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
-      {/* 3-Step ChatGPT Workflow Header */}
+      {/* Step Header */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-        gap: '14px'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '16px'
       }}>
         {/* Step 1: Upload Photo */}
         <div style={{
-          padding: '16px',
+          padding: '18px',
           background: 'rgba(255, 255, 255, 0.02)',
           border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: '14px',
+          borderRadius: '16px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '10px'
+          gap: '12px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ background: 'var(--accent-gold, #d4af37)', color: '#0f172a', fontWeight: '900', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>1</div>
-            <strong style={{ fontSize: '0.85rem', color: '#fff' }}>Banyo Fotoğrafını Yükle</strong>
+            <div style={{ background: 'var(--accent-gold, #d4af37)', color: '#0f172a', fontWeight: '900', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>1</div>
+            <strong style={{ fontSize: '0.9rem', color: '#fff' }}>1. Banyo Fotoğrafınızı Yükleyin</strong>
           </div>
           
           <input
@@ -296,38 +399,40 @@ export default function PhotoVisualizer({ activeProduct }) {
           <button
             onClick={() => fileInputRef.current?.click()}
             style={{
-              padding: '10px',
-              borderRadius: '8px',
+              padding: '12px',
+              borderRadius: '10px',
               border: '1px dashed var(--accent-gold, #d4af37)',
-              background: 'rgba(212, 175, 55, 0.08)',
+              background: 'rgba(212, 175, 55, 0.1)',
               color: 'var(--accent-gold, #d4af37)',
-              fontSize: '0.78rem',
+              fontSize: '0.82rem',
               fontWeight: '800',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '6px'
+              gap: '8px'
             }}
           >
-            <Upload size={14} />
+            <Upload size={16} />
             <span>{userUploadedImageUrl ? '📸 Yüklenen Fotoğrafı Değiştir' : '📸 Kendi Banyo Fotoğrafını Yükle'}</span>
           </button>
 
           {/* Presets Bar */}
-          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '2px' }}>
-            {PRESET_BATHROOMS.map(preset => (
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.68rem', color: '#94a3b8', width: '100%' }}>Veya Örnek Odalar:</span>
+            {ROOM_PRESETS.map(preset => (
               <button
                 key={preset.id}
                 onClick={() => { setSelectedPreset(preset); setUserUploadedImageUrl(null); }}
                 style={{
-                  fontSize: '0.65rem',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
+                  fontSize: '0.68rem',
+                  padding: '5px 10px',
+                  borderRadius: '6px',
                   border: selectedPreset?.id === preset.id && !userUploadedImageUrl ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.06)',
                   background: selectedPreset?.id === preset.id && !userUploadedImageUrl ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255,255,255,0.02)',
                   color: selectedPreset?.id === preset.id && !userUploadedImageUrl ? 'var(--accent-gold, #d4af37)' : '#94a3b8',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  fontWeight: '700'
                 }}
               >
                 {preset.name}
@@ -338,86 +443,55 @@ export default function PhotoVisualizer({ activeProduct }) {
 
         {/* Step 2: Selected Ceramic */}
         <div style={{
-          padding: '16px',
+          padding: '18px',
           background: 'rgba(197, 160, 89, 0.06)',
-          border: '1px solid rgba(197, 160, 89, 0.2)',
-          borderRadius: '14px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ background: 'var(--accent-gold, #d4af37)', color: '#0f172a', fontWeight: '900', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>2</div>
-            <strong style={{ fontSize: '0.85rem', color: '#fff' }}>Döşenecek Seramik Modeli</strong>
-          </div>
-          <div>
-            <span style={{ fontSize: '0.9rem', fontWeight: '900', color: '#fff', display: 'block' }}>{activeProduct?.name || 'Calacatta Gold Luxury'}</span>
-            <span style={{ fontSize: '0.72rem', color: 'var(--accent-gold, #d4af37)', fontWeight: '600' }}>
-              {activeProduct?.width || 60}x{activeProduct?.height || 120} cm • {activeProduct?.finish || 'Parlak'} • {activeProduct?.style || 'Mermer'}
-            </span>
-          </div>
-          <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>
-            *Katalogdan herhangi bir seramik seçtiğinizde burası otomatik güncellenir.
-          </span>
-        </div>
-
-        {/* Step 3: Generate AI */}
-        <div style={{
-          padding: '16px',
-          background: 'rgba(255, 255, 255, 0.02)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: '14px',
+          border: '1px solid rgba(197, 160, 89, 0.25)',
+          borderRadius: '16px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          gap: '10px'
+          gap: '12px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ background: 'var(--accent-gold, #d4af37)', color: '#0f172a', fontWeight: '900', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>3</div>
-            <strong style={{ fontSize: '0.85rem', color: '#fff' }}>ChatGPT Tarzı AI Döşeme</strong>
+            <div style={{ background: 'var(--accent-gold, #d4af37)', color: '#0f172a', fontWeight: '900', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>2</div>
+            <strong style={{ fontSize: '0.9rem', color: '#fff' }}>2. Döşenecek Seramik Modeli</strong>
           </div>
-
-          <button
-            onClick={handleGenerateAiReTile}
-            disabled={aiGenerating}
-            style={{
-              padding: '12px 18px',
-              borderRadius: '10px',
-              border: 'none',
-              background: 'linear-gradient(135deg, var(--accent-gold, #d4af37), #b8860b)',
-              color: '#0f172a',
-              cursor: 'pointer',
-              fontWeight: '900',
-              fontSize: '0.82rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 18px rgba(212, 175, 55, 0.4)'
-            }}
-          >
-            {aiGenerating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-            <span>{aiGenerating ? 'AI Fotoğrafınızı Dönüştürüyor...' : '✨ Yapay Zeka ile Banyonu Döşe'}</span>
-          </button>
+          <div>
+            <span style={{ fontSize: '0.95rem', fontWeight: '900', color: '#fff', display: 'block' }}>{activeProduct?.name || 'Calacatta Gold Luxury'}</span>
+            <span style={{ fontSize: '0.78rem', color: 'var(--accent-gold, #d4af37)', fontWeight: '700', display: 'block', marginTop: '2px' }}>
+              {activeProduct?.width || 60}x{activeProduct?.height || 120} cm • {activeProduct?.finish || 'Parlak'} • {activeProduct?.style || 'Mermer'}
+            </span>
+          </div>
+          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
+            *Katalogdan başka seramความ seçtiğinizde burası anında güncellenir.
+          </span>
         </div>
       </div>
 
-      {/* Editor Main Canvas & Before/After Split */}
+      {/* Main Canvas & Split Comparison */}
       <div style={{
-        position: 'relative',
-        background: '#020617',
-        border: '1px solid rgba(212, 175, 55, 0.25)',
-        borderRadius: '20px',
-        overflow: 'hidden',
-        boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        
-        {/* Canvas */}
-        <div ref={containerRef} style={{ width: '100%', position: 'relative' }}>
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr) 260px',
+        gap: '20px',
+        alignItems: 'start'
+      }} className="photo-visualizer-split-grid">
+
+        {/* Canvas Area */}
+        <div 
+          ref={containerRef} 
+          style={{
+            position: 'relative',
+            background: '#020617',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
           <canvas
             ref={canvasRef}
             onMouseDown={handleMouseDown}
@@ -430,11 +504,11 @@ export default function PhotoVisualizer({ activeProduct }) {
             style={{
               display: 'block',
               maxWidth: '100%',
-              cursor: isCompareMode ? 'col-resize' : 'default'
+              cursor: 'col-resize'
             }}
           />
 
-          {/* Banner Badges */}
+          {/* Badges */}
           <div style={{
             position: 'absolute',
             top: '16px',
@@ -449,89 +523,152 @@ export default function PhotoVisualizer({ activeProduct }) {
             fontWeight: '800',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            pointerEvents: 'none'
           }}>
             <Sparkles size={14} style={{ color: 'var(--accent-gold, #d4af37)' }} />
-            <span>{aiResultImageObj ? 'ChatGPT Tarzı Dönüştürülmüş AI Görseli' : 'Yüklenen Orijinal Fotoğraf'}</span>
+            <span>Sol: Orijinal Banyo | Sağ: {activeProduct?.name || 'Seçili Seramik'} Döşenmiş Hal</span>
           </div>
 
-          {aiResultImageObj && (
-            <div style={{
-              position: 'absolute',
-              top: '16px',
-              right: '16px',
-              background: 'rgba(15, 23, 42, 0.85)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: '10px',
-              padding: '6px 12px',
-              fontSize: '0.72rem',
-              color: '#94a3b8',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}>
-              <Sliders size={12} style={{ color: 'var(--accent-gold, #d4af37)' }} />
-              <span>Sürgüyü sağa-sola kaydırarak Öncesi/Sonrası kıyaslayın</span>
-            </div>
-          )}
+          <div style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            background: 'rgba(15, 23, 42, 0.85)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            borderRadius: '10px',
+            padding: '6px 12px',
+            fontSize: '0.72rem',
+            color: '#94a3b8',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            pointerEvents: 'none'
+          }}>
+            <Sliders size={12} style={{ color: 'var(--accent-gold, #d4af37)' }} />
+            <span>Sürgüyü sağa-sola kaydırarak Before/After karşılaştırın</span>
+          </div>
         </div>
 
-        {/* Bottom Toolbar */}
+        {/* Controls Panel */}
         <div style={{
-          width: '100%',
-          padding: '14px 24px',
-          background: 'rgba(15, 23, 42, 0.9)',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(255, 255, 255, 0.02)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: '16px',
+          padding: '16px',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '12px'
+          flexDirection: 'column',
+          gap: '16px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>Seçili Görsel:</span>
-            <strong style={{ fontSize: '0.82rem', color: '#fff' }}>
-              {userUploadedImageUrl ? 'Yüklediğiniz Özel Banyo Fotoğrafı' : selectedPreset?.name}
-            </strong>
+          {/* Scale Slider */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#94a3b8', marginBottom: '6px' }}>
+              <span>Seramik Ölçeği (Ebatı)</span>
+              <strong style={{ color: '#fff' }}>%{Math.round(tileScale * 100)}</strong>
+            </div>
+            <input
+              type="range"
+              min="0.3"
+              max="2.0"
+              step="0.05"
+              value={tileScale}
+              onChange={(e) => setTileScale(parseFloat(e.target.value))}
+              style={{ width: '100%', accentColor: 'var(--accent-gold, #d4af37)' }}
+            />
           </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            {aiResultImageObj && (
+          {/* Rotation Toggle */}
+          <div>
+            <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Döşeme Yönü</span>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
               <button
-                onClick={() => setIsCompareMode(!isCompareMode)}
+                onClick={() => setStudioTileRotation(0)}
                 style={{
-                  fontSize: '0.75rem',
-                  padding: '8px 14px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--accent-gold, #d4af37)',
-                  background: 'rgba(212, 175, 55, 0.15)',
-                  color: 'var(--accent-gold, #d4af37)',
-                  fontWeight: '800',
+                  fontSize: '0.68rem',
+                  padding: '6px',
+                  borderRadius: '6px',
+                  border: tileRotation === 0 ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.06)',
+                  background: tileRotation === 0 ? 'rgba(197, 160, 89, 0.15)' : 'rgba(255,255,255,0.02)',
+                  color: tileRotation === 0 ? 'var(--accent-gold, #d4af37)' : '#94a3b8',
                   cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
+                  fontWeight: '700'
                 }}
               >
-                <Sliders size={14} />
-                <span>{isCompareMode ? 'Tam Görsele Geç' : 'Öncesi / Sonrası Sürgüsü'}</span>
+                Dikey (0°)
               </button>
-            )}
+              <button
+                onClick={() => setStudioTileRotation(90)}
+                style={{
+                  fontSize: '0.68rem',
+                  padding: '6px',
+                  borderRadius: '6px',
+                  border: tileRotation === 90 ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.06)',
+                  background: tileRotation === 90 ? 'rgba(197, 160, 89, 0.15)' : 'rgba(255,255,255,0.02)',
+                  color: tileRotation === 90 ? 'var(--accent-gold, #d4af37)' : '#94a3b8',
+                  cursor: 'pointer',
+                  fontWeight: '700'
+                }}
+              >
+                Yatay (90°)
+              </button>
+            </div>
+          </div>
 
+          {/* Lay Pattern */}
+          <div>
+            <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Döşeme Şekli</span>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
+              <button
+                onClick={() => setStudioLayPattern('flat')}
+                style={{
+                  fontSize: '0.68rem',
+                  padding: '6px',
+                  borderRadius: '6px',
+                  border: studioLayPattern === 'flat' ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.06)',
+                  background: studioLayPattern === 'flat' ? 'rgba(197, 160, 89, 0.15)' : 'rgba(255,255,255,0.02)',
+                  color: studioLayPattern === 'flat' ? 'var(--accent-gold, #d4af37)' : '#94a3b8',
+                  cursor: 'pointer',
+                  fontWeight: '700'
+                }}
+              >
+                Düz Izgara
+              </button>
+              <button
+                onClick={() => setStudioLayPattern('diagonal')}
+                style={{
+                  fontSize: '0.68rem',
+                  padding: '6px',
+                  borderRadius: '6px',
+                  border: studioLayPattern === 'diagonal' ? '1px solid var(--accent-gold, #d4af37)' : '1px solid rgba(255,255,255,0.06)',
+                  background: studioLayPattern === 'diagonal' ? 'rgba(197, 160, 89, 0.15)' : 'rgba(255,255,255,0.02)',
+                  color: studioLayPattern === 'diagonal' ? 'var(--accent-gold, #d4af37)' : '#94a3b8',
+                  cursor: 'pointer',
+                  fontWeight: '700'
+                }}
+              >
+                Çapraz (45°)
+              </button>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
             <button
               onClick={handleDownload}
               style={{
-                fontSize: '0.75rem',
-                padding: '8px 16px',
+                width: '100%',
+                padding: '10px',
                 borderRadius: '8px',
-                border: 'none',
-                background: 'rgba(255,255,255,0.1)',
-                color: '#fff',
+                background: 'rgba(197, 160, 89, 0.15)',
+                color: 'var(--accent-gold, #d4af37)',
+                border: '1px solid var(--accent-gold, #d4af37)',
+                fontSize: '0.78rem',
                 fontWeight: '800',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '6px'
               }}
             >
@@ -542,23 +679,50 @@ export default function PhotoVisualizer({ activeProduct }) {
             <button
               onClick={handleExportInstagramStory}
               style={{
-                fontSize: '0.75rem',
-                padding: '8px 16px',
+                width: '100%',
+                padding: '10px',
                 borderRadius: '8px',
-                border: '1px solid rgba(225, 48, 108, 0.4)',
-                background: 'rgba(225, 48, 108, 0.15)',
+                background: 'linear-gradient(135deg, rgba(225, 48, 108, 0.2), rgba(225, 48, 108, 0.05))',
                 color: '#f472b6',
+                border: '1px solid rgba(225, 48, 108, 0.4)',
+                fontSize: '0.78rem',
                 fontWeight: '800',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '6px'
               }}
             >
               <Sparkles size={14} />
               <span>Instagram Story (9:16)</span>
             </button>
+
+            <button
+              onClick={() => {
+                if (selectedPreset) setActiveRegions(selectedPreset.regions);
+              }}
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '8px',
+                border: '1px solid rgba(255,255,255,0.1)',
+                background: 'rgba(255,255,255,0.02)',
+                color: '#cbd5e1',
+                fontSize: '0.78rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px'
+              }}
+            >
+              <RefreshCw size={14} />
+              <span>Görünümü Sıfırla</span>
+            </button>
           </div>
+
         </div>
 
       </div>
