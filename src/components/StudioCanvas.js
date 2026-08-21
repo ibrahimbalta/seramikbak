@@ -1793,6 +1793,8 @@ export default function StudioCanvas({
             fontSize: '0.7rem',
             fontWeight: '800',
             whiteSpace: 'nowrap',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.4)'
+          }}>
             ◀ Kıyasla ▶
           </div>
         </div>
