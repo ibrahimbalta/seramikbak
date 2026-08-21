@@ -5740,7 +5740,8 @@ export default function Home() {
                 <PhotoVisualizer activeProduct={activeProduct} />
               </div>
             ) : (
-              <div className="studio-layout">
+              <>
+                <div className="studio-layout">
               <div className="studio-control-panel glass-panel">
                 <h3>3D Sanal Stüdyo</h3>
                 <p className="desc">Seçili seramiği banyo/mutfak sahnesine giydirerek specula (parlaklık) ve döşeme etkisini inceleyin.</p>
@@ -6290,9 +6291,10 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          )}
-        </div>
-      )}
+          </>
+        )}
+      </div>
+    )}
 
         {/* TAB 3: DEALER FINDER */}
         {activeTab === 'dealers' && (() => {
