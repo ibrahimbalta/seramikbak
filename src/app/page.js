@@ -95,7 +95,6 @@ import ProductCard from '@/components/ProductCard';
 import TileCalculatorWidget from '@/components/TileCalculatorWidget';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
 import ProductSchemaJsonLd from '@/components/ProductSchemaJsonLd';
-import SmartBathroomAssistantModal from '@/components/SmartBathroomAssistantModal';
 
 const PhotoVisualizer = dynamic(() => import('@/components/PhotoVisualizer'), { ssr: false });
 
@@ -751,7 +750,6 @@ export default function Home() {
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedMoodIndex, setSelectedMoodIndex] = useState(0);
-  const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
   const [studioSubTab, setStudioSubTab] = useState('photo');
   const [moodboardCombos, setMoodboardCombos] = useState(DEFAULT_MOODBOARD_COMBOS);
   const [moodboardCategory, setMoodboardCategory] = useState('all');
@@ -3423,19 +3421,6 @@ export default function Home() {
               <button className={`nav-link ${activeTab === 'search' ? 'active' : ''}`} onClick={() => setActiveTab('search')}>
                 <SearchIcon size={14} />
                 <span>{t('products')}</span>
-              </button>
-              <button 
-                className="nav-link" 
-                onClick={() => setIsAiAssistantOpen(true)}
-                style={{
-                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.08))',
-                  border: '1px solid var(--accent-gold, #d4af37)',
-                  color: 'var(--accent-gold, #d4af37)',
-                  fontWeight: '800'
-                }}
-              >
-                <Sparkles size={14} />
-                <span>⚡ 30-Sn Banyo Tasarla</span>
               </button>
               <button className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); }}>
                 <Palette size={14} />
@@ -8279,45 +8264,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      {/* 30-SECOND SMART BATHROOM ASSISTANT MODAL */}
-      <SmartBathroomAssistantModal 
-        isOpen={isAiAssistantOpen} 
-        onClose={() => setIsAiAssistantOpen(false)} 
-        onSelectProduct={(p) => { setActiveProduct(p); }} 
-        onOpenStudio={(p) => { setActiveProduct(p); setActiveTab('studio'); }} 
-      />
-
-      {/* ALWAYS-VISIBLE FLOATING AI ASSISTANT BUTTON */}
-      <div style={{
-        position: 'fixed',
-        bottom: '30px',
-        right: '30px',
-        zIndex: 99990,
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        <button
-          onClick={() => setIsAiAssistantOpen(true)}
-          style={{
-            background: 'linear-gradient(135deg, #d4af37, #b8860b)',
-            color: '#0f172a',
-            border: '2px solid #ffffff',
-            borderRadius: '50px',
-            padding: '14px 24px',
-            fontSize: '0.9rem',
-            fontWeight: '900',
-            cursor: 'pointer',
-            boxShadow: '0 10px 35px rgba(212, 175, 55, 0.6), 0 4px 15px rgba(0, 0, 0, 0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
-          }}
-        >
-          <Sparkles size={22} />
-          <span>⚡ 30-Sn Banyo Tasarla</span>
-        </button>
-      </div>
 
       {/* COMPARISON MODAL */}
       {showComparisonModal && (
