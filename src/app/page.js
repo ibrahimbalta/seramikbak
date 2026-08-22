@@ -4274,7 +4274,9 @@ export default function Home() {
                   <div className="stat-card-info">
                     <div className="stat-card-number">
                       {(liveStats.todayVisitors || liveStats.activeOnlineUsers || 0).toLocaleString('tr-TR')}
-                      <span className="stat-mini-tag tag-green">Canlı</span>
+                      <span className="stat-mini-tag tag-green" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <span className="live-pulse-dot" /> Canlı
+                      </span>
                     </div>
                     <div className="stat-card-title">Ziyaretçi & İnceleme</div>
                   </div>
@@ -5167,6 +5169,42 @@ export default function Home() {
                     Temizle
                   </button>
                 </div>
+
+                {/* Active Filter Badges */}
+                {(selectedBrand || selectedStyle || selectedFinish || selectedSize || selectedRectified === 'true' || selectedIsPremium === 'true') && (
+                  <div className="active-filter-badges-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
+                    {selectedBrand && (
+                      <span className="active-filter-tag" onClick={() => { setSelectedBrand(''); fetchProducts(); }}>
+                        {selectedBrand} ✕
+                      </span>
+                    )}
+                    {selectedStyle && (
+                      <span className="active-filter-tag" onClick={() => { setSelectedStyle(''); fetchProducts(); }}>
+                        {selectedStyle} ✕
+                      </span>
+                    )}
+                    {selectedFinish && (
+                      <span className="active-filter-tag" onClick={() => { setSelectedFinish(''); fetchProducts(); }}>
+                        {selectedFinish} ✕
+                      </span>
+                    )}
+                    {selectedSize && (
+                      <span className="active-filter-tag" onClick={() => { setSelectedSize(''); fetchProducts(); }}>
+                        {selectedSize} ✕
+                      </span>
+                    )}
+                    {selectedRectified === 'true' && (
+                      <span className="active-filter-tag" onClick={() => { setSelectedRectified(''); fetchProducts(); }}>
+                        Rektifiyeli ✕
+                      </span>
+                    )}
+                    {selectedIsPremium === 'true' && (
+                      <span className="active-filter-tag" onClick={() => { setSelectedIsPremium(''); fetchProducts(); }}>
+                        Premium ✕
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {/* Standalone Premium Series Switch */}
                 <div className="premium-toggle-card" style={{ 
