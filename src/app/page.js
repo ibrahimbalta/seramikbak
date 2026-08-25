@@ -1136,21 +1136,41 @@ export default function Home() {
   const startArCamera = async () => {
     setArCameraError(false);
     setShowArCameraModal(true);
+    let stream = null;
+
     try {
-      if (typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: 'environment' } }
-        });
-        arStreamRef.current = stream;
+      if (typeof window !== 'undefined' && navigator?.mediaDevices?.getUserMedia) {
+        // Attempt 1: Rear environment camera
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
+        } catch (e1) {
+          // Attempt 2: General video constraint
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          } catch (e2) {
+            console.warn('All getUserMedia attempts failed:', e2);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('AR WebCam stream error:', err);
+    }
+
+    if (stream) {
+      arStreamRef.current = stream;
+      setTimeout(() => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-      } else {
-        setArCameraError(true);
-      }
-    } catch (err) {
-      console.warn('AR Camera access error:', err);
+      }, 150);
+    } else {
       setArCameraError(true);
+      // Auto-trigger native device camera application via input (capture="environment")
+      setTimeout(() => {
+        if (arFileInputRef.current) {
+          arFileInputRef.current.click();
+        }
+      }, 300);
     }
   };
 
@@ -15029,7 +15049,7 @@ export default function Home() {
                       onClick={() => startArCamera()} 
                       style={{ padding: '9px 14px', background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', fontSize: '0.74rem', fontWeight: '700', cursor: 'pointer' }}
                     >
-                      Canlı Kamerayı Tekrar Den et
+                      Canlı Kamerayı Tekrar Deneyin
                     </button>
                   </div>
                 </div>
