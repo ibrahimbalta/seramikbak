@@ -4339,523 +4339,232 @@ export default function Home() {
               </div>
             </div>
 
-            {/* -------------------- AI ARCHITECTURAL CERAMIC STUDIO v7.0 (STANDALONE CLEAN MODULE) -------------------- */}
-            <div className="ai-studio-standalone-module">
+            {/* -------------------- AI INTERIOR ARCHITECT MODULE (CLEAN & ELEGANT) -------------------- */}
+            <div className="ai-studio-standalone-module glass-panel" style={{ borderRadius: '24px', padding: '24px', background: 'rgba(255, 255, 255, 0.95)', border: '1px solid rgba(179, 142, 71, 0.25)', boxShadow: '0 12px 40px rgba(0,0,0,0.04)', marginBottom: '32px' }}>
               
-              {/* Top Studio Module Header */}
-              <div className="ai-studio-mod-header">
-                <div className="ai-studio-title-group">
-                  <div className="ai-studio-icon-badge">
+              {/* Module Header */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px', paddingBottom: '16px', borderBottom: '1px solid rgba(0,0,0,0.06)', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 6px 16px rgba(179, 142, 71, 0.25)' }}>
                     <Sparkles size={22} />
                   </div>
                   <div>
-                    <div className="ai-studio-title-row">
-                      <h3 className="ai-studio-title">AI Mimarlık & Kombin Stüdyosu</h3>
-                      <span className="ai-live-badge">
-                        <span className="pulse-dot" /> CANLI İÇ MİMAR ALGORİTMASI
-                      </span>
-                    </div>
-                    <p className="ai-studio-subdesc">
-                      Zemin ve duvar seramiklerini, derz dolgusunu ve armatür detaylarını mimari algoritma ve canlı oda simülasyonu ile tasarlayın.
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a', margin: 0, letterSpacing: '-0.02em' }}>
+                      Akıllı AI İç Mimar Stüdyosu
+                    </h3>
+                    <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>
+                      Yapay zeka mimarımız ile banyonuz için mükemmel seramik, duvar dekoru ve derz kombinini tek tıkla keşfedin.
                     </p>
                   </div>
                 </div>
 
-                {/* Top Module Action Controls */}
-                <div className="ai-studio-top-actions">
+                {/* Header Actions */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <button 
                     onClick={() => setShowAiPhotoScanModal(true)}
-                    className="ai-photo-scan-btn"
-                    title="Banyonuzun veya odanızın fotoğrafını yükleyerek AI seramik eşleştirmesi yapın"
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '12px', background: '#0f172a', color: '#fff', fontSize: '0.75rem', fontWeight: '700', border: 'none', cursor: 'pointer', transition: 'all 0.2s' }}
                   >
                     <Camera size={15} />
-                    <span>Oda Fotoğrafını Tara</span>
+                    <span>Oda Fotoğrafı Tara</span>
                   </button>
-
-                  <div className="studio-view-toggle-group">
-                    <button
-                      onClick={() => setStudioViewMode('cards')}
-                      className={`studio-view-btn ${studioViewMode === 'cards' ? 'active' : ''}`}
-                      title="4-Malzeme kart görünümü"
-                    >
-                      <Layers size={13} />
-                      <span>🧱 4-Kart</span>
-                    </button>
-                    <button
-                      onClick={() => setStudioViewMode('composite')}
-                      className={`studio-view-btn ${studioViewMode === 'composite' ? 'active' : ''}`}
-                      title="Canlı kompozit mimari oda simülasyonu"
-                    >
-                      <Eye size={13} />
-                      <span>🖼️ Canlı Odada Gör</span>
-                    </button>
-                  </div>
                 </div>
               </div>
 
-              {/* Clean Single Toolbar: Prompt Bar + Category Filter Chips */}
-              <div className="ai-studio-toolbar-row">
-                <div className="prompt-input-wrapper">
-                  <SearchIcon size={15} className="prompt-search-icon" />
-                  <input 
-                    type="text"
-                    value={aiPromptInput}
-                    onChange={(e) => setAiPromptInput(e.target.value)}
-                    placeholder="İç Mimara Sor (Örn: 'Woodline Mat', 'Calacatta Gold')..."
-                    className="prompt-input"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAiAnalyzePrompt(aiPromptInput);
-                      }
-                    }}
-                  />
-                  <button 
-                    onClick={() => handleAiAnalyzePrompt(aiPromptInput)}
-                    className="prompt-submit-btn"
-                    disabled={aiGeneratingCombo}
-                  >
-                    <Sparkles size={13} />
-                    <span>{aiGeneratingCombo ? 'Analiz Ediliyor...' : 'AI Analiz Et'}</span>
-                  </button>
-                </div>
-
-                <div className="ai-studio-toolbar-right">
-                  <button 
-                    onClick={() => handleAiAnalyzePrompt('')}
-                    className="random-combo-btn"
-                    disabled={aiGeneratingCombo}
-                  >
-                    <Shuffle size={13} />
-                    <span>Rastgele Kombin</span>
-                  </button>
-
-                  <div className="studio-category-pills">
-                    {[
-                      { key: 'all', label: 'Tüm Alanlar' },
-                      { key: 'banyo', label: '🛁 Banyo' },
-                      { key: 'mutfak', label: '🍳 Mutfak' },
-                      { key: 'salon', label: '🛋️ Salon' }
-                    ].map(cat => (
+              {/* Concept Selector Tabs */}
+              <div style={{ marginBottom: '20px' }}>
+                <span style={{ fontSize: '0.7rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>
+                  MİMARİ STİL KONSEPTLERİ:
+                </span>
+                <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '4px' }}>
+                  {moodboardCombos.slice(0, 4).map((combo) => {
+                    const isActive = selectedMoodIndex === combo.id;
+                    return (
                       <button
-                        key={cat.key}
-                        onClick={() => setMoodboardCategory(cat.key)}
-                        className={`studio-cat-pill ${moodboardCategory === cat.key ? 'active' : ''}`}
+                        key={combo.id}
+                        onClick={() => {
+                          setSelectedMoodIndex(combo.id);
+                          setActiveTileIndex(0);
+                        }}
+                        style={{
+                          padding: '10px 18px',
+                          borderRadius: '14px',
+                          border: isActive ? '2px solid #b38e47' : '1px solid rgba(0,0,0,0.08)',
+                          background: isActive ? 'rgba(179, 142, 71, 0.12)' : '#ffffff',
+                          color: isActive ? '#b38e47' : '#334155',
+                          fontSize: '0.8rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          boxShadow: isActive ? '0 4px 14px rgba(179, 142, 71, 0.15)' : 'none'
+                        }}
                       >
-                        {cat.label}
+                        <span>{isActive ? '✨' : '🏛️'}</span>
+                        <span>{combo.styleName}</span>
+                        <span style={{ fontSize: '0.68rem', padding: '2px 6px', borderRadius: '6px', background: isActive ? '#b38e47' : 'rgba(0,0,0,0.05)', color: isActive ? '#fff' : '#64748b' }}>
+                          %{combo.matchScore} Uyum
+                        </span>
                       </button>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Single Unified Concept Selector Ribbon */}
-              <div className="ai-studio-concept-ribbon scrollbar-hidden">
-                <span className="concept-ribbon-label">MİMARİ KONSEPTLER:</span>
-                <div className="concept-tabs-row">
-                  {moodboardCombos
-                    .filter(c => moodboardCategory === 'all' || c.category === moodboardCategory)
-                    .map((combo) => {
-                      const isActive = selectedMoodIndex === combo.id;
-                      return (
-                        <button
-                          key={combo.id}
-                          onClick={() => {
-                            setSelectedMoodIndex(combo.id);
-                            setActiveTileIndex(0);
-                          }}
-                          className={`concept-tab-btn ${isActive ? 'active' : ''}`}
-                        >
-                          <span className="pill-badge">{combo.styleBadge}</span>
-                          <span className="pill-name">{combo.styleName}</span>
-                          <span className="pill-score">%{combo.matchScore} Uyum</span>
-                        </button>
-                      );
-                    })}
-                </div>
-              </div>
-
-              {/* Main Workspace: Active Concept, Budget Calculator, Cards & Actions */}
+              {/* 2-Column Clean Workspace */}
               {(() => {
                 const activeCombo = (moodboardCombos && moodboardCombos.length > 0)
                   ? (moodboardCombos.find(c => c && c.id === selectedMoodIndex) || moodboardCombos[0])
                   : (DEFAULT_MOODBOARD_COMBOS[0] || {});
                 
-                const tilesList = activeCombo?.tiles || [
-                  {
-                    name: activeCombo?.floorTile?.name || 'Calacatta Gold 60x120',
-                    size: activeCombo?.floorTile?.size || '60x120 cm',
-                    finish: activeCombo?.floorTile?.finish || 'Full Lappato',
-                    img: activeCombo?.floorTile?.img || '/textures/calacatta_gold.jpg',
-                    badge: '👑 PREMİUM KOLEKSİYON',
-                    brand: 'NG KÜTAHYA',
-                    price: '₺740 / m²'
-                  }
-                ];
-
+                const tilesList = activeCombo?.tiles || [{
+                  name: activeCombo?.floorTile?.name || 'Calacatta Gold 60x120',
+                  size: activeCombo?.floorTile?.size || '60x120 cm',
+                  finish: activeCombo?.floorTile?.finish || 'Full Lappato',
+                  img: activeCombo?.floorTile?.img || '/textures/calacatta_gold.jpg',
+                  brand: 'NG KÜTAHYA',
+                  price: '₺740 / m²'
+                }];
                 const currentTile = tilesList[activeTileIndex % tilesList.length] || tilesList[0];
                 const currentFaucet = String(customFaucetFinish || activeCombo?.complement?.fixtureBadge || 'Mat Siyah');
 
-                // Dynamic Budget Calculations
                 const floorPriceNum = parseInt(String(currentTile?.price || activeCombo?.floorTile?.price || '740').replace(/[^0-9]/g, '')) || 740;
                 const wallPriceNum = parseInt(String(activeCombo?.wallTile?.price || '630').replace(/[^0-9]/g, '')) || 630;
                 
                 const floorM2Needed = Math.ceil(studioRoomSizeM2 * 1.1);
                 const wallM2Needed = Math.ceil(studioRoomSizeM2 * 1.8 * 1.1);
-                
                 const floorTotalCost = floorM2Needed * floorPriceNum;
                 const wallTotalCost = wallM2Needed * wallPriceNum;
                 const chemicalGroutCost = Math.ceil(studioRoomSizeM2 * 45);
                 const totalEstimatedBudget = floorTotalCost + wallTotalCost + chemicalGroutCost;
 
                 return (
-                  <div className="ai-studio-workspace">
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', alignItems: 'stretch' }}>
                     
-                    {/* Workspace Top Header Bar: Active Concept Info & Budget Calculator */}
-                    <div className="workspace-header-row">
-                      <div className="workspace-concept-info">
-                        <div className="concept-heading-box">
-                          <span className="concept-status-badge">✨ SEÇİLİ MİMARİ KONSEPT</span>
-                          <h4 className="concept-main-title">{activeCombo?.styleName || 'Konsept'} — <span className="concept-sub-tagline">{activeCombo?.tagline || ''}</span></h4>
-                        </div>
-                        
-                        <div className="concept-color-swatches">
-                          <span className="swatch-title">Harmonize Palet:</span>
-                          <div className="swatch-dots-row">
-                            {activeCombo?.colorPalette?.map((hex, idx) => (
-                              <div 
-                                key={idx} 
-                                className="studio-swatch-circle" 
-                                style={{ background: hex }} 
-                                title={`Doku / Ton ${idx+1}: ${hex}`}
-                              />
-                            ))}
-                          </div>
+                    {/* Left Column: Visual Room Stage */}
+                    <div style={{ background: '#0f172a', borderRadius: '20px', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', color: '#fff', position: 'relative', minHeight: '340px' }}>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                        <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#b38e47', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                          🖼️ CANLI MİMARİ ODA SİMÜLASYONU
+                        </span>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button 
+                            onClick={() => setStudioViewMode(studioViewMode === 'composite' ? 'cards' : 'composite')}
+                            style={{ fontSize: '0.7rem', fontWeight: '700', padding: '4px 10px', borderRadius: '8px', background: 'rgba(255,255,255,0.12)', color: '#fff', border: 'none', cursor: 'pointer' }}
+                          >
+                            {studioViewMode === 'composite' ? '🧱 Görünüm' : '🖼️ 3D Oda'}
+                          </button>
                         </div>
                       </div>
 
-                      {/* Clean Budget Bar */}
-                      <div className="workspace-budget-card">
-                        <div className="calc-size-group">
-                          <label className="calc-label">📐 Proje Alanı:</label>
-                          <div className="calc-input-wrapper">
-                            <input 
-                              type="number" 
-                              min="3" 
-                              max="200" 
-                              value={studioRoomSizeM2}
-                              onChange={(e) => setStudioRoomSizeM2(Math.max(1, parseInt(e.target.value) || 1))}
-                              className="calc-m2-input"
-                            />
-                            <span className="m2-unit">m²</span>
+                      {/* Visual Canvas Image / Stage */}
+                      <div style={{ flex: 1, borderRadius: '14px', overflow: 'hidden', position: 'relative', minHeight: '220px', background: '#1e293b', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <img 
+                          src={currentTile?.img || '/textures/calacatta_gold.jpg'} 
+                          alt={currentTile?.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => { e.target.onerror = null; e.target.src = '/textures/calacatta_gold.jpg'; }}
+                        />
+                        <div style={{ position: 'absolute', bottom: '12px', left: '12px', right: '12px', background: 'rgba(15, 23, 42, 0.88)', backdropFilter: 'blur(10px)', padding: '12px 14px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div>
+                            <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#fff', display: 'block' }}>{currentTile?.name}</span>
+                            <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>{currentTile?.size} • {currentTile?.finish}</span>
                           </div>
-
-                          <div className="calc-quick-pills">
-                            {[
-                              { label: '8 m² Banyo', val: 8 },
-                              { label: '15 m² Mutfak', val: 15 },
-                              { label: '30 m² Salon', val: 30 }
-                            ].map((preset, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => setStudioRoomSizeM2(preset.val)}
-                                className={`calc-quick-btn ${studioRoomSizeM2 === preset.val ? 'active' : ''}`}
-                              >
-                                {preset.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="calc-result-badge">
-                          <span className="calc-result-label">Tahmini Malzeme Bütçesi:</span>
-                          <strong className="calc-result-value">₺{totalEstimatedBudget.toLocaleString('tr-TR')}</strong>
+                          <button
+                            onClick={() => handleTryMoodboard({ ...activeCombo, tileName: currentTile?.name || activeCombo?.floorTile?.name })}
+                            style={{ padding: '7px 14px', borderRadius: '10px', background: '#b38e47', color: '#0f172a', fontSize: '0.72rem', fontWeight: '800', border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(179,142,71,0.3)' }}
+                          >
+                            3D Stüdyoda Aç →
+                          </button>
                         </div>
                       </div>
                     </div>
 
-                    {/* CONDITIONALLY RENDER: 4-Material Cards OR Canlı Kompozit Oda Simülasyonu */}
-                    {studioViewMode === 'composite' ? (
-                      /* HYPER-REALISTIC 3D ARCHITECTURAL ROOM VISUALIZER */
-                      <div className={`studio-composite-room-view camera-angle-${roomCameraAngle}`}>
-                        <div className="composite-room-stage">
-                          
-                          {/* 1. Wall Surface Layer with Seamless Tile Grid & Lighting */}
-                          <div 
-                            className="stage-wall-layer"
-                            style={{
-                              backgroundImage: `url(${activeCombo?.wallTile?.img || '/textures/vista_bej.jpg'})`,
-                              backgroundSize: '240px 140px'
-                            }}
-                          >
-                            <div className="wall-grout-grid-overlay" style={{ boxShadow: `inset 0 0 0 1px ${activeCombo?.grout?.hex || '#eae6df'}44` }} />
-                            <div className="wall-specular-gloss" />
-                            <div className="wall-spotlights" />
-
-                            {/* Floating LED Mirror & Vanity Unit Overlay */}
-                            <div className="stage-backlit-mirror">
-                              <div className="mirror-glass-glow" />
-                            </div>
-
-                            <div className="stage-vanity-unit">
-                              <div 
-                                className="vanity-cabinet-front" 
-                                style={{ background: activeCombo?.complement?.cabinetHex || '#5c4033' }}
-                              >
-                                <div className="vanity-drawer-lines" />
-                              </div>
-                              <div className="vanity-counter-top" />
-
-                              {/* Realistic Faucet Hardware Finish */}
-                              <div className={`stage-faucet-hardware finish-${currentFaucet.toLowerCase().includes('gold') ? 'gold' : currentFaucet.toLowerCase().includes('siyah') ? 'black' : 'chrome'}`}>
-                                <div className="faucet-body" />
-                                <div className="faucet-spout" />
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* 2. Wall-Floor Baseboard (Süpürgelik) & Contact Shadow */}
-                          <div className="stage-baseboard-line">
-                            <div className="baseboard-shadow" />
-                          </div>
-
-                          {/* 3. Floor Surface Plane with Perspective Distortion & Grout Lines */}
-                          <div className="stage-floor-perspective">
-                            <div 
-                              className="floor-tile-canvas"
-                              style={{
-                                backgroundImage: `url(${currentTile?.img || '/textures/calacatta_gold.jpg'})`,
-                                backgroundSize: roomCameraAngle === 'macro' ? '300px 180px' : '180px 110px'
-                              }}
-                            >
-                              <div className="floor-grout-grid-overlay" style={{ boxShadow: `inset 0 0 0 2px ${activeCombo?.grout?.hex || '#eae6df'}` }} />
-                              <div className="floor-gloss-reflection" />
-                              <div className="vanity-floor-shadow" />
-                            </div>
-                          </div>
-
-                          {/* 4. Ambient Vignette */}
-                          <div className="stage-vignette-overlay" />
-
-                          {/* 5. Top Controls: Camera Angles & Material Specs */}
-                          <div className="stage-top-controls">
-                            <div className="camera-angle-tabs">
-                              {[
-                                { key: 'eye', label: '👁️ Göz Hizası', title: 'Genel Mimar Perspektifi' },
-                                { key: 'top', label: '📐 Zemin & Derz', title: 'Zemin ve Derz Çizgileri Açısı' },
-                                { key: 'macro', label: '🔍 Doku Yakın Çekim', title: 'Yüzey Parlaklığı ve Dokusu' }
-                              ].map(cam => (
-                                <button
-                                  key={cam.key}
-                                  onClick={() => setRoomCameraAngle(cam.key)}
-                                  className={`camera-tab-btn ${roomCameraAngle === cam.key ? 'active' : ''}`}
-                                  title={cam.title}
-                                >
-                                  {cam.label}
-                                </button>
-                              ))}
-                            </div>
-
-                            <div className="stage-material-info-chip">
-                              <span>🚰 Armatür: <strong>{currentFaucet}</strong></span>
-                              <span>📐 Derz: <strong>{activeCombo?.grout?.color} ({activeCombo?.grout?.width || '1.5mm'})</strong></span>
-                            </div>
-                          </div>
-
-                          {/* 6. Interactive Hotspots Overlay */}
-                          <div className="stage-bottom-hotspots">
-                            <button className="hotspot-badge floor" onClick={() => setActiveTileIndex((prev) => (prev + 1) % tilesList.length)}>
-                              🔄 Zemin Değiştir ({currentTile?.name})
-                            </button>
-                            <button className="hotspot-badge wall" onClick={() => setStudioViewMode('cards')}>
-                              🧱 Malzeme Kartlarını İncele
-                            </button>
-                          </div>
+                    {/* Right Column: Recipe & Consolidated Budget Card */}
+                    <div style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: '20px', padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: '0 4px 20px rgba(0,0,0,0.02)' }}>
+                      
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                          <h4 style={{ fontSize: '1.05rem', fontWeight: '800', color: '#0f172a', margin: 0 }}>
+                            {activeCombo?.styleName}
+                          </h4>
+                          <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#059669', background: 'rgba(16, 185, 129, 0.1)', padding: '4px 10px', borderRadius: '8px' }}>
+                            Uyumlu Mimar Konsepti
+                          </span>
                         </div>
-                      </div>
-                    ) : (
-                      /* 4 EQUAL-WIDTH CLEAN LIGHT MATERIAL CARDS */
-                      <div className="studio-materials-grid">
-                        
-                        {/* Card 1: 🔲 ZEMİN SERAMİĞİ */}
-                        <div className="studio-material-card studio-tile-showcase-card">
-                          <div className="card-header-tag">
-                            <span>01 / ZEMİN SERAMİĞİ</span>
-                            <span className="tile-badge-overlay">{currentTile?.badge || '👑 PREMİUM'}</span>
-                          </div>
-                          
-                          <div className="studio-tile-img-box">
-                            <img 
-                              src={currentTile?.img || '/textures/calacatta_gold.jpg'} 
-                              alt={currentTile?.name || 'Zemin Seramiği'}
-                              onError={(e) => { e.target.onerror = null; e.target.src = '/textures/calacatta_gold.jpg'; }}
-                            />
-                            <div className="tile-brand-tag">{currentTile?.brand || 'NG KÜTAHYA'}</div>
-                            <div className="tile-price-tag">{currentTile?.price || '₺740/m²'}</div>
-                          </div>
 
-                          {tilesList.length > 1 && (
-                            <div className="tile-carousel-nav">
-                              <span className="carousel-nav-label">Alternatif Zemin Seramikleri:</span>
-                              <div className="carousel-dots-group">
-                                {tilesList.map((t, idx) => (
-                                  <button
-                                    key={idx}
-                                    onClick={() => setActiveTileIndex(idx)}
-                                    className={`tile-carousel-dot ${activeTileIndex === idx ? 'active' : ''}`}
-                                    title={t.name}
-                                  >
-                                    {idx + 1}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          <div className="material-details">
-                            <h5 className="material-name">{currentTile?.name || activeCombo?.floorTile?.name}</h5>
-                            <p className="material-sub">{currentTile?.size} • {currentTile?.finish}</p>
-                            <div className="tech-spec-row">
-                              <span className="tech-badge">{activeCombo?.floorTile?.pei || 'PEI 4'}</span>
-                              <span className="tech-badge">{activeCombo?.floorTile?.slip || 'R10 Kaymaz'}</span>
-                            </div>
-                            <div className="calc-material-cost">
-                              Gereken: {floorM2Needed} m² • <strong>₺{floorTotalCost.toLocaleString('tr-TR')}</strong>
-                            </div>
+                        {/* Material Summary Items */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.78rem', padding: '9px 12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                            <span style={{ color: '#475569', fontWeight: '600' }}>🔲 Zemin Karo:</span>
+                            <strong style={{ color: '#0f172a' }}>{currentTile?.name}</strong>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.78rem', padding: '9px 12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                            <span style={{ color: '#475569', fontWeight: '600' }}>🧱 Duvar Dekor:</span>
+                            <strong style={{ color: '#0f172a' }}>{activeCombo?.wallTile?.name}</strong>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.78rem', padding: '9px 12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                            <span style={{ color: '#475569', fontWeight: '600' }}>📐 Derz & Armatür:</span>
+                            <strong style={{ color: '#0f172a' }}>{activeCombo?.grout?.color} • {currentFaucet}</strong>
                           </div>
                         </div>
 
-                        {/* Card 2: 🧱 DUVAR & DEKOR SERAMİĞİ */}
-                        <div className="studio-material-card studio-tile-showcase-card">
-                          <div className="card-header-tag">
-                            <span>02 / DUVAR & DEKOR SERAMİĞİ</span>
-                            <span className="tile-badge-overlay">{activeCombo?.wallTile?.badge || '✨ UYUMLU DEKOR'}</span>
-                          </div>
-                          <div className="studio-tile-img-box">
-                            <img 
-                              src={activeCombo?.wallTile?.img || '/textures/calacatta_gold.jpg'} 
-                              alt={activeCombo?.wallTile?.name || 'Duvar Dekor Seramiği'}
-                              onError={(e) => { e.target.onerror = null; e.target.src = '/textures/calacatta_gold.jpg'; }}
-                            />
-                            <div className="tile-brand-tag">{activeCombo?.wallTile?.brand || 'VitrA'}</div>
-                            <div className="tile-price-tag">{activeCombo?.wallTile?.price || '₺620/m²'}</div>
-                          </div>
-                          <div className="material-details">
-                            <h5 className="material-name">{activeCombo?.wallTile?.name}</h5>
-                            <p className="material-sub">{activeCombo?.wallTile?.size} • {activeCombo?.wallTile?.finish}</p>
-                            <div className="calc-material-cost">
-                              Gereken: ~{wallM2Needed} m² • <strong>₺{wallTotalCost.toLocaleString('tr-TR')}</strong>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card 3: 📐 DERZ & YAPI KİMYASALI */}
-                        <div className="studio-material-card">
-                          <div className="card-header-tag">
-                            <span>03 / DERZ & YAPI KİMYASALI</span>
-                            <span className="tile-badge-overlay">{activeCombo?.grout?.width || '1.5mm Derz'}</span>
-                          </div>
-                          <div className="studio-grout-box">
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <div 
-                                className="studio-grout-swatch-circle"
-                                style={{ background: activeCombo?.grout?.hex || '#eae6df' }}
-                                title={`Derz Rengi: ${activeCombo?.grout?.color}`}
-                              />
-                              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span className="grout-color-name">{activeCombo?.grout?.color || 'Derz Renk Tonu'}</span>
-                                <span style={{ fontSize: '0.6rem', color: '#64748b' }}>Uyumlu Derz Çizgisi</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="material-details">
-                            <h5 className="material-name">{activeCombo?.grout?.name}</h5>
-                            <p className="material-sub">Teknik Özellik: {activeCombo?.grout?.type}</p>
-                            <div className="calc-material-cost">
-                              Tahmini Sarfiyat • <strong>₺{chemicalGroutCost.toLocaleString('tr-TR')}</strong>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card 4: 🚪 BANYO & İÇ MEKAN TAMAMLAYICI */}
-                        <div className="studio-material-card">
-                          <div className="card-header-tag">
-                            <span>04 / TAMAMLAYICI EKİPMAN</span>
-                            <div className="fixture-chips-row">
-                              {['Mat Siyah', 'Gold', 'Krom'].map(f => (
-                                <button
-                                  key={f}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setCustomFaucetFinish(f);
-                                  }}
-                                  className={`fixture-mini-chip ${currentFaucet.includes(f) ? 'active' : ''}`}
-                                >
-                                  {f}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="studio-complement-box">
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <div className="wood-texture-icon" style={{ background: activeCombo?.complement?.cabinetHex || '#5c4033' }} title="Mobilya Dokusu" />
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                                <div className="fixture-finish-badge">🚰 {currentFaucet}</div>
-                                <span style={{ fontSize: '0.6rem', color: '#64748b' }}>Seçili Armatür Stili</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="material-details">
-                            <h5 className="material-name">{activeCombo?.complement?.cabinet}</h5>
-                            <p className="material-sub">Armatür: {activeCombo?.complement?.fixture}</p>
-                          </div>
-                        </div>
-
-                      </div>
-                    )}
-
-                    {/* Workspace Bottom Specification & Action Bar */}
-                    <div className="workspace-footer-row">
-                      <div className="studio-spec-notes">
-                        <div className="spec-pill-group">
-                          <span className="spec-pill gold">✨ %{activeCombo.matchScore} Uyum Skoru</span>
-                          <span className="spec-pill">💡 Aydınlatma: {activeCombo.lighting || '3000K LED'}</span>
-                          <span className="spec-pill">📐 Derz: {activeCombo.groutColor || '1.5mm Fildişi'}</span>
-                        </div>
-                        <p className="architect-tip-text">
-                          <strong>İç Mimar Tavsiyesi:</strong> {activeCombo.desc}
+                        {/* Architect Tip */}
+                        <p style={{ fontSize: '0.74rem', color: '#475569', background: 'rgba(179, 142, 71, 0.08)', borderLeft: '3px solid #b38e47', padding: '10px 14px', borderRadius: '4px 10px 10px 4px', margin: '0 0 16px 0', lineHeight: '1.4' }}>
+                          💡 <strong>İç Mimar Notu:</strong> {activeCombo?.desc}
                         </p>
                       </div>
 
-                      <div className="studio-action-buttons-group">
-                        <button
-                          onClick={() => handleCopyArchitectSpec(activeCombo, currentTile, currentFaucet, totalEstimatedBudget)}
-                          className="studio-secondary-action-btn"
-                          title="Tüm malzeme reçetesini ve bütçe detaylarını kopyala"
-                        >
-                          <Copy size={15} />
-                          <span>{specCopiedMsg ? '✅ Reçete Kopyalandı!' : 'Reçeteyi Kopyala'}</span>
-                        </button>
+                      {/* Consolidated Budget & Action Buttons */}
+                      <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: '14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                          <div>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b', display: 'block', fontWeight: '600' }}>Proje Alanı:</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px' }}>
+                              {[8, 15, 30].map(val => (
+                                <button 
+                                  key={val} 
+                                  onClick={() => setStudioRoomSizeM2(val)}
+                                  style={{ fontSize: '0.68rem', fontWeight: '700', padding: '4px 10px', borderRadius: '8px', border: studioRoomSizeM2 === val ? '1px solid #b38e47' : '1px solid #e2e8f0', background: studioRoomSizeM2 === val ? 'rgba(179,142,71,0.12)' : '#fff', color: studioRoomSizeM2 === val ? '#b38e47' : '#64748b', cursor: 'pointer' }}
+                                >
+                                  {val}m²
+                                </button>
+                              ))}
+                            </div>
+                          </div>
 
-                        <button
-                          onClick={() => handleRequestQuoteForCombo(activeCombo, currentTile)}
-                          className="studio-quote-action-btn"
-                          title="Bu kombin için kayıtlı bayilerden doğrudan fiyat teklifi iste"
-                        >
-                          <DollarSign size={15} />
-                          <span>Bayilerden Teklif İstet</span>
-                        </button>
+                          <div style={{ textAlign: 'right' }}>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b', display: 'block', fontWeight: '600' }}>Tahmini Toplam Malzeme Bütçesi:</span>
+                            <strong style={{ fontSize: '1.3rem', fontWeight: '800', color: '#b38e47' }}>
+                              ₺{totalEstimatedBudget.toLocaleString('tr-TR')}
+                            </strong>
+                          </div>
+                        </div>
 
-                        <button
-                          onClick={() => handleTryMoodboard({ ...activeCombo, tileName: currentTile?.name || activeCombo?.floorTile?.name })}
-                          className="studio-3d-action-btn"
-                        >
-                          <Palette size={16} />
-                          <span>3D Stüdyoda Aç →</span>
-                        </button>
+                        {/* Action Buttons */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                          <button
+                            onClick={() => handleCopyArchitectSpec(activeCombo, currentTile, currentFaucet, totalEstimatedBudget)}
+                            style={{ padding: '11px', borderRadius: '12px', background: '#f1f5f9', color: '#0f172a', fontSize: '0.75rem', fontWeight: '700', border: '1px solid #cbd5e1', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s' }}
+                          >
+                            <Copy size={14} />
+                            <span>{specCopiedMsg ? '✅ Kopyalandı' : 'Reçeteyi Kopyala'}</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleRequestQuoteForCombo(activeCombo, currentTile)}
+                            style={{ padding: '11px', borderRadius: '12px', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: '#fff', fontSize: '0.75rem', fontWeight: '700', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', boxShadow: '0 4px 14px rgba(15,23,42,0.18)', transition: 'all 0.2s' }}
+                          >
+                            <DollarSign size={14} />
+                            <span>Bayiden Fiyat İste</span>
+                          </button>
+                        </div>
                       </div>
-                    </div>
 
+                    </div>
                   </div>
                 );
               })()}
