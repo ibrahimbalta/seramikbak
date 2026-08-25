@@ -1136,46 +1136,50 @@ export default function Home() {
 
   const startArCamera = async () => {
     setArCameraError(false);
-    setArCustomFloorImage(null); // Return to live stream mode!
+    setArCustomFloorImage(null); // Live WebCam mode!
     setShowArCameraModal(true);
     let stream = null;
 
-    try {
-      if (typeof window !== 'undefined' && navigator?.mediaDevices?.getUserMedia) {
-        // Attempt 1: Rear environment camera
+    if (typeof window !== 'undefined' && navigator?.mediaDevices?.getUserMedia) {
+      // Step 1: Mobile rear camera preferred (facingMode ideal)
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: { ideal: 'environment' } } 
+        });
+      } catch (e1) {
+        console.warn('FacingMode ideal environment failed, fallback to video true:', e1);
+      }
+
+      // Step 2: Fallback for Desktop PC / Laptop / Chrome DevTools
+      if (!stream) {
         try {
-          stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } 
-          });
-        } catch (e1) {
-          // Attempt 2: Basic video stream fallback
-          try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          } catch (e2) {
-            console.warn('All getUserMedia attempts failed:', e2);
-          }
+          stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        } catch (e2) {
+          console.warn('Standard getUserMedia video failed:', e2);
         }
       }
-    } catch (err) {
-      console.warn('AR WebCam stream error:', err);
     }
 
     if (stream) {
       arStreamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play().catch(e => console.warn('video play error:', e));
-      }
+      setArCameraError(false);
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play().catch(e => console.warn('video.play error:', e));
+        }
+      }, 50);
     } else {
+      console.warn('No webcam stream could be created');
       setArCameraError(true);
     }
   };
 
-  // Ensure live video stream attaches to videoRef when modal renders
+  // Re-bind live video stream whenever modal opens or camera view resets
   useEffect(() => {
     if (showArCameraModal && !arCustomFloorImage && !arCameraError && videoRef.current && arStreamRef.current) {
       videoRef.current.srcObject = arStreamRef.current;
-      videoRef.current.play().catch(e => console.warn('video play error:', e));
+      videoRef.current.play().catch(e => console.warn('useEffect video play error:', e));
     }
   }, [showArCameraModal, arCustomFloorImage, arCameraError]);
 
@@ -15041,22 +15045,45 @@ export default function Home() {
                   alt="Zemin Fotoğrafı" 
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 />
-              ) : arCameraError ? (
-                /* Camera Error / Permission Denied Fallback UI */
+              ) : (
+                /* Live WebCam Video Element (Always mounted so videoRef is ready) */
+                <video 
+                  ref={videoRef} 
+                  autoPlay 
+                  playsInline 
+                  muted 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover',
+                    display: arCameraError ? 'none' : 'block'
+                  }} 
+                />
+              )}
+
+              {/* Camera Error / Permission Denied Fallback UI */}
+              {arCameraError && !arCustomFloorImage && (
                 <div style={{ padding: '20px 24px', textAlign: 'center', color: '#cbd5e1' }}>
                   <CameraOff size={36} style={{ margin: '0 auto 10px', color: '#f59e0b', display: 'block' }} />
-                  <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>Canlı WebCam Yayını Başlatılamadı</h4>
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>Canlı Kamera İzni İsteniyor</h4>
                   <p style={{ fontSize: '0.74rem', color: '#94a3b8', maxWidth: '380px', margin: '0 auto 14px', lineHeight: '1.4' }}>
-                    Tarayıcınızın kilit (🔒) simgesinden kamera izni verebilir ya da aşağıdaki butonlar ile oda fotoğrafınızı kullanabilirsiniz:
+                    Tarayıcınızın kamera iznini onaylayın veya aşağıdaki butonlar ile doğrudan fotoğraf çekin / yükleyin:
                   </p>
                   
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
                     <button 
-                      onClick={() => arCameraFileInputRef.current?.click()} 
-                      style={{ padding: '9px 16px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', color: '#0f172a', border: 'none', borderRadius: '8px', fontSize: '0.76rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(179,142,71,0.3)' }}
+                      onClick={() => startArCamera()} 
+                      style={{ padding: '9px 16px', background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '0.76rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(56,189,248,0.3)' }}
                     >
                       <Camera size={16} />
-                      <span>📸 Kamera İle Çek</span>
+                      <span>🎥 Canlı Kamerayı İzin Ver & Başlat</span>
+                    </button>
+
+                    <button 
+                      onClick={() => arCameraFileInputRef.current?.click()} 
+                      style={{ padding: '9px 14px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', color: '#0f172a', border: 'none', borderRadius: '8px', fontSize: '0.76rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <span>📸 Kamera İle Fotoğraf Çek</span>
                     </button>
 
                     <button 
@@ -15067,15 +15094,6 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
-              ) : (
-                /* Live WebCam Stream */
-                <video 
-                  ref={videoRef} 
-                  autoPlay 
-                  playsInline 
-                  muted 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                />
               )}
 
               {/* AR Floor Texture Projection Layer */}
