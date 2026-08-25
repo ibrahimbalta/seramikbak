@@ -14943,98 +14943,13 @@ export default function Home() {
             position: absolute;
             top: -2px;
             right: -8px;
-            background: var(--accent-gold);
-            color: #1a1c24;
-            font-size: 0.55rem;
-            font-weight: 800;
-            border-radius: 50%;
-            min-width: 14px;
-            height: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 3px;
-            line-height: 1;
-            border: 1px solid #fff;
-          }
-
-          /* Mobile Compare Bar - above the tab navigation */
-          .sticky-compare-bar {
-            bottom: 60px;
-            padding: 10px 12px;
-            z-index: 9999;
-          }
-          .compare-bar-container {
-            flex-direction: column;
-            gap: 10px;
-          }
-          .compare-bar-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 100%;
-          }
-          .compare-bar-info h4 {
-            font-size: 0.85rem;
-            margin: 0;
-          }
-          .compare-bar-info p {
-            margin: 0;
-            font-size: 0.72rem;
-          }
-          .compare-bar-items {
-            gap: 8px;
-            justify-content: flex-start;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            flex-shrink: 0;
-          }
-          .compare-bar-item {
-            width: 56px;
-          }
-          .compare-bar-item.empty {
-            display: none;
-          }
-          .compare-bar-item-thumb {
-            width: 48px;
-            height: 48px;
-          }
-          .compare-bar-item-name {
-            font-size: 0.58rem;
-          }
-          .compare-bar-actions {
-            width: 100%;
-            justify-content: stretch;
-          }
-          .compare-bar-actions button {
-            flex: 1;
-          }
-        }
-
-        /* Responsive AI Chatbot styling for mobile */
-        @media (max-width: 600px) {
-          .ai-chatbot-window {
-            position: fixed !important;
-            bottom: 60px !important; /* sit above bottom tab navigation */
-            right: 0px !important;
-            left: 0px !important;
-            width: 100% !important;
-            height: 48vh !important; /* 48% viewport height */
-            max-height: 48vh !important;
-            border-radius: 20px 20px 0 0 !important;
-            border: none !important;
-            border-top: 2px solid #d4af37 !important;
-            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15) !important;
-            z-index: 9999 !important;
-          }
-          .ai-chatbot-window form {
-            padding: 12px 16px !important;
-          }
           .ai-chat-header button {
             padding: 8px !important;
             font-size: 1.1rem !important;
           }
         }
+      `}</style>
+
       {/* REAL WEB-CAM / AR CAMERA MODAL */}
       {showArCameraModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
@@ -15172,8 +15087,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      </style>
     </main>
   );
 }
