@@ -5446,47 +5446,88 @@ export default function Home() {
                 </div>
 
                 {/* 3D COMPARISON & CAMERA MODES */}
-                <div className="control-group" style={{ marginTop: '10px' }}>
-                  <label>Gelişmiş Modlar & Görünüm</label>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                <div className="control-group" style={{ marginTop: '12px', marginBottom: '12px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', display: 'block', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                    Gelişmiş Modlar & Görünüm
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                     <button 
                       onClick={() => {
-                        setStudioComparisonMode(!studioComparisonMode);
-                        if (!studioComparisonProduct && products.length > 1) {
+                        const newMode = !studioComparisonMode;
+                        setStudioComparisonMode(newMode);
+                        if (newMode && !studioComparisonProduct && products.length > 1) {
                           setStudioComparisonProduct(products[1]);
                         }
                       }}
                       style={{
-                        flex: 1,
-                        padding: '6px 10px',
-                        borderRadius: '6px',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
                         fontSize: '0.72rem',
                         fontWeight: '700',
                         border: studioComparisonMode ? '1px solid var(--accent-gold)' : '1px solid rgba(255,255,255,0.1)',
-                        background: studioComparisonMode ? 'rgba(212, 175, 55, 0.15)' : 'rgba(255,255,255,0.02)',
+                        background: studioComparisonMode ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255,255,255,0.04)',
                         color: studioComparisonMode ? 'var(--accent-gold)' : '#fff',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px'
                       }}
+                      title="İki farklı ürünü canlı 3D sahnede yan yana kıyaslayın"
                     >
-                      {studioComparisonMode ? '✓ 3D Kıyaslama Açık' : '⚖️ 3D Canlı Kıyasla'}
+                      <span>{studioComparisonMode ? '✓ 3D Kıyaslama Açık' : '⚖️ 3D Canlı Kıyasla'}</span>
                     </button>
+
                     <button 
                       onClick={() => setStudioWalkthroughMode(!studioWalkthroughMode)}
                       style={{
-                        flex: 1,
-                        padding: '6px 10px',
-                        borderRadius: '6px',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
                         fontSize: '0.72rem',
                         fontWeight: '700',
                         border: studioWalkthroughMode ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
-                        background: studioWalkthroughMode ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255,255,255,0.02)',
+                        background: studioWalkthroughMode ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255,255,255,0.04)',
                         color: studioWalkthroughMode ? '#38bdf8' : '#fff',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px'
                       }}
+                      title="Banyo/Oda içerisinde 360 derece canlı göz hizası gezintisi yapın"
                     >
-                      {studioWalkthroughMode ? '🎥 Dış Kamera' : '🥽 360° İç Gezinti'}
+                      <span>{studioWalkthroughMode ? '🎥 Dış Kamera' : '🥽 360° İç Gezinti'}</span>
                     </button>
                   </div>
+
+                  {/* Kıyaslama Ürün Seçici Dropdown */}
+                  {studioComparisonMode && (
+                    <div style={{ marginTop: '10px', background: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.3)', padding: '8px 10px', borderRadius: '8px' }}>
+                      <label style={{ fontSize: '0.68rem', color: 'var(--accent-gold)', fontWeight: '700', display: 'block', marginBottom: '4px' }}>
+                        ⚖️ Kıyaslanacak 2. Ürün:
+                      </label>
+                      <select
+                        value={studioComparisonProduct?.id || ''}
+                        onChange={(e) => {
+                          const found = products.find(p => p.id === parseInt(e.target.value) || p.id === e.target.value);
+                          if (found) setStudioComparisonProduct(found);
+                        }}
+                        style={{ width: '100%', background: '#0f172a', color: '#fff', border: '1px solid #334155', borderRadius: '6px', padding: '5px 8px', fontSize: '0.72rem', fontWeight: '600' }}
+                      >
+                        {products.map(p => (
+                          <option key={p.id} value={p.id}>
+                            {p.name} ({p.brand?.name || 'Marka'})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
 
                 <div className="control-group" style={{ marginTop: '14px', marginBottom: '14px' }}>

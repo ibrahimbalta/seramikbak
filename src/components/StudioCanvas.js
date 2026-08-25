@@ -1458,20 +1458,35 @@ export default function StudioCanvas({
           backWallMeshRef.current.material = backWallMat;
         }
 
-        // Left Wall
-        const leftTexture = texture.clone();
-        leftTexture.repeat.set(repeatY, wallRepeatY); 
-        const leftWallMat = new THREE.MeshPhysicalMaterial({
-          map: leftTexture,
-          roughness: roughness,
-          metalness: metalness,
-          clearcoat: clearcoat,
-          clearcoatRoughness: clearcoatRoughness
-        });
-        if (leftWallMeshRef.current) {
-          if (leftWallMeshRef.current.material.map) leftWallMeshRef.current.material.map.dispose();
-          leftWallMeshRef.current.material.dispose();
-          leftWallMeshRef.current.material = leftWallMat;
+        // Left Wall: If comparisonMode is active and comparisonProduct exists, apply comparisonProduct to Left Wall!
+        const compTargetProduct = (comparisonMode && comparisonProduct) ? comparisonProduct : wallProduct;
+        const compRealUrl = compTargetProduct.textureUrl || compTargetProduct.imageUrl;
+
+        const applyLeftWallMat = (leftSource) => {
+          const compTex = generateGroutOverlay(leftSource, compTargetProduct, groutWidth, groutColor, tileRotation, layPattern);
+          const compW_m = (compTargetProduct.width || 60) / 100;
+          const compH_m = (compTargetProduct.height || 120) / 100;
+          compTex.repeat.set(ROOM_DEPTH / compW_m, ROOM_HEIGHT / compH_m);
+          compTex.colorSpace = THREE.SRGBColorSpace;
+
+          const leftWallMat = new THREE.MeshPhysicalMaterial({
+            map: compTex,
+            roughness: compTargetProduct.finish === 'Parlak' ? 0.08 : 0.85,
+            clearcoat: compTargetProduct.finish === 'Parlak' ? 1.0 : 0.0
+          });
+          if (leftWallMeshRef.current) {
+            if (leftWallMeshRef.current.material.map) leftWallMeshRef.current.material.map.dispose();
+            leftWallMeshRef.current.material.dispose();
+            leftWallMeshRef.current.material = leftWallMat;
+          }
+        };
+
+        if (comparisonMode && comparisonProduct && compRealUrl) {
+          const isAbs = compRealUrl.startsWith('http://') || compRealUrl.startsWith('https://') || compRealUrl.startsWith('//');
+          const compFinalUrl = isAbs ? `/api/proxy?url=${encodeURIComponent(compRealUrl)}` : compRealUrl;
+          loader.load(compFinalUrl, (loaded) => applyLeftWallMat(loaded.image), undefined, () => applyLeftWallMat(generateProceduralTexture(compTargetProduct)));
+        } else {
+          applyLeftWallMat(sourceImageOrCanvas);
         }
       };
 
@@ -1745,7 +1760,19 @@ export default function StudioCanvas({
       }
     }
 
-  }, [floorProduct, wallProduct, accentProduct, showerProduct, showerFloorProduct, toiletWallProduct, leftWallAccentProduct, stripeWallProduct, applyFloor, applyWalls, applyAccent, applyShower, applyShowerFloor, applyToiletWall, applyLeftWallAccent, applyStripeWall, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
+  }, [floorProduct, wallProduct, accentProduct, showerProduct, showerFloorProduct, toiletWallProduct, leftWallAccentProduct, stripeWallProduct, comparisonProduct, comparisonMode, walkthroughMode, applyFloor, applyWalls, applyAccent, applyShower, applyShowerFloor, applyToiletWall, applyLeftWallAccent, applyStripeWall, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);
+
+  // Walkthrough Mode Camera Adjustments
+  useEffect(() => {
+    if (!cameraRef.current || !isSceneReady) return;
+    if (walkthroughMode) {
+      cameraRef.current.position.set(0, 1.4, 0.2);
+      cameraRef.current.lookAt(0, 1.4, -1.8);
+    } else {
+      cameraRef.current.position.set(4, 3.2, 5);
+      cameraRef.current.lookAt(0, ROOM_HEIGHT / 3, 0);
+    }
+  }, [walkthroughMode, isSceneReady]);
 
   const downloadSnapshot = () => {
     if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return;
