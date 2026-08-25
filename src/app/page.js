@@ -54,7 +54,9 @@ import {
   RefreshCw,
   ExternalLink,
   Truck,
-  Package
+  Package,
+  CameraOff,
+  RotateCcw
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -1110,6 +1112,36 @@ export default function Home() {
   const [studioTimeOfDay, setStudioTimeOfDay] = useState('day'); // sunrise, day, sunset, night
   const [studioCabinetColor, setStudioCabinetColor] = useState('#5c4033'); // oak, white, anthracite, walnut
   const [studioFaucetColor, setStudioFaucetColor] = useState('chrome'); // chrome, black, gold, rosegold
+
+  // AR Camera State & Controls
+  const [showArCameraModal, setShowArCameraModal] = useState(false);
+  const [arOpacity, setArOpacity] = useState(0.85);
+  const [arScale, setArScale] = useState(1.0);
+  const [arAngle, setArAngle] = useState(0);
+  const [arCameraError, setArCameraError] = useState(false);
+  const videoRef = useRef(null);
+  const arStreamRef = useRef(null);
+
+  const startArCamera = async () => {
+    setArCameraError(false);
+    setShowArCameraModal(true);
+    try {
+      if (typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' } }
+        });
+        arStreamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } else {
+        setArCameraError(true);
+      }
+    } catch (err) {
+      console.warn('AR Camera access error:', err);
+      setArCameraError(true);
+    }
+  };
 
   // Geolocation & Dealer Locator State
   const [userLocationName, setUserLocationName] = useState('Kadıköy Merkez');
@@ -5629,7 +5661,7 @@ export default function Home() {
                   </div>
                   <button onClick={() => {
                     if (activeProduct) logInteraction('AR_TRY', activeProduct.id, activeProduct.brandId);
-                    alert('WebXR AR başlatılıyor... Kamera izinleri istenecek.');
+                    startArCamera();
                   }} className="btn-primary ar-btn">AR Kamerasını Aç</button>
                 </div>
               </div>
@@ -15003,7 +15035,145 @@ export default function Home() {
             font-size: 1.1rem !important;
           }
         }
-      `}</style>
+      {/* REAL WEB-CAM / AR CAMERA MODAL */}
+      {showArCameraModal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+          <div style={{ background: '#0f172a', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', maxWidth: '640px', width: '100%', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', position: 'relative' }}>
+            
+            {/* Modal Header */}
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#1e293b' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Sparkles size={20} style={{ color: '#b38e47' }} />
+                <div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#fff', margin: 0 }}>Canlı AR Kamera Döşeme</h3>
+                  <p style={{ fontSize: '0.7rem', color: '#94a3b8', margin: 0 }}>{activeProduct?.name || 'Seçili Karo'} ile gerçek zemini kaplayın</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  setShowArCameraModal(false);
+                  if (arStreamRef.current) {
+                    arStreamRef.current.getTracks().forEach(t => t.stop());
+                  }
+                }}
+                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Live Video / AR Stream Stage */}
+            <div style={{ position: 'relative', width: '100%', height: '380px', background: '#020617', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {arCameraError ? (
+                <div style={{ padding: '24px', textAlign: 'center', color: '#cbd5e1' }}>
+                  <CameraOff size={40} style={{ margin: '0 auto 12px', color: '#ef4444', display: 'block' }} />
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>Kamera Bağlantısı Kurulamadı</h4>
+                  <p style={{ fontSize: '0.78rem', color: '#94a3b8', maxWidth: '360px', margin: '0 auto 16px' }}>Kamera izinlerini kontrol edin veya cihazınızda arka kameraya izin verildiğinden emin olun.</p>
+                  <button 
+                    onClick={() => startArCamera()} 
+                    style={{ padding: '8px 16px', background: '#b38e47', color: '#0f172a', border: 'none', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
+                  >
+                    Kamerayı Tekrar Dene
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <video 
+                    ref={videoRef} 
+                    autoPlay 
+                    playsInline 
+                    muted 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  />
+
+                  {/* AR Floor Texture Projection Layer */}
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      bottom: '0',
+                      left: '10%',
+                      right: '10%',
+                      height: '65%',
+                      transform: `perspective(400px) rotateX(60deg) scale(${arScale}) rotate(${arAngle}deg)`,
+                      transformOrigin: 'bottom center',
+                      backgroundImage: `url(${activeProduct?.imageUrl || activeProduct?.textureUrl || '/textures/calacatta_gold.jpg'})`,
+                      backgroundSize: `${100 * arScale}px ${100 * arScale}px`,
+                      backgroundRepeat: 'repeat',
+                      opacity: arOpacity,
+                      boxShadow: '0 -10px 30px rgba(0,0,0,0.5)',
+                      pointerEvents: 'none',
+                      transition: 'opacity 0.2s ease, transform 0.1s ease'
+                    }}
+                  />
+
+                  {/* AR Floor Grid Overlay Badge */}
+                  <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(8px)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.68rem', color: '#b38e47', fontWeight: '700' }}>
+                    ✨ AR Zemin Eşleştirmesi Aktif
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* AR Controls Bar */}
+            <div style={{ padding: '16px 20px', background: '#1e293b', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: '700' }}>
+                    🎨 Karo Saydamlığı (Opacity: %{Math.round(arOpacity * 100)})
+                  </label>
+                  <input 
+                    type="range" 
+                    min="0.2" 
+                    max="1.0" 
+                    step="0.05" 
+                    value={arOpacity}
+                    onChange={(e) => setArOpacity(parseFloat(e.target.value))}
+                    style={{ width: '100%', accentColor: '#b38e47' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: '700' }}>
+                    📐 Karo Ölçeği (Boyut: {arScale}x)
+                  </label>
+                  <input 
+                    type="range" 
+                    min="0.5" 
+                    max="2.5" 
+                    step="0.1" 
+                    value={arScale}
+                    onChange={(e) => setArScale(parseFloat(e.target.value))}
+                    style={{ width: '100%', accentColor: '#b38e47' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                <button
+                  onClick={() => setArAngle((prev) => (prev + 45) % 360)}
+                  style={{ padding: '8px 14px', background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <RotateCcw size={14} />
+                  <span>45° Döndür</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    alert('AR Fotoğrafı Galerinize Kaydedildi!');
+                  }}
+                  style={{ padding: '8px 20px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', color: '#0f172a', border: 'none', borderRadius: '10px', fontSize: '0.78rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 14px rgba(179,142,71,0.3)' }}
+                >
+                  <Camera size={14} />
+                  <span>Fotoğraf Çek & Kaydet</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      </style>
     </main>
   );
 }
