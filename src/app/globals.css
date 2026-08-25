@@ -2275,12 +2275,33 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 640px) {
   .live-stats-section-banner {
-    padding: 14px 16px;
-    gap: 12px;
+    padding: 12px 14px;
+    gap: 10px;
   }
   .live-stats-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .stat-card-item {
+    padding: 8px 8px;
+    gap: 8px;
+  }
+  .stat-icon-wrapper {
+    width: 28px;
+    height: 28px;
+  }
+  .stat-icon-wrapper svg {
+    width: 14px;
+    height: 14px;
+  }
+  .stat-card-number {
+    font-size: 0.95rem;
+  }
+  .stat-card-title {
+    font-size: 0.64rem;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.15;
   }
   .live-ticker-container {
     max-width: 100%;
