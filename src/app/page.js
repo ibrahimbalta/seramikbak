@@ -4221,37 +4221,7 @@ export default function Home() {
                       <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 16px', boxShadow: '0 2px 6px rgba(0,0,0,0.02)' }}>🇷🇺 Русский</span>
                     </div>
 
-                    {/* 4-Pillar Visual Feature Cards Grid */}
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                      gap: '16px',
-                      marginBottom: '28px'
-                    }}>
-                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '18px 20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                        <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>🌐</div>
-                        <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>5 Dilde SEO İndeksleme</h4>
-                        <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: '1.45' }}>Türkçe, İngilizce, Almanca, Arapça ve Rusça dillerinde hedef kitleye özel içerik mimarisi.</p>
-                      </div>
 
-                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '18px 20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                        <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>🔍</div>
-                        <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>Google Global & Yandex</h4>
-                        <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: '1.45' }}>Almanya, İngiltere, Körfez ve Rusya pazarlarındaki arama motorlarında üst sıra görünürlüğü.</p>
-                      </div>
-
-                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '18px 20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                        <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>📦</div>
-                        <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>BIM & 4K CAD Şartnamesi</h4>
-                        <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: '1.45' }}>Uluslararası mimarlık bürolarının projelerinde kullanabileceği Revit (.rfa) ve 4K PBR kaplamalar.</p>
-                      </div>
-
-                      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '18px 20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                        <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>🤝</div>
-                        <h4 style={{ fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', margin: '0 0 4px 0' }}>Doğrudan B2B İhracat</h4>
-                        <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: '1.45' }}>Yüksek metrajlı toplu konut/otel projelerine ve distribütörlere komisyonsuz doğrudan erişim.</p>
-                      </div>
-                    </div>
 
                     {/* Action Buttons */}
                     <div style={{
