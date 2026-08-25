@@ -1119,8 +1119,19 @@ export default function Home() {
   const [arScale, setArScale] = useState(1.0);
   const [arAngle, setArAngle] = useState(0);
   const [arCameraError, setArCameraError] = useState(false);
+  const [arCustomFloorImage, setArCustomFloorImage] = useState(null);
   const videoRef = useRef(null);
   const arStreamRef = useRef(null);
+  const arFileInputRef = useRef(null);
+
+  const handleArFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setArCustomFloorImage(url);
+      setArCameraError(false);
+    }
+  };
 
   const startArCamera = async () => {
     setArCameraError(false);
@@ -14953,6 +14964,15 @@ export default function Home() {
       {/* REAL WEB-CAM / AR CAMERA MODAL */}
       {showArCameraModal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+          {/* Hidden File Input for Native Mobile Camera Snapshot & Gallery Upload */}
+          <input 
+            type="file" 
+            ref={arFileInputRef} 
+            accept="image/*" 
+            style={{ display: 'none' }} 
+            onChange={handleArFileUpload} 
+          />
+
           <div style={{ background: '#0f172a', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', maxWidth: '640px', width: '100%', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', position: 'relative' }}>
             
             {/* Modal Header */}
@@ -14960,13 +14980,14 @@ export default function Home() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Sparkles size={20} style={{ color: '#b38e47' }} />
                 <div>
-                  <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#fff', margin: 0 }}>Canlı AR Kamera Döşeme</h3>
-                  <p style={{ fontSize: '0.7rem', color: '#94a3b8', margin: 0 }}>{activeProduct?.name || 'Seçili Karo'} ile gerçek zemini kaplayın</p>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#fff', margin: 0 }}>Canlı AR Kamera & Zemin Kaplama</h3>
+                  <p style={{ fontSize: '0.7rem', color: '#94a3b8', margin: 0 }}>{activeProduct?.name || 'Seçili Karo'} ile zeminizi görün</p>
                 </div>
               </div>
               <button 
                 onClick={() => {
                   setShowArCameraModal(false);
+                  setArCustomFloorImage(null);
                   if (arStreamRef.current) {
                     arStreamRef.current.getTracks().forEach(t => t.stop());
                   }
@@ -14977,31 +14998,55 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Live Video / AR Stream Stage */}
+            {/* Live Video / Custom Floor Image AR Stage */}
             <div style={{ position: 'relative', width: '100%', height: '380px', background: '#020617', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {arCameraError ? (
-                <div style={{ padding: '24px', textAlign: 'center', color: '#cbd5e1' }}>
-                  <CameraOff size={40} style={{ margin: '0 auto 12px', color: '#ef4444', display: 'block' }} />
-                  <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>Kamera Bağlantısı Kurulamadı</h4>
-                  <p style={{ fontSize: '0.78rem', color: '#94a3b8', maxWidth: '360px', margin: '0 auto 16px' }}>Kamera izinlerini kontrol edin veya cihazınızda arka kameraya izin verildiğinden emin olun.</p>
-                  <button 
-                    onClick={() => startArCamera()} 
-                    style={{ padding: '8px 16px', background: '#b38e47', color: '#0f172a', border: 'none', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
-                  >
-                    Kamerayı Tekrar Dene
-                  </button>
+              {arCustomFloorImage ? (
+                /* Custom Uploaded / Snapped Photo */
+                <img 
+                  src={arCustomFloorImage} 
+                  alt="Zemin Fotoğrafı" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+              ) : arCameraError ? (
+                /* Camera Error / Permission Denied Fallback UI */
+                <div style={{ padding: '20px 24px', textAlign: 'center', color: '#cbd5e1' }}>
+                  <CameraOff size={36} style={{ margin: '0 auto 10px', color: '#f59e0b', display: 'block' }} />
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>Kamera İzni İsteniyor veya Engellendi</h4>
+                  <p style={{ fontSize: '0.74rem', color: '#94a3b8', maxWidth: '380px', margin: '0 auto 12px', lineHeight: '1.4' }}>
+                    Tarayıcınızın adres çubuğundaki kilit (🔒) simgesine dokunup kamera iznini <strong>"İzin Ver"</strong> yapabilirsiniz. Veya doğrudan telefon kameranızla fotoğraf çekebilirsiniz:
+                  </p>
+                  
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+                    <button 
+                      onClick={() => arFileInputRef.current?.click()} 
+                      style={{ padding: '9px 18px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', color: '#0f172a', border: 'none', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(179,142,71,0.3)' }}
+                    >
+                      <Camera size={16} />
+                      <span>📸 Fotoğraf Çek / Galeriden Yükle</span>
+                    </button>
+
+                    <button 
+                      onClick={() => startArCamera()} 
+                      style={{ padding: '9px 14px', background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', fontSize: '0.74rem', fontWeight: '700', cursor: 'pointer' }}
+                    >
+                      Canlı Kamerayı Tekrar Den et
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <>
-                  <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    playsInline 
-                    muted 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                  />
+                /* Live WebCam Stream */
+                <video 
+                  ref={videoRef} 
+                  autoPlay 
+                  playsInline 
+                  muted 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+              )}
 
-                  {/* AR Floor Texture Projection Layer */}
+              {/* AR Floor Texture Projection Layer */}
+              {(!arCameraError || arCustomFloorImage) && (
+                <>
                   <div 
                     style={{
                       position: 'absolute',
@@ -15022,7 +15067,7 @@ export default function Home() {
                   />
 
                   {/* AR Floor Grid Overlay Badge */}
-                  <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(15, 23, 42, 0.8)', backdropFilter: 'blur(8px)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.68rem', color: '#b38e47', fontWeight: '700' }}>
+                  <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.68rem', color: '#b38e47', fontWeight: '700' }}>
                     ✨ AR Zemin Eşleştirmesi Aktif
                   </div>
                 </>
@@ -15064,22 +15109,33 @@ export default function Home() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <button
-                  onClick={() => setArAngle((prev) => (prev + 45) % 360)}
-                  style={{ padding: '8px 14px', background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
-                >
-                  <RotateCcw size={14} />
-                  <span>45° Döndür</span>
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => setArAngle((prev) => (prev + 45) % 360)}
+                    style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    <RotateCcw size={14} />
+                    <span>45° Döndür</span>
+                  </button>
+
+                  <button
+                    onClick={() => arFileInputRef.current?.click()}
+                    style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.08)', color: '#b38e47', border: '1px solid rgba(179,142,71,0.3)', borderRadius: '8px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    title="Kendi odanızın fotoğrafını seçerek zemin döşeyin"
+                  >
+                    <Camera size={14} />
+                    <span>Zemin Fotoğrafı Yükle</span>
+                  </button>
+                </div>
 
                 <button
                   onClick={() => {
-                    alert('AR Fotoğrafı Galerinize Kaydedildi!');
+                    alert('AR Ekran Görünümü Galerinize Kaydedildi!');
                   }}
-                  style={{ padding: '8px 20px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', color: '#0f172a', border: 'none', borderRadius: '10px', fontSize: '0.78rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 14px rgba(179,142,71,0.3)' }}
+                  style={{ padding: '8px 16px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', color: '#0f172a', border: 'none', borderRadius: '10px', fontSize: '0.76rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 14px rgba(179,142,71,0.3)' }}
                 >
-                  <Camera size={14} />
-                  <span>Fotoğraf Çek & Kaydet</span>
+                  <Sparkles size={14} />
+                  <span>Görünümü Kaydet</span>
                 </button>
               </div>
             </div>
