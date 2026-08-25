@@ -15011,15 +15011,15 @@ export default function Home() {
             onChange={handleArFileUpload} 
           />
 
-          <div style={{ background: '#0f172a', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', maxWidth: '640px', width: '100%', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', position: 'relative' }}>
+          <div style={{ background: '#0f172a', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', maxWidth: '600px', width: '100%', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)', position: 'relative' }}>
             
             {/* Modal Header */}
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#1e293b' }}>
+            <div style={{ padding: '14px 18px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#1e293b' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Sparkles size={20} style={{ color: '#b38e47' }} />
                 <div>
-                  <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#fff', margin: 0 }}>Canlı AR Kamera & Zemin Kaplama</h3>
-                  <p style={{ fontSize: '0.7rem', color: '#94a3b8', margin: 0 }}>{activeProduct?.name || 'Seçili Karo'} ile zeminizi görün</p>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#fff', margin: 0 }}>AR Zemin Kaplama Modu</h3>
+                  <p style={{ fontSize: '0.68rem', color: '#94a3b8', margin: 0 }}>{activeProduct?.name || 'Seçili Karo'} ile odanızı görün</p>
                 </div>
               </div>
               <button 
@@ -15036,8 +15036,8 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Live Video / Custom Floor Image AR Stage */}
-            <div style={{ position: 'relative', width: '100%', height: '380px', background: '#020617', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {/* Stage Area */}
+            <div style={{ position: 'relative', width: '100%', height: '360px', background: '#020617', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {arCustomFloorImage ? (
                 /* Custom Uploaded / Snapped Photo */
                 <img 
@@ -15046,7 +15046,7 @@ export default function Home() {
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 />
               ) : (
-                /* Live WebCam Video Element (Always mounted so videoRef is ready) */
+                /* Live WebCam Video Element */
                 <video 
                   ref={videoRef} 
                   autoPlay 
@@ -15063,32 +15063,25 @@ export default function Home() {
 
               {/* Camera Error / Permission Denied Fallback UI */}
               {arCameraError && !arCustomFloorImage && (
-                <div style={{ padding: '20px 24px', textAlign: 'center', color: '#cbd5e1' }}>
+                <div style={{ padding: '20px', textAlign: 'center', color: '#cbd5e1', maxWidth: '400px' }}>
                   <CameraOff size={36} style={{ margin: '0 auto 10px', color: '#f59e0b', display: 'block' }} />
-                  <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>Canlı Kamera İzni İsteniyor</h4>
-                  <p style={{ fontSize: '0.74rem', color: '#94a3b8', maxWidth: '380px', margin: '0 auto 14px', lineHeight: '1.4' }}>
-                    Tarayıcınızın kamera iznini onaylayın veya aşağıdaki butonlar ile doğrudan fotoğraf çekin / yükleyin:
+                  <h4 style={{ fontSize: '0.92rem', fontWeight: '700', color: '#fff', marginBottom: '6px' }}>Canlı Kamera Yayınına Erişilemedi</h4>
+                  <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: '0 auto 16px', lineHeight: '1.4' }}>
+                    Tarayıcınızın kilit (🔒) simgesinden kamera iznini onaylayın veya doğrudan telefonunuzla zemin fotoğrafı çekin:
                   </p>
                   
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
-                    <button 
-                      onClick={() => startArCamera()} 
-                      style={{ padding: '9px 16px', background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '0.76rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(56,189,248,0.3)' }}
-                    >
-                      <Camera size={16} />
-                      <span>🎥 Canlı Kamerayı İzin Ver & Başlat</span>
-                    </button>
-
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                     <button 
                       onClick={() => arCameraFileInputRef.current?.click()} 
-                      style={{ padding: '9px 14px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', color: '#0f172a', border: 'none', borderRadius: '8px', fontSize: '0.76rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      style={{ padding: '10px 12px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', color: '#0f172a', border: 'none', borderRadius: '10px', fontSize: '0.75rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                     >
-                      <span>📸 Kamera İle Fotoğraf Çek</span>
+                      <Camera size={15} />
+                      <span>📸 Kamera İle Çek</span>
                     </button>
 
                     <button 
                       onClick={() => arGalleryFileInputRef.current?.click()} 
-                      style={{ padding: '9px 14px', background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '8px', fontSize: '0.74rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '10px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                     >
                       <span>📁 Galeriden Seç</span>
                     </button>
@@ -15120,18 +15113,19 @@ export default function Home() {
 
                   {/* AR Floor Grid Overlay Badge */}
                   <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.68rem', color: '#b38e47', fontWeight: '700' }}>
-                    ✨ AR Zemin Eşleştirmesi Aktif
+                    ✨ AR Zemin Kaplama Aktif
                   </div>
                 </>
               )}
             </div>
 
             {/* AR Controls Bar */}
-            <div style={{ padding: '16px 20px', background: '#1e293b', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div style={{ padding: '14px 18px', background: '#1e293b', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {/* Sliders Row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
                 <div>
                   <label style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: '700' }}>
-                    🎨 Karo Saydamlığı (Opacity: %{Math.round(arOpacity * 100)})
+                    🎨 Saydamlık (%{Math.round(arOpacity * 100)})
                   </label>
                   <input 
                     type="range" 
@@ -15146,7 +15140,7 @@ export default function Home() {
 
                 <div>
                   <label style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: '700' }}>
-                    📐 Karo Ölçeği (Boyut: {arScale}x)
+                    📐 Ölçek ({arScale}x)
                   </label>
                   <input 
                     type="range" 
@@ -15160,44 +15154,78 @@ export default function Home() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                  <button
-                    onClick={() => startArCamera()}
-                    style={{ padding: '7px 10px', background: arCustomFloorImage ? 'rgba(255,255,255,0.08)' : 'rgba(56, 189, 248, 0.2)', color: arCustomFloorImage ? '#fff' : '#38bdf8', border: arCustomFloorImage ? '1px solid rgba(255,255,255,0.1)' : '1px solid #38bdf8', borderRadius: '8px', fontSize: '0.7rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-                    title="Canlı kamera yayınına dönün"
-                  >
-                    <Camera size={13} />
-                    <span>🎥 Canlı Kamera</span>
-                  </button>
+              {/* Clean 3-Column Button Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                <button
+                  onClick={() => arCameraFileInputRef.current?.click()}
+                  style={{
+                    padding: '9px 6px',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '0.72rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <Camera size={13} />
+                  <span>📸 Resim Çek/Yükle</span>
+                </button>
 
-                  <button
-                    onClick={() => setArAngle((prev) => (prev + 45) % 360)}
-                    style={{ padding: '7px 10px', background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '0.7rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-                  >
-                    <RotateCcw size={13} />
-                    <span>45° Döndür</span>
-                  </button>
-
-                  <button
-                    onClick={() => arGalleryFileInputRef.current?.click()}
-                    style={{ padding: '7px 10px', background: 'rgba(255,255,255,0.08)', color: '#b38e47', border: '1px solid rgba(179,142,71,0.3)', borderRadius: '8px', fontSize: '0.7rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-                    title="Galerinizden oda resmi seçin"
-                  >
-                    <span>📁 Galeriden Seç</span>
-                  </button>
-                </div>
+                <button
+                  onClick={() => setArAngle((prev) => (prev + 45) % 360)}
+                  style={{
+                    padding: '9px 6px',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '0.72rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <RotateCcw size={13} />
+                  <span>45° Döndür</span>
+                </button>
 
                 <button
                   onClick={() => {
                     alert('AR Ekran Görünümü Galerinize Kaydedildi!');
                   }}
-                  style={{ padding: '8px 14px', background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)', color: '#0f172a', border: 'none', borderRadius: '8px', fontSize: '0.74rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', boxShadow: '0 4px 14px rgba(179,142,71,0.3)' }}
+                  style={{
+                    padding: '9px 6px',
+                    background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#0f172a',
+                    fontSize: '0.72rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 4px 12px rgba(179,142,71,0.3)'
+                  }}
                 >
                   <Sparkles size={13} />
-                  <span>Kaydet</span>
+                  <span>✨ Kaydet</span>
                 </button>
               </div>
+
             </div>
 
           </div>
