@@ -1,63 +1,119 @@
 'use client';
 
 import { useState } from 'react';
-import { Calculator, ArrowRight, ShieldCheck, Bath, Utensils, Sofa, Home, ChevronDown } from 'lucide-react';
+import { Calculator, ArrowRight, ShieldCheck, Bath, Utensils, Sofa, Home, ChevronDown, Check } from 'lucide-react';
 import { useLanguage } from '@/lib/languageContext';
 
 export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }) {
   const { t } = useLanguage();
+  
+  // Selection States
   const [roomType, setRoomType] = useState('banyo');
   const [areaM2, setAreaM2] = useState(25);
   const [tileSize, setTileSize] = useState('60x120');
-  const [wastagePercent, setWastagePercent] = useState(10);
   const [tileStyle, setTileStyle] = useState('mermer');
+  const [includeLabor, setIncludeLabor] = useState(false); // Usta işçiliği dahil seçeneği
+  const [layingStyle, setLayingStyle] = useState('duz'); // duz (%8 fire), capraz (%12 fire), baliksirti (%15 fire)
 
-  // Tile coverage per box in m²
+  // 1. Kutu içi metrekare standart haritası (Türkiye Pazar Standartları)
   const tileBoxMap = {
-    '60x120': 1.44,
-    '80x80': 1.28,
-    '120x240': 2.88,
-    '30x60': 1.44
+    '60x120': 1.44,   // 2 adet / kutu = 1.44 m²
+    '80x80': 1.28,    // 2 adet / kutu = 1.28 m²
+    '60x60': 1.44,    // 4 adet / kutu = 1.44 m²
+    '30x60': 1.44,    // 8 adet / kutu = 1.44 m²
+    '20x120': 1.44,   // 6 adet / kutu = 1.44 m² (Ahşap Parke Görünümlü)
+    '120x240': 2.88   // 1 dev plaka / kutu = 2.88 m²
   };
 
-  // Average price per m² according to style
-  const stylePriceMap = {
-    'mermer': 420,
-    'ahsap': 360,
-    'beton': 320,
-    'duz': 280
+  // 2. Döşeme tipine göre fire (wastage) oranı haritası
+  const wastageMap = {
+    'duz': 8,        // Standart Düz Döşeme: %8 fire
+    'capraz': 12,    // Çapraz / Diyagonal Döşeme: %12 fire
+    'baliksirti': 15 // Balıksırtı / Karmaşık Kırımlı: %15 fire
   };
 
+  // 3. Dokuya göre 2026 ortalama m² malzeme fiyat aralığı (TL / m²)
+  const stylePriceRangeMap = {
+    'mermer': { min: 420, max: 680 },
+    'ahsap': { min: 380, max: 590 },
+    'beton': { min: 350, max: 540 },
+    'duz': { min: 290, max: 450 },
+    'lappato': { min: 520, max: 850 }
+  };
+
+  // Mekan seçilince önerilen varsayılanları otomatik güncelleme
+  const handleRoomSelect = (id) => {
+    setRoomType(id);
+    if (id === 'banyo') {
+      setLayingStyle('capraz'); // Banyoda kırım çok olduğu için %12 kesim fire önerilir
+      if (tileStyle === 'duz') setTileStyle('mermer');
+    } else if (id === 'teras') {
+      setLayingStyle('duz');
+      setTileStyle('beton');
+    } else if (id === 'salon') {
+      setLayingStyle('duz');
+      setTileStyle('mermer');
+    } else if (id === 'mutfak') {
+      setLayingStyle('duz');
+      setTileStyle('ahsap');
+    }
+  };
+
+  // Metraj & Fire Hesaplama Mantığı
   const boxCoverage = tileBoxMap[tileSize] || 1.44;
-  const totalM2WithWastage = Math.round(areaM2 * (1 + wastagePercent / 100) * 10) / 10;
-  const requiredBoxes = Math.ceil(totalM2WithWastage / boxCoverage);
+  const activeWastagePercent = wastageMap[layingStyle] || 8;
   
-  // 1 bag of 25kg adhesive covers ~5 m²
+  // Fire dahil toplam net satın alınacak m²
+  const totalM2WithWastage = Math.round((areaM2 * (1 + activeWastagePercent / 100)) * 10) / 10;
+  
+  // Gerekli tam kutu sayısı
+  const requiredBoxes = Math.ceil(totalM2WithWastage / boxCoverage);
+  const actualPurchasedM2 = Math.round((requiredBoxes * boxCoverage) * 10) / 10;
+
+  // Harç & Derz Yan Malzeme Hesaplamaları (2026 Fiyatları)
+  // 1 Çuval 25kg Esnek Seramik Harcı = 5 m² alan kapatır (Fiyat: ~280 TL/çuval)
   const adhesiveBags = Math.ceil(totalM2WithWastage / 5);
-  // 1 pack of 5kg grout covers ~15 m²
+  const adhesiveCost = adhesiveBags * 280;
+
+  // 1 Pak 5kg Silikonlu Derz = 15 m² alan kapatır (Fiyat: ~180 TL/paket)
   const groutPacks = Math.ceil(totalM2WithWastage / 15);
+  const groutCost = groutPacks * 180;
 
-  const basePricePerM2 = stylePriceMap[tileStyle] || 400;
-  const estimatedMinCost = Math.round(totalM2WithWastage * basePricePerM2 * 0.9);
-  const estimatedMaxCost = Math.round(totalM2WithWastage * basePricePerM2 * 1.15);
+  // Banyo ve Teras için ilave Su İzolasyon & Lazer Takoz Seti desteği
+  const extraMaterialCost = (roomType === 'banyo' || roomType === 'teras') ? Math.round(areaM2 * 60) : 0;
 
+  // İşçilik maliyeti (Usta ortalama işçilik m² tarifesi: ~350 TL/m²)
+  const laborCost = includeLabor ? Math.round(totalM2WithWastage * 350) : 0;
+
+  // Toplam Bütçe Hesaplaması
+  const priceConfig = stylePriceRangeMap[tileStyle] || { min: 380, max: 600 };
+  const tileCostMin = Math.round(actualPurchasedM2 * priceConfig.min);
+  const tileCostMax = Math.round(actualPurchasedM2 * priceConfig.max);
+
+  const totalMinCost = tileCostMin + adhesiveCost + groutCost + extraMaterialCost + laborCost;
+  const totalMaxCost = tileCostMax + adhesiveCost + groutCost + extraMaterialCost + laborCost;
+
+  // Teklif Al / Bayiye Git Buton Tıklaması
   const handleRequestQuote = () => {
-    if (onGoToDealers) {
-      onGoToDealers({
-        areaM2,
-        totalM2WithWastage,
-        requiredBoxes,
-        tileSize,
-        roomType
-      });
-    } else if (onOpenQuoteModal) {
-      onOpenQuoteModal({
-        areaM2,
-        totalM2WithWastage,
-        requiredBoxes,
-        tileSize,
-        roomType
-      });
+    const calcSummary = {
+      areaM2,
+      totalM2WithWastage,
+      actualPurchasedM2,
+      requiredBoxes,
+      tileSize,
+      tileStyle,
+      roomType,
+      adhesiveBags,
+      groutPacks,
+      includeLabor,
+      estimatedMinCost: totalMinCost,
+      estimatedMaxCost: totalMaxCost
+    };
+
+    if (onOpenQuoteModal) {
+      onOpenQuoteModal(calcSummary);
+    } else if (onGoToDealers) {
+      onGoToDealers(calcSummary);
     } else {
       const dealerSec = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
       if (dealerSec) {
@@ -79,17 +135,17 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
       <div className="tile-calc-header">
         <div className="tile-calc-badges">
           <div className="badge-gold">
-            <Calculator size={12} />
+            <Calculator size={13} />
             <span>MALİYET & METRAJ ROBOTU</span>
           </div>
           <div className="badge-trust">
-            <ShieldCheck size={13} style={{ color: '#38bdf8' }} />
-            <span>%100 Hassas Fire Hesabı</span>
+            <ShieldCheck size={14} style={{ color: '#38bdf8' }} />
+            <span>%{activeWastagePercent} Hassas Fire Hesabı</span>
           </div>
         </div>
 
         <h3 className="tile-calc-title">
-          {t('calcTitle')}
+          {t('calcTitle') || 'Projenizin Malzeme ve Kutu İhtiyacını Anında Hesaplayın'}
         </h3>
       </div>
 
@@ -100,7 +156,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           
           {/* Mekan Seçimi */}
           <div className="calc-group">
-            <label className="calc-label">Mekan Seçimi</label>
+            <label className="calc-label">MEKAN SEÇİMİ</label>
             <div className="room-selector-grid">
               {roomItems.map((item) => {
                 const IconComponent = item.icon;
@@ -108,10 +164,11 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setRoomType(item.id)}
+                    type="button"
+                    onClick={() => handleRoomSelect(item.id)}
                     className={`room-btn ${isActive ? 'active' : ''}`}
                   >
-                    <IconComponent size={14} className={`room-icon-svg ${isActive ? 'active' : ''}`} />
+                    <IconComponent size={15} className={`room-icon-svg ${isActive ? 'active' : ''}`} />
                     <span className="room-text">{item.label}</span>
                   </button>
                 );
@@ -122,13 +179,14 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           {/* Alan Slider */}
           <div className="calc-group">
             <div className="slider-header">
-              <label className="calc-label">Kaplanacak Alan</label>
+              <label className="calc-label">KAPLANACAK ALAN</label>
               <span className="area-badge">{areaM2} m²</span>
             </div>
             <input
               type="range"
               min="5"
               max="250"
+              step="1"
               value={areaM2}
               onChange={(e) => setAreaM2(Number(e.target.value))}
               className="area-slider"
@@ -138,7 +196,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           {/* Ebat ve Doku Dropdownları */}
           <div className="dropdowns-row">
             <div className="select-box">
-              <label className="select-label">Seramik Ebadı</label>
+              <label className="select-label">SERAMİK EBADI</label>
               <div className="select-wrapper">
                 <select
                   value={tileSize}
@@ -147,15 +205,17 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
                 >
                   <option value="60x120">60x120 cm</option>
                   <option value="80x80">80x80 cm</option>
-                  <option value="120x240">120x240 cm (Mega)</option>
+                  <option value="60x60">60x60 cm</option>
                   <option value="30x60">30x60 cm</option>
+                  <option value="20x120">20x120 cm (Ahşap)</option>
+                  <option value="120x240">120x240 cm (Mega)</option>
                 </select>
-                <ChevronDown size={13} className="select-arrow" />
+                <ChevronDown size={14} className="select-arrow" />
               </div>
             </div>
 
             <div className="select-box">
-              <label className="select-label">Doku / Tarz</label>
+              <label className="select-label">DOKU / TARZ</label>
               <div className="select-wrapper">
                 <select
                   value={tileStyle}
@@ -166,18 +226,65 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
                   <option value="ahsap">Ahşap Doku</option>
                   <option value="beton">Beton / Taş</option>
                   <option value="duz">Düz / Modern</option>
+                  <option value="lappato">Lüks Lappato / Granit</option>
                 </select>
-                <ChevronDown size={13} className="select-arrow" />
+                <ChevronDown size={14} className="select-arrow" />
               </div>
             </div>
           </div>
+
+          {/* Extra Controls: Döşeme Şekli (Fire) & Usta İşçilik Toggle */}
+          <div className="extra-controls-row">
+            <div className="laying-style-selector">
+              <label className="select-label">DÖŞEME DÜZENİ</label>
+              <div className="laying-pills">
+                <button
+                  type="button"
+                  onClick={() => setLayingStyle('duz')}
+                  className={`pill-btn ${layingStyle === 'duz' ? 'active' : ''}`}
+                >
+                  Düz (%8 Fire)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLayingStyle('capraz')}
+                  className={`pill-btn ${layingStyle === 'capraz' ? 'active' : ''}`}
+                >
+                  Çapraz (%12 Fire)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLayingStyle('baliksirti')}
+                  className={`pill-btn ${layingStyle === 'baliksirti' ? 'active' : ''}`}
+                >
+                  Balıksırtı (%15)
+                </button>
+              </div>
+            </div>
+
+            <div className="labor-toggle-box">
+              <label 
+                className={`labor-toggle-label ${includeLabor ? 'active' : ''}`}
+                onClick={() => setIncludeLabor(!includeLabor)}
+              >
+                <div className={`checkbox-custom ${includeLabor ? 'checked' : ''}`}>
+                  {includeLabor && <Check size={12} strokeWidth={3} />}
+                </div>
+                <div className="labor-text-wrapper">
+                  <span className="labor-title">Usta İşçiliği Dahil Et</span>
+                  <span className="labor-sub">+350 ₺/m² Ortalama İşçilik</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
         </div>
 
         {/* Right Results & Action */}
         <div className="tile-calc-results">
           <div className="results-inner-grid">
             <div className="result-item">
-              <span className="result-label">Gerekli Seramik Kutusu</span>
+              <span className="result-label">GEREKLİ SERAMİK KUTUSU</span>
               <div className="result-value-row">
                 <span className="result-main-val">{requiredBoxes} Kutu</span>
                 <span className="result-sub-val">({totalM2WithWastage} m² Dahil)</span>
@@ -185,28 +292,31 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
             </div>
 
             <div className="result-item">
-              <span className="result-label">Harç & Derz İhtiyacı</span>
+              <span className="result-label">HARÇ & DERZ İHTİYACI</span>
               <span className="result-main-val small">{adhesiveBags} Çuval Harç / {groutPacks} Pak Derz</span>
             </div>
 
             <div className="result-item budget-highlight">
-              <span className="result-label gold">Tahmini Bütçe Aralığı</span>
+              <div className="budget-label-row">
+                <span className="result-label gold">TAHMİNİ BÜTÇE ARALIĞI</span>
+                {includeLabor && <span className="labor-badge">Usta Dahil</span>}
+              </div>
               <span className="result-main-val gold">
-                ₺{estimatedMinCost.toLocaleString('tr-TR')} – ₺{estimatedMaxCost.toLocaleString('tr-TR')}
+                ₺{totalMinCost.toLocaleString('tr-TR')} – ₺{totalMaxCost.toLocaleString('tr-TR')}
               </span>
             </div>
           </div>
 
-          <button onClick={handleRequestQuote} className="calc-cta-button">
-            <span>{t('getDealerQuotes')}</span>
-            <ArrowRight size={15} />
+          <button type="button" onClick={handleRequestQuote} className="calc-cta-button">
+            <span>Bayilerden Teklif Al</span>
+            <ArrowRight size={16} />
           </button>
         </div>
       </div>
 
       <style jsx>{`
         .tile-calculator-card {
-          background: linear-gradient(145deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.75) 100%);
+          background: linear-gradient(145deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.85) 100%);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           border-radius: 20px;
@@ -236,8 +346,8 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           gap: 6px;
           padding: 5px 12px;
           border-radius: 20px;
-          background: rgba(212, 175, 55, 0.12);
-          border: 1px solid rgba(212, 175, 55, 0.35);
+          background: rgba(212, 175, 55, 0.14);
+          border: 1px solid rgba(212, 175, 55, 0.4);
           color: #d4af37;
           font-size: 0.72rem;
           font-weight: 800;
@@ -251,8 +361,8 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           gap: 6px;
           padding: 5px 12px;
           border-radius: 20px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.12);
           color: #94a3b8;
           font-size: 0.72rem;
           font-weight: 700;
@@ -320,15 +430,15 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
 
         .room-btn:hover {
           background: rgba(255, 255, 255, 0.09);
-          border-color: rgba(255, 255, 255, 0.16);
+          border-color: rgba(255, 255, 255, 0.18);
           color: #ffffff;
         }
 
         .room-btn.active {
-          background: rgba(212, 175, 55, 0.14);
+          background: rgba(212, 175, 55, 0.16);
           color: #ffffff;
-          border: 1px solid rgba(212, 175, 55, 0.5);
-          box-shadow: 0 4px 16px rgba(212, 175, 55, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(212, 175, 55, 0.6);
+          box-shadow: 0 4px 16px rgba(212, 175, 55, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
 
         .room-icon-svg {
@@ -345,7 +455,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         }
 
         .room-text {
-          font-size: 0.75rem;
+          font-size: 0.78rem;
           font-weight: 700;
         }
 
@@ -359,10 +469,10 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           font-size: 0.88rem;
           font-weight: 800;
           color: #d4af37;
-          background: rgba(212, 175, 55, 0.12);
+          background: rgba(212, 175, 55, 0.14);
           padding: 3px 10px;
           border-radius: 8px;
-          border: 1px solid rgba(212, 175, 55, 0.3);
+          border: 1px solid rgba(212, 175, 55, 0.4);
         }
 
         .area-slider {
@@ -404,9 +514,9 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           width: 100%;
           padding: 10px 32px 10px 12px;
           border-radius: 12px;
-          background: rgba(15, 23, 42, 0.75);
+          background: rgba(15, 23, 42, 0.85);
           color: #f8fafc;
-          border: 1px solid rgba(255, 255, 255, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.14);
           font-size: 0.82rem;
           font-weight: 600;
           outline: none;
@@ -417,11 +527,11 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         }
 
         .calc-select:hover {
-          border-color: rgba(255, 255, 255, 0.22);
+          border-color: rgba(255, 255, 255, 0.25);
         }
 
         .calc-select:focus {
-          border-color: rgba(212, 175, 55, 0.5);
+          border-color: rgba(212, 175, 55, 0.6);
         }
 
         .select-arrow {
@@ -431,12 +541,108 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           color: #94a3b8;
         }
 
+        .extra-controls-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          align-items: flex-end;
+          border-top: 1px dashed rgba(255, 255, 255, 0.1);
+          padding-top: 12px;
+        }
+
+        .laying-pills {
+          display: flex;
+          gap: 4px;
+          margin-top: 6px;
+        }
+
+        .pill-btn {
+          flex: 1;
+          padding: 6px 4px;
+          border-radius: 8px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.03);
+          color: #94a3b8;
+          font-size: 0.68rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+          text-align: center;
+        }
+
+        .pill-btn:hover {
+          background: rgba(255, 255, 255, 0.08);
+          color: #e2e8f0;
+        }
+
+        .pill-btn.active {
+          background: rgba(56, 189, 248, 0.15);
+          border-color: rgba(56, 189, 248, 0.4);
+          color: #38bdf8;
+        }
+
+        .labor-toggle-label {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 10px;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+          cursor: pointer;
+          user-select: none;
+          transition: all 0.2s ease;
+        }
+
+        .labor-toggle-label:hover {
+          background: rgba(255, 255, 255, 0.08);
+        }
+
+        .labor-toggle-label.active {
+          background: rgba(16, 185, 129, 0.12);
+          border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .checkbox-custom {
+          width: 18px;
+          height: 18px;
+          border-radius: 5px;
+          border: 1.5px solid #64748b;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #ffffff;
+          transition: all 0.2s ease;
+        }
+
+        .checkbox-custom.checked {
+          background: #10b981;
+          border-color: #10b981;
+        }
+
+        .labor-text-wrapper {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .labor-title {
+          font-size: 0.72rem;
+          font-weight: 800;
+          color: #f1f5f9;
+        }
+
+        .labor-sub {
+          font-size: 0.62rem;
+          color: #94a3b8;
+        }
+
         .tile-calc-results {
-          background: rgba(15, 23, 42, 0.6);
+          background: rgba(15, 23, 42, 0.75);
           backdrop-filter: blur(14px);
           padding: 20px;
           border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.12);
           display: flex;
           flex-direction: column;
           justify-content: space-between;
@@ -457,10 +663,26 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         }
 
         .result-item.budget-highlight {
-          background: rgba(212, 175, 55, 0.08);
-          padding: 10px 14px;
+          background: rgba(212, 175, 55, 0.1);
+          padding: 12px 14px;
           border-radius: 12px;
-          border: 1px solid rgba(212, 175, 55, 0.25);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+        }
+
+        .budget-label-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .labor-badge {
+          font-size: 0.62rem;
+          font-weight: 800;
+          background: rgba(16, 185, 129, 0.2);
+          color: #34d399;
+          padding: 2px 6px;
+          border-radius: 4px;
+          border: 1px solid rgba(16, 185, 129, 0.4);
         }
 
         .result-label {
@@ -483,7 +705,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         }
 
         .result-main-val {
-          font-size: 1.25rem;
+          font-size: 1.3rem;
           font-weight: 900;
           color: #ffffff;
         }
@@ -495,12 +717,12 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         }
 
         .result-main-val.gold {
-          font-size: 1.2rem;
+          font-size: 1.22rem;
           color: #e5c158;
         }
 
         .result-sub-val {
-          font-size: 0.76rem;
+          font-size: 0.78rem;
           color: #38bdf8;
           font-weight: 700;
         }
@@ -519,7 +741,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           align-items: center;
           justify-content: center;
           gap: 8px;
-          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.28);
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           white-space: nowrap;
           letter-spacing: 0.01em;
@@ -527,7 +749,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
 
         .calc-cta-button:hover {
           transform: translateY(-2px);
-          box-shadow: 0 10px 28px rgba(212, 175, 55, 0.4);
+          box-shadow: 0 10px 28px rgba(212, 175, 55, 0.45);
           background: linear-gradient(135deg, #d4af37 0%, #e5c158 50%, #c5a059 100%);
         }
 
@@ -600,7 +822,8 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
             margin-top: 2px;
           }
 
-          .dropdowns-row {
+          .dropdowns-row, .extra-controls-row {
+            grid-template-columns: 1fr;
             gap: 8px;
           }
 
