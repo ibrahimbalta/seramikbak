@@ -21,15 +21,17 @@ export const metadata = {
     default: "SeramikBak | Global Ceramic Tile Engine, 3D Room Visualizer & B2B Portal",
     template: "%s | SeramikBak Global"
   },
-  description: "Türkiye'nin ve dünyanın önde gelen seramik markalarını (Kütahya, Bien, Ege, Güral, Vitra) tek platformda sunan, Web 3D Sanal Stüdyo ve AR (Artırılmış Gerçeklik) destekli uluslararası seramik arama motoru ve ihracat portalı.",
+  description: "Türkiye'nin ve dünyanın önde gelen seramik markalarını (Çanakkale Seramik, NG Kütahya, VitrA, Bien, Yurtbay, Seramiksan, Ege Seramik, Qua Granite, DuraTiles, Decovita, Graniser, Güral, Hitit, Seranit, Termal, Uşak Seramik) tek çatı altında buluşturan, Web 3D Sanal Stüdyo ve WebAR destekli uluslararası seramik arama motoru.",
   keywords: [
-    // Turkish SEO Keywords
-    "seramik", "fayans", "karo", "zemin kaplama", "duvar karosu",
-    "banyo seramik", "mutfak fayans", "3d sanal stüdyo", "seramik bak",
-    "kütahya seramik", "bien seramik", "ege seramik", "güral seramik", "vitra seramik",
-    "seramik fiyatları", "seramik modelleri", "banyo tasarımı",
-    "artırılmış gerçeklik", "AR", "seramik pazar yeri",
-    "seramik bayi", "seramik showroom", "online seramik", "seramik ihracat",
+    // 16 Dev Türk Seramik Markası
+    "çanakkale seramik", "ng kütahya seramik", "vitra seramik", "bien seramik", "yurtbay seramik",
+    "seramiksan", "ege seramik", "qua granite", "duratiles", "decovita",
+    "graniser", "güral seramik", "hitit seramik", "seranit", "termal seramik", "uşak seramik",
+    
+    // Turkish Core SEO Keywords
+    "seramik", "fayans", "karo", "zemin kaplama", "duvar karosu", "seramik modelleri", "seramik fiyatları",
+    "banyo seramik", "mutfak fayans", "3d sanal stüdyo", "seramik bak", "seramik bayi", "istanbul seramik bayi",
+    "ankara seramik bayi", "izmir seramik bayi", "bursa seramik bayi", "antalya seramik bayi", "konya seramik bayi",
 
     // Global English SEO Keywords
     "ceramic tiles", "porcelain tiles", "wall tiles", "floor tiles",
