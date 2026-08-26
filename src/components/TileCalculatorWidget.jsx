@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Calculator, ArrowRight, ShieldCheck, Bath, Utensils, Sofa, Home, ChevronDown, Check, Info } from 'lucide-react';
+import { Calculator, ArrowRight, ShieldCheck, Bath, Utensils, Sofa, Home, ChevronDown, Check } from 'lucide-react';
 import { useLanguage } from '@/lib/languageContext';
 
 export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }) {
@@ -57,9 +57,9 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
 
   // 2. Döşeme düzenine göre fire (wastage) ve işçilik zorluk çarpanı
   const layingConfigMap = {
-    'duz': { wastage: 8, laborMultiplier: 1.0, label: 'Düz (%8 Fire)' },
-    'capraz': { wastage: 12, laborMultiplier: 1.15, label: 'Çapraz (%12 Fire)' },
-    'baliksirti': { wastage: 15, laborMultiplier: 1.25, label: 'Balıksırtı (%15 Fire)' }
+    'duz': { wastage: 8, laborMultiplier: 1.0, label: 'Düz (%8)' },
+    'capraz': { wastage: 12, laborMultiplier: 1.15, label: 'Çapraz (%12)' },
+    'baliksirti': { wastage: 15, laborMultiplier: 1.25, label: 'Balıksırtı (%15)' }
   };
 
   // 3. Dokuya göre baz m² malzeme fiyat aralığı (TL / m²)
@@ -101,22 +101,20 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
   const actualPurchasedM2 = Math.round((requiredBoxes * sizeConfig.coverage) * 10) / 10;
 
   // Yan Malzeme (Harç & Derz)
-  // 1 Çuval 25kg Esnek Harç = 5 m² (280 ₺/çuval)
   const adhesiveBags = Math.ceil(totalM2WithWastage / 5);
   const adhesiveCost = adhesiveBags * 280;
 
-  // 1 Pak 5kg Silikonlu Derz = 15 m² (180 ₺/paket)
   const groutPacks = Math.ceil(totalM2WithWastage / 15);
   const groutCost = groutPacks * 180;
 
-  // Banyo & Teras için Su İzolasyonu & Takoz Seti ilavesi
+  // Banyo & Teras İzolasyon İlavesi
   const extraMaterialCost = (roomType === 'banyo' || roomType === 'teras') ? Math.round(areaM2 * 55) : 0;
 
   // Ebat ve Döşeme Zorluğuna Göre Dinamik Usta İşçilik Fiyatı (₺ / m²)
   const dynamicLaborRatePerM2 = Math.round(sizeConfig.baseLaborRate * layingConfig.laborMultiplier);
   const laborCost = includeLabor ? Math.round(totalM2WithWastage * dynamicLaborRatePerM2) : 0;
 
-  // Seramik Malzeme Bütçesi (Ebat çarpanı etkili)
+  // Seramik Malzeme Bütçesi
   const tileCostMin = Math.round(actualPurchasedM2 * styleConfig.min * sizeConfig.priceMultiplier);
   const tileCostMax = Math.round(actualPurchasedM2 * styleConfig.max * sizeConfig.priceMultiplier);
 
@@ -168,7 +166,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         <div className="tile-calc-badges">
           <div className="badge-gold">
             <Calculator size={13} />
-            <span>AKILLI MALİYET ROBOTU</span>
+            <span>MALİYET & METRAJ ROBOTU</span>
           </div>
           <div className="badge-trust">
             <ShieldCheck size={14} style={{ color: '#38bdf8' }} />
@@ -265,9 +263,10 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
             </div>
           </div>
 
-          {/* Döşeme Düzeni & Usta İşçiliği Seçiçileri */}
-          <div className="extra-controls-container">
-            <div className="laying-style-selector">
+          {/* Symmetrical & Uniform Bottom Grid (Nizami Hizalı) */}
+          <div className="extra-controls-grid">
+            {/* Döşeme Düzeni */}
+            <div className="extra-control-col">
               <label className="select-label">DÖŞEME DÜZENİ</label>
               <div className="laying-pills">
                 {Object.keys(layingConfigMap).map((key) => (
@@ -283,22 +282,21 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
               </div>
             </div>
 
-            <div className="labor-toggle-card">
-              <label 
-                className={`labor-toggle-row ${includeLabor ? 'active' : ''}`}
+            {/* Usta İşçiliği */}
+            <div className="extra-control-col">
+              <label className="select-label">USTA İŞÇİLİĞİ</label>
+              <button
+                type="button"
                 onClick={() => setIncludeLabor(!includeLabor)}
+                className={`labor-toggle-btn ${includeLabor ? 'active' : ''}`}
               >
                 <div className={`checkbox-custom ${includeLabor ? 'checked' : ''}`}>
-                  {includeLabor && <Check size={12} strokeWidth={3} />}
+                  {includeLabor && <Check size={11} strokeWidth={3.5} />}
                 </div>
-                <div className="labor-text-wrapper">
-                  <span className="labor-title">Usta İşçiliği Dahil Et</span>
-                  <span className="labor-sub">
-                    {tileSize === '120x240' ? 'Mega Plaka Özel İşçilik' : 
-                     tileSize === '60x120' ? 'Büyük Ebat İşçilik' : 'Standart İşçilik'}: ~{dynamicLaborRatePerM2} ₺/m²
-                  </span>
-                </div>
-              </label>
+                <span>
+                  {includeLabor ? `Usta Dahil (+${dynamicLaborRatePerM2} ₺/m²)` : `Usta İşçiliği Ekle (~${dynamicLaborRatePerM2} ₺/m²)`}
+                </span>
+              </button>
             </div>
           </div>
 
@@ -329,7 +327,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
                 ₺{totalMinCost.toLocaleString('tr-TR')} – ₺{totalMaxCost.toLocaleString('tr-TR')}
               </span>
               <span className="budget-breakdown-info">
-                *Seramik + Harç/Derz {includeLabor ? `+ Usta (${dynamicLaborRatePerM2} ₺/m²)` : ''} dahil maliyettir.
+                *Seramik + Harç/Derz {includeLabor ? `+ Usta (${dynamicLaborRatePerM2} ₺/m²)` : ''} maliyetidir.
               </span>
             </div>
           </div>
@@ -558,31 +556,39 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           color: #94a3b8;
         }
 
-        .extra-controls-container {
+        /* Perfectly Symmetrical & Uniform Extra Controls Grid */
+        .extra-controls-grid {
           display: grid;
-          grid-template-columns: 1.1fr 0.9fr;
+          grid-template-columns: 1.15fr 0.85fr;
           gap: 10px;
-          align-items: flex-end;
-          background: rgba(255, 255, 255, 0.02);
-          padding: 10px;
-          border-radius: 12px;
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          align-items: flex-start;
+          padding-top: 4px;
+        }
+
+        .extra-control-col {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
         }
 
         .laying-pills {
-          display: flex;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
           gap: 4px;
-          margin-top: 4px;
+          height: 38px;
         }
 
         .pill-btn {
-          flex: 1;
-          padding: 5px 3px;
-          border-radius: 6px;
+          height: 38px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 4px;
+          border-radius: 9px;
           border: 1px solid rgba(255, 255, 255, 0.08);
           background: rgba(255, 255, 255, 0.03);
           color: #94a3b8;
-          font-size: 0.65rem;
+          font-size: 0.68rem;
           font-weight: 700;
           cursor: pointer;
           transition: all 0.2s ease;
@@ -596,32 +602,45 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         }
 
         .pill-btn.active {
-          background: rgba(56, 189, 248, 0.15);
+          background: rgba(56, 189, 248, 0.14);
           border-color: rgba(56, 189, 248, 0.4);
           color: #38bdf8;
         }
 
-        .labor-toggle-row {
+        .labor-toggle-btn {
+          height: 38px;
+          width: 100%;
           display: flex;
           align-items: center;
+          justify-content: center;
           gap: 8px;
-          padding: 6px 8px;
-          background: rgba(255, 255, 255, 0.04);
+          padding: 0 10px;
+          border-radius: 9px;
           border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 8px;
+          background: rgba(255, 255, 255, 0.03);
+          color: #94a3b8;
+          font-size: 0.72rem;
+          font-weight: 700;
           cursor: pointer;
-          user-select: none;
           transition: all 0.2s ease;
+          user-select: none;
+          white-space: nowrap;
         }
 
-        .labor-toggle-row.active {
-          background: rgba(16, 185, 129, 0.12);
-          border-color: rgba(16, 185, 129, 0.4);
+        .labor-toggle-btn:hover {
+          background: rgba(255, 255, 255, 0.08);
+          color: #e2e8f0;
+        }
+
+        .labor-toggle-btn.active {
+          background: rgba(16, 185, 129, 0.14);
+          border-color: rgba(16, 185, 129, 0.45);
+          color: #34d399;
         }
 
         .checkbox-custom {
-          width: 16px;
-          height: 16px;
+          width: 15px;
+          height: 15px;
           border-radius: 4px;
           border: 1.5px solid #64748b;
           display: flex;
@@ -634,24 +653,6 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         .checkbox-custom.checked {
           background: #10b981;
           border-color: #10b981;
-        }
-
-        .labor-text-wrapper {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .labor-title {
-          font-size: 0.7rem;
-          font-weight: 800;
-          color: #f1f5f9;
-          line-height: 1.2;
-        }
-
-        .labor-sub {
-          font-size: 0.6rem;
-          color: #94a3b8;
-          line-height: 1.2;
         }
 
         .tile-calc-results {
@@ -786,9 +787,17 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
             gap: 12px;
           }
 
-          .dropdowns-row, .extra-controls-container {
+          .dropdowns-row, .extra-controls-grid {
             grid-template-columns: 1fr;
             gap: 8px;
+          }
+
+          .laying-pills {
+            height: auto;
+          }
+
+          .pill-btn, .labor-toggle-btn {
+            height: 36px;
           }
         }
       `}</style>
