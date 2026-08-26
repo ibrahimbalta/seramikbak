@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { sendLeadNotification } from '@/lib/email';
 
 export async function POST(request) {
   try {
@@ -66,6 +67,19 @@ export async function POST(request) {
         brandId: product.brandId,
         city: dealer.city || 'İstanbul'
       }
+    });
+
+    // Send email notification to seramikbak@gmail.com and dealer
+    sendLeadNotification({
+      name: clientName,
+      phone: clientPhone,
+      city: dealer.city,
+      notes: notes || '',
+      dealerName: dealer.name,
+      dealerEmail: dealer.email,
+      productName: product.name
+    }).catch(err => {
+      console.error('Lead email notification trigger error:', err);
     });
 
     return NextResponse.json({

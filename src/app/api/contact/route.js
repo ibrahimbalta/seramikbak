@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { sendContactNotification } from '@/lib/email';
 
 export async function POST(req) {
   try {
@@ -22,6 +23,11 @@ export async function POST(req) {
         message,
         status: 'UNREAD'
       }
+    });
+
+    // Send async email notification to seramikbak@gmail.com
+    sendContactNotification({ name, email, phone, subject: subject || 'Genel Destek / Soru', message }).catch(err => {
+      console.error('Contact email notification trigger error:', err);
     });
 
     return NextResponse.json({

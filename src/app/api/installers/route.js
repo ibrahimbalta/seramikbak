@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { sendInstallerNotification } from '@/lib/email';
 
 export async function GET(request) {
   try {
@@ -86,6 +87,17 @@ export async function POST(request) {
         reviewCount: 1,
         status: 'ACTIVE'
       }
+    });
+
+    // Send email notification to seramikbak@gmail.com
+    sendInstallerNotification({
+      name: name.trim(),
+      phone: cleanPhone,
+      city: city.trim(),
+      experienceYears: experienceYears || 10,
+      specialties: specialties || 'Seramik Döşeme'
+    }).catch(err => {
+      console.error('Installer email notification trigger error:', err);
     });
 
     return NextResponse.json({

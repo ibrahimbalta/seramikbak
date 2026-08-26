@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { sendProjectDemandNotification } from '@/lib/email';
 
 export async function POST(request) {
   try {
@@ -80,6 +81,20 @@ export async function POST(request) {
         notes: notes || '',
         status: 'PENDING'
       }
+    });
+
+    // Send email notification to seramikbak@gmail.com
+    sendProjectDemandNotification({
+      companyName,
+      contactName,
+      contactPhone,
+      contactEmail,
+      projectName,
+      city,
+      quantityM2: m2Int,
+      budgetM2
+    }).catch(err => {
+      console.error('Project demand email notification trigger error:', err);
     });
 
     return NextResponse.json({
