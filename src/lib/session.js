@@ -1,10 +1,14 @@
 import crypto from 'crypto';
 
+if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+  console.warn('⚠️ GÜVENLİK UYARISI: SESSION_SECRET ortam değişkeni tanımlı değil! Üretim ortamında .env dosyasına rastgele güçlü bir SESSION_SECRET ekleyiniz.');
+}
+
 const SECRET = process.env.SESSION_SECRET || 'seramikbak_super_secret_session_key_32_chars';
 const ALGORITHM = 'aes-256-cbc';
 
-// Generate key deterministically from secret
-const KEY = crypto.scryptSync(SECRET, 'salt-session-key', 32);
+// Generate 32-byte key deterministically from secret using SHA-256
+const KEY = crypto.createHash('sha256').update(SECRET).digest();
 
 /**
  * Encrypts a JSON payload into a secure hex token.

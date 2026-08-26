@@ -12,7 +12,7 @@ model Brand {
   name      String        @unique
   logoUrl   String?
   username  String?       @unique
-  password  String        @default("marka123")
+  password  String
   products  Product[]
   dealers   Dealer[]
   campaigns AdCampaign[]
@@ -85,7 +85,7 @@ model Dealer {
   brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
   phone     String
   email     String?
-  password  String   @default("bayi123")
+  password  String
   status    String   @default("APPROVED") // PENDING_APPROVAL, APPROVED, REJECTED
   address   String
   city      String   // e.g., "İstanbul"

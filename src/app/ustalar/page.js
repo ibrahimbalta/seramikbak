@@ -55,6 +55,7 @@ export default function InstallersDirectoryPage() {
   const [regSpecialties, setRegSpecialties] = useState('');
   const [regContractRate, setRegContractRate] = useState('280 ₺/m²');
   const [regNotes, setRegNotes] = useState('');
+  const [regKvkkAccepted, setRegKvkkAccepted] = useState(false);
   const [regLoading, setRegLoading] = useState(false);
   const [regSuccess, setRegSuccess] = useState('');
   const [regError, setRegError] = useState('');
@@ -162,6 +163,12 @@ export default function InstallersDirectoryPage() {
     e.preventDefault();
     setRegError('');
     setRegSuccess('');
+
+    if (!regKvkkAccepted) {
+      setRegError('Lütfen KVKK Aydınlatma Metni\'ni okuyup onaylayınız.');
+      return;
+    }
+
     setRegLoading(true);
 
     try {
@@ -1254,6 +1261,20 @@ export default function InstallersDirectoryPage() {
                     onChange={(e) => setRegNotes(e.target.value)}
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.82rem', boxSizing: 'border-box' }}
                   />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginTop: '6px', marginBottom: '6px' }}>
+                  <input 
+                    type="checkbox" 
+                    id="installer-kvkk-check" 
+                    checked={regKvkkAccepted} 
+                    onChange={(e) => setRegKvkkAccepted(e.target.checked)} 
+                    required
+                    style={{ marginTop: '3px', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="installer-kvkk-check" style={{ fontSize: '0.76rem', color: '#cbd5e1', lineHeight: '1.4', cursor: 'pointer', userSelect: 'none' }}>
+                    Kişisel verilerimin işlenmesine ilişkin <Link href="/yasal?tab=kvkk" target="_blank" style={{ color: '#d4af37', fontWeight: '600', textDecoration: 'underline' }}>KVKK Aydınlatma Metni'ni</Link> okudum ve kabul ediyorum.
+                  </label>
                 </div>
 
                 <button

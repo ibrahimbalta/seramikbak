@@ -184,6 +184,7 @@ export const viewport = {
 };
 
 import { LanguageProvider } from "@/lib/languageContext";
+import CookieBanner from "@/components/CookieBanner";
 
 export default function RootLayout({ children }) {
   return (
@@ -232,6 +233,7 @@ export default function RootLayout({ children }) {
       <body>
         <LanguageProvider>
           {children}
+          <CookieBanner />
         </LanguageProvider>
       </body>
     </html>
