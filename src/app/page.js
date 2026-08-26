@@ -3828,10 +3828,11 @@ export default function Home() {
                     )}
                     
                     {/* Inline Image Upload (Görsel Arama) */}
-                    <div className="search-camera-trigger" title="Görsel ile Arama Yap (CLIP)">
+                    <div className="search-camera-trigger" title="Görsel ile Arama Yap (Seramik Shazam)">
                       <ImageIcon size={20} className="camera-trigger-icon" />
                       <input 
                         type="file" 
+                        id="hero-visual-search-input"
                         accept="image/*" 
                         onChange={handleVisualSearch} 
                         className="invisible-file-upload-input"
@@ -3914,6 +3915,9 @@ export default function Home() {
                 {/* Popular Searches */}
                 <div className="hero-popular-tags">
                   <span className="pop-tags-label">Popüler Aramalar:</span>
+                  <label htmlFor="hero-visual-search-input" className="pop-tag-capsule" style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(179,142,71,0.35) 100%)', border: '1px solid rgba(212,175,55,0.6)', color: '#d4af37', fontWeight: '800', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                    📸 Fotoğraf Yükle (AI Shazam)
+                  </label>
                   <button onClick={() => handleTagClick('Mermer', 'style', 'Mermer')} className="pop-tag-capsule">60x120 Mermer</button>
                   <button onClick={() => handleTagClick('Calacatta Gold', 'style', 'Mermer')} className="pop-tag-capsule">Calacatta Gold</button>
                   <button onClick={() => handleTagClick('Ahşap', 'style', 'Ahşap')} className="pop-tag-capsule">Mat Ahşap</button>
@@ -3932,10 +3936,10 @@ export default function Home() {
                     <Activity size={16} />
                     <span>150+ Marka</span>
                   </div>
-                  <div className="feature-stat-capsule">
-                    <ImageIcon size={16} />
-                    <span>Görsel Arama ile Keşfet</span>
-                  </div>
+                  <label htmlFor="hero-visual-search-input" className="feature-stat-capsule" style={{ cursor: 'pointer', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.5)' }}>
+                    <ImageIcon size={16} style={{ color: '#d4af37' }} />
+                    <span style={{ color: '#d4af37', fontWeight: '700' }}>📸 AI Seramik Shazam'ı (Görsel Arama)</span>
+                  </label>
                   <div className="feature-stat-capsule">
                     <Sparkles size={16} />
                     <span>3D Sanal Deneyim</span>
