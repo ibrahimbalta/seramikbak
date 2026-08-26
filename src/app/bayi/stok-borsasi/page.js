@@ -35,6 +35,29 @@ export default function DealerStockExchangePage() {
   const [selectedCity, setSelectedCity] = useState('Tüm İller');
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Dealer Session Lock Check
+  const [isDealerLoggedIn, setIsDealerLoggedIn] = useState(false);
+  const [dealerSession, setDealerSession] = useState(null);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('sb_dealer_session');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.id) {
+          setIsDealerLoggedIn(true);
+          setDealerSession(parsed);
+          setFormContactName(parsed.name || '');
+          setFormContactPhone(parsed.phone || '');
+          setFormCity(parsed.city || 'İstanbul');
+          setFormDistrict(parsed.district || '');
+        }
+      }
+    } catch (e) {
+      console.warn('Dealer session parse error:', e);
+    }
+  }, []);
+
   // New Offer Modal State
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [formType, setFormType] = useState('NEED_STOCK');
@@ -147,6 +170,88 @@ export default function DealerStockExchangePage() {
 
   const needCount = offers.filter(o => o.type === 'NEED_STOCK').length;
   const haveCount = offers.filter(o => o.type === 'HAVE_STOCK').length;
+
+  if (!isDealerLoggedIn) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #090d16 0%, #0f172a 100%)',
+        color: '#ffffff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px',
+        fontFamily: 'Outfit, sans-serif'
+      }}>
+        <div style={{
+          background: 'rgba(15, 23, 42, 0.9)',
+          border: '1px solid rgba(212, 175, 55, 0.3)',
+          borderRadius: '24px',
+          padding: '40px 32px',
+          maxWidth: '520px',
+          textAlign: 'center',
+          boxShadow: '0 25px 50px rgba(0,0,0,0.5)'
+        }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '20px',
+            background: 'rgba(212, 175, 55, 0.15)',
+            border: '1px solid rgba(212, 175, 55, 0.4)',
+            color: '#d4af37',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px auto'
+          }}>
+            <Building2 size={32} />
+          </div>
+
+          <h2 style={{ fontSize: '1.6rem', fontWeight: '900', margin: '0 0 12px 0', color: '#fff' }}>
+            🔒 Sadece Yetkili Seramik Bayilerine Özeldir
+          </h2>
+          <p style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 24px 0' }}>
+            Bayiler Arası Stok Borsa & Takas Ağı, ticari mahremiyet ve bayi güvenliği gereğince sadece doğrulanmış yetkili bayi girişine açıktır.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <Link
+              href="/bayi"
+              style={{
+                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                color: '#000',
+                padding: '14px',
+                borderRadius: '12px',
+                fontWeight: '900',
+                fontSize: '0.92rem',
+                textDecoration: 'none',
+                display: 'block'
+              }}
+            >
+              🔑 Bayi Girişi Yap
+            </Link>
+
+            <Link
+              href="/bayi"
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: '#fff',
+                padding: '14px',
+                borderRadius: '12px',
+                fontWeight: '700',
+                fontSize: '0.88rem',
+                textDecoration: 'none',
+                display: 'block'
+              }}
+            >
+              📝 Yetkili Bayi Kayıt Başvurusu Yap
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{
