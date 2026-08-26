@@ -59,6 +59,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import WebARModal from '@/components/WebARModal';
 
 // Dynamically import client-only components to prevent Next.js SSR hydration mismatches
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
@@ -1061,6 +1062,14 @@ export default function Home() {
   const [visualSearchLoading, setVisualSearchLoading] = useState(false);
   const [uploadedImagePreview, setUploadedImagePreview] = useState(null);
   const [visualSearchMatches, setVisualSearchMatches] = useState(null);
+
+  // WebAR Camera Modal State
+  const [showWebARModal, setShowWebARModal] = useState(false);
+  const [webarProduct, setWebarProduct] = useState(null);
+  const handleOpenWebAR = (product) => {
+    setWebarProduct(product || null);
+    setShowWebARModal(true);
+  };
 
   // 3D Studio Options
   const [studioTarget, setStudioTarget] = useState('floor'); // floor, walls, accent, shower, showerFloor, toilet, leftWallAccent, stripe
@@ -3940,10 +3949,14 @@ export default function Home() {
                     <ImageIcon size={16} style={{ color: '#d4af37' }} />
                     <span style={{ color: '#d4af37', fontWeight: '700' }}>📸 AI Seramik Shazam'ı (Görsel Arama)</span>
                   </label>
-                  <div className="feature-stat-capsule">
+                  <button 
+                    onClick={() => handleOpenWebAR()} 
+                    className="feature-stat-capsule" 
+                    style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(5,150,105,0.3) 100%)', border: '1px solid rgba(16,185,129,0.6)', color: '#10b981', fontWeight: '800' }}
+                  >
                     <Sparkles size={16} />
-                    <span>3D Sanal Deneyim</span>
-                  </div>
+                    <span>📱 Canlı Kamera Web-AR ile Odanda Gör</span>
+                  </button>
                 </div>
               </div>
 
@@ -14948,6 +14961,13 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* WEB-AR CAMERA FLOOR OVERLAY MODAL */}
+      <WebARModal 
+        isOpen={showWebARModal} 
+        onClose={() => setShowWebARModal(false)} 
+        selectedProduct={webarProduct} 
+      />
     </main>
   );
 }
