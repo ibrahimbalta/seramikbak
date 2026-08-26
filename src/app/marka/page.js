@@ -2365,56 +2365,10 @@ export default function BrandPortalPage() {
                                     {prod.name}
                                   </h4>
 
-                                  {/* Badges */}
                                   <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '10px' }}>
                                     <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.style}</span>
                                     <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.finish} Yüzey</span>
                                     <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.color}</span>
-                                  </div>
-                                </div>
-
-                                {/* Retail Store Price Integrations */}
-                                <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '12px' }}>
-                                  <h5 style={{ fontSize: '0.72rem', fontWeight: '800', color: '#64748b', margin: '0 0 6px 0', textTransform: 'uppercase' }}>Dijital Pazar Yeri Fiyatları</h5>
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    
-                                    {prod.trendyolPrice ? (
-                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                                        <span style={{ color: '#ea580c', fontWeight: '700' }}>Trendyol:</span>
-                                        <strong style={{ color: '#0f172a' }}>₺{prod.trendyolPrice.toLocaleString('tr-TR')} / m²</strong>
-                                      </div>
-                                    ) : (
-                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', opacity: 0.5 }}>
-                                        <span>Trendyol:</span>
-                                        <span>Yok</span>
-                                      </div>
-                                    )}
-
-                                    {prod.koctasPrice ? (
-                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                                        <span style={{ color: '#2563eb', fontWeight: '700' }}>Koçtaş:</span>
-                                        <strong style={{ color: '#0f172a' }}>₺{prod.koctasPrice.toLocaleString('tr-TR')} / m²</strong>
-                                      </div>
-                                    ) : (
-                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', opacity: 0.5 }}>
-                                        <span>Koçtaş:</span>
-                                        <span>Yok</span>
-                                      </div>
-                                    )}
-
-                                    {prod.hepsiburadaPrice && (
-                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                                        <span style={{ color: '#ff6000', fontWeight: '700' }}>Hepsiburada:</span>
-                                        <strong style={{ color: '#0f172a' }}>₺{prod.hepsiburadaPrice.toLocaleString('tr-TR')} / m²</strong>
-                                      </div>
-                                    )}
-
-                                    {prod.yerevdekorPrice && (
-                                      <div style={{ display: 'flex', justifyItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                                        <span style={{ color: '#0d9488', fontWeight: '700' }}>YerEvDekor:</span>
-                                        <strong style={{ color: '#0f172a' }}>₺{prod.yerevdekorPrice.toLocaleString('tr-TR')} / m²</strong>
-                                      </div>
-                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -3022,7 +2976,6 @@ export default function BrandPortalPage() {
                                   <div style={{ fontSize: '0.78rem', fontWeight: '800', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{selectedProd.name}</div>
                                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px', fontSize: '0.68rem', borderTop: '1px solid #f1f5f9', paddingTop: '6px' }}>
                                     <span style={{ background: '#f1f5f9', color: '#475569', padding: '1px 4px', borderRadius: '2px', fontSize: '0.6rem' }}>{selectedProd.width}x{selectedProd.height}</span>
-                                    {selectedProd.trendyolPrice && <strong style={{ color: '#059669' }}>₺{selectedProd.trendyolPrice.toLocaleString('tr-TR')} / m²</strong>}
                                   </div>
                                 </div>
                               </div>
@@ -3579,7 +3532,6 @@ export default function BrandPortalPage() {
                                   if (prod.width && prod.height) setBrandOutletDimensions(`${prod.width}x${prod.height} cm`);
                                   if (prod.style || prod.finish) setBrandOutletColorFinish(`${prod.finish || ''} ${prod.style || ''}`.trim());
                                   if (prod.imageUrl) setBrandOutletImageUrl(prod.imageUrl);
-                                  if (prod.trendyolPrice) setBrandOutletOriginalPrice(prod.trendyolPrice.toString());
                                 }
                               }
                             }}

@@ -116,24 +116,7 @@ function enrichProductData(p) {
   return {
     ...p,
     offers: dealerOffers,
-    cheapestOffer: sortedOffers[0],
-    
-    // Only return real URLs stored in database (no fake search links)
-    trendyolUrl: p.trendyolUrl || null,
-    hepsiburadaUrl: p.hepsiburadaUrl || null,
-    n11Url: p.n11Url || null,
-    koctasUrl: p.koctasUrl || null,
-    bauhausUrl: p.bauhausUrl || null,
-    yerevdekorUrl: p.yerevdekorUrl || null,
-    
-    // Only return real prices stored in database (no fake formula prices)
-    trendyolPrice: (p.trendyolPrice && p.trendyolPrice > 0) ? p.trendyolPrice : null,
-    hepsiburadaPrice: (p.hepsiburadaPrice && p.hepsiburadaPrice > 0) ? p.hepsiburadaPrice : null,
-    hepsiPrice: (p.hepsiburadaPrice && p.hepsiburadaPrice > 0) ? p.hepsiburadaPrice : null,
-    n11Price: (p.n11Price && p.n11Price > 0) ? p.n11Price : null,
-    koctasPrice: (p.koctasPrice && p.koctasPrice > 0) ? p.koctasPrice : null,
-    bauhausPrice: (p.bauhausPrice && p.bauhausPrice > 0) ? p.bauhausPrice : null,
-    yerevdekorPrice: (p.yerevdekorPrice && p.yerevdekorPrice > 0) ? p.yerevdekorPrice : null
+    cheapestOffer: sortedOffers[0]
   };
 }
 
@@ -2447,7 +2430,7 @@ export default function Home() {
     logInteraction('VIEW', product.id, product.brandId);
 
     // Fetch full product details asynchronously to keep the main grid query fast
-    if (product && (product.trendyolUrl === undefined && product.hepsiburadaUrl === undefined)) {
+    if (product && product.code) {
       fetch(`/api/search?q=${product.code}&fullDetail=true`)
         .then(res => res.json())
         .then(data => {
@@ -6304,12 +6287,12 @@ export default function Home() {
                           <strong style={{ color: 'var(--accent-blue-hover)' }}>Bayi Başı 25 TL / Teklif</strong>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px', background: 'rgba(0,0,0,0.01)', borderRadius: '4px' }}>
-                          <span>3. Yapı Market / Trendyol Affiliate:</span>
-                          <strong style={{ color: 'var(--accent-green)' }}>%2-%5 Satış Komisyonu</strong>
+                          <span>3. Sponsorlu Ürün & Podyum İhalesi:</span>
+                          <strong style={{ color: 'var(--accent-green)' }}>Haftalık Sponsorlu Listeleme</strong>
                         </div>
                       </div>
                       <p style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '8px', lineHeight: '1.3' }}>
-                        *SeramikBak stok ve lojistik riski almaz. Müşteriyi online pazaryerlerine veya en yakın fiziksel bayiye yönlendirerek pasif komisyon ve abonelik geliri üretir.
+                        *SeramikBak stok ve lojistik riski almaz. Müşteriyi doğrudan yetkili bayilere ve ustalara yönlendirerek B2B SaaS aboneliği ve sponsorlu reklam geliri üretir.
                       </p>
                     </div>
                   </div>
@@ -6705,211 +6688,7 @@ export default function Home() {
                   )}
                 </div>
 
-                {/* 2. Online Pazaryerleri & Yapı Market Fiyatları */}
-                <div className="channel-box marketplace-prices-box" style={{ 
-                  marginTop: '16px', 
-                  background: 'rgba(15, 23, 42, 0.85)', 
-                  border: '1px solid rgba(245, 158, 11, 0.3)', 
-                  borderRadius: '12px', 
-                  padding: '16px',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                    <h4 className="channel-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <ShoppingBag size={18} style={{ color: '#fbbf24' }} />
-                      <span style={{ color: '#fbbf24', fontSize: '0.92rem', fontWeight: '800', letterSpacing: '0.3px' }}>Pazaryeri & Yapı Market Fiyatları</span>
-                    </h4>
-                    <button 
-                      onClick={() => handleRefreshLivePrices(detailProduct.id)}
-                      disabled={isCrawlingPrice}
-                      style={{
-                        fontSize: '0.72rem',
-                        fontWeight: '700',
-                        padding: '5px 11px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        borderRadius: '6px',
-                        border: '1px solid #f59e0b',
-                        background: 'rgba(245, 158, 11, 0.18)',
-                        color: '#fbbf24',
-                        cursor: isCrawlingPrice ? 'wait' : 'pointer',
-                        transition: 'all 0.2s ease'
-                      }}
-                      title="Canlı Fiyatları Bot İle Güncelle"
-                    >
-                      <RefreshCw size={13} className={isCrawlingPrice ? 'animate-spin' : ''} />
-                      <span>{isCrawlingPrice ? 'Tarayan...' : 'Canlı Fiyat Güncelle'}</span>
-                    </button>
-                  </div>
 
-                  <p className="channel-desc" style={{ marginBottom: '14px', color: '#cbd5e1', fontSize: '0.78rem', lineHeight: '1.4' }}>
-                    Önde gelen online pazaryerleri ve yapı marketlerdeki metrekare satış fiyatları ve doğrudan satıcı mağaza bağlantıları:
-                  </p>
-
-                  {crawlLogMsg && (
-                    <div style={{
-                      padding: '8px 12px',
-                      fontSize: '0.75rem',
-                      fontWeight: '600',
-                      borderRadius: '8px',
-                      marginBottom: '12px',
-                      background: 'rgba(16, 185, 129, 0.2)',
-                      border: '1px solid rgba(16, 185, 129, 0.5)',
-                      color: '#34d399'
-                    }}>
-                      {crawlLogMsg}
-                    </div>
-                  )}
-
-                  <div className="marketplace-prices-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {(() => {
-                      const vendors = [
-                        { name: 'Trendyol', key: 'trendyol', price: detailProduct.trendyolPrice, url: detailProduct.trendyolUrl, color: '#f97316', badge: 'Pazaryeri' },
-                        { name: 'Hepsiburada', key: 'hepsiburada', price: detailProduct.hepsiburadaPrice || detailProduct.hepsiPrice, url: detailProduct.hepsiburadaUrl, color: '#ff6600', badge: 'Pazaryeri' },
-                        { name: 'n11', key: 'n11', price: detailProduct.n11Price, url: detailProduct.n11Url, color: '#ff3b5c', badge: 'Pazaryeri' },
-                        { name: 'YerEvDekor', key: 'yerevdekor', price: detailProduct.yerevdekorPrice, url: detailProduct.yerevdekorUrl, color: '#2dd4bf', badge: 'Yapı Market' },
-                        { name: 'Koçtaş', key: 'koctas', price: detailProduct.koctasPrice, url: detailProduct.koctasUrl, color: '#60a5fa', badge: 'Yapı Market' },
-                        { name: 'Bauhaus', key: 'bauhaus', price: detailProduct.bauhausPrice, url: detailProduct.bauhausUrl, color: '#f87171', badge: 'Yapı Market' }
-                      ];
-
-                      const validPrices = vendors.filter(v => v.price && v.price > 0).map(v => v.price);
-                      const minPrice = validPrices.length > 0 ? Math.min(...validPrices) : null;
-
-                      return vendors.map(v => {
-                        const hasRealPrice = v.price && v.price > 0;
-                        const hasDirectLink = v.url && 
-                          !v.url.includes('/sr?q=') && 
-                          !v.url.includes('/ara?q=') && 
-                          !v.url.includes('/arama?q=') && 
-                          !v.url.includes('/search?q=');
-                        const isLowest = hasRealPrice && minPrice !== null && v.price === minPrice;
-
-                        return (
-                          <div 
-                            key={v.key} 
-                            className="marketplace-row-item"
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '10px 14px',
-                              borderRadius: '8px',
-                              background: isLowest ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                              border: isLowest ? '1px solid #10b981' : '1px solid rgba(255, 255, 255, 0.1)',
-                              opacity: hasRealPrice ? 1 : 0.9,
-                              transition: 'all 0.2s ease',
-                              flexWrap: 'wrap',
-                              gap: '8px 12px'
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                              <span 
-                                style={{ 
-                                  fontWeight: '800', 
-                                  fontSize: '0.85rem', 
-                                  color: v.color,
-                                  minWidth: '80px',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px'
-                                }}
-                              >
-                                {v.name}
-                              </span>
-                              <span style={{ 
-                                fontSize: '0.68rem', 
-                                fontWeight: '600',
-                                padding: '2px 7px', 
-                                borderRadius: '4px', 
-                                background: 'rgba(255, 255, 255, 0.1)', 
-                                color: '#cbd5e1' 
-                              }}>
-                                {v.badge}
-                              </span>
-                              {isLowest && (
-                                <span style={{
-                                  fontSize: '0.68rem',
-                                  fontWeight: '800',
-                                  padding: '2px 8px',
-                                  borderRadius: '4px',
-                                  background: 'rgba(16, 185, 129, 0.3)',
-                                  color: '#34d399',
-                                  border: '1px solid #10b981',
-                                  boxShadow: '0 0 10px rgba(16, 185, 129, 0.2)'
-                                }}>
-                                  🔥 En Uygun Fiyat
-                                </span>
-                              )}
-                            </div>
-
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', justifyContent: 'flex-end', flex: 1, minWidth: '150px' }}>
-                              {hasRealPrice ? (
-                                <>
-                                  <strong style={{ 
-                                    fontSize: isLowest ? '0.98rem' : '0.92rem', 
-                                    fontWeight: '800', 
-                                    color: isLowest ? '#34d399' : '#ffffff',
-                                    textShadow: isLowest ? '0 0 8px rgba(52, 211, 153, 0.3)' : 'none',
-                                    whiteSpace: 'nowrap'
-                                  }}>
-                                    ₺{v.price.toLocaleString('tr-TR')} <span style={{ fontSize: '0.74rem', fontWeight: '400', color: '#cbd5e1' }}>/ m²</span>
-                                  </strong>
-
-                                  {hasDirectLink ? (
-                                    <a 
-                                      href={v.url} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer" 
-                                      style={{
-                                        fontSize: '0.72rem',
-                                        fontWeight: '700',
-                                        padding: '5px 10px',
-                                        borderRadius: '6px',
-                                        border: '1px solid rgba(255, 255, 255, 0.3)',
-                                        background: 'rgba(255, 255, 255, 0.15)',
-                                        color: '#ffffff',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '4px',
-                                        textDecoration: 'none',
-                                        transition: 'all 0.2s ease',
-                                        whiteSpace: 'nowrap'
-                                      }}
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <span>Mağazada Gör</span>
-                                      <ExternalLink size={12} style={{ color: '#ffffff' }} />
-                                    </a>
-                                  ) : (
-                                    <span style={{ fontSize: '0.72rem', color: '#64748b', fontStyle: 'italic', padding: '4px 6px', whiteSpace: 'nowrap' }}>Satışta Değil</span>
-                                  )}
-                                </>
-                              ) : (
-                                <span style={{ 
-                                  fontSize: '0.74rem', 
-                                  fontWeight: '600', 
-                                  color: '#94a3b8', 
-                                  background: 'rgba(255, 255, 255, 0.05)', 
-                                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                                  padding: '5px 12px', 
-                                  borderRadius: '6px',
-                                  whiteSpace: 'nowrap'
-                                }}>
-                                  Ürün Yok
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      });
-                    })()}
-                  </div>
-
-                  <p style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '12px', fontStyle: 'italic', lineHeight: '1.4' }}>
-                    * Fiyatlar online pazaryerleri ve yapı marketlerin canlı katalog verilerinden otomatik çekilir. Stok durumu satıcı firmalara göre değişkenlik gösterebilir.
-                  </p>
-                </div>
 
 
               </div>
@@ -7834,49 +7613,13 @@ export default function Home() {
                   <tbody>
                     {/* Fiyatlar */}
                     <tr className="section-row">
-                      <td colSpan={comparedProducts.length + 1}>Pazar Yeri ve En Düşük Bayi Fiyatları</td>
+                      <td colSpan={comparedProducts.length + 1}>En Düşük Bayi Fiyatları</td>
                     </tr>
                     <tr>
                       <td className="feature-name">En Düşük Bayi Fiyatı</td>
                       {comparedProducts.map(p => (
                         <td key={p.id} className="feature-value highlight-gold">
                           {p.cheapestOffer?.price ? `${p.cheapestOffer.price} TL/m²` : 'Bilinmiyor'}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Trendyol Fiyatı</td>
-                      {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">
-                          {p.trendyolPrice ? (
-                            <a href={p.trendyolUrl} target="_blank" rel="noopener noreferrer" className="marketplace-link trendyol">
-                              {p.trendyolPrice} TL <span className="buy-arrow">↗</span>
-                            </a>
-                          ) : 'Satışta Değil'}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Hepsiburada Fiyatı</td>
-                      {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">
-                          {p.hepsiPrice ? (
-                            <a href={p.hepsiburadaUrl} target="_blank" rel="noopener noreferrer" className="marketplace-link hepsiburada">
-                              {p.hepsiPrice} TL <span className="buy-arrow">↗</span>
-                            </a>
-                          ) : 'Satışta Değil'}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Koçtaş Fiyatı</td>
-                      {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">
-                          {p.koctasPrice ? (
-                            <a href={p.koctasUrl} target="_blank" rel="noopener noreferrer" className="marketplace-link koctas">
-                              {p.koctasPrice} TL <span className="buy-arrow">↗</span>
-                            </a>
-                          ) : 'Satışta Değil'}
                         </td>
                       ))}
                     </tr>

@@ -143,19 +143,7 @@ export async function POST(request) {
       imageExt = 'jpg',
       textureBase64,
       textureExt = 'jpg',
-      isPremium = false,
-      trendyolPrice,
-      trendyolUrl,
-      hepsiburadaPrice,
-      hepsiburadaUrl,
-      n11Price,
-      n11Url,
-      koctasPrice,
-      koctasUrl,
-      bauhausPrice,
-      bauhausUrl,
-      yerevdekorPrice,
-      yerevdekorUrl
+      isPremium = false
     } = body;
 
     // Validation
@@ -210,19 +198,7 @@ export async function POST(request) {
         area: area || 'Yer,Duvar',
         imageUrl,
         textureUrl,
-        isPremium: Boolean(isPremium),
-        trendyolPrice: trendyolPrice ? parseFloat(trendyolPrice) : null,
-        trendyolUrl: trendyolUrl || null,
-        hepsiburadaPrice: hepsiburadaPrice ? parseFloat(hepsiburadaPrice) : null,
-        hepsiburadaUrl: hepsiburadaUrl || null,
-        n11Price: n11Price ? parseFloat(n11Price) : null,
-        n11Url: n11Url || null,
-        koctasPrice: koctasPrice ? parseFloat(koctasPrice) : null,
-        koctasUrl: koctasUrl || null,
-        bauhausPrice: bauhausPrice ? parseFloat(bauhausPrice) : null,
-        bauhausUrl: bauhausUrl || null,
-        yerevdekorPrice: yerevdekorPrice ? parseFloat(yerevdekorPrice) : null,
-        yerevdekorUrl: yerevdekorUrl || null
+        isPremium: Boolean(isPremium)
       }
     });
 
@@ -261,18 +237,6 @@ export async function PUT(request) {
       textureBase64,
       textureExt = 'jpg',
       isPremium,
-      trendyolPrice,
-      trendyolUrl,
-      hepsiburadaPrice,
-      hepsiburadaUrl,
-      n11Price,
-      n11Url,
-      koctasPrice,
-      koctasUrl,
-      bauhausPrice,
-      bauhausUrl,
-      yerevdekorPrice,
-      yerevdekorUrl
     } = body;
 
     if (!id) {
@@ -312,18 +276,6 @@ export async function PUT(request) {
     if (area) updateData.area = area;
     if (isPremium !== undefined) updateData.isPremium = Boolean(isPremium);
 
-    updateData.trendyolPrice = trendyolPrice !== undefined ? (trendyolPrice ? parseFloat(trendyolPrice) : null) : undefined;
-    updateData.trendyolUrl = trendyolUrl !== undefined ? (trendyolUrl || null) : undefined;
-    updateData.hepsiburadaPrice = hepsiburadaPrice !== undefined ? (hepsiburadaPrice ? parseFloat(hepsiburadaPrice) : null) : undefined;
-    updateData.hepsiburadaUrl = hepsiburadaUrl !== undefined ? (hepsiburadaUrl || null) : undefined;
-    updateData.n11Price = n11Price !== undefined ? (n11Price ? parseFloat(n11Price) : null) : undefined;
-    updateData.n11Url = n11Url !== undefined ? (n11Url || null) : undefined;
-    updateData.koctasPrice = koctasPrice !== undefined ? (koctasPrice ? parseFloat(koctasPrice) : null) : undefined;
-    updateData.koctasUrl = koctasUrl !== undefined ? (koctasUrl || null) : undefined;
-    updateData.bauhausPrice = bauhausPrice !== undefined ? (bauhausPrice ? parseFloat(bauhausPrice) : null) : undefined;
-    updateData.bauhausUrl = bauhausUrl !== undefined ? (bauhausUrl || null) : undefined;
-    updateData.yerevdekorPrice = yerevdekorPrice !== undefined ? (yerevdekorPrice ? parseFloat(yerevdekorPrice) : null) : undefined;
-    updateData.yerevdekorUrl = yerevdekorUrl !== undefined ? (yerevdekorUrl || null) : undefined;
 
     // Save custom images if base64 provided
     if (imageBase64) {
