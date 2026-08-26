@@ -109,15 +109,6 @@ export default function ProductCard({
         <h4 className="card-title-new">{product.name}</h4>
         <p className="card-specs-new">{product.width}x{product.height} cm • {translateStyle(product.style) || product.style}</p>
         <p className="card-brand-new">{product.brand?.name}</p>
-
-        {/* Authorized Dealer Offer Badge if available */}
-        {product.cheapestOffer && (
-          <div className="card-marketplace-prices-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '6px', paddingTop: '6px', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
-            <span style={{ fontSize: '0.62rem', fontWeight: '700', padding: '2px 6px', borderRadius: '6px', background: 'rgba(179, 142, 71, 0.12)', color: 'var(--accent-gold)', border: '1px solid var(--border-gold)' }}>
-              Bayi ₺{product.cheapestOffer.price} / m²
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );
