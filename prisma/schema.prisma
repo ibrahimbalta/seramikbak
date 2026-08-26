@@ -96,6 +96,7 @@ model Dealer {
   sampleOrders SampleOrder[]
   saas      DealerSaaSConfig[]
   inventories DealerInventory[]
+  stockExchanges DealerStockExchange[]
   xmlFeedUrl  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -400,5 +401,24 @@ model SampleOrder {
   cargoCompany   String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+model DealerStockExchange {
+  id           String   @id @default(uuid())
+  dealerId     String?
+  dealer       Dealer?  @relation(fields: [dealerId], references: [id], onDelete: SetNull)
+  type         String   // NEED_STOCK (Stok Aranıyor), HAVE_STOCK (Fazla Stok / Takaslık)
+  productName  String
+  brandName    String?
+  quantityM2   Int      @default(10)
+  city         String   @default("İstanbul")
+  district     String?
+  urgent       Boolean  @default(true)
+  notes        String?
+  contactName  String
+  contactPhone String
+  status       String   @default("OPEN") // OPEN, MATCHED, CLOSED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 

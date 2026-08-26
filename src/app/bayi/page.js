@@ -2240,6 +2240,7 @@ export default function DealerPortalPage() {
             <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
+                { id: 'stock-exchange', label: '🤝 Bayi Stok Borsası', icon: <Building2 size={18} /> },
                 { id: 'quick-quote', label: 'PDF Teklif Oluştur', icon: <Calculator size={18} /> },
                 { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
                 { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
@@ -2253,6 +2254,10 @@ export default function DealerPortalPage() {
                   <button
                     key={link.id}
                     onClick={() => {
+                      if (link.id === 'stock-exchange') {
+                        window.location.href = '/bayi/stok-borsasi';
+                        return;
+                      }
                       setActivePortalTab(link.id);
                       if (link.id === 'settings') {
                         setShowSettings(true);
