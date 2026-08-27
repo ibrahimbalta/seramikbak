@@ -18,6 +18,7 @@ import {
   Sparkles, 
   Layers,
   ArrowRight,
+  ArrowLeft,
   Filter,
   Flame,
   ShieldCheck
@@ -271,20 +272,49 @@ export default function DealerStockExchangePage() {
       }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(212, 175, 55, 0.15)',
-            border: '1px solid rgba(212, 175, 55, 0.4)',
-            color: '#d4af37',
-            padding: '6px 16px',
-            borderRadius: '20px',
-            fontWeight: '800',
-            fontSize: '0.82rem',
-            marginBottom: '16px'
+            justifyContent: 'space-between',
+            marginBottom: '20px',
+            flexWrap: 'wrap',
+            gap: '12px'
           }}>
-            <Building2 size={16} />
-            <span>SeramikBak B2B Yetkili Bayi Ağı</span>
+            <Link
+              href="/bayi"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: '#cbd5e1',
+                padding: '8px 16px',
+                borderRadius: '12px',
+                fontWeight: '700',
+                fontSize: '0.85rem',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <ArrowLeft size={16} />
+              <span>Bayi Portalına Dön</span>
+            </Link>
+
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              background: 'rgba(212, 175, 55, 0.15)',
+              border: '1px solid rgba(212, 175, 55, 0.4)',
+              color: '#d4af37',
+              padding: '6px 16px',
+              borderRadius: '20px',
+              fontWeight: '800',
+              fontSize: '0.82rem'
+            }}>
+              <Building2 size={16} />
+              <span>SeramikBak B2B Yetkili Bayi Ağı</span>
+            </div>
           </div>
 
           <h1 style={{ fontSize: '2.2rem', fontWeight: '900', margin: '0 0 12px 0', letterSpacing: '-0.5px' }}>
