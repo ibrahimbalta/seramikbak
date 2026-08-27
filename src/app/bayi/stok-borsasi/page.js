@@ -21,7 +21,13 @@ import {
   ArrowLeft,
   Filter,
   Flame,
-  ShieldCheck
+  ShieldCheck,
+  Pencil,
+  Trash2,
+  CheckCircle,
+  RotateCcw,
+  Star,
+  UserCheck
 } from 'lucide-react';
 
 const TURKEY_CITIES = [
@@ -32,7 +38,7 @@ const TURKEY_CITIES = [
 export default function DealerStockExchangePage() {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTypeTab, setActiveTypeTab] = useState('ALL'); // 'ALL' | 'NEED_STOCK' | 'HAVE_STOCK'
+  const [activeTypeTab, setActiveTypeTab] = useState('ALL'); // 'ALL' | 'NEED_STOCK' | 'HAVE_STOCK' | 'MY_OFFERS'
   const [selectedCity, setSelectedCity] = useState('Tüm İller');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -75,26 +81,63 @@ export default function DealerStockExchangePage() {
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState('');
 
+  // Edit Offer Modal State
+  const [editingOffer, setEditingOffer] = useState(null);
+  const [editFormType, setEditFormType] = useState('NEED_STOCK');
+  const [editFormProductName, setEditFormProductName] = useState('');
+  const [editFormBrandName, setEditFormBrandName] = useState('');
+  const [editFormQuantityM2, setEditFormQuantityM2] = useState('20');
+  const [editFormCity, setEditFormCity] = useState('');
+  const [editFormDistrict, setEditFormDistrict] = useState('');
+  const [editFormUrgent, setEditFormUrgent] = useState(true);
+  const [editFormNotes, setEditFormNotes] = useState('');
+  const [editFormContactName, setEditFormContactName] = useState('');
+  const [editFormContactPhone, setEditFormContactPhone] = useState('');
+  const [editFormStatus, setEditFormStatus] = useState('OPEN');
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  const [editError, setEditError] = useState('');
+  const [editSuccess, setEditSuccess] = useState('');
+
   useEffect(() => {
     fetchStockOffers();
-  }, [activeTypeTab, selectedCity]);
+  }, [activeTypeTab, selectedCity, dealerSession]);
 
   const fetchStockOffers = async () => {
     setLoading(true);
     try {
       let url = `/api/b2b/stock-exchange?type=${activeTypeTab}&city=${encodeURIComponent(selectedCity === 'Tüm İller' ? 'ALL' : selectedCity)}`;
       if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
+      if (activeTypeTab === 'MY_OFFERS' && dealerSession) {
+        url += `&dealerId=${encodeURIComponent(dealerSession.id || '')}&phone=${encodeURIComponent(dealerSession.phone || '')}&status=ALL`;
+      }
       
       const res = await fetch(url);
       const data = await res.json();
       if (data.success) {
-        setOffers(data.offers || []);
+        let list = data.offers || [];
+        if (activeTypeTab === 'MY_OFFERS') {
+          list = list.filter(o => isMyOffer(o));
+        }
+        setOffers(list);
       }
     } catch (err) {
       console.error('Fetch Stock Offers Error:', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const isMyOffer = (offer) => {
+    if (!dealerSession) return false;
+    if (offer.dealerId && offer.dealerId === dealerSession.id) return true;
+    if (dealerSession.phone && offer.contactPhone) {
+      const cleanSessionPhone = dealerSession.phone.replace(/[^\d]/g, '');
+      const cleanOfferPhone = offer.contactPhone.replace(/[^\d]/g, '');
+      if (cleanSessionPhone && cleanOfferPhone && cleanSessionPhone.length >= 7 && cleanOfferPhone.length >= 7) {
+        if (cleanSessionPhone.slice(-7) === cleanOfferPhone.slice(-7)) return true;
+      }
+    }
+    return false;
   };
 
   const handleSearchSubmit = (e) => {
@@ -154,19 +197,101 @@ export default function DealerStockExchangePage() {
     }
   };
 
-  const handleMarkMatched = async (offerId) => {
+  const openEditModal = (offer) => {
+    setEditingOffer(offer);
+    setEditFormType(offer.type || 'NEED_STOCK');
+    setEditFormProductName(offer.productName || '');
+    setEditFormBrandName(offer.brandName || '');
+    setEditFormQuantityM2(String(offer.quantityM2 || 20));
+    setEditFormCity(offer.city || 'İstanbul');
+    setEditFormDistrict(offer.district || '');
+    setEditFormUrgent(Boolean(offer.urgent));
+    setEditFormNotes(offer.notes || '');
+    setEditFormContactName(offer.contactName || '');
+    setEditFormContactPhone(offer.contactPhone || '');
+    setEditFormStatus(offer.status || 'OPEN');
+    setEditError('');
+    setEditSuccess('');
+  };
+
+  const handleUpdateOffer = async (e) => {
+    e.preventDefault();
+    if (!editingOffer) return;
+    setEditSubmitting(true);
+    setEditError('');
+    setEditSuccess('');
+
     try {
       const res = await fetch('/api/b2b/stock-exchange', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: offerId, status: 'MATCHED' })
+        body: JSON.stringify({
+          id: editingOffer.id,
+          type: editFormType,
+          productName: editFormProductName,
+          brandName: editFormBrandName,
+          quantityM2: parseInt(editFormQuantityM2, 10) || 10,
+          city: editFormCity,
+          district: editFormDistrict,
+          urgent: editFormUrgent,
+          notes: editFormNotes,
+          contactName: editFormContactName,
+          contactPhone: editFormContactPhone,
+          status: editFormStatus
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setEditSuccess('İlanınız başarıyla güncellendi!');
+        setTimeout(() => {
+          setEditingOffer(null);
+          setEditSuccess('');
+          fetchStockOffers();
+        }, 1000);
+      } else {
+        setEditError(data.error || 'İlan güncellenemedi.');
+      }
+    } catch (err) {
+      console.error('Update Stock Offer Error:', err);
+      setEditError('Bir sunucu hatası oluştu.');
+    } finally {
+      setEditSubmitting(false);
+    }
+  };
+
+  const handleDeleteOffer = async (offerId) => {
+    if (!window.confirm('Bu ilanı silmek istediğinizden emin misiniz?')) return;
+    try {
+      const res = await fetch(`/api/b2b/stock-exchange?id=${offerId}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchStockOffers();
+      } else {
+        alert(data.error || 'İlan silinemedi.');
+      }
+    } catch (err) {
+      console.error('Delete Stock Offer Error:', err);
+      alert('İlan silinirken hata oluştu.');
+    }
+  };
+
+  const handleToggleStatus = async (offerId, currentStatus) => {
+    const nextStatus = currentStatus === 'OPEN' ? 'MATCHED' : 'OPEN';
+    try {
+      const res = await fetch('/api/b2b/stock-exchange', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: offerId, status: nextStatus })
       });
       const data = await res.json();
       if (data.success) {
         fetchStockOffers();
       }
     } catch (err) {
-      console.error('Update status error:', err);
+      console.error('Toggle status error:', err);
     }
   };
 
@@ -380,11 +505,12 @@ export default function DealerStockExchangePage() {
           marginBottom: '24px'
         }}>
           {/* Type Tabs */}
-          <div style={{ display: 'flex', gap: '8px', background: 'rgba(15, 23, 42, 0.8)', padding: '4px', borderRadius: '12px' }}>
+          <div style={{ display: 'flex', gap: '8px', background: 'rgba(15, 23, 42, 0.8)', padding: '4px', borderRadius: '12px', flexWrap: 'wrap' }}>
             {[
               { id: 'ALL', label: 'Tüm İlanlar' },
               { id: 'NEED_STOCK', label: '🚨 Stok Aranıyor' },
-              { id: 'HAVE_STOCK', label: '📦 Takaslık Mal Var' }
+              { id: 'HAVE_STOCK', label: '📦 Takaslık Mal Var' },
+              { id: 'MY_OFFERS', label: '📌 Benim İlanlarım' }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -457,11 +583,47 @@ export default function DealerStockExchangePage() {
           </div>
         )}
 
+        {/* Empty State for My Offers */}
+        {!loading && activeTypeTab === 'MY_OFFERS' && offers.length === 0 && (
+          <div style={{
+            background: 'rgba(30, 41, 59, 0.4)',
+            border: '1px dashed rgba(212, 175, 55, 0.3)',
+            borderRadius: '20px',
+            padding: '40px',
+            textAlign: 'center',
+            color: '#cbd5e1'
+          }}>
+            <p style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 8px 0', color: '#fff' }}>
+              Henüz verilmiş aktif stok/takas ilanınız bulunmuyor.
+            </p>
+            <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: '0 0 20px 0' }}>
+              Elinizdeki fazla stokları veya acil aradığınız seramik ihtiyaçlarınızı diğer bayilerle paylaşın.
+            </p>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              style={{
+                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                color: '#000',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '12px',
+                fontWeight: '900',
+                fontSize: '0.85rem',
+                cursor: 'pointer'
+              }}
+            >
+              + İlk İlanınızı Ekleyin
+            </button>
+          </div>
+        )}
+
         {/* Offers Grid */}
-        {!loading && (
+        {!loading && offers.length > 0 && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))', gap: '20px' }}>
             {offers.map(offer => {
               const isNeed = offer.type === 'NEED_STOCK';
+              const mine = isMyOffer(offer);
+              const isMatched = offer.status === 'MATCHED';
               const cleanPhone = (offer.contactPhone || '').replace(/[^\d]/g, '');
               const waText = encodeURIComponent(`Merhaba ${offer.contactName}, SeramikBak B2B Stok Borsası'ndaki "${offer.productName}" ilanınız için ulaşıyorum.`);
               const waUrl = `https://wa.me/90${cleanPhone.slice(-10)}?text=${waText}`;
@@ -470,8 +632,10 @@ export default function DealerStockExchangePage() {
                 <div
                   key={offer.id}
                   style={{
-                    background: 'rgba(30, 41, 59, 0.7)',
-                    border: isNeed ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(16, 185, 129, 0.4)',
+                    background: isMatched ? 'rgba(15, 23, 42, 0.85)' : 'rgba(30, 41, 59, 0.7)',
+                    border: mine 
+                      ? '2px solid rgba(212, 175, 55, 0.6)' 
+                      : (isNeed ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(16, 185, 129, 0.4)'),
                     borderRadius: '20px',
                     padding: '20px',
                     display: 'flex',
@@ -479,28 +643,52 @@ export default function DealerStockExchangePage() {
                     justifyContent: 'space-between',
                     position: 'relative',
                     backdropFilter: 'blur(8px)',
+                    opacity: isMatched ? 0.75 : 1,
                     transition: 'transform 0.2s ease',
-                    boxShadow: isNeed ? '0 8px 24px rgba(239,68,68,0.1)' : '0 8px 24px rgba(16,185,129,0.1)'
+                    boxShadow: mine ? '0 8px 24px rgba(212,175,55,0.2)' : (isNeed ? '0 8px 24px rgba(239,68,68,0.1)' : '0 8px 24px rgba(16,185,129,0.1)')
                   }}
                 >
                   <div>
-                    {/* Header Badge */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <span style={{
-                        padding: '4px 10px',
-                        borderRadius: '8px',
-                        fontSize: '0.72rem',
-                        fontWeight: '900',
-                        background: isNeed ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                        color: isNeed ? '#f87171' : '#34d399',
-                        border: isNeed ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(16,185,129,0.4)'
-                      }}>
-                        {isNeed ? '🚨 STOK ARANACAK (EKSİK HASSAS)' : '📦 FAZLA STOK / TAKASLIK'}
-                      </span>
+                    {/* Header Badges */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '6px' }}>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        <span style={{
+                          padding: '4px 10px',
+                          borderRadius: '8px',
+                          fontSize: '0.72rem',
+                          fontWeight: '900',
+                          background: isNeed ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                          color: isNeed ? '#f87171' : '#34d399',
+                          border: isNeed ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(16,185,129,0.4)'
+                        }}>
+                          {isNeed ? '🚨 STOK ARANIYOR' : '📦 TAKASLIK MAL'}
+                        </span>
 
-                      {offer.urgent && (
+                        {mine && (
+                          <span style={{
+                            padding: '4px 8px',
+                            borderRadius: '8px',
+                            fontSize: '0.7rem',
+                            fontWeight: '900',
+                            background: 'rgba(212, 175, 55, 0.25)',
+                            color: '#fef08a',
+                            border: '1px solid rgba(212,175,55,0.5)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            <Star size={12} fill="#fef08a" /> Sizin İlanınız
+                          </span>
+                        )}
+                      </div>
+
+                      {isMatched ? (
+                        <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '800', background: 'rgba(148, 163, 184, 0.2)', padding: '2px 8px', borderRadius: '6px' }}>
+                          ✅ Eşleşti / Tamamlandı
+                        </span>
+                      ) : offer.urgent && (
                         <span style={{ fontSize: '0.7rem', color: '#fef08a', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                          ⚡ 24 Saat İçi Acil
+                          ⚡ Acil
                         </span>
                       )}
                     </div>
@@ -542,10 +730,80 @@ export default function DealerStockExchangePage() {
                     )}
                   </div>
 
-                  {/* Footer Action Buttons */}
+                  {/* Action Bar */}
                   <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px', marginTop: '10px' }}>
-                    <div style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700', marginBottom: '10px' }}>
-                      👤 {offer.contactName}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <div style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700' }}>
+                        👤 {offer.contactName}
+                      </div>
+
+                      {/* Owner Management Buttons */}
+                      {mine && (
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button
+                            onClick={() => openEditModal(offer)}
+                            title="İlanı Düzenle"
+                            style={{
+                              background: 'rgba(212, 175, 55, 0.2)',
+                              border: '1px solid rgba(212, 175, 55, 0.4)',
+                              color: '#d4af37',
+                              padding: '4px 8px',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontSize: '0.72rem',
+                              fontWeight: '700'
+                            }}
+                          >
+                            <Pencil size={13} />
+                            <span>Düzenle</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleToggleStatus(offer.id, offer.status)}
+                            title={isMatched ? "Yeniden Yayına Al" : "Çözüldü Olarak İşaretle"}
+                            style={{
+                              background: isMatched ? 'rgba(59, 130, 246, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                              border: isMatched ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid rgba(16, 185, 129, 0.4)',
+                              color: isMatched ? '#60a5fa' : '#34d399',
+                              padding: '4px 8px',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontSize: '0.72rem',
+                              fontWeight: '700'
+                            }}
+                          >
+                            {isMatched ? <RotateCcw size={13} /> : <CheckCircle size={13} />}
+                            <span>{isMatched ? 'Aç' : 'Kapat'}</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleDeleteOffer(offer.id)}
+                            title="İlanı Sil"
+                            style={{
+                              background: 'rgba(239, 68, 68, 0.2)',
+                              border: '1px solid rgba(239, 68, 68, 0.4)',
+                              color: '#f87171',
+                              padding: '4px 8px',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontSize: '0.72rem',
+                              fontWeight: '700'
+                            }}
+                          >
+                            <Trash2 size={13} />
+                            <span>Sil</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
@@ -797,6 +1055,221 @@ export default function DealerStockExchangePage() {
                 }}
               >
                 {submitting ? 'Yayınlanıyor...' : '🚀 B2B İlanı Yayınla'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Offer Modal */}
+      {editingOffer && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.8)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#0f172a',
+            border: '1px solid rgba(212, 175, 55, 0.4)',
+            borderRadius: '24px',
+            width: '100%',
+            maxWidth: '560px',
+            padding: '28px',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '900', color: '#fff' }}>
+                ✏️ İlanınızı Düzenleyin
+              </h3>
+              <button onClick={() => setEditingOffer(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {editError && (
+              <div style={{ background: 'rgba(239,68,68,0.2)', border: '1px solid #ef4444', color: '#f87171', padding: '10px', borderRadius: '10px', fontSize: '0.82rem', marginBottom: '14px' }}>
+                ⚠️ {editError}
+              </div>
+            )}
+
+            {editSuccess && (
+              <div style={{ background: 'rgba(16,185,129,0.2)', border: '1px solid #10b981', color: '#34d399', padding: '10px', borderRadius: '10px', fontSize: '0.82rem', marginBottom: '14px' }}>
+                ✅ {editSuccess}
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateOffer} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {/* Type Switcher */}
+              <div>
+                <label style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700', display: 'block', marginBottom: '6px' }}>İlan Tipi *</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setEditFormType('NEED_STOCK')}
+                    style={{
+                      padding: '12px',
+                      borderRadius: '12px',
+                      border: editFormType === 'NEED_STOCK' ? '2px solid #ef4444' : '1px solid rgba(255,255,255,0.1)',
+                      background: editFormType === 'NEED_STOCK' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(30, 41, 59, 0.6)',
+                      color: editFormType === 'NEED_STOCK' ? '#f87171' : '#cbd5e1',
+                      fontWeight: '800',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🚨 Acil Stok Aranıyor (Eksik)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditFormType('HAVE_STOCK')}
+                    style={{
+                      padding: '12px',
+                      borderRadius: '12px',
+                      border: editFormType === 'HAVE_STOCK' ? '2px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
+                      background: editFormType === 'HAVE_STOCK' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(30, 41, 59, 0.6)',
+                      color: editFormType === 'HAVE_STOCK' ? '#34d399' : '#cbd5e1',
+                      fontWeight: '800',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    📦 Fazla / Takaslık Mal Var
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700', display: 'block', marginBottom: '4px' }}>Seramik / Karo Adı ve Ebadı *</label>
+                <input
+                  type="text"
+                  placeholder="Örn: Calacatta Gold 60x120 Rektifiyeli Porselen"
+                  value={editFormProductName}
+                  onChange={(e) => setEditFormProductName(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700', display: 'block', marginBottom: '4px' }}>Seramik Markası</label>
+                  <input
+                    type="text"
+                    placeholder="Örn: NG Kütahya / Vitra"
+                    value={editFormBrandName}
+                    onChange={(e) => setEditFormBrandName(e.target.value)}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700', display: 'block', marginBottom: '4px' }}>Miktar (m²)</label>
+                  <input
+                    type="number"
+                    placeholder="20"
+                    value={editFormQuantityM2}
+                    onChange={(e) => setEditFormQuantityM2(e.target.value)}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700', display: 'block', marginBottom: '4px' }}>Şehir *</label>
+                  <input
+                    type="text"
+                    placeholder="Örn: İstanbul"
+                    value={editFormCity}
+                    onChange={(e) => setEditFormCity(e.target.value)}
+                    required
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700', display: 'block', marginBottom: '4px' }}>İlçe</label>
+                  <input
+                    type="text"
+                    placeholder="Örn: Kadıköy"
+                    value={editFormDistrict}
+                    onChange={(e) => setEditFormDistrict(e.target.value)}
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700', display: 'block', marginBottom: '4px' }}>İletişim Kişisi / Bayi *</label>
+                  <input
+                    type="text"
+                    placeholder="Örn: Yıldız Yapı / Mehmet B."
+                    value={editFormContactName}
+                    onChange={(e) => setEditFormContactName(e.target.value)}
+                    required
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700', display: 'block', marginBottom: '4px' }}>Telefon / WhatsApp *</label>
+                  <input
+                    type="tel"
+                    placeholder="Örn: 0532 123 45 67"
+                    value={editFormContactPhone}
+                    onChange={(e) => setEditFormContactPhone(e.target.value)}
+                    required
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700', display: 'block', marginBottom: '4px' }}>İlan Durumu</label>
+                <select
+                  value={editFormStatus}
+                  onChange={(e) => setEditFormStatus(e.target.value)}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.86rem', boxSizing: 'border-box' }}
+                >
+                  <option value="OPEN">🟢 Yayında / Açık</option>
+                  <option value="MATCHED">✅ Eşleşti / Tamamlandı</option>
+                  <option value="CLOSED">🔒 Kapatıldı</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: '700', display: 'block', marginBottom: '4px' }}>Açıklama / İhtiyaç Notu</label>
+                <textarea
+                  rows={2}
+                  placeholder="Müşteri projesi için eksik kaldı, teslim alabiliriz veya depomuzdan verebiliriz..."
+                  value={editFormNotes}
+                  onChange={(e) => setEditFormNotes(e.target.value)}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', background: 'rgba(30, 41, 59, 0.9)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={editSubmitting}
+                style={{
+                  background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                  color: '#000',
+                  border: 'none',
+                  padding: '12px',
+                  borderRadius: '12px',
+                  fontWeight: '900',
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  marginTop: '8px'
+                }}
+              >
+                {editSubmitting ? 'Güncelleniyor...' : '💾 Değişiklikleri Kaydet'}
               </button>
             </form>
           </div>

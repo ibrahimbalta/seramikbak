@@ -68,15 +68,23 @@ const INITIAL_B2B_OFFERS = [
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type'); // 'NEED_STOCK' | 'HAVE_STOCK' | 'ALL'
+    const type = searchParams.get('type'); // 'NEED_STOCK' | 'HAVE_STOCK' | 'MY_OFFERS' | 'ALL'
     const city = searchParams.get('city');
     const search = searchParams.get('search');
+    const dealerId = searchParams.get('dealerId');
+    const phone = searchParams.get('phone');
+    const statusParam = searchParams.get('status'); // 'OPEN' | 'MATCHED' | 'CLOSED' | 'ALL'
 
-    const where = {
-      status: 'OPEN'
-    };
+    const where = {};
 
-    if (type && type !== 'ALL') {
+    // By default show OPEN status unless explicitly asked or filtering by owner
+    if (statusParam && statusParam !== 'ALL') {
+      where.status = statusParam;
+    } else if (!statusParam && !dealerId && !phone) {
+      where.status = 'OPEN';
+    }
+
+    if (type && type !== 'ALL' && type !== 'MY_OFFERS') {
       where.type = type;
     }
 
@@ -84,13 +92,33 @@ export async function GET(request) {
       where.city = city;
     }
 
+    if (dealerId || phone) {
+      const ownerConditions = [];
+      if (dealerId) ownerConditions.push({ dealerId });
+      if (phone) {
+        const cleanPhone = phone.replace(/[^\d+]/g, '');
+        if (cleanPhone) {
+          ownerConditions.push({ contactPhone: { contains: cleanPhone.slice(-7) } });
+        }
+      }
+      if (ownerConditions.length > 0) {
+        where.OR = ownerConditions;
+      }
+    }
+
     if (search) {
-      where.OR = [
+      const searchOR = [
         { productName: { contains: search, mode: 'insensitive' } },
         { brandName: { contains: search, mode: 'insensitive' } },
         { district: { contains: search, mode: 'insensitive' } },
         { contactName: { contains: search, mode: 'insensitive' } }
       ];
+      if (where.OR) {
+        where.AND = [{ OR: where.OR }, { OR: searchOR }];
+        delete where.OR;
+      } else {
+        where.OR = searchOR;
+      }
     }
 
     let offers = await prisma.dealerStockExchange.findMany({
@@ -101,10 +129,10 @@ export async function GET(request) {
       ]
     });
 
-    // Fallback seed offers if DB table is clean
-    if (offers.length === 0) {
+    // Fallback seed offers if DB table is clean and no specific dealerId requested
+    if (offers.length === 0 && !dealerId && !phone) {
       let filteredSeed = INITIAL_B2B_OFFERS;
-      if (type && type !== 'ALL') filteredSeed = filteredSeed.filter(o => o.type === type);
+      if (type && type !== 'ALL' && type !== 'MY_OFFERS') filteredSeed = filteredSeed.filter(o => o.type === type);
       if (city && city !== 'ALL') filteredSeed = filteredSeed.filter(o => o.city === city);
       if (search) {
         const s = search.toLowerCase();
@@ -185,20 +213,66 @@ export async function POST(request) {
 export async function PUT(request) {
   try {
     const body = await request.json();
-    const { id, status } = body;
+    const {
+      id,
+      type,
+      productName,
+      brandName,
+      quantityM2,
+      city,
+      district,
+      urgent,
+      notes,
+      contactName,
+      contactPhone,
+      status
+    } = body;
 
-    if (!id || !status) {
-      return NextResponse.json({ success: false, error: 'İlan ID ve Yeni Durum zorunludur.' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'İlan ID zorunludur.' }, { status: 400 });
     }
+
+    const updateData = {};
+    if (status !== undefined) updateData.status = status;
+    if (type !== undefined) updateData.type = type;
+    if (productName !== undefined) updateData.productName = productName.trim();
+    if (brandName !== undefined) updateData.brandName = brandName ? brandName.trim() : 'Genel Seramik Markası';
+    if (quantityM2 !== undefined) updateData.quantityM2 = parseInt(quantityM2, 10) || 10;
+    if (city !== undefined) updateData.city = city.trim();
+    if (district !== undefined) updateData.district = district ? district.trim() : null;
+    if (urgent !== undefined) updateData.urgent = Boolean(urgent);
+    if (notes !== undefined) updateData.notes = notes ? notes.trim() : null;
+    if (contactName !== undefined) updateData.contactName = contactName.trim();
+    if (contactPhone !== undefined) updateData.contactPhone = contactPhone.replace(/[^\d+]/g, '');
 
     const updated = await prisma.dealerStockExchange.update({
       where: { id },
-      data: { status }
+      data: updateData
     });
 
-    return NextResponse.json({ success: true, offer: updated });
+    return NextResponse.json({ success: true, offer: updated, message: 'İlan başarıyla güncellendi.' });
   } catch (error) {
     console.error('PUT /api/b2b/stock-exchange Error:', error);
     return NextResponse.json({ success: false, error: 'İlan güncelleme hatası.' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Silinecek ilan ID\'si gereklidir.' }, { status: 400 });
+    }
+
+    await prisma.dealerStockExchange.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({ success: true, message: 'İlan başarıyla silindi.' });
+  } catch (error) {
+    console.error('DELETE /api/b2b/stock-exchange Error:', error);
+    return NextResponse.json({ success: false, error: 'İlan silinirken bir hata oluştu.' }, { status: 500 });
   }
 }
