@@ -3420,9 +3420,9 @@ export default function DealerPortalPage() {
 
                   {/* PDF Catalog Group */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '16px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>İndirilebilir Ürün Kataloğu & Broşür (PDF)</label>
-                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Müşterilerin indirebileceği PDF kataloğunuz</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' }}>İndirilebilir Ürün Kataloğu & Broşür Linki (PDF)</label>
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Müşterilerinizin indirebileceği PDF kataloğunuzun internet adresi</span>
                     </div>
 
                     <div className="catalog-inputs-grid" style={{ display: 'grid', gap: '10px', alignItems: 'center' }}>
@@ -3431,43 +3431,17 @@ export default function DealerPortalPage() {
                         value={profilePdfCatalogName} 
                         onChange={(e) => setProfilePdfCatalogName(e.target.value)} 
                         placeholder="Katalog Başlığı (Örn: 2026 Seramik Kataloğu)"
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', width: '100%', boxSizing: 'border-box' }}
                         className="portal-input"
                       />
                       <input 
                         type="text" 
                         value={profilePdfCatalogUrl} 
                         onChange={(e) => setProfilePdfCatalogUrl(e.target.value)} 
-                        placeholder="PDF Linki veya Dosya Yükleyin"
-                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none' }}
+                        placeholder="Katalog PDF Linki (Örn: https://site.com/katalog.pdf)"
+                        style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', width: '100%', boxSizing: 'border-box' }}
                         className="portal-input"
                       />
-                      <label style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        padding: '12px 18px',
-                        background: '#ffffff',
-                        border: '1.5px solid var(--accent-gold)',
-                        color: 'var(--accent-gold)',
-                        borderRadius: '10px',
-                        cursor: 'pointer',
-                        fontSize: '0.82rem',
-                        fontWeight: '700',
-                        userSelect: 'none',
-                        transition: 'all 0.2s',
-                        whiteSpace: 'nowrap'
-                      }} className="hover-gold-btn">
-                        <input 
-                          type="file" 
-                          accept="application/pdf" 
-                          onChange={handlePdfUpload} 
-                          style={{ display: 'none' }} 
-                          disabled={isUploadingPdf}
-                        />
-                        {isUploadingPdf ? 'Yükleniyor...' : 'PDF Yükle'}
-                      </label>
                     </div>
                   </div>
 
@@ -6405,7 +6379,7 @@ export default function DealerPortalPage() {
 
         .catalog-inputs-grid {
           display: grid;
-          grid-template-columns: 1fr 2fr auto;
+          grid-template-columns: 1fr 2fr;
           gap: 10px;
           align-items: center;
         }
