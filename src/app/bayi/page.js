@@ -2497,17 +2497,17 @@ export default function DealerPortalPage() {
               </div>
 
               {/* Live Calculation Preview & Interactive Form Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.15fr 0.85fr', gap: '24px', alignItems: 'start' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.15fr 0.85fr', gap: isMobile ? '16px' : '24px', alignItems: 'start', width: '100%', boxSizing: 'border-box' }}>
                 {/* Quick Quote Form Card */}
-                <div className="quote-form-card" style={{ background: '#ffffff', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                <div className="quote-form-card" style={{ background: '#ffffff', padding: isMobile ? '16px 12px' : '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)', width: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <FileText size={18} style={{ color: '#d4af37' }} />
                     Teklif ve Müşteri Parametreleri
                   </h3>
 
-                  <form onSubmit={handleGenerateQuote} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div className="form-group-row">
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <form onSubmit={handleGenerateQuote} style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', boxSizing: 'border-box' }}>
+                    <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '16px', width: '100%', boxSizing: 'border-box' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Müşteri Adı / Unvanı *</label>
                         <input 
                           type="text" 
@@ -2515,10 +2515,10 @@ export default function DealerPortalPage() {
                           onChange={(e) => setQuoteCustomerName(e.target.value)} 
                           placeholder="Örn: Ahmet Yılmaz" 
                           required 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>WhatsApp / Telefon *</label>
                         <input 
                           type="text" 
@@ -2526,59 +2526,59 @@ export default function DealerPortalPage() {
                           onChange={(e) => setQuoteCustomerPhone(e.target.value)} 
                           placeholder="Örn: 0532 123 45 67" 
                           required 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                     </div>
 
-                    <div className="form-group-row">
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '16px', width: '100%', boxSizing: 'border-box' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Proje / Mekan Adı</label>
                         <input 
                           type="text" 
                           value={quoteProjectName} 
                           onChange={(e) => setQuoteProjectName(e.target.value)} 
                           placeholder="Örn: Vadi Konutları Banyo Yenileme" 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Müşteri E-Posta (İsteğe Bağlı)</label>
                         <input 
                           type="email" 
                           value={quoteCustomerEmail} 
                           onChange={(e) => setQuoteCustomerEmail(e.target.value)} 
                           placeholder="Örn: ahmet@mail.com" 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                     </div>
 
-                    <div className="form-group-row">
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '16px', width: '100%', boxSizing: 'border-box' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Seçilen Seramik Modeli</label>
                         <input 
                           type="text" 
                           value={quoteProductName} 
                           onChange={(e) => setQuoteProductName(e.target.value)} 
                           placeholder="Örn: 60x120 Calacatta Mermer Porselen" 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Stok / SKU Kodu</label>
                         <input 
                           type="text" 
                           value={quoteProductCode} 
                           onChange={(e) => setQuoteProductCode(e.target.value)} 
                           placeholder="Örn: QUA-CAL-60120" 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                     </div>
 
-                    <div className="form-group-row">
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '16px', width: '100%', boxSizing: 'border-box' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Net Uygulama Alanı (m²) *</label>
                         <input 
                           type="number" 
@@ -2586,15 +2586,15 @@ export default function DealerPortalPage() {
                           onChange={(e) => setQuoteAreaM2(e.target.value)} 
                           min={1} 
                           required 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Kesim Firesi Oranı (%)</label>
                         <select 
                           value={quoteWastePercent} 
                           onChange={(e) => setQuoteWastePercent(e.target.value)} 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}
                         >
                           <option value={5}>%5 Fire (Düz / Standart Döşeme)</option>
                           <option value={10}>%10 Fire (Diyagonal / Balıksırtı)</option>
@@ -2603,8 +2603,8 @@ export default function DealerPortalPage() {
                       </div>
                     </div>
 
-                    <div className="form-group-row">
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '16px', width: '100%', boxSizing: 'border-box' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Seramik m² Liste Fiyatı (₺) *</label>
                         <input 
                           type="number" 
@@ -2612,10 +2612,10 @@ export default function DealerPortalPage() {
                           onChange={(e) => setQuoteUnitPriceM2(e.target.value)} 
                           min={0} 
                           required 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Müşteri İskonto İndirimi (%)</label>
                         <input 
                           type="number" 
@@ -2623,17 +2623,17 @@ export default function DealerPortalPage() {
                           onChange={(e) => setQuoteDiscountPercent(e.target.value)} 
                           min={0} 
                           max={100} 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                     </div>
 
                     {/* Consumables Toggle & Manual Input Section */}
-                    <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div style={{ background: '#f8fafc', padding: isMobile ? '12px 10px' : '16px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '14px', width: '100%', boxSizing: 'border-box' }}>
                       <div style={{ fontSize: '0.8rem', fontWeight: '800', color: '#475569' }}>Yapıştırıcı Harç & Derz Sarfiyat</div>
 
                       {/* Adhesive Row */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', cursor: 'pointer' }}>
                           <input 
                             type="checkbox" 
@@ -2643,8 +2643,8 @@ export default function DealerPortalPage() {
                           <span>Yapıştırıcı Harç (25kg Torba) Ekle</span>
                         </label>
                         {quoteIncludeAdhesive && (
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', paddingLeft: '26px' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px', paddingLeft: isMobile ? '4px' : '26px', width: '100%', boxSizing: 'border-box' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', boxSizing: 'border-box' }}>
                               <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Torba Adedi (Boş = otomatik)</label>
                               <input 
                                 type="number" 
@@ -2652,17 +2652,17 @@ export default function DealerPortalPage() {
                                 onChange={(e) => setQuoteAdhesiveManualBags(e.target.value)} 
                                 placeholder="Otomatik" 
                                 min={0} 
-                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                               />
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', boxSizing: 'border-box' }}>
                               <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Torba Birim Fiyatı (₺)</label>
                               <input 
                                 type="number" 
                                 value={quoteAdhesiveUnitPriceBag} 
                                 onChange={(e) => setQuoteAdhesiveUnitPriceBag(e.target.value)} 
                                 min={0} 
-                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                               />
                             </div>
                           </div>
@@ -2670,7 +2670,7 @@ export default function DealerPortalPage() {
                       </div>
 
                       {/* Grout Row */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', cursor: 'pointer' }}>
                           <input 
                             type="checkbox" 
@@ -2680,8 +2680,8 @@ export default function DealerPortalPage() {
                           <span>Derz Dolgusu (kg) Ekle</span>
                         </label>
                         {quoteIncludeGrout && (
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', paddingLeft: '26px' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px', paddingLeft: isMobile ? '4px' : '26px', width: '100%', boxSizing: 'border-box' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', boxSizing: 'border-box' }}>
                               <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Derz Miktarı kg (Boş = otomatik)</label>
                               <input 
                                 type="number" 
@@ -2689,17 +2689,17 @@ export default function DealerPortalPage() {
                                 onChange={(e) => setQuoteGroutManualKg(e.target.value)} 
                                 placeholder="Otomatik" 
                                 min={0} 
-                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                               />
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', boxSizing: 'border-box' }}>
                               <label style={{ fontSize: '0.7rem', fontWeight: '700' }}>Derz Birim Fiyatı (₺/kg)</label>
                               <input 
                                 type="number" 
                                 value={quoteGroutUnitPriceKg} 
                                 onChange={(e) => setQuoteGroutUnitPriceKg(e.target.value)} 
                                 min={0} 
-                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem' }} 
+                                style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                               />
                             </div>
                           </div>
@@ -2707,25 +2707,25 @@ export default function DealerPortalPage() {
                       </div>
                     </div>
 
-                    <div className="form-group-row">
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="form-group-row" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '12px' : '16px', width: '100%', boxSizing: 'border-box' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>İşçilik & Uygulama Tutarı (₺)</label>
                         <input 
                           type="number" 
                           value={quoteLaborCostTotal} 
                           onChange={(e) => setQuoteLaborCostTotal(e.target.value)} 
                           min={0} 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', boxSizing: 'border-box' }}>
                         <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Lojistik & Sevk Tutarı (₺)</label>
                         <input 
                           type="number" 
                           value={quoteShippingCostTotal} 
                           onChange={(e) => setQuoteShippingCostTotal(e.target.value)} 
                           min={0} 
-                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }} 
+                          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} 
                         />
                       </div>
                     </div>
@@ -2784,35 +2784,35 @@ export default function DealerPortalPage() {
                     });
 
                     return (
-                      <div className="quote-calc-card" style={{ background: '#ffffff', padding: '24px', borderRadius: '16px', border: '1px solid #d4af37', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 8px 30px rgba(212,175,55,0.12)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '14px' }}>
+                      <div className="quote-calc-card" style={{ background: '#ffffff', padding: isMobile ? '16px 12px' : '24px', borderRadius: '16px', border: '1px solid #d4af37', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 8px 30px rgba(212,175,55,0.12)', width: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '14px', flexWrap: 'wrap', gap: '6px' }}>
                           <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.05em' }}>CANLI HESAPLAMA ÖNİZLEME</span>
                           <span style={{ fontSize: '0.7rem', background: 'rgba(5,150,105,0.1)', color: '#059669', padding: '3px 10px', borderRadius: '12px', fontWeight: '800' }}>Canlı Metraj</span>
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.83rem', color: '#475569' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px' }}>
                             <span>Net Kaplama Alanı:</span>
                             <strong>{calc.netAreaM2} m²</strong>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px' }}>
                             <span>Kesim Firesi (+%{calc.wastePercent}):</span>
                             <strong>+{calc.wasteM2} m²</strong>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#0f172a', fontWeight: '800', background: '#f8fafc', padding: '8px 12px', borderRadius: '8px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', color: '#0f172a', fontWeight: '800', background: '#f8fafc', padding: '8px 12px', borderRadius: '8px' }}>
                             <span>Sipariş Seramik Miktarı:</span>
                             <strong style={{ color: '#d4af37' }}>{calc.totalTileM2} m²</strong>
                           </div>
 
                           {calc.includeAdhesive && (
-                            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#2563eb' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', color: '#2563eb' }}>
                               <span>Gerekli Yapıştırıcı Harç:</span>
                               <strong>{calc.adhesiveBagsCount} Torba ({calc.totalAdhesiveKg} kg)</strong>
                             </div>
                           )}
 
                           {calc.includeGrout && (
-                            <div style={{ display: 'flex', justifyContent: 'space-between', color: '#2563eb' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', color: '#2563eb' }}>
                               <span>Gerekli Derz Dolgusu:</span>
                               <strong>{calc.totalGroutKg} kg</strong>
                             </div>
@@ -2820,21 +2820,21 @@ export default function DealerPortalPage() {
                         </div>
 
                         <div style={{ borderTop: '2px dashed #e2e8f0', paddingTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', fontSize: '0.83rem' }}>
                             <span>Ara Toplam (KDV Hariç):</span>
                             <span>₺{calc.subtotalBeforeVat.toLocaleString('tr-TR')}</span>
                           </div>
                           {calc.tileDiscountAmount > 0 && (
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem', color: '#dc2626' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', fontSize: '0.83rem', color: '#dc2626' }}>
                               <span>İskonto İndirimi (%{calc.discountPercent}):</span>
                               <span>-₺{calc.tileDiscountAmount.toLocaleString('tr-TR')}</span>
                             </div>
                           )}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4px', fontSize: '0.83rem' }}>
                             <span>KDV Tutarı (%20):</span>
                             <span>₺{calc.vatAmount.toLocaleString('tr-TR')}</span>
                           </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.25rem', fontWeight: '900', color: '#0f172a', marginTop: '6px', background: 'rgba(212,175,55,0.08)', padding: '12px', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.3)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px', fontSize: isMobile ? '1.05rem' : '1.25rem', fontWeight: '900', color: '#0f172a', marginTop: '6px', background: 'rgba(212,175,55,0.08)', padding: '12px 10px', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.3)', width: '100%', boxSizing: 'border-box' }}>
                             <span>GENEL TOPLAM:</span>
                             <span style={{ color: '#b38e47' }}>₺{calc.grandTotal.toLocaleString('tr-TR')}</span>
                           </div>
