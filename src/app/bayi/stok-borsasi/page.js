@@ -583,8 +583,8 @@ export default function DealerStockExchangePage() {
           </div>
         )}
 
-        {/* Empty State for My Offers */}
-        {!loading && activeTypeTab === 'MY_OFFERS' && offers.length === 0 && (
+        {/* Empty State */}
+        {!loading && offers.length === 0 && (
           <div style={{
             background: 'rgba(30, 41, 59, 0.4)',
             border: '1px dashed rgba(212, 175, 55, 0.3)',
@@ -594,10 +594,12 @@ export default function DealerStockExchangePage() {
             color: '#cbd5e1'
           }}>
             <p style={{ fontSize: '1.1rem', fontWeight: '800', margin: '0 0 8px 0', color: '#fff' }}>
-              Henüz verilmiş aktif stok/takas ilanınız bulunmuyor.
+              {activeTypeTab === 'MY_OFFERS' 
+                ? 'Henüz verilmiş aktif stok/takas ilanınız bulunmuyor.' 
+                : 'Bu kategoride henüz kayıtlı ilan bulunmuyor.'}
             </p>
             <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: '0 0 20px 0' }}>
-              Elinizdeki fazla stokları veya acil aradığınız seramik ihtiyaçlarınızı diğer bayilerle paylaşın.
+              Elinizdeki fazla stokları veya acil aradığınız seramik ihtiyaçlarınızı diğer bayilerle hemen paylaşın.
             </p>
             <button
               onClick={() => setShowCreateModal(true)}
@@ -612,7 +614,7 @@ export default function DealerStockExchangePage() {
                 cursor: 'pointer'
               }}
             >
-              + İlk İlanınızı Ekleyin
+              + Yeni Stok / Takas İlanı Aç
             </button>
           </div>
         )}

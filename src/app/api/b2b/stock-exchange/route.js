@@ -1,70 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-// Realistic B2B seed data for demonstration if DB is fresh
-const INITIAL_B2B_OFFERS = [
-  {
-    id: 'b2b-seed-1',
-    type: 'NEED_STOCK',
-    productName: 'Calacatta Gold 60x120 Rektifiyeli Porselen',
-    brandName: 'NG Kütahya Seramik',
-    quantityM2: 24,
-    city: 'İstanbul',
-    district: 'Kadıköy',
-    urgent: true,
-    notes: 'Müşteri banyo projesi için eksik kaldı, acil teslim alabiliriz.',
-    contactName: 'Yıldız Yapı / Mehmet Bey',
-    contactPhone: '05321234567',
-    status: 'OPEN',
-    createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
-  },
-  {
-    id: 'b2b-seed-2',
-    type: 'HAVE_STOCK',
-    productName: 'Calacatta Gold 60x120 Rektifiyeli Porselen',
-    brandName: 'NG Kütahya Seramik',
-    quantityM2: 60,
-    city: 'İstanbul',
-    district: 'Ümraniye',
-    urgent: false,
-    notes: 'Depoda fazla stok var, takasa veya uygun fiyata teslime hazır.',
-    contactName: 'Anadolu Seramik / Ali Bey',
-    contactPhone: '05339876543',
-    status: 'OPEN',
-    createdAt: new Date(Date.now() - 3600000 * 5).toISOString()
-  },
-  {
-    id: 'b2b-seed-3',
-    type: 'NEED_STOCK',
-    productName: 'Marmara Beyazı 80x80 Parlak Karo',
-    brandName: 'VitrA',
-    quantityM2: 40,
-    city: 'Ankara',
-    district: 'Çankaya',
-    urgent: true,
-    notes: 'Villa projesine 40 m2 daha lazım, fabrika siparişi beklenemiyor.',
-    contactName: 'Başkent Yapı / Hakan Bey',
-    contactPhone: '05355554433',
-    status: 'OPEN',
-    createdAt: new Date(Date.now() - 3600000 * 12).toISOString()
-  },
-  {
-    id: 'b2b-seed-4',
-    type: 'HAVE_STOCK',
-    productName: 'Natural Oak 20x120 Ahşap Dokulu Seramik',
-    brandName: 'Bien Seramik',
-    quantityM2: 120,
-    city: 'İzmir',
-    district: 'Karşıyaka',
-    urgent: false,
-    notes: 'Seri sonu fazla stok. Çapraz bayi takasına açık.',
-    contactName: 'Ege Dekores / Murat Bey',
-    contactPhone: '05307778899',
-    status: 'OPEN',
-    createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
-  }
-];
-
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -121,29 +57,13 @@ export async function GET(request) {
       }
     }
 
-    let offers = await prisma.dealerStockExchange.findMany({
+    const offers = await prisma.dealerStockExchange.findMany({
       where,
       orderBy: [
         { urgent: 'desc' },
         { createdAt: 'desc' }
       ]
     });
-
-    // Fallback seed offers if DB table is clean and no specific dealerId requested
-    if (offers.length === 0 && !dealerId && !phone) {
-      let filteredSeed = INITIAL_B2B_OFFERS;
-      if (type && type !== 'ALL' && type !== 'MY_OFFERS') filteredSeed = filteredSeed.filter(o => o.type === type);
-      if (city && city !== 'ALL') filteredSeed = filteredSeed.filter(o => o.city === city);
-      if (search) {
-        const s = search.toLowerCase();
-        filteredSeed = filteredSeed.filter(o => 
-          o.productName.toLowerCase().includes(s) || 
-          o.brandName.toLowerCase().includes(s) || 
-          o.contactName.toLowerCase().includes(s)
-        );
-      }
-      offers = filteredSeed;
-    }
 
     return NextResponse.json({
       success: true,
