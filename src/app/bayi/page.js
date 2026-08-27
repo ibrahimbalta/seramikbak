@@ -211,6 +211,11 @@ export default function DealerPortalPage() {
   }, []);
 
   const handleMobileTabChange = (tabId) => {
+    if (tabId === 'stock-exchange') {
+      setShowMobileMoreMenu(false);
+      window.location.href = '/bayi/stok-borsasi';
+      return;
+    }
     setActivePortalTab(tabId);
     setShowMobileMoreMenu(false);
     if (tabId === 'settings') {
@@ -7042,9 +7047,9 @@ export default function DealerPortalPage() {
         }}>
           {[
             { id: 'dashboard', label: 'Panel', icon: <Activity size={20} /> },
+            { id: 'stock-exchange', label: 'Takas Borsa', icon: <RefreshCw size={20} /> },
             { id: 'b2b-projects', label: 'Talepler', icon: <Building2 size={20} /> },
             { id: 'inventory', label: 'Stok', icon: <Package size={20} /> },
-            { id: 'settings', label: 'Ayarlar', icon: <Settings size={20} /> },
             { id: 'more', label: 'Menü', icon: <Menu size={20} /> }
           ].map(tab => {
             const isActive = tab.id === 'more' ? showMobileMoreMenu : (activePortalTab === tab.id);
@@ -7120,10 +7125,12 @@ export default function DealerPortalPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
+                { id: 'stock-exchange', label: '🤝 Bayi Stok Borsası', icon: <RefreshCw size={18} /> },
                 { id: 'quick-quote', label: 'PDF Teklif Oluştur', icon: <Calculator size={18} /> },
-                { id: 'b2b-projects', label: 'Proje Talepleri', icon: <Building2 size={18} /> },
+                { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
                 { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
                 { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
+                { id: 'outlet-exchange', label: 'Outlet & Proje Fazlası', icon: <Sparkles size={18} /> },
                 { id: 'subscription', label: 'Abonelik & SaaS', icon: <CreditCard size={18} /> },
                 { id: 'settings', label: 'Şube Ayarları', icon: <Settings size={18} /> }
               ].map(item => {
