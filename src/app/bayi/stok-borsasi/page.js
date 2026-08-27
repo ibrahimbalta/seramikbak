@@ -127,7 +127,8 @@ export default function DealerStockExchangePage() {
           urgent: formUrgent,
           notes: formNotes,
           contactName: formContactName,
-          contactPhone: formContactPhone
+          contactPhone: formContactPhone,
+          dealerId: dealerSession?.id || null
         })
       });
 
