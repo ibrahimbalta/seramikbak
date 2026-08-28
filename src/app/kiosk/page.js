@@ -33,9 +33,9 @@ import QuoteModal from '@/components/QuoteModal';
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
   ssr: false,
   loading: () => (
-    <div className="flex flex-col items-center justify-center min-h-[500px] bg-slate-950 text-slate-400 rounded-3xl border border-slate-800 p-8">
-      <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-4" />
-      <span className="text-base font-bold text-slate-200">Showroom 3D Sanal Stüdyo Yükleniyor...</span>
+    <div className="kiosk-loading-box">
+      <div className="kiosk-spin-loader" />
+      <span>Showroom 3D Sanal Stüdyo Yükleniyor...</span>
     </div>
   )
 });
@@ -134,7 +134,6 @@ export default function ShowroomKioskPage() {
   };
 
   const handleOpenQuoteModal = () => {
-    // 3D Canvas Snapshot Al
     try {
       const canvasEl = document.querySelector('canvas');
       if (canvasEl) {
@@ -159,31 +158,24 @@ export default function ShowroomKioskPage() {
   });
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white font-sans selection:bg-amber-500 selection:text-slate-950 overflow-hidden flex flex-col">
+    <main className="kiosk-page-container">
       {/* Top Touch Kiosk Bar */}
-      <header className="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-6 py-3 flex items-center justify-between shrink-0 z-20">
-        <div className="flex items-center gap-4">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center font-black text-slate-950 text-xl shadow-lg shadow-amber-500/20">
-            S
-          </div>
+      <header className="kiosk-header">
+        <div className="header-left">
+          <div className="brand-badge">S</div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
-                Seramik<span className="text-amber-400">Bak</span>
-              </h1>
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-bold uppercase tracking-wider">
-                Tablet Showroom Ekranı
-              </span>
+            <div className="brand-title-row">
+              <h1 className="brand-title">Seramik<span className="gold-accent">Bak</span></h1>
+              <span className="kiosk-pill">Tablet Showroom Ekranı</span>
             </div>
-            <p className="text-xs text-slate-400 font-medium">
+            <p className="dealer-sub-text">
               {selectedDealer ? `${selectedDealer.name} Dokunmatik Satış Portalı` : 'Showroom Satış Asistanı'}
             </p>
           </div>
         </div>
 
         {/* Top Header Actions */}
-        <div className="flex items-center gap-3">
-          {/* Bayi Seçici Dropdown */}
+        <div className="header-right">
           {dealers.length > 0 && (
             <select
               value={selectedDealer?.id || ''}
@@ -191,7 +183,7 @@ export default function ShowroomKioskPage() {
                 const found = dealers.find(d => d.id === e.target.value);
                 if (found) setSelectedDealer(found);
               }}
-              className="bg-slate-950 border border-slate-800 text-amber-400 text-xs font-bold rounded-xl px-3 py-2 focus:outline-none cursor-pointer"
+              className="dealer-select"
             >
               {dealers.map(d => (
                 <option key={d.id} value={d.id}>{d.name} ({d.city})</option>
@@ -199,77 +191,59 @@ export default function ShowroomKioskPage() {
             </select>
           )}
 
-          <button
-            onClick={() => setShowQrModal(true)}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition-all cursor-pointer"
-          >
-            <QrCode className="w-4 h-4 text-amber-400" />
+          <button onClick={() => setShowQrModal(true)} className="btn-secondary-kiosk">
+            <QrCode size={16} />
             <span>QR ile İndir</span>
           </button>
 
-          <button
-            onClick={handleOpenQuoteModal}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 hover:from-amber-400 hover:to-amber-500 transition-all cursor-pointer animate-pulse"
-          >
-            <FileText className="w-4 h-4" />
+          <button onClick={handleOpenQuoteModal} className="btn-primary-gold-kiosk">
+            <FileText size={16} />
             <span>PDF Teklif Oluştur</span>
           </button>
 
-          <button
-            onClick={toggleFullscreen}
-            className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all cursor-pointer"
-            title="Tam Ekran"
-          >
-            {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+          <button onClick={toggleFullscreen} className="btn-icon-kiosk" title="Tam Ekran">
+            {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
           </button>
         </div>
       </header>
 
       {/* Main Touch Workspace */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
-        {/* Left Side: Touch Tile Selector Sidebar (4 Cols) */}
-        <div className="lg:col-span-4 bg-slate-900 border-r border-slate-800 p-4 flex flex-col gap-3 overflow-y-auto custom-scrollbar">
+      <div className="kiosk-workspace-grid">
+        {/* Left Side: Touch Tile Selector Sidebar */}
+        <div className="kiosk-sidebar">
           {/* Surface Target Toggle (Zemin / Duvar) */}
-          <div className="bg-slate-950 p-1.5 rounded-2xl border border-slate-800 grid grid-cols-2 gap-2">
+          <div className="surface-target-grid">
             <button
               onClick={() => setActiveTargetSurface('floor')}
-              className={`py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                activeTargetSurface === 'floor'
-                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                  : 'text-slate-400 hover:text-white'
-              }`}
+              className={`target-btn ${activeTargetSurface === 'floor' ? 'active' : ''}`}
             >
-              <Layers className="w-3.5 h-3.5" />
+              <Layers size={14} />
               <span>Zemin Seramiği ({floorProduct ? floorProduct.name.split(' ')[0] : 'Seç'})</span>
             </button>
 
             <button
               onClick={() => setActiveTargetSurface('walls')}
-              className={`py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                activeTargetSurface === 'walls'
-                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-                  : 'text-slate-400 hover:text-white'
-              }`}
+              className={`target-btn ${activeTargetSurface === 'walls' ? 'active' : ''}`}
             >
-              <Eye className="w-3.5 h-3.5" />
+              <Eye size={14} />
               <span>Duvar Seramiği ({wallProduct ? wallProduct.name.split(' ')[0] : 'Seç'})</span>
             </button>
           </div>
 
           {/* Search Box */}
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <div className="search-box-wrapper">
+            <Search size={15} className="search-icon" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Dokunarak model ara (ör. Calacatta, Mermer)..."
-              className="w-full bg-slate-950 border border-slate-800 text-white text-xs rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-amber-500"
+              className="search-input"
             />
           </div>
 
           {/* Style Filter Touch Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          <div className="filter-pills-row">
             {[
               { id: 'all', label: 'Tümü' },
               { id: 'mermer', label: 'Mermer' },
@@ -279,11 +253,7 @@ export default function ShowroomKioskPage() {
               <button
                 key={tab.id}
                 onClick={() => setSelectedCategory(tab.id)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
-                  selectedCategory === tab.id
-                    ? 'bg-slate-800 text-amber-400 border border-amber-500/50'
-                    : 'bg-slate-950 border border-slate-800 text-slate-400'
-                }`}
+                className={`filter-pill ${selectedCategory === tab.id ? 'active' : ''}`}
               >
                 {tab.label}
               </button>
@@ -291,7 +261,7 @@ export default function ShowroomKioskPage() {
           </div>
 
           {/* Touch Product Cards Grid */}
-          <div className="grid grid-cols-2 gap-3 flex-1 overflow-y-auto min-h-[300px] custom-scrollbar">
+          <div className="products-scroll-grid">
             {filteredProducts.map(product => {
               const isFloorSelected = floorProduct?.id === product.id;
               const isWallSelected = wallProduct?.id === product.id;
@@ -301,36 +271,20 @@ export default function ShowroomKioskPage() {
                 <div
                   key={product.id}
                   onClick={() => handleSelectProductForTarget(product)}
-                  className={`bg-slate-950 border rounded-2xl p-2.5 cursor-pointer transition-all flex flex-col justify-between ${
-                    isCurrentTarget
-                      ? 'border-amber-500 ring-2 ring-amber-500/40 shadow-xl'
-                      : 'border-slate-800 hover:border-slate-700'
-                  }`}
+                  className={`product-touch-card ${isCurrentTarget ? 'active' : ''}`}
                 >
-                  <div className="h-24 bg-slate-900 rounded-xl overflow-hidden mb-2 relative">
+                  <div className="card-thumb-wrapper">
                     <img
                       src={product.imageUrl || product.textureUrl || '/hero/hero_ceramics.jpg'}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      className="card-thumb-img"
                     />
-                    {isFloorSelected && (
-                      <span className="absolute top-1.5 left-1.5 bg-amber-500 text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded-full">
-                        ZEMİN
-                      </span>
-                    )}
-                    {isWallSelected && (
-                      <span className="absolute top-1.5 right-1.5 bg-sky-500 text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded-full">
-                        DUVAR
-                      </span>
-                    )}
+                    {isFloorSelected && <span className="tag-floor">ZEMİN</span>}
+                    {isWallSelected && <span className="tag-wall">DUVAR</span>}
                   </div>
-                  <div>
-                    <h3 className="font-bold text-white text-xs leading-snug line-clamp-1">
-                      {product.name}
-                    </h3>
-                    <p className="text-[10px] text-amber-400 font-medium mt-0.5">
-                      {product.width}x{product.height} cm • {product.finish || 'Mat'}
-                    </p>
+                  <div className="card-info">
+                    <h3 className="product-title">{product.name}</h3>
+                    <p className="product-specs">{product.width}x{product.height} cm • {product.finish || 'Mat'}</p>
                   </div>
                 </div>
               );
@@ -338,10 +292,10 @@ export default function ShowroomKioskPage() {
           </div>
         </div>
 
-        {/* Right Side: 3D Visualizer Canvas & Sales Calculator (8 Cols) */}
-        <div className="lg:col-span-8 bg-slate-950 p-4 flex flex-col justify-between relative overflow-hidden">
-          {/* Main 3D Canvas */}
-          <div ref={canvasContainerRef} className="flex-1 rounded-3xl border border-slate-800 overflow-hidden relative shadow-2xl bg-slate-950 min-h-[360px]">
+        {/* Right Side: 3D Visualizer Canvas & Sales Calculator */}
+        <div className="kiosk-canvas-area">
+          {/* Main 3D Canvas Box */}
+          <div ref={canvasContainerRef} className="canvas-frame">
             <StudioCanvas
               activeProduct={selectedProduct}
               floorProduct={floorProduct}
@@ -355,13 +309,13 @@ export default function ShowroomKioskPage() {
           </div>
 
           {/* Bottom Live Calculation & Sales Bar */}
-          <div className="mt-3 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+          <div className="sales-bottom-bar">
             {/* Top Row: Room Controls */}
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-3">
+            <div className="controls-row">
               {/* Mekan Tipi */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400 font-bold">Mekan:</span>
-                <div className="flex items-center gap-1">
+              <div className="ctrl-group">
+                <span className="ctrl-label">Mekan:</span>
+                <div className="btn-group-sm">
                   {[
                     { id: 'banyo', label: 'Banyo' },
                     { id: 'mutfak', label: 'Mutfak' },
@@ -371,9 +325,7 @@ export default function ShowroomKioskPage() {
                     <button
                       key={r.id}
                       onClick={() => setRoomType(r.id)}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        roomType === r.id ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 hover:text-white'
-                      }`}
+                      className={`btn-sm ${roomType === r.id ? 'active' : ''}`}
                     >
                       {r.label}
                     </button>
@@ -382,25 +334,25 @@ export default function ShowroomKioskPage() {
               </div>
 
               {/* Alan Slider */}
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-slate-400 font-bold">Kaplanacak Alan:</span>
-                <div className="flex items-center gap-2">
+              <div className="ctrl-group">
+                <span className="ctrl-label">Kaplanacak Alan:</span>
+                <div className="slider-box">
                   <input
                     type="range"
                     min="5"
                     max="150"
                     value={areaM2}
                     onChange={(e) => setAreaM2(Number(e.target.value))}
-                    className="accent-amber-500 bg-slate-950 h-2 rounded-lg cursor-pointer w-28"
+                    className="kiosk-range-slider"
                   />
-                  <span className="text-amber-400 text-xs font-extrabold w-12 text-right">{areaM2} m²</span>
+                  <span className="area-text">{areaM2} m²</span>
                 </div>
               </div>
 
               {/* Döşeme Düzeni (Fire) */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400 font-bold">Dizim (Fire %):</span>
-                <div className="flex items-center gap-1">
+              <div className="ctrl-group">
+                <span className="ctrl-label">Dizim (Fire %):</span>
+                <div className="btn-group-sm">
                   {[
                     { id: 'duz', label: 'Düz (%8)' },
                     { id: 'capraz', label: 'Çapraz (%12)' },
@@ -409,9 +361,7 @@ export default function ShowroomKioskPage() {
                     <button
                       key={style.id}
                       onClick={() => setLayingStyle(style.id)}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                        layingStyle === style.id ? 'bg-sky-500/20 text-sky-400 border border-sky-500/40' : 'bg-slate-950 text-slate-400'
-                      }`}
+                      className={`btn-sm ${layingStyle === style.id ? 'active-sky' : ''}`}
                     >
                       {style.label}
                     </button>
@@ -421,52 +371,43 @@ export default function ShowroomKioskPage() {
             </div>
 
             {/* Bottom Row: Itemized Price Summary & PDF Button */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-4 text-xs">
-                <div>
-                  <span className="text-slate-500 block text-[10px] uppercase font-bold">Gereken Seramik</span>
-                  <span className="text-white font-extrabold">{totalM2WithWaste} m² ({requiredBoxes} Kutu)</span>
+            <div className="totals-row">
+              <div className="summary-pills">
+                <div className="sum-pill">
+                  <span className="sum-title">Gereken Seramik</span>
+                  <span className="sum-val">{totalM2WithWaste} m² ({requiredBoxes} Kutu)</span>
                 </div>
-                <div className="h-6 w-px bg-slate-800" />
-                <div>
-                  <span className="text-slate-500 block text-[10px] uppercase font-bold">Sarfiyat (Harç/Derz)</span>
-                  <span className="text-slate-300 font-bold">{adhesiveBags} Çuval / {groutPacks} Pak</span>
+                <div className="divider-v" />
+                <div className="sum-pill">
+                  <span className="sum-title">Sarfiyat (Harç/Derz)</span>
+                  <span className="sum-val">{adhesiveBags} Çuval / {groutPacks} Pak</span>
                 </div>
-                <div className="h-6 w-px bg-slate-800" />
-                {/* Usta Toggle */}
+                <div className="divider-v" />
                 <button
                   onClick={() => setIncludeLabor(!includeLabor)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                    includeLabor ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-slate-950 text-slate-500'
-                  }`}
+                  className={`toggle-hizmet ${includeLabor ? 'active-green' : ''}`}
                 >
-                  <Wrench className="w-3.5 h-3.5" />
+                  <Wrench size={14} />
                   <span>{includeLabor ? 'Ustalık Dahil' : '+ Ustalık Ekle'}</span>
                 </button>
-                {/* Nakliye Toggle */}
                 <button
                   onClick={() => setIncludeShipping(!includeShipping)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                    includeShipping ? 'bg-sky-500/20 text-sky-400 border border-sky-500/40' : 'bg-slate-950 text-slate-500'
-                  }`}
+                  className={`toggle-hizmet ${includeShipping ? 'active-sky' : ''}`}
                 >
-                  <Truck className="w-3.5 h-3.5" />
+                  <Truck size={14} />
                   <span>{includeShipping ? 'Nakliye Dahil' : '+ Nakliye Ekle'}</span>
                 </button>
               </div>
 
               {/* Total Price & CTA */}
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <span className="text-slate-400 block text-[10px] font-bold uppercase">Tahmini Toplam (KDV Dahil)</span>
-                  <span className="text-amber-400 text-lg font-black tracking-tight">₺{grandTotal.toLocaleString('tr-TR')}</span>
+              <div className="price-cta-box">
+                <div className="price-col">
+                  <span className="price-label">Tahmini Toplam (KDV Dahil)</span>
+                  <span className="price-val">₺{grandTotal.toLocaleString('tr-TR')}</span>
                 </div>
 
-                <button
-                  onClick={handleOpenQuoteModal}
-                  className="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 hover:from-amber-400 hover:to-amber-500 transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  <FileText className="w-4 h-4" />
+                <button onClick={handleOpenQuoteModal} className="btn-cta-pdf">
+                  <FileText size={16} />
                   <span>Teklifi Çıkar</span>
                 </button>
               </div>
@@ -477,36 +418,30 @@ export default function ShowroomKioskPage() {
 
       {/* QR Code Modal */}
       {showQrModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-8 text-center relative shadow-2xl">
-            <button
-              onClick={() => setShowQrModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full bg-slate-800 cursor-pointer"
-            >
-              <X className="w-5 h-5" />
+        <div className="kiosk-modal-backdrop">
+          <div className="kiosk-modal-card">
+            <button onClick={() => setShowQrModal(false)} className="btn-modal-close">
+              <X size={18} />
             </button>
 
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-4">
-              <Smartphone className="w-7 h-7" />
+            <div className="qr-icon-header">
+              <Smartphone size={28} />
             </div>
 
-            <h3 className="text-xl font-bold text-white mb-2">Tasarımı Telefonuna Al!</h3>
-            <p className="text-xs text-slate-300 mb-6">
+            <h3 className="modal-title">Tasarımı Telefonuna Al!</h3>
+            <p className="modal-desc">
               Kameranızla aşağıdaki QR kodu okutarak hazırladığınız 3D banyo tasarımını ve bayi teklifini telefonunuzda görün.
             </p>
 
-            <div className="bg-white p-4 rounded-2xl inline-block mb-6 shadow-xl">
+            <div className="qr-img-box">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent('https://www.seramikbak.com/kiosk')}`}
                 alt="Showroom QR"
-                className="w-44 h-44 mx-auto"
+                className="qr-img"
               />
             </div>
 
-            <button
-              onClick={() => setShowQrModal(false)}
-              className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition-all cursor-pointer"
-            >
+            <button onClick={() => setShowQrModal(false)} className="btn-modal-confirm">
               Anlaşıldı, Kapat
             </button>
           </div>
@@ -544,6 +479,630 @@ export default function ShowroomKioskPage() {
           }}
         />
       )}
+
+      <style jsx>{`
+        .kiosk-page-container {
+          min-height: 100vh;
+          background: #090d16;
+          color: #ffffff;
+          font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+        }
+
+        .kiosk-loading-box {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 450px;
+          background: #0f172a;
+          color: #94a3b8;
+          border-radius: 20px;
+          border: 1px solid #1e293b;
+          padding: 24px;
+        }
+
+        .kiosk-spin-loader {
+          width: 44px;
+          height: 44px;
+          border: 4px solid #f59e0b;
+          border-top-color: transparent;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        .kiosk-header {
+          background: rgba(15, 23, 42, 0.95);
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid #1e293b;
+          padding: 12px 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          z-index: 20;
+        }
+
+        .header-left {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .brand-badge {
+          width: 42px;
+          height: 42px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          color: #0f172a;
+          font-weight: 900;
+          font-size: 1.2rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .brand-title-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .brand-title {
+          font-size: 1.35rem;
+          font-weight: 900;
+          color: #ffffff;
+          margin: 0;
+          letter-spacing: -0.02em;
+        }
+
+        .gold-accent {
+          color: #fbbf24;
+        }
+
+        .kiosk-pill {
+          background: rgba(245, 158, 11, 0.15);
+          border: 1px solid rgba(245, 158, 11, 0.35);
+          color: #fbbf24;
+          font-size: 0.65rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          padding: 2px 8px;
+          border-radius: 20px;
+        }
+
+        .dealer-sub-text {
+          font-size: 0.75rem;
+          color: #94a3b8;
+          margin: 2px 0 0 0;
+        }
+
+        .header-right {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .dealer-select {
+          background: #0f172a;
+          border: 1px solid #1e293b;
+          color: #fbbf24;
+          font-size: 0.75rem;
+          font-weight: 700;
+          padding: 8px 12px;
+          border-radius: 10px;
+          outline: none;
+          cursor: pointer;
+        }
+
+        .btn-secondary-kiosk {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: #1e293b;
+          color: #e2e8f0;
+          border: 1px solid #334155;
+          padding: 8px 14px;
+          border-radius: 10px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .btn-primary-gold-kiosk {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          color: #0f172a;
+          border: none;
+          padding: 8px 18px;
+          border-radius: 10px;
+          font-size: 0.75rem;
+          font-weight: 900;
+          cursor: pointer;
+          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-icon-kiosk {
+          background: #1e293b;
+          color: #94a3b8;
+          border: none;
+          padding: 8px;
+          border-radius: 10px;
+          cursor: pointer;
+        }
+
+        .kiosk-workspace-grid {
+          flex: 1;
+          display: grid;
+          grid-template-columns: 380px 1fr;
+          overflow: hidden;
+        }
+
+        .kiosk-sidebar {
+          background: #0f172a;
+          border-right: 1px solid #1e293b;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          overflow-y: auto;
+        }
+
+        .surface-target-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+          background: #090d16;
+          padding: 4px;
+          border-radius: 12px;
+          border: 1px solid #1e293b;
+        }
+
+        .target-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          padding: 8px 6px;
+          border-radius: 8px;
+          border: none;
+          background: transparent;
+          color: #94a3b8;
+          font-size: 0.7rem;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .target-btn.active {
+          background: #f59e0b;
+          color: #0f172a;
+        }
+
+        .search-box-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+
+        .search-icon {
+          position: absolute;
+          left: 12px;
+          color: #64748b;
+        }
+
+        .search-input {
+          width: 100%;
+          background: #090d16;
+          border: 1px solid #1e293b;
+          color: #ffffff;
+          font-size: 0.75rem;
+          padding: 10px 12px 10px 36px;
+          border-radius: 10px;
+          outline: none;
+        }
+
+        .filter-pills-row {
+          display: flex;
+          gap: 6px;
+          overflow-x: auto;
+        }
+
+        .filter-pill {
+          background: #090d16;
+          border: 1px solid #1e293b;
+          color: #94a3b8;
+          padding: 6px 12px;
+          border-radius: 8px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          cursor: pointer;
+          white-space: nowrap;
+        }
+
+        .filter-pill.active {
+          background: #1e293b;
+          color: #fbbf24;
+          border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .products-scroll-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          overflow-y: auto;
+          flex: 1;
+        }
+
+        .product-touch-card {
+          background: #090d16;
+          border: 1px solid #1e293b;
+          border-radius: 12px;
+          padding: 8px;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .product-touch-card.active {
+          border-color: #f59e0b;
+          box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+        }
+
+        .card-thumb-wrapper {
+          height: 90px;
+          background: #1e293b;
+          border-radius: 8px;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .card-thumb-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .tag-floor {
+          position: absolute;
+          top: 4px;
+          left: 4px;
+          background: #f59e0b;
+          color: #0f172a;
+          font-size: 0.6rem;
+          font-weight: 900;
+          padding: 2px 6px;
+          border-radius: 10px;
+        }
+
+        .tag-wall {
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          background: #0284c7;
+          color: #ffffff;
+          font-size: 0.6rem;
+          font-weight: 900;
+          padding: 2px 6px;
+          border-radius: 10px;
+        }
+
+        .product-title {
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: #ffffff;
+          margin: 0;
+          line-height: 1.2;
+        }
+
+        .product-specs {
+          font-size: 0.65rem;
+          color: #fbbf24;
+          margin: 2px 0 0 0;
+        }
+
+        .kiosk-canvas-area {
+          background: #090d16;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .canvas-frame {
+          flex: 1;
+          background: #090d16;
+          border: 1px solid #1e293b;
+          border-radius: 20px;
+          overflow: hidden;
+          position: relative;
+          min-height: 380px;
+        }
+
+        .sales-bottom-bar {
+          background: #0f172a;
+          border: 1px solid #1e293b;
+          border-radius: 16px;
+          padding: 14px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .controls-row {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          border-bottom: 1px solid #1e293b;
+          padding-bottom: 10px;
+        }
+
+        .ctrl-group {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .ctrl-label {
+          font-size: 0.72rem;
+          color: #94a3b8;
+          font-weight: 700;
+        }
+
+        .btn-group-sm {
+          display: flex;
+          gap: 4px;
+        }
+
+        .btn-sm {
+          background: #090d16;
+          border: 1px solid #1e293b;
+          color: #94a3b8;
+          font-size: 0.7rem;
+          font-weight: 700;
+          padding: 4px 10px;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+
+        .btn-sm.active {
+          background: #f59e0b;
+          color: #0f172a;
+        }
+
+        .btn-sm.active-sky {
+          background: rgba(56, 189, 248, 0.2);
+          color: #38bdf8;
+          border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .slider-box {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .kiosk-range-slider {
+          accent-color: #f59e0b;
+          width: 100px;
+        }
+
+        .area-text {
+          font-size: 0.75rem;
+          font-weight: 800;
+          color: #fbbf24;
+        }
+
+        .totals-row {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .summary-pills {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .sum-pill {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .sum-title {
+          font-size: 0.6rem;
+          color: #64748b;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+
+        .sum-val {
+          font-size: 0.75rem;
+          font-weight: 800;
+          color: #ffffff;
+        }
+
+        .divider-v {
+          width: 1px;
+          height: 24px;
+          background: #1e293b;
+        }
+
+        .toggle-hizmet {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          background: #090d16;
+          border: 1px solid #1e293b;
+          color: #64748b;
+          padding: 4px 10px;
+          border-radius: 8px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .toggle-hizmet.active-green {
+          background: rgba(16, 185, 129, 0.15);
+          color: #34d399;
+          border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .toggle-hizmet.active-sky {
+          background: rgba(56, 189, 248, 0.15);
+          color: #38bdf8;
+          border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .price-cta-box {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .price-col {
+          text-align: right;
+        }
+
+        .price-label {
+          display: block;
+          font-size: 0.6rem;
+          color: #94a3b8;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+
+        .price-val {
+          font-size: 1.15rem;
+          font-weight: 900;
+          color: #fbbf24;
+        }
+
+        .btn-cta-pdf {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          color: #0f172a;
+          border: none;
+          padding: 10px 18px;
+          border-radius: 10px;
+          font-size: 0.75rem;
+          font-weight: 900;
+          cursor: pointer;
+          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Modal Styles */
+        .kiosk-modal-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          background: rgba(9, 13, 22, 0.85);
+          backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+        }
+
+        .kiosk-modal-card {
+          background: #0f172a;
+          border: 1px solid #1e293b;
+          border-radius: 24px;
+          width: 100%;
+          max-width: 400px;
+          padding: 28px;
+          text-align: center;
+          position: relative;
+        }
+
+        .btn-modal-close {
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          background: #1e293b;
+          color: #94a3b8;
+          border: none;
+          padding: 6px;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+
+        .qr-icon-header {
+          width: 52px;
+          height: 52px;
+          border-radius: 16px;
+          background: rgba(245, 158, 11, 0.15);
+          color: #fbbf24;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 12px auto;
+        }
+
+        .modal-title {
+          font-size: 1.15rem;
+          font-weight: 800;
+          color: #ffffff;
+          margin: 0 0 6px 0;
+        }
+
+        .modal-desc {
+          font-size: 0.75rem;
+          color: #94a3b8;
+          margin-bottom: 16px;
+        }
+
+        .qr-img-box {
+          background: #ffffff;
+          padding: 12px;
+          border-radius: 16px;
+          display: inline-block;
+          margin-bottom: 16px;
+        }
+
+        .qr-img {
+          width: 160px;
+          height: 160px;
+        }
+
+        .btn-modal-confirm {
+          width: 100%;
+          background: #f59e0b;
+          color: #0f172a;
+          border: none;
+          padding: 12px;
+          border-radius: 10px;
+          font-size: 0.8rem;
+          font-weight: 900;
+          cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+          .kiosk-workspace-grid {
+            grid-template-columns: 1fr;
+          }
+          .kiosk-sidebar {
+            max-height: 350px;
+          }
+        }
+      `}</style>
     </main>
   );
 }

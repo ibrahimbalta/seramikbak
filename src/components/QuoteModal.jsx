@@ -115,164 +115,350 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full p-6 text-white shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full bg-slate-800 transition-colors cursor-pointer"
-        >
-          <X className="w-5 h-5" />
+    <div className="quote-modal-backdrop">
+      <div className="quote-modal-card">
+        <button onClick={onClose} className="btn-modal-close">
+          <X size={18} />
         </button>
 
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center">
-            <FileText className="w-6 h-6" />
+        <div className="modal-header-row">
+          <div className="icon-badge-gold">
+            <FileText size={24} />
           </div>
           <div>
-            <h2 className="text-xl font-extrabold text-white">Resmi Fiyat Teklifi Oluştur</h2>
-            <p className="text-xs text-slate-400">
+            <h2 className="modal-title">Resmi Fiyat Teklifi Oluştur</h2>
+            <p className="modal-sub">
               3D Tasarım snapshot'ı ve hesaplanan kalemler teklif belgesine işlenecektir.
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleGenerateQuote} className="space-y-4">
+        <form onSubmit={handleGenerateQuote} className="modal-form-grid">
           {/* Müşteri ve Proje Bilgileri */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">Müşteri Adı Soyadı *</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <div className="inputs-2col">
+            <div className="input-group">
+              <label className="input-label">Müşteri Adı Soyadı *</label>
+              <div className="input-with-icon">
+                <User size={15} className="input-icon" />
                 <input
                   type="text"
                   required
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="ör. Zeynep Yılmaz"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="modal-input"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">Telefon Numarası *</label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <div className="input-group">
+              <label className="input-label">Telefon Numarası *</label>
+              <div className="input-with-icon">
+                <Phone size={15} className="input-icon" />
                 <input
                   type="tel"
                   required
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
                   placeholder="05xx xxx xx xx"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="modal-input"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">E-Posta Adresi (Opsiyonel)</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <div className="input-group">
+              <label className="input-label">E-Posta Adresi (Opsiyonel)</label>
+              <div className="input-with-icon">
+                <Mail size={15} className="input-icon" />
                 <input
                   type="email"
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
                   placeholder="ornek@email.com"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="modal-input"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">Proje / Mekan Tanımı</label>
+            <div className="input-group">
+              <label className="input-label">Proje / Mekan Tanımı</label>
               <input
                 type="text"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
                 placeholder="ör. Ebeveyn Banyosu Yenileme"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                className="modal-input no-icon"
               />
             </div>
           </div>
 
           {/* İskonto ve Notlar */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">Özel İskonto Oranı (%)</label>
-              <div className="relative">
-                <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <div className="inputs-2col">
+            <div className="input-group">
+              <label className="input-label">Özel İskonto Oranı (%)</label>
+              <div className="input-with-icon">
+                <Percent size={15} className="input-icon" />
                 <input
                   type="number"
                   min="0"
                   max="50"
                   value={discountPercent}
                   onChange={(e) => setDiscountPercent(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  className="modal-input"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-400 mb-1">Teklif Notu / Özel Şartlar</label>
+            <div className="input-group">
+              <label className="input-label">Teklif Notu / Özel Şartlar</label>
               <input
                 type="text"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="ör. 7 gün geçerlidir. Kat taşıma dahildir."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                className="modal-input no-icon"
               />
             </div>
           </div>
 
           {/* Hesaplama Özeti Kartı */}
-          <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-2 text-xs">
-            <div className="flex justify-between text-slate-400 font-bold border-b border-slate-800 pb-2">
+          <div className="calc-summary-card">
+            <div className="summary-hdr">
               <span>HESAPLANAN KALEMLER</span>
-              <span className="text-amber-400">{selectedProduct?.name} ({areaM2} m² + %{wastePercent} Fire)</span>
+              <span className="gold-text">{selectedProduct?.name} ({areaM2} m² + %{wastePercent} Fire)</span>
             </div>
-            <div className="flex justify-between text-slate-300">
+            <div className="summary-line">
               <span>Seramik Malzemesi ({totalM2WithWaste} m² / {requiredBoxes} Kutu):</span>
               <span>₺{tileCost.toLocaleString('tr-TR')}</span>
             </div>
             {includeAdhesive && (
-              <div className="flex justify-between text-slate-300">
+              <div className="summary-line">
                 <span>Seramik Yapıştırıcı Harç ({adhesiveBags} Torba):</span>
                 <span>₺{adhesiveCost.toLocaleString('tr-TR')}</span>
               </div>
             )}
             {includeGrout && (
-              <div className="flex justify-between text-slate-300">
+              <div className="summary-line">
                 <span>Derz Dolgusu ({groutPacks} Kova):</span>
                 <span>₺{groutCost.toLocaleString('tr-TR')}</span>
               </div>
             )}
             {includeLabor && laborCost > 0 && (
-              <div className="flex justify-between text-emerald-400 font-medium">
+              <div className="summary-line green">
                 <span>Sertifikalı Ustalık İşçiliği:</span>
                 <span>₺{laborCost.toLocaleString('tr-TR')}</span>
               </div>
             )}
             {includeShipping && shippingCost > 0 && (
-              <div className="flex justify-between text-sky-400 font-medium">
+              <div className="summary-line sky">
                 <span>Lojistik & Nakliye Teslimat:</span>
                 <span>₺{shippingCost.toLocaleString('tr-TR')}</span>
               </div>
             )}
-            <div className="flex justify-between text-white font-extrabold text-sm border-t border-slate-800 pt-2 mt-2">
+            <div className="summary-total-line">
               <span>TAHMİNİ GENEL TOPLAM (KDV Dahil):</span>
-              <span className="text-amber-400">₺{grandTotal.toLocaleString('tr-TR')}</span>
+              <span className="gold-text">₺{grandTotal.toLocaleString('tr-TR')}</span>
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <FileCheck className="w-5 h-5" />
+          <button type="submit" className="btn-submit-pdf">
+            <FileCheck size={18} />
             <span>PDF Teklifi Saniyeler İçinde Oluştur</span>
           </button>
         </form>
       </div>
+
+      <style jsx>{`
+        .quote-modal-backdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          background: rgba(9, 13, 22, 0.85);
+          backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 16px;
+        }
+
+        .quote-modal-card {
+          background: #0f172a;
+          border: 1px solid #1e293b;
+          border-radius: 24px;
+          max-width: 600px;
+          width: 100%;
+          padding: 24px;
+          color: #ffffff;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+          position: relative;
+          max-height: 90vh;
+          overflow-y: auto;
+          font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        }
+
+        .btn-modal-close {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          background: #1e293b;
+          color: #94a3b8;
+          border: none;
+          padding: 6px;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+
+        .modal-header-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 20px;
+        }
+
+        .icon-badge-gold {
+          width: 44px;
+          height: 44px;
+          border-radius: 14px;
+          background: rgba(245, 158, 11, 0.15);
+          border: 1px solid rgba(245, 158, 11, 0.3);
+          color: #fbbf24;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .modal-title {
+          font-size: 1.15rem;
+          font-weight: 800;
+          margin: 0;
+          color: #ffffff;
+        }
+
+        .modal-sub {
+          font-size: 0.72rem;
+          color: #94a3b8;
+          margin: 2px 0 0 0;
+        }
+
+        .modal-form-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .inputs-2col {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+
+        .input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .input-label {
+          font-size: 0.7rem;
+          font-weight: 700;
+          color: #94a3b8;
+        }
+
+        .input-with-icon {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+
+        .input-icon {
+          position: absolute;
+          left: 10px;
+          color: #64748b;
+        }
+
+        .modal-input {
+          width: 100%;
+          background: #090d16;
+          border: 1px solid #1e293b;
+          border-radius: 10px;
+          padding: 9px 12px 9px 34px;
+          font-size: 0.75rem;
+          color: #ffffff;
+          outline: none;
+        }
+
+        .modal-input.no-icon {
+          padding-left: 12px;
+        }
+
+        .calc-summary-card {
+          background: #090d16;
+          border: 1px solid #1e293b;
+          border-radius: 14px;
+          padding: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          font-size: 0.72rem;
+        }
+
+        .summary-hdr {
+          display: flex;
+          justify-content: space-between;
+          font-weight: 800;
+          color: #94a3b8;
+          border-bottom: 1px solid #1e293b;
+          padding-bottom: 6px;
+        }
+
+        .summary-line {
+          display: flex;
+          justify-content: space-between;
+          color: #cbd5e1;
+        }
+
+        .summary-line.green { color: #34d399; }
+        .summary-line.sky { color: #38bdf8; }
+
+        .summary-total-line {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.85rem;
+          font-weight: 900;
+          color: #ffffff;
+          border-top: 1px solid #1e293b;
+          padding-top: 6px;
+          margin-top: 4px;
+        }
+
+        .gold-text {
+          color: #fbbf24;
+        }
+
+        .btn-submit-pdf {
+          width: 100%;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          color: #0f172a;
+          border: none;
+          padding: 12px;
+          border-radius: 12px;
+          font-size: 0.8rem;
+          font-weight: 900;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        @media (max-width: 600px) {
+          .inputs-2col {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
     </div>
   );
 }
