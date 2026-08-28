@@ -56,7 +56,8 @@ import {
   Truck,
   Package,
   CameraOff,
-  RotateCcw
+  RotateCcw,
+  Smartphone
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import WebARModal from '@/components/WebARModal';
