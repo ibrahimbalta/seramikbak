@@ -1848,13 +1848,224 @@ export default function ShowroomKioskPage() {
           cursor: pointer;
         }
 
-        @media (max-width: 900px) {
+        /* ---------------------------------------------------- */
+        /* RESPONSIVE DESIGN: TABLET & MOBILE VIEWPORTS         */
+        /* ---------------------------------------------------- */
+
+        /* Large Tablets & Laptops (<= 1024px) */
+        @media (max-width: 1024px) {
           .kiosk-workspace-grid {
-            grid-template-columns: 1fr;
-            height: auto;
+            grid-template-columns: 310px 1fr;
           }
+
+          .kiosk-header {
+            padding: 6px 12px;
+          }
+
+          .dealer-sub-text {
+            display: none;
+          }
+
+          .brand-title {
+            font-size: 1.05rem;
+          }
+
+          .btn-mode-kiosk span,
+          .btn-secondary-kiosk span,
+          .btn-primary-gold-kiosk span {
+            font-size: 0.7rem;
+          }
+        }
+
+        /* Mobile & Medium Tablets (<= 768px) */
+        @media (max-width: 768px) {
+          .kiosk-page-container {
+            height: auto;
+            min-height: 100vh;
+            overflow-y: auto;
+          }
+
+          .kiosk-header {
+            height: auto;
+            min-height: 52px;
+            padding: 8px 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+
+          .header-left {
+            gap: 8px;
+          }
+
+          .header-right {
+            overflow-x: auto;
+            max-width: 100%;
+            width: 100%;
+            justify-content: flex-start;
+            padding-bottom: 2px;
+            -webkit-overflow-scrolling: touch;
+          }
+
+          .btn-mode-kiosk,
+          .btn-secondary-kiosk,
+          .btn-primary-gold-kiosk {
+            flex-shrink: 0;
+            padding: 8px 10px;
+            font-size: 0.7rem;
+            min-height: 38px;
+          }
+
+          .kiosk-workspace-grid {
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            overflow: visible;
+          }
+
+          /* 3D Visualizer Canvas Section on Mobile (Placed First for Visual Focus) */
+          .kiosk-canvas-area {
+            order: 1;
+            width: 100%;
+            height: 400px;
+            min-height: 350px;
+          }
+
+          .canvas-frame {
+            height: 100%;
+          }
+
+          /* Sidebar Section on Mobile (Placed Below Canvas) */
           .kiosk-sidebar {
-            max-height: 350px;
+            order: 2;
+            width: 100%;
+            max-height: none;
+            height: auto;
+            overflow: visible;
+            border-right: none;
+            border-top: 1px solid #1e293b;
+            padding: 12px;
+            gap: 12px;
+          }
+
+          .surface-target-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            padding: 6px;
+          }
+
+          .target-btn {
+            padding: 8px 4px;
+            font-size: 0.7rem;
+            min-height: 38px;
+          }
+
+          .kiosk-brand-dropdown {
+            padding: 10px;
+            font-size: 0.85rem;
+            min-height: 42px;
+          }
+
+          .search-input {
+            padding: 9px 10px 9px 34px;
+            font-size: 0.78rem;
+            min-height: 40px;
+          }
+
+          .filter-pill {
+            padding: 6px 12px;
+            font-size: 0.72rem;
+            min-height: 34px;
+          }
+
+          .products-scroll-grid {
+            max-height: 420px;
+            min-height: 220px;
+            overflow-y: auto;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+          }
+
+          .product-touch-card {
+            padding: 8px;
+          }
+
+          .card-thumb-wrapper {
+            height: 95px;
+          }
+
+          .studio-bottom-bar,
+          .sales-bottom-bar {
+            padding: 10px;
+            border-radius: 12px;
+            width: 100%;
+          }
+
+          .controls-row {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 6px;
+            -webkit-overflow-scrolling: touch;
+          }
+
+          .totals-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+          }
+
+          .summary-pills {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+          }
+
+          .divider-v {
+            display: none;
+          }
+
+          .ctrl-group {
+            flex-shrink: 0;
+          }
+
+          .btn-sm {
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            min-height: 36px;
+          }
+
+          .swatch-btn {
+            width: 32px;
+            height: 32px;
+          }
+        }
+
+        /* Compact Mobile Phones (<= 480px) */
+        @media (max-width: 480px) {
+          .kiosk-canvas-area {
+            height: 340px;
+            min-height: 300px;
+          }
+
+          .surface-target-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+
+          .products-scroll-grid {
+            grid-template-columns: 1fr 1fr;
+            max-height: 380px;
+          }
+
+          .product-title {
+            font-size: 0.72rem;
+          }
+
+          .product-specs {
+            font-size: 0.62rem;
+          }
+
+          .overlay-sub-hint {
+            display: none;
           }
         }
       `}</style>
