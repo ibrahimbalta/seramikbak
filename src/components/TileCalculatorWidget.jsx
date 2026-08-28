@@ -341,14 +341,14 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
 
       <style jsx>{`
         .tile-calculator-card {
-          background: rgba(15, 23, 42, 0.75);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
+          background: rgba(15, 23, 42, 0.48);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
           border-radius: 20px;
           padding: 24px;
           color: #ffffff;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
           margin: 20px 0 16px 0;
           transition: all 0.3s ease;
         }
@@ -656,11 +656,11 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         }
 
         .tile-calc-results {
-          background: rgba(15, 23, 42, 0.85);
+          background: rgba(15, 23, 42, 0.42);
           backdrop-filter: blur(14px);
           padding: 16px;
           border-radius: 14px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.12);
           display: flex;
           flex-direction: column;
           justify-content: space-between;
