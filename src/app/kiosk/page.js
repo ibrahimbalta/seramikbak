@@ -25,8 +25,12 @@ import {
   Palette,
   Grid,
   Filter,
-  Maximize
+  Maximize,
+  Calculator,
+  Wrench,
+  Truck
 } from 'lucide-react';
+import QuoteModal from '@/components/QuoteModal';
 
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
   ssr: false,
@@ -38,126 +42,60 @@ const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), {
   )
 });
 
-// Gerçek Seramik Doku Görselleri (Görsel Tekrarlama Glitch'i Olmaz)
-const FALLBACK_PRODUCTS = [
-  {
-    id: 'demo-1',
-    name: 'Calacatta Gold Porselen Seramik',
-    code: 'SB-CAL-60120',
-    width: 60,
-    height: 120,
-    style: 'Mermer',
-    finish: 'Mat Rektifiye',
-    color: 'Beyaz / Altın',
-    brand: { id: 'b1', name: 'VitrA' },
-    imageUrl: '/textures/calacatta_gold.jpg',
-    textureUrl: '/textures/calacatta_gold.jpg'
-  },
-  {
-    id: 'demo-2',
-    name: 'Nero Marquina Siyah Mermer Karo',
-    code: 'SB-NERO-60120',
-    width: 60,
-    height: 120,
-    style: 'Mermer',
-    finish: 'Lüks Parlak',
-    color: 'Siyah',
-    brand: { id: 'b2', name: 'NG Kütahya Seramik' },
-    imageUrl: '/textures/albatros_antrasit.jpg',
-    textureUrl: '/textures/albatros_antrasit.jpg'
-  },
-  {
-    id: 'demo-3',
-    name: 'Nordic Meşe Ahşap Doku Porselen',
-    code: 'SB-OAK-20120',
-    width: 20,
-    height: 120,
-    style: 'Ahşap',
-    finish: 'Mat Ahşap',
-    color: 'Doğal Meşe',
-    brand: { id: 'b3', name: 'Bien Seramik' },
-    imageUrl: '/textures/natural_oak.jpg',
-    textureUrl: '/textures/natural_oak.jpg'
-  },
-  {
-    id: 'demo-4',
-    name: 'Urban Gri Beton Doku Karo',
-    code: 'SB-BETON-6060',
-    width: 60,
-    height: 60,
-    style: 'Beton',
-    finish: 'Mat Endüstriyel',
-    color: 'Gri',
-    brand: { id: 'b4', name: 'Çanakkale Seramik' },
-    imageUrl: '/textures/concrete_light_grey.jpg',
-    textureUrl: '/textures/concrete_light_grey.jpg'
-  },
-  {
-    id: 'demo-5',
-    name: 'Loft Antrasit Beton Porselen',
-    code: 'SB-LOFT-8080',
-    width: 80,
-    height: 80,
-    style: 'Beton',
-    finish: 'Lapatto',
-    color: 'Koyu Antrasit',
-    brand: { id: 'b5', name: 'Ege Seramik' },
-    imageUrl: '/textures/loft_beton.jpg',
-    textureUrl: '/textures/loft_beton.jpg'
-  },
-  {
-    id: 'demo-6',
-    name: 'Teak Doğal Ahşap Parke Karo',
-    code: 'SB-TEAK-20120',
-    width: 20,
-    height: 120,
-    style: 'Ahşap',
-    finish: 'Mat Derzli',
-    color: 'Koyu Meşe',
-    brand: { id: 'b6', name: 'Yurtbay Seramik' },
-    imageUrl: '/textures/teak_ahsap.jpg',
-    textureUrl: '/textures/teak_ahsap.jpg'
-  },
-  {
-    id: 'demo-7',
-    name: 'Vista Bej Doğal Taş Karo',
-    code: 'SB-VISTA-60120',
-    width: 60,
-    height: 120,
-    style: 'Taş',
-    finish: 'Rölyef Mat',
-    color: 'Sıcak Bej',
-    brand: { id: 'b7', name: 'Seramiksan' },
-    imageUrl: '/textures/vista_bej.jpg',
-    textureUrl: '/textures/vista_bej.jpg'
-  },
-  {
-    id: 'demo-8',
-    name: 'Travertino Classico Mermer Porselen',
-    code: 'SB-TRAV-60120',
-    width: 60,
-    height: 120,
-    style: 'Mermer',
-    finish: 'Parlak Mega Slab',
-    color: 'Krem Traverten',
-    brand: { id: 'b8', name: 'Qua Granite' },
-    imageUrl: '/textures/travertino_classico.jpg',
-    textureUrl: '/textures/travertino_classico.jpg'
-  }
+// Marka Bazlı Zengin Seramik Koleksiyon Kütüphanesi
+const BRAND_CATALOG = [
+  // Graniser
+  { id: 'gra-1', name: 'Graniser Calacatta Mermer Porselen', code: 'GRA-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Rektifiye', color: 'Beyaz / Altın', brand: { id: 'graniser', name: 'Graniser' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 520 },
+  { id: 'gra-2', name: 'Graniser Loft Gri Beton Karo', code: 'GRA-BET-6060', width: 60, height: 60, style: 'Beton', finish: 'Mat Endüstriyel', color: 'Gri', brand: { id: 'graniser', name: 'Graniser' }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg', unitPrice: 380 },
+  { id: 'gra-3', name: 'Graniser Teak Ahşap Doku Karo', code: 'GRA-TEAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Derzli', color: 'Koyu Meşe', brand: { id: 'graniser', name: 'Graniser' }, imageUrl: '/textures/teak_ahsap.jpg', textureUrl: '/textures/teak_ahsap.jpg', unitPrice: 440 },
+  { id: 'gra-4', name: 'Graniser Travertino Bej Taş Karo', code: 'GRA-TRAV-60120', width: 60, height: 120, style: 'Taş', finish: 'Rölyef Mat', color: 'Bej', brand: { id: 'graniser', name: 'Graniser' }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 490 },
+  { id: 'gra-5', name: 'Graniser Albatros Siyah Mermer', code: 'GRA-ALB-8080', width: 80, height: 80, style: 'Mermer', finish: 'Lüks Parlak', color: 'Siyah', brand: { id: 'graniser', name: 'Graniser' }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg', unitPrice: 560 },
+
+  // VitrA
+  { id: 'vit-1', name: 'VitrA Marbleous Calacatta Gold', code: 'VIT-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Mat Rektifiye', color: 'Beyaz / Altın', brand: { id: 'vitra', name: 'VitrA' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 580 },
+  { id: 'vit-2', name: 'VitrA Cementmix Gri Beton Porselen', code: 'VIT-CEM-6060', width: 60, height: 60, style: 'Beton', finish: 'Lapatto', color: 'Açık Gri', brand: { id: 'vitra', name: 'VitrA' }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg', unitPrice: 420 },
+  { id: 'vit-3', name: 'VitrA Oakwood Meşe Ahşap Karo', code: 'VIT-OAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Ahşap', color: 'Doğal Meşe', brand: { id: 'vitra', name: 'VitrA' }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg', unitPrice: 480 },
+  { id: 'vit-4', name: 'VitrA Vista Bej Doğal Taş', code: 'VIT-VIS-60120', width: 60, height: 120, style: 'Taş', finish: 'Mat Rektifiye', color: 'Vizon Bej', brand: { id: 'vitra', name: 'VitrA' }, imageUrl: '/textures/vista_bej.jpg', textureUrl: '/textures/vista_bej.jpg', unitPrice: 510 },
+
+  // NG Kütahya Seramik
+  { id: 'kut-1', name: 'NG Kütahya Nero Marquina Siyah', code: 'KUT-NERO-60120', width: 60, height: 120, style: 'Mermer', finish: 'Lüks Parlak', color: 'Siyah Damarlı', brand: { id: 'kutahya', name: 'NG Kütahya Seramik' }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg', unitPrice: 540 },
+  { id: 'kut-2', name: 'NG Kütahya Vista Bej Porselen', code: 'KUT-VIS-60120', width: 60, height: 120, style: 'Taş', finish: 'Mat Rektifiye', color: 'Bej', brand: { id: 'kutahya', name: 'NG Kütahya Seramik' }, imageUrl: '/textures/vista_bej.jpg', textureUrl: '/textures/vista_bej.jpg', unitPrice: 470 },
+  { id: 'kut-3', name: 'NG Kütahya Loft Antrasit Beton', code: 'KUT-BET-8080', width: 80, height: 80, style: 'Beton', finish: 'Mat Endüstriyel', color: 'Antrasit', brand: { id: 'kutahya', name: 'NG Kütahya Seramik' }, imageUrl: '/textures/loft_beton.jpg', textureUrl: '/textures/loft_beton.jpg', unitPrice: 450 },
+
+  // Bien Seramik
+  { id: 'bie-1', name: 'Bien Nordic Meşe Ahşap Porselen', code: 'BIE-OAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Ahşap', color: 'Doğal Meşe', brand: { id: 'bien', name: 'Bien Seramik' }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg', unitPrice: 430 },
+  { id: 'bie-2', name: 'Bien Calacatta Venato Mermer', code: 'BIE-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Mega Slab', color: 'Beyaz Gri', brand: { id: 'bien', name: 'Bien Seramik' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 530 },
+
+  // Çanakkale Seramik
+  { id: 'can-1', name: 'Çanakkale Urban Gri Beton Karo', code: 'CAN-BET-6060', width: 60, height: 60, style: 'Beton', finish: 'Mat Endüstriyel', color: 'Gri', brand: { id: 'canakkale', name: 'Çanakkale Seramik' }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg', unitPrice: 390 },
+  { id: 'can-2', name: 'Çanakkale Orient Traverten Mermer', code: 'CAN-TRAV-60120', width: 60, height: 120, style: 'Mermer', finish: 'Mat Rektifiye', color: 'Sıcak Krem', brand: { id: 'canakkale', name: 'Çanakkale Seramik' }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 480 },
+
+  // Ege Seramik
+  { id: 'ege-1', name: 'Ege Loft Antrasit Beton Porselen', code: 'EGE-LOFT-8080', width: 80, height: 80, style: 'Beton', finish: 'Lapatto', color: 'Koyu Antrasit', brand: { id: 'ege', name: 'Ege Seramik' }, imageUrl: '/textures/loft_beton.jpg', textureUrl: '/textures/loft_beton.jpg', unitPrice: 460 },
+
+  // Yurtbay Seramik
+  { id: 'yur-1', name: 'Yurtbay Teak Doğal Ahşap Karo', code: 'YUR-TEAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Derzli', color: 'Koyu Meşe', brand: { id: 'yurtbay', name: 'Yurtbay Seramik' }, imageUrl: '/textures/teak_ahsap.jpg', textureUrl: '/textures/teak_ahsap.jpg', unitPrice: 420 },
+
+  // Seramiksan
+  { id: 'ser-1', name: 'Seramiksan Vista Bej Taş Karo', code: 'SER-VIS-60120', width: 60, height: 120, style: 'Taş', finish: 'Rölyef Mat', color: 'Sıcak Bej', brand: { id: 'seramiksan', name: 'Seramiksan' }, imageUrl: '/textures/vista_bej.jpg', textureUrl: '/textures/vista_bej.jpg', unitPrice: 440 },
+
+  // Qua Granite
+  { id: 'qua-1', name: 'Qua Travertino Classico Granite', code: 'QUA-TRAV-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Mega Slab', color: 'Krem Traverten', brand: { id: 'qua', name: 'Qua Granite' }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 590 }
 ];
 
 export default function ShowroomKioskPage() {
   const canvasContainerRef = useRef(null);
 
   // Ürün ve Marka Eyaletleri
-  const [products, setProducts] = useState(FALLBACK_PRODUCTS);
+  const [products, setProducts] = useState(BRAND_CATALOG);
   const [brands, setBrands] = useState([]);
   const [selectedBrandId, setSelectedBrandId] = useState('all');
+  const [selectedDealer, setSelectedDealer] = useState(null);
 
   // 3D Sanal Stüdyo Yüzey Seçimleri
-  const [selectedProduct, setSelectedProduct] = useState(FALLBACK_PRODUCTS[0]);
-  const [floorProduct, setFloorProduct] = useState(FALLBACK_PRODUCTS[0]);
-  const [wallProduct, setWallProduct] = useState(FALLBACK_PRODUCTS[1] || FALLBACK_PRODUCTS[0]);
+  const [selectedProduct, setSelectedProduct] = useState(BRAND_CATALOG[0]);
+  const [floorProduct, setFloorProduct] = useState(BRAND_CATALOG[0]);
+  const [wallProduct, setWallProduct] = useState(BRAND_CATALOG[1] || BRAND_CATALOG[0]);
   const [accentProduct, setAccentProduct] = useState(null);
   const [showerProduct, setShowerProduct] = useState(null);
   const [showerFloorProduct, setShowerFloorProduct] = useState(null);
@@ -187,32 +125,44 @@ export default function ShowroomKioskPage() {
   const [faucetColor, setFaucetColor] = useState('chrome');
   const [cabinetColor, setCabinetColor] = useState('oak');
 
+  // Metraj & Canlı Satış Teklifi Hesaplama Eyaletleri (Kiosk Tablet Modu)
+  const [areaM2, setAreaM2] = useState(18);
+  const [layingStyle, setLayingStyle] = useState('capraz'); // 'duz' (%8), 'capraz' (%12), 'baliksirti' (%15)
+  const [unitPriceM2, setUnitPriceM2] = useState(480);
+  const [includeLabor, setIncludeLabor] = useState(true);
+  const [laborRatePerM2, setLaborRatePerM2] = useState(250);
+  const [includeShipping, setIncludeShipping] = useState(true);
+  const [shippingCostInput, setShippingCostInput] = useState(1500);
+
   // Modlar & Görünüm
   const [comparisonMode, setComparisonMode] = useState(false);
   const [walkthroughMode, setWalkthroughMode] = useState(false);
+  const [bottomTab, setBottomTab] = useState('studio'); // 'studio' | 'quote'
 
   // Filtreler & Modallar
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStyle, setSelectedStyle] = useState('all');
   const [showQrModal, setShowQrModal] = useState(false);
+  const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [snapshotUrl, setSnapshotUrl] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Veritabanından Tüm Ürünleri ve Markaları Yükle
   useEffect(() => {
     async function loadData() {
       try {
-        const [prodRes, brandRes] = await Promise.all([
+        const [prodRes, brandRes, dealerRes] = await Promise.all([
           fetch('/api/products?limit=200').then(r => r.json()).catch(() => null),
-          fetch('/api/brands').then(r => r.json()).catch(() => null)
+          fetch('/api/brands').then(r => r.json()).catch(() => null),
+          fetch('/api/dealers').then(r => r.json()).catch(() => null)
         ]);
 
         if (prodRes && prodRes.products && prodRes.products.length > 0) {
-          // Temiz doku yolları atanmasını kontrol et
           const sanitizedProducts = prodRes.products.map((p, idx) => {
             let tex = p.textureUrl || p.imageUrl;
             if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
-              const fallbackIdx = idx % FALLBACK_PRODUCTS.length;
-              tex = FALLBACK_PRODUCTS[fallbackIdx].textureUrl;
+              const fallbackIdx = idx % BRAND_CATALOG.length;
+              tex = BRAND_CATALOG[fallbackIdx].textureUrl;
             }
             return {
               ...p,
@@ -220,14 +170,27 @@ export default function ShowroomKioskPage() {
               textureUrl: tex
             };
           });
-          setProducts(sanitizedProducts);
-          setSelectedProduct(sanitizedProducts[0]);
-          setFloorProduct(sanitizedProducts[0]);
-          setWallProduct(sanitizedProducts[1] || sanitizedProducts[0]);
+
+          // Birleştir: Veritabanındaki ürünler + Marka kataloğu
+          const combined = [...sanitizedProducts];
+          BRAND_CATALOG.forEach(bItem => {
+            if (!combined.some(c => c.code === bItem.code)) {
+              combined.push(bItem);
+            }
+          });
+
+          setProducts(combined);
+          setSelectedProduct(combined[0]);
+          setFloorProduct(combined[0]);
+          setWallProduct(combined[1] || combined[0]);
         }
 
         if (brandRes && Array.isArray(brandRes)) {
           setBrands(brandRes);
+        }
+
+        if (dealerRes && dealerRes.dealers && dealerRes.dealers.length > 0) {
+          setSelectedDealer(dealerRes.dealers[0]);
         }
       } catch (err) {
         console.error('Kiosk data fetch error:', err);
@@ -249,6 +212,9 @@ export default function ShowroomKioskPage() {
   // Soldaki Ürün Kartına Tıklandığında Anında 3D Sanal Stüdyo Yüzeyine Uygula!
   const handleSelectProductForTarget = (product) => {
     setSelectedProduct(product);
+    if (product.unitPrice) {
+      setUnitPriceM2(product.unitPrice);
+    }
 
     if (activeTargetSurface === 'floor') {
       setFloorProduct(product);
@@ -285,14 +251,43 @@ export default function ShowroomKioskPage() {
     else if (target === 'stripe') setActiveTargetSurface('stripe');
   };
 
+  // Teklif Oluşturma Modalını Aç ve Ekran Görüntüsü Al
+  const handleOpenQuoteModal = () => {
+    try {
+      const canvasEl = document.querySelector('canvas');
+      if (canvasEl) {
+        const snap = canvasEl.toDataURL('image/jpeg', 0.9);
+        setSnapshotUrl(snap);
+      }
+    } catch (e) {
+      console.warn('Snapshot capture warning:', e);
+    }
+    setShowQuoteModal(true);
+  };
+
+  // Marka Seçimi Değiştiğinde
+  const handleBrandChange = (brandId) => {
+    setSelectedBrandId(brandId);
+    setSelectedStyle('all'); // Marka seçildiğinde stil filtresini sıfırla ki tüm modeller gözüksün
+  };
+
   // Akıllı Ürün Filtreleme (Marka + Stil + Arama)
   const filteredProducts = products.filter(p => {
-    const brandMatch = selectedBrandId === 'all' || p.brandId === selectedBrandId || (p.brand && p.brand.id === selectedBrandId);
-    
-    const styleLower = (p.style || '').toLowerCase();
-    const nameLower = (p.name || '').toLowerCase();
-    const codeLower = (p.code || '').toLowerCase();
-    const brandNameLower = (p.brand?.name || '').toLowerCase();
+    // Marka eşleşmesi (id veya name partial match)
+    let brandMatch = true;
+    if (selectedBrandId !== 'all') {
+      const bId = String(selectedBrandId).toLowerCase();
+      const pBrandId = String(p.brandId || '').toLowerCase();
+      const pBrandName = String(p.brand?.name || '').toLowerCase();
+      const pBrandIdObj = String(p.brand?.id || '').toLowerCase();
+
+      brandMatch = pBrandId === bId || pBrandIdObj === bId || pBrandName.includes(bId);
+    }
+
+    let styleLower = (p.style || '').toLowerCase();
+    let nameLower = (p.name || '').toLowerCase();
+    let codeLower = (p.code || '').toLowerCase();
+    let brandNameLower = (p.brand?.name || '').toLowerCase();
 
     let styleMatch = true;
     if (selectedStyle === 'mermer') styleMatch = styleLower.includes('mermer') || nameLower.includes('mermer');
@@ -309,12 +304,51 @@ export default function ShowroomKioskPage() {
     return brandMatch && styleMatch && searchMatch;
   });
 
-  const displayProducts = filteredProducts.length > 0 ? filteredProducts : FALLBACK_PRODUCTS;
+  // Eğer seçilen marka için veritabanında henüz ürün yoksa, o markaya özel dinamik koleksiyon oluştur
+  let displayProducts = filteredProducts;
+  if (displayProducts.length === 0 && selectedBrandId !== 'all') {
+    const brandObj = brands.find(b => b.id === selectedBrandId) || { name: selectedBrandId };
+    const brandNameStr = brandObj.name || selectedBrandId;
 
-  // Tüm Markaların Listesini Topla
-  const uniqueBrandList = brands.length > 0 ? brands : Array.from(
-    new Set(displayProducts.map(p => p.brand?.name).filter(Boolean))
-  ).map((name, i) => ({ id: `b-${i}`, name }));
+    displayProducts = [
+      { id: `${selectedBrandId}-1`, name: `${brandNameStr} Calacatta Gold Porselen`, code: `${brandNameStr.substring(0,3).toUpperCase()}-CAL-60120`, width: 60, height: 120, style: 'Mermer', finish: 'Parlak Rektifiye', color: 'Beyaz Altın', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 540 },
+      { id: `${selectedBrandId}-2`, name: `${brandNameStr} Nero Marquina Siyah Karo`, code: `${brandNameStr.substring(0,3).toUpperCase()}-NERO-60120`, width: 60, height: 120, style: 'Mermer', finish: 'Lüks Parlak', color: 'Siyah', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg', unitPrice: 560 },
+      { id: `${selectedBrandId}-3`, name: `${brandNameStr} Urban Gri Beton Porselen`, code: `${brandNameStr.substring(0,3).toUpperCase()}-BET-6060`, width: 60, height: 60, style: 'Beton', finish: 'Mat Endüstriyel', color: 'Gri', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg', unitPrice: 410 },
+      { id: `${selectedBrandId}-4`, name: `${brandNameStr} Nordic Meşe Ahşap Doku`, code: `${brandNameStr.substring(0,3).toUpperCase()}-OAK-20120`, width: 20, height: 120, style: 'Ahşap', finish: 'Mat Ahşap', color: 'Doğal Meşe', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg', unitPrice: 460 },
+      { id: `${selectedBrandId}-5`, name: `${brandNameStr} Vista Bej Doğal Taş`, code: `${brandNameStr.substring(0,3).toUpperCase()}-VIS-60120`, width: 60, height: 120, style: 'Taş', finish: 'Mat Rektifiye', color: 'Bej', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/vista_bej.jpg', textureUrl: '/textures/vista_bej.jpg', unitPrice: 490 },
+      { id: `${selectedBrandId}-6`, name: `${brandNameStr} Travertino Classico`, code: `${brandNameStr.substring(0,3).toUpperCase()}-TRAV-60120`, width: 60, height: 120, style: 'Mermer', finish: 'Mega Slab', color: 'Krem', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 580 }
+    ];
+  } else if (displayProducts.length === 0) {
+    displayProducts = BRAND_CATALOG;
+  }
+
+  // Tüm Markaların Listesini Derle
+  const knownBrandNames = ['Graniser', 'VitrA', 'NG Kütahya Seramik', 'Bien Seramik', 'Çanakkale Seramik', 'Yurtbay Seramik', 'Ege Seramik', 'Seramiksan', 'Qua Granite', 'Duratiles', 'Decovita', 'Hitit Seramik'];
+  
+  const uniqueBrandList = brands.length > 0 ? brands : knownBrandNames.map(name => ({
+    id: name.toLowerCase().replace(/[^a-z0-9]/g, ''),
+    name: name
+  }));
+
+  // Metraj & Canlı Fiyat Hesaplama Matematiği
+  const wastePercent = layingStyle === 'baliksirti' ? 15 : layingStyle === 'capraz' ? 12 : 8;
+  const totalM2WithWaste = Math.round((areaM2 * (1 + wastePercent / 100)) * 10) / 10;
+  const requiredBoxes = Math.ceil(totalM2WithWaste / 1.44);
+
+  const unitPriceNum = Number(unitPriceM2) || 0;
+  const tileCost = Math.round(totalM2WithWaste * unitPriceNum);
+  const adhesiveBags = Math.ceil(totalM2WithWaste / 5);
+  const adhesiveCost = adhesiveBags * 280;
+  const groutPacks = Math.ceil(totalM2WithWaste / 15);
+  const groutCost = groutPacks * 180;
+  const laborRateNum = Number(laborRatePerM2) || 0;
+  const laborCost = includeLabor ? Math.round(totalM2WithWaste * laborRateNum) : 0;
+  const shippingNum = Number(shippingCostInput) || 0;
+  const shippingCost = includeShipping ? shippingNum : 0;
+
+  const subtotalBeforeVat = tileCost + adhesiveCost + groutCost + laborCost + shippingCost;
+  const vatAmount = Math.round(subtotalBeforeVat * 0.20);
+  const grandTotal = subtotalBeforeVat + vatAmount;
 
   return (
     <main className="kiosk-page-container">
@@ -330,10 +364,10 @@ export default function ShowroomKioskPage() {
           <div>
             <div className="brand-title-row">
               <h1 className="brand-title">Seramik<span className="gold-accent">Bak</span></h1>
-              <span className="kiosk-pill">3D Sanal Stüdyo & Showroom Kiosk</span>
+              <span className="kiosk-pill">Tablet Showroom Ekranı</span>
             </div>
             <p className="dealer-sub-text">
-              Tüm Markaların Seramik Koleksiyonları ve Canlı 3D Simülasyon Ekranı
+              {selectedDealer ? `${selectedDealer.name} Dokunmatik Satış Portalı` : 'Showroom Satış Asistanı'}
             </p>
           </div>
         </div>
@@ -341,28 +375,21 @@ export default function ShowroomKioskPage() {
         {/* Top Header Actions */}
         <div className="header-right">
           <button 
-            onClick={() => {
-              const newMode = !comparisonMode;
-              setComparisonMode(newMode);
-              if (newMode && !comparisonProduct && products.length > 1) {
-                setComparisonProduct(products[1]);
-              }
-            }}
-            className={`btn-mode-kiosk ${comparisonMode ? 'active-gold' : ''}`}
+            onClick={() => setBottomTab(bottomTab === 'quote' ? 'studio' : 'quote')}
+            className={`btn-mode-kiosk ${bottomTab === 'quote' ? 'active-gold' : ''}`}
           >
-            <span>⚖️ 3D Kıyasla</span>
-          </button>
-
-          <button 
-            onClick={() => setWalkthroughMode(!walkthroughMode)}
-            className={`btn-mode-kiosk ${walkthroughMode ? 'active-sky' : ''}`}
-          >
-            <span>🎥 360° İç Gezinti</span>
+            <Calculator size={16} />
+            <span>Metraj & Fiyat Paneli</span>
           </button>
 
           <button onClick={() => setShowQrModal(true)} className="btn-secondary-kiosk">
             <QrCode size={16} />
             <span>QR ile İndir</span>
+          </button>
+
+          <button onClick={handleOpenQuoteModal} className="btn-primary-gold-kiosk">
+            <FileText size={16} />
+            <span>PDF Teklif Oluştur</span>
           </button>
 
           <button onClick={toggleFullscreen} className="btn-icon-kiosk" title="Tam Ekran">
@@ -373,7 +400,7 @@ export default function ShowroomKioskPage() {
 
       {/* Main Touch Workspace Grid */}
       <div className="kiosk-workspace-grid">
-        {/* Left Side: Product Selector Sidebar */}
+        {/* Left Side: Product & Brand Selector Sidebar */}
         <div className="kiosk-sidebar">
           {/* Surface Target Selection Grid (Hangi Yüzey Kaplanacak?) */}
           <div className="section-label-header">
@@ -440,12 +467,12 @@ export default function ShowroomKioskPage() {
             </div>
             <select
               value={selectedBrandId}
-              onChange={(e) => setSelectedBrandId(e.target.value)}
+              onChange={(e) => handleBrandChange(e.target.value)}
               className="kiosk-brand-dropdown"
             >
-              <option value="all">🏢 Tüm Markalar ({displayProducts.length} Model)</option>
+              <option value="all">🏢 Tüm Markalar ({products.length} Model)</option>
               {uniqueBrandList.map(b => (
-                <option key={b.id} value={b.id}>
+                <option key={b.id} value={b.id || b.name}>
                   {b.name}
                 </option>
               ))}
@@ -483,7 +510,7 @@ export default function ShowroomKioskPage() {
             ))}
           </div>
 
-          {/* Products List Grid (FİYATSIZ, TEMİZ KARO DOKULARI) */}
+          {/* Products List Grid (Markaya Ait Tüm Ürünler - Aşağı Doğru Kaydırılabilir) */}
           <div className="products-scroll-grid">
             {displayProducts.map(product => {
               const isFloorSelected = floorProduct?.id === product.id;
@@ -582,139 +609,281 @@ export default function ShowroomKioskPage() {
             </div>
           </div>
 
-          {/* Bottom Live 3D Studio Control Bar (FİYATSIZ, TAM SANAL STÜDYO KONTROLLERİ) */}
-          <div className="studio-bottom-bar">
-            {/* Control Row 1: Mekan Tipi & Dizim Şekli */}
-            <div className="controls-row">
-              {/* Simülasyon Sahnesi */}
-              <div className="ctrl-group">
-                <span className="ctrl-label">Mekan:</span>
-                <div className="btn-group-sm">
-                  {[
-                    { id: 'bathroom', label: 'Banyo' },
-                    { id: 'livingroom', label: 'Salon' },
-                    { id: 'kitchen', label: 'Mutfak' },
-                    { id: 'terrace', label: 'Teras' }
-                  ].map(r => (
-                    <button
-                      key={r.id}
-                      onClick={() => setRoomType(r.id)}
-                      className={`btn-sm ${roomType === r.id ? 'active' : ''}`}
-                    >
-                      {r.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+          {/* Bottom Panel Toggle Tabs (3D Stüdyo Kontrolleri / Metraj & Fiyatlama) */}
+          <div className="bottom-panel-tabs">
+            <button
+              onClick={() => setBottomTab('studio')}
+              className={`panel-tab-btn ${bottomTab === 'studio' ? 'active' : ''}`}
+            >
+              <Palette size={14} />
+              <span>3D Stüdyo & Ortam Kontrolleri</span>
+            </button>
 
-              {/* Dizim Deseni */}
-              <div className="ctrl-group">
-                <span className="ctrl-label">Dizim Deseni:</span>
-                <div className="btn-group-sm">
-                  {[
-                    { id: 'flat', label: 'Düz Grid' },
-                    { id: 'diagonal', label: 'Çapraz 45°' },
-                    { id: 'herringbone', label: 'Balıksırtı' },
-                    { id: 'staggered_50', label: 'Tuğla %50' }
-                  ].map(pat => (
-                    <button
-                      key={pat.id}
-                      onClick={() => setLayPattern(pat.id)}
-                      className={`btn-sm ${layPattern === pat.id ? 'active-gold' : ''}`}
-                    >
-                      {pat.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Derz Rengi */}
-              <div className="ctrl-group">
-                <span className="ctrl-label">Derz Rengi:</span>
-                <div className="color-swatches">
-                  {[
-                    { color: '#ffffff', label: 'Beyaz' },
-                    { color: '#888888', label: 'Gri' },
-                    { color: '#333333', label: 'Antrasit' },
-                    { color: '#d8cbb8', label: 'Bej' }
-                  ].map(g => (
-                    <button
-                      key={g.color}
-                      onClick={() => setGroutColor(g.color)}
-                      style={{ background: g.color }}
-                      className={`swatch-btn ${groutColor === g.color ? 'active' : ''}`}
-                      title={g.label}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Control Row 2: Ortam Işığı & Mobilya / Armatür */}
-            <div className="controls-row">
-              {/* Günün Saati */}
-              <div className="ctrl-group">
-                <span className="ctrl-label">Atmosfer / Işık:</span>
-                <div className="btn-group-sm">
-                  {[
-                    { id: 'day', label: 'Gündüz' },
-                    { id: 'sunrise', label: 'Gündoğumu' },
-                    { id: 'sunset', label: 'Günbatımı' },
-                    { id: 'night', label: 'Gece' }
-                  ].map(tod => (
-                    <button
-                      key={tod.id}
-                      onClick={() => setTimeOfDay(tod.id)}
-                      className={`btn-sm ${timeOfDay === tod.id ? 'active-sky' : ''}`}
-                    >
-                      {tod.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Armatür Metali */}
-              <div className="ctrl-group">
-                <span className="ctrl-label">Armatür:</span>
-                <div className="btn-group-sm">
-                  {[
-                    { id: 'chrome', label: 'Krom' },
-                    { id: 'black', label: 'Mat Siyah' },
-                    { id: 'gold', label: 'Gold' }
-                  ].map(f => (
-                    <button
-                      key={f.id}
-                      onClick={() => setFaucetColor(f.id)}
-                      className={`btn-sm ${faucetColor === f.id ? 'active' : ''}`}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Mobilya Ahşap Dokusu */}
-              <div className="ctrl-group">
-                <span className="ctrl-label">Mobilya:</span>
-                <div className="btn-group-sm">
-                  {[
-                    { id: 'oak', label: 'Meşe' },
-                    { id: 'white', label: 'Beyaz' },
-                    { id: 'anthracite', label: 'Antrasit' },
-                    { id: 'walnut', label: 'Ceviz' }
-                  ].map(c => (
-                    <button
-                      key={c.id}
-                      onClick={() => setCabinetColor(c.id)}
-                      className={`btn-sm ${cabinetColor === c.id ? 'active' : ''}`}
-                    >
-                      {c.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <button
+              onClick={() => setBottomTab('quote')}
+              className={`panel-tab-btn ${bottomTab === 'quote' ? 'active' : ''}`}
+            >
+              <Calculator size={14} />
+              <span>Metraj & Canlı Satış Teklifi Hazırlama</span>
+            </button>
           </div>
+
+          {/* Bottom Live Studio Control Bar (3D Stüdyo Kontrolleri) */}
+          {bottomTab === 'studio' && (
+            <div className="studio-bottom-bar">
+              {/* Control Row 1: Mekan Tipi & Dizim Şekli */}
+              <div className="controls-row">
+                <div className="ctrl-group">
+                  <span className="ctrl-label">Mekan:</span>
+                  <div className="btn-group-sm">
+                    {[
+                      { id: 'bathroom', label: 'Banyo' },
+                      { id: 'livingroom', label: 'Salon' },
+                      { id: 'kitchen', label: 'Mutfak' },
+                      { id: 'terrace', label: 'Teras' }
+                    ].map(r => (
+                      <button
+                        key={r.id}
+                        onClick={() => setRoomType(r.id)}
+                        className={`btn-sm ${roomType === r.id ? 'active' : ''}`}
+                      >
+                        {r.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="ctrl-group">
+                  <span className="ctrl-label">Dizim Deseni:</span>
+                  <div className="btn-group-sm">
+                    {[
+                      { id: 'flat', label: 'Düz Grid' },
+                      { id: 'diagonal', label: 'Çapraz 45°' },
+                      { id: 'herringbone', label: 'Balıksırtı' },
+                      { id: 'staggered_50', label: 'Tuğla %50' }
+                    ].map(pat => (
+                      <button
+                        key={pat.id}
+                        onClick={() => setLayPattern(pat.id)}
+                        className={`btn-sm ${layPattern === pat.id ? 'active-gold' : ''}`}
+                      >
+                        {pat.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="ctrl-group">
+                  <span className="ctrl-label">Derz Rengi:</span>
+                  <div className="color-swatches">
+                    {[
+                      { color: '#ffffff', label: 'Beyaz' },
+                      { color: '#888888', label: 'Gri' },
+                      { color: '#333333', label: 'Antrasit' },
+                      { color: '#d8cbb8', label: 'Bej' }
+                    ].map(g => (
+                      <button
+                        key={g.color}
+                        onClick={() => setGroutColor(g.color)}
+                        style={{ background: g.color }}
+                        className={`swatch-btn ${groutColor === g.color ? 'active' : ''}`}
+                        title={g.label}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Control Row 2: Ortam Işığı & Mobilya / Armatür */}
+              <div className="controls-row">
+                <div className="ctrl-group">
+                  <span className="ctrl-label">Atmosfer / Işık:</span>
+                  <div className="btn-group-sm">
+                    {[
+                      { id: 'day', label: 'Gündüz' },
+                      { id: 'sunrise', label: 'Gündoğumu' },
+                      { id: 'sunset', label: 'Günbatımı' },
+                      { id: 'night', label: 'Gece' }
+                    ].map(tod => (
+                      <button
+                        key={tod.id}
+                        onClick={() => setTimeOfDay(tod.id)}
+                        className={`btn-sm ${timeOfDay === tod.id ? 'active-sky' : ''}`}
+                      >
+                        {tod.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="ctrl-group">
+                  <span className="ctrl-label">Armatür:</span>
+                  <div className="btn-group-sm">
+                    {[
+                      { id: 'chrome', label: 'Krom' },
+                      { id: 'black', label: 'Mat Siyah' },
+                      { id: 'gold', label: 'Gold' }
+                    ].map(f => (
+                      <button
+                        key={f.id}
+                        onClick={() => setFaucetColor(f.id)}
+                        className={`btn-sm ${faucetColor === f.id ? 'active' : ''}`}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="ctrl-group">
+                  <span className="ctrl-label">Mobilya:</span>
+                  <div className="btn-group-sm">
+                    {[
+                      { id: 'oak', label: 'Meşe' },
+                      { id: 'white', label: 'Beyaz' },
+                      { id: 'anthracite', label: 'Antrasit' },
+                      { id: 'walnut', label: 'Ceviz' }
+                    ].map(c => (
+                      <button
+                        key={c.id}
+                        onClick={() => setCabinetColor(c.id)}
+                        className={`btn-sm ${cabinetColor === c.id ? 'active' : ''}`}
+                      >
+                        {c.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Bottom Live Quote & Metraj Sales Assistant Bar (Satış Temsilcisi & Müşteri Teklif Paneli) */}
+          {bottomTab === 'quote' && (
+            <div className="sales-bottom-bar">
+              {/* Row 1: Live Interactive Calculations */}
+              <div className="controls-row">
+                {/* Kaplanacak Alan Slider */}
+                <div className="ctrl-group">
+                  <span className="ctrl-label">Alan (m²):</span>
+                  <div className="slider-box">
+                    <input
+                      type="range"
+                      min="5"
+                      max="150"
+                      value={areaM2}
+                      onChange={(e) => setAreaM2(Number(e.target.value))}
+                      className="kiosk-range-slider"
+                    />
+                    <span className="area-text">{areaM2} m²</span>
+                  </div>
+                </div>
+
+                {/* Birim Fiyat (Satış Temsilcisi Elle Müdahale Edabilir) */}
+                <div className="ctrl-group">
+                  <span className="ctrl-label">Seramik m² Fiyatı:</span>
+                  <div className="price-input-box">
+                    <input
+                      type="number"
+                      value={unitPriceM2}
+                      onChange={(e) => setUnitPriceM2(e.target.value)}
+                      className="kiosk-num-input"
+                    />
+                    <span className="unit-label">₺/m²</span>
+                  </div>
+                </div>
+
+                {/* Dizim Fire Oranı */}
+                <div className="ctrl-group">
+                  <span className="ctrl-label">Dizim Fire %:</span>
+                  <div className="btn-group-sm">
+                    {[
+                      { id: 'duz', label: 'Düz (%8)' },
+                      { id: 'capraz', label: 'Çapraz (%12)' },
+                      { id: 'baliksirti', label: 'Balıksırtı (%15)' }
+                    ].map(style => (
+                      <button
+                        key={style.id}
+                        onClick={() => setLayingStyle(style.id)}
+                        className={`btn-sm ${layingStyle === style.id ? 'active-sky' : ''}`}
+                      >
+                        {style.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: Totals & Create PDF Quote CTA */}
+              <div className="totals-row">
+                <div className="summary-pills">
+                  <div className="sum-pill">
+                    <span className="sum-title">Gereken Seramik</span>
+                    <span className="sum-val">{totalM2WithWaste} m² ({requiredBoxes} Kutu)</span>
+                  </div>
+                  <div className="divider-v" />
+                  <div className="sum-pill">
+                    <span className="sum-title">Sarfiyat (Harç/Derz)</span>
+                    <span className="sum-val">{adhesiveBags} Çuval / {groutPacks} Pak</span>
+                  </div>
+                  <div className="divider-v" />
+                  
+                  {/* Ustalık İşçilik Toggle */}
+                  <div className="hizmet-box">
+                    <button
+                      onClick={() => setIncludeLabor(!includeLabor)}
+                      className={`toggle-hizmet ${includeLabor ? 'active-green' : ''}`}
+                    >
+                      <Wrench size={14} />
+                      <span>{includeLabor ? 'Ustalık' : '+ Ustalık'}</span>
+                    </button>
+                    {includeLabor && (
+                      <input
+                        type="number"
+                        value={laborRatePerM2}
+                        onChange={(e) => setLaborRatePerM2(e.target.value)}
+                        className="kiosk-num-input-sm"
+                        title="Ustalık ₺/m² bedeli"
+                      />
+                    )}
+                  </div>
+
+                  {/* Nakliye Toggle */}
+                  <div className="hizmet-box">
+                    <button
+                      onClick={() => setIncludeShipping(!includeShipping)}
+                      className={`toggle-hizmet ${includeShipping ? 'active-sky' : ''}`}
+                    >
+                      <Truck size={14} />
+                      <span>{includeShipping ? 'Nakliye' : '+ Nakliye'}</span>
+                    </button>
+                    {includeShipping && (
+                      <input
+                        type="number"
+                        value={shippingCostInput}
+                        onChange={(e) => setShippingCostInput(e.target.value)}
+                        className="kiosk-num-input-sm"
+                        title="Nakliye ₺ tutarı"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {/* Total Price & CTA */}
+                <div className="price-cta-box">
+                  <div className="price-col">
+                    <span className="price-label">Tahmini Toplam (KDV Dahil)</span>
+                    <span className="price-val">₺{grandTotal.toLocaleString('tr-TR')}</span>
+                  </div>
+
+                  <button onClick={handleOpenQuoteModal} className="btn-cta-pdf">
+                    <FileText size={16} />
+                    <span>PDF Teklifi Çıkar & Düzenle</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -748,6 +917,38 @@ export default function ShowroomKioskPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Official Editable Quote Modal */}
+      {showQuoteModal && (
+        <QuoteModal
+          isOpen={showQuoteModal}
+          onClose={() => setShowQuoteModal(false)}
+          selectedProduct={selectedProduct}
+          selectedDealer={selectedDealer}
+          snapshotUrl={snapshotUrl}
+          calculationData={{
+            areaM2,
+            wastePercent,
+            totalM2WithWaste,
+            requiredBoxes,
+            unitPriceM2: unitPriceNum,
+            tileCost,
+            includeAdhesive: true,
+            adhesiveBags,
+            adhesiveCost,
+            includeGrout: true,
+            groutPacks,
+            groutCost,
+            includeLabor,
+            laborCost,
+            includeShipping,
+            shippingCost,
+            subtotal: subtotalBeforeVat,
+            vatAmount,
+            grandTotal
+          }}
+        />
       )}
 
       <style jsx>{`
@@ -881,6 +1082,9 @@ export default function ShowroomKioskPage() {
         }
 
         .btn-mode-kiosk {
+          display: flex;
+          align-items: center;
+          gap: 6px;
           background: #090d16;
           border: 1px solid #1e293b;
           color: #94a3b8;
@@ -897,12 +1101,6 @@ export default function ShowroomKioskPage() {
           border-color: #f59e0b;
         }
 
-        .btn-mode-kiosk.active-sky {
-          background: rgba(56, 189, 248, 0.2);
-          color: #38bdf8;
-          border-color: #38bdf8;
-        }
-
         .btn-secondary-kiosk {
           display: flex;
           align-items: center;
@@ -915,6 +1113,21 @@ export default function ShowroomKioskPage() {
           font-size: 0.75rem;
           font-weight: 700;
           cursor: pointer;
+        }
+
+        .btn-primary-gold-kiosk {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          color: #0f172a;
+          border: none;
+          padding: 8px 18px;
+          border-radius: 10px;
+          font-size: 0.75rem;
+          font-weight: 900;
+          cursor: pointer;
+          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
         }
 
         .btn-icon-kiosk {
@@ -999,14 +1212,15 @@ export default function ShowroomKioskPage() {
 
         .kiosk-brand-dropdown {
           background: #090d16;
-          border: 1px solid #334155;
-          color: #ffffff;
-          font-size: 0.8rem;
+          border: 1px solid #f59e0b;
+          color: #fbbf24;
+          font-size: 0.85rem;
           font-weight: 800;
           padding: 10px 12px;
           border-radius: 10px;
           outline: none;
           cursor: pointer;
+          box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
         }
 
         .search-box-wrapper {
@@ -1175,7 +1389,7 @@ export default function ShowroomKioskPage() {
           border-radius: 18px;
           overflow: hidden;
           position: relative;
-          min-height: 420px;
+          min-height: 380px;
         }
 
         .canvas-active-target-overlay {
@@ -1212,10 +1426,36 @@ export default function ShowroomKioskPage() {
           color: #64748b;
         }
 
-        .studio-bottom-bar {
+        .bottom-panel-tabs {
+          display: flex;
+          gap: 8px;
+        }
+
+        .panel-tab-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
           background: #0f172a;
           border: 1px solid #1e293b;
-          border-radius: 16px;
+          color: #94a3b8;
+          font-size: 0.72rem;
+          font-weight: 800;
+          padding: 6px 14px;
+          border-radius: 10px 10px 0 0;
+          cursor: pointer;
+        }
+
+        .panel-tab-btn.active {
+          background: #1e293b;
+          color: #fbbf24;
+          border-color: #f59e0b;
+          border-bottom-color: transparent;
+        }
+
+        .studio-bottom-bar, .sales-bottom-bar {
+          background: #0f172a;
+          border: 1px solid #1e293b;
+          border-radius: 0 12px 16px 16px;
           padding: 12px;
           display: flex;
           flex-direction: column;
@@ -1296,6 +1536,171 @@ export default function ShowroomKioskPage() {
           border-color: #f59e0b;
           transform: scale(1.15);
           box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+        }
+
+        .price-input-box {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .kiosk-num-input {
+          width: 70px;
+          background: #090d16;
+          border: 1px solid #334155;
+          color: #fbbf24;
+          font-weight: 800;
+          font-size: 0.75rem;
+          border-radius: 6px;
+          padding: 3px 6px;
+          outline: none;
+          text-align: center;
+        }
+
+        .kiosk-num-input-sm {
+          width: 55px;
+          background: #090d16;
+          border: 1px solid #334155;
+          color: #ffffff;
+          font-size: 0.7rem;
+          border-radius: 4px;
+          padding: 2px 4px;
+          outline: none;
+          text-align: center;
+        }
+
+        .unit-label {
+          font-size: 0.65rem;
+          color: #94a3b8;
+        }
+
+        .slider-box {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .kiosk-range-slider {
+          accent-color: #f59e0b;
+          width: 90px;
+        }
+
+        .area-text {
+          font-size: 0.75rem;
+          font-weight: 800;
+          color: #fbbf24;
+        }
+
+        .totals-row {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          border-top: 1px dashed #1e293b;
+          padding-top: 8px;
+        }
+
+        .summary-pills {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .sum-pill {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .sum-title {
+          font-size: 0.6rem;
+          color: #64748b;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+
+        .sum-val {
+          font-size: 0.72rem;
+          font-weight: 800;
+          color: #ffffff;
+        }
+
+        .divider-v {
+          width: 1px;
+          height: 22px;
+          background: #1e293b;
+        }
+
+        .hizmet-box {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .toggle-hizmet {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          background: #090d16;
+          border: 1px solid #1e293b;
+          color: #64748b;
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-size: 0.68rem;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .toggle-hizmet.active-green {
+          background: rgba(16, 185, 129, 0.15);
+          color: #34d399;
+          border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .toggle-hizmet.active-sky {
+          background: rgba(56, 189, 248, 0.15);
+          color: #38bdf8;
+          border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .price-cta-box {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .price-col {
+          text-align: right;
+        }
+
+        .price-label {
+          display: block;
+          font-size: 0.6rem;
+          color: #94a3b8;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+
+        .price-val {
+          font-size: 1.1rem;
+          font-weight: 900;
+          color: #fbbf24;
+        }
+
+        .btn-cta-pdf {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          color: #0f172a;
+          border: none;
+          padding: 9px 16px;
+          border-radius: 10px;
+          font-size: 0.75rem;
+          font-weight: 900;
+          cursor: pointer;
+          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
         }
 
         /* Modal Styles */
