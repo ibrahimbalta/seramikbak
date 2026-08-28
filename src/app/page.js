@@ -3491,10 +3491,23 @@ export default function Home() {
                 href="/kiosk" 
                 className="nav-link"
                 title="Bayi Teşhir & Tablet Satış Modu"
-                style={{ textDecoration: 'none' }}
+                style={{ 
+                  display: 'inline-flex', 
+                  flexDirection: 'row', 
+                  alignItems: 'center', 
+                  gap: '8px', 
+                  color: '#475569', 
+                  fontWeight: '700', 
+                  fontSize: '0.85rem', 
+                  fontFamily: 'var(--font-title)', 
+                  textDecoration: 'none', 
+                  padding: '8px 24px', 
+                  borderRadius: '24px',
+                  whiteSpace: 'nowrap'
+                }}
               >
-                <Layers size={14} />
-                <span>{t('kioskMode')}</span>
+                <Layers size={14} style={{ color: '#64748b', flexShrink: 0 }} />
+                <span style={{ fontWeight: '700', color: '#475569', lineHeight: 1, whiteSpace: 'nowrap' }}>{t('kioskMode')}</span>
               </Link>
             </>
           )}
@@ -9047,7 +9060,7 @@ export default function Home() {
           gap: 4px;
         }
 
-        .nav-link {
+        :global(.nav-link) {
           background: transparent;
           border: none;
           color: #475569;
@@ -9055,35 +9068,40 @@ export default function Home() {
           border-radius: 24px;
           cursor: pointer;
           font-family: var(--font-title);
-          font-weight: 700;
+          font-weight: 700 !important;
           font-size: 0.85rem;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          display: flex;
-          align-items: center;
-          gap: 8px;
+          display: inline-flex !important;
+          flex-direction: row !important;
+          align-items: center !important;
+          gap: 8px !important;
           letter-spacing: 0.02em;
           white-space: nowrap !important;
           flex-shrink: 0;
+          text-decoration: none !important;
         }
 
-        .nav-link span {
+        :global(.nav-link span) {
           white-space: nowrap !important;
           word-break: keep-all !important;
           line-height: 1 !important;
           display: inline-block !important;
+          font-weight: 700 !important;
+          color: inherit !important;
         }
 
-        .nav-link svg {
+        :global(.nav-link svg) {
           color: #64748b;
           transition: color 0.3s ease, transform 0.3s ease;
+          flex-shrink: 0 !important;
         }
 
-        .nav-link:hover {
-          color: #0f172a;
+        :global(.nav-link:hover) {
+          color: #0f172a !important;
           background: rgba(255, 255, 255, 0.6);
         }
 
-        .nav-link:hover svg {
+        :global(.nav-link:hover svg) {
           color: var(--accent-gold);
           transform: translateY(-1px);
         }
