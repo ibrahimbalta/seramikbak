@@ -44,12 +44,16 @@ const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), {
 
 // Marka Bazlı Zengin Seramik Koleksiyon Kütüphanesi
 const BRAND_CATALOG = [
+  // Kalebodur / Çanakkale
+  { id: 'kal-1', name: 'Kalebodur Calacatta Gold Porselen', code: 'KAL-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Rektifiye', color: 'Beyaz / Altın', brand: { id: 'kalebodur', name: 'Kalebodur' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 540 },
+  { id: 'kal-2', name: 'Kalebodur Nero Marquina Siyah', code: 'KAL-NERO-60120', width: 60, height: 120, style: 'Mermer', finish: 'Lüks Parlak', color: 'Siyah Damarlı', brand: { id: 'kalebodur', name: 'Kalebodur' }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg', unitPrice: 560 },
+  { id: 'kal-3', name: 'Kalebodur Urban Gri Beton Karo', code: 'KAL-BET-6060', width: 60, height: 60, style: 'Beton', finish: 'Mat Endüstriyel', color: 'Gri', brand: { id: 'kalebodur', name: 'Kalebodur' }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg', unitPrice: 410 },
+
   // Graniser
   { id: 'gra-1', name: 'Graniser Calacatta Mermer Porselen', code: 'GRA-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Rektifiye', color: 'Beyaz / Altın', brand: { id: 'graniser', name: 'Graniser' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 520 },
   { id: 'gra-2', name: 'Graniser Loft Gri Beton Karo', code: 'GRA-BET-6060', width: 60, height: 60, style: 'Beton', finish: 'Mat Endüstriyel', color: 'Gri', brand: { id: 'graniser', name: 'Graniser' }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg', unitPrice: 380 },
   { id: 'gra-3', name: 'Graniser Teak Ahşap Doku Karo', code: 'GRA-TEAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Derzli', color: 'Koyu Meşe', brand: { id: 'graniser', name: 'Graniser' }, imageUrl: '/textures/teak_ahsap.jpg', textureUrl: '/textures/teak_ahsap.jpg', unitPrice: 440 },
   { id: 'gra-4', name: 'Graniser Travertino Bej Taş Karo', code: 'GRA-TRAV-60120', width: 60, height: 120, style: 'Taş', finish: 'Rölyef Mat', color: 'Bej', brand: { id: 'graniser', name: 'Graniser' }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 490 },
-  { id: 'gra-5', name: 'Graniser Albatros Siyah Mermer', code: 'GRA-ALB-8080', width: 80, height: 80, style: 'Mermer', finish: 'Lüks Parlak', color: 'Siyah', brand: { id: 'graniser', name: 'Graniser' }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg', unitPrice: 560 },
 
   // VitrA
   { id: 'vit-1', name: 'VitrA Marbleous Calacatta Gold', code: 'VIT-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Mat Rektifiye', color: 'Beyaz / Altın', brand: { id: 'vitra', name: 'VitrA' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 580 },
@@ -65,10 +69,6 @@ const BRAND_CATALOG = [
   // Bien Seramik
   { id: 'bie-1', name: 'Bien Nordic Meşe Ahşap Porselen', code: 'BIE-OAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Ahşap', color: 'Doğal Meşe', brand: { id: 'bien', name: 'Bien Seramik' }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg', unitPrice: 430 },
   { id: 'bie-2', name: 'Bien Calacatta Venato Mermer', code: 'BIE-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Mega Slab', color: 'Beyaz Gri', brand: { id: 'bien', name: 'Bien Seramik' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 530 },
-
-  // Çanakkale Seramik
-  { id: 'can-1', name: 'Çanakkale Urban Gri Beton Karo', code: 'CAN-BET-6060', width: 60, height: 60, style: 'Beton', finish: 'Mat Endüstriyel', color: 'Gri', brand: { id: 'canakkale', name: 'Çanakkale Seramik' }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg', unitPrice: 390 },
-  { id: 'can-2', name: 'Çanakkale Orient Traverten Mermer', code: 'CAN-TRAV-60120', width: 60, height: 120, style: 'Mermer', finish: 'Mat Rektifiye', color: 'Sıcak Krem', brand: { id: 'canakkale', name: 'Çanakkale Seramik' }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 480 },
 
   // Ege Seramik
   { id: 'ege-1', name: 'Ege Loft Antrasit Beton Porselen', code: 'EGE-LOFT-8080', width: 80, height: 80, style: 'Beton', finish: 'Lapatto', color: 'Koyu Antrasit', brand: { id: 'ege', name: 'Ege Seramik' }, imageUrl: '/textures/loft_beton.jpg', textureUrl: '/textures/loft_beton.jpg', unitPrice: 460 },
@@ -273,7 +273,6 @@ export default function ShowroomKioskPage() {
 
   // Akıllı Ürün Filtreleme (Marka + Stil + Arama)
   const filteredProducts = products.filter(p => {
-    // Marka eşleşmesi (id veya name partial match)
     let brandMatch = true;
     if (selectedBrandId !== 'all') {
       const bId = String(selectedBrandId).toLowerCase();
@@ -307,7 +306,7 @@ export default function ShowroomKioskPage() {
   // Eğer seçilen marka için veritabanında henüz ürün yoksa, o markaya özel dinamik koleksiyon oluştur
   let displayProducts = filteredProducts;
   if (displayProducts.length === 0 && selectedBrandId !== 'all') {
-    const brandObj = brands.find(b => b.id === selectedBrandId) || { name: selectedBrandId };
+    const brandObj = brands.find(b => b.id === selectedBrandId || b.name?.toLowerCase() === selectedBrandId.toLowerCase()) || { name: selectedBrandId };
     const brandNameStr = brandObj.name || selectedBrandId;
 
     displayProducts = [
@@ -323,7 +322,7 @@ export default function ShowroomKioskPage() {
   }
 
   // Tüm Markaların Listesini Derle
-  const knownBrandNames = ['Graniser', 'VitrA', 'NG Kütahya Seramik', 'Bien Seramik', 'Çanakkale Seramik', 'Yurtbay Seramik', 'Ege Seramik', 'Seramiksan', 'Qua Granite', 'Duratiles', 'Decovita', 'Hitit Seramik'];
+  const knownBrandNames = ['Kalebodur', 'Graniser', 'VitrA', 'NG Kütahya Seramik', 'Bien Seramik', 'Çanakkale Seramik', 'Yurtbay Seramik', 'Ege Seramik', 'Seramiksan', 'Qua Granite', 'Duratiles', 'Decovita', 'Hitit Seramik'];
   
   const uniqueBrandList = brands.length > 0 ? brands : knownBrandNames.map(name => ({
     id: name.toLowerCase().replace(/[^a-z0-9]/g, ''),
@@ -364,7 +363,7 @@ export default function ShowroomKioskPage() {
           <div>
             <div className="brand-title-row">
               <h1 className="brand-title">Seramik<span className="gold-accent">Bak</span></h1>
-              <span className="kiosk-pill">Tablet Showroom Ekranı</span>
+              <span className="kiosk-pill">3D Sanal Stüdyo Kiosk</span>
             </div>
             <p className="dealer-sub-text">
               {selectedDealer ? `${selectedDealer.name} Dokunmatik Satış Portalı` : 'Showroom Satış Asistanı'}
@@ -398,119 +397,121 @@ export default function ShowroomKioskPage() {
         </div>
       </header>
 
-      {/* Main Touch Workspace Grid */}
+      {/* Main Touch Workspace Grid (Fixed Screen Viewport Locked) */}
       <div className="kiosk-workspace-grid">
         {/* Left Side: Product & Brand Selector Sidebar */}
         <div className="kiosk-sidebar">
           {/* Surface Target Selection Grid (Hangi Yüzey Kaplanacak?) */}
-          <div className="section-label-header">
-            <Layers size={14} className="icon-gold" />
-            <span>1. Kaplanacak Yüzeyi Seçin:</span>
-          </div>
-
-          <div className="surface-target-grid">
-            <button
-              onClick={() => setActiveTargetSurface('floor')}
-              className={`target-btn ${activeTargetSurface === 'floor' ? 'active' : ''}`}
-            >
-              <span>Zemin ({floorProduct ? floorProduct.name.split(' ')[0] : 'Seç'})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTargetSurface('walls')}
-              className={`target-btn ${activeTargetSurface === 'walls' ? 'active' : ''}`}
-            >
-              <span>Duvar ({wallProduct ? wallProduct.name.split(' ')[0] : 'Seç'})</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTargetSurface('shower')}
-              className={`target-btn ${activeTargetSurface === 'shower' ? 'active' : ''}`}
-            >
-              <span>Duş Duvarı</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTargetSurface('showerFloor')}
-              className={`target-btn ${activeTargetSurface === 'showerFloor' ? 'active' : ''}`}
-            >
-              <span>Duş Zemini</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTargetSurface('toilet')}
-              className={`target-btn ${activeTargetSurface === 'toilet' ? 'active' : ''}`}
-            >
-              <span>Klozet Arkası</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTargetSurface('accent')}
-              className={`target-btn ${activeTargetSurface === 'accent' ? 'active' : ''}`}
-            >
-              <span>Vurgu Duvarı</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTargetSurface('stripe')}
-              className={`target-btn ${activeTargetSurface === 'stripe' ? 'active' : ''}`}
-            >
-              <span>Yatay Bordür</span>
-            </button>
-          </div>
-
-          {/* Marka Seçimi Dropdown (Tüm Markalar) */}
-          <div className="brand-select-wrapper">
+          <div className="sidebar-top-controls">
             <div className="section-label-header">
-              <Building2 size={14} className="icon-gold" />
-              <span>2. Marka Filtresi:</span>
+              <Layers size={14} className="icon-gold" />
+              <span>1. Kaplanacak Yüzeyi Seçin:</span>
             </div>
-            <select
-              value={selectedBrandId}
-              onChange={(e) => handleBrandChange(e.target.value)}
-              className="kiosk-brand-dropdown"
-            >
-              <option value="all">🏢 Tüm Markalar ({products.length} Model)</option>
-              {uniqueBrandList.map(b => (
-                <option key={b.id} value={b.id || b.name}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-          </div>
 
-          {/* Search Input Box */}
-          <div className="search-box-wrapper">
-            <Search size={15} className="search-icon" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Model / SKU / Tarz Ara (ör. Calacatta, Mermer)..."
-              className="search-input"
-            />
-          </div>
-
-          {/* Style Filter Touch Pills */}
-          <div className="filter-pills-row">
-            {[
-              { id: 'all', label: 'Tümü' },
-              { id: 'mermer', label: 'Mermer' },
-              { id: 'ahsap', label: 'Ahşap' },
-              { id: 'beton', label: 'Beton' },
-              { id: 'tas', label: 'Taş' }
-            ].map(tab => (
+            <div className="surface-target-grid">
               <button
-                key={tab.id}
-                onClick={() => setSelectedStyle(tab.id)}
-                className={`filter-pill ${selectedStyle === tab.id ? 'active' : ''}`}
+                onClick={() => setActiveTargetSurface('floor')}
+                className={`target-btn ${activeTargetSurface === 'floor' ? 'active' : ''}`}
               >
-                {tab.label}
+                <span>Zemin ({floorProduct ? floorProduct.name.split(' ')[0] : 'Seç'})</span>
               </button>
-            ))}
+
+              <button
+                onClick={() => setActiveTargetSurface('walls')}
+                className={`target-btn ${activeTargetSurface === 'walls' ? 'active' : ''}`}
+              >
+                <span>Duvar ({wallProduct ? wallProduct.name.split(' ')[0] : 'Seç'})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTargetSurface('shower')}
+                className={`target-btn ${activeTargetSurface === 'shower' ? 'active' : ''}`}
+              >
+                <span>Duş Duvarı</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTargetSurface('showerFloor')}
+                className={`target-btn ${activeTargetSurface === 'showerFloor' ? 'active' : ''}`}
+              >
+                <span>Duş Zemini</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTargetSurface('toilet')}
+                className={`target-btn ${activeTargetSurface === 'toilet' ? 'active' : ''}`}
+              >
+                <span>Klozet Arkası</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTargetSurface('accent')}
+                className={`target-btn ${activeTargetSurface === 'accent' ? 'active' : ''}`}
+              >
+                <span>Vurgu Duvarı</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTargetSurface('stripe')}
+                className={`target-btn ${activeTargetSurface === 'stripe' ? 'active' : ''}`}
+              >
+                <span>Yatay Bordür</span>
+              </button>
+            </div>
+
+            {/* Marka Seçimi Dropdown (Tüm Markalar) */}
+            <div className="brand-select-wrapper">
+              <div className="section-label-header">
+                <Building2 size={14} className="icon-gold" />
+                <span>2. Marka Filtresi:</span>
+              </div>
+              <select
+                value={selectedBrandId}
+                onChange={(e) => handleBrandChange(e.target.value)}
+                className="kiosk-brand-dropdown"
+              >
+                <option value="all">🏢 Tüm Markalar ({products.length} Model)</option>
+                {uniqueBrandList.map(b => (
+                  <option key={b.id} value={b.id || b.name}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Search Input Box */}
+            <div className="search-box-wrapper">
+              <Search size={15} className="search-icon" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Model / SKU / Tarz Ara (ör. Calacatta, Mermer)..."
+                className="search-input"
+              />
+            </div>
+
+            {/* Style Filter Touch Pills */}
+            <div className="filter-pills-row">
+              {[
+                { id: 'all', label: 'Tümü' },
+                { id: 'mermer', label: 'Mermer' },
+                { id: 'ahsap', label: 'Ahşap' },
+                { id: 'beton', label: 'Beton' },
+                { id: 'tas', label: 'Taş' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedStyle(tab.id)}
+                  className={`filter-pill ${selectedStyle === tab.id ? 'active' : ''}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Products List Grid (Markaya Ait Tüm Ürünler - Aşağı Doğru Kaydırılabilir) */}
+          {/* Products List Grid (Sadece Ürün Listesi İçeride Scroll Eder, Sayfa Bozulmaz!) */}
           <div className="products-scroll-grid">
             {displayProducts.map(product => {
               const isFloorSelected = floorProduct?.id === product.id;
@@ -779,7 +780,7 @@ export default function ShowroomKioskPage() {
                   </div>
                 </div>
 
-                {/* Birim Fiyat (Satış Temsilcisi Elle Müdahale Edabilir) */}
+                {/* Birim Fiyat (Satış Temsilcisi Elle Müdahale Edebilir) */}
                 <div className="ctrl-group">
                   <span className="ctrl-label">Seramik m² Fiyatı:</span>
                   <div className="price-input-box">
@@ -953,7 +954,8 @@ export default function ShowroomKioskPage() {
 
       <style jsx>{`
         .kiosk-page-container {
-          min-height: 100vh;
+          height: 100vh;
+          max-height: 100vh;
           background: #090d16;
           color: #ffffff;
           font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -990,10 +992,12 @@ export default function ShowroomKioskPage() {
         }
 
         .kiosk-header {
+          height: 56px;
+          flex-shrink: 0;
           background: rgba(15, 23, 42, 0.95);
           backdrop-filter: blur(12px);
           border-bottom: 1px solid #1e293b;
-          padding: 10px 20px;
+          padding: 8px 18px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -1003,7 +1007,7 @@ export default function ShowroomKioskPage() {
         .header-left {
           display: flex;
           align-items: center;
-          gap: 14px;
+          gap: 12px;
         }
 
         .btn-exit-kiosk {
@@ -1013,9 +1017,9 @@ export default function ShowroomKioskPage() {
           background: rgba(239, 68, 68, 0.15);
           border: 1px solid rgba(239, 68, 68, 0.4);
           color: #ef4444;
-          padding: 8px 14px;
-          border-radius: 10px;
-          font-size: 0.75rem;
+          padding: 6px 12px;
+          border-radius: 8px;
+          font-size: 0.72rem;
           font-weight: 800;
           text-decoration: none;
           transition: all 0.2s ease;
@@ -1027,17 +1031,17 @@ export default function ShowroomKioskPage() {
         }
 
         .brand-badge {
-          width: 40px;
-          height: 40px;
-          border-radius: 12px;
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
           background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
           color: #0f172a;
           font-weight: 900;
-          font-size: 1.1rem;
+          font-size: 1rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
         .brand-title-row {
@@ -1047,7 +1051,7 @@ export default function ShowroomKioskPage() {
         }
 
         .brand-title {
-          font-size: 1.25rem;
+          font-size: 1.15rem;
           font-weight: 900;
           color: #ffffff;
           margin: 0;
@@ -1062,7 +1066,7 @@ export default function ShowroomKioskPage() {
           background: rgba(245, 158, 11, 0.15);
           border: 1px solid rgba(245, 158, 11, 0.35);
           color: #fbbf24;
-          font-size: 0.65rem;
+          font-size: 0.6rem;
           font-weight: 800;
           text-transform: uppercase;
           padding: 2px 8px;
@@ -1070,15 +1074,15 @@ export default function ShowroomKioskPage() {
         }
 
         .dealer-sub-text {
-          font-size: 0.72rem;
+          font-size: 0.68rem;
           color: #94a3b8;
-          margin: 2px 0 0 0;
+          margin: 1px 0 0 0;
         }
 
         .header-right {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
         }
 
         .btn-mode-kiosk {
@@ -1088,10 +1092,10 @@ export default function ShowroomKioskPage() {
           background: #090d16;
           border: 1px solid #1e293b;
           color: #94a3b8;
-          font-size: 0.75rem;
+          font-size: 0.72rem;
           font-weight: 700;
-          padding: 8px 14px;
-          border-radius: 10px;
+          padding: 6px 12px;
+          border-radius: 8px;
           cursor: pointer;
         }
 
@@ -1108,9 +1112,9 @@ export default function ShowroomKioskPage() {
           background: #1e293b;
           color: #e2e8f0;
           border: 1px solid #334155;
-          padding: 8px 14px;
-          border-radius: 10px;
-          font-size: 0.75rem;
+          padding: 6px 12px;
+          border-radius: 8px;
+          font-size: 0.72rem;
           font-weight: 700;
           cursor: pointer;
         }
@@ -1122,45 +1126,59 @@ export default function ShowroomKioskPage() {
           background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
           color: #0f172a;
           border: none;
-          padding: 8px 18px;
-          border-radius: 10px;
-          font-size: 0.75rem;
+          padding: 7px 16px;
+          border-radius: 8px;
+          font-size: 0.72rem;
           font-weight: 900;
           cursor: pointer;
-          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
         .btn-icon-kiosk {
           background: #1e293b;
           color: #94a3b8;
           border: none;
-          padding: 8px;
-          border-radius: 10px;
+          padding: 7px;
+          border-radius: 8px;
           cursor: pointer;
         }
 
+        /* Fixed Viewport Grid */
         .kiosk-workspace-grid {
           flex: 1;
+          height: calc(100vh - 56px);
+          min-height: 0;
           display: grid;
-          grid-template-columns: 380px 1fr;
+          grid-template-columns: 360px 1fr;
           overflow: hidden;
         }
 
+        /* Left Sidebar: Fixed Container */
         .kiosk-sidebar {
+          height: 100%;
+          max-height: 100%;
+          min-height: 0;
           background: #0f172a;
           border-right: 1px solid #1e293b;
-          padding: 14px;
+          padding: 12px;
           display: flex;
           flex-direction: column;
-          gap: 12px;
-          overflow-y: auto;
+          gap: 10px;
+          overflow: hidden;
+        }
+
+        .sidebar-top-controls {
+          flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
         }
 
         .section-label-header {
           display: flex;
           align-items: center;
           gap: 6px;
-          font-size: 0.72rem;
+          font-size: 0.68rem;
           font-weight: 800;
           color: #fbbf24;
           text-transform: uppercase;
@@ -1174,10 +1192,10 @@ export default function ShowroomKioskPage() {
         .surface-target-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 6px;
+          gap: 4px;
           background: #090d16;
-          padding: 6px;
-          border-radius: 10px;
+          padding: 4px;
+          border-radius: 8px;
           border: 1px solid #1e293b;
         }
 
@@ -1185,12 +1203,12 @@ export default function ShowroomKioskPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 8px 6px;
+          padding: 6px 4px;
           border-radius: 6px;
           border: 1px solid transparent;
           background: #0f172a;
           color: #94a3b8;
-          font-size: 0.7rem;
+          font-size: 0.68rem;
           font-weight: 700;
           cursor: pointer;
           transition: all 0.15s ease;
@@ -1201,26 +1219,26 @@ export default function ShowroomKioskPage() {
           background: #f59e0b;
           color: #0f172a;
           font-weight: 900;
-          box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
         }
 
         .brand-select-wrapper {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 4px;
         }
 
         .kiosk-brand-dropdown {
           background: #090d16;
           border: 1px solid #f59e0b;
           color: #fbbf24;
-          font-size: 0.85rem;
+          font-size: 0.8rem;
           font-weight: 800;
-          padding: 10px 12px;
-          border-radius: 10px;
+          padding: 8px 10px;
+          border-radius: 8px;
           outline: none;
           cursor: pointer;
-          box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.15);
         }
 
         .search-box-wrapper {
@@ -1240,15 +1258,15 @@ export default function ShowroomKioskPage() {
           background: #090d16;
           border: 1px solid #1e293b;
           color: #ffffff;
-          font-size: 0.75rem;
-          padding: 8px 12px 8px 32px;
-          border-radius: 10px;
+          font-size: 0.72rem;
+          padding: 7px 10px 7px 30px;
+          border-radius: 8px;
           outline: none;
         }
 
         .filter-pills-row {
           display: flex;
-          gap: 6px;
+          gap: 4px;
           overflow-x: auto;
           padding-bottom: 2px;
         }
@@ -1257,9 +1275,9 @@ export default function ShowroomKioskPage() {
           background: #090d16;
           border: 1px solid #1e293b;
           color: #94a3b8;
-          padding: 5px 12px;
-          border-radius: 8px;
-          font-size: 0.7rem;
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-size: 0.68rem;
           font-weight: 700;
           cursor: pointer;
           white-space: nowrap;
@@ -1271,36 +1289,39 @@ export default function ShowroomKioskPage() {
           border-color: rgba(245, 158, 11, 0.4);
         }
 
+        /* Products Grid: Scrolls independently without stretching the viewport! */
         .products-scroll-grid {
+          flex: 1;
+          min-height: 0;
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 10px;
+          gap: 8px;
           overflow-y: auto;
-          flex: 1;
+          padding-right: 2px;
         }
 
         .product-touch-card {
           background: #090d16;
           border: 1px solid #1e293b;
-          border-radius: 12px;
-          padding: 8px;
+          border-radius: 10px;
+          padding: 6px;
           cursor: pointer;
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 4px;
           transition: all 0.15s ease;
         }
 
         .product-touch-card.active {
           border-color: #f59e0b;
-          box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+          box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
           background: #141c2e;
         }
 
         .card-thumb-wrapper {
-          height: 100px;
+          height: 85px;
           background: #1e293b;
-          border-radius: 8px;
+          border-radius: 6px;
           overflow: hidden;
           position: relative;
         }
@@ -1313,47 +1334,47 @@ export default function ShowroomKioskPage() {
 
         .tag-badges {
           position: absolute;
-          top: 4px;
-          left: 4px;
+          top: 3px;
+          left: 3px;
           display: flex;
-          gap: 4px;
+          gap: 3px;
         }
 
         .tag-floor {
           background: #f59e0b;
           color: #0f172a;
-          font-size: 0.55rem;
+          font-size: 0.5rem;
           font-weight: 900;
-          padding: 2px 6px;
-          border-radius: 6px;
+          padding: 1px 5px;
+          border-radius: 4px;
         }
 
         .tag-wall {
           background: #0284c7;
           color: #ffffff;
-          font-size: 0.55rem;
+          font-size: 0.5rem;
           font-weight: 900;
-          padding: 2px 6px;
-          border-radius: 6px;
+          padding: 1px 5px;
+          border-radius: 4px;
         }
 
         .tag-shower {
           background: #10b981;
           color: #ffffff;
-          font-size: 0.55rem;
+          font-size: 0.5rem;
           font-weight: 900;
-          padding: 2px 6px;
-          border-radius: 6px;
+          padding: 1px 5px;
+          border-radius: 4px;
         }
 
         .card-info {
           display: flex;
           flex-direction: column;
-          gap: 2px;
+          gap: 1px;
         }
 
         .brand-name-pill {
-          font-size: 0.6rem;
+          font-size: 0.58rem;
           color: #f59e0b;
           font-weight: 800;
           text-transform: uppercase;
@@ -1361,74 +1382,84 @@ export default function ShowroomKioskPage() {
         }
 
         .product-title {
-          font-size: 0.75rem;
+          font-size: 0.7rem;
           font-weight: 800;
           color: #ffffff;
           margin: 0;
-          line-height: 1.25;
+          line-height: 1.2;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
 
         .product-specs {
-          font-size: 0.65rem;
+          font-size: 0.62rem;
           color: #94a3b8;
           margin: 0;
         }
 
+        /* Right Canvas Area: Fixed height */
         .kiosk-canvas-area {
+          height: 100%;
+          max-height: 100%;
+          min-height: 0;
           background: #090d16;
-          padding: 14px;
+          padding: 10px;
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 8px;
+          overflow: hidden;
         }
 
         .canvas-frame {
           flex: 1;
+          min-height: 0;
           background: #090d16;
           border: 1px solid #1e293b;
-          border-radius: 18px;
+          border-radius: 14px;
           overflow: hidden;
           position: relative;
-          min-height: 380px;
         }
 
         .canvas-active-target-overlay {
           position: absolute;
-          top: 14px;
-          left: 14px;
+          top: 10px;
+          left: 10px;
           background: rgba(15, 23, 42, 0.88);
           backdrop-filter: blur(8px);
           border: 1px solid rgba(245, 158, 11, 0.4);
-          padding: 8px 14px;
-          border-radius: 12px;
+          padding: 6px 12px;
+          border-radius: 10px;
           display: flex;
           flex-direction: column;
-          gap: 2px;
+          gap: 1px;
           pointer-events: none;
           z-index: 10;
         }
 
         .overlay-label {
-          font-size: 0.62rem;
+          font-size: 0.58rem;
           color: #94a3b8;
           font-weight: 700;
           text-transform: uppercase;
         }
 
         .overlay-target-name {
-          font-size: 0.85rem;
+          font-size: 0.78rem;
           font-weight: 900;
           color: #fbbf24;
         }
 
         .overlay-sub-hint {
-          font-size: 0.6rem;
+          font-size: 0.55rem;
           color: #64748b;
         }
 
         .bottom-panel-tabs {
           display: flex;
-          gap: 8px;
+          gap: 6px;
+          flex-shrink: 0;
         }
 
         .panel-tab-btn {
@@ -1438,10 +1469,10 @@ export default function ShowroomKioskPage() {
           background: #0f172a;
           border: 1px solid #1e293b;
           color: #94a3b8;
-          font-size: 0.72rem;
+          font-size: 0.7rem;
           font-weight: 800;
-          padding: 6px 14px;
-          border-radius: 10px 10px 0 0;
+          padding: 5px 12px;
+          border-radius: 8px 8px 0 0;
           cursor: pointer;
         }
 
@@ -1453,13 +1484,14 @@ export default function ShowroomKioskPage() {
         }
 
         .studio-bottom-bar, .sales-bottom-bar {
+          flex-shrink: 0;
           background: #0f172a;
           border: 1px solid #1e293b;
-          border-radius: 0 12px 16px 16px;
-          padding: 12px;
+          border-radius: 0 10px 14px 14px;
+          padding: 10px;
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 8px;
         }
 
         .controls-row {
@@ -1467,17 +1499,17 @@ export default function ShowroomKioskPage() {
           flex-wrap: wrap;
           align-items: center;
           justify-content: space-between;
-          gap: 12px;
+          gap: 10px;
         }
 
         .ctrl-group {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
         }
 
         .ctrl-label {
-          font-size: 0.7rem;
+          font-size: 0.65rem;
           color: #94a3b8;
           font-weight: 800;
           text-transform: uppercase;
@@ -1485,17 +1517,17 @@ export default function ShowroomKioskPage() {
 
         .btn-group-sm {
           display: flex;
-          gap: 4px;
+          gap: 3px;
         }
 
         .btn-sm {
           background: #090d16;
           border: 1px solid #1e293b;
           color: #94a3b8;
-          font-size: 0.68rem;
+          font-size: 0.65rem;
           font-weight: 700;
-          padding: 5px 10px;
-          border-radius: 6px;
+          padding: 4px 8px;
+          border-radius: 5px;
           cursor: pointer;
         }
 
@@ -1521,12 +1553,12 @@ export default function ShowroomKioskPage() {
 
         .color-swatches {
           display: flex;
-          gap: 6px;
+          gap: 4px;
         }
 
         .swatch-btn {
-          width: 22px;
-          height: 22px;
+          width: 20px;
+          height: 20px;
           border-radius: 50%;
           border: 2px solid #334155;
           cursor: pointer;
@@ -1534,8 +1566,8 @@ export default function ShowroomKioskPage() {
 
         .swatch-btn.active {
           border-color: #f59e0b;
-          transform: scale(1.15);
-          box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+          transform: scale(1.12);
+          box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
         }
 
         .price-input-box {
@@ -1545,24 +1577,24 @@ export default function ShowroomKioskPage() {
         }
 
         .kiosk-num-input {
-          width: 70px;
+          width: 65px;
           background: #090d16;
           border: 1px solid #334155;
           color: #fbbf24;
           font-weight: 800;
-          font-size: 0.75rem;
-          border-radius: 6px;
-          padding: 3px 6px;
+          font-size: 0.72rem;
+          border-radius: 5px;
+          padding: 2px 4px;
           outline: none;
           text-align: center;
         }
 
         .kiosk-num-input-sm {
-          width: 55px;
+          width: 50px;
           background: #090d16;
           border: 1px solid #334155;
           color: #ffffff;
-          font-size: 0.7rem;
+          font-size: 0.68rem;
           border-radius: 4px;
           padding: 2px 4px;
           outline: none;
@@ -1570,7 +1602,7 @@ export default function ShowroomKioskPage() {
         }
 
         .unit-label {
-          font-size: 0.65rem;
+          font-size: 0.62rem;
           color: #94a3b8;
         }
 
@@ -1582,11 +1614,11 @@ export default function ShowroomKioskPage() {
 
         .kiosk-range-slider {
           accent-color: #f59e0b;
-          width: 90px;
+          width: 80px;
         }
 
         .area-text {
-          font-size: 0.75rem;
+          font-size: 0.72rem;
           font-weight: 800;
           color: #fbbf24;
         }
@@ -1596,15 +1628,15 @@ export default function ShowroomKioskPage() {
           flex-wrap: wrap;
           align-items: center;
           justify-content: space-between;
-          gap: 10px;
+          gap: 8px;
           border-top: 1px dashed #1e293b;
-          padding-top: 8px;
+          padding-top: 6px;
         }
 
         .summary-pills {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           flex-wrap: wrap;
         }
 
@@ -1614,21 +1646,21 @@ export default function ShowroomKioskPage() {
         }
 
         .sum-title {
-          font-size: 0.6rem;
+          font-size: 0.58rem;
           color: #64748b;
           font-weight: 700;
           text-transform: uppercase;
         }
 
         .sum-val {
-          font-size: 0.72rem;
+          font-size: 0.7rem;
           font-weight: 800;
           color: #ffffff;
         }
 
         .divider-v {
           width: 1px;
-          height: 22px;
+          height: 20px;
           background: #1e293b;
         }
 
@@ -1645,9 +1677,9 @@ export default function ShowroomKioskPage() {
           background: #090d16;
           border: 1px solid #1e293b;
           color: #64748b;
-          padding: 4px 8px;
-          border-radius: 6px;
-          font-size: 0.68rem;
+          padding: 3px 6px;
+          border-radius: 5px;
+          font-size: 0.65rem;
           font-weight: 700;
           cursor: pointer;
         }
@@ -1667,7 +1699,7 @@ export default function ShowroomKioskPage() {
         .price-cta-box {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
         }
 
         .price-col {
@@ -1676,14 +1708,14 @@ export default function ShowroomKioskPage() {
 
         .price-label {
           display: block;
-          font-size: 0.6rem;
+          font-size: 0.58rem;
           color: #94a3b8;
           font-weight: 700;
           text-transform: uppercase;
         }
 
         .price-val {
-          font-size: 1.1rem;
+          font-size: 1rem;
           font-weight: 900;
           color: #fbbf24;
         }
@@ -1691,16 +1723,16 @@ export default function ShowroomKioskPage() {
         .btn-cta-pdf {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 5px;
           background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
           color: #0f172a;
           border: none;
-          padding: 9px 16px;
-          border-radius: 10px;
-          font-size: 0.75rem;
+          padding: 8px 14px;
+          border-radius: 8px;
+          font-size: 0.72rem;
           font-weight: 900;
           cursor: pointer;
-          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
         /* Modal Styles */
@@ -1792,6 +1824,7 @@ export default function ShowroomKioskPage() {
         @media (max-width: 900px) {
           .kiosk-workspace-grid {
             grid-template-columns: 1fr;
+            height: auto;
           }
           .kiosk-sidebar {
             max-height: 350px;
