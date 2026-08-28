@@ -23,7 +23,12 @@ export async function GET(request) {
     }
 
     if (brandId && brandId !== 'all') {
-      where.brandId = brandId;
+      where.OR = [
+        { brandId: brandId },
+        { brand: { id: brandId } },
+        { brand: { name: { equals: brandId, mode: 'insensitive' } } },
+        { brand: { name: { contains: brandId, mode: 'insensitive' } } }
+      ];
     }
 
     if (style && style !== 'all') {

@@ -91,6 +91,7 @@ export default function ShowroomKioskPage() {
   const [brands, setBrands] = useState([]);
   const [selectedBrandId, setSelectedBrandId] = useState('all');
   const [selectedDealer, setSelectedDealer] = useState(null);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
 
   // 3D Sanal Stüdyo Yüzey Seçimleri
   const [selectedProduct, setSelectedProduct] = useState(BRAND_CATALOG[0]);
@@ -147,43 +148,14 @@ export default function ShowroomKioskPage() {
   const [snapshotUrl, setSnapshotUrl] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Veritabanından Tüm Ürünleri ve Markaları Yükle
+  // Veritabanından Markaları ve Bayileri Yükle
   useEffect(() => {
-    async function loadData() {
+    async function loadMetaData() {
       try {
-        const [prodRes, brandRes, dealerRes] = await Promise.all([
-          fetch('/api/products?limit=200').then(r => r.json()).catch(() => null),
+        const [brandRes, dealerRes] = await Promise.all([
           fetch('/api/brands').then(r => r.json()).catch(() => null),
           fetch('/api/dealers').then(r => r.json()).catch(() => null)
         ]);
-
-        if (prodRes && prodRes.products && prodRes.products.length > 0) {
-          const sanitizedProducts = prodRes.products.map((p, idx) => {
-            let tex = p.textureUrl || p.imageUrl;
-            if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
-              const fallbackIdx = idx % BRAND_CATALOG.length;
-              tex = BRAND_CATALOG[fallbackIdx].textureUrl;
-            }
-            return {
-              ...p,
-              imageUrl: tex,
-              textureUrl: tex
-            };
-          });
-
-          // Birleştir: Veritabanındaki ürünler + Marka kataloğu
-          const combined = [...sanitizedProducts];
-          BRAND_CATALOG.forEach(bItem => {
-            if (!combined.some(c => c.code === bItem.code)) {
-              combined.push(bItem);
-            }
-          });
-
-          setProducts(combined);
-          setSelectedProduct(combined[0]);
-          setFloorProduct(combined[0]);
-          setWallProduct(combined[1] || combined[0]);
-        }
 
         if (brandRes && Array.isArray(brandRes)) {
           setBrands(brandRes);
@@ -193,11 +165,57 @@ export default function ShowroomKioskPage() {
           setSelectedDealer(dealerRes.dealers[0]);
         }
       } catch (err) {
-        console.error('Kiosk data fetch error:', err);
+        console.error('Kiosk meta data fetch error:', err);
       }
     }
-    loadData();
+    loadMetaData();
   }, []);
+
+  // Seçilen Markaya (veya Tüm Markalara) Göre Veritabanından Ürünleri Canlı Yükle
+  useEffect(() => {
+    let isSubscribed = true;
+    async function loadProductsForBrand() {
+      setIsLoadingProducts(true);
+      try {
+        const url = selectedBrandId !== 'all' 
+          ? `/api/products?brandId=${encodeURIComponent(selectedBrandId)}&limit=2000`
+          : `/api/products?limit=2000`;
+
+        const prodRes = await fetch(url).then(r => r.json()).catch(() => null);
+
+        if (isSubscribed && prodRes && prodRes.products && prodRes.products.length > 0) {
+          const sanitizedProducts = prodRes.products.map((p, idx) => {
+            let img = p.imageUrl || p.textureUrl;
+            let tex = p.textureUrl || p.imageUrl;
+            if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
+              const fallbackIdx = idx % BRAND_CATALOG.length;
+              tex = BRAND_CATALOG[fallbackIdx].textureUrl;
+            }
+            if (!img) {
+              img = tex;
+            }
+            return {
+              ...p,
+              imageUrl: img,
+              textureUrl: tex,
+              unitPrice: p.unitPrice || Math.round((p.width || 60) * (p.height || 120) * 0.08 + (p.finish === 'Parlak' ? 120 : 0) + 380)
+            };
+          });
+
+          setProducts(sanitizedProducts);
+          if (sanitizedProducts.length > 0) {
+            setSelectedProduct(prev => prev || sanitizedProducts[0]);
+          }
+        }
+      } catch (err) {
+        console.error('Kiosk brand products fetch error:', err);
+      } finally {
+        if (isSubscribed) setIsLoadingProducts(false);
+      }
+    }
+    loadProductsForBrand();
+    return () => { isSubscribed = false; };
+  }, [selectedBrandId]);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -303,31 +321,21 @@ export default function ShowroomKioskPage() {
     return brandMatch && styleMatch && searchMatch;
   });
 
-  // Eğer seçilen marka için veritabanında henüz ürün yoksa, o markaya özel dinamik koleksiyon oluştur
   let displayProducts = filteredProducts;
-  if (displayProducts.length === 0 && selectedBrandId !== 'all') {
-    const brandObj = brands.find(b => b.id === selectedBrandId || b.name?.toLowerCase() === selectedBrandId.toLowerCase()) || { name: selectedBrandId };
-    const brandNameStr = brandObj.name || selectedBrandId;
-
-    displayProducts = [
-      { id: `${selectedBrandId}-1`, name: `${brandNameStr} Calacatta Gold Porselen`, code: `${brandNameStr.substring(0,3).toUpperCase()}-CAL-60120`, width: 60, height: 120, style: 'Mermer', finish: 'Parlak Rektifiye', color: 'Beyaz Altın', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 540 },
-      { id: `${selectedBrandId}-2`, name: `${brandNameStr} Nero Marquina Siyah Karo`, code: `${brandNameStr.substring(0,3).toUpperCase()}-NERO-60120`, width: 60, height: 120, style: 'Mermer', finish: 'Lüks Parlak', color: 'Siyah', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg', unitPrice: 560 },
-      { id: `${selectedBrandId}-3`, name: `${brandNameStr} Urban Gri Beton Porselen`, code: `${brandNameStr.substring(0,3).toUpperCase()}-BET-6060`, width: 60, height: 60, style: 'Beton', finish: 'Mat Endüstriyel', color: 'Gri', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg', unitPrice: 410 },
-      { id: `${selectedBrandId}-4`, name: `${brandNameStr} Nordic Meşe Ahşap Doku`, code: `${brandNameStr.substring(0,3).toUpperCase()}-OAK-20120`, width: 20, height: 120, style: 'Ahşap', finish: 'Mat Ahşap', color: 'Doğal Meşe', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg', unitPrice: 460 },
-      { id: `${selectedBrandId}-5`, name: `${brandNameStr} Vista Bej Doğal Taş`, code: `${brandNameStr.substring(0,3).toUpperCase()}-VIS-60120`, width: 60, height: 120, style: 'Taş', finish: 'Mat Rektifiye', color: 'Bej', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/vista_bej.jpg', textureUrl: '/textures/vista_bej.jpg', unitPrice: 490 },
-      { id: `${selectedBrandId}-6`, name: `${brandNameStr} Travertino Classico`, code: `${brandNameStr.substring(0,3).toUpperCase()}-TRAV-60120`, width: 60, height: 120, style: 'Mermer', finish: 'Mega Slab', color: 'Krem', brand: { id: selectedBrandId, name: brandNameStr }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 580 }
-    ];
-  } else if (displayProducts.length === 0) {
+  if (displayProducts.length === 0 && !isLoadingProducts && selectedBrandId === 'all') {
     displayProducts = BRAND_CATALOG;
   }
 
-  // Tüm Markaların Listesini Derle
-  const knownBrandNames = ['Kalebodur', 'Graniser', 'VitrA', 'NG Kütahya Seramik', 'Bien Seramik', 'Çanakkale Seramik', 'Yurtbay Seramik', 'Ege Seramik', 'Seramiksan', 'Qua Granite', 'Duratiles', 'Decovita', 'Hitit Seramik'];
+  // Tüm Markaların Listesini ve Toplam Sayılarını Derle
+  const knownBrandNames = ['Kalebodur', 'Graniser', 'VitrA', 'NG Kütahya Seramik', 'Bien Seramik', 'Çanakkale Seramik', 'Yurtbay Seramik', 'Ege Seramik', 'Seramiksan', 'Qua Granite', 'Duratiles', 'Decovita', 'Hitit Seramik', 'Seranit', 'Güral Seramik', 'Termal Seramik', 'Uşak Seramik'];
   
   const uniqueBrandList = brands.length > 0 ? brands : knownBrandNames.map(name => ({
-    id: name.toLowerCase().replace(/[^a-z0-9]/g, ''),
-    name: name
+    id: name,
+    name: name,
+    _count: { products: 0 }
   }));
+
+  const totalProductCountInDb = brands.reduce((acc, b) => acc + (b._count?.products || 0), 0) || products.length;
 
   // Metraj & Canlı Fiyat Hesaplama Matematiği
   const wastePercent = layingStyle === 'baliksirti' ? 15 : layingStyle === 'capraz' ? 12 : 8;
@@ -470,10 +478,10 @@ export default function ShowroomKioskPage() {
                 onChange={(e) => handleBrandChange(e.target.value)}
                 className="kiosk-brand-dropdown"
               >
-                <option value="all">🏢 Tüm Markalar ({products.length} Model)</option>
+                <option value="all">🏢 Tüm Markalar ({totalProductCountInDb} Model)</option>
                 {uniqueBrandList.map(b => (
-                  <option key={b.id} value={b.id || b.name}>
-                    {b.name}
+                  <option key={b.id} value={b.id}>
+                    {b.name} {b._count?.products ? `(${b._count.products} Model)` : ''}
                   </option>
                 ))}
               </select>
@@ -513,50 +521,61 @@ export default function ShowroomKioskPage() {
 
           {/* Products List Grid (Sadece Ürün Listesi İçeride Scroll Eder, Sayfa Bozulmaz!) */}
           <div className="products-scroll-grid">
-            {displayProducts.map(product => {
-              const isFloorSelected = floorProduct?.id === product.id;
-              const isWallSelected = wallProduct?.id === product.id;
-              const isShowerSelected = showerProduct?.id === product.id;
-              const isToiletSelected = toiletWallProduct?.id === product.id;
+            {isLoadingProducts ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '220px', color: '#94a3b8', width: '100%' }}>
+                <div className="kiosk-spin-loader" />
+                <span style={{ marginTop: '12px', fontSize: '0.85rem', fontWeight: '500' }}>Marka Ürünleri Çekiliyor...</span>
+              </div>
+            ) : displayProducts.length === 0 ? (
+              <div style={{ padding: '30px 15px', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
+                Seçilen filtreye uygun ürün bulunamadı.
+              </div>
+            ) : (
+              displayProducts.map(product => {
+                const isFloorSelected = floorProduct?.id === product.id;
+                const isWallSelected = wallProduct?.id === product.id;
+                const isShowerSelected = showerProduct?.id === product.id;
+                const isToiletSelected = toiletWallProduct?.id === product.id;
 
-              const isCurrentTarget = 
-                (activeTargetSurface === 'floor' && isFloorSelected) ||
-                (activeTargetSurface === 'walls' && isWallSelected) ||
-                (activeTargetSurface === 'shower' && isShowerSelected) ||
-                (activeTargetSurface === 'toilet' && isToiletSelected);
+                const isCurrentTarget = 
+                  (activeTargetSurface === 'floor' && isFloorSelected) ||
+                  (activeTargetSurface === 'walls' && isWallSelected) ||
+                  (activeTargetSurface === 'shower' && isShowerSelected) ||
+                  (activeTargetSurface === 'toilet' && isToiletSelected);
 
-              return (
-                <div
-                  key={product.id}
-                  onClick={() => handleSelectProductForTarget(product)}
-                  className={`product-touch-card ${isCurrentTarget ? 'active' : ''}`}
-                >
-                  <div className="card-thumb-wrapper">
-                    <img
-                      src={product.textureUrl || product.imageUrl || '/textures/calacatta_gold.jpg'}
-                      alt={product.name}
-                      className="card-thumb-img"
-                      onError={(e) => {
-                        e.target.src = '/textures/calacatta_gold.jpg';
-                      }}
-                    />
-                    <div className="tag-badges">
-                      {isFloorSelected && <span className="tag-floor">ZEMİN</span>}
-                      {isWallSelected && <span className="tag-wall">DUVAR</span>}
-                      {isShowerSelected && <span className="tag-shower">DUŞ</span>}
+                return (
+                  <div
+                    key={product.id}
+                    onClick={() => handleSelectProductForTarget(product)}
+                    className={`product-touch-card ${isCurrentTarget ? 'active' : ''}`}
+                  >
+                    <div className="card-thumb-wrapper">
+                      <img
+                        src={product.imageUrl || product.textureUrl || '/textures/calacatta_gold.jpg'}
+                        alt={product.name}
+                        className="card-thumb-img"
+                        onError={(e) => {
+                          e.target.src = '/textures/calacatta_gold.jpg';
+                        }}
+                      />
+                      <div className="tag-badges">
+                        {isFloorSelected && <span className="tag-floor">ZEMİN</span>}
+                        {isWallSelected && <span className="tag-wall">DUVAR</span>}
+                        {isShowerSelected && <span className="tag-shower">DUŞ</span>}
+                      </div>
+                    </div>
+
+                    <div className="card-info">
+                      <span className="brand-name-pill">{product.brand?.name || 'Seramik Markası'}</span>
+                      <h3 className="product-title">{product.name}</h3>
+                      <p className="product-specs">
+                        {product.width}x{product.height} cm • {product.style || 'Seramik'} • {product.finish || 'Mat'}
+                      </p>
                     </div>
                   </div>
-
-                  <div className="card-info">
-                    <span className="brand-name-pill">{product.brand?.name || 'Seramik Markası'}</span>
-                    <h3 className="product-title">{product.name}</h3>
-                    <p className="product-specs">
-                      {product.width}x{product.height} cm • {product.style || 'Seramik'} • {product.finish || 'Mat'}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
 

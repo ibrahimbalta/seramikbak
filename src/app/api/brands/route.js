@@ -20,7 +20,10 @@ export async function GET() {
       select: {
         id: true,
         name: true,
-        logoUrl: true
+        logoUrl: true,
+        _count: {
+          select: { products: true }
+        }
       }
     });
 
