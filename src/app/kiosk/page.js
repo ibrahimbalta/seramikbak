@@ -18,30 +18,27 @@ import {
   Minimize2,
   Smartphone,
   FileText,
-  Calculator,
-  ShieldCheck,
-  Truck,
-  Wrench,
-  Bath,
-  Utensils,
-  Sofa,
-  Home,
   LogOut,
-  Edit3
+  Sun,
+  Moon,
+  Compass,
+  Palette,
+  Grid,
+  Filter,
+  Maximize
 } from 'lucide-react';
-import QuoteModal from '@/components/QuoteModal';
 
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
   ssr: false,
   loading: () => (
     <div className="kiosk-loading-box">
       <div className="kiosk-spin-loader" />
-      <span>Showroom 3D Sanal Stüdyo Yükleniyor...</span>
+      <span>3D Sanal Stüdyo & Seramik Modelleri Yükleniyor...</span>
     </div>
   )
 });
 
-// Zengin Varsayılan Seramik Modellleri (DB Boş Olsa Bile Sayfa Asla Boş Kalmaz)
+// Gerçek Seramik Doku Görselleri (Görsel Tekrarlama Glitch'i Olmaz)
 const FALLBACK_PRODUCTS = [
   {
     id: 'demo-1',
@@ -52,9 +49,9 @@ const FALLBACK_PRODUCTS = [
     style: 'Mermer',
     finish: 'Mat Rektifiye',
     color: 'Beyaz / Altın',
-    imageUrl: '/hero/hero_ceramics.jpg',
-    textureUrl: '/hero/hero_ceramics.jpg',
-    unitPrice: 480
+    brand: { id: 'b1', name: 'VitrA' },
+    imageUrl: '/textures/calacatta_gold.jpg',
+    textureUrl: '/textures/calacatta_gold.jpg'
   },
   {
     id: 'demo-2',
@@ -65,9 +62,9 @@ const FALLBACK_PRODUCTS = [
     style: 'Mermer',
     finish: 'Lüks Parlak',
     color: 'Siyah',
-    imageUrl: '/hero/hero_ceramics.jpg',
-    textureUrl: '/hero/hero_ceramics.jpg',
-    unitPrice: 540
+    brand: { id: 'b2', name: 'NG Kütahya Seramik' },
+    imageUrl: '/textures/albatros_antrasit.jpg',
+    textureUrl: '/textures/albatros_antrasit.jpg'
   },
   {
     id: 'demo-3',
@@ -78,9 +75,9 @@ const FALLBACK_PRODUCTS = [
     style: 'Ahşap',
     finish: 'Mat Ahşap',
     color: 'Doğal Meşe',
-    imageUrl: '/hero/hero_ceramics.jpg',
-    textureUrl: '/hero/hero_ceramics.jpg',
-    unitPrice: 420
+    brand: { id: 'b3', name: 'Bien Seramik' },
+    imageUrl: '/textures/natural_oak.jpg',
+    textureUrl: '/textures/natural_oak.jpg'
   },
   {
     id: 'demo-4',
@@ -91,9 +88,9 @@ const FALLBACK_PRODUCTS = [
     style: 'Beton',
     finish: 'Mat Endüstriyel',
     color: 'Gri',
-    imageUrl: '/hero/hero_ceramics.jpg',
-    textureUrl: '/hero/hero_ceramics.jpg',
-    unitPrice: 360
+    brand: { id: 'b4', name: 'Çanakkale Seramik' },
+    imageUrl: '/textures/concrete_light_grey.jpg',
+    textureUrl: '/textures/concrete_light_grey.jpg'
   },
   {
     id: 'demo-5',
@@ -102,133 +99,142 @@ const FALLBACK_PRODUCTS = [
     width: 80,
     height: 80,
     style: 'Beton',
-    finish: 'Lappato',
+    finish: 'Lapatto',
     color: 'Koyu Antrasit',
-    imageUrl: '/hero/hero_ceramics.jpg',
-    textureUrl: '/hero/hero_ceramics.jpg',
-    unitPrice: 490
+    brand: { id: 'b5', name: 'Ege Seramik' },
+    imageUrl: '/textures/loft_beton.jpg',
+    textureUrl: '/textures/loft_beton.jpg'
   },
   {
     id: 'demo-6',
-    name: 'Statuario Lüks Mermer Porselen',
-    code: 'SB-STAT-120240',
-    width: 120,
-    height: 240,
-    style: 'Mermer',
-    finish: 'Parlak Mega Slab',
-    color: 'Beyaz / Gri Damar',
-    imageUrl: '/hero/hero_ceramics.jpg',
-    textureUrl: '/hero/hero_ceramics.jpg',
-    unitPrice: 780
-  },
-  {
-    id: 'demo-7',
-    name: 'Vizon Rölyef Banyo Duvar Karosu',
-    code: 'SB-VIZ-3090',
-    width: 30,
-    height: 90,
-    style: 'Düz',
-    finish: 'Rölyef Mat',
-    color: 'Vizon / Bej',
-    imageUrl: '/hero/hero_ceramics.jpg',
-    textureUrl: '/hero/hero_ceramics.jpg',
-    unitPrice: 380
-  },
-  {
-    id: 'demo-8',
-    name: 'Ceviz Parke Dokulu Porselen',
-    code: 'SB-WAL-20120',
+    name: 'Teak Doğal Ahşap Parke Karo',
+    code: 'SB-TEAK-20120',
     width: 20,
     height: 120,
     style: 'Ahşap',
     finish: 'Mat Derzli',
-    color: 'Koyu Ceviz',
-    imageUrl: '/hero/hero_ceramics.jpg',
-    textureUrl: '/hero/hero_ceramics.jpg',
-    unitPrice: 440
+    color: 'Koyu Meşe',
+    brand: { id: 'b6', name: 'Yurtbay Seramik' },
+    imageUrl: '/textures/teak_ahsap.jpg',
+    textureUrl: '/textures/teak_ahsap.jpg'
+  },
+  {
+    id: 'demo-7',
+    name: 'Vista Bej Doğal Taş Karo',
+    code: 'SB-VISTA-60120',
+    width: 60,
+    height: 120,
+    style: 'Taş',
+    finish: 'Rölyef Mat',
+    color: 'Sıcak Bej',
+    brand: { id: 'b7', name: 'Seramiksan' },
+    imageUrl: '/textures/vista_bej.jpg',
+    textureUrl: '/textures/vista_bej.jpg'
+  },
+  {
+    id: 'demo-8',
+    name: 'Travertino Classico Mermer Porselen',
+    code: 'SB-TRAV-60120',
+    width: 60,
+    height: 120,
+    style: 'Mermer',
+    finish: 'Parlak Mega Slab',
+    color: 'Krem Traverten',
+    brand: { id: 'b8', name: 'Qua Granite' },
+    imageUrl: '/textures/travertino_classico.jpg',
+    textureUrl: '/textures/travertino_classico.jpg'
   }
 ];
 
 export default function ShowroomKioskPage() {
   const canvasContainerRef = useRef(null);
+
+  // Ürün ve Marka Eyaletleri
   const [products, setProducts] = useState(FALLBACK_PRODUCTS);
-  const [dealers, setDealers] = useState([]);
-  const [selectedDealer, setSelectedDealer] = useState(null);
+  const [brands, setBrands] = useState([]);
+  const [selectedBrandId, setSelectedBrandId] = useState('all');
+
+  // 3D Sanal Stüdyo Yüzey Seçimleri
   const [selectedProduct, setSelectedProduct] = useState(FALLBACK_PRODUCTS[0]);
   const [floorProduct, setFloorProduct] = useState(FALLBACK_PRODUCTS[0]);
   const [wallProduct, setWallProduct] = useState(FALLBACK_PRODUCTS[1] || FALLBACK_PRODUCTS[0]);
-  const [activeTargetSurface, setActiveTargetSurface] = useState('floor'); // 'floor' | 'walls'
-  const [selectedGroutColor, setSelectedGroutColor] = useState('#888888');
-  
-  // Metraj & Kullanıcı Müdahale Edilebilir Fiyatlama Eyaletleri
-  const [roomType, setRoomType] = useState('banyo');
-  const [areaM2, setAreaM2] = useState(18);
-  const [layingStyle, setLayingStyle] = useState('capraz'); // 'duz' (%8), 'capraz' (%12), 'baliksirti' (%15)
-  
-  // Elle Değiştirilebilir Birim Fiyatlar & Seçenekler
-  const [unitPriceM2, setUnitPriceM2] = useState(480);
-  const [includeLabor, setIncludeLabor] = useState(true);
-  const [laborRatePerM2, setLaborRatePerM2] = useState(250);
-  const [includeShipping, setIncludeShipping] = useState(true);
-  const [shippingCostInput, setShippingCostInput] = useState(1500);
+  const [accentProduct, setAccentProduct] = useState(null);
+  const [showerProduct, setShowerProduct] = useState(null);
+  const [showerFloorProduct, setShowerFloorProduct] = useState(null);
+  const [toiletWallProduct, setToiletWallProduct] = useState(null);
+  const [stripeWallProduct, setStripeWallProduct] = useState(null);
+  const [comparisonProduct, setComparisonProduct] = useState(null);
 
+  // Yüzey Uygulama Açık/Kapalı
+  const [applyFloor, setApplyFloor] = useState(true);
+  const [applyWalls, setApplyWalls] = useState(true);
+  const [applyAccent, setApplyAccent] = useState(false);
+  const [applyShower, setApplyShower] = useState(false);
+  const [applyShowerFloor, setApplyShowerFloor] = useState(false);
+  const [applyToiletWall, setApplyToiletWall] = useState(false);
+  const [applyStripeWall, setApplyStripeWall] = useState(false);
+
+  // Aktif Uygulama Yüzeyi Hedefi ('floor' | 'walls' | 'shower' | 'showerFloor' | 'toilet' | 'accent' | 'stripe')
+  const [activeTargetSurface, setActiveTargetSurface] = useState('floor');
+
+  // Stüdyo Ortam & Fizik Ayarları
+  const [roomType, setRoomType] = useState('bathroom'); // 'bathroom' | 'livingroom' | 'kitchen' | 'terrace'
+  const [groutColor, setGroutColor] = useState('#888888');
+  const [groutWidth, setGroutWidth] = useState('2');
+  const [layPattern, setLayPattern] = useState('flat'); // 'flat' | 'diagonal' | 'herringbone' | 'staggered_50' | 'staggered_33'
+  const [timeOfDay, setTimeOfDay] = useState('day'); // 'day' | 'sunrise' | 'sunset' | 'night'
+  const [lightTemp, setLightTemp] = useState('neutral');
+  const [faucetColor, setFaucetColor] = useState('chrome');
+  const [cabinetColor, setCabinetColor] = useState('oak');
+
+  // Modlar & Görünüm
+  const [comparisonMode, setComparisonMode] = useState(false);
+  const [walkthroughMode, setWalkthroughMode] = useState(false);
+
+  // Filtreler & Modallar
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedStyle, setSelectedStyle] = useState('all');
   const [showQrModal, setShowQrModal] = useState(false);
-  const [showQuoteModal, setShowQuoteModal] = useState(false);
-  const [snapshotUrl, setSnapshotUrl] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // Veritabanından Tüm Ürünleri ve Markaları Yükle
   useEffect(() => {
-    async function loadKioskData() {
+    async function loadData() {
       try {
-        const [prodRes, dealerRes] = await Promise.all([
-          fetch('/api/products?limit=50').then(r => r.json()).catch(() => ({ products: [] })),
-          fetch('/api/dealers').then(r => r.json()).catch(() => ({ dealers: [] }))
+        const [prodRes, brandRes] = await Promise.all([
+          fetch('/api/products?limit=200').then(r => r.json()).catch(() => null),
+          fetch('/api/brands').then(r => r.json()).catch(() => null)
         ]);
 
-        if (prodRes.products && prodRes.products.length > 0) {
-          setProducts(prodRes.products);
-          setSelectedProduct(prodRes.products[0]);
-          setFloorProduct(prodRes.products[0]);
-          setWallProduct(prodRes.products[1] || prodRes.products[0]);
+        if (prodRes && prodRes.products && prodRes.products.length > 0) {
+          // Temiz doku yolları atanmasını kontrol et
+          const sanitizedProducts = prodRes.products.map((p, idx) => {
+            let tex = p.textureUrl || p.imageUrl;
+            if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
+              const fallbackIdx = idx % FALLBACK_PRODUCTS.length;
+              tex = FALLBACK_PRODUCTS[fallbackIdx].textureUrl;
+            }
+            return {
+              ...p,
+              imageUrl: tex,
+              textureUrl: tex
+            };
+          });
+          setProducts(sanitizedProducts);
+          setSelectedProduct(sanitizedProducts[0]);
+          setFloorProduct(sanitizedProducts[0]);
+          setWallProduct(sanitizedProducts[1] || sanitizedProducts[0]);
         }
-        if (dealerRes.dealers && dealerRes.dealers.length > 0) {
-          setDealers(dealerRes.dealers);
-          setSelectedDealer(dealerRes.dealers[0]);
+
+        if (brandRes && Array.isArray(brandRes)) {
+          setBrands(brandRes);
         }
       } catch (err) {
-        console.error('Kiosk data loading fallback:', err);
+        console.error('Kiosk data fetch error:', err);
       }
     }
-    loadKioskData();
+    loadData();
   }, []);
-
-  // Fire oranı ve m² hesabı
-  const wastePercent = layingStyle === 'baliksirti' ? 15 : layingStyle === 'capraz' ? 12 : 8;
-  const totalM2WithWaste = Math.round((areaM2 * (1 + wastePercent / 100)) * 10) / 10;
-  const coveragePerBox = 1.44;
-  const requiredBoxes = Math.ceil(totalM2WithWaste / coveragePerBox);
-  
-  // Kalem Kalem Dinamik Fiyatlar (Kullanıcı Müdahalesi Dahil)
-  const unitPriceNum = Number(unitPriceM2) || 0;
-  const tileCost = Math.round(totalM2WithWaste * unitPriceNum);
-  
-  const adhesiveBags = Math.ceil(totalM2WithWaste / 5);
-  const adhesiveCost = adhesiveBags * 280;
-  
-  const groutPacks = Math.ceil(totalM2WithWaste / 15);
-  const groutCost = groutPacks * 180;
-  
-  const laborRateNum = Number(laborRatePerM2) || 0;
-  const laborCost = includeLabor ? Math.round(totalM2WithWaste * laborRateNum) : 0;
-  
-  const shippingNum = Number(shippingCostInput) || 0;
-  const shippingCost = includeShipping ? shippingNum : 0;
-
-  const subtotalBeforeVat = tileCost + adhesiveCost + groutCost + laborCost + shippingCost;
-  const vatAmount = Math.round(subtotalBeforeVat * 0.20);
-  const grandTotal = subtotalBeforeVat + vatAmount;
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -240,98 +246,123 @@ export default function ShowroomKioskPage() {
     }
   };
 
+  // Soldaki Ürün Kartına Tıklandığında Anında 3D Sanal Stüdyo Yüzeyine Uygula!
   const handleSelectProductForTarget = (product) => {
     setSelectedProduct(product);
-    if (product.unitPrice) {
-      setUnitPriceM2(product.unitPrice);
-    }
+
     if (activeTargetSurface === 'floor') {
       setFloorProduct(product);
-    } else {
+      setApplyFloor(true);
+    } else if (activeTargetSurface === 'walls') {
       setWallProduct(product);
+      setApplyWalls(true);
+    } else if (activeTargetSurface === 'shower') {
+      setShowerProduct(product);
+      setApplyShower(true);
+    } else if (activeTargetSurface === 'showerFloor') {
+      setShowerFloorProduct(product);
+      setApplyShowerFloor(true);
+    } else if (activeTargetSurface === 'toilet') {
+      setToiletWallProduct(product);
+      setApplyToiletWall(true);
+    } else if (activeTargetSurface === 'accent') {
+      setAccentProduct(product);
+      setApplyAccent(true);
+    } else if (activeTargetSurface === 'stripe') {
+      setStripeWallProduct(product);
+      setApplyStripeWall(true);
     }
   };
 
-  const handleOpenQuoteModal = () => {
-    try {
-      const canvasEl = document.querySelector('canvas');
-      if (canvasEl) {
-        const snap = canvasEl.toDataURL('image/jpeg', 0.9);
-        setSnapshotUrl(snap);
-      }
-    } catch (e) {
-      console.warn('Snapshot capture warning:', e);
-    }
-    setShowQuoteModal(true);
+  // 3D Sahneden Bir Yüzeye Tıklandığında O Yüzeyi Hedef Yap
+  const handleToggleTargetFromCanvas = (target) => {
+    if (target === 'floor') setActiveTargetSurface('floor');
+    else if (target === 'walls') setActiveTargetSurface('walls');
+    else if (target === 'shower') setActiveTargetSurface('shower');
+    else if (target === 'showerFloor') setActiveTargetSurface('showerFloor');
+    else if (target === 'toilet') setActiveTargetSurface('toilet');
+    else if (target === 'accent') setActiveTargetSurface('accent');
+    else if (target === 'stripe') setActiveTargetSurface('stripe');
   };
 
-  // Akıllı Ürün Filtreleme (Kategoriye Göre Hiçbir Zaman 0 Sonuç Vermez)
+  // Akıllı Ürün Filtreleme (Marka + Stil + Arama)
   const filteredProducts = products.filter(p => {
+    const brandMatch = selectedBrandId === 'all' || p.brandId === selectedBrandId || (p.brand && p.brand.id === selectedBrandId);
+    
     const styleLower = (p.style || '').toLowerCase();
     const nameLower = (p.name || '').toLowerCase();
     const codeLower = (p.code || '').toLowerCase();
+    const brandNameLower = (p.brand?.name || '').toLowerCase();
 
-    if (selectedCategory === 'mermer' && !styleLower.includes('mermer') && !nameLower.includes('mermer')) return false;
-    if (selectedCategory === 'ahsap' && !styleLower.includes('ahşap') && !styleLower.includes('ahsap') && !nameLower.includes('ahşap')) return false;
-    if (selectedCategory === 'beton' && !styleLower.includes('beton') && !nameLower.includes('beton')) return false;
-    
+    let styleMatch = true;
+    if (selectedStyle === 'mermer') styleMatch = styleLower.includes('mermer') || nameLower.includes('mermer');
+    else if (selectedStyle === 'ahsap') styleMatch = styleLower.includes('ahşap') || styleLower.includes('ahsap') || nameLower.includes('ahşap');
+    else if (selectedStyle === 'beton') styleMatch = styleLower.includes('beton') || nameLower.includes('beton');
+    else if (selectedStyle === 'tas') styleMatch = styleLower.includes('taş') || styleLower.includes('tas') || nameLower.includes('taş');
+
+    let searchMatch = true;
     if (searchTerm) {
       const q = searchTerm.toLowerCase();
-      return nameLower.includes(q) || codeLower.includes(q) || styleLower.includes(q);
+      searchMatch = nameLower.includes(q) || codeLower.includes(q) || styleLower.includes(q) || brandNameLower.includes(q);
     }
-    return true;
+
+    return brandMatch && styleMatch && searchMatch;
   });
 
-  // Eğer filtre sonucu boş çıkarsa varsayılan kütüphaneyi göster (Sayfa asla boş kalmasın)
   const displayProducts = filteredProducts.length > 0 ? filteredProducts : FALLBACK_PRODUCTS;
+
+  // Tüm Markaların Listesini Topla
+  const uniqueBrandList = brands.length > 0 ? brands : Array.from(
+    new Set(displayProducts.map(p => p.brand?.name).filter(Boolean))
+  ).map((name, i) => ({ id: `b-${i}`, name }));
 
   return (
     <main className="kiosk-page-container">
-      {/* Top Touch Kiosk Bar */}
+      {/* Top Touch Kiosk Header */}
       <header className="kiosk-header">
         <div className="header-left">
-          <Link href="/" className="btn-exit-kiosk" title="Kiosk Modundan Çık ve Ana Sayfaya Dön">
+          <Link href="/" className="btn-exit-kiosk" title="Kiosk Modundan Çık">
             <LogOut size={16} />
-            <span>Ana Sayfaya Dön</span>
+            <span>Ana Sayfa</span>
           </Link>
 
           <div className="brand-badge">S</div>
           <div>
             <div className="brand-title-row">
               <h1 className="brand-title">Seramik<span className="gold-accent">Bak</span></h1>
-              <span className="kiosk-pill">Tablet Showroom Ekranı</span>
+              <span className="kiosk-pill">3D Sanal Stüdyo & Showroom Kiosk</span>
             </div>
             <p className="dealer-sub-text">
-              {selectedDealer ? `${selectedDealer.name} Dokunmatik Satış Portalı` : 'Showroom Satış Asistanı'}
+              Tüm Markaların Seramik Koleksiyonları ve Canlı 3D Simülasyon Ekranı
             </p>
           </div>
         </div>
 
         {/* Top Header Actions */}
         <div className="header-right">
-          {dealers.length > 0 && (
-            <select
-              value={selectedDealer?.id || ''}
-              onChange={(e) => {
-                const found = dealers.find(d => d.id === e.target.value);
-                if (found) setSelectedDealer(found);
-              }}
-              className="dealer-select"
-            >
-              {dealers.map(d => (
-                <option key={d.id} value={d.id}>{d.name} ({d.city})</option>
-              ))}
-            </select>
-          )}
+          <button 
+            onClick={() => {
+              const newMode = !comparisonMode;
+              setComparisonMode(newMode);
+              if (newMode && !comparisonProduct && products.length > 1) {
+                setComparisonProduct(products[1]);
+              }
+            }}
+            className={`btn-mode-kiosk ${comparisonMode ? 'active-gold' : ''}`}
+          >
+            <span>⚖️ 3D Kıyasla</span>
+          </button>
+
+          <button 
+            onClick={() => setWalkthroughMode(!walkthroughMode)}
+            className={`btn-mode-kiosk ${walkthroughMode ? 'active-sky' : ''}`}
+          >
+            <span>🎥 360° İç Gezinti</span>
+          </button>
 
           <button onClick={() => setShowQrModal(true)} className="btn-secondary-kiosk">
             <QrCode size={16} />
             <span>QR ile İndir</span>
-          </button>
-
-          <button onClick={handleOpenQuoteModal} className="btn-primary-gold-kiosk">
-            <FileText size={16} />
-            <span>PDF Teklif Oluştur</span>
           </button>
 
           <button onClick={toggleFullscreen} className="btn-icon-kiosk" title="Tam Ekran">
@@ -340,37 +371,95 @@ export default function ShowroomKioskPage() {
         </div>
       </header>
 
-      {/* Main Touch Workspace */}
+      {/* Main Touch Workspace Grid */}
       <div className="kiosk-workspace-grid">
-        {/* Left Side: Touch Tile Selector Sidebar */}
+        {/* Left Side: Product Selector Sidebar */}
         <div className="kiosk-sidebar">
-          {/* Surface Target Toggle (Zemin / Duvar) */}
+          {/* Surface Target Selection Grid (Hangi Yüzey Kaplanacak?) */}
+          <div className="section-label-header">
+            <Layers size={14} className="icon-gold" />
+            <span>1. Kaplanacak Yüzeyi Seçin:</span>
+          </div>
+
           <div className="surface-target-grid">
             <button
               onClick={() => setActiveTargetSurface('floor')}
               className={`target-btn ${activeTargetSurface === 'floor' ? 'active' : ''}`}
             >
-              <Layers size={14} />
-              <span>Zemin Seramiği ({floorProduct ? floorProduct.name.split(' ')[0] : 'Seç'})</span>
+              <span>Zemin ({floorProduct ? floorProduct.name.split(' ')[0] : 'Seç'})</span>
             </button>
 
             <button
               onClick={() => setActiveTargetSurface('walls')}
               className={`target-btn ${activeTargetSurface === 'walls' ? 'active' : ''}`}
             >
-              <Eye size={14} />
-              <span>Duvar Seramiği ({wallProduct ? wallProduct.name.split(' ')[0] : 'Seç'})</span>
+              <span>Duvar ({wallProduct ? wallProduct.name.split(' ')[0] : 'Seç'})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTargetSurface('shower')}
+              className={`target-btn ${activeTargetSurface === 'shower' ? 'active' : ''}`}
+            >
+              <span>Duş Duvarı</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTargetSurface('showerFloor')}
+              className={`target-btn ${activeTargetSurface === 'showerFloor' ? 'active' : ''}`}
+            >
+              <span>Duş Zemini</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTargetSurface('toilet')}
+              className={`target-btn ${activeTargetSurface === 'toilet' ? 'active' : ''}`}
+            >
+              <span>Klozet Arkası</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTargetSurface('accent')}
+              className={`target-btn ${activeTargetSurface === 'accent' ? 'active' : ''}`}
+            >
+              <span>Vurgu Duvarı</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTargetSurface('stripe')}
+              className={`target-btn ${activeTargetSurface === 'stripe' ? 'active' : ''}`}
+            >
+              <span>Yatay Bordür</span>
             </button>
           </div>
 
-          {/* Search Box */}
+          {/* Marka Seçimi Dropdown (Tüm Markalar) */}
+          <div className="brand-select-wrapper">
+            <div className="section-label-header">
+              <Building2 size={14} className="icon-gold" />
+              <span>2. Marka Filtresi:</span>
+            </div>
+            <select
+              value={selectedBrandId}
+              onChange={(e) => setSelectedBrandId(e.target.value)}
+              className="kiosk-brand-dropdown"
+            >
+              <option value="all">🏢 Tüm Markalar ({displayProducts.length} Model)</option>
+              {uniqueBrandList.map(b => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Search Input Box */}
           <div className="search-box-wrapper">
             <Search size={15} className="search-icon" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Dokunarak model ara (ör. Calacatta, Mermer)..."
+              placeholder="Model / SKU / Tarz Ara (ör. Calacatta, Mermer)..."
               className="search-input"
             />
           </div>
@@ -381,24 +470,32 @@ export default function ShowroomKioskPage() {
               { id: 'all', label: 'Tümü' },
               { id: 'mermer', label: 'Mermer' },
               { id: 'ahsap', label: 'Ahşap' },
-              { id: 'beton', label: 'Beton' }
+              { id: 'beton', label: 'Beton' },
+              { id: 'tas', label: 'Taş' }
             ].map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setSelectedCategory(tab.id)}
-                className={`filter-pill ${selectedCategory === tab.id ? 'active' : ''}`}
+                onClick={() => setSelectedStyle(tab.id)}
+                className={`filter-pill ${selectedStyle === tab.id ? 'active' : ''}`}
               >
                 {tab.label}
               </button>
             ))}
           </div>
 
-          {/* Touch Product Cards Grid (Asla Boş Kalmaz) */}
+          {/* Products List Grid (FİYATSIZ, TEMİZ KARO DOKULARI) */}
           <div className="products-scroll-grid">
             {displayProducts.map(product => {
               const isFloorSelected = floorProduct?.id === product.id;
               const isWallSelected = wallProduct?.id === product.id;
-              const isCurrentTarget = activeTargetSurface === 'floor' ? isFloorSelected : isWallSelected;
+              const isShowerSelected = showerProduct?.id === product.id;
+              const isToiletSelected = toiletWallProduct?.id === product.id;
+
+              const isCurrentTarget = 
+                (activeTargetSurface === 'floor' && isFloorSelected) ||
+                (activeTargetSurface === 'walls' && isWallSelected) ||
+                (activeTargetSurface === 'shower' && isShowerSelected) ||
+                (activeTargetSurface === 'toilet' && isToiletSelected);
 
               return (
                 <div
@@ -408,17 +505,26 @@ export default function ShowroomKioskPage() {
                 >
                   <div className="card-thumb-wrapper">
                     <img
-                      src={product.imageUrl || product.textureUrl || '/hero/hero_ceramics.jpg'}
+                      src={product.textureUrl || product.imageUrl || '/textures/calacatta_gold.jpg'}
                       alt={product.name}
                       className="card-thumb-img"
+                      onError={(e) => {
+                        e.target.src = '/textures/calacatta_gold.jpg';
+                      }}
                     />
-                    {isFloorSelected && <span className="tag-floor">ZEMİN</span>}
-                    {isWallSelected && <span className="tag-wall">DUVAR</span>}
+                    <div className="tag-badges">
+                      {isFloorSelected && <span className="tag-floor">ZEMİN</span>}
+                      {isWallSelected && <span className="tag-wall">DUVAR</span>}
+                      {isShowerSelected && <span className="tag-shower">DUŞ</span>}
+                    </div>
                   </div>
+
                   <div className="card-info">
+                    <span className="brand-name-pill">{product.brand?.name || 'Seramik Markası'}</span>
                     <h3 className="product-title">{product.name}</h3>
-                    <p className="product-specs">{product.width}x{product.height} cm • {product.finish || 'Mat'}</p>
-                    <p className="product-price">₺{product.unitPrice || unitPriceM2} / m²</p>
+                    <p className="product-specs">
+                      {product.width}x{product.height} cm • {product.style || 'Seramik'} • {product.finish || 'Mat'}
+                    </p>
                   </div>
                 </div>
               );
@@ -426,35 +532,69 @@ export default function ShowroomKioskPage() {
           </div>
         </div>
 
-        {/* Right Side: 3D Visualizer Canvas & Editable Sales Calculator */}
+        {/* Right Side: 3D Visualizer Canvas & Live Studio Controls */}
         <div className="kiosk-canvas-area">
-          {/* Main 3D Canvas Box */}
+          {/* Main 3D Visualizer Canvas Frame */}
           <div ref={canvasContainerRef} className="canvas-frame">
             <StudioCanvas
               activeProduct={selectedProduct}
               floorProduct={floorProduct}
               wallProduct={wallProduct}
-              applyFloor={true}
-              applyWalls={true}
-              groutColor={selectedGroutColor}
-              groutWidth="2"
+              accentProduct={accentProduct}
+              showerProduct={showerProduct}
+              showerFloorProduct={showerFloorProduct}
+              toiletWallProduct={toiletWallProduct}
+              stripeWallProduct={stripeWallProduct}
+              comparisonProduct={comparisonProduct}
+              applyFloor={applyFloor}
+              applyWalls={applyWalls}
+              applyAccent={applyAccent}
+              applyShower={applyShower}
+              applyShowerFloor={applyShowerFloor}
+              applyToiletWall={applyToiletWall}
+              applyStripeWall={applyStripeWall}
+              comparisonMode={comparisonMode}
+              walkthroughMode={walkthroughMode}
+              onToggleTarget={handleToggleTargetFromCanvas}
               roomType={roomType}
+              groutColor={groutColor}
+              groutWidth={groutWidth}
+              layPattern={layPattern}
+              timeOfDay={timeOfDay}
+              lightTemp={lightTemp}
+              faucetColor={faucetColor}
+              cabinetColor={cabinetColor}
             />
+
+            {/* Target Surface Overlay Badge inside 3D Canvas */}
+            <div className="canvas-active-target-overlay">
+              <span className="overlay-label">Aktif Yüzey Hedefi:</span>
+              <strong className="overlay-target-name">
+                {activeTargetSurface === 'floor' && 'Zemin Seramiği'}
+                {activeTargetSurface === 'walls' && 'Ana Duvar Seramiği'}
+                {activeTargetSurface === 'shower' && 'Duş Kabini Duvarı'}
+                {activeTargetSurface === 'showerFloor' && 'Duş Kabini Zemini'}
+                {activeTargetSurface === 'toilet' && 'Klozet Arkası Vurgu Duvarı'}
+                {activeTargetSurface === 'accent' && 'Lavabo Arkası Vurgu Duvarı'}
+                {activeTargetSurface === 'stripe' && 'Yatay Bordür Kuşağı'}
+              </strong>
+              <span className="overlay-sub-hint">(Sol menüden seçeceğiniz seramik buraya uygulanır)</span>
+            </div>
           </div>
 
-          {/* Bottom Live Calculation & User Interactive Sales Bar */}
-          <div className="sales-bottom-bar">
-            {/* Top Row: Room Controls */}
+          {/* Bottom Live 3D Studio Control Bar (FİYATSIZ, TAM SANAL STÜDYO KONTROLLERİ) */}
+          <div className="studio-bottom-bar">
+            {/* Control Row 1: Mekan Tipi & Dizim Şekli */}
             <div className="controls-row">
-              {/* Mekan Tipi */}
+              {/* Simülasyon Sahnesi */}
               <div className="ctrl-group">
                 <span className="ctrl-label">Mekan:</span>
                 <div className="btn-group-sm">
                   {[
-                    { id: 'banyo', label: 'Banyo' },
-                    { id: 'mutfak', label: 'Mutfak' },
-                    { id: 'salon', label: 'Salon' },
-                    { id: 'teras', label: 'Teras' }
+                    { id: 'bathroom', label: 'Banyo' },
+                    { id: 'livingroom', label: 'Salon' },
+                    { id: 'kitchen', label: 'Mutfak' },
+                    { id: 'terrace', label: 'Teras' }
                   ].map(r => (
                     <button
                       key={r.id}
@@ -467,130 +607,118 @@ export default function ShowroomKioskPage() {
                 </div>
               </div>
 
-              {/* Alan Slider */}
+              {/* Dizim Deseni */}
               <div className="ctrl-group">
-                <span className="ctrl-label">Kaplanacak Alan:</span>
-                <div className="slider-box">
-                  <input
-                    type="range"
-                    min="5"
-                    max="150"
-                    value={areaM2}
-                    onChange={(e) => setAreaM2(Number(e.target.value))}
-                    className="kiosk-range-slider"
-                  />
-                  <span className="area-text">{areaM2} m²</span>
-                </div>
-              </div>
-
-              {/* Seramik m² Birim Fiyatı (Kullanıcı Elle Girebilir) */}
-              <div className="ctrl-group">
-                <span className="ctrl-label">Seramik m² Fiyatı:</span>
-                <div className="price-input-box">
-                  <input
-                    type="number"
-                    value={unitPriceM2}
-                    onChange={(e) => setUnitPriceM2(e.target.value)}
-                    className="kiosk-num-input"
-                  />
-                  <span className="unit-label">₺/m²</span>
-                </div>
-              </div>
-
-              {/* Döşeme Düzeni (Fire) */}
-              <div className="ctrl-group">
-                <span className="ctrl-label">Dizim (Fire %):</span>
+                <span className="ctrl-label">Dizim Deseni:</span>
                 <div className="btn-group-sm">
                   {[
-                    { id: 'duz', label: 'Düz (%8)' },
-                    { id: 'capraz', label: 'Çapraz (%12)' },
-                    { id: 'baliksirti', label: 'Balıksırtı (%15)' }
-                  ].map(style => (
+                    { id: 'flat', label: 'Düz Grid' },
+                    { id: 'diagonal', label: 'Çapraz 45°' },
+                    { id: 'herringbone', label: 'Balıksırtı' },
+                    { id: 'staggered_50', label: 'Tuğla %50' }
+                  ].map(pat => (
                     <button
-                      key={style.id}
-                      onClick={() => setLayingStyle(style.id)}
-                      className={`btn-sm ${layingStyle === style.id ? 'active-sky' : ''}`}
+                      key={pat.id}
+                      onClick={() => setLayPattern(pat.id)}
+                      className={`btn-sm ${layPattern === pat.id ? 'active-gold' : ''}`}
                     >
-                      {style.label}
+                      {pat.label}
                     </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Derz Rengi */}
+              <div className="ctrl-group">
+                <span className="ctrl-label">Derz Rengi:</span>
+                <div className="color-swatches">
+                  {[
+                    { color: '#ffffff', label: 'Beyaz' },
+                    { color: '#888888', label: 'Gri' },
+                    { color: '#333333', label: 'Antrasit' },
+                    { color: '#d8cbb8', label: 'Bej' }
+                  ].map(g => (
+                    <button
+                      key={g.color}
+                      onClick={() => setGroutColor(g.color)}
+                      style={{ background: g.color }}
+                      className={`swatch-btn ${groutColor === g.color ? 'active' : ''}`}
+                      title={g.label}
+                    />
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Bottom Row: Itemized Price Summary & PDF Button */}
-            <div className="totals-row">
-              <div className="summary-pills">
-                <div className="sum-pill">
-                  <span className="sum-title">Gereken Seramik</span>
-                  <span className="sum-val">{totalM2WithWaste} m² ({requiredBoxes} Kutu)</span>
-                </div>
-                <div className="divider-v" />
-                <div className="sum-pill">
-                  <span className="sum-title">Sarfiyat (Harç/Derz)</span>
-                  <span className="sum-val">{adhesiveBags} Çuval / {groutPacks} Pak</span>
-                </div>
-                <div className="divider-v" />
-                
-                {/* Ustalık İşçilik Toggle ve Fiyatı */}
-                <div className="hizmet-box">
-                  <button
-                    onClick={() => setIncludeLabor(!includeLabor)}
-                    className={`toggle-hizmet ${includeLabor ? 'active-green' : ''}`}
-                  >
-                    <Wrench size={14} />
-                    <span>{includeLabor ? 'Ustalık' : '+ Ustalık'}</span>
-                  </button>
-                  {includeLabor && (
-                    <input
-                      type="number"
-                      value={laborRatePerM2}
-                      onChange={(e) => setLaborRatePerM2(e.target.value)}
-                      className="kiosk-num-input-sm"
-                      title="Ustalık ₺/m² bedeli"
-                    />
-                  )}
-                </div>
-
-                {/* Nakliye Toggle ve Fiyatı */}
-                <div className="hizmet-box">
-                  <button
-                    onClick={() => setIncludeShipping(!includeShipping)}
-                    className={`toggle-hizmet ${includeShipping ? 'active-sky' : ''}`}
-                  >
-                    <Truck size={14} />
-                    <span>{includeShipping ? 'Nakliye' : '+ Nakliye'}</span>
-                  </button>
-                  {includeShipping && (
-                    <input
-                      type="number"
-                      value={shippingCostInput}
-                      onChange={(e) => setShippingCostInput(e.target.value)}
-                      className="kiosk-num-input-sm"
-                      title="Nakliye ₺ tutarı"
-                    />
-                  )}
+            {/* Control Row 2: Ortam Işığı & Mobilya / Armatür */}
+            <div className="controls-row">
+              {/* Günün Saati */}
+              <div className="ctrl-group">
+                <span className="ctrl-label">Atmosfer / Işık:</span>
+                <div className="btn-group-sm">
+                  {[
+                    { id: 'day', label: 'Gündüz' },
+                    { id: 'sunrise', label: 'Gündoğumu' },
+                    { id: 'sunset', label: 'Günbatımı' },
+                    { id: 'night', label: 'Gece' }
+                  ].map(tod => (
+                    <button
+                      key={tod.id}
+                      onClick={() => setTimeOfDay(tod.id)}
+                      className={`btn-sm ${timeOfDay === tod.id ? 'active-sky' : ''}`}
+                    >
+                      {tod.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Total Price & CTA */}
-              <div className="price-cta-box">
-                <div className="price-col">
-                  <span className="price-label">Tahmini Toplam (KDV Dahil)</span>
-                  <span className="price-val">₺{grandTotal.toLocaleString('tr-TR')}</span>
+              {/* Armatür Metali */}
+              <div className="ctrl-group">
+                <span className="ctrl-label">Armatür:</span>
+                <div className="btn-group-sm">
+                  {[
+                    { id: 'chrome', label: 'Krom' },
+                    { id: 'black', label: 'Mat Siyah' },
+                    { id: 'gold', label: 'Gold' }
+                  ].map(f => (
+                    <button
+                      key={f.id}
+                      onClick={() => setFaucetColor(f.id)}
+                      className={`btn-sm ${faucetColor === f.id ? 'active' : ''}`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
                 </div>
+              </div>
 
-                <button onClick={handleOpenQuoteModal} className="btn-cta-pdf">
-                  <FileText size={16} />
-                  <span>Teklifi Çıkar & Düzenle</span>
-                </button>
+              {/* Mobilya Ahşap Dokusu */}
+              <div className="ctrl-group">
+                <span className="ctrl-label">Mobilya:</span>
+                <div className="btn-group-sm">
+                  {[
+                    { id: 'oak', label: 'Meşe' },
+                    { id: 'white', label: 'Beyaz' },
+                    { id: 'anthracite', label: 'Antrasit' },
+                    { id: 'walnut', label: 'Ceviz' }
+                  ].map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => setCabinetColor(c.id)}
+                      className={`btn-sm ${cabinetColor === c.id ? 'active' : ''}`}
+                    >
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* QR Code Modal */}
+      {/* QR Code Download Modal */}
       {showQrModal && (
         <div className="kiosk-modal-backdrop">
           <div className="kiosk-modal-card">
@@ -602,9 +730,9 @@ export default function ShowroomKioskPage() {
               <Smartphone size={28} />
             </div>
 
-            <h3 className="modal-title">Tasarımı Telefonuna Al!</h3>
+            <h3 className="modal-title">3D Tasarımı Telefonuna Al!</h3>
             <p className="modal-desc">
-              Kameranızla aşağıdaki QR kodu okutarak hazırladığınız 3D banyo tasarımını ve bayi teklifini telefonunuzda görün.
+              Kameranızla QR kodu okutarak hazırladığınız 3D banyo seramik tasarımını kendi cep telefonunuzda inceleyebilirsiniz.
             </p>
 
             <div className="qr-img-box">
@@ -620,38 +748,6 @@ export default function ShowroomKioskPage() {
             </button>
           </div>
         </div>
-      )}
-
-      {/* Official Editable Quote Modal */}
-      {showQuoteModal && (
-        <QuoteModal
-          isOpen={showQuoteModal}
-          onClose={() => setShowQuoteModal(false)}
-          selectedProduct={selectedProduct}
-          selectedDealer={selectedDealer}
-          snapshotUrl={snapshotUrl}
-          calculationData={{
-            areaM2,
-            wastePercent,
-            totalM2WithWaste,
-            requiredBoxes,
-            unitPriceM2: unitPriceNum,
-            tileCost,
-            includeAdhesive: true,
-            adhesiveBags,
-            adhesiveCost,
-            includeGrout: true,
-            groutPacks,
-            groutCost,
-            includeLabor,
-            laborCost,
-            includeShipping,
-            shippingCost,
-            subtotal: subtotalBeforeVat,
-            vatAmount,
-            grandTotal
-          }}
-        />
       )}
 
       <style jsx>{`
@@ -784,16 +880,27 @@ export default function ShowroomKioskPage() {
           gap: 10px;
         }
 
-        .dealer-select {
-          background: #0f172a;
+        .btn-mode-kiosk {
+          background: #090d16;
           border: 1px solid #1e293b;
-          color: #fbbf24;
+          color: #94a3b8;
           font-size: 0.75rem;
           font-weight: 700;
-          padding: 8px 12px;
+          padding: 8px 14px;
           border-radius: 10px;
-          outline: none;
           cursor: pointer;
+        }
+
+        .btn-mode-kiosk.active-gold {
+          background: rgba(245, 158, 11, 0.2);
+          color: #fbbf24;
+          border-color: #f59e0b;
+        }
+
+        .btn-mode-kiosk.active-sky {
+          background: rgba(56, 189, 248, 0.2);
+          color: #38bdf8;
+          border-color: #38bdf8;
         }
 
         .btn-secondary-kiosk {
@@ -810,21 +917,6 @@ export default function ShowroomKioskPage() {
           cursor: pointer;
         }
 
-        .btn-primary-gold-kiosk {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-          color: #0f172a;
-          border: none;
-          padding: 8px 18px;
-          border-radius: 10px;
-          font-size: 0.75rem;
-          font-weight: 900;
-          cursor: pointer;
-          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-        }
-
         .btn-icon-kiosk {
           background: #1e293b;
           color: #94a3b8;
@@ -837,7 +929,7 @@ export default function ShowroomKioskPage() {
         .kiosk-workspace-grid {
           flex: 1;
           display: grid;
-          grid-template-columns: 360px 1fr;
+          grid-template-columns: 380px 1fr;
           overflow: hidden;
         }
 
@@ -847,8 +939,23 @@ export default function ShowroomKioskPage() {
           padding: 14px;
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 12px;
           overflow-y: auto;
+        }
+
+        .section-label-header {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.72rem;
+          font-weight: 800;
+          color: #fbbf24;
+          text-transform: uppercase;
+          letter-spacing: 0.02em;
+        }
+
+        .icon-gold {
+          color: #f59e0b;
         }
 
         .surface-target-grid {
@@ -856,7 +963,7 @@ export default function ShowroomKioskPage() {
           grid-template-columns: 1fr 1fr;
           gap: 6px;
           background: #090d16;
-          padding: 4px;
+          padding: 6px;
           border-radius: 10px;
           border: 1px solid #1e293b;
         }
@@ -865,20 +972,41 @@ export default function ShowroomKioskPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
-          padding: 8px 4px;
+          padding: 8px 6px;
           border-radius: 6px;
-          border: none;
-          background: transparent;
+          border: 1px solid transparent;
+          background: #0f172a;
           color: #94a3b8;
           font-size: 0.7rem;
           font-weight: 700;
           cursor: pointer;
+          transition: all 0.15s ease;
+          text-align: center;
         }
 
         .target-btn.active {
           background: #f59e0b;
           color: #0f172a;
+          font-weight: 900;
+          box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+        }
+
+        .brand-select-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .kiosk-brand-dropdown {
+          background: #090d16;
+          border: 1px solid #334155;
+          color: #ffffff;
+          font-size: 0.8rem;
+          font-weight: 800;
+          padding: 10px 12px;
+          border-radius: 10px;
+          outline: none;
+          cursor: pointer;
         }
 
         .search-box-wrapper {
@@ -908,13 +1036,14 @@ export default function ShowroomKioskPage() {
           display: flex;
           gap: 6px;
           overflow-x: auto;
+          padding-bottom: 2px;
         }
 
         .filter-pill {
           background: #090d16;
           border: 1px solid #1e293b;
           color: #94a3b8;
-          padding: 5px 10px;
+          padding: 5px 12px;
           border-radius: 8px;
           font-size: 0.7rem;
           font-weight: 700;
@@ -945,15 +1074,17 @@ export default function ShowroomKioskPage() {
           display: flex;
           flex-direction: column;
           gap: 6px;
+          transition: all 0.15s ease;
         }
 
         .product-touch-card.active {
           border-color: #f59e0b;
-          box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+          box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+          background: #141c2e;
         }
 
         .card-thumb-wrapper {
-          height: 90px;
+          height: 100px;
           background: #1e293b;
           border-radius: 8px;
           overflow: hidden;
@@ -966,49 +1097,67 @@ export default function ShowroomKioskPage() {
           object-fit: cover;
         }
 
-        .tag-floor {
+        .tag-badges {
           position: absolute;
           top: 4px;
           left: 4px;
+          display: flex;
+          gap: 4px;
+        }
+
+        .tag-floor {
           background: #f59e0b;
           color: #0f172a;
-          font-size: 0.6rem;
+          font-size: 0.55rem;
           font-weight: 900;
           padding: 2px 6px;
-          border-radius: 10px;
+          border-radius: 6px;
         }
 
         .tag-wall {
-          position: absolute;
-          top: 4px;
-          right: 4px;
           background: #0284c7;
           color: #ffffff;
-          font-size: 0.6rem;
+          font-size: 0.55rem;
           font-weight: 900;
           padding: 2px 6px;
-          border-radius: 10px;
+          border-radius: 6px;
+        }
+
+        .tag-shower {
+          background: #10b981;
+          color: #ffffff;
+          font-size: 0.55rem;
+          font-weight: 900;
+          padding: 2px 6px;
+          border-radius: 6px;
+        }
+
+        .card-info {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .brand-name-pill {
+          font-size: 0.6rem;
+          color: #f59e0b;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.02em;
         }
 
         .product-title {
-          font-size: 0.72rem;
-          font-weight: 700;
+          font-size: 0.75rem;
+          font-weight: 800;
           color: #ffffff;
           margin: 0;
-          line-height: 1.2;
+          line-height: 1.25;
         }
 
         .product-specs {
           font-size: 0.65rem;
           color: #94a3b8;
-          margin: 2px 0 0 0;
-        }
-
-        .product-price {
-          font-size: 0.72rem;
-          font-weight: 800;
-          color: #fbbf24;
-          margin: 2px 0 0 0;
+          margin: 0;
         }
 
         .kiosk-canvas-area {
@@ -1016,7 +1165,6 @@ export default function ShowroomKioskPage() {
           padding: 14px;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
           gap: 10px;
         }
 
@@ -1027,10 +1175,44 @@ export default function ShowroomKioskPage() {
           border-radius: 18px;
           overflow: hidden;
           position: relative;
-          min-height: 380px;
+          min-height: 420px;
         }
 
-        .sales-bottom-bar {
+        .canvas-active-target-overlay {
+          position: absolute;
+          top: 14px;
+          left: 14px;
+          background: rgba(15, 23, 42, 0.88);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(245, 158, 11, 0.4);
+          padding: 8px 14px;
+          border-radius: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          pointer-events: none;
+          z-index: 10;
+        }
+
+        .overlay-label {
+          font-size: 0.62rem;
+          color: #94a3b8;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+
+        .overlay-target-name {
+          font-size: 0.85rem;
+          font-weight: 900;
+          color: #fbbf24;
+        }
+
+        .overlay-sub-hint {
+          font-size: 0.6rem;
+          color: #64748b;
+        }
+
+        .studio-bottom-bar {
           background: #0f172a;
           border: 1px solid #1e293b;
           border-radius: 16px;
@@ -1045,57 +1227,20 @@ export default function ShowroomKioskPage() {
           flex-wrap: wrap;
           align-items: center;
           justify-content: space-between;
-          gap: 10px;
-          border-bottom: 1px solid #1e293b;
-          padding-bottom: 8px;
+          gap: 12px;
         }
 
         .ctrl-group {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
         }
 
         .ctrl-label {
           font-size: 0.7rem;
           color: #94a3b8;
-          font-weight: 700;
-        }
-
-        .price-input-box {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .kiosk-num-input {
-          width: 70px;
-          background: #090d16;
-          border: 1px solid #334155;
-          color: #fbbf24;
           font-weight: 800;
-          font-size: 0.75rem;
-          border-radius: 6px;
-          padding: 3px 6px;
-          outline: none;
-          text-align: center;
-        }
-
-        .kiosk-num-input-sm {
-          width: 55px;
-          background: #090d16;
-          border: 1px solid #334155;
-          color: #ffffff;
-          font-size: 0.7rem;
-          border-radius: 4px;
-          padding: 2px 4px;
-          outline: none;
-          text-align: center;
-        }
-
-        .unit-label {
-          font-size: 0.65rem;
-          color: #94a3b8;
+          text-transform: uppercase;
         }
 
         .btn-group-sm {
@@ -1109,7 +1254,7 @@ export default function ShowroomKioskPage() {
           color: #94a3b8;
           font-size: 0.68rem;
           font-weight: 700;
-          padding: 4px 8px;
+          padding: 5px 10px;
           border-radius: 6px;
           cursor: pointer;
         }
@@ -1117,139 +1262,40 @@ export default function ShowroomKioskPage() {
         .btn-sm.active {
           background: #f59e0b;
           color: #0f172a;
+          font-weight: 900;
+        }
+
+        .btn-sm.active-gold {
+          background: rgba(245, 158, 11, 0.2);
+          color: #fbbf24;
+          border-color: #f59e0b;
+          font-weight: 800;
         }
 
         .btn-sm.active-sky {
           background: rgba(56, 189, 248, 0.2);
           color: #38bdf8;
-          border-color: rgba(56, 189, 248, 0.4);
+          border-color: #38bdf8;
+          font-weight: 800;
         }
 
-        .slider-box {
+        .color-swatches {
           display: flex;
-          align-items: center;
           gap: 6px;
         }
 
-        .kiosk-range-slider {
-          accent-color: #f59e0b;
-          width: 90px;
-        }
-
-        .area-text {
-          font-size: 0.75rem;
-          font-weight: 800;
-          color: #fbbf24;
-        }
-
-        .totals-row {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          justify-content: space-between;
-          gap: 10px;
-        }
-
-        .summary-pills {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          flex-wrap: wrap;
-        }
-
-        .sum-pill {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .sum-title {
-          font-size: 0.6rem;
-          color: #64748b;
-          font-weight: 700;
-          text-transform: uppercase;
-        }
-
-        .sum-val {
-          font-size: 0.72rem;
-          font-weight: 800;
-          color: #ffffff;
-        }
-
-        .divider-v {
-          width: 1px;
+        .swatch-btn {
+          width: 22px;
           height: 22px;
-          background: #1e293b;
-        }
-
-        .hizmet-box {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .toggle-hizmet {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          background: #090d16;
-          border: 1px solid #1e293b;
-          color: #64748b;
-          padding: 4px 8px;
-          border-radius: 6px;
-          font-size: 0.68rem;
-          font-weight: 700;
+          border-radius: 50%;
+          border: 2px solid #334155;
           cursor: pointer;
         }
 
-        .toggle-hizmet.active-green {
-          background: rgba(16, 185, 129, 0.15);
-          color: #34d399;
-          border-color: rgba(16, 185, 129, 0.4);
-        }
-
-        .toggle-hizmet.active-sky {
-          background: rgba(56, 189, 248, 0.15);
-          color: #38bdf8;
-          border-color: rgba(56, 189, 248, 0.4);
-        }
-
-        .price-cta-box {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .price-col {
-          text-align: right;
-        }
-
-        .price-label {
-          display: block;
-          font-size: 0.6rem;
-          color: #94a3b8;
-          font-weight: 700;
-          text-transform: uppercase;
-        }
-
-        .price-val {
-          font-size: 1.1rem;
-          font-weight: 900;
-          color: #fbbf24;
-        }
-
-        .btn-cta-pdf {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-          color: #0f172a;
-          border: none;
-          padding: 9px 16px;
-          border-radius: 10px;
-          font-size: 0.75rem;
-          font-weight: 900;
-          cursor: pointer;
-          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        .swatch-btn.active {
+          border-color: #f59e0b;
+          transform: scale(1.15);
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
         }
 
         /* Modal Styles */
@@ -1343,7 +1389,7 @@ export default function ShowroomKioskPage() {
             grid-template-columns: 1fr;
           }
           .kiosk-sidebar {
-            max-height: 320px;
+            max-height: 350px;
           }
         }
       `}</style>
