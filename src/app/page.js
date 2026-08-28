@@ -3934,9 +3934,6 @@ export default function Home() {
                 {/* Popular Searches */}
                 <div className="hero-popular-tags">
                   <span className="pop-tags-label">Popüler Aramalar:</span>
-                  <label htmlFor="hero-visual-search-input" className="pop-tag-capsule" style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(179,142,71,0.35) 100%)', border: '1px solid rgba(212,175,55,0.6)', color: '#d4af37', fontWeight: '800', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                    📸 Fotoğraf Yükle (AI Shazam)
-                  </label>
                   <button onClick={() => handleTagClick('Mermer', 'style', 'Mermer')} className="pop-tag-capsule">60x120 Mermer</button>
                   <button onClick={() => handleTagClick('Calacatta Gold', 'style', 'Mermer')} className="pop-tag-capsule">Calacatta Gold</button>
                   <button onClick={() => handleTagClick('Ahşap', 'style', 'Ahşap')} className="pop-tag-capsule">Mat Ahşap</button>
@@ -3948,33 +3945,35 @@ export default function Home() {
                 {/* Feature Columns Row */}
                 <div className="hero-feature-stats-row">
                   <div className="feature-stat-capsule">
-                    <Layers2 size={16} />
+                    <Layers2 size={15} style={{ color: '#94a3b8' }} />
                     <span>25.000+ Seramik Ürün</span>
                   </div>
                   <div className="feature-stat-capsule">
-                    <Activity size={16} />
+                    <Activity size={15} style={{ color: '#94a3b8' }} />
                     <span>150+ Marka</span>
                   </div>
+
+                  <label htmlFor="hero-visual-search-input" className="hero-feature-btn gold-theme" title="Fotoğraf Yükleyerek Yapay Zeka ile Seramik Bul">
+                    <Camera size={15} />
+                    <span>AI Seramik Shazam</span>
+                  </label>
+
                   <Link 
                     href="/kiosk" 
-                    className="feature-stat-capsule" 
-                    style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(217,119,6,0.3) 100%)', border: '1px solid rgba(245,158,11,0.6)', color: '#fbbf24', fontWeight: '800', textDecoration: 'none' }}
-                    title="Bayi Teşhir & Tablet Kiosk Modu"
+                    className="hero-feature-btn amber-theme" 
+                    title="3D Showroom & Tablet Kiosk Modu"
                   >
-                    <Layers size={16} style={{ color: '#f59e0b' }} />
-                    <span>🖥️ Teşhir Kiosk (3D Stüdyo)</span>
+                    <Layers size={15} />
+                    <span>Teşhir Kiosk (3D Stüdyo)</span>
                   </Link>
-                  <label htmlFor="hero-visual-search-input" className="feature-stat-capsule" style={{ cursor: 'pointer', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.5)' }}>
-                    <ImageIcon size={16} style={{ color: '#d4af37' }} />
-                    <span style={{ color: '#d4af37', fontWeight: '700' }}>📸 AI Seramik Shazam'ı (Görsel Arama)</span>
-                  </label>
+
                   <button 
                     onClick={() => handleOpenWebAR()} 
-                    className="feature-stat-capsule" 
-                    style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(5,150,105,0.3) 100%)', border: '1px solid rgba(16,185,129,0.6)', color: '#10b981', fontWeight: '800' }}
+                    className="hero-feature-btn emerald-theme"
+                    title="Kamera İle Seramiği Odanda Canlı Gör"
                   >
-                    <Sparkles size={16} />
-                    <span>📱 Canlı Kamera Web-AR ile Odanda Gör</span>
+                    <Smartphone size={15} />
+                    <span>Web-AR ile Odanda Gör</span>
                   </button>
                 </div>
               </div>
@@ -10077,25 +10076,88 @@ export default function Home() {
 
         .hero-feature-stats-row {
           display: flex;
-          gap: 12px;
-          margin-top: 14px;
+          align-items: center;
+          gap: 8px;
+          margin-top: 16px;
           flex-wrap: wrap;
         }
 
         .feature-stat-capsule {
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: 7px;
           background: rgba(255, 255, 255, 0.05);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          color: rgba(255, 255, 255, 0.9);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: rgba(255, 255, 255, 0.85);
+          padding: 8px 14px;
+          border-radius: 10px;
+          font-size: 0.76rem;
+          font-weight: 600;
+          white-space: nowrap;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-feature-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
           padding: 8px 16px;
-          border-radius: 24px;
-          font-size: 0.75rem;
-          font-weight: 500;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+          border-radius: 10px;
+          font-size: 0.78rem;
+          font-weight: 700;
+          text-decoration: none;
+          cursor: pointer;
+          white-space: nowrap;
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-feature-btn:hover {
+          transform: translateY(-2px);
+        }
+
+        .hero-feature-btn:active {
+          transform: translateY(0) scale(0.98);
+        }
+
+        .hero-feature-btn.gold-theme {
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.16) 0%, rgba(212, 175, 55, 0.05) 100%);
+          border: 1px solid rgba(212, 175, 55, 0.45);
+          color: #fbbf24;
+        }
+
+        .hero-feature-btn.gold-theme:hover {
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.28) 0%, rgba(212, 175, 55, 0.12) 100%);
+          border-color: #fbbf24;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(251, 191, 36, 0.25);
+        }
+
+        .hero-feature-btn.amber-theme {
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.06) 100%);
+          border: 1px solid rgba(245, 158, 11, 0.5);
+          color: #f59e0b;
+        }
+
+        .hero-feature-btn.amber-theme:hover {
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(217, 119, 6, 0.15) 100%);
+          border-color: #f59e0b;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .hero-feature-btn.emerald-theme {
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(5, 150, 105, 0.05) 100%);
+          border: 1px solid rgba(16, 185, 129, 0.45);
+          color: #34d399;
+        }
+
+        .hero-feature-btn.emerald-theme:hover {
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.28) 0%, rgba(5, 150, 105, 0.12) 100%);
+          border-color: #34d399;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(52, 211, 153, 0.25);
         }
 
         /* 3D Slab display stand platform on Hero right */
