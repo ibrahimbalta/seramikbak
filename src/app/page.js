@@ -3433,14 +3433,6 @@ export default function Home() {
               <TrendingUp size={13} />
               <span>{t('brandPortal')}</span>
             </Link>
-            <Link 
-              href="/kiosk" 
-              className="utility-item kiosk-btn-link"
-              title="Bayi Teşhir & Tablet Satış Modu"
-            >
-              <div className="pulse-indicator-green" />
-              <span>{t('kioskMode')}</span>
-            </Link>
           </div>
 
           <div className="utility-right">
@@ -3497,22 +3489,11 @@ export default function Home() {
               </button>
               <Link 
                 href="/kiosk" 
-                className="nav-link kiosk-nav-link"
+                className="nav-link"
                 title="Bayi Teşhir & Tablet Satış Modu"
-                style={{ 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
-                  gap: '6px',
-                  background: 'rgba(16, 185, 129, 0.1)', 
-                  border: '1px solid rgba(16, 185, 129, 0.3)', 
-                  color: '#10b981', 
-                  fontWeight: '700',
-                  padding: '5px 12px',
-                  borderRadius: '20px',
-                  textDecoration: 'none'
-                }}
+                style={{ textDecoration: 'none' }}
               >
-                <div className="pulse-indicator-green" />
+                <Layers size={14} />
                 <span>{t('kioskMode')}</span>
               </Link>
             </>
@@ -3678,13 +3659,12 @@ export default function Home() {
               </button>
               <Link 
                 href="/kiosk" 
-                className="mobile-nav-link kiosk-link" 
+                className="mobile-nav-link" 
                 onClick={() => setShowMobileMenu(false)}
-                style={{ textDecoration: 'none', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.22) 100%)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.4)', fontWeight: '800' }}
+                style={{ textDecoration: 'none' }}
               >
-                <div className="pulse-indicator-green" />
-                <span style={{ color: '#10b981', fontWeight: '800' }}>Teşhir Kiosk</span>
-                <span style={{ marginLeft: 'auto', background: '#10b981', color: '#ffffff', fontSize: '0.62rem', fontWeight: '900', padding: '2px 7px', borderRadius: '12px' }}>Bayi Kiosk</span>
+                <Layers size={16} />
+                <span>Teşhir Kiosk</span>
               </Link>
               <Link 
                 href="/global-tanitim"
