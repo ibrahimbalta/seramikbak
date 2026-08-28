@@ -365,13 +365,8 @@ export default function ShowroomKioskPage() {
       <header className="kiosk-header">
         <div className="header-left">
           <Link href="/" className="btn-exit-kiosk" title="Ana Sayfaya Dön">
-            <div className="btn-exit-icon-box">
-              <Home size={15} />
-            </div>
-            <span>Ana Sayfa</span>
+            <Home size={18} />
           </Link>
-
-          <div className="brand-badge">S</div>
           <div>
             <div className="brand-title-row">
               <h1 className="brand-title">Seramik<span className="gold-accent">Bak</span></h1>
@@ -1036,15 +1031,13 @@ export default function ShowroomKioskPage() {
         .btn-exit-kiosk {
           display: flex;
           align-items: center;
-          gap: 8px;
+          justify-content: center;
+          width: 38px;
+          height: 38px;
+          border-radius: 10px;
           background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
           border: 1px solid rgba(255, 255, 255, 0.14);
-          color: #f1f5f9;
-          padding: 6px 14px 6px 8px;
-          border-radius: 10px;
-          font-size: 0.82rem;
-          font-weight: 600;
-          letter-spacing: 0.01em;
+          color: #fbbf24;
           text-decoration: none;
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
@@ -1052,36 +1045,16 @@ export default function ShowroomKioskPage() {
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .btn-exit-icon-box {
-          width: 28px;
-          height: 28px;
-          border-radius: 7px;
-          background: rgba(212, 175, 55, 0.15);
-          border: 1px solid rgba(212, 175, 55, 0.3);
-          color: #fbbf24;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.25s ease;
-        }
-
         .btn-exit-kiosk:hover {
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.08) 100%);
-          border-color: rgba(212, 175, 55, 0.5);
-          color: #ffffff;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.25);
-        }
-
-        .btn-exit-kiosk:hover .btn-exit-icon-box {
           background: #f59e0b;
           border-color: #f59e0b;
           color: #0f172a;
-          transform: scale(1.05);
+          transform: translateY(-1px) scale(1.05);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.4);
         }
 
         .btn-exit-kiosk:active {
-          transform: translateY(0) scale(0.97);
+          transform: translateY(0) scale(0.95);
         }
 
         .brand-badge {
