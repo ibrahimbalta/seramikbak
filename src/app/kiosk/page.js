@@ -668,6 +668,16 @@ export default function ShowroomKioskPage() {
               </strong>
               <span className="overlay-sub-hint">(Sol menüden seçeceğiniz seramik buraya uygulanır)</span>
             </div>
+
+            {/* Canvas Mobile Expand Button */}
+            <button 
+              onClick={toggleFullscreen} 
+              className="canvas-expand-touch-btn"
+              title="3D Stüdyo Tam Ekran Modu"
+            >
+              {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+              <span>{isFullscreen ? 'Küçült' : 'Büyüt'}</span>
+            </button>
           </div>
 
           {/* Bottom Panel Toggle Tabs (3D Stüdyo Kontrolleri / Metraj & Fiyatlama) */}
@@ -1525,6 +1535,33 @@ export default function ShowroomKioskPage() {
           color: #64748b;
         }
 
+        .canvas-expand-touch-btn {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: rgba(15, 23, 42, 0.88);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(245, 158, 11, 0.4);
+          color: #fbbf24;
+          padding: 6px 12px;
+          border-radius: 10px;
+          font-size: 0.75rem;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          cursor: pointer;
+          z-index: 12;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+          transition: all 0.2s ease;
+        }
+
+        .canvas-expand-touch-btn:hover {
+          background: #f59e0b;
+          color: #0f172a;
+          border-color: #f59e0b;
+        }
+
         .bottom-panel-tabs {
           display: flex;
           gap: 6px;
@@ -1964,16 +2001,41 @@ export default function ShowroomKioskPage() {
             overflow: visible;
           }
 
-          /* 3D Visualizer Canvas Section on Mobile (Placed First for Visual Focus) */
+          /* 3D Visualizer Canvas Section on Mobile (Placed First with PROMINENT Large Viewport) */
           .kiosk-canvas-area {
             order: 1;
             width: 100%;
-            height: 400px;
-            min-height: 350px;
+            height: auto;
+            min-height: 520px;
+            padding: 6px;
           }
 
           .canvas-frame {
-            height: 100%;
+            height: 480px;
+            min-height: 440px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+          }
+
+          .canvas-active-target-overlay {
+            top: 8px;
+            left: 8px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.92);
+          }
+
+          .overlay-label {
+            font-size: 0.52rem;
+          }
+
+          .overlay-target-name {
+            font-size: 0.72rem;
+          }
+
+          .overlay-sub-hint {
+            display: none !important;
           }
 
           /* Sidebar Section on Mobile (Placed Below Canvas) */
@@ -2085,8 +2147,13 @@ export default function ShowroomKioskPage() {
         /* Compact Mobile Phones (<= 480px) */
         @media (max-width: 480px) {
           .kiosk-canvas-area {
-            height: 340px;
-            min-height: 300px;
+            height: auto;
+            min-height: 480px;
+          }
+
+          .canvas-frame {
+            height: 430px;
+            min-height: 380px;
           }
 
           .surface-target-grid {
