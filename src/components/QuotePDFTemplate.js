@@ -120,9 +120,19 @@ export default function QuotePDFTemplate({ quote, onClose }) {
             <h4>PROJE / MEKAN BİLGİLERİ</h4>
             <div className="info-line"><strong>Proje Adı:</strong> {projectName}</div>
             <div className="info-line"><strong>Tedarikçi Marka:</strong> {brandName}</div>
-            <div className="info-line"><strong>Garanti Statusu:</strong> %100 Orijinal Fabrika Garantili</div>
+            <div className="info-line"><strong>Garanti Statüsü:</strong> %100 Orijinal Fabrika Garantili</div>
           </div>
         </div>
+
+        {/* 3D Tasarım Görseli Snapshot Preview */}
+        {productImageUrl && (
+          <div className="3d-snapshot-box" style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#0f172a', textAlign: 'center', padding: '8px' }}>
+            <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#d4af37', marginBottom: '4px', textTransform: 'uppercase' }}>
+              3D MEKAN TASARIM ÖNİZLEMESİ (SHOWROOM STÜDYO)
+            </div>
+            <img src={productImageUrl} alt="3D Tasarım" style={{ maxHeight: '200px', width: 'auto', margin: '0 auto', borderRadius: '6px', objectFit: 'contain' }} />
+          </div>
+        )}
 
         {/* Itemized Table */}
         <table className="sheet-table">
