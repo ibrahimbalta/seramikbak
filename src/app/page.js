@@ -6179,16 +6179,17 @@ export default function Home() {
                         <line x1="40" y1="170" x2="480" y2="170" stroke="var(--border-color)" />
 
                         {(() => {
-                          const maxViews = Math.max(...b2bStats.timeline.map(t => t.views), 1);
-                          const pointsViews = b2bStats.timeline.map((t, idx) => {
-                            const x = 40 + (idx * (440 / 29));
-                            const y = 170 - ((t.views / maxViews) * 140);
+                          const timeline = b2bStats?.timeline || [];
+                          const maxViews = Math.max(...timeline.map(t => t.views || 0), 1);
+                          const pointsViews = timeline.map((t, idx) => {
+                            const x = 40 + (idx * (440 / Math.max(timeline.length - 1, 1)));
+                            const y = 170 - (((t.views || 0) / maxViews) * 140);
                             return `${x},${y}`;
                           }).join(' ');
 
-                          const pointsClicks = b2bStats.timeline.map((t, idx) => {
-                            const x = 40 + (idx * (440 / 29));
-                            const y = 170 - ((t.clicks * 4 / maxViews) * 140);
+                          const pointsClicks = timeline.map((t, idx) => {
+                            const x = 40 + (idx * (440 / Math.max(timeline.length - 1, 1)));
+                            const y = 170 - ((((t.clicks || 0) * 4) / maxViews) * 140);
                             return `${x},${y}`;
                           }).join(' ');
 
@@ -6197,13 +6198,13 @@ export default function Home() {
                               <polyline fill="none" stroke="var(--accent-blue)" strokeWidth="2.5" points={pointsViews} />
                               <polyline fill="none" stroke="var(--accent-gold)" strokeWidth="2.5" points={pointsClicks} />
                               
-                              {b2bStats.timeline.map((t, idx) => {
-                                if (idx % 6 !== 0 && idx !== 29) return null;
-                                const x = 40 + (idx * (440 / 29));
+                              {timeline.map((t, idx) => {
+                                if (idx % 6 !== 0 && idx !== timeline.length - 1) return null;
+                                const x = 40 + (idx * (440 / Math.max(timeline.length - 1, 1)));
                                 return (
                                   <g key={idx}>
-                                    <circle cx={x} cy={170 - ((t.views / maxViews) * 140)} r="3.5" fill="var(--accent-blue)" />
-                                    <circle cx={x} cy={170 - ((t.clicks * 4 / maxViews) * 140)} r="3.5" fill="var(--accent-gold)" />
+                                    <circle cx={x} cy={170 - (((t.views || 0) / maxViews) * 140)} r="3.5" fill="var(--accent-blue)" />
+                                    <circle cx={x} cy={170 - ((((t.clicks || 0) * 4) / maxViews) * 140)} r="3.5" fill="var(--accent-gold)" />
                                     <text x={x} y="188" fontSize="8" fill="var(--text-secondary)" textAnchor="middle">{t.date}</text>
                                   </g>
                                 );
@@ -6227,7 +6228,7 @@ export default function Home() {
 
                     <div className="active-campaigns-list">
                       <h5>Mevcut Reklam Kampanyaları</h5>
-                      {b2bStats.campaigns.map((camp) => (
+                      {(b2bStats?.campaigns || []).map((camp) => (
                         <div key={camp.id} className="campaign-row">
                           <div className="camp-meta">
                             <strong>{camp.product?.name}</strong>
@@ -6236,7 +6237,7 @@ export default function Home() {
                           <div className="camp-data">
                             <div>Tık: <strong>{camp.clicks}</strong></div>
                             <div>Tık Başı: <strong>{camp.bidAmount} TL</strong></div>
-                            <div className="budget-capsule">Bütçe: <strong>{camp.budget.toFixed(2)} TL</strong></div>
+                            <div className="budget-capsule">Bütçe: <strong>{(camp.budget || 0).toFixed(2)} TL</strong></div>
                           </div>
                         </div>
                       ))}
@@ -6251,7 +6252,7 @@ export default function Home() {
                           <label>Hedef Ürün</label>
                           <select value={campaignProduct} onChange={(e) => setCampaignProduct(e.target.value)} required>
                             <option value="">Seçin...</option>
-                            {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                            {(products || []).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                           </select>
                         </div>
                         <div className="form-group-inline"><label>Teklif (TL)</label><input type="number" step="0.1" value={campaignBid} onChange={(e) => setCampaignBid(e.target.value)} required /></div>
@@ -6271,7 +6272,7 @@ export default function Home() {
                         <table className="intel-table">
                           <thead><tr><th>Arama</th><th>Adet</th></tr></thead>
                           <tbody>
-                            {b2bStats.topKeywords.map((item, idx) => (
+                            {(b2bStats?.topKeywords || []).map((item, idx) => (
                               <tr key={idx}><td>{item.keyword}</td><td><strong>{item.count}</strong></td></tr>
                             ))}
                           </tbody>
@@ -6282,7 +6283,7 @@ export default function Home() {
                         <table className="intel-table">
                           <thead><tr><th>İl</th><th>Tıklama</th></tr></thead>
                           <tbody>
-                            {b2bStats.topCities.map((item, idx) => (
+                            {(b2bStats?.topCities || []).map((item, idx) => (
                               <tr key={idx}><td>{item.city}</td><td><strong>{item.count}</strong></td></tr>
                             ))}
                           </tbody>
@@ -7200,7 +7201,7 @@ export default function Home() {
                     <div>
                       <h4 style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: '#64748b', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Sergilenen Özel Konseptler</h4>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                        {selectedDetailDealer.specialConcepts.split(',').map((concept, idx) => (
+                        {(selectedDetailDealer.specialConcepts || '').split(',').filter(Boolean).map((concept, idx) => (
                           <span 
                             key={idx} 
                             style={{ 
@@ -7225,7 +7226,7 @@ export default function Home() {
                     <div>
                       <h4 style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: '#64748b', margin: '0 0 8px 0', letterSpacing: '0.05em' }}>Showroom Fotoğrafları</h4>
                       <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
-                        {selectedDetailDealer.showroomImages.split(',').filter(Boolean).map((img, idx) => (
+                        {(selectedDetailDealer.showroomImages || '').split(',').filter(Boolean).map((img, idx) => (
                           <div 
                             key={idx}
                             style={{ 
