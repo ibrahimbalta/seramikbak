@@ -3495,6 +3495,26 @@ export default function Home() {
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
               </button>
+              <Link 
+                href="/kiosk" 
+                className="nav-link kiosk-nav-link"
+                title="Bayi Teşhir & Tablet Satış Modu"
+                style={{ 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: '6px',
+                  background: 'rgba(16, 185, 129, 0.1)', 
+                  border: '1px solid rgba(16, 185, 129, 0.3)', 
+                  color: '#10b981', 
+                  fontWeight: '700',
+                  padding: '5px 12px',
+                  borderRadius: '20px',
+                  textDecoration: 'none'
+                }}
+              >
+                <div className="pulse-indicator-green" />
+                <span>{t('kioskMode')}</span>
+              </Link>
             </>
           )}
         </nav>
@@ -3649,16 +3669,6 @@ export default function Home() {
                 <Palette size={16} />
                 <span>{t('studio3d')}</span>
               </button>
-              <Link 
-                href="/kiosk" 
-                className="mobile-nav-link kiosk-link" 
-                onClick={() => setShowMobileMenu(false)}
-                style={{ textDecoration: 'none', background: 'linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(217,119,6,0.25) 100%)', color: '#fbbf24', border: '1px solid rgba(245,158,11,0.4)', fontWeight: '800' }}
-              >
-                <Layers size={16} style={{ color: '#f59e0b' }} />
-                <span style={{ color: '#fbbf24', fontWeight: '800' }}>Teşhir Kiosk</span>
-                <span style={{ marginLeft: 'auto', background: '#f59e0b', color: '#0f172a', fontSize: '0.62rem', fontWeight: '900', padding: '2px 7px', borderRadius: '12px' }}>3D Showroom</span>
-              </Link>
               <button 
                 className={`mobile-nav-link ${activeTab === 'dealers' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); }}
@@ -3666,6 +3676,16 @@ export default function Home() {
                 <MapPin size={16} />
                 <span>{t('dealers')}</span>
               </button>
+              <Link 
+                href="/kiosk" 
+                className="mobile-nav-link kiosk-link" 
+                onClick={() => setShowMobileMenu(false)}
+                style={{ textDecoration: 'none', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.22) 100%)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.4)', fontWeight: '800' }}
+              >
+                <div className="pulse-indicator-green" />
+                <span style={{ color: '#10b981', fontWeight: '800' }}>Teşhir Kiosk</span>
+                <span style={{ marginLeft: 'auto', background: '#10b981', color: '#ffffff', fontSize: '0.62rem', fontWeight: '900', padding: '2px 7px', borderRadius: '12px' }}>Bayi Kiosk</span>
+              </Link>
               <Link 
                 href="/global-tanitim"
                 className="mobile-nav-link"
