@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FileText, User, Phone, Mail, FileCheck, X, Sparkles, Building2, CheckCircle2, Percent } from 'lucide-react';
+import { FileText, User, Phone, Mail, FileCheck, X, Sparkles, Building2, CheckCircle2, Percent, Edit3, Plus, Trash2 } from 'lucide-react';
 import QuotePDFTemplate from './QuotePDFTemplate';
 
 export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedDealer, calculationData, snapshotUrl }) {
@@ -9,34 +9,79 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [projectName, setProjectName] = useState('Banyo / Mekan Yenileme');
-  const [notes, setNotes] = useState('');
+  const [notes, setNotes] = useState('Teklif 7 gün süreyle geçerlidir.');
   const [discountPercent, setDiscountPercent] = useState(0);
+
+  // Kullanıcının elle müdahale edebildiği kalemler (Editable State)
+  const [editableAreaM2, setEditableAreaM2] = useState(calculationData?.areaM2 || 18);
+  const [editableWastePercent, setEditableWastePercent] = useState(calculationData?.wastePercent || 10);
+  const [editableUnitPriceM2, setEditableUnitPriceM2] = useState(calculationData?.unitPriceM2 || 480);
+  
+  const [includeAdhesive, setIncludeAdhesive] = useState(calculationData?.includeAdhesive ?? true);
+  const [editableAdhesiveBags, setEditableAdhesiveBags] = useState(calculationData?.adhesiveBags || 4);
+  const [editableAdhesiveBagPrice, setEditableAdhesiveBagPrice] = useState(280);
+
+  const [includeGrout, setIncludeGrout] = useState(calculationData?.includeGrout ?? true);
+  const [editableGroutPacks, setEditableGroutPacks] = useState(calculationData?.groutPacks || 2);
+  const [editableGroutPackPrice, setEditableGroutPackPrice] = useState(180);
+
+  const [includeLabor, setIncludeLabor] = useState(calculationData?.includeLabor ?? true);
+  const [editableLaborRateM2, setEditableLaborRateM2] = useState(250);
+
+  const [includeShipping, setIncludeShipping] = useState(calculationData?.includeShipping ?? true);
+  const [editableShippingCost, setEditableShippingCost] = useState(1500);
+
+  // Ekstra Özel Hizmet Kalemleri (ör. Moloz Sökümü, Eski Fayans Kırımı)
+  const [customItems, setCustomItems] = useState([]);
+  const [newCustomName, setNewCustomName] = useState('');
+  const [newCustomPrice, setNewCustomPrice] = useState('');
+
   const [showPdf, setShowPdf] = useState(false);
   const [generatedQuote, setGeneratedQuote] = useState(null);
 
   if (!isOpen) return null;
 
-  const {
-    areaM2 = 15,
-    wastePercent = 10,
-    totalM2WithWaste = 16.5,
-    requiredBoxes = 12,
-    unitPriceM2 = 450,
-    tileCost = 7425,
-    includeAdhesive = true,
-    adhesiveBags = 4,
-    adhesiveCost = 1120,
-    includeGrout = true,
-    groutPacks = 2,
-    groutCost = 360,
-    includeLabor = false,
-    laborCost = 0,
-    includeShipping = false,
-    shippingCost = 0,
-    subtotal = 8905,
-    vatAmount = 1781,
-    grandTotal = 10686
-  } = calculationData || {};
+  // Hesaplama Matematiği (Kullanıcının girdiği anlık değerlere göre)
+  const areaM2Num = Number(editableAreaM2) || 0;
+  const wastePercentNum = Number(editableWastePercent) || 0;
+  const totalM2WithWaste = Math.round((areaM2Num * (1 + wastePercentNum / 100)) * 10) / 10;
+  const requiredBoxes = Math.ceil(totalM2WithWaste / 1.44);
+
+  const unitPriceM2Num = Number(editableUnitPriceM2) || 0;
+  const tileCost = Math.round(totalM2WithWaste * unitPriceM2Num);
+
+  const adhesiveBagsNum = Number(editableAdhesiveBags) || 0;
+  const adhesiveBagPriceNum = Number(editableAdhesiveBagPrice) || 0;
+  const adhesiveCost = includeAdhesive ? adhesiveBagsNum * adhesiveBagPriceNum : 0;
+
+  const groutPacksNum = Number(editableGroutPacks) || 0;
+  const groutPackPriceNum = Number(editableGroutPackPrice) || 0;
+  const groutCost = includeGrout ? groutPacksNum * groutPackPriceNum : 0;
+
+  const laborRateNum = Number(editableLaborRateM2) || 0;
+  const laborCost = includeLabor ? Math.round(totalM2WithWaste * laborRateNum) : 0;
+
+  const shippingCostNum = Number(editableShippingCost) || 0;
+  const shippingCost = includeShipping ? shippingCostNum : 0;
+
+  const customItemsTotal = customItems.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+
+  const subtotalBeforeDiscount = tileCost + adhesiveCost + groutCost + laborCost + shippingCost + customItemsTotal;
+  const discountAmount = Math.round((subtotalBeforeDiscount * (Number(discountPercent) || 0)) / 100);
+  const subtotalAfterDiscount = subtotalBeforeDiscount - discountAmount;
+  const vatAmount = Math.round(subtotalAfterDiscount * 0.20);
+  const finalGrandTotal = subtotalAfterDiscount + vatAmount;
+
+  const handleAddCustomItem = () => {
+    if (!newCustomName || !newCustomPrice) return;
+    setCustomItems([...customItems, { name: newCustomName, price: Number(newCustomPrice) || 0 }]);
+    setNewCustomName('');
+    setNewCustomPrice('');
+  };
+
+  const handleRemoveCustomItem = (index) => {
+    setCustomItems(customItems.filter((_, i) => i !== index));
+  };
 
   const handleGenerateQuote = (e) => {
     e.preventDefault();
@@ -44,11 +89,6 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
       alert('Lütfen Müşteri Adı ve Telefon Numarasını giriniz.');
       return;
     }
-
-    const discountAmount = Math.round((subtotal * (Number(discountPercent) || 0)) / 100);
-    const discountedSubtotal = subtotal - discountAmount;
-    const calculatedVat = Math.round(discountedSubtotal * 0.20);
-    const finalGrandTotal = discountedSubtotal + calculatedVat;
 
     const quoteId = `SB-${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -68,33 +108,34 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
       productCode: selectedProduct?.code || 'SB-60120',
       productImageUrl: snapshotUrl || selectedProduct?.imageUrl || selectedProduct?.textureUrl || '/hero/hero_ceramics.jpg',
       calculations: {
-        unitPriceM2: unitPriceM2,
+        unitPriceM2: unitPriceM2Num,
         totalTileM2: totalM2WithWaste,
-        netAreaM2: areaM2,
-        wastePercent: wastePercent,
+        netAreaM2: areaM2Num,
+        wastePercent: wastePercentNum,
         netTileCost: tileCost,
         includeAdhesive: includeAdhesive,
-        adhesiveUnitPriceBag: 280,
-        adhesiveBagsCount: adhesiveBags,
-        totalAdhesiveKg: adhesiveBags * 25,
+        adhesiveUnitPriceBag: adhesiveBagPriceNum,
+        adhesiveBagsCount: adhesiveBagsNum,
+        totalAdhesiveKg: adhesiveBagsNum * 25,
         totalAdhesiveCost: adhesiveCost,
         includeGrout: includeGrout,
-        groutUnitPriceKg: 180,
-        totalGroutKg: groutPacks * 5,
+        groutUnitPriceKg: groutPackPriceNum,
+        totalGroutKg: groutPacksNum * 5,
         totalGroutCost: groutCost,
-        laborCost: includeLabor ? laborCost : 0,
-        shippingCost: includeShipping ? shippingCost : 0,
-        subtotalBeforeVat: subtotal,
+        laborCost: laborCost,
+        shippingCost: shippingCost,
+        subtotalBeforeVat: subtotalBeforeDiscount,
         discountPercent: Number(discountPercent) || 0,
         tileDiscountAmount: discountAmount,
         vatRate: 20,
-        vatAmount: calculatedVat,
-        grandTotal: finalGrandTotal
+        vatAmount: vatAmount,
+        grandTotal: finalGrandTotal,
+        customItems: customItems
       },
       notes: notes,
       createdAt: new Date().toISOString(),
       whatsappMessage: encodeURIComponent(
-        `Merhaba ${customerName}, SeramikBak 3D Showroom'da hazırladığımız Sayın ${customerName} için teklifiniz hazır! Teklif No: ${quoteId}, Tutar: ₺${finalGrandTotal.toLocaleString('tr-TR')} KDV Dahil.`
+        `Merhaba ${customerName}, SeramikBak Showroom'da hazırladığımız fiyat teklifiniz hazır! Teklif No: ${quoteId}, Tutar: ₺${finalGrandTotal.toLocaleString('tr-TR')} KDV Dahil.`
       )
     };
 
@@ -126,144 +167,321 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
             <FileText size={24} />
           </div>
           <div>
-            <h2 className="modal-title">Resmi Fiyat Teklifi Oluştur</h2>
+            <h2 className="modal-title">Resmi Fiyat Teklifi Oluştur (Fiyatları Düzenleyin)</h2>
             <p className="modal-sub">
-              3D Tasarım snapshot'ı ve hesaplanan kalemler teklif belgesine işlenecektir.
+              Tüm m², malzeme, usta ve nakliye kalemlerini müşteri isteğine göre elle düzenleyebilirsiniz.
             </p>
           </div>
         </div>
 
         <form onSubmit={handleGenerateQuote} className="modal-form-grid">
-          {/* Müşteri ve Proje Bilgileri */}
+          {/* Müşteri Bilgileri */}
+          <div className="section-title-row">
+            <User size={14} className="gold-text" />
+            <span>Müşteri & Proje Bilgileri</span>
+          </div>
+
           <div className="inputs-2col">
             <div className="input-group">
               <label className="input-label">Müşteri Adı Soyadı *</label>
-              <div className="input-with-icon">
-                <User size={15} className="input-icon" />
-                <input
-                  type="text"
-                  required
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="ör. Zeynep Yılmaz"
-                  className="modal-input"
-                />
-              </div>
+              <input
+                type="text"
+                required
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder="ör. Zeynep Yılmaz"
+                className="modal-input"
+              />
             </div>
 
             <div className="input-group">
               <label className="input-label">Telefon Numarası *</label>
-              <div className="input-with-icon">
-                <Phone size={15} className="input-icon" />
-                <input
-                  type="tel"
-                  required
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                  placeholder="05xx xxx xx xx"
-                  className="modal-input"
-                />
-              </div>
+              <input
+                type="tel"
+                required
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                placeholder="05xx xxx xx xx"
+                className="modal-input"
+              />
             </div>
 
             <div className="input-group">
-              <label className="input-label">E-Posta Adresi (Opsiyonel)</label>
-              <div className="input-with-icon">
-                <Mail size={15} className="input-icon" />
-                <input
-                  type="email"
-                  value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                  placeholder="ornek@email.com"
-                  className="modal-input"
-                />
-              </div>
+              <label className="input-label">E-Posta (Opsiyonel)</label>
+              <input
+                type="email"
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                placeholder="ornek@email.com"
+                className="modal-input"
+              />
             </div>
 
             <div className="input-group">
-              <label className="input-label">Proje / Mekan Tanımı</label>
+              <label className="input-label">Proje Tanımı</label>
               <input
                 type="text"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
                 placeholder="ör. Ebeveyn Banyosu Yenileme"
-                className="modal-input no-icon"
+                className="modal-input"
               />
             </div>
           </div>
 
-          {/* İskonto ve Notlar */}
-          <div className="inputs-2col">
-            <div className="input-group">
-              <label className="input-label">Özel İskonto Oranı (%)</label>
-              <div className="input-with-icon">
-                <Percent size={15} className="input-icon" />
-                <input
-                  type="number"
-                  min="0"
-                  max="50"
-                  value={discountPercent}
-                  onChange={(e) => setDiscountPercent(e.target.value)}
-                  className="modal-input"
-                />
+          {/* DÜZENLENEBİLİR KALEMLER & FİYATLAR */}
+          <div className="section-title-row">
+            <Edit3 size={14} className="gold-text" />
+            <span>Kalem Kalem Malzeme ve Hizmet Fiyat Düzenleme</span>
+          </div>
+
+          <div className="editable-items-box">
+            {/* Seramik m² ve Fiyatı */}
+            <div className="edit-row">
+              <div className="edit-info">
+                <strong>Seramik Kaplama ({selectedProduct?.name || 'Karo'})</strong>
+                <span className="sub-info">Net: {areaM2Num} m² + %{wastePercentNum} Fire = <strong>{totalM2WithWaste} m²</strong> ({requiredBoxes} Kutu)</span>
+              </div>
+              <div className="edit-inputs">
+                <div className="field">
+                  <label>Alan (m²)</label>
+                  <input
+                    type="number"
+                    value={editableAreaM2}
+                    onChange={(e) => setEditableAreaM2(e.target.value)}
+                  />
+                </div>
+                <div className="field">
+                  <label>Birim Fiyat (₺/m²)</label>
+                  <input
+                    type="number"
+                    value={editableUnitPriceM2}
+                    onChange={(e) => setEditableUnitPriceM2(e.target.value)}
+                  />
+                </div>
+                <div className="field-total">
+                  <label>Toplam</label>
+                  <span>₺{tileCost.toLocaleString('tr-TR')}</span>
+                </div>
               </div>
             </div>
 
+            {/* Yapıştırıcı Harç */}
+            <div className="edit-row">
+              <div className="edit-info flex-row">
+                <input
+                  type="checkbox"
+                  checked={includeAdhesive}
+                  onChange={(e) => setIncludeAdhesive(e.target.checked)}
+                />
+                <span>Seramik Yapıştırıcı Harç (25kg Torba)</span>
+              </div>
+              {includeAdhesive && (
+                <div className="edit-inputs">
+                  <div className="field">
+                    <label>Çuval Adet</label>
+                    <input
+                      type="number"
+                      value={editableAdhesiveBags}
+                      onChange={(e) => setEditableAdhesiveBags(e.target.value)}
+                    />
+                  </div>
+                  <div className="field">
+                    <label>Çuval Fiyatı (₺)</label>
+                    <input
+                      type="number"
+                      value={editableAdhesiveBagPrice}
+                      onChange={(e) => setEditableAdhesiveBagPrice(e.target.value)}
+                    />
+                  </div>
+                  <div className="field-total">
+                    <label>Toplam</label>
+                    <span>₺{adhesiveCost.toLocaleString('tr-TR')}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Derz Dolgusu */}
+            <div className="edit-row">
+              <div className="edit-info flex-row">
+                <input
+                  type="checkbox"
+                  checked={includeGrout}
+                  onChange={(e) => setIncludeGrout(e.target.checked)}
+                />
+                <span>Silikonlu Derz Dolgusu (Kova/Paket)</span>
+              </div>
+              {includeGrout && (
+                <div className="edit-inputs">
+                  <div className="field">
+                    <label>Paket Adet</label>
+                    <input
+                      type="number"
+                      value={editableGroutPacks}
+                      onChange={(e) => setEditableGroutPacks(e.target.value)}
+                    />
+                  </div>
+                  <div className="field">
+                    <label>Paket Fiyatı (₺)</label>
+                    <input
+                      type="number"
+                      value={editableGroutPackPrice}
+                      onChange={(e) => setEditableGroutPackPrice(e.target.value)}
+                    />
+                  </div>
+                  <div className="field-total">
+                    <label>Toplam</label>
+                    <span>₺{groutCost.toLocaleString('tr-TR')}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Ustalık İşçiliği */}
+            <div className="edit-row">
+              <div className="edit-info flex-row">
+                <input
+                  type="checkbox"
+                  checked={includeLabor}
+                  onChange={(e) => setIncludeLabor(e.target.checked)}
+                />
+                <span>Garantili Usta İşçiliği</span>
+              </div>
+              {includeLabor && (
+                <div className="edit-inputs">
+                  <div className="field">
+                    <label>İşçilik (₺/m²)</label>
+                    <input
+                      type="number"
+                      value={editableLaborRateM2}
+                      onChange={(e) => setEditableLaborRateM2(e.target.value)}
+                    />
+                  </div>
+                  <div className="field-total" style={{ gridColumn: 'span 2' }}>
+                    <label>Toplam Ustalık</label>
+                    <span>₺{laborCost.toLocaleString('tr-TR')}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Nakliye */}
+            <div className="edit-row">
+              <div className="edit-info flex-row">
+                <input
+                  type="checkbox"
+                  checked={includeShipping}
+                  onChange={(e) => setIncludeShipping(e.target.checked)}
+                />
+                <span>Lojistik & Kat Taşıma Bedeli</span>
+              </div>
+              {includeShipping && (
+                <div className="edit-inputs">
+                  <div className="field" style={{ gridColumn: 'span 2' }}>
+                    <label>Nakliye Tutarı (₺)</label>
+                    <input
+                      type="number"
+                      value={editableShippingCost}
+                      onChange={(e) => setEditableShippingCost(e.target.value)}
+                    />
+                  </div>
+                  <div className="field-total">
+                    <label>Toplam</label>
+                    <span>₺{shippingCost.toLocaleString('tr-TR')}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Ekstra Özel Kalem Ekleme */}
+            <div className="custom-items-section">
+              <label className="input-label">Ekstra Kalem Ekle (ör. Moloz Kırımı, Duşakabin vb.)</label>
+              <div className="add-custom-row">
+                <input
+                  type="text"
+                  placeholder="Hizmet/Ürün Adı"
+                  value={newCustomName}
+                  onChange={(e) => setNewCustomName(e.target.value)}
+                  className="modal-input"
+                />
+                <input
+                  type="number"
+                  placeholder="Tutar (₺)"
+                  value={newCustomPrice}
+                  onChange={(e) => setNewCustomPrice(e.target.value)}
+                  className="modal-input short"
+                />
+                <button type="button" onClick={handleAddCustomItem} className="btn-add-item">
+                  <Plus size={16} /> Ekle
+                </button>
+              </div>
+
+              {customItems.length > 0 && (
+                <div className="custom-items-list">
+                  {customItems.map((item, idx) => (
+                    <div key={idx} className="custom-item-chip">
+                      <span>{item.name}: <strong>₺{item.price.toLocaleString('tr-TR')}</strong></span>
+                      <button type="button" onClick={() => handleRemoveCustomItem(idx)} className="btn-del">
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* İskonto & Notlar */}
+          <div className="inputs-2col">
             <div className="input-group">
-              <label className="input-label">Teklif Notu / Özel Şartlar</label>
+              <label className="input-label">Özel İskonto Oranı (%)</label>
+              <input
+                type="number"
+                min="0"
+                max="50"
+                value={discountPercent}
+                onChange={(e) => setDiscountPercent(e.target.value)}
+                className="modal-input"
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Teklif Notu / Geçerlilik Süresi</label>
               <input
                 type="text"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="ör. 7 gün geçerlidir. Kat taşıma dahildir."
-                className="modal-input no-icon"
+                className="modal-input"
               />
             </div>
           </div>
 
           {/* Hesaplama Özeti Kartı */}
           <div className="calc-summary-card">
-            <div className="summary-hdr">
-              <span>HESAPLANAN KALEMLER</span>
-              <span className="gold-text">{selectedProduct?.name} ({areaM2} m² + %{wastePercent} Fire)</span>
-            </div>
             <div className="summary-line">
-              <span>Seramik Malzemesi ({totalM2WithWaste} m² / {requiredBoxes} Kutu):</span>
-              <span>₺{tileCost.toLocaleString('tr-TR')}</span>
+              <span>Ara Toplam (KDV Hariç):</span>
+              <span>₺{subtotalBeforeDiscount.toLocaleString('tr-TR')}</span>
             </div>
-            {includeAdhesive && (
-              <div className="summary-line">
-                <span>Seramik Yapıştırıcı Harç ({adhesiveBags} Torba):</span>
-                <span>₺{adhesiveCost.toLocaleString('tr-TR')}</span>
+            {discountAmount > 0 && (
+              <div className="summary-line discount">
+                <span>İskonto İndirimi (%{discountPercent}):</span>
+                <span>-₺{discountAmount.toLocaleString('tr-TR')}</span>
               </div>
             )}
-            {includeGrout && (
-              <div className="summary-line">
-                <span>Derz Dolgusu ({groutPacks} Kova):</span>
-                <span>₺{groutCost.toLocaleString('tr-TR')}</span>
-              </div>
-            )}
-            {includeLabor && laborCost > 0 && (
-              <div className="summary-line green">
-                <span>Sertifikalı Ustalık İşçiliği:</span>
-                <span>₺{laborCost.toLocaleString('tr-TR')}</span>
-              </div>
-            )}
-            {includeShipping && shippingCost > 0 && (
-              <div className="summary-line sky">
-                <span>Lojistik & Nakliye Teslimat:</span>
-                <span>₺{shippingCost.toLocaleString('tr-TR')}</span>
-              </div>
-            )}
+            <div className="summary-line">
+              <span>KDV (%20):</span>
+              <span>₺{vatAmount.toLocaleString('tr-TR')}</span>
+            </div>
             <div className="summary-total-line">
-              <span>TAHMİNİ GENEL TOPLAM (KDV Dahil):</span>
-              <span className="gold-text">₺{grandTotal.toLocaleString('tr-TR')}</span>
+              <span>GENEL TOPLAM (KDV Dahil):</span>
+              <span className="gold-text">₺{finalGrandTotal.toLocaleString('tr-TR')}</span>
             </div>
           </div>
 
           <button type="submit" className="btn-submit-pdf">
             <FileCheck size={18} />
-            <span>PDF Teklifi Saniyeler İçinde Oluştur</span>
+            <span>Resmi PDF Teklifi Oluştur</span>
           </button>
         </form>
       </div>
@@ -285,7 +503,7 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           background: #0f172a;
           border: 1px solid #1e293b;
           border-radius: 24px;
-          max-width: 600px;
+          max-width: 680px;
           width: 100%;
           padding: 24px;
           color: #ffffff;
@@ -312,7 +530,7 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           display: flex;
           align-items: center;
           gap: 12px;
-          margin-bottom: 20px;
+          margin-bottom: 16px;
         }
 
         .icon-badge-gold {
@@ -329,7 +547,7 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         }
 
         .modal-title {
-          font-size: 1.15rem;
+          font-size: 1.1rem;
           font-weight: 800;
           margin: 0;
           color: #ffffff;
@@ -347,10 +565,22 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           gap: 14px;
         }
 
+        .section-title-row {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.78rem;
+          font-weight: 800;
+          color: #fbbf24;
+          border-bottom: 1px solid #1e293b;
+          padding-bottom: 4px;
+          margin-top: 6px;
+        }
+
         .inputs-2col {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 12px;
+          gap: 10px;
         }
 
         .input-group {
@@ -365,31 +595,164 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           color: #94a3b8;
         }
 
-        .input-with-icon {
-          position: relative;
-          display: flex;
-          align-items: center;
-        }
-
-        .input-icon {
-          position: absolute;
-          left: 10px;
-          color: #64748b;
-        }
-
         .modal-input {
           width: 100%;
           background: #090d16;
           border: 1px solid #1e293b;
           border-radius: 10px;
-          padding: 9px 12px 9px 34px;
+          padding: 8px 12px;
           font-size: 0.75rem;
           color: #ffffff;
           outline: none;
         }
 
-        .modal-input.no-icon {
-          padding-left: 12px;
+        .modal-input.short {
+          width: 110px;
+        }
+
+        .editable-items-box {
+          background: #090d16;
+          border: 1px solid #1e293b;
+          border-radius: 14px;
+          padding: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .edit-row {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          border-bottom: 1px dashed #1e293b;
+          padding-bottom: 8px;
+        }
+
+        .edit-row:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        .edit-info {
+          font-size: 0.75rem;
+          color: #e2e8f0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .edit-info.flex-row {
+          justify-content: flex-start;
+          gap: 8px;
+          font-weight: 700;
+        }
+
+        .sub-info {
+          font-size: 0.68rem;
+          color: #94a3b8;
+        }
+
+        .edit-inputs {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 8px;
+          align-items: center;
+          background: rgba(15, 23, 42, 0.6);
+          padding: 8px;
+          border-radius: 8px;
+        }
+
+        .field {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .field label {
+          font-size: 0.62rem;
+          color: #64748b;
+          font-weight: 700;
+        }
+
+        .field input {
+          background: #090d16;
+          border: 1px solid #334155;
+          color: #ffffff;
+          border-radius: 6px;
+          padding: 4px 8px;
+          font-size: 0.75rem;
+          font-weight: 700;
+        }
+
+        .field-total {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 2px;
+        }
+
+        .field-total label {
+          font-size: 0.62rem;
+          color: #64748b;
+          font-weight: 700;
+        }
+
+        .field-total span {
+          font-size: 0.8rem;
+          font-weight: 800;
+          color: #fbbf24;
+        }
+
+        .custom-items-section {
+          margin-top: 4px;
+        }
+
+        .add-custom-row {
+          display: flex;
+          gap: 6px;
+          margin-top: 4px;
+        }
+
+        .btn-add-item {
+          background: #1e293b;
+          color: #fbbf24;
+          border: 1px solid rgba(245, 158, 11, 0.4);
+          padding: 0 12px;
+          border-radius: 8px;
+          font-size: 0.72rem;
+          font-weight: 800;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          white-space: nowrap;
+        }
+
+        .custom-items-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 8px;
+        }
+
+        .custom-item-chip {
+          background: rgba(245, 158, 11, 0.12);
+          border: 1px solid rgba(245, 158, 11, 0.3);
+          color: #e2e8f0;
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-size: 0.7rem;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .btn-del {
+          background: none;
+          border: none;
+          color: #ef4444;
+          cursor: pointer;
+          padding: 0;
         }
 
         .calc-summary-card {
@@ -400,16 +763,7 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           display: flex;
           flex-direction: column;
           gap: 6px;
-          font-size: 0.72rem;
-        }
-
-        .summary-hdr {
-          display: flex;
-          justify-content: space-between;
-          font-weight: 800;
-          color: #94a3b8;
-          border-bottom: 1px solid #1e293b;
-          padding-bottom: 6px;
+          font-size: 0.75rem;
         }
 
         .summary-line {
@@ -418,13 +772,12 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           color: #cbd5e1;
         }
 
-        .summary-line.green { color: #34d399; }
-        .summary-line.sky { color: #38bdf8; }
+        .summary-line.discount { color: #ef4444; }
 
         .summary-total-line {
           display: flex;
           justify-content: space-between;
-          font-size: 0.85rem;
+          font-size: 0.9rem;
           font-weight: 900;
           color: #ffffff;
           border-top: 1px solid #1e293b;
@@ -443,7 +796,7 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           border: none;
           padding: 12px;
           border-radius: 12px;
-          font-size: 0.8rem;
+          font-size: 0.85rem;
           font-weight: 900;
           cursor: pointer;
           display: flex;
@@ -455,6 +808,9 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
 
         @media (max-width: 600px) {
           .inputs-2col {
+            grid-template-columns: 1fr;
+          }
+          .edit-inputs {
             grid-template-columns: 1fr;
           }
         }
