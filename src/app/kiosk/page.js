@@ -87,6 +87,11 @@ const BRAND_CATALOG = [
 
 export default function ShowroomKioskPage() {
   const canvasContainerRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Ürün ve Marka Eyaletleri
   const [products, setProducts] = useState(BRAND_CATALOG);
@@ -359,8 +364,45 @@ export default function ShowroomKioskPage() {
   const vatAmount = Math.round(subtotalBeforeVat * 0.20);
   const grandTotal = subtotalBeforeVat + vatAmount;
 
+  if (!mounted) {
+    return (
+      <main style={{ 
+        minHeight: '100vh', 
+        background: '#0b0f19', 
+        color: '#f8fafc', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        flexDirection: 'column', 
+        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' 
+      }}>
+        <div style={{ 
+          width: '44px', 
+          height: '44px', 
+          border: '3px solid rgba(245,158,11,0.2)', 
+          borderTopColor: '#f59e0b', 
+          borderRadius: '50%', 
+          animation: 'kioskSpin 0.8s linear infinite' 
+        }} />
+        <h2 style={{ marginTop: '20px', fontSize: '1.25rem', fontWeight: '800', color: '#f8fafc', letterSpacing: '-0.02em' }}>
+          Seramik<span style={{ color: '#f59e0b' }}>Bak</span> Kiosk
+        </h2>
+        <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '6px' }}>3D Showroom Sanal Stüdyosu Hazırlanıyor...</p>
+        <style>{`@keyframes kioskSpin { to { transform: rotate(360deg); } }`}</style>
+      </main>
+    );
+  }
+
   return (
-    <main className="kiosk-page-container">
+    <main 
+      className="kiosk-page-container"
+      style={{
+        background: '#0b0f19',
+        color: '#f8fafc',
+        minHeight: '100vh',
+        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      }}
+    >
       {/* Top Touch Kiosk Header */}
       <header className="kiosk-header">
         <div className="header-left">
