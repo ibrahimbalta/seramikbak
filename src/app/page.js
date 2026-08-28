@@ -3432,14 +3432,14 @@ export default function Home() {
               <TrendingUp size={13} />
               <span>{t('brandPortal')}</span>
             </Link>
-            <button 
-              onClick={() => setIsKioskMode(true)} 
+            <Link 
+              href="/kiosk" 
               className="utility-item kiosk-btn-link"
-              title="Bayi Teşhir Modu (Kiosk)"
+              title="Bayi Teşhir & Tablet Satış Modu"
             >
               <div className="pulse-indicator-green" />
               <span>{t('kioskMode')}</span>
-            </button>
+            </Link>
           </div>
 
           <div className="utility-right">

@@ -5723,7 +5723,7 @@ export default function DealerPortalPage() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => window.open('/?kiosk=true', '_blank')}
+                  onClick={() => window.open('/kiosk', '_blank')}
                   style={{
                     width: '100%',
                     background: 'rgba(255, 255, 255, 0.06)',
