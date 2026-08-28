@@ -3648,6 +3648,16 @@ export default function Home() {
                 <Palette size={16} />
                 <span>{t('studio3d')}</span>
               </button>
+              <Link 
+                href="/kiosk" 
+                className="mobile-nav-link kiosk-link" 
+                onClick={() => setShowMobileMenu(false)}
+                style={{ textDecoration: 'none', background: 'linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(217,119,6,0.25) 100%)', color: '#fbbf24', border: '1px solid rgba(245,158,11,0.4)', fontWeight: '800' }}
+              >
+                <Layers size={16} style={{ color: '#f59e0b' }} />
+                <span style={{ color: '#fbbf24', fontWeight: '800' }}>Teşhir Kiosk</span>
+                <span style={{ marginLeft: 'auto', background: '#f59e0b', color: '#0f172a', fontSize: '0.62rem', fontWeight: '900', padding: '2px 7px', borderRadius: '12px' }}>3D Showroom</span>
+              </Link>
               <button 
                 className={`mobile-nav-link ${activeTab === 'dealers' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); }}
@@ -3945,6 +3955,15 @@ export default function Home() {
                     <Activity size={16} />
                     <span>150+ Marka</span>
                   </div>
+                  <Link 
+                    href="/kiosk" 
+                    className="feature-stat-capsule" 
+                    style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(245,158,11,0.2) 0%, rgba(217,119,6,0.3) 100%)', border: '1px solid rgba(245,158,11,0.6)', color: '#fbbf24', fontWeight: '800', textDecoration: 'none' }}
+                    title="Bayi Teşhir & Tablet Kiosk Modu"
+                  >
+                    <Layers size={16} style={{ color: '#f59e0b' }} />
+                    <span>🖥️ Teşhir Kiosk (3D Stüdyo)</span>
+                  </Link>
                   <label htmlFor="hero-visual-search-input" className="feature-stat-capsule" style={{ cursor: 'pointer', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.5)' }}>
                     <ImageIcon size={16} style={{ color: '#d4af37' }} />
                     <span style={{ color: '#d4af37', fontWeight: '700' }}>📸 AI Seramik Shazam'ı (Görsel Arama)</span>
