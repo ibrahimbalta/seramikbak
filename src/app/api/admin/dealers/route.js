@@ -97,9 +97,9 @@ export async function DELETE(request) {
 
 export async function PUT(request) {
   try {
-    const auth = await verifyAuth(request, 'admin');
+    const auth = await verifyAuth(request);
     if (!auth) {
-      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen oturum açın.' }, { status: 401 });
     }
     const body = await request.json();
     const { 
@@ -133,12 +133,19 @@ export async function PUT(request) {
     } = body;
 
     if (!id) {
-      return NextResponse.json({ error: 'Missing dealer id' }, { status: 400 });
+      return NextResponse.json({ error: 'Bayi ID eksik.' }, { status: 400 });
+    }
+
+    const isAdmin = auth.role === 'admin';
+    const isSelfDealer = auth.role === 'dealer' && auth.id === id;
+
+    if (!isAdmin && !isSelfDealer) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 403 });
     }
 
     const updateData = {};
-    if (name !== undefined) updateData.name = name;
-    if (status !== undefined) updateData.status = status;
+    if (isAdmin && name !== undefined) updateData.name = name;
+    if (isAdmin && status !== undefined) updateData.status = status;
     if (phone !== undefined) updateData.phone = phone;
     if (email !== undefined) updateData.email = email || null;
     if (address !== undefined) updateData.address = address;
