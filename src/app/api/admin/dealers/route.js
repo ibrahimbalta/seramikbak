@@ -129,7 +129,12 @@ export async function PUT(request) {
       pdfCatalogUrl,
       pdfCatalogName,
       themePreset,
-      themePrimary
+      themePrimary,
+      socialInstagram,
+      socialFacebook,
+      socialLinkedin,
+      socialYoutube,
+      socialWebsite
     } = body;
 
     if (!id) {
@@ -172,6 +177,11 @@ export async function PUT(request) {
     if (pdfCatalogName !== undefined) updateData.pdfCatalogName = pdfCatalogName;
     if (themePreset !== undefined) updateData.themePreset = themePreset;
     if (themePrimary !== undefined) updateData.themePrimary = themePrimary;
+    if (socialInstagram !== undefined) updateData.socialInstagram = socialInstagram;
+    if (socialFacebook !== undefined) updateData.socialFacebook = socialFacebook;
+    if (socialLinkedin !== undefined) updateData.socialLinkedin = socialLinkedin;
+    if (socialYoutube !== undefined) updateData.socialYoutube = socialYoutube;
+    if (socialWebsite !== undefined) updateData.socialWebsite = socialWebsite;
 
     const updatedDealer = await prisma.dealer.update({
       where: { id },

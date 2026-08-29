@@ -246,6 +246,13 @@ export default function DealerPortalPage() {
   const [profileFeaturedProducts, setProfileFeaturedProducts] = useState([]);
   const [featuredSearchTerm, setFeaturedSearchTerm] = useState('');
 
+  // Social Media Links
+  const [profileSocialInstagram, setProfileSocialInstagram] = useState('');
+  const [profileSocialFacebook, setProfileSocialFacebook] = useState('');
+  const [profileSocialLinkedin, setProfileSocialLinkedin] = useState('');
+  const [profileSocialYoutube, setProfileSocialYoutube] = useState('');
+  const [profileSocialWebsite, setProfileSocialWebsite] = useState('');
+
   const loadBrandProducts = async () => {
     try {
       const url = dealerInfo?.brandId 
@@ -483,6 +490,11 @@ export default function DealerPortalPage() {
           setProfilePdfCatalogName(session.pdfCatalogName || '');
           setProfileThemePreset(session.themePreset || 'GOLD');
           setProfileThemePrimary(session.themePrimary || '#d4af37');
+          setProfileSocialInstagram(session.socialInstagram || '');
+          setProfileSocialFacebook(session.socialFacebook || '');
+          setProfileSocialLinkedin(session.socialLinkedin || '');
+          setProfileSocialYoutube(session.socialYoutube || '');
+          setProfileSocialWebsite(session.socialWebsite || '');
         } catch (err) {
           console.error('Session restore failed:', err);
         }
@@ -1436,6 +1448,11 @@ export default function DealerPortalPage() {
           pdfCatalogName: profilePdfCatalogName,
           themePreset: profileThemePreset,
           themePrimary: profileThemePrimary,
+          socialInstagram: profileSocialInstagram,
+          socialFacebook: profileSocialFacebook,
+          socialLinkedin: profileSocialLinkedin,
+          socialYoutube: profileSocialYoutube,
+          socialWebsite: profileSocialWebsite,
           status: 'APPROVED' // Keep approved status
         })
       });
@@ -1465,7 +1482,12 @@ export default function DealerPortalPage() {
           pdfCatalogUrl: profilePdfCatalogUrl,
           pdfCatalogName: profilePdfCatalogName,
           themePreset: profileThemePreset,
-          themePrimary: profileThemePrimary
+          themePrimary: profileThemePrimary,
+          socialInstagram: profileSocialInstagram,
+          socialFacebook: profileSocialFacebook,
+          socialLinkedin: profileSocialLinkedin,
+          socialYoutube: profileSocialYoutube,
+          socialWebsite: profileSocialWebsite
         };
         setDealerInfo(updatedSession);
         localStorage.setItem('sb_dealer_session', JSON.stringify(updatedSession));
@@ -3690,6 +3712,78 @@ export default function DealerPortalPage() {
                         style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.88rem', outline: 'none', resize: 'vertical', fontFamily: 'inherit' }}
                         className="portal-input"
                       />
+                    </div>
+
+                    {/* Social Media & Web Links Section */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                      <label style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
+                        Sosyal Medya & Web Bağlantıları
+                      </label>
+                      <span style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '-6px' }}>
+                        Müşterilerinizin şubenize ait sosyal medya hesaplarına ve web sitenize ulaşabilmesi için bağlantıları girin.
+                      </span>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px', marginTop: '4px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <label style={{ fontSize: '0.73rem', fontWeight: '700', color: '#475569' }}>📸 Instagram Sayfası</label>
+                          <input 
+                            type="text"
+                            value={profileSocialInstagram}
+                            onChange={(e) => setProfileSocialInstagram(e.target.value)}
+                            placeholder="https://instagram.com/sube_adi"
+                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                            className="portal-input"
+                          />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <label style={{ fontSize: '0.73rem', fontWeight: '700', color: '#475569' }}>👍 Facebook Sayfası</label>
+                          <input 
+                            type="text"
+                            value={profileSocialFacebook}
+                            onChange={(e) => setProfileSocialFacebook(e.target.value)}
+                            placeholder="https://facebook.com/sube_sayfasi"
+                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                            className="portal-input"
+                          />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <label style={{ fontSize: '0.73rem', fontWeight: '700', color: '#475569' }}>💼 LinkedIn Sayfası</label>
+                          <input 
+                            type="text"
+                            value={profileSocialLinkedin}
+                            onChange={(e) => setProfileSocialLinkedin(e.target.value)}
+                            placeholder="https://linkedin.com/company/sube_adi"
+                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                            className="portal-input"
+                          />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <label style={{ fontSize: '0.73rem', fontWeight: '700', color: '#475569' }}>▶️ YouTube Kanalı</label>
+                          <input 
+                            type="text"
+                            value={profileSocialYoutube}
+                            onChange={(e) => setProfileSocialYoutube(e.target.value)}
+                            placeholder="https://youtube.com/@sube_kanali"
+                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                            className="portal-input"
+                          />
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <label style={{ fontSize: '0.73rem', fontWeight: '700', color: '#475569' }}>🌐 Resmi İnternet Sitesi</label>
+                          <input 
+                            type="text"
+                            value={profileSocialWebsite}
+                            onChange={(e) => setProfileSocialWebsite(e.target.value)}
+                            placeholder="https://www.subewebsitesi.com"
+                            style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '0.82rem', outline: 'none' }}
+                            className="portal-input"
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     {/* Logistics checkboxes */}

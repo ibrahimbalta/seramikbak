@@ -118,6 +118,13 @@ model Dealer {
   pdfCatalogName    String?
   themePreset       String?  @default("GOLD")
   themePrimary      String?  @default("#d4af37")
+  
+  // Social Media & Web Links
+  socialInstagram   String?
+  socialFacebook    String?
+  socialLinkedin    String?
+  socialYoutube     String?
+  socialWebsite     String?
   analytics         AnalyticsLog[]
   outletListings    OutletListing[]
 
