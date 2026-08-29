@@ -315,6 +315,13 @@ export default function DealerProfileClient({ dealer, products }) {
           
           {/* Quick Actions */}
           <div className="profile-actions" style={{ zIndex: 1 }}>
+            <Link 
+              href="/kiosk" 
+              className="btn-3d-studio-hero"
+            >
+              <Sparkles size={16} />
+              3D Banyo Stüdyosu'nda Kapla
+            </Link>
             <a 
               href={`https://wa.me/${dealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20profil%20sayfan%C4%B1zdan%20ula%C5%9F%C4%B1yorum.%20Showroom%27daki%20seramikleriniz%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`} 
               target="_blank" 
@@ -1126,14 +1133,24 @@ export default function DealerProfileClient({ dealer, products }) {
                     <h3 className="featured-product-name">{prod.name}</h3>
                     <span className="featured-product-meta">Kod: {prod.code} • Ebat: {prod.width}x{prod.height} cm • Yüzey: {prod.finish}</span>
                   </div>
-                  <button 
-                    type="button" 
-                    onClick={() => handleFeatureClick(prod.id)}
-                    className="featured-product-action-btn"
-                  >
-                    <span>Teklif Talebi Listesine Ekle</span>
-                    <ArrowRight size={12} />
-                  </button>
+                  <div className="product-card-actions-group">
+                    <Link 
+                      href="/kiosk"
+                      className="btn-3d-try-card"
+                      title="Bu ürünü 3D Sanal Banyo Stüdyosu'nda canlı uygulayın"
+                    >
+                      <Sparkles size={13} />
+                      3D'de Kapla
+                    </Link>
+                    <button 
+                      type="button" 
+                      onClick={() => handleFeatureClick(prod.id)}
+                      className="featured-product-action-btn"
+                    >
+                      <span>Teklif Talebi Ekle</span>
+                      <ArrowRight size={12} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
