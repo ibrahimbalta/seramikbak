@@ -169,12 +169,12 @@ export default function StudioCanvas({
         ctx.fill();
       }
       
-      for (let k = 0; k < 3000; k++) {
+      for (let k = 0; k < 300; k++) {
         const nx = Math.floor(Math.random() * 512);
         const ny = Math.floor(Math.random() * 512);
         const ncolor = Math.random() > 0.5 ? 255 : 0;
         ctx.fillStyle = `rgba(${ncolor}, ${ncolor}, ${ncolor}, 0.05)`;
-        ctx.fillRect(nx, ny, 1, 1);
+        ctx.fillRect(nx, ny, 2, 2);
       }
     } 
     else {
@@ -275,12 +275,19 @@ export default function StudioCanvas({
     camera.position.set(4, 3.2, 5); 
     cameraRef.current = camera;
 
-    // 3. Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true });
+    const isMobileDevice = typeof window !== 'undefined' && window.innerWidth <= 768;
+
+    // 3. Renderer with high performance & mobile optimizations
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: !isMobileDevice, 
+      alpha: false, 
+      preserveDrawingBuffer: true,
+      powerPreference: "high-performance"
+    });
     renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobileDevice ? 1.5 : 2.0));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = isMobileDevice ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.0;
     
@@ -297,8 +304,9 @@ export default function StudioCanvas({
     const directionalLight = new THREE.DirectionalLight('#ffffff', 0.65);
     directionalLight.position.set(4, 5, 3);
     directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 1024;
-    directionalLight.shadow.mapSize.height = 1024;
+    const shadowMapRes = isMobileDevice ? 512 : 1024;
+    directionalLight.shadow.mapSize.width = shadowMapRes;
+    directionalLight.shadow.mapSize.height = shadowMapRes;
     directionalLight.shadow.camera.near = 0.5;
     directionalLight.shadow.camera.far = 15;
     directionalLight.shadow.bias = -0.001;

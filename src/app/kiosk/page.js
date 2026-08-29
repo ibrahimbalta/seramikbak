@@ -699,7 +699,7 @@ export default function ShowroomKioskPage() {
               title="Kaplama & Seramik Menüsünü Aç"
             >
               <Menu size={16} />
-              <span>☰ Menü & Kaplamalar</span>
+              <span>Menü & Kaplamalar</span>
             </button>
 
             {/* Target Surface Overlay Badge inside 3D Canvas */}
@@ -2061,19 +2061,24 @@ export default function ShowroomKioskPage() {
 
         /* Mobile & Medium Tablets (<= 768px): Full 3D Viewport + Left Slide-Out Drawer */
         @media (max-width: 768px) {
+          .kiosk-pill {
+            display: none !important;
+          }
+
           .btn-mobile-drawer-toggle {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: #0f172a;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 900;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 8px;
             border: none;
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+            white-space: nowrap;
           }
 
           .kiosk-page-container {
@@ -2084,22 +2089,27 @@ export default function ShowroomKioskPage() {
           }
 
           .kiosk-header {
-            height: 50px;
-            padding: 6px 10px;
+            height: 48px;
+            padding: 4px 8px;
             flex-wrap: nowrap;
-            gap: 6px;
+            gap: 4px;
             z-index: 20;
           }
 
           .header-left {
             gap: 6px;
+            flex-shrink: 0;
+          }
+
+          .brand-title {
+            font-size: 0.95rem;
           }
 
           .header-right {
             overflow-x: auto;
             max-width: 100%;
             justify-content: flex-end;
-            gap: 6px;
+            gap: 4px;
             -webkit-overflow-scrolling: touch;
           }
 
@@ -2108,19 +2118,23 @@ export default function ShowroomKioskPage() {
             display: none;
           }
 
+          .btn-primary-gold-kiosk span {
+            font-size: 0.65rem;
+          }
+
           .btn-mode-kiosk,
           .btn-secondary-kiosk,
           .btn-primary-gold-kiosk {
             flex-shrink: 0;
-            padding: 6px 10px;
-            font-size: 0.7rem;
-            min-height: 34px;
+            padding: 5px 8px;
+            font-size: 0.68rem;
+            min-height: 32px;
           }
 
           .kiosk-workspace-grid {
             display: block;
             position: relative;
-            height: calc(100vh - 50px);
+            height: calc(100vh - 48px);
             overflow: hidden;
           }
 
@@ -2150,10 +2164,10 @@ export default function ShowroomKioskPage() {
           .canvas-mobile-floating-menu-btn {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 8px;
+            left: 8px;
             z-index: 15;
             background: rgba(15, 23, 42, 0.92);
             backdrop-filter: blur(10px);
@@ -2161,9 +2175,9 @@ export default function ShowroomKioskPage() {
             border: 1px solid #f59e0b;
             color: #fbbf24;
             font-weight: 800;
-            font-size: 0.75rem;
-            padding: 7px 14px;
-            border-radius: 20px;
+            font-size: 0.72rem;
+            padding: 6px 12px;
+            border-radius: 18px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
             cursor: pointer;
             transition: transform 0.15s ease;
@@ -2174,11 +2188,18 @@ export default function ShowroomKioskPage() {
           }
 
           .canvas-active-target-overlay {
-            top: 52px;
-            left: 10px;
-            padding: 4px 8px;
+            position: absolute;
+            top: 46px;
+            left: 8px;
+            max-width: calc(100% - 60px);
+            padding: 3px 8px;
             border-radius: 8px;
             background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           .overlay-label {
@@ -2186,7 +2207,7 @@ export default function ShowroomKioskPage() {
           }
 
           .overlay-target-name {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
           }
 
           .overlay-sub-hint {
