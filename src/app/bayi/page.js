@@ -244,6 +244,24 @@ export default function DealerPortalPage() {
   const [profileAboutText, setProfileAboutText] = useState('');
   const [profileLogisticsServices, setProfileLogisticsServices] = useState('shipping,showroom_stock,credit_card,install_support');
   const [profileFeaturedProducts, setProfileFeaturedProducts] = useState([]);
+  const [featuredSearchTerm, setFeaturedSearchTerm] = useState('');
+
+  const loadBrandProducts = async () => {
+    try {
+      const url = dealerInfo?.brandId 
+        ? `/api/admin/products?brandId=${dealerInfo.brandId}&limit=5000`
+        : `/api/admin/products?limit=5000`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setBrandProducts(data.products || []);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load brand products:', err);
+    }
+  };
   const [profileDealerCampaigns, setProfileDealerCampaigns] = useState([]);
   const [profileReferenceProjects, setProfileReferenceProjects] = useState([]);
   const [profileDealerFaqs, setProfileDealerFaqs] = useState([]);
@@ -533,20 +551,7 @@ export default function DealerPortalPage() {
     }
   }, [isLoggedIn, dealerInfo]);
 
-  const loadBrandProducts = async () => {
-    if (!dealerInfo?.brandId) return;
-    try {
-      const res = await fetch(`/api/admin/products?brandId=${dealerInfo.brandId}&limit=100`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          setBrandProducts(data.products || []);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to load brand products:', err);
-    }
-  };
+
 
   const loadBankDetails = async () => {
     try {
@@ -3713,26 +3718,71 @@ export default function DealerPortalPage() {
                       </div>
                     </div>
 
-                    {/* Featured Products */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
-                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Öne Çıkan Ürünler (Maks. 6 Adet)</label>
-                      <span style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '-6px' }}>Şube vitrininizde sergilenecek ürünleri seçin.</span>
-                      <div style={{ maxHeight: '180px', overflowY: 'auto', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', background: '#f8fafc' }} className="scrollbar-hidden">
-                        {brandProducts.length > 0 ? brandProducts.map(prod => {
-                          const isChecked = profileFeaturedProducts.includes(prod.id);
-                          return (
-                            <label key={prod.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: '600', color: '#334155', cursor: 'pointer' }}>
-                              <input 
-                                type="checkbox" 
-                                checked={isChecked}
-                                onChange={() => toggleFeaturedProduct(prod.id)}
-                                style={{ width: '15px', height: '15px', accentColor: 'var(--accent-gold)' }}
-                              />
-                              <span>{prod.name} ({prod.code})</span>
-                            </label>
-                          );
-                        }) : (
-                          <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontStyle: 'italic' }}>Markanıza ait ürün bulunamadı.</span>
+                    {/* Featured Products (Unlimited Selection & Search Filter) */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+                        <div>
+                          <label style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
+                            Öne Çıkan Ürünler ({profileFeaturedProducts.length} Ürün Seçildi)
+                          </label>
+                          <p style={{ fontSize: '0.7rem', color: '#64748b', margin: '2px 0 0 0' }}>
+                            Showroom sayfanızda sergilenmesini istediğiniz ürünleri sınırsız olarak seçebilirsiniz.
+                          </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button 
+                            type="button" 
+                            onClick={() => setProfileFeaturedProducts(brandProducts.map(p => p.id))}
+                            style={{ padding: '5px 10px', fontSize: '0.7rem', background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a', borderRadius: '6px', fontWeight: '700', cursor: 'pointer' }}
+                          >
+                            Tümünü Seç ({brandProducts.length})
+                          </button>
+                          <button 
+                            type="button" 
+                            onClick={() => setProfileFeaturedProducts([])}
+                            style={{ padding: '5px 10px', fontSize: '0.7rem', background: '#f1f5f9', color: '#64748b', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+                          >
+                            Temizle
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Quick Search Filter */}
+                      {brandProducts.length > 5 && (
+                        <input 
+                          type="text"
+                          value={featuredSearchTerm}
+                          onChange={(e) => setFeaturedSearchTerm(e.target.value)}
+                          placeholder="Ürün adı veya koduna göre hızlı filtrele..."
+                          style={{ padding: '8px 12px', fontSize: '0.8rem', borderRadius: '8px', border: '1.5px solid #cbd5e1', outline: 'none', background: '#ffffff', color: '#0f172a', fontWeight: '600' }}
+                        />
+                      )}
+
+                      {/* Product Checkboxes Container */}
+                      <div style={{ maxHeight: '280px', overflowY: 'auto', border: '1.5px solid #cbd5e1', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', background: '#ffffff' }}>
+                        {brandProducts.length > 0 ? (
+                          brandProducts
+                            .filter(prod => {
+                              if (!featuredSearchTerm) return true;
+                              const q = featuredSearchTerm.toLowerCase();
+                              return (prod.name || '').toLowerCase().includes(q) || (prod.code || '').toLowerCase().includes(q);
+                            })
+                            .map(prod => {
+                              const isChecked = profileFeaturedProducts.includes(prod.id);
+                              return (
+                                <label key={prod.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.82rem', fontWeight: '600', color: '#334155', cursor: 'pointer', padding: '4px 8px', borderRadius: '6px', background: isChecked ? '#fefce8' : 'transparent', border: isChecked ? '1px solid #fef08a' : '1px solid transparent', transition: 'all 0.15s ease' }}>
+                                  <input 
+                                    type="checkbox" 
+                                    checked={isChecked}
+                                    onChange={() => toggleFeaturedProduct(prod.id)}
+                                    style={{ width: '16px', height: '16px', accentColor: '#d97706', cursor: 'pointer' }}
+                                  />
+                                  <span>{prod.name} <span style={{ fontSize: '0.72rem', color: '#64748b' }}>({prod.code})</span></span>
+                                </label>
+                              );
+                            })
+                        ) : (
+                          <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontStyle: 'italic' }}>Yükleniyor veya sistemde ürün bulunamadı.</span>
                         )}
                       </div>
                     </div>
