@@ -556,11 +556,78 @@ export default function StudioCanvas({
       updateCameraPosition();
     };
 
+    // Mobile touch interaction listeners (pinch zoom, orbit rotate, tap target)
+    let initialPinchDistance = null;
+    let initialPinchRadius = radius;
+
+    const getTouchDistance = (t1, t2) => {
+      const dx = t1.clientX - t2.clientX;
+      const dy = t1.clientY - t2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const onTouchStart = (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        const touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        previousMousePosition = { x: touch.clientX, y: touch.clientY };
+      } else if (e.touches.length === 2) {
+        isDragging = false;
+        initialPinchDistance = getTouchDistance(e.touches[0], e.touches[1]);
+        initialPinchRadius = radius;
+      }
+    };
+
+    const onTouchMove = (e) => {
+      if (e.touches.length === 1 && isDragging) {
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - previousMousePosition.x;
+        const deltaY = touch.clientY - previousMousePosition.y;
+
+        theta -= deltaX * 0.006;
+        phi = Math.max(0.1, Math.min(Math.PI / 2 - 0.05, phi - deltaY * 0.006));
+
+        previousMousePosition = { x: touch.clientX, y: touch.clientY };
+        updateCameraPosition();
+      } else if (e.touches.length === 2 && initialPinchDistance) {
+        const currentDist = getTouchDistance(e.touches[0], e.touches[1]);
+        const scale = initialPinchDistance / Math.max(currentDist, 1);
+        radius = Math.max(3.2, Math.min(12, initialPinchRadius * scale));
+        updateCameraPosition();
+      }
+    };
+
+    const onTouchEnd = (e) => {
+      if (isDragging) {
+        isDragging = false;
+        const touch = e.changedTouches[0];
+        if (touch) {
+          const dragDistance = Math.sqrt(
+            Math.pow(touch.clientX - startX, 2) + Math.pow(touch.clientY - startY, 2)
+          );
+          if (dragDistance < 10) {
+            onContainerClick(touch);
+          }
+        }
+      }
+      if (e.touches.length < 2) {
+        initialPinchDistance = null;
+      }
+    };
+
     const container = containerRef.current;
+    container.style.touchAction = 'none';
     container.addEventListener('mousedown', onMouseDown);
     container.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
     container.addEventListener('wheel', onWheel);
+
+    // Touch event listeners
+    container.addEventListener('touchstart', onTouchStart, { passive: true });
+    container.addEventListener('touchmove', onTouchMove, { passive: true });
+    container.addEventListener('touchend', onTouchEnd);
 
     // Render loop
     let animationFrameId;
@@ -572,24 +639,48 @@ export default function StudioCanvas({
 
     setIsSceneReady(true);
 
-    // Resize handler
+    // Robust Resize handler & ResizeObserver
     const handleResize = () => {
-      if (!containerRef.current) return;
-      camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+      if (!containerRef.current || !rendererRef.current || !cameraRef.current) return;
+      const w = containerRef.current.clientWidth || containerRef.current.parentElement?.clientWidth || window.innerWidth;
+      const h = containerRef.current.clientHeight || containerRef.current.parentElement?.clientHeight || 450;
+      if (w > 0 && h > 0) {
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
     };
     window.addEventListener('resize', handleResize);
+
+    let resizeObserver = null;
+    if (typeof ResizeObserver !== 'undefined' && container) {
+      resizeObserver = new ResizeObserver(() => {
+        handleResize();
+      });
+      resizeObserver.observe(container);
+    }
+
+    // Delayed double check for mobile layout stability
+    const timer1 = setTimeout(handleResize, 100);
+    const timer2 = setTimeout(handleResize, 400);
 
     // Cleanup
     return () => {
       cancelAnimationFrame(animationFrameId);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
       setIsSceneReady(false);
       window.removeEventListener('resize', handleResize);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
       if (container) {
         container.removeEventListener('mousedown', onMouseDown);
         container.removeEventListener('mousemove', onMouseMove);
         container.removeEventListener('wheel', onWheel);
+        container.removeEventListener('touchstart', onTouchStart);
+        container.removeEventListener('touchmove', onTouchMove);
+        container.removeEventListener('touchend', onTouchEnd);
       }
       window.removeEventListener('mouseup', onMouseUp);
       if (rendererRef.current) {

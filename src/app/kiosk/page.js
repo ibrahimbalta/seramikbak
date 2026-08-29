@@ -30,7 +30,8 @@ import {
   Maximize,
   Calculator,
   Wrench,
-  Truck
+  Truck,
+  Menu
 } from 'lucide-react';
 import QuoteModal from '@/components/QuoteModal';
 
@@ -154,6 +155,7 @@ export default function ShowroomKioskPage() {
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [snapshotUrl, setSnapshotUrl] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Veritabanından Markaları ve Bayileri Yükle
   useEffect(() => {
@@ -263,6 +265,9 @@ export default function ShowroomKioskPage() {
       setStripeWallProduct(product);
       setApplyStripeWall(true);
     }
+
+    // Mobilde ürün seçildiğinde 3D banyo görünümünü açmak için çekmeceyi kapat
+    setIsMobileMenuOpen(false);
   };
 
   // 3D Sahneden Bir Yüzeye Tıklandığında O Yüzeyi Hedef Yap
@@ -423,6 +428,15 @@ export default function ShowroomKioskPage() {
         {/* Top Header Actions */}
         <div className="header-right">
           <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+            className="btn-mobile-drawer-toggle"
+            title="Mobil Çekmece Menüyü Aç/Kapat"
+          >
+            <Menu size={16} />
+            <span>Menü & Kaplamalar</span>
+          </button>
+
+          <button 
             onClick={() => setBottomTab(bottomTab === 'quote' ? 'studio' : 'quote')}
             className={`btn-mode-kiosk ${bottomTab === 'quote' ? 'active-gold' : ''}`}
           >
@@ -446,10 +460,34 @@ export default function ShowroomKioskPage() {
         </div>
       </header>
 
+      {/* Mobile Drawer Dark Backdrop Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="kiosk-mobile-backdrop" 
+          onClick={() => setIsMobileMenuOpen(false)}
+          title="Menüyü Kapat"
+        />
+      )}
+
       {/* Main Touch Workspace Grid (Fixed Screen Viewport Locked) */}
       <div className="kiosk-workspace-grid">
-        {/* Left Side: Product & Brand Selector Sidebar */}
-        <div className="kiosk-sidebar">
+        {/* Left Side: Product & Brand Selector Sidebar (Mobile Slide-Out Drawer) */}
+        <div className={`kiosk-sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+          {/* Mobile Drawer Top Header Bar */}
+          <div className="mobile-drawer-header">
+            <div className="drawer-title-row">
+              <Layers size={16} className="icon-gold" />
+              <span>3D Kaplama & Katalog Menüsü</span>
+            </div>
+            <button 
+              onClick={() => setIsMobileMenuOpen(false)} 
+              className="btn-close-drawer"
+              title="Kapat"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
           {/* Surface Target Selection Grid (Hangi Yüzey Kaplanacak?) */}
           <div className="sidebar-top-controls">
             <div className="section-label-header">
@@ -654,6 +692,16 @@ export default function ShowroomKioskPage() {
               cabinetColor={cabinetColor}
             />
 
+            {/* Mobile Floating Left Drawer Trigger Button */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)} 
+              className="canvas-mobile-floating-menu-btn"
+              title="Kaplama & Seramik Menüsünü Aç"
+            >
+              <Menu size={16} />
+              <span>☰ Menü & Kaplamalar</span>
+            </button>
+
             {/* Target Surface Overlay Badge inside 3D Canvas */}
             <div className="canvas-active-target-overlay">
               <span className="overlay-label">Aktif Yüzey Hedefi:</span>
@@ -678,6 +726,30 @@ export default function ShowroomKioskPage() {
               {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
               <span>{isFullscreen ? 'Küçült' : 'Büyüt'}</span>
             </button>
+
+            {/* Mobile Quick Surface Chips Bar at Bottom of 3D Canvas */}
+            <div className="canvas-mobile-surface-chips">
+              {[
+                { id: 'floor', label: 'Zemin' },
+                { id: 'walls', label: 'Duvar' },
+                { id: 'shower', label: 'Duş' },
+                { id: 'showerFloor', label: 'Duş Zem' },
+                { id: 'toilet', label: 'Klozet' },
+                { id: 'accent', label: 'Vurgu' },
+                { id: 'stripe', label: 'Bordür' }
+              ].map(chip => (
+                <button
+                  key={chip.id}
+                  onClick={() => {
+                    setActiveTargetSurface(chip.id);
+                    setIsMobileMenuOpen(true);
+                  }}
+                  className={`chip-surface-btn ${activeTargetSurface === chip.id ? 'active' : ''}`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Bottom Panel Toggle Tabs (3D Stüdyo Kontrolleri / Metraj & Fiyatlama) */}
@@ -1927,6 +1999,37 @@ export default function ShowroomKioskPage() {
           cursor: pointer;
         }
 
+        .btn-mobile-drawer-toggle {
+          display: none;
+        }
+
+        .mobile-drawer-header {
+          display: none;
+        }
+
+        .canvas-mobile-floating-menu-btn {
+          display: none;
+        }
+
+        .canvas-mobile-surface-chips {
+          display: none;
+        }
+
+        .kiosk-mobile-backdrop {
+          position: fixed;
+          inset: 0;
+          background: rgba(9, 13, 22, 0.8);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          z-index: 9998;
+          animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
         /* ---------------------------------------------------- */
         /* RESPONSIVE DESIGN: TABLET & MOBILE VIEWPORTS         */
         /* ---------------------------------------------------- */
@@ -1956,103 +2059,247 @@ export default function ShowroomKioskPage() {
           }
         }
 
-        /* Mobile & Medium Tablets (<= 768px) */
+        /* Mobile & Medium Tablets (<= 768px): Full 3D Viewport + Left Slide-Out Drawer */
         @media (max-width: 768px) {
+          .btn-mobile-drawer-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #0f172a;
+            font-size: 0.72rem;
+            font-weight: 900;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+          }
+
           .kiosk-page-container {
-            height: auto;
-            min-height: 100vh;
-            overflow-y: auto;
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+            position: relative;
           }
 
           .kiosk-header {
-            height: auto;
-            min-height: 52px;
-            padding: 8px 12px;
-            flex-wrap: wrap;
-            gap: 8px;
+            height: 50px;
+            padding: 6px 10px;
+            flex-wrap: nowrap;
+            gap: 6px;
+            z-index: 20;
           }
 
           .header-left {
-            gap: 8px;
+            gap: 6px;
           }
 
           .header-right {
             overflow-x: auto;
             max-width: 100%;
-            width: 100%;
-            justify-content: flex-start;
-            padding-bottom: 2px;
+            justify-content: flex-end;
+            gap: 6px;
             -webkit-overflow-scrolling: touch;
+          }
+
+          .btn-mode-kiosk span,
+          .btn-secondary-kiosk span {
+            display: none;
           }
 
           .btn-mode-kiosk,
           .btn-secondary-kiosk,
           .btn-primary-gold-kiosk {
             flex-shrink: 0;
-            padding: 8px 10px;
+            padding: 6px 10px;
             font-size: 0.7rem;
-            min-height: 38px;
+            min-height: 34px;
           }
 
           .kiosk-workspace-grid {
-            display: flex;
-            flex-direction: column;
-            height: auto;
-            overflow: visible;
+            display: block;
+            position: relative;
+            height: calc(100vh - 50px);
+            overflow: hidden;
           }
 
-          /* 3D Visualizer Canvas Section on Mobile (Placed First with PROMINENT Large Viewport) */
+          /* 3D Visualizer Canvas Section on Mobile (Full Viewport Screen) */
           .kiosk-canvas-area {
-            order: 1;
-            width: 100%;
-            height: auto;
-            min-height: 520px;
-            padding: 6px;
+            position: absolute;
+            inset: 0;
+            width: 100vw;
+            height: 100%;
+            z-index: 1;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
           }
 
           .canvas-frame {
-            height: 480px;
-            min-height: 440px;
+            height: 100%;
             width: 100%;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            flex: 1;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            position: relative;
+          }
+
+          /* Mobile Floating Drawer Trigger Button over 3D Canvas */
+          .canvas-mobile-floating-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 15;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid #f59e0b;
+            color: #fbbf24;
+            font-weight: 800;
+            font-size: 0.75rem;
+            padding: 7px 14px;
+            border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: transform 0.15s ease;
+          }
+
+          .canvas-mobile-floating-menu-btn:active {
+            transform: scale(0.95);
           }
 
           .canvas-active-target-overlay {
-            top: 8px;
-            left: 8px;
+            top: 52px;
+            left: 10px;
             padding: 4px 8px;
             border-radius: 8px;
             background: rgba(15, 23, 42, 0.92);
           }
 
           .overlay-label {
-            font-size: 0.52rem;
+            font-size: 0.5rem;
           }
 
           .overlay-target-name {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
           }
 
           .overlay-sub-hint {
             display: none !important;
           }
 
-          /* Sidebar Section on Mobile (Placed Below Canvas) */
+          /* Mobile Bottom Quick Surface Chips Bar */
+          .canvas-mobile-surface-chips {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            position: absolute;
+            bottom: 12px;
+            left: 10px;
+            right: 10px;
+            z-index: 15;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            -webkit-overflow-scrolling: touch;
+          }
+
+          .chip-surface-btn {
+            flex-shrink: 0;
+            background: #090d16;
+            border: 1px solid #1e293b;
+            color: #94a3b8;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+          }
+
+          .chip-surface-btn.active {
+            background: #f59e0b;
+            color: #0f172a;
+            border-color: #f59e0b;
+            font-weight: 900;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+          }
+
+          /* Left Slide-out Drawer Panel on Mobile */
           .kiosk-sidebar {
-            order: 2;
-            width: 100%;
-            max-height: none;
-            height: auto;
-            overflow: visible;
-            border-right: none;
-            border-top: 1px solid #1e293b;
-            padding: 12px;
-            gap: 12px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 88vw;
+            max-width: 380px;
+            height: 100vh;
+            z-index: 9999;
+            background: #0f172a;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 14px;
+            overflow-y: auto;
+            border-right: 1px solid #1e293b;
+          }
+
+          .kiosk-sidebar.mobile-open {
+            transform: translateX(0);
+          }
+
+          .mobile-drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1e293b;
+            margin-bottom: 4px;
+            flex-shrink: 0;
+          }
+
+          .drawer-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 900;
+            font-size: 0.85rem;
+            color: #fbbf24;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+          }
+
+          .btn-close-drawer {
+            background: #1e293b;
+            color: #94a3b8;
+            border: none;
+            padding: 6px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .btn-close-drawer:active {
+            background: #f59e0b;
+            color: #0f172a;
           }
 
           .surface-target-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 6px;
             padding: 6px;
           }
@@ -2082,8 +2329,8 @@ export default function ShowroomKioskPage() {
           }
 
           .products-scroll-grid {
-            max-height: 420px;
-            min-height: 220px;
+            flex: 1;
+            min-height: 250px;
             overflow-y: auto;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
@@ -2146,14 +2393,8 @@ export default function ShowroomKioskPage() {
 
         /* Compact Mobile Phones (<= 480px) */
         @media (max-width: 480px) {
-          .kiosk-canvas-area {
-            height: auto;
-            min-height: 480px;
-          }
-
-          .canvas-frame {
-            height: 430px;
-            min-height: 380px;
+          .kiosk-sidebar {
+            width: 92vw;
           }
 
           .surface-target-grid {
@@ -2162,7 +2403,6 @@ export default function ShowroomKioskPage() {
 
           .products-scroll-grid {
             grid-template-columns: 1fr 1fr;
-            max-height: 380px;
           }
 
           .product-title {
