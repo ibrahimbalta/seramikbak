@@ -21,7 +21,13 @@ import {
   TrendingUp,
   ShieldCheck,
   FileText,
-  Download
+  Download,
+  Search,
+  Truck,
+  Wrench,
+  Package,
+  CreditCard,
+  Layers
 } from 'lucide-react';
 import './dealer-profile.css';
 
@@ -51,23 +57,33 @@ export default function DealerProfileClient({ dealer, products }) {
   const concepts = dealer.specialConcepts ? dealer.specialConcepts.split(',').filter(Boolean) : [];
   const bannerBgImage = dealer.bannerUrl || (images.length > 0 ? images[0] : '/images/dealer-banner-default.jpg');
 
-  const safeParseJSON = (str, fallback) => {
-    if (!str) return fallback;
+  // Inventory search & filter states
+  const [inventorySearchTerm, setInventorySearchTerm] = useState('');
+  const [inventoryStyleFilter, setInventoryStyleFilter] = useState('all');
+  const [inventoryStatusFilter, setInventoryStatusFilter] = useState('all');
+
+  const safeParseJSON = (val, fallback) => {
+    if (val === null || val === undefined || val === '') return fallback;
+    if (typeof val === 'object') return val;
     try {
-      return JSON.parse(str);
+      return JSON.parse(val);
     } catch (e) {
       return fallback;
     }
   };
 
   const featuredProductIds = safeParseJSON(dealer.featuredProducts, []);
+  const featuredIdsNormalized = Array.isArray(featuredProductIds)
+    ? featuredProductIds.map(item => (typeof item === 'object' && item !== null ? item.id : item))
+    : [];
+
   const campaigns = safeParseJSON(dealer.dealerCampaigns, []);
   const referenceProjects = safeParseJSON(dealer.referenceProjects, []);
   const faqs = safeParseJSON(dealer.dealerFaqs, []);
   const dealerStats = safeParseJSON(dealer.dealerStats, { experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' });
   const servicesList = dealer.logisticsServices ? dealer.logisticsServices.split(',').filter(Boolean) : [];
 
-  const featuredProductsList = products.filter(p => featuredProductIds.includes(p.id));
+  const featuredProductsList = products.filter(p => featuredIdsNormalized.includes(p.id));
 
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
@@ -750,6 +766,82 @@ export default function DealerProfileClient({ dealer, products }) {
 
         </div>
 
+        {/* SECTION: SHOWROOM PRIVILEGES & SERVICES */}
+        <div className="showroom-services-section" style={{ marginTop: '56px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+            <span style={{
+              fontSize: '0.78rem',
+              fontWeight: '800',
+              color: 'var(--accent-gold)',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              background: 'rgba(var(--accent-gold-rgb, 179,142,71), 0.1)',
+              padding: '6px 16px',
+              borderRadius: '20px',
+              border: '1px solid rgba(var(--accent-gold-rgb, 179,142,71), 0.25)',
+              display: 'inline-block'
+            }}>
+              MÜŞTERİ AYRICALIKLARI
+            </span>
+            <h2 className="section-main-heading" style={{ marginTop: '12px', marginBottom: '8px' }}>
+              Showroom Hizmetlerimiz & Ayrıcalıklarınız
+            </h2>
+            <p style={{ fontSize: '0.86rem', color: '#64748b', maxWidth: '660px', margin: '0 auto' }}>
+              Seramik seçimi ve mekan yenileme sürecinizde yetkili bayimizin sunduğu ücretsiz mimarlık, sigortalı nakliye ve işçilik garantisi avantajları.
+            </p>
+          </div>
+
+          <div className="services-showcase-grid">
+            <div className="service-card-modern">
+              <div className="service-icon-box">
+                <Sparkles size={22} />
+              </div>
+              <h3>3D Sanal Banyo & Mimar Destek</h3>
+              <p>Banyonuzun ölçülerine göre karoları 3D sanal stüdyoda canlı döşeyip tasarım ve metraj raporu çıkarıyoruz.</p>
+            </div>
+
+            <div className="service-card-modern">
+              <div className="service-icon-box">
+                <Truck size={22} />
+              </div>
+              <h3>Sigortalı Nakliye & Kapıya Teslim</h3>
+              <p>Paletli ve kırılma sigortalı araçlarımızla seramiklerinizi şantiyenize veya adresinize güvenle ulaştırıyoruz.</p>
+            </div>
+
+            <div className="service-card-modern">
+              <div className="service-icon-box">
+                <Wrench size={22} />
+              </div>
+              <h3>Sertifikalı Usta & İşçilik Garantisi</h3>
+              <p>Bölgenizdeki tecrübeli seramik ustalarıyla buluşturuyor, derz ve kaplama işçiliğini garantili sunuyoruz.</p>
+            </div>
+
+            <div className="service-card-modern">
+              <div className="service-icon-box">
+                <Package size={22} />
+              </div>
+              <h3>Ücretsiz Numune Kargo Desteği</h3>
+              <p>Beğendiğiniz seramik dokularını yerinde görmek için adresinize gerçek numune karosu talep edebilirsiniz.</p>
+            </div>
+
+            <div className="service-card-modern">
+              <div className="service-icon-box">
+                <CreditCard size={22} />
+              </div>
+              <h3>Kart Taksiti & Esnek Ödeme Planı</h3>
+              <p>Tüm banka kartlarına özel taksit seçenekleri ve mimari projelere özel vadeli ödeme çözümleri sunuyoruz.</p>
+            </div>
+
+            <div className="service-card-modern">
+              <div className="service-icon-box">
+                <Building2 size={22} />
+              </div>
+              <h3>B2B & Toplu Proje İskontoları</h3>
+              <p>Müteahhit, mimar ve otel projeleri için fabrika teslimi toptan palet fiyatları ve özel iskonto avantajı.</p>
+            </div>
+          </div>
+        </div>
+
         {/* SECTION: OUTLET & PROJE FAZLASI BORSASI */}
         {dealer.outletListings && dealer.outletListings.length > 0 && (
           <div className="showroom-outlet-section" style={{ marginTop: '48px' }}>
@@ -1027,122 +1119,206 @@ export default function DealerProfileClient({ dealer, products }) {
         )}
 
         {/* SECTION: SHOWROOM ENVANTERİ */}
-        {dealer.inventories && dealer.inventories.length > 0 && (
-          <div className="featured-products-section" style={{ marginTop: '48px' }}>
-            <h2 className="section-main-heading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              <Building2 size={24} style={{ color: 'var(--accent-gold)' }} />
-              Şube Stokları & Hazır Envanter Listesi
-            </h2>
-            <p style={{ fontSize: '0.86rem', color: '#64748b', textAlign: 'center', marginTop: '-8px', marginBottom: '28px' }}>
-              Bayimizin showroomunda sergilenen ve depolarında teslimata hazır bulunan güncel seramik envanteri.
-            </p>
-            <div className="featured-products-grid">
-              {dealer.inventories.map(item => {
-                if (!item.product) return null;
-                const prod = item.product;
-                
-                let statusLabel = 'Stokta Var';
-                let statusColor = '#10b981';
-                let statusBg = '#ecfdf5';
+        {dealer.inventories && dealer.inventories.length > 0 && (() => {
+          const filteredInventories = dealer.inventories.filter(item => {
+            if (!item?.product) return false;
+            const prod = item.product;
+            const q = inventorySearchTerm.toLowerCase().trim();
+            const textMatch = !q || 
+              (prod.name && prod.name.toLowerCase().includes(q)) ||
+              (prod.code && prod.code.toLowerCase().includes(q)) ||
+              (prod.style && prod.style.toLowerCase().includes(q)) ||
+              (prod.finish && prod.finish.toLowerCase().includes(q)) ||
+              (prod.color && prod.color.toLowerCase().includes(q));
 
-                if (item.status === 'DISPLAY_ONLY') {
-                  statusLabel = 'Teşhir Ürünü';
-                  statusColor = '#d97706';
-                  statusBg = '#fffbeb';
-                } else if (item.status === 'ORDER_ONLY') {
-                  statusLabel = 'Sipariş Üzerine';
-                  statusColor = '#2563eb';
-                  statusBg = '#eff6ff';
-                }
+            const styleMatch = inventoryStyleFilter === 'all' || 
+              (prod.style && prod.style.toLowerCase().includes(inventoryStyleFilter.toLowerCase()));
 
-                return (
-                  <div key={item.id} className="featured-product-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <div className="featured-product-image-container" style={{ position: 'relative' }}>
-                      <img 
-                        src={prod.imageUrl || getTextureFallback(prod)} 
-                        alt={prod.name} 
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = getTextureFallback(prod);
-                        }}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
-                      />
-                      <span style={{
-                        position: 'absolute',
-                        top: '8px',
-                        left: '8px',
-                        fontSize: '0.6rem',
-                        fontWeight: '800',
-                        color: statusColor,
-                        background: statusBg,
-                        padding: '3px 8px',
-                        borderRadius: '16px',
-                        border: `1px solid ${statusColor}33`,
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                      }}>
-                        {statusLabel}
-                      </span>
-                    </div>
-                    <div className="featured-product-info" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <span className="featured-product-style">{prod.style} serisi</span>
-                      <h3 className="featured-product-name">{prod.name}</h3>
-                      <span className="featured-product-meta" style={{ flex: 1 }}>Kod: {prod.code} • Ebat: {prod.width}x{prod.height} cm • Yüzey: {prod.finish}</span>
-                      
-                      <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '6px' }}>
-                        <div>
-                          <span style={{ fontSize: '0.6rem', color: '#64748b', display: 'block' }}>Mevcut Stok</span>
-                          <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
-                            {item.status === 'IN_STOCK' ? `${item.stock.toLocaleString('tr-TR')} m²` : (item.status === 'DISPLAY_ONLY' ? 'Teşhir / Numune' : 'Siparişle (3-7 Gün)')}
+            const statusMatch = inventoryStatusFilter === 'all' || item.status === inventoryStatusFilter;
+
+            return textMatch && styleMatch && statusMatch;
+          });
+
+          return (
+            <div className="featured-products-section" style={{ marginTop: '56px' }}>
+              <h2 className="section-main-heading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <Building2 size={24} style={{ color: 'var(--accent-gold)' }} />
+                Şube Stokları & Hazır Envanter Listesi
+              </h2>
+              <p style={{ fontSize: '0.86rem', color: '#64748b', textAlign: 'center', marginTop: '-8px', marginBottom: '24px' }}>
+                Bayimizin showroomunda sergilenen ve depolarında teslimata hazır bulunan güncel seramik envanteri.
+              </p>
+
+              {/* Live Search & Filter Bar */}
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.85)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(0, 0, 0, 0.08)',
+                borderRadius: '18px',
+                padding: '16px 20px',
+                marginBottom: '28px',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '14px',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.03)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: '1 1 300px', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '8px 14px' }}>
+                  <Search size={16} style={{ color: '#94a3b8' }} />
+                  <input
+                    type="text"
+                    value={inventorySearchTerm}
+                    onChange={(e) => setInventorySearchTerm(e.target.value)}
+                    placeholder="Envanterde seramik modeli, ebat veya kod ara... (Örn: Calacatta, 60x120)"
+                    style={{ border: 'none', outline: 'none', background: 'transparent', width: '100%', fontSize: '0.84rem', color: '#0f172a' }}
+                  />
+                  {inventorySearchTerm && (
+                    <button type="button" onClick={() => setInventorySearchTerm('')} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 'bold' }}>✕</button>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', marginRight: '2px' }}>Stil:</span>
+                  {['all', 'Mermer', 'Beton', 'Ahşap', 'Taş'].map(styleKey => (
+                    <button
+                      key={styleKey}
+                      type="button"
+                      onClick={() => setInventoryStyleFilter(styleKey)}
+                      style={{
+                        border: '1px solid',
+                        borderColor: inventoryStyleFilter === styleKey ? 'var(--accent-gold)' : '#cbd5e1',
+                        background: inventoryStyleFilter === styleKey ? 'var(--accent-gold)' : '#ffffff',
+                        color: inventoryStyleFilter === styleKey ? '#ffffff' : '#475569',
+                        borderRadius: '20px',
+                        padding: '5px 14px',
+                        fontSize: '0.75rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {styleKey === 'all' ? 'Tüm Stiller' : styleKey}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {filteredInventories.length > 0 ? (
+                <div className="featured-products-grid">
+                  {filteredInventories.map(item => {
+                    if (!item.product) return null;
+                    const prod = item.product;
+                    
+                    let statusLabel = 'Stokta Var';
+                    let statusColor = '#10b981';
+                    let statusBg = '#ecfdf5';
+
+                    if (item.status === 'DISPLAY_ONLY') {
+                      statusLabel = 'Teşhir Ürünü';
+                      statusColor = '#d97706';
+                      statusBg = '#fffbeb';
+                    } else if (item.status === 'ORDER_ONLY') {
+                      statusLabel = 'Sipariş Üzerine';
+                      statusColor = '#2563eb';
+                      statusBg = '#eff6ff';
+                    }
+
+                    return (
+                      <div key={item.id} className="featured-product-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                        <div className="featured-product-image-container" style={{ position: 'relative' }}>
+                          <img 
+                            src={prod.imageUrl || getTextureFallback(prod)} 
+                            alt={prod.name} 
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = getTextureFallback(prod);
+                            }}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+                          />
+                          <span style={{
+                            position: 'absolute',
+                            top: '8px',
+                            left: '8px',
+                            fontSize: '0.6rem',
+                            fontWeight: '800',
+                            color: statusColor,
+                            background: statusBg,
+                            padding: '3px 8px',
+                            borderRadius: '16px',
+                            border: `1px solid ${statusColor}33`,
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                          }}>
+                            {statusLabel}
                           </span>
                         </div>
-                        {item.price && (
-                          <div style={{ textAlign: 'right' }}>
-                            <span style={{ fontSize: '0.6rem', color: '#64748b', display: 'block' }}>Bayi Özel Fiyatı</span>
-                            <span style={{ fontSize: '0.82rem', fontWeight: '900', color: 'var(--accent-gold, #b38e47)' }}>
-                              ₺{item.price.toLocaleString('tr-TR')} 
-                              <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: '500' }}> / m²</span>
-                            </span>
+                        <div className="featured-product-info" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <span className="featured-product-style">{prod.style} serisi</span>
+                          <h3 className="featured-product-name">{prod.name}</h3>
+                          <span className="featured-product-meta" style={{ flex: 1 }}>Kod: {prod.code} • Ebat: {prod.width}x{prod.height} cm • Yüzey: {prod.finish}</span>
+                          
+                          <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '6px' }}>
+                            <div>
+                              <span style={{ fontSize: '0.6rem', color: '#64748b', display: 'block' }}>Mevcut Stok</span>
+                              <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
+                                {item.status === 'IN_STOCK' ? `${item.stock.toLocaleString('tr-TR')} m²` : (item.status === 'DISPLAY_ONLY' ? 'Teşhir / Numune' : 'Siparişle (3-7 Gün)')}
+                              </span>
+                            </div>
+                            {item.price && (
+                              <div style={{ textAlign: 'right' }}>
+                                <span style={{ fontSize: '0.6rem', color: '#64748b', display: 'block' }}>Bayi Özel Fiyatı</span>
+                                <span style={{ fontSize: '0.82rem', fontWeight: '900', color: 'var(--accent-gold, #b38e47)' }}>
+                                  ₺{item.price.toLocaleString('tr-TR')} 
+                                  <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: '500' }}> / m²</span>
+                                </span>
+                              </div>
+                            )}
                           </div>
-                        )}
+                        </div>
+                        <div className="product-card-actions-group" style={{ display: 'flex', gap: '8px' }}>
+                          <Link 
+                            href={`/kiosk?productId=${encodeURIComponent(prod.id)}&code=${encodeURIComponent(prod.code || '')}`}
+                            onClick={() => {
+                              try {
+                                const selectedObj = {
+                                  ...prod,
+                                  unitPrice: item.price || prod.unitPrice,
+                                  textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
+                                  imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
+                                };
+                                sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
+                              } catch(e) {}
+                            }}
+                            className="btn-3d-try-card"
+                            title="Bu ürünü 3D Sanal Banyo Stüdyosu'nda canlı uygulayın"
+                            style={{ flex: 1, textDecoration: 'none' }}
+                          >
+                            <Sparkles size={13} />
+                            3D'de Kapla
+                          </Link>
+                          <button 
+                            type="button" 
+                            onClick={() => handleFeatureClick(prod.id)}
+                            className="featured-product-action-btn"
+                            style={{ flex: 1 }}
+                          >
+                            <span>Stoktan Teklif İsteyin</span>
+                            <ArrowRight size={12} />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="product-card-actions-group" style={{ display: 'flex', gap: '8px' }}>
-                      <Link 
-                        href={`/kiosk?productId=${encodeURIComponent(prod.id)}&code=${encodeURIComponent(prod.code || '')}`}
-                        onClick={() => {
-                          try {
-                            const selectedObj = {
-                              ...prod,
-                              unitPrice: item.price || prod.unitPrice,
-                              textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
-                              imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
-                            };
-                            sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
-                          } catch(e) {}
-                        }}
-                        className="btn-3d-try-card"
-                        title="Bu ürünü 3D Sanal Banyo Stüdyosu'nda canlı uygulayın"
-                        style={{ flex: 1, textDecoration: 'none' }}
-                      >
-                        <Sparkles size={13} />
-                        3D'de Kapla
-                      </Link>
-                      <button 
-                        type="button" 
-                        onClick={() => handleFeatureClick(prod.id)}
-                        className="featured-product-action-btn"
-                        style={{ flex: 1 }}
-                      >
-                        <span>Stoktan Teklif İsteyin</span>
-                        <ArrowRight size={12} />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+                    );
+                  })}
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '36px 20px', background: 'rgba(255, 255, 255, 0.6)', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
+                  <p style={{ fontSize: '0.9rem', color: '#64748b', margin: 0 }}>Aradığınız kriterlere uygun seramik stok kaydı bulunamadı.</p>
+                  <button type="button" onClick={() => { setInventorySearchTerm(''); setInventoryStyleFilter('all'); }} style={{ marginTop: '10px', padding: '6px 16px', borderRadius: '8px', border: 'none', background: 'var(--accent-gold)', color: '#fff', fontSize: '0.78rem', fontWeight: 'bold', cursor: 'pointer' }}>Filtreleri Temizle</button>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* SECTION: FEATURED PRODUCTS */}
         {featuredProductsList.length > 0 && (
