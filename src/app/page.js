@@ -14500,14 +14500,26 @@ export default function Home() {
 
           /* Showroom Hero Banner & Search Form Mobile Fixes */
           .showroom-hero-banner {
-            padding: 20px 15px !important;
+            padding: 16px 12px !important;
             min-height: auto !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+          }
+          .hero-banner-content {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            gap: 12px !important;
           }
           .showroom-hero-banner h1,
           .showroom-hero-banner h2 {
             font-size: 1.35rem !important;
             color: #ffffff !important;
             line-height: 1.35 !important;
+            min-height: auto !important;
           }
           .hero-banner-subtitle {
             font-size: 0.78rem !important;
@@ -14523,6 +14535,8 @@ export default function Home() {
             border-radius: var(--border-radius-md) !important;
             padding: 10px !important;
             gap: 8px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
           }
           .search-bar-icon-left {
             display: none !important;
@@ -14537,6 +14551,28 @@ export default function Home() {
             border-radius: var(--border-radius-sm) !important;
             padding: 10px !important;
             text-align: center !important;
+          }
+          .hero-popular-tags {
+            gap: 6px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .pop-tag-capsule {
+            padding: 4px 10px !important;
+            font-size: 0.68rem !important;
+          }
+          .hero-feature-stats-row {
+            gap: 6px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+            margin-top: 10px !important;
+          }
+          .feature-stat-capsule, .hero-feature-btn {
+            padding: 6px 10px !important;
+            font-size: 0.7rem !important;
+            border-radius: 8px !important;
           }
         }
 

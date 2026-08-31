@@ -1,18 +1,17 @@
+project_name: seramikbak
 stack:
-  language: TypeScript/JavaScript
-  framework: Next.js (App Router, React 19)
-  styling: Tailwind CSS v4
-  3d: Three.js
-  database: Prisma / LibSQL
+  framework: Next.js 15+ (App Router)
+  ui: React 19, Tailwind CSS v4, styled-jsx / custom CSS
+  database: Prisma / LibSQL SQLite
 commands:
   dev: npm run dev
   build: npm run build
   lint: npm run lint
 conventions:
-  - Turkish UI text
-  - Responsive web design (mobile, tablet, desktop)
+  style: Tailwind CSS + CSS-in-JS (<style jsx>)
+  responsive: Mobile-first responsive design using media queries (@media (max-width: 768px))
 active_team:
   - tech-lead
   - frontend-engineer
-  - 3d-engineer
   - code-reviewer
+  - qa-tester

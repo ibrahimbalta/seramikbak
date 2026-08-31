@@ -351,6 +351,9 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
           margin: 20px 0 16px 0;
           transition: all 0.3s ease;
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
         }
 
         .tile-calc-header {
@@ -406,18 +409,24 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           grid-template-columns: 1.2fr 0.8fr;
           gap: 20px;
           align-items: stretch;
+          width: 100%;
+          min-width: 0;
         }
 
         .tile-calc-inputs {
           display: flex;
           flex-direction: column;
           gap: 14px;
+          width: 100%;
+          min-width: 0;
         }
 
         .calc-group {
           display: flex;
           flex-direction: column;
           gap: 6px;
+          width: 100%;
+          min-width: 0;
         }
 
         .calc-label {
@@ -433,6 +442,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           grid-template-columns: repeat(4, 1fr);
           gap: 6px;
           width: 100%;
+          min-width: 0;
         }
 
         .room-btn {
@@ -448,6 +458,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           color: #cbd5e1;
           transition: all 0.2s ease;
           white-space: nowrap;
+          min-width: 0;
         }
 
         .room-btn:hover {
@@ -463,6 +474,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
 
         .room-icon-svg {
           color: #94a3b8;
+          flex-shrink: 0;
         }
 
         .room-btn.active .room-icon-svg {
@@ -503,12 +515,16 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 10px;
+          width: 100%;
+          min-width: 0;
         }
 
         .select-box {
           display: flex;
           flex-direction: column;
           gap: 4px;
+          width: 100%;
+          min-width: 0;
         }
 
         .select-label {
@@ -523,10 +539,13 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           position: relative;
           display: flex;
           align-items: center;
+          width: 100%;
+          min-width: 0;
         }
 
         .calc-select {
           width: 100%;
+          min-width: 0;
           padding: 8px 28px 8px 10px;
           border-radius: 10px;
           background: rgba(15, 23, 42, 0.85);
@@ -539,6 +558,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           appearance: none;
           -webkit-appearance: none;
           transition: border-color 0.2s ease;
+          text-overflow: ellipsis;
         }
 
         .calc-select:hover {
@@ -563,12 +583,16 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           gap: 10px;
           align-items: flex-start;
           padding-top: 4px;
+          width: 100%;
+          min-width: 0;
         }
 
         .extra-control-col {
           display: flex;
           flex-direction: column;
           gap: 4px;
+          width: 100%;
+          min-width: 0;
         }
 
         .laying-pills {
@@ -576,6 +600,8 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           grid-template-columns: repeat(3, 1fr);
           gap: 4px;
           height: 38px;
+          width: 100%;
+          min-width: 0;
         }
 
         .pill-btn {
@@ -594,6 +620,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           transition: all 0.2s ease;
           white-space: nowrap;
           text-align: center;
+          min-width: 0;
         }
 
         .pill-btn:hover {
@@ -625,6 +652,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           transition: all 0.2s ease;
           user-select: none;
           white-space: nowrap;
+          min-width: 0;
         }
 
         .labor-toggle-btn:hover {
@@ -665,18 +693,25 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           flex-direction: column;
           justify-content: space-between;
           gap: 12px;
+          width: 100%;
+          min-width: 0;
+          box-sizing: border-box;
         }
 
         .results-inner-grid {
           display: flex;
           flex-direction: column;
           gap: 10px;
+          width: 100%;
+          min-width: 0;
         }
 
         .result-item {
           display: flex;
           flex-direction: column;
           gap: 3px;
+          width: 100%;
+          min-width: 0;
         }
 
         .result-item.budget-highlight {
@@ -781,6 +816,9 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
             padding: 12px;
             border-radius: 16px;
             margin: 10px 0;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
           }
 
           .tile-calc-header {
@@ -788,7 +826,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           }
 
           .tile-calc-title {
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             line-height: 1.25;
           }
 
@@ -805,28 +843,41 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           .tile-calc-grid {
             grid-template-columns: 1fr;
             gap: 10px;
+            width: 100%;
           }
 
           .tile-calc-inputs {
             gap: 8px;
+            width: 100%;
           }
 
           .calc-group {
             gap: 3px;
+            width: 100%;
           }
 
           .calc-label, .select-label, .result-label {
             font-size: 0.62rem;
           }
 
-          .room-btn {
-            padding: 5px 3px;
+          .room-selector-grid {
+            grid-template-columns: repeat(4, 1fr);
             gap: 4px;
+            width: 100%;
+          }
+
+          .room-btn {
+            padding: 6px 2px;
+            gap: 3px;
             border-radius: 8px;
+            min-width: 0;
           }
 
           .room-text {
-            font-size: 0.68rem;
+            font-size: 0.66rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           .area-badge {
@@ -837,57 +888,77 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           .dropdowns-row {
             grid-template-columns: 1fr 1fr;
             gap: 6px;
+            width: 100%;
           }
 
           .calc-select {
-            padding: 6px 20px 6px 8px;
-            font-size: 0.72rem;
+            padding: 6px 18px 6px 6px;
+            font-size: 0.7rem;
             border-radius: 8px;
+            width: 100%;
+            text-overflow: ellipsis;
           }
 
           .select-arrow {
-            right: 6px;
+            right: 4px;
           }
 
           .extra-controls-grid {
-            grid-template-columns: 1.1fr 0.9fr;
-            gap: 6px;
+            grid-template-columns: 1fr;
+            gap: 8px;
             padding-top: 2px;
+            width: 100%;
+          }
+
+          .extra-control-col {
+            width: 100%;
           }
 
           .laying-pills {
-            height: 32px;
-            gap: 3px;
+            grid-template-columns: repeat(3, 1fr);
+            height: 34px;
+            gap: 4px;
+            width: 100%;
           }
 
           .pill-btn {
-            height: 32px;
-            font-size: 0.6rem;
-            padding: 0 2px;
+            height: 34px;
+            font-size: 0.64rem;
+            padding: 0 4px;
             border-radius: 7px;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           .labor-toggle-btn {
-            height: 32px;
-            font-size: 0.64rem;
-            padding: 0 5px;
-            gap: 4px;
+            height: 34px;
+            font-size: 0.68rem;
+            padding: 0 8px;
+            gap: 6px;
             border-radius: 7px;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
 
           .checkbox-custom {
-            width: 12px;
-            height: 12px;
+            width: 13px;
+            height: 13px;
           }
 
           .tile-calc-results {
             padding: 10px 12px;
             border-radius: 12px;
             gap: 8px;
+            width: 100%;
           }
 
           .results-inner-grid {
             gap: 5px;
+            width: 100%;
           }
 
           .result-item.budget-highlight {
@@ -920,6 +991,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
             padding: 9px 12px;
             font-size: 0.78rem;
             border-radius: 8px;
+            width: 100%;
           }
         }
       `}</style>
