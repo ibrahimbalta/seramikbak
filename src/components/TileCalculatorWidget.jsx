@@ -778,26 +778,148 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
 
         @media (max-width: 640px) {
           .tile-calculator-card {
-            padding: 14px;
+            padding: 12px;
             border-radius: 16px;
+            margin: 10px 0;
+          }
+
+          .tile-calc-header {
+            margin-bottom: 8px;
+          }
+
+          .tile-calc-title {
+            font-size: 0.95rem;
+            line-height: 1.25;
+          }
+
+          .tile-calc-badges {
+            margin-bottom: 6px;
+            gap: 6px;
+          }
+
+          .badge-gold, .badge-trust {
+            padding: 2px 7px;
+            font-size: 0.62rem;
           }
 
           .tile-calc-grid {
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 10px;
           }
 
-          .dropdowns-row, .extra-controls-grid {
-            grid-template-columns: 1fr;
+          .tile-calc-inputs {
             gap: 8px;
           }
 
-          .laying-pills {
-            height: auto;
+          .calc-group {
+            gap: 3px;
           }
 
-          .pill-btn, .labor-toggle-btn {
-            height: 36px;
+          .calc-label, .select-label, .result-label {
+            font-size: 0.62rem;
+          }
+
+          .room-btn {
+            padding: 5px 3px;
+            gap: 4px;
+            border-radius: 8px;
+          }
+
+          .room-text {
+            font-size: 0.68rem;
+          }
+
+          .area-badge {
+            font-size: 0.74rem;
+            padding: 1px 6px;
+          }
+
+          .dropdowns-row {
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+          }
+
+          .calc-select {
+            padding: 6px 20px 6px 8px;
+            font-size: 0.72rem;
+            border-radius: 8px;
+          }
+
+          .select-arrow {
+            right: 6px;
+          }
+
+          .extra-controls-grid {
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 6px;
+            padding-top: 2px;
+          }
+
+          .laying-pills {
+            height: 32px;
+            gap: 3px;
+          }
+
+          .pill-btn {
+            height: 32px;
+            font-size: 0.6rem;
+            padding: 0 2px;
+            border-radius: 7px;
+          }
+
+          .labor-toggle-btn {
+            height: 32px;
+            font-size: 0.64rem;
+            padding: 0 5px;
+            gap: 4px;
+            border-radius: 7px;
+          }
+
+          .checkbox-custom {
+            width: 12px;
+            height: 12px;
+          }
+
+          .tile-calc-results {
+            padding: 10px 12px;
+            border-radius: 12px;
+            gap: 8px;
+          }
+
+          .results-inner-grid {
+            gap: 5px;
+          }
+
+          .result-item.budget-highlight {
+            padding: 8px 10px;
+            border-radius: 8px;
+          }
+
+          .result-main-val {
+            font-size: 1rem;
+          }
+
+          .result-main-val.gold {
+            font-size: 1rem;
+          }
+
+          .result-main-val.small {
+            font-size: 0.78rem;
+          }
+
+          .result-sub-val {
+            font-size: 0.66rem;
+          }
+
+          .budget-breakdown-info {
+            font-size: 0.58rem;
+            margin-top: 2px;
+          }
+
+          .calc-cta-button {
+            padding: 9px 12px;
+            font-size: 0.78rem;
+            border-radius: 8px;
           }
         }
       `}</style>
