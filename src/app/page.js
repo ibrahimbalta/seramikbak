@@ -9199,20 +9199,29 @@ export default function Home() {
         }
 
         .header-btn {
-          display: flex;
+          display: inline-flex;
           align-items: center;
+          justify-content: center;
           gap: 8px;
+          height: 38px;
           background: rgba(0, 0, 0, 0.02);
           border: 1px solid rgba(0, 0, 0, 0.05);
           color: #475569;
-          padding: 9px 18px;
+          padding: 0 16px;
           border-radius: 20px;
           cursor: pointer;
           font-family: var(--font-title);
           font-size: 0.8rem;
           font-weight: 600;
+          white-space: nowrap;
+          box-sizing: border-box;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           text-decoration: none !important;
+        }
+
+        .header-btn span {
+          white-space: nowrap;
+          line-height: 1;
         }
 
         .header-btn:hover {
