@@ -57,7 +57,8 @@ import {
   Package,
   CameraOff,
   RotateCcw,
-  Smartphone
+  Smartphone,
+  Store
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import WebARModal from '@/components/WebARModal';
@@ -4054,7 +4055,193 @@ export default function Home() {
               </div>
             </div>
 
+            {/* SECTION: HOW IT WORKS (SERAMİKBAK NASIL ÇALIŞIR?) */}
+            <div className="how-it-works-section" style={{
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%)',
+              border: '1px solid rgba(212, 175, 55, 0.25)',
+              borderRadius: '24px',
+              padding: '32px 24px',
+              marginTop: '28px',
+              marginBottom: '32px',
+              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.25)',
+              backdropFilter: 'blur(16px)'
+            }}>
+              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(212, 175, 55, 0.15)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
+                  color: 'var(--accent-gold, #d4af37)',
+                  padding: '6px 16px',
+                  borderRadius: '20px',
+                  fontSize: '0.78rem',
+                  fontWeight: '800',
+                  letterSpacing: '0.5px',
+                  marginBottom: '10px'
+                }}>
+                  <Sparkles size={14} />
+                  <span>AKILLI SERAMİK TEŞHİR & TEDARİK SÜRECİ</span>
+                </div>
+                <h2 style={{ fontSize: '1.75rem', fontWeight: '900', color: '#ffffff', margin: '0 0 8px 0', fontFamily: 'var(--font-title)' }}>
+                  SeramikBak Nasıl Çalışır?
+                </h2>
+                <p style={{ fontSize: '0.88rem', color: '#94a3b8', maxWidth: '640px', margin: '0 auto', lineHeight: '1.5' }}>
+                  Hayalinizdeki banyo, mutfak veya zemin seramiğini bulup yetkili bayilerden canlı teklif almanın en kolay yolu!
+                </p>
+              </div>
 
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: '20px'
+              }}>
+                {/* Step 1 */}
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '20px',
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--accent-gold, #d4af37) 0%, #b38e47 100%)',
+                    color: '#ffffff',
+                    fontWeight: '900',
+                    fontSize: '0.85rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(179,142,71,0.3)'
+                  }}>01</div>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '14px',
+                    background: 'rgba(212, 175, 55, 0.15)',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--accent-gold, #d4af37)',
+                    marginBottom: '16px'
+                  }}>
+                    <Palette size={24} />
+                  </div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#ffffff', margin: '0 0 8px 0' }}>
+                    1️⃣ Modeli Seç & 3D Stüdyoda Dene
+                  </h3>
+                  <p style={{ fontSize: '0.82rem', color: '#cbd5e1', lineHeight: '1.6', margin: 0 }}>
+                    Binlerce seramik modelini renk, tarz ve ebada göre saniyeler içinde inceleyin. 3D Sanal Stüdyo veya Web-AR kamera ile kendi banyonuzda/salonunuzda canlı görün.
+                  </p>
+                </div>
+
+                {/* Step 2 */}
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '20px',
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--accent-gold, #d4af37) 0%, #b38e47 100%)',
+                    color: '#ffffff',
+                    fontWeight: '900',
+                    fontSize: '0.85rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(179,142,71,0.3)'
+                  }}>02</div>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '14px',
+                    background: 'rgba(212, 175, 55, 0.15)',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--accent-gold, #d4af37)',
+                    marginBottom: '16px'
+                  }}>
+                    <MapPin size={24} />
+                  </div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#ffffff', margin: '0 0 8px 0' }}>
+                    2️⃣ En Yakın Bayiden Canlı Fiyat Al
+                  </h3>
+                  <p style={{ fontSize: '0.82rem', color: '#cbd5e1', lineHeight: '1.6', margin: 0 }}>
+                    Şehrinizdeki yetkili seramik bayilerinin güncel stoklarını ve m² fiyat tekliflerini karşılaştırın. Tek tıkla WhatsApp veya canlı teklif formu ile iletişime geçin.
+                  </p>
+                </div>
+
+                {/* Step 3 */}
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '20px',
+                  padding: '24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--accent-gold, #d4af37) 0%, #b38e47 100%)',
+                    color: '#ffffff',
+                    fontWeight: '900',
+                    fontSize: '0.85rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(179,142,71,0.3)'
+                  }}>03</div>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '14px',
+                    background: 'rgba(212, 175, 55, 0.15)',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--accent-gold, #d4af37)',
+                    marginBottom: '16px'
+                  }}>
+                    <Truck size={24} />
+                  </div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#ffffff', margin: '0 0 8px 0' }}>
+                    3️⃣ Mimar Destekli Kapına Gelsin
+                  </h3>
+                  <p style={{ fontSize: '0.82rem', color: '#cbd5e1', lineHeight: '1.6', margin: 0 }}>
+                    İsterseniz adresinize numune seramik talep edin, isterseniz sigortalı nakliye ve sertifikalı usta desteğiyle kapınıza kadar güvenle teslim alın.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             {/* Categories & 3D Showcase Section */}
             <div className="categories-showcase-container">
@@ -5238,6 +5425,128 @@ export default function Home() {
                     </button>
                   </div>
                 )}
+                {/* SECTION: DEALER B2B SAAS BANNER (BAYİMİZ OLUN / MAĞAZANIZI EKLENİN) */}
+                <div className="dealer-b2b-saas-banner" style={{
+                  background: 'linear-gradient(135deg, #0b0f19 0%, #1e293b 100%)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
+                  borderRadius: '24px',
+                  padding: '36px 32px',
+                  marginTop: '48px',
+                  marginBottom: '32px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '32px',
+                  flexWrap: 'wrap',
+                  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.35)',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  {/* Glow background accent */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '-50px',
+                    right: '-50px',
+                    width: '240px',
+                    height: '240px',
+                    background: 'radial-gradient(circle, rgba(212,175,55,0.2) 0%, transparent 70%)',
+                    borderRadius: '50%',
+                    pointerEvents: 'none'
+                  }} />
+
+                  <div style={{ flex: '1 1 500px', zIndex: 2 }}>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      background: 'rgba(212, 175, 55, 0.15)',
+                      border: '1px solid rgba(212, 175, 55, 0.4)',
+                      color: 'var(--accent-gold, #d4af37)',
+                      padding: '5px 14px',
+                      borderRadius: '20px',
+                      fontSize: '0.75rem',
+                      fontWeight: '800',
+                      letterSpacing: '0.5px',
+                      marginBottom: '12px'
+                    }}>
+                      <Building2 size={14} />
+                      <span>SERAMİK BAYİLERİ VE SHOWROOM SAHİPLERİ İÇİN</span>
+                    </div>
+                    
+                    <h2 style={{ fontSize: '1.85rem', fontWeight: '900', color: '#ffffff', margin: '0 0 12px 0', lineHeight: 1.25, fontFamily: 'var(--font-title)' }}>
+                      🏬 Seramik Bayisi misiniz? <br />
+                      <span style={{ background: 'linear-gradient(135deg, #d4af37 0%, #fef08a 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                        Showroom'unuzu Dijitalleştirin ve Müşteri Çekin!
+                      </span>
+                    </h2>
+
+                    <p style={{ fontSize: '0.9rem', color: '#94a3b8', margin: '0 0 20px 0', lineHeight: '1.6', maxWidth: '640px' }}>
+                      Mağazanızı Türkiye genelindeki haritamıza ekleyin, stoklu seramiklerinizi sergileyin ve 3D Sanal Stüdyo Kiosk sistemini mağazanızdaki tablet ve teşhir ekranlarında anında kullanın.
+                    </p>
+
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', color: '#cbd5e1', fontWeight: '600' }}>
+                        <CheckCircle size={16} style={{ color: 'var(--accent-gold)' }} />
+                        <span>Haritada Ön Sıra Görünürlük</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', color: '#cbd5e1', fontWeight: '600' }}>
+                        <CheckCircle size={16} style={{ color: 'var(--accent-gold)' }} />
+                        <span>3D Teşhir Kiosk Lisansı</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', color: '#cbd5e1', fontWeight: '600' }}>
+                        <CheckCircle size={16} style={{ color: 'var(--accent-gold)' }} />
+                        <span>Canlı Müşteri Talepleri</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flexShrink: 0, zIndex: 2, minWidth: '220px' }}>
+                    <Link 
+                      href="/bayi" 
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
+                        background: 'linear-gradient(135deg, var(--accent-gold, #d4af37) 0%, #b38e47 100%)',
+                        color: '#ffffff',
+                        padding: '14px 28px',
+                        borderRadius: '14px',
+                        fontSize: '0.92rem',
+                        fontWeight: '800',
+                        textDecoration: 'none',
+                        boxShadow: '0 8px 24px rgba(179, 142, 71, 0.35)',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <Store size={18} />
+                      <span>Hemen Bayi Paneline Gir</span>
+                    </Link>
+                    
+                    <Link 
+                      href="/proje-talep" 
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        color: '#ffffff',
+                        padding: '12px 24px',
+                        borderRadius: '14px',
+                        fontSize: '0.85rem',
+                        fontWeight: '700',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <FileText size={16} />
+                      <span>Kurumsal Demo Talep Et</span>
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
