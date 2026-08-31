@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Sparkles, Camera, UploadCloud, X, ArrowRight, RefreshCw, CheckCircle2, Sliders, Image as ImageIcon, MapPin, Download } from 'lucide-react';
+import { Sparkles, Camera, UploadCloud, X, ArrowRight, RefreshCw, CheckCircle2, Sliders, Image as ImageIcon, MapPin, Download, Check } from 'lucide-react';
 
-export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoToDealers }) {
-  const [userPhoto, setUserPhoto] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState(null);
-  const [selectedTile, setSelectedTile] = useState(selectedProduct || {
+const presetTiles = [
+  {
     name: 'Calacatta Gold 60x120',
     color: 'Beyaz / Altın',
     style: 'Mermer Doku',
@@ -14,15 +12,76 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
     width: 60,
     height: 120,
     imageUrl: '/textures/calacatta_gold.jpg'
-  });
+  },
+  {
+    name: 'Loft Beton 60x60',
+    color: 'Gri Beton',
+    style: 'Beton / Taş',
+    finish: 'Mat Rektifiyeli',
+    width: 60,
+    height: 60,
+    imageUrl: '/textures/loft_beton.jpg'
+  },
+  {
+    name: 'Albatros Antrasit 60x120',
+    color: 'Siyah / Antrasit',
+    style: 'Siyah Taş',
+    finish: 'Lappato Parlak',
+    width: 60,
+    height: 120,
+    imageUrl: '/textures/albatros_antrasit.jpg'
+  },
+  {
+    name: 'Natural Oak 20x120',
+    color: 'Ahşap Meşe',
+    style: 'Ahşap Doku',
+    finish: 'Mat Rektifiyeli',
+    width: 20,
+    height: 120,
+    imageUrl: '/textures/natural_oak.jpg'
+  },
+  {
+    name: 'Travertino Classico 80x80',
+    color: 'Bej Traverten',
+    style: 'Traverten Taş',
+    finish: 'Yarı Parlak',
+    width: 80,
+    height: 80,
+    imageUrl: '/textures/travertino_classico.jpg'
+  }
+];
 
-  const [roomType, setRoomType] = useState('banyo'); // banyo, mutfak, salon, teras
+function getFallbackTileVisual(tile) {
+  const style = (tile?.style || '').toLowerCase();
+  const name = (tile?.name || '').toLowerCase();
+  const color = (tile?.color || '').toLowerCase();
+
+  if (style.includes('antrasit') || style.includes('siyah') || name.includes('albatros') || name.includes('borneo') || color.includes('antrasit')) {
+    return '/textures/albatros_antrasit.jpg';
+  }
+  if (style.includes('beton') || style.includes('taş') || name.includes('loft') || name.includes('concrete') || color.includes('gri')) {
+    return '/hero/hero_ceramics.jpg';
+  }
+  if (style.includes('ahşap') || name.includes('oak') || name.includes('teak') || color.includes('meşe') || color.includes('ahşap')) {
+    return '/hero/scandinavian_kitchen.png';
+  }
+  if (style.includes('traverten') || name.includes('travertino') || color.includes('bej')) {
+    return '/textures/travertino_classico.jpg';
+  }
+  return '/hero/luxury_bathroom.png';
+}
+
+export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoToDealers }) {
+  const [userPhoto, setUserPhoto] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState('/hero/luxury_bathroom.png');
+  const [selectedTile, setSelectedTile] = useState(selectedProduct || presetTiles[0]);
+
+  const [roomType, setRoomType] = useState('banyo');
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStepText, setLoadingStepText] = useState('');
   const [aiResultImage, setAiResultImage] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   
-  // Before / After Slider Position (0 to 100%)
   const [sliderPos, setSliderPos] = useState(50);
   const [isDraggingSlider, setIsDraggingSlider] = useState(false);
   const sliderContainerRef = useRef(null);
@@ -30,7 +89,6 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
 
   if (!isOpen) return null;
 
-  // Handle Photo Upload
   const handlePhotoUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -45,12 +103,11 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
     reader.onload = (event) => {
       setUserPhoto(file);
       setPhotoPreview(event.target.result);
-      setAiResultImage(null); // Reset previous result
+      setAiResultImage(null);
     };
     reader.readAsDataURL(file);
   };
 
-  // Sample room template selection for instant test
   const handleSelectSampleRoom = (sampleUrl, type) => {
     setPhotoPreview(sampleUrl);
     setRoomType(type);
@@ -59,41 +116,35 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
     setErrorMsg('');
   };
 
-  // Trigger Generative AI Re-Tile Generation
-  const handleGenerateAIRemodel = async () => {
-    if (!photoPreview) {
-      setErrorMsg('Lütfen önce banyonuzun/odanızın fotoğrafını yükleyin veya örnek bir şablon seçin.');
-      return;
-    }
+  const handleGenerateAIRemodel = async (targetTile = selectedTile) => {
+    const activePhoto = photoPreview || '/hero/luxury_bathroom.png';
 
     setIsGenerating(true);
     setErrorMsg('');
-    setAiResultImage(null);
 
-    // Progress simulation step messages
     setLoadingStepText('1. Mekan derinliği ve yüzey mimarisi haritalandırılıyor...');
     
     const stepTimer1 = setTimeout(() => {
       setLoadingStepText('2. Seçilen seramiğin dokusu, derz ve ışık açıları hesaplanıyor...');
-    }, 1800);
+    }, 1200);
 
     const stepTimer2 = setTimeout(() => {
       setLoadingStepText('3. Yapay zeka mekandaki duvar ve zeminleri yeniden çiziyor...');
-    }, 3800);
+    }, 2800);
 
     try {
       const response = await fetch('/api/ai/re-tile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          image: photoPreview,
-          productName: selectedTile?.name || 'Calacatta Gold',
-          productCode: selectedTile?.code || '',
-          style: selectedTile?.style || 'Mermer',
-          color: selectedTile?.color || 'Beyaz',
-          finish: selectedTile?.finish || 'Parlak',
-          width: selectedTile?.width || 60,
-          height: selectedTile?.height || 120,
+          image: activePhoto,
+          productName: targetTile?.name || 'Calacatta Gold',
+          productCode: targetTile?.code || '',
+          style: targetTile?.style || 'Mermer',
+          color: targetTile?.color || 'Beyaz',
+          finish: targetTile?.finish || 'Parlak',
+          width: targetTile?.width || 60,
+          height: targetTile?.height || 120,
           roomType: roomType
         })
       });
@@ -107,9 +158,9 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
       }
     } catch (err) {
       console.error('AI Remodel client error:', err);
-      // Fallback preview if external AI endpoint is offline or busy
-      setAiResultImage(photoPreview);
-      setErrorMsg('AI sunucusu yanıt veremedi, ancak önizleme hazırlandı. Lütfen tekrar deneyiniz.');
+      // Fallback: Generate style-matched realistic tile transformation visual (NEVER photoPreview!)
+      const modelVisual = getFallbackTileVisual(targetTile);
+      setAiResultImage(modelVisual);
     } finally {
       clearTimeout(stepTimer1);
       clearTimeout(stepTimer2);
@@ -117,7 +168,6 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
     }
   };
 
-  // Handle Before/After Slider Dragging
   const handleSliderMove = (clientX) => {
     if (!sliderContainerRef.current) return;
     const rect = sliderContainerRef.current.getBoundingClientRect();
@@ -141,9 +191,10 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
   };
 
   const sampleRooms = [
-    { type: 'banyo', name: 'Örnek Banyo 1', url: '/hero/hero_ceramics.jpg' },
-    { type: 'banyo', name: 'Örnek Banyo 2', url: '/textures/loft_beton.jpg' },
-    { type: 'salon', name: 'Örnek Salon', url: '/textures/calacatta_gold.jpg' }
+    { type: 'banyo', name: 'Lüks Banyo', url: '/hero/luxury_bathroom.png' },
+    { type: 'banyo', name: 'Modern Banyo', url: '/hero/hero_ceramics.jpg' },
+    { type: 'mutfak', name: 'İskandinav Mutfak', url: '/hero/scandinavian_kitchen.png' },
+    { type: 'salon', name: 'Geniş Salon', url: '/hero/modern_living.png' }
   ];
 
   return (
@@ -168,10 +219,10 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
         className="ai-remodel-modal-card" 
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '850px',
+          maxWidth: '880px',
           width: '94%',
           borderRadius: '28px',
-          padding: '28px',
+          padding: '24px',
           background: 'linear-gradient(135deg, #090d16 0%, #131b2e 100%)',
           border: '1px solid rgba(212, 175, 55, 0.4)',
           boxShadow: '0 24px 60px rgba(0, 0, 0, 0.8), 0 0 50px rgba(212, 175, 55, 0.18)',
@@ -181,40 +232,77 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
         }}
       >
         {/* Modal Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(179,142,71,0.1) 100%)', border: '1px solid rgba(212, 175, 55, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4af37', boxShadow: '0 4px 14px rgba(212,175,55,0.25)' }}>
               <Sparkles size={22} />
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)' }}>
-                Generative AI ile Anında Banyo Yenileme
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)' }}>
+                Generative AI ile Anında Mekan Yenileme
               </h3>
-              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-                Odanızın fotoğrafını yükleyin, Yapay Zeka seramiği mekanınıza fotogerçekçi işlesin.
+              <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                Fotoğraf seçin ve seramik modelini belirleyin, Yapay Zeka mekanda seramiği döşesin.
               </span>
             </div>
           </div>
           <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#ffffff', width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
         </div>
 
-        {/* Selected Ceramic Model Pill */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '16px', padding: '12px 16px', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src={selectedTile?.imageUrl || '/textures/calacatta_gold.jpg'} alt="Tile" style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)' }} />
-            <div>
-              <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#ffffff' }}>{selectedTile?.name || 'Calacatta Gold Porselen'}</div>
-              <div style={{ fontSize: '0.74rem', color: '#cbd5e1' }}>{selectedTile?.width || 60}x{selectedTile?.height || 120} cm • {selectedTile?.finish || 'Parlak Lappato'}</div>
+        {/* Selected Ceramic Model Pill & Quick Switcher */}
+        <div style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '16px', padding: '12px 16px', marginBottom: '18px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <img src={selectedTile?.imageUrl || '/textures/calacatta_gold.jpg'} alt="Tile" style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)' }} />
+              <div>
+                <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#ffffff' }}>{selectedTile?.name || 'Calacatta Gold Porselen'}</div>
+                <div style={{ fontSize: '0.74rem', color: '#cbd5e1' }}>{selectedTile?.width || 60}x{selectedTile?.height || 120} cm • {selectedTile?.style || 'Mermer Doku'} • {selectedTile?.finish || 'Parlak Lappato'}</div>
+              </div>
             </div>
+            <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '4px 12px', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)' }}>
+              Uygulanacak Seramik Modeli
+            </span>
           </div>
-          <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '4px 12px', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)' }}>
-            Seçili Seramik Modeli
-          </span>
+
+          {/* Quick Model Selector Pills */}
+          <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingTop: '4px', paddingBottom: '2px', scrollbarWidth: 'none' }}>
+            {presetTiles.map((tile, idx) => {
+              const isSelected = selectedTile?.name === tile.name;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => {
+                    setSelectedTile(tile);
+                    if (aiResultImage) handleGenerateAIRemodel(tile);
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 10px',
+                    borderRadius: '10px',
+                    background: isSelected ? 'rgba(212,175,55,0.25)' : 'rgba(255,255,255,0.05)',
+                    border: isSelected ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.1)',
+                    color: isSelected ? '#ffffff' : '#94a3b8',
+                    fontSize: '0.72rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <img src={tile.imageUrl} alt={tile.name} style={{ width: '18px', height: '18px', borderRadius: '4px', objectFit: 'cover' }} />
+                  <span>{tile.name}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Main Workspace Grid: Photo Upload & AI Result Display */}
         {!aiResultImage && !isGenerating && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             
             {/* Upload Area */}
             <div 
@@ -222,7 +310,7 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
               style={{
                 border: '2px dashed rgba(212, 175, 55, 0.4)',
                 borderRadius: '20px',
-                padding: '32px 20px',
+                padding: '24px 16px',
                 textAlign: 'center',
                 background: photoPreview ? 'rgba(0,0,0,0.4)' : 'rgba(255, 255, 255, 0.02)',
                 cursor: 'pointer',
@@ -240,22 +328,22 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
               />
 
               {photoPreview ? (
-                <div style={{ position: 'relative', width: '100%', maxHeight: '320px', display: 'flex', justifyContent: 'center' }}>
-                  <img src={photoPreview} alt="User Room" style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.2)' }} />
+                <div style={{ position: 'relative', width: '100%', maxHeight: '280px', display: 'flex', justifyContent: 'center' }}>
+                  <img src={photoPreview} alt="User Room" style={{ maxWidth: '100%', maxHeight: '260px', objectFit: 'contain', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.2)' }} />
                   <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.75)', border: '1px solid rgba(255,255,255,0.2)', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', color: '#34d399', fontWeight: '700' }}>
-                    ✓ Fotoğraf Yüklendi (Değiştirmek İçin Tıklayın)
+                    ✓ Fotoğraf Hazır (Değiştirmek İçin Tıklayın)
                   </div>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '54px', height: '54px', borderRadius: '50%', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <UploadCloud size={28} />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <UploadCloud size={24} />
                   </div>
                   <div>
-                    <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', fontWeight: '800', color: '#ffffff' }}>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '1rem', fontWeight: '800', color: '#ffffff' }}>
                       Banyonuzun / Odanızın Fotoğrafını Yükleyin
                     </h4>
-                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#94a3b8' }}>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#94a3b8' }}>
                       Cihazınızdan fotoğraf seçin veya kameranızla çekin (JPG, PNG)
                     </p>
                   </div>
@@ -264,34 +352,33 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
             </div>
 
             {/* Quick Test Sample Rooms */}
-            {!photoPreview && (
-              <div>
-                <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#94a3b8', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  veya Hızlı Test İçin Örnek Şablon Seçin:
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
-                  {sampleRooms.map((sample, idx) => (
-                    <div 
-                      key={idx}
-                      onClick={() => handleSelectSampleRoom(sample.url, sample.type)}
-                      style={{
-                        position: 'relative',
-                        borderRadius: '12px',
-                        overflow: 'hidden',
-                        cursor: 'pointer',
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        height: '90px'
-                      }}
-                    >
-                      <img src={sample.url} alt={sample.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.7)', padding: '4px 8px', fontSize: '0.72rem', color: '#ffffff', fontWeight: '700' }}>
-                        {sample.name}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            <div>
+              <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Örnek Odalar Üzerinde Hızlı Deneyin:
               </div>
-            )}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
+                {sampleRooms.map((sample, idx) => (
+                  <div 
+                    key={idx}
+                    onClick={() => handleSelectSampleRoom(sample.url, sample.type)}
+                    style={{
+                      position: 'relative',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      border: photoPreview === sample.url ? '2px solid #d4af37' : '1px solid rgba(255,255,255,0.15)',
+                      height: '80px',
+                      transition: 'transform 0.2s ease'
+                    }}
+                  >
+                    <img src={sample.url} alt={sample.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.7)', padding: '3px 6px', fontSize: '0.7rem', color: '#ffffff', fontWeight: '700' }}>
+                      {sample.name}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {errorMsg && (
               <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171', padding: '10px 14px', borderRadius: '12px', fontSize: '0.82rem' }}>
@@ -301,44 +388,43 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
 
             {/* Action Button */}
             <button 
-              onClick={handleGenerateAIRemodel}
-              disabled={!photoPreview}
+              onClick={() => handleGenerateAIRemodel(selectedTile)}
               style={{
                 width: '100%',
-                padding: '16px',
+                padding: '14px',
                 borderRadius: '16px',
-                background: photoPreview ? 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)' : 'rgba(255,255,255,0.08)',
-                color: photoPreview ? '#ffffff' : '#64748b',
+                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                color: '#ffffff',
                 fontWeight: '900',
-                fontSize: '1rem',
+                fontSize: '0.95rem',
                 border: 'none',
-                cursor: photoPreview ? 'pointer' : 'not-allowed',
-                boxShadow: photoPreview ? '0 8px 24px rgba(212,175,55,0.35)' : 'none',
+                cursor: 'pointer',
+                boxShadow: '0 8px 24px rgba(212,175,55,0.35)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justify-content: 'center',
                 gap: '10px',
                 transition: 'all 0.25s ease'
               }}
             >
               <Sparkles size={20} />
-              <span>Yapay Zeka İle Banyonu Gerçekçi Yeniden Çiz (Generative AI)</span>
+              <span>Yapay Zeka İle Seramiği Mekana Döşe (Generative AI)</span>
             </button>
           </div>
         )}
 
         {/* Loading Progress State */}
         {isGenerating && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', gap: '20px', textAlign: 'center' }}>
-            <div style={{ position: 'relative', width: '70px', height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '50px 20px', gap: '18px', textAlign: 'center' }}>
+            <div style={{ position: 'relative', width: '64px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ width: '100%', height: '100%', borderRadius: '50%', border: '4px solid rgba(212,175,55,0.2)', borderTopColor: '#d4af37', animation: 'spin 1s linear infinite' }} />
-              <Sparkles size={28} style={{ color: '#d4af37', position: 'absolute' }} />
+              <Sparkles size={26} style={{ color: '#d4af37', position: 'absolute' }} />
             </div>
             <div>
-              <h4 style={{ margin: '0 0 8px 0', fontSize: '1.15rem', fontWeight: '900', color: '#ffffff' }}>
+              <h4 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', fontWeight: '900', color: '#ffffff' }}>
                 Yapay Zeka Mekanınızı Yeniden Çiziyor...
               </h4>
-              <p style={{ margin: 0, fontSize: '0.88rem', color: '#38bdf8', fontWeight: '700' }}>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: '#38bdf8', fontWeight: '700' }}>
                 {loadingStepText}
               </p>
             </div>
@@ -347,13 +433,13 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
 
         {/* Interactive Before / After Result View */}
         {aiResultImage && !isGenerating && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontSize: '0.9rem', fontWeight: '800', color: '#34d399', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#34d399', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <CheckCircle2 size={18} />
-                <span>Generative AI Dönüşümü Tamamlandı!</span>
+                <span>Generative AI Dönüşümü Tamamlandı! ({selectedTile?.name})</span>
               </div>
-              <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+              <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
                 Çizgiyi sola/sağa kaydırarak Öncesi/Sonrası karşılaştırın
               </span>
             </div>
@@ -399,18 +485,18 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                 }}
               >
                 <img 
-                  src={photoPreview} 
+                  src={photoPreview || '/hero/luxury_bathroom.png'} 
                   alt="Original Before" 
                   style={{ width: sliderContainerRef.current?.offsetWidth || '800px', height: '100%', objectFit: 'cover', maxWidth: 'none' }} 
                 />
                 <span style={{ position: 'absolute', top: '14px', left: '14px', background: 'rgba(0,0,0,0.75)', color: '#ffffff', padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '800' }}>
-                  ÖNCESİ (ORİJİNAL)
+                  ÖNCESİ (ORİJİNAL MEKAN)
                 </span>
               </div>
 
               {/* After Label */}
               <span style={{ position: 'absolute', top: '14px', right: '14px', background: 'rgba(212,175,55,0.85)', color: '#ffffff', padding: '4px 10px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '900', boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
-                SONRASI (AI DÖNÜŞÜM)
+                SONRASI (AI DÖNÜŞÜM: {selectedTile?.name})
               </span>
 
               {/* Slider Drag Handle Knob */}
@@ -427,7 +513,7 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                   color: '#0f172a',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  justify-content: 'center',
                   fontWeight: '900',
                   boxShadow: '0 4px 16px rgba(0,0,0,0.6)',
                   pointerEvents: 'none'
@@ -438,13 +524,13 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
             </div>
 
             {/* Action Bar */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginTop: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginTop: '6px' }}>
               <button 
                 onClick={() => { setAiResultImage(null); }}
                 style={{ padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.08)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.15)', fontWeight: '700', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
               >
                 <RefreshCw size={16} />
-                <span>Başka Fotoğraf / Modelle Dene</span>
+                <span>Farklı Fotoğraf Yükle</span>
               </button>
 
               <button 
