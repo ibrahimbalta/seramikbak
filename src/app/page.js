@@ -802,6 +802,8 @@ export default function Home() {
   // Product Comparison Wizard States
   const [comparedProducts, setComparedProducts] = useState([]);
   const [showComparisonModal, setShowComparisonModal] = useState(false);
+  const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
+  const [howItWorksActiveTab, setHowItWorksActiveTab] = useState('customers');
 
   const toggleCompareProduct = (product) => {
     setComparedProducts(prev => {
@@ -3418,6 +3420,25 @@ export default function Home() {
               <HomeIcon size={13} />
               <span style={{ fontWeight: '800' }}>{t('home')}</span>
             </Link>
+            <button 
+              onClick={() => { setShowHowItWorksModal(true); setHowItWorksActiveTab('customers'); }}
+              className="utility-item portal-link"
+              style={{
+                background: 'rgba(212, 175, 55, 0.12)',
+                border: '1px solid rgba(212, 175, 55, 0.35)',
+                borderRadius: '16px',
+                padding: '2px 10px',
+                color: 'var(--accent-gold, #d4af37)',
+                fontWeight: '800',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              <HelpCircle size={13} />
+              <span>Nasıl Çalışır?</span>
+            </button>
             <Link href="/hakkimizda" className="utility-item portal-link">
               <Info size={13} />
               <span>{t('about')}</span>
@@ -6981,6 +7002,123 @@ export default function Home() {
                 </button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* HOW IT WORKS & DEALER ONBOARDING MODAL */}
+      {showHowItWorksModal && (
+        <div className="modal-overlay animate-fade-in" onClick={() => setShowHowItWorksModal(false)} style={{ zIndex: 99999 }}>
+          <div className="modal-content glass-panel-gold" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '680px', width: '92%', borderRadius: '24px', padding: '28px' }}>
+            
+            {/* Modal Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4af37' }}>
+                  <Sparkles size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)' }}>SeramikBak Rehberi</h3>
+                  <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>Platform kullanımı ve bayi ortaklığı hakkında bilgi alın</span>
+                </div>
+              </div>
+              <button onClick={() => setShowHowItWorksModal(false)} className="close-modal-btn" style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#ffffff', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', fontSize: '1rem' }}>✕</button>
+            </div>
+
+            {/* Modal Segmented Tab Switcher */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '14px', marginBottom: '24px' }}>
+              <button 
+                onClick={() => setHowItWorksActiveTab('customers')}
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: howItWorksActiveTab === 'customers' ? 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)' : 'transparent',
+                  color: howItWorksActiveTab === 'customers' ? '#ffffff' : '#94a3b8',
+                  fontWeight: '800',
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <HomeIcon size={15} />
+                <span>Müşteriler İçin (Nasıl Çalışır?)</span>
+              </button>
+
+              <button 
+                onClick={() => setHowItWorksActiveTab('dealers')}
+                style={{
+                  padding: '10px 16px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: howItWorksActiveTab === 'dealers' ? 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)' : 'transparent',
+                  color: howItWorksActiveTab === 'dealers' ? '#ffffff' : '#94a3b8',
+                  fontWeight: '800',
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Building2 size={15} />
+                <span>Seramik Bayileri İçin</span>
+              </button>
+            </div>
+
+            {/* Tab 1: For Customers */}
+            {howItWorksActiveTab === 'customers' ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(212,175,55,0.2)', color: '#d4af37', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>1</div>
+                  <div>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', fontWeight: '800', color: '#ffffff' }}>1. Modeli Seç & 3D Stüdyoda Dene</h4>
+                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#cbd5e1', lineHeight: '1.5' }}>Sitede binlerce seramik modelini inceleyin. 3D Sanal Stüdyo veya Web-AR kamera ile kendi banyonuzda canlı görün.</p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(212,175,55,0.2)', color: '#d4af37', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>2</div>
+                  <div>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', fontWeight: '800', color: '#ffffff' }}>2. En Yakın Bayiden Canlı Fiyat Al</h4>
+                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#cbd5e1', lineHeight: '1.5' }}>Şehrinizdeki yetkili bayilerin stok ve m² fiyatlarını karşılaştırın, tek tıkla canlı fiyat teklifi alın.</p>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(212,175,55,0.2)', color: '#d4af37', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>3</div>
+                  <div>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', fontWeight: '800', color: '#ffffff' }}>3. Mimar Destekli Kapına Gelsin</h4>
+                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#cbd5e1', lineHeight: '1.5' }}>İster numune karo talep edin, ister nakliye ve usta desteğiyle kapınıza kadar güvenle teslim alın.</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Tab 2: For Dealers */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '16px', padding: '18px' }}>
+                  <h4 style={{ margin: '0 0 8px 0', fontSize: '1rem', fontWeight: '800', color: '#ffffff' }}>🏬 Showroom'unuzu Dijitalleştirin</h4>
+                  <p style={{ margin: '0 0 12px 0', fontSize: '0.83rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                    Mağazanızı haritamıza ekleyin, stoklu seramiklerinizi sergileyin ve 3D Sanal Stüdyo Kiosk sistemini mağazanızdaki tablet ve ekranlarda anında kullanın.
+                  </p>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                    <Link href="/bayi" onClick={() => setShowHowItWorksModal(false)} className="btn-primary" style={{ padding: '8px 18px', fontSize: '0.82rem', borderRadius: '10px', textDecoration: 'none', fontWeight: '800' }}>
+                      Hemen Bayi Paneline Gir
+                    </Link>
+                    <Link href="/proje-talep" onClick={() => setShowHowItWorksModal(false)} style={{ padding: '8px 18px', fontSize: '0.82rem', borderRadius: '10px', textDecoration: 'none', fontWeight: '700', background: 'rgba(255,255,255,0.08)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.2)' }}>
+                      Demo Talep Et
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       )}
