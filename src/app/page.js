@@ -60,6 +60,7 @@ import {
   Smartphone,
   Store
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import WebARModal from '@/components/WebARModal';
 import AIRemodelModal from '@/components/AIRemodelModal';
 
