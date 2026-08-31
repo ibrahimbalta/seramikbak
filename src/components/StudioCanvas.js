@@ -63,6 +63,7 @@ export default function StudioCanvas({
   const ambientLightRef = useRef(null);
   const directionalLightRef = useRef(null);
   const pointLightRef = useRef(null);
+  const imageCacheRef = useRef(new Map());
 
   // Tracks loading state and type
   const [textureStatus, setTextureStatus] = useState('Procedural (Fallback)');
@@ -1427,11 +1428,47 @@ export default function StudioCanvas({
 
   }, [lightTemp, lightIntensity, timeOfDay, isSceneReady]);
 
-  // Regenerate tile textures and repeat maps reactively
+  // Regenerate tile textures and repeat maps reactively with instant 0-ms visual tiling & RAM caching
   useEffect(() => {
     if (!isSceneReady || !sceneRef.current) return;
 
     const loader = new THREE.TextureLoader();
+
+    // Instant (0-ms) procedural preview + RAM cached high-res JPG loader helper
+    const loadAndApplyTexture = (product, applyCallback) => {
+      if (!product) return;
+
+      // 1. INSTANT 0-MS PROCEDURAL TILE RENDER (Zero lag, zero delay)
+      const proceduralCanvas = generateProceduralTexture(product);
+      applyCallback(proceduralCanvas, false);
+
+      // 2. ASYNC HIGH-RES JPG PHOTO UPGRADE WITH RAM CACHING
+      const realTextureUrl = product.textureUrl || product.imageUrl;
+      if (realTextureUrl) {
+        const isAbsolute = realTextureUrl.startsWith('http://') || realTextureUrl.startsWith('https://') || realTextureUrl.startsWith('//');
+        const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realTextureUrl)}` : realTextureUrl;
+
+        if (imageCacheRef.current.has(finalUrl)) {
+          // Direct 0ms RAM retrieval from cache!
+          const cachedImg = imageCacheRef.current.get(finalUrl);
+          applyCallback(cachedImg, true);
+        } else {
+          loader.load(
+            finalUrl,
+            (loadedTexture) => {
+              if (loadedTexture && loadedTexture.image) {
+                imageCacheRef.current.set(finalUrl, loadedTexture.image);
+                applyCallback(loadedTexture.image, true);
+              }
+            },
+            undefined,
+            () => {
+              // Keep procedural preview if load fails
+            }
+          );
+        }
+      }
+    };
 
     // 1. FLOOR TILING LOGIC
     if (applyFloor && floorProduct) {
@@ -1445,32 +1482,15 @@ export default function StudioCanvas({
         texture.repeat.set(repeatX, repeatY);
         texture.colorSpace = THREE.SRGBColorSpace;
 
-        let roughness = 0.5;
-        let metalness = 0.1;
-        let clearcoat = 0.0;
-        let clearcoatRoughness = 0.0;
-
-        if (floorProduct.finish === 'Parlak') {
-          roughness = 0.08;
-          metalness = 0.15;
-          clearcoat = 1.0;
-          clearcoatRoughness = 0.05;
-        } else if (floorProduct.finish === 'Mat') {
-          roughness = 0.85;
-          metalness = 0.05;
-        } else if (floorProduct.finish === 'Lapatto') {
-          roughness = 0.35;
-          metalness = 0.1;
-          clearcoat = 0.4;
-          clearcoatRoughness = 0.2;
-        }
+        let roughness = floorProduct.finish === 'Parlak' ? 0.08 : (floorProduct.finish === 'Lapatto' ? 0.35 : 0.85);
+        let metalness = floorProduct.finish === 'Parlak' ? 0.15 : 0.05;
+        let clearcoat = floorProduct.finish === 'Parlak' ? 1.0 : (floorProduct.finish === 'Lapatto' ? 0.4 : 0.0);
 
         const newMaterial = new THREE.MeshPhysicalMaterial({
           map: texture,
-          roughness: roughness,
-          metalness: metalness,
-          clearcoat: clearcoat,
-          clearcoatRoughness: clearcoatRoughness
+          roughness,
+          metalness,
+          clearcoat
         });
 
         if (floorMeshRef.current) {
@@ -1481,27 +1501,8 @@ export default function StudioCanvas({
         setTextureStatus(isImage ? 'Real JPG Image Loaded' : 'Procedural Fallback Generated');
       };
 
-      const realTextureUrl = floorProduct.textureUrl || floorProduct.imageUrl;
-      if (realTextureUrl) {
-        const isAbsolute = realTextureUrl.startsWith('http://') || realTextureUrl.startsWith('https://') || realTextureUrl.startsWith('//');
-        const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realTextureUrl)}` : realTextureUrl;
-        loader.load(
-          finalUrl,
-          (loadedTexture) => {
-            applyFloorTexture(loadedTexture.image, true);
-          },
-          undefined,
-          () => {
-            const proceduralCanvas = generateProceduralTexture(floorProduct);
-            applyFloorTexture(proceduralCanvas, false);
-          }
-        );
-      } else {
-        const proceduralCanvas = generateProceduralTexture(floorProduct);
-        applyFloorTexture(proceduralCanvas, false);
-      }
+      loadAndApplyTexture(floorProduct, applyFloorTexture);
     } else {
-      // Apply default plain floor
       if (floorMeshRef.current) {
         if (floorMeshRef.current.material.map) floorMeshRef.current.material.map.dispose();
         floorMeshRef.current.material.dispose();
@@ -1514,43 +1515,19 @@ export default function StudioCanvas({
       const w_m = wallProduct.width / 100;
       const h_m = wallProduct.height / 100;
       const repeatX = ROOM_WIDTH / w_m;
-      const repeatY = ROOM_DEPTH / h_m;
       const wallRepeatY = ROOM_HEIGHT / h_m;
 
       const applyWallsTexture = (sourceImageOrCanvas, isImage = true) => {
         const texture = generateGroutOverlay(sourceImageOrCanvas, wallProduct, groutWidth, groutColor, tileRotation, layPattern);
         texture.colorSpace = THREE.SRGBColorSpace;
 
-        let roughness = 0.5;
-        let metalness = 0.1;
-        let clearcoat = 0.0;
-        let clearcoatRoughness = 0.0;
-
-        if (wallProduct.finish === 'Parlak') {
-          roughness = 0.08;
-          metalness = 0.15;
-          clearcoat = 1.0;
-          clearcoatRoughness = 0.05;
-        } else if (wallProduct.finish === 'Mat') {
-          roughness = 0.85;
-          metalness = 0.05;
-        } else if (wallProduct.finish === 'Lapatto') {
-          roughness = 0.35;
-          metalness = 0.1;
-          clearcoat = 0.4;
-          clearcoatRoughness = 0.2;
-        }
+        let roughness = wallProduct.finish === 'Parlak' ? 0.08 : 0.85;
+        let clearcoat = wallProduct.finish === 'Parlak' ? 1.0 : 0.0;
 
         // Back Wall
         const backTexture = texture.clone();
         backTexture.repeat.set(repeatX, wallRepeatY);
-        const backWallMat = new THREE.MeshPhysicalMaterial({
-          map: backTexture,
-          roughness: roughness,
-          metalness: metalness,
-          clearcoat: clearcoat,
-          clearcoatRoughness: clearcoatRoughness
-        });
+        const backWallMat = new THREE.MeshPhysicalMaterial({ map: backTexture, roughness, clearcoat });
         if (backWallMeshRef.current) {
           if (backWallMeshRef.current.material.map) backWallMeshRef.current.material.map.dispose();
           backWallMeshRef.current.material.dispose();
@@ -1559,7 +1536,6 @@ export default function StudioCanvas({
 
         // Left Wall: If comparisonMode is active and comparisonProduct exists, apply comparisonProduct to Left Wall!
         const compTargetProduct = (comparisonMode && comparisonProduct) ? comparisonProduct : wallProduct;
-        const compRealUrl = compTargetProduct.textureUrl || compTargetProduct.imageUrl;
 
         const applyLeftWallMat = (leftSource) => {
           const compTex = generateGroutOverlay(leftSource, compTargetProduct, groutWidth, groutColor, tileRotation, layPattern);
@@ -1580,36 +1556,15 @@ export default function StudioCanvas({
           }
         };
 
-        if (comparisonMode && comparisonProduct && compRealUrl) {
-          const isAbs = compRealUrl.startsWith('http://') || compRealUrl.startsWith('https://') || compRealUrl.startsWith('//');
-          const compFinalUrl = isAbs ? `/api/proxy?url=${encodeURIComponent(compRealUrl)}` : compRealUrl;
-          loader.load(compFinalUrl, (loaded) => applyLeftWallMat(loaded.image), undefined, () => applyLeftWallMat(generateProceduralTexture(compTargetProduct)));
+        if (comparisonMode && comparisonProduct) {
+          loadAndApplyTexture(comparisonProduct, applyLeftWallMat);
         } else {
           applyLeftWallMat(sourceImageOrCanvas);
         }
       };
 
-      const realTextureUrl = wallProduct.textureUrl || wallProduct.imageUrl;
-      if (realTextureUrl) {
-        const isAbsolute = realTextureUrl.startsWith('http://') || realTextureUrl.startsWith('https://') || realTextureUrl.startsWith('//');
-        const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realTextureUrl)}` : realTextureUrl;
-        loader.load(
-          finalUrl,
-          (loadedTexture) => {
-            applyWallsTexture(loadedTexture.image, true);
-          },
-          undefined,
-          () => {
-            const proceduralCanvas = generateProceduralTexture(wallProduct);
-            applyWallsTexture(proceduralCanvas, false);
-          }
-        );
-      } else {
-        const proceduralCanvas = generateProceduralTexture(wallProduct);
-        applyWallsTexture(proceduralCanvas, false);
-      }
+      loadAndApplyTexture(wallProduct, applyWallsTexture);
     } else {
-      // Apply default plain walls
       if (backWallMeshRef.current) {
         if (backWallMeshRef.current.material.map) backWallMeshRef.current.material.map.dispose();
         backWallMeshRef.current.material.dispose();
@@ -1626,237 +1581,199 @@ export default function StudioCanvas({
     if (accentWallMeshRef.current) {
       accentWallMeshRef.current.visible = !!applyAccent;
     }
-    if (applyAccent && accentWallMeshRef.current) {
-      if (accentProduct) {
-        const w_m = accentProduct.width / 100;
-        const h_m = accentProduct.height / 100;
+    if (applyAccent && accentWallMeshRef.current && accentProduct) {
+      const w_m = accentProduct.width / 100;
+      const h_m = accentProduct.height / 100;
 
-        const applyAccentTexture = (sourceImageOrCanvas) => {
-          const texture = generateGroutOverlay(sourceImageOrCanvas, accentProduct, groutWidth, groutColor, tileRotation, layPattern);
-          texture.repeat.set(1.3 / w_m, ROOM_HEIGHT / h_m);
-          texture.colorSpace = THREE.SRGBColorSpace;
-          if (accentWallMeshRef.current) {
-            accentWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
-              map: texture,
-              roughness: accentProduct.finish === 'Parlak' ? 0.08 : 0.85,
-              clearcoat: accentProduct.finish === 'Parlak' ? 1.0 : 0.0
-            });
-          }
-        };
-
-        const realUrl = accentProduct.textureUrl || accentProduct.imageUrl;
-        if (realUrl) {
-          const isAbsolute = realUrl.startsWith('http://') || realUrl.startsWith('https://') || realUrl.startsWith('//');
-          const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realUrl)}` : realUrl;
-          loader.load(finalUrl, (loaded) => applyAccentTexture(loaded.image), undefined, () => applyAccentTexture(generateProceduralTexture(accentProduct)));
-        } else {
-          applyAccentTexture(generateProceduralTexture(accentProduct));
+      const applyAccentTexture = (sourceImageOrCanvas) => {
+        const texture = generateGroutOverlay(sourceImageOrCanvas, accentProduct, groutWidth, groutColor, tileRotation, layPattern);
+        texture.repeat.set(1.3 / w_m, ROOM_HEIGHT / h_m);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        if (accentWallMeshRef.current) {
+          if (accentWallMeshRef.current.material.map) accentWallMeshRef.current.material.map.dispose();
+          accentWallMeshRef.current.material.dispose();
+          accentWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
+            map: texture,
+            roughness: accentProduct.finish === 'Parlak' ? 0.08 : 0.85,
+            clearcoat: accentProduct.finish === 'Parlak' ? 1.0 : 0.0
+          });
         }
-      } else {
-        accentWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
-      }
+      };
+
+      loadAndApplyTexture(accentProduct, applyAccentTexture);
+    } else if (accentWallMeshRef.current && !accentProduct) {
+      accentWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
     // 4. SHOWER CABIN WALLS (DUŞAKABİN İKİ TARAF) LOGIC
     if (showerBackWallMeshRef.current) showerBackWallMeshRef.current.visible = !!applyShower;
     if (showerSideWallMeshRef.current) showerSideWallMeshRef.current.visible = !!applyShower;
-    if (applyShower && (showerBackWallMeshRef.current || showerSideWallMeshRef.current)) {
-      if (showerProduct) {
-        const w_m = showerProduct.width / 100;
-        const h_m = showerProduct.height / 100;
+    if (applyShower && showerProduct && (showerBackWallMeshRef.current || showerSideWallMeshRef.current)) {
+      const w_m = showerProduct.width / 100;
+      const h_m = showerProduct.height / 100;
 
-        const applyShowerTexture = (sourceImageOrCanvas) => {
-          const texture = generateGroutOverlay(sourceImageOrCanvas, showerProduct, groutWidth, groutColor, tileRotation, layPattern);
-          texture.colorSpace = THREE.SRGBColorSpace;
+      const applyShowerTexture = (sourceImageOrCanvas) => {
+        const texture = generateGroutOverlay(sourceImageOrCanvas, showerProduct, groutWidth, groutColor, tileRotation, layPattern);
+        texture.colorSpace = THREE.SRGBColorSpace;
 
-          const backTex = texture.clone();
-          backTex.repeat.set(1.15 / w_m, ROOM_HEIGHT / h_m);
-          const showerBackMat = new THREE.MeshPhysicalMaterial({
-            map: backTex,
-            roughness: showerProduct.finish === 'Parlak' ? 0.08 : 0.85,
-            clearcoat: showerProduct.finish === 'Parlak' ? 1.0 : 0.0
-          });
-          if (showerBackWallMeshRef.current) showerBackWallMeshRef.current.material = showerBackMat;
-
-          const sideTex = texture.clone();
-          sideTex.repeat.set(1.15 / w_m, ROOM_HEIGHT / h_m);
-          const showerSideMat = new THREE.MeshPhysicalMaterial({
-            map: sideTex,
-            roughness: showerProduct.finish === 'Parlak' ? 0.08 : 0.85,
-            clearcoat: showerProduct.finish === 'Parlak' ? 1.0 : 0.0
-          });
-          if (showerSideWallMeshRef.current) showerSideWallMeshRef.current.material = showerSideMat;
-        };
-
-        const realUrl = showerProduct.textureUrl || showerProduct.imageUrl;
-        if (realUrl) {
-          const isAbsolute = realUrl.startsWith('http://') || realUrl.startsWith('https://') || realUrl.startsWith('//');
-          const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realUrl)}` : realUrl;
-          loader.load(finalUrl, (loaded) => applyShowerTexture(loaded.image), undefined, () => applyShowerTexture(generateProceduralTexture(showerProduct)));
-        } else {
-          applyShowerTexture(generateProceduralTexture(showerProduct));
+        const backTex = texture.clone();
+        backTex.repeat.set(1.15 / w_m, ROOM_HEIGHT / h_m);
+        const showerBackMat = new THREE.MeshPhysicalMaterial({
+          map: backTex,
+          roughness: showerProduct.finish === 'Parlak' ? 0.08 : 0.85,
+          clearcoat: showerProduct.finish === 'Parlak' ? 1.0 : 0.0
+        });
+        if (showerBackWallMeshRef.current) {
+          if (showerBackWallMeshRef.current.material.map) showerBackWallMeshRef.current.material.map.dispose();
+          showerBackWallMeshRef.current.material.dispose();
+          showerBackWallMeshRef.current.material = showerBackMat;
         }
-      } else {
-        if (showerBackWallMeshRef.current) showerBackWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
-        if (showerSideWallMeshRef.current) showerSideWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
-      }
+
+        const sideTex = texture.clone();
+        sideTex.repeat.set(1.15 / w_m, ROOM_HEIGHT / h_m);
+        const showerSideMat = new THREE.MeshPhysicalMaterial({
+          map: sideTex,
+          roughness: showerProduct.finish === 'Parlak' ? 0.08 : 0.85,
+          clearcoat: showerProduct.finish === 'Parlak' ? 1.0 : 0.0
+        });
+        if (showerSideWallMeshRef.current) {
+          if (showerSideWallMeshRef.current.material.map) showerSideWallMeshRef.current.material.map.dispose();
+          showerSideWallMeshRef.current.material.dispose();
+          showerSideWallMeshRef.current.material = showerSideMat;
+        }
+      };
+
+      loadAndApplyTexture(showerProduct, applyShowerTexture);
+    } else if (!showerProduct) {
+      if (showerBackWallMeshRef.current) showerBackWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+      if (showerSideWallMeshRef.current) showerSideWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
     // 5. TOILET BACK WALL (KLOZET ARKASI VURGU DUVARI) LOGIC
     if (toiletWallMeshRef.current) toiletWallMeshRef.current.visible = !!applyToiletWall;
-    if (applyToiletWall && toiletWallMeshRef.current) {
-      if (toiletWallProduct) {
-        const w_m = toiletWallProduct.width / 100;
-        const h_m = toiletWallProduct.height / 100;
+    if (applyToiletWall && toiletWallMeshRef.current && toiletWallProduct) {
+      const w_m = toiletWallProduct.width / 100;
+      const h_m = toiletWallProduct.height / 100;
 
-        const applyToiletTexture = (sourceImageOrCanvas) => {
-          const texture = generateGroutOverlay(sourceImageOrCanvas, toiletWallProduct, groutWidth, groutColor, tileRotation, layPattern);
-          texture.repeat.set(1.0 / w_m, ROOM_HEIGHT / h_m);
-          texture.colorSpace = THREE.SRGBColorSpace;
-          if (toiletWallMeshRef.current) {
-            toiletWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
-              map: texture,
-              roughness: toiletWallProduct.finish === 'Parlak' ? 0.08 : 0.85,
-              clearcoat: toiletWallProduct.finish === 'Parlak' ? 1.0 : 0.0
-            });
-          }
-        };
-
-        const realUrl = toiletWallProduct.textureUrl || toiletWallProduct.imageUrl;
-        if (realUrl) {
-          const isAbsolute = realUrl.startsWith('http://') || realUrl.startsWith('https://') || realUrl.startsWith('//');
-          const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realUrl)}` : realUrl;
-          loader.load(finalUrl, (loaded) => applyToiletTexture(loaded.image), undefined, () => applyToiletTexture(generateProceduralTexture(toiletWallProduct)));
-        } else {
-          applyToiletTexture(generateProceduralTexture(toiletWallProduct));
+      const applyToiletTexture = (sourceImageOrCanvas) => {
+        const texture = generateGroutOverlay(sourceImageOrCanvas, toiletWallProduct, groutWidth, groutColor, tileRotation, layPattern);
+        texture.repeat.set(1.0 / w_m, ROOM_HEIGHT / h_m);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        if (toiletWallMeshRef.current) {
+          if (toiletWallMeshRef.current.material.map) toiletWallMeshRef.current.material.map.dispose();
+          toiletWallMeshRef.current.material.dispose();
+          toiletWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
+            map: texture,
+            roughness: toiletWallProduct.finish === 'Parlak' ? 0.08 : 0.85,
+            clearcoat: toiletWallProduct.finish === 'Parlak' ? 1.0 : 0.0
+          });
         }
-      } else {
-        toiletWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
-      }
+      };
+
+      loadAndApplyTexture(toiletWallProduct, applyToiletTexture);
+    } else if (toiletWallMeshRef.current && !toiletWallProduct) {
+      toiletWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
     // 6. LEFT WALL ACCENT PANEL (SOL YAN DUVAR VURGU BÖLGESİ) LOGIC
     if (leftWallAccentMeshRef.current) leftWallAccentMeshRef.current.visible = !!applyLeftWallAccent;
-    if (applyLeftWallAccent && leftWallAccentMeshRef.current) {
-      if (leftWallAccentProduct) {
-        const w_m = leftWallAccentProduct.width / 100;
-        const h_m = leftWallAccentProduct.height / 100;
+    if (applyLeftWallAccent && leftWallAccentMeshRef.current && leftWallAccentProduct) {
+      const w_m = leftWallAccentProduct.width / 100;
+      const h_m = leftWallAccentProduct.height / 100;
 
-        const applyLeftAccentTexture = (sourceImageOrCanvas) => {
-          const texture = generateGroutOverlay(sourceImageOrCanvas, leftWallAccentProduct, groutWidth, groutColor, tileRotation, layPattern);
-          texture.repeat.set(1.1 / w_m, ROOM_HEIGHT / h_m);
-          texture.colorSpace = THREE.SRGBColorSpace;
-          if (leftWallAccentMeshRef.current) {
-            leftWallAccentMeshRef.current.material = new THREE.MeshPhysicalMaterial({
-              map: texture,
-              roughness: leftWallAccentProduct.finish === 'Parlak' ? 0.08 : 0.85,
-              clearcoat: leftWallAccentProduct.finish === 'Parlak' ? 1.0 : 0.0
-            });
-          }
-        };
-
-        const realUrl = leftWallAccentProduct.textureUrl || leftWallAccentProduct.imageUrl;
-        if (realUrl) {
-          const isAbsolute = realUrl.startsWith('http://') || realUrl.startsWith('https://') || realUrl.startsWith('//');
-          const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realUrl)}` : realUrl;
-          loader.load(finalUrl, (loaded) => applyLeftAccentTexture(loaded.image), undefined, () => applyLeftAccentTexture(generateProceduralTexture(leftWallAccentProduct)));
-        } else {
-          applyLeftAccentTexture(generateProceduralTexture(leftWallAccentProduct));
+      const applyLeftAccentTexture = (sourceImageOrCanvas) => {
+        const texture = generateGroutOverlay(sourceImageOrCanvas, leftWallAccentProduct, groutWidth, groutColor, tileRotation, layPattern);
+        texture.repeat.set(1.1 / w_m, ROOM_HEIGHT / h_m);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        if (leftWallAccentMeshRef.current) {
+          if (leftWallAccentMeshRef.current.material.map) leftWallAccentMeshRef.current.material.map.dispose();
+          leftWallAccentMeshRef.current.material.dispose();
+          leftWallAccentMeshRef.current.material = new THREE.MeshPhysicalMaterial({
+            map: texture,
+            roughness: leftWallAccentProduct.finish === 'Parlak' ? 0.08 : 0.85,
+            clearcoat: leftWallAccentProduct.finish === 'Parlak' ? 1.0 : 0.0
+          });
         }
-      } else {
-        leftWallAccentMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
-      }
+      };
+
+      loadAndApplyTexture(leftWallAccentProduct, applyLeftAccentTexture);
+    } else if (leftWallAccentMeshRef.current && !leftWallAccentProduct) {
+      leftWallAccentMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
     // 7. HORIZONTAL STRIPE ACCENT BAND (YATAY BORDÜR / ŞERİT KUŞAĞI - DUVARLARI SARAN BANT) LOGIC
     if (stripeWallMeshRef.current) stripeWallMeshRef.current.visible = !!applyStripeWall;
     if (leftStripeWallMeshRef.current) leftStripeWallMeshRef.current.visible = !!applyStripeWall;
-    if (applyStripeWall && (stripeWallMeshRef.current || leftStripeWallMeshRef.current)) {
-      if (stripeWallProduct) {
-        const w_m = stripeWallProduct.width / 100;
-        const h_m = stripeWallProduct.height / 100;
+    if (applyStripeWall && stripeWallProduct && (stripeWallMeshRef.current || leftStripeWallMeshRef.current)) {
+      const w_m = stripeWallProduct.width / 100;
+      const h_m = stripeWallProduct.height / 100;
 
-        const applyStripeTexture = (sourceImageOrCanvas) => {
-          const texture = generateGroutOverlay(sourceImageOrCanvas, stripeWallProduct, groutWidth, groutColor, tileRotation, layPattern);
-          texture.colorSpace = THREE.SRGBColorSpace;
+      const applyStripeTexture = (sourceImageOrCanvas) => {
+        const texture = generateGroutOverlay(sourceImageOrCanvas, stripeWallProduct, groutWidth, groutColor, tileRotation, layPattern);
+        texture.colorSpace = THREE.SRGBColorSpace;
 
-          const roughness = stripeWallProduct.finish === 'Parlak' ? 0.08 : 0.85;
-          const clearcoat = stripeWallProduct.finish === 'Parlak' ? 1.0 : 0.0;
+        const roughness = stripeWallProduct.finish === 'Parlak' ? 0.08 : 0.85;
+        const clearcoat = stripeWallProduct.finish === 'Parlak' ? 1.0 : 0.0;
 
-          // Back Wall Stripe
-          if (stripeWallMeshRef.current) {
-            const backTex = texture.clone();
-            backTex.repeat.set(ROOM_WIDTH / w_m, 0.6 / h_m);
-            stripeWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
-              map: backTex,
-              roughness: roughness,
-              clearcoat: clearcoat
-            });
-          }
-
-          // Left Wall Stripe
-          if (leftStripeWallMeshRef.current) {
-            const leftTex = texture.clone();
-            leftTex.repeat.set(ROOM_DEPTH / w_m, 0.6 / h_m);
-            leftStripeWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
-              map: leftTex,
-              roughness: roughness,
-              clearcoat: clearcoat
-            });
-          }
-        };
-
-        const realUrl = stripeWallProduct.textureUrl || stripeWallProduct.imageUrl;
-        if (realUrl) {
-          const isAbsolute = realUrl.startsWith('http://') || realUrl.startsWith('https://') || realUrl.startsWith('//');
-          const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realUrl)}` : realUrl;
-          loader.load(finalUrl, (loaded) => applyStripeTexture(loaded.image), undefined, () => applyStripeTexture(generateProceduralTexture(stripeWallProduct)));
-        } else {
-          applyStripeTexture(generateProceduralTexture(stripeWallProduct));
-        }
-      } else {
+        // Back Wall Stripe
         if (stripeWallMeshRef.current) {
-          stripeWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+          const backTex = texture.clone();
+          backTex.repeat.set(ROOM_WIDTH / w_m, 0.6 / h_m);
+          if (stripeWallMeshRef.current.material.map) stripeWallMeshRef.current.material.map.dispose();
+          stripeWallMeshRef.current.material.dispose();
+          stripeWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
+            map: backTex,
+            roughness,
+            clearcoat
+          });
         }
+
+        // Left Wall Stripe
         if (leftStripeWallMeshRef.current) {
-          leftStripeWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+          const leftTex = texture.clone();
+          leftTex.repeat.set(ROOM_DEPTH / w_m, 0.6 / h_m);
+          if (leftStripeWallMeshRef.current.material.map) leftStripeWallMeshRef.current.material.map.dispose();
+          leftStripeWallMeshRef.current.material.dispose();
+          leftStripeWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
+            map: leftTex,
+            roughness,
+            clearcoat
+          });
         }
-      }
+      };
+
+      loadAndApplyTexture(stripeWallProduct, applyStripeTexture);
+    } else if (!stripeWallProduct) {
+      if (stripeWallMeshRef.current) stripeWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
+      if (leftStripeWallMeshRef.current) leftStripeWallMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
     // 8. SHOWER FLOOR / TRAY (DUŞ TABANI / DUŞ TEKNESİ ZEMİNİ) LOGIC
     if (showerFloorMeshRef.current) {
       showerFloorMeshRef.current.visible = !!applyShowerFloor;
     }
-    if (applyShowerFloor && showerFloorMeshRef.current) {
-      if (showerFloorProduct) {
-        const w_m = showerFloorProduct.width / 100;
-        const h_m = showerFloorProduct.height / 100;
+    if (applyShowerFloor && showerFloorMeshRef.current && showerFloorProduct) {
+      const w_m = showerFloorProduct.width / 100;
+      const h_m = showerFloorProduct.height / 100;
 
-        const applyShowerFloorTexture = (sourceImageOrCanvas) => {
-          const texture = generateGroutOverlay(sourceImageOrCanvas, showerFloorProduct, groutWidth, groutColor, tileRotation, layPattern);
-          texture.repeat.set(1.15 / w_m, 1.15 / h_m);
-          texture.colorSpace = THREE.SRGBColorSpace;
-          if (showerFloorMeshRef.current) {
-            showerFloorMeshRef.current.material = new THREE.MeshPhysicalMaterial({
-              map: texture,
-              roughness: showerFloorProduct.finish === 'Parlak' ? 0.08 : 0.85,
-              clearcoat: showerFloorProduct.finish === 'Parlak' ? 1.0 : 0.0
-            });
-          }
-        };
-
-        const realUrl = showerFloorProduct.textureUrl || showerFloorProduct.imageUrl;
-        if (realUrl) {
-          const isAbsolute = realUrl.startsWith('http://') || realUrl.startsWith('https://') || realUrl.startsWith('//');
-          const finalUrl = isAbsolute ? `/api/proxy?url=${encodeURIComponent(realUrl)}` : realUrl;
-          loader.load(finalUrl, (loaded) => applyShowerFloorTexture(loaded.image), undefined, () => applyShowerFloorTexture(generateProceduralTexture(showerFloorProduct)));
-        } else {
-          applyShowerFloorTexture(generateProceduralTexture(showerFloorProduct));
+      const applyShowerFloorTexture = (sourceImageOrCanvas) => {
+        const texture = generateGroutOverlay(sourceImageOrCanvas, showerFloorProduct, groutWidth, groutColor, tileRotation, layPattern);
+        texture.repeat.set(1.15 / w_m, 1.15 / h_m);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        if (showerFloorMeshRef.current) {
+          if (showerFloorMeshRef.current.material.map) showerFloorMeshRef.current.material.map.dispose();
+          showerFloorMeshRef.current.material.dispose();
+          showerFloorMeshRef.current.material = new THREE.MeshPhysicalMaterial({
+            map: texture,
+            roughness: showerFloorProduct.finish === 'Parlak' ? 0.08 : 0.85,
+            clearcoat: showerFloorProduct.finish === 'Parlak' ? 1.0 : 0.0
+          });
         }
-      } else {
-        showerFloorMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
-      }
+      };
+
+      loadAndApplyTexture(showerFloorProduct, applyShowerFloorTexture);
+    } else if (showerFloorMeshRef.current && !showerFloorProduct) {
+      showerFloorMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
   }, [floorProduct, wallProduct, accentProduct, showerProduct, showerFloorProduct, toiletWallProduct, leftWallAccentProduct, stripeWallProduct, comparisonProduct, comparisonMode, walkthroughMode, applyFloor, applyWalls, applyAccent, applyShower, applyShowerFloor, applyToiletWall, applyLeftWallAccent, applyStripeWall, groutWidth, groutColor, tileRotation, layPattern, isSceneReady]);

@@ -7,6 +7,8 @@
 
 export function cropWhiteBorders(sourceImageOrCanvas) {
   if (!sourceImageOrCanvas || typeof window === 'undefined') return sourceImageOrCanvas;
+  if (sourceImageOrCanvas instanceof HTMLCanvasElement) return sourceImageOrCanvas;
+  if (sourceImageOrCanvas._croppedCanvas) return sourceImageOrCanvas._croppedCanvas;
 
   try {
     const w = sourceImageOrCanvas.width || sourceImageOrCanvas.naturalWidth;
@@ -117,9 +119,11 @@ export function cropWhiteBorders(sourceImageOrCanvas) {
       croppedCanvas.height = cropH;
       const croppedCtx = croppedCanvas.getContext('2d');
       croppedCtx.drawImage(sourceImageOrCanvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+      sourceImageOrCanvas._croppedCanvas = croppedCanvas;
       return croppedCanvas;
     }
 
+    sourceImageOrCanvas._croppedCanvas = sourceImageOrCanvas;
     return sourceImageOrCanvas;
   } catch (err) {
     console.warn('Auto crop white borders warning:', err);
