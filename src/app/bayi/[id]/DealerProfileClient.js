@@ -316,7 +316,20 @@ export default function DealerProfileClient({ dealer, products }) {
           {/* Quick Actions */}
           <div className="profile-actions" style={{ zIndex: 1 }}>
             <Link 
-              href="/kiosk" 
+              href={featuredProductsList.length > 0 ? `/kiosk?productId=${encodeURIComponent(featuredProductsList[0].id)}&code=${encodeURIComponent(featuredProductsList[0].code || '')}` : "/kiosk"} 
+              onClick={() => {
+                if (featuredProductsList.length > 0) {
+                  try {
+                    const prod = featuredProductsList[0];
+                    const selectedObj = {
+                      ...prod,
+                      textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
+                      imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
+                    };
+                    sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
+                  } catch(e) {}
+                }
+              }}
               className="btn-3d-studio-hero"
             >
               <Sparkles size={16} />
@@ -1093,14 +1106,37 @@ export default function DealerProfileClient({ dealer, products }) {
                         )}
                       </div>
                     </div>
-                    <button 
-                      type="button" 
-                      onClick={() => handleFeatureClick(prod.id)}
-                      className="featured-product-action-btn"
-                    >
-                      <span>Stoktan Teklif İsteyin</span>
-                      <ArrowRight size={12} />
-                    </button>
+                    <div className="product-card-actions-group" style={{ display: 'flex', gap: '8px' }}>
+                      <Link 
+                        href={`/kiosk?productId=${encodeURIComponent(prod.id)}&code=${encodeURIComponent(prod.code || '')}`}
+                        onClick={() => {
+                          try {
+                            const selectedObj = {
+                              ...prod,
+                              unitPrice: item.price || prod.unitPrice,
+                              textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
+                              imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
+                            };
+                            sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
+                          } catch(e) {}
+                        }}
+                        className="btn-3d-try-card"
+                        title="Bu ürünü 3D Sanal Banyo Stüdyosu'nda canlı uygulayın"
+                        style={{ flex: 1, textDecoration: 'none' }}
+                      >
+                        <Sparkles size={13} />
+                        3D'de Kapla
+                      </Link>
+                      <button 
+                        type="button" 
+                        onClick={() => handleFeatureClick(prod.id)}
+                        className="featured-product-action-btn"
+                        style={{ flex: 1 }}
+                      >
+                        <span>Stoktan Teklif İsteyin</span>
+                        <ArrowRight size={12} />
+                      </button>
+                    </div>
                   </div>
                 );
               })}
@@ -1135,7 +1171,17 @@ export default function DealerProfileClient({ dealer, products }) {
                   </div>
                   <div className="product-card-actions-group">
                     <Link 
-                      href="/kiosk"
+                      href={`/kiosk?productId=${encodeURIComponent(prod.id)}&code=${encodeURIComponent(prod.code || '')}`}
+                      onClick={() => {
+                        try {
+                          const selectedObj = {
+                            ...prod,
+                            textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
+                            imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
+                          };
+                          sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
+                        } catch(e) {}
+                      }}
                       className="btn-3d-try-card"
                       title="Bu ürünü 3D Sanal Banyo Stüdyosu'nda canlı uygulayın"
                     >

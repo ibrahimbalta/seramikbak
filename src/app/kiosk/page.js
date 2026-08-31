@@ -86,13 +86,27 @@ const BRAND_CATALOG = [
   { id: 'qua-1', name: 'Qua Travertino Classico Granite', code: 'QUA-TRAV-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Mega Slab', color: 'Krem Traverten', brand: { id: 'qua', name: 'Qua Granite' }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 590 }
 ];
 
+const getTextureFallback = (prod) => {
+  if (!prod) return '/textures/calacatta_gold.jpg';
+  const str = `${prod.style || ''} ${prod.color || ''} ${prod.name || ''}`.toLowerCase();
+  if (str.includes('ahşap') || str.includes('wood') || str.includes('oak') || str.includes('teak')) {
+    return '/textures/natural_oak.jpg';
+  }
+  if (str.includes('beton') || str.includes('concrete') || str.includes('cement') || str.includes('stark')) {
+    return '/textures/concrete_light_grey.jpg';
+  }
+  if (str.includes('taş') || str.includes('stone') || str.includes('traver') || str.includes('bej') || str.includes('beige') || str.includes('roca')) {
+    return '/textures/vista_bej.jpg';
+  }
+  if (str.includes('antrasit') || str.includes('fume') || str.includes('charcoal') || str.includes('dark') || str.includes('grey') || str.includes('gray')) {
+    return '/textures/albatros_antrasit.jpg';
+  }
+  return '/textures/calacatta_gold.jpg';
+};
+
 export default function ShowroomKioskPage() {
   const canvasContainerRef = useRef(null);
   const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Ürün ve Marka Eyaletleri
   const [products, setProducts] = useState(BRAND_CATALOG);
@@ -104,13 +118,75 @@ export default function ShowroomKioskPage() {
   // 3D Sanal Stüdyo Yüzey Seçimleri
   const [selectedProduct, setSelectedProduct] = useState(BRAND_CATALOG[0]);
   const [floorProduct, setFloorProduct] = useState(BRAND_CATALOG[0]);
-  const [wallProduct, setWallProduct] = useState(BRAND_CATALOG[1] || BRAND_CATALOG[0]);
+  const [wallProduct, setWallProduct] = useState(BRAND_CATALOG[0]);
   const [accentProduct, setAccentProduct] = useState(null);
   const [showerProduct, setShowerProduct] = useState(null);
   const [showerFloorProduct, setShowerFloorProduct] = useState(null);
   const [toiletWallProduct, setToiletWallProduct] = useState(null);
   const [stripeWallProduct, setStripeWallProduct] = useState(null);
   const [comparisonProduct, setComparisonProduct] = useState(null);
+
+  // Showroom'dan seçilip gelinen seramiği zemin ve duvara uygula
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window === 'undefined') return;
+
+    let targetProduct = null;
+
+    // 1. Session Storage kontrolü (Showroom kartına tıklanınca anında yazılan ürün)
+    try {
+      const stored = sessionStorage.getItem('kiosk_selected_product');
+      if (stored) {
+        targetProduct = JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error('Kiosk sessionStorage read error:', e);
+    }
+
+    // 2. URL searchParams kontrolü (?productId=... &code=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramProductId = urlParams.get('productId') || urlParams.get('product') || urlParams.get('id');
+    const paramCode = urlParams.get('code');
+
+    if (!targetProduct && (paramProductId || paramCode)) {
+      targetProduct = BRAND_CATALOG.find(p =>
+        (paramProductId && String(p.id) === String(paramProductId)) ||
+        (paramCode && (p.code === paramCode || p.name?.toLowerCase().includes(paramCode.toLowerCase())))
+      );
+    }
+
+    if (targetProduct) {
+      let tex = targetProduct.textureUrl || targetProduct.imageUrl;
+      let img = targetProduct.imageUrl || tex;
+      if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
+        tex = getTextureFallback(targetProduct);
+      }
+
+      const finalProd = {
+        ...targetProduct,
+        imageUrl: img || tex,
+        textureUrl: tex || img,
+        unitPrice: targetProduct.unitPrice || 480
+      };
+
+      setSelectedProduct(finalProd);
+      setFloorProduct(finalProd);
+      setWallProduct(finalProd);
+      setApplyFloor(true);
+      setApplyWalls(true);
+      if (finalProd.unitPrice) {
+        setUnitPriceM2(finalProd.unitPrice);
+      }
+
+      setProducts(prev => {
+        const exists = prev.some(p => p.id === finalProd.id || (p.code && p.code === finalProd.code));
+        if (!exists) {
+          return [finalProd, ...prev];
+        }
+        return prev;
+      });
+    }
+  }, []);
 
   // Yüzey Uygulama Açık/Kapalı
   const [applyFloor, setApplyFloor] = useState(true);
@@ -211,10 +287,42 @@ export default function ShowroomKioskPage() {
             };
           });
 
-          setProducts(sanitizedProducts);
-          if (sanitizedProducts.length > 0) {
-            setSelectedProduct(prev => prev || sanitizedProducts[0]);
+          // Showroom'dan seçilen ürün eşleşmesi var mı kontrol et
+          if (typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramProductId = urlParams.get('productId') || urlParams.get('product') || urlParams.get('id');
+            const paramCode = urlParams.get('code');
+            let storedProd = null;
+            try {
+              const stored = sessionStorage.getItem('kiosk_selected_product');
+              if (stored) storedProd = JSON.parse(stored);
+            } catch(e) {}
+
+            const targetId = storedProd?.id || paramProductId;
+            const targetCode = storedProd?.code || paramCode;
+
+            if (targetId || targetCode) {
+              const matched = sanitizedProducts.find(p =>
+                (targetId && String(p.id) === String(targetId)) ||
+                (targetCode && (p.code === targetCode || p.name?.toLowerCase().includes(String(targetCode).toLowerCase())))
+              );
+              if (matched) {
+                setSelectedProduct(matched);
+                setFloorProduct(matched);
+                setWallProduct(matched);
+                setApplyFloor(true);
+                setApplyWalls(true);
+                if (matched.unitPrice) setUnitPriceM2(matched.unitPrice);
+              }
+            }
           }
+
+          setProducts(prev => {
+            if (selectedProduct && !sanitizedProducts.some(p => p.id === selectedProduct.id || (p.code && p.code === selectedProduct.code))) {
+              return [selectedProduct, ...sanitizedProducts];
+            }
+            return sanitizedProducts;
+          });
         }
       } catch (err) {
         console.error('Kiosk brand products fetch error:', err);
