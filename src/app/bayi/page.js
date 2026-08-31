@@ -277,6 +277,7 @@ export default function DealerPortalPage() {
   const [profilePdfCatalogName, setProfilePdfCatalogName] = useState('');
   const [profileThemePreset, setProfileThemePreset] = useState('GOLD');
   const [profileThemePrimary, setProfileThemePrimary] = useState('#d4af37');
+  const [profileThemeBgColor, setProfileThemeBgColor] = useState('#f8f9fc');
   const [actionStats, setActionStats] = useState({ views: 0, whatsapp: 0, phone: 0, directions: 0, pdfDownload: 0, totalInteractions: 0 });
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
@@ -488,7 +489,10 @@ export default function DealerPortalPage() {
           setProfileDealerStats(safeParseJSON(session.dealerStats, { experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' }));
           setProfilePdfCatalogUrl(session.pdfCatalogUrl || '');
           setProfilePdfCatalogName(session.pdfCatalogName || '');
-          setProfileThemePreset(session.themePreset || 'GOLD');
+          const rawThemeSession = session.themePreset || 'GOLD';
+          const themeSessionParts = rawThemeSession.split('|');
+          setProfileThemePreset(themeSessionParts[0] || 'GOLD');
+          setProfileThemeBgColor(themeSessionParts[1] || '#f8f9fc');
           setProfileThemePrimary(session.themePrimary || '#d4af37');
           setProfileSocialInstagram(session.socialInstagram || '');
           setProfileSocialFacebook(session.socialFacebook || '');
@@ -1112,7 +1116,10 @@ export default function DealerPortalPage() {
         setProfileReferenceProjects(safeParseJSON(data.dealer.referenceProjects, []));
         setProfileDealerFaqs(safeParseJSON(data.dealer.dealerFaqs, []));
         setProfileDealerStats(safeParseJSON(data.dealer.dealerStats, { experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' }));
-        setProfileThemePreset(data.dealer.themePreset || 'GOLD');
+        const rawThemeFetch = data.dealer.themePreset || 'GOLD';
+        const themeFetchParts = rawThemeFetch.split('|');
+        setProfileThemePreset(themeFetchParts[0] || 'GOLD');
+        setProfileThemeBgColor(themeFetchParts[1] || '#f8f9fc');
         setProfileThemePrimary(data.dealer.themePrimary || '#d4af37');
       } else {
         setLoginError(data.error || 'Giriş başarısız oldu.');
@@ -1446,7 +1453,7 @@ export default function DealerPortalPage() {
           dealerStats: JSON.stringify(profileDealerStats),
           pdfCatalogUrl: profilePdfCatalogUrl,
           pdfCatalogName: profilePdfCatalogName,
-          themePreset: profileThemePreset,
+          themePreset: `${profileThemePreset}|${profileThemeBgColor}`,
           themePrimary: profileThemePrimary,
           socialInstagram: profileSocialInstagram,
           socialFacebook: profileSocialFacebook,
@@ -1481,7 +1488,7 @@ export default function DealerPortalPage() {
           dealerStats: JSON.stringify(profileDealerStats),
           pdfCatalogUrl: profilePdfCatalogUrl,
           pdfCatalogName: profilePdfCatalogName,
-          themePreset: profileThemePreset,
+          themePreset: `${profileThemePreset}|${profileThemeBgColor}`,
           themePrimary: profileThemePrimary,
           socialInstagram: profileSocialInstagram,
           socialFacebook: profileSocialFacebook,
@@ -3341,6 +3348,78 @@ export default function DealerPortalPage() {
                         placeholder="#d4af37"
                         style={{ width: '100px', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase' }}
                       />
+                  {/* Page Background Color Options */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '20px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <label style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
+                        🖼️ Showroom Sayfası Arka Plan Rengi
+                      </label>
+                      <span style={{ fontSize: '0.7rem', color: '#64748b' }}>
+                        Showroom profili sayfanızın genel zemin temasını belirleyin (Açık, Gece Siyahı, Beton Gri vb.)
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '10px' }}>
+                      {[
+                        { id: '#f8f9fc', name: '🥛 İncili Açık (Varsayılan)', previewBg: '#f8f9fc', border: '#cbd5e1', isDark: false },
+                        { id: '#0b0f17', name: '🌑 Cyber Obsidian Dark', previewBg: '#0b0f17', border: '#1e293b', isDark: true },
+                        { id: '#1e293b', name: '🏛️ Loft Beton Gri', previewBg: '#1e293b', border: '#334155', isDark: true },
+                        { id: '#fcf8f2', name: '🌾 Sıcak Traverten & Bej', previewBg: '#fcf8f2', border: '#e2d9cd', isDark: false },
+                        { id: '#0d1f17', name: '🌿 Lüks Zümrüt Yeşili', previewBg: '#0d1f17', border: '#163829', isDark: true }
+                      ].map((bgItem) => {
+                        const isSelected = profileThemeBgColor === bgItem.id;
+                        return (
+                          <div
+                            key={bgItem.id}
+                            onClick={() => setProfileThemeBgColor(bgItem.id)}
+                            style={{
+                              border: isSelected ? '2px solid var(--accent-gold)' : `1px solid ${bgItem.border}`,
+                              background: bgItem.previewBg,
+                              color: bgItem.isDark ? '#f8fafc' : '#0f172a',
+                              borderRadius: '12px',
+                              padding: '12px 14px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px',
+                              transition: 'all 0.2s ease',
+                              boxShadow: isSelected ? '0 4px 14px rgba(179,142,71,0.25)' : '0 2px 6px rgba(0,0,0,0.03)'
+                            }}
+                          >
+                            <div style={{
+                              width: '16px',
+                              height: '16px',
+                              borderRadius: '50%',
+                              background: bgItem.previewBg,
+                              border: `2px solid ${isSelected ? 'var(--accent-gold)' : (bgItem.isDark ? '#ffffff' : '#000000')}`,
+                              flexShrink: 0
+                            }} />
+                            <span style={{ fontSize: '0.78rem', fontWeight: '800', lineHeight: 1.2 }}>
+                              {bgItem.name}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Custom Background Color Input */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginTop: '8px' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Özel Arka Plan Kodu:</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input 
+                          type="color" 
+                          value={profileThemeBgColor || '#f8f9fc'} 
+                          onChange={(e) => setProfileThemeBgColor(e.target.value)}
+                          style={{ width: '38px', height: '38px', border: 'none', borderRadius: '8px', cursor: 'pointer', background: 'transparent' }}
+                        />
+                        <input 
+                          type="text" 
+                          value={profileThemeBgColor || '#f8f9fc'} 
+                          onChange={(e) => setProfileThemeBgColor(e.target.value)}
+                          placeholder="#f8f9fc"
+                          style={{ width: '100px', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', fontWeight: '700', textTransform: 'uppercase' }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

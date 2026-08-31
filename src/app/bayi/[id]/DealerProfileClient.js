@@ -241,8 +241,36 @@ export default function DealerProfileClient({ dealer, products }) {
   const primaryColor = dealer.themePrimary || '#d4af37';
   const primaryRgb = hexToRgb(primaryColor);
 
+  // Parse Background Color from themePreset (Format: PRESET|#hex)
+  const rawTheme = dealer.themePreset || 'GOLD|#f8f9fc';
+  const themeParts = rawTheme.split('|');
+  const bgColor = themeParts[1] || '#f8f9fc';
+
+  const isColorDark = (hex) => {
+    if (!hex) return false;
+    let c = hex.replace('#', '');
+    if (c.length === 3) c = c.split('').map(x => x + x).join('');
+    const num = parseInt(c, 16);
+    if (isNaN(num)) return false;
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness < 130;
+  };
+
+  const isDarkTheme = isColorDark(bgColor);
+
   return (
-    <div className="profile-page-wrapper" style={{ '--accent-gold': primaryColor, '--accent-gold-rgb': primaryRgb }}>
+    <div 
+      className={`profile-page-wrapper ${isDarkTheme ? 'dark-theme-mode' : 'light-theme-mode'}`} 
+      style={{ 
+        '--accent-gold': primaryColor, 
+        '--accent-gold-rgb': primaryRgb,
+        '--bg-dark': bgColor,
+        backgroundColor: bgColor 
+      }}
+    >
       {/* Header Bar */}
       <div className="profile-header-bar">
         <Link href="/" className="back-link">
