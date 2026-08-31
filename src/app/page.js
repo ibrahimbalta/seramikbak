@@ -3994,15 +3994,6 @@ export default function Home() {
                     <span>AI Seramik Shazam</span>
                   </label>
 
-                  <Link 
-                    href="/kiosk" 
-                    className="hero-feature-btn amber-theme" 
-                    title="3D Showroom & Tablet Kiosk Modu"
-                  >
-                    <Layers size={15} />
-                    <span>Teşhir Kiosk (3D Stüdyo)</span>
-                  </Link>
-
                   <button 
                     onClick={() => handleOpenWebAR()} 
                     className="hero-feature-btn emerald-theme"
