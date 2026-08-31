@@ -7697,7 +7697,7 @@ export default function Home() {
             <div className="compare-modal-header">
               <div>
                 <h2>Teknik Detay Karşılaştırma Sihirbazı</h2>
-                <p>Seçtiğiniz seramik modellerinin tüm teknik detay ve pazar fiyatlarının yan yana analizi</p>
+                <p>Seçtiğiniz seramik modellerinin tüm teknik detay ve mimari özelliklerinin yan yana analizi</p>
               </div>
               <button className="compare-modal-close" onClick={() => setShowComparisonModal(false)}>✕</button>
             </div>
@@ -7730,18 +7730,6 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {/* Fiyatlar */}
-                    <tr className="section-row">
-                      <td colSpan={comparedProducts.length + 1}>En Düşük Bayi Fiyatları</td>
-                    </tr>
-                    <tr>
-                      <td className="feature-name">En Düşük Bayi Fiyatı</td>
-                      {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value highlight-gold">
-                          {p.cheapestOffer?.price ? `${p.cheapestOffer.price} TL/m²` : 'Bilinmiyor'}
-                        </td>
-                      ))}
-                    </tr>
 
                     {/* Boyut ve Görünüm */}
                     <tr className="section-row">
