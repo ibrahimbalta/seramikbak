@@ -1569,27 +1569,90 @@ export default function DealerProfileClient({ dealer, products }) {
               Referans Projelerimiz
             </h2>
             <div className="projects-grid">
-              {referenceProjects.map((proj, idx) => (
-                <div key={idx} className="project-card">
-                  {proj.imageUrl && (
-                    <div className="project-card-image-container">
-                      <img 
-                        src={proj.imageUrl} 
-                        alt={proj.title}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = '/textures/calacatta_gold.jpg';
-                        }}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                      />
+              {referenceProjects.map((proj, idx) => {
+                const targetUrl = proj.linkUrl || proj.url || proj.link;
+                return (
+                  <div key={idx} className="project-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    {proj.imageUrl && (
+                      <div className="project-card-image-container">
+                        {targetUrl ? (
+                          <a href={targetUrl.startsWith('http') ? targetUrl : `https://${targetUrl}`} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', height: '100%' }}>
+                            <img 
+                              src={proj.imageUrl} 
+                              alt={proj.title}
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = '/textures/calacatta_gold.jpg';
+                              }}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            />
+                          </a>
+                        ) : (
+                          <img 
+                            src={proj.imageUrl} 
+                            alt={proj.title}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = '/textures/calacatta_gold.jpg';
+                            }}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                          />
+                        )}
+                      </div>
+                    )}
+                    <div className="project-card-body" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <h3 className="project-card-title">{proj.title}</h3>
+                      <p className="project-card-desc">{proj.desc}</p>
+
+                      <div style={{ marginTop: 'auto', paddingTop: '14px' }}>
+                        {targetUrl ? (
+                          <a 
+                            href={targetUrl.startsWith('http') ? targetUrl : `https://${targetUrl}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              fontSize: '0.8rem',
+                              fontWeight: '800',
+                              color: 'var(--accent-gold, #b38e47)',
+                              textDecoration: 'none'
+                            }}
+                          >
+                            <span>Projeyi Detaylı İncele</span>
+                            <ArrowRight size={14} />
+                          </a>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNotes(prev => prev ? `${prev} • "${proj.title}" referansı hakkında bilgi almak istiyorum.` : `"${proj.title}" referansı hakkında bilgi almak istiyorum.`);
+                              const el = document.querySelector('#quote-form-section');
+                              if (el) el.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              fontSize: '0.78rem',
+                              fontWeight: '800',
+                              color: 'var(--accent-gold, #b38e47)',
+                              background: 'transparent',
+                              border: 'none',
+                              padding: 0,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <span>Bu Proje Hakkında Bilgi Al</span>
+                            <ArrowRight size={14} />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  )}
-                  <div className="project-card-body">
-                    <h3 className="project-card-title">{proj.title}</h3>
-                    <p className="project-card-desc">{proj.desc}</p>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

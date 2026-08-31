@@ -1395,7 +1395,7 @@ export default function DealerPortalPage() {
   };
 
   const addReferenceProject = () => {
-    setProfileReferenceProjects([...profileReferenceProjects, { title: '', desc: '', imageUrl: '' }]);
+    setProfileReferenceProjects([...profileReferenceProjects, { title: '', desc: '', imageUrl: '', linkUrl: '' }]);
   };
 
   const updateReferenceProject = (index, field, value) => {
