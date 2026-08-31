@@ -1054,7 +1054,7 @@ export default function DealerProfileClient({ dealer, products }) {
                   BAYİDEN OUTLET & PROJE FAZLASI BORSASI
                 </div>
                 <h2 style={{ fontSize: '1.75rem', fontWeight: '900', color: '#ffffff', margin: '0 0 8px 0' }}>
-                  🔥 Kapatıyoruz / Proje Fazlası Fırsat Paletleri
+                  🔥 Outlet & Proje Fazlası Fırsat Paletleri
                 </h2>
                 <p style={{ fontSize: '0.88rem', color: '#94a3b8', maxWidth: '680px', margin: '0 auto', lineHeight: '1.6' }}>
                   Bayimizin deposunda kalan son 30-50 m² şantiye fazlası, seri sonu ve 2. kalite paletler uygun fiyata satışta! Kiralık daire yenileyecekler ve ufak tadilat yapacaklar için büyük fırsat.
@@ -1119,7 +1119,7 @@ export default function DealerProfileClient({ dealer, products }) {
                             borderRadius: '12px',
                             boxShadow: '0 4px 10px rgba(239, 68, 68, 0.4)'
                           }}>
-                            {item.badgeTag || 'Kapatıyoruz / Proje Fazlası'}
+                            {item.badgeTag || 'Outlet / Proje Fazlası'}
                           </span>
                           <span style={{
                             background: 'rgba(15, 23, 42, 0.85)',
