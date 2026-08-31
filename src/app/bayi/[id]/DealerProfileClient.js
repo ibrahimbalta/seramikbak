@@ -27,7 +27,10 @@ import {
   Wrench,
   Package,
   CreditCard,
-  Layers
+  Layers,
+  Calculator,
+  Flame,
+  X
 } from 'lucide-react';
 import './dealer-profile.css';
 
@@ -52,6 +55,13 @@ export default function DealerProfileClient({ dealer, products }) {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Calculator modal states
+  const [showCalculatorModal, setShowCalculatorModal] = useState(false);
+  const [calcWidth, setCalcWidth] = useState('');
+  const [calcLength, setCalcLength] = useState('');
+  const [calcHeight, setCalcHeight] = useState('');
+  const [calcWastePercent, setCalcWastePercent] = useState(10);
 
   const images = dealer.showroomImages ? dealer.showroomImages.split(',').filter(Boolean) : [];
   const concepts = dealer.specialConcepts ? dealer.specialConcepts.split(',').filter(Boolean) : [];
@@ -431,36 +441,97 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
         </div>
 
-        {/* AI ERA INTERACTIVE STYLE PROMPT STRIP */}
-        <div className="ai-style-prompt-strip">
-          <span className="prompt-strip-title">🤖 AI Stil & Trend Önerileri:</span>
-          <div className="prompt-strip-scroll">
-            {[
-              { label: '✨ Calacatta Gold Mermer', query: 'Mermer' },
-              { label: '🏛️ Loft Gri Beton', query: 'Beton' },
-              { label: '🌿 Nordic Meşe Ahşap', query: 'Ahşap' },
-              { label: '👑 Nero Siyah Lüks Slab', query: 'Siyah' },
-              { label: '💎 Travertino Classico', query: 'Taş' },
-              { label: '🔥 Proje Fazlası Outlet', query: 'Outlet' }
-            ].map((item, idx) => (
+        {/* QUICK STORE ACTIONS & TOOLS BAR */}
+        <div className="quick-actions-store-bar">
+          <span className="quick-actions-bar-title">⚡ Hızlı Mağaza Araçları:</span>
+          <div className="quick-actions-bar-scroll">
+            <Link 
+              href={featuredProductsList.length > 0 ? `/kiosk?productId=${encodeURIComponent(featuredProductsList[0].id)}&code=${encodeURIComponent(featuredProductsList[0].code || '')}` : "/kiosk"}
+              className="quick-action-chip primary-chip"
+              onClick={() => {
+                if (featuredProductsList.length > 0) {
+                  try {
+                    const prod = featuredProductsList[0];
+                    const selectedObj = {
+                      ...prod,
+                      textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
+                      imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
+                    };
+                    sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
+                  } catch(e) {}
+                }
+              }}
+            >
+              <Sparkles size={14} />
+              <span>🎮 3D Banyo Stüdyosu</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.querySelector('.featured-products-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="quick-action-chip"
+            >
+              <Building2 size={14} />
+              <span>📦 Stoklu Seramik Envanteri</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.querySelector('.showroom-outlet-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="quick-action-chip highlight-chip"
+            >
+              <Flame size={14} style={{ color: '#ef4444' }} />
+              <span>🔥 Outlet & Fırsat Karoları</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowCalculatorModal(true)}
+              className="quick-action-chip gold-chip"
+            >
+              <Calculator size={14} />
+              <span>📐 Metraj & Kutu Hesaplayıcı</span>
+            </button>
+
+            {dealer.pdfCatalogUrl ? (
+              <a
+                href={dealer.pdfCatalogUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="quick-action-chip"
+              >
+                <FileText size={14} />
+                <span>📄 E-Katalog & Broşür</span>
+              </a>
+            ) : (
               <button
-                key={idx}
                 type="button"
                 onClick={() => {
-                  if (item.query === 'Outlet') {
-                    const el = document.querySelector('.showroom-outlet-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  } else {
-                    setInventoryStyleFilter(item.query);
-                    const el = document.querySelector('.featured-products-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }
+                  const el = document.querySelector('.showroom-services-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="prompt-chip-btn"
+                className="quick-action-chip"
               >
-                {item.label}
+                <FileText size={14} />
+                <span>✨ Şube Ayrıcalıkları</span>
               </button>
-            ))}
+            )}
+
+            <a
+              href={`https://wa.me/${dealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20Showroom%20sayfan%C4%B1zdaki%20seramik%20stoklar%C4%B1%20ve%20m%C2%B2%20fiyatlar%C4%B1%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="quick-action-chip whatsapp-chip"
+            >
+              <MessageSquare size={14} />
+              <span>💬 WhatsApp Canlı Mimar</span>
+            </a>
           </div>
         </div>
 
@@ -1567,6 +1638,123 @@ export default function DealerProfileClient({ dealer, products }) {
           <span>Teklif Al</span>
         </button>
       </div>
+      {/* SERAMİK METRAJ & KUTU HESAPLAYICI MODALI */}
+      {showCalculatorModal && (
+        <div className="calculator-modal-overlay" onClick={() => setShowCalculatorModal(false)}>
+          <div className="calculator-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="calculator-modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ padding: '8px', borderRadius: '12px', background: 'rgba(212, 175, 55, 0.15)', color: 'var(--accent-gold)' }}>
+                  <Calculator size={22} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>Akıllı Seramik & Kutu Hesaplayıcı</h3>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Banyo, salon veya dış mekan zemin/duvar ihtiyacınızı anında hesaplayın</span>
+                </div>
+              </div>
+              <button type="button" onClick={() => setShowCalculatorModal(false)} className="calculator-modal-close-btn">
+                ✕
+              </button>
+            </div>
+
+            <div className="calculator-modal-body">
+              <div className="calculator-grid-inputs">
+                <div className="calc-input-group">
+                  <label>Zemin Eni (Metre)</label>
+                  <input 
+                    type="number" 
+                    step="0.1" 
+                    value={calcWidth} 
+                    onChange={(e) => setCalcWidth(e.target.value)} 
+                    placeholder="Örn: 3.5"
+                  />
+                </div>
+                <div className="calc-input-group">
+                  <label>Zemin Boyu (Metre)</label>
+                  <input 
+                    type="number" 
+                    step="0.1" 
+                    value={calcLength} 
+                    onChange={(e) => setCalcLength(e.target.value)} 
+                    placeholder="Örn: 4.0"
+                  />
+                </div>
+                <div className="calc-input-group">
+                  <label>Duvar Yüksekliği (Opsiyonel / m)</label>
+                  <input 
+                    type="number" 
+                    step="0.1" 
+                    value={calcHeight} 
+                    onChange={(e) => setCalcHeight(e.target.value)} 
+                    placeholder="Örn: 2.6 (Banyo için)"
+                  />
+                </div>
+                <div className="calc-input-group">
+                  <label>Fire & Kesim Payı (%)</label>
+                  <select value={calcWastePercent} onChange={(e) => setCalcWastePercent(Number(e.target.value))}>
+                    <option value={5}>%5 (Düz Döşeme)</option>
+                    <option value={10}>%10 (Standart - Önerilen)</option>
+                    <option value={15}>%15 (Diyagonal / Derzli)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Calculation Summary Box */}
+              {(() => {
+                const w = parseFloat(calcWidth) || 0;
+                const l = parseFloat(calcLength) || 0;
+                const h = parseFloat(calcHeight) || 0;
+                
+                const floorNet = w * l;
+                const wallNet = h > 0 ? 2 * (w + l) * h : 0;
+                const netM2 = floorNet + wallNet;
+                const grossM2 = netM2 * (1 + calcWastePercent / 100);
+                const boxM2 = 1.44; // standard box size for 60x120 or 60x60
+                const numBoxes = grossM2 > 0 ? Math.ceil(grossM2 / boxM2) : 0;
+                const totalWeightKg = Math.round(grossM2 * 22); // ~22kg per m² porcelain tile
+
+                return (
+                  <div className="calculator-results-card">
+                    <div className="calc-res-item">
+                      <span className="res-label">Net Alan</span>
+                      <span className="res-value">{netM2.toFixed(2)} m²</span>
+                    </div>
+                    <div className="calc-res-item">
+                      <span className="res-label">Fireli Toplam İhtiyaç</span>
+                      <span className="res-value highlight">{grossM2.toFixed(2)} m²</span>
+                    </div>
+                    <div className="calc-res-item">
+                      <span className="res-label">Tahmini Kutu Sayısı</span>
+                      <span className="res-value badge">{numBoxes} Paket / Kutu</span>
+                    </div>
+                    <div className="calc-res-item">
+                      <span className="res-label">Yaklaşık Ağırlık</span>
+                      <span className="res-value">~{totalWeightKg} kg</span>
+                    </div>
+
+                    {grossM2 > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const quoteMsg = `Hesaplanan Metraj: Net ${netM2.toFixed(2)} m², Fireli ${grossM2.toFixed(2)} m² (${numBoxes} Kutu / Paket, ~${totalWeightKg} kg)`;
+                          setNotes(prev => prev ? `${prev} • ${quoteMsg}` : quoteMsg);
+                          setShowCalculatorModal(false);
+                          const el = document.querySelector('#quote-form-section');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="btn-apply-calc-quote"
+                      >
+                        <Send size={15} />
+                        Bu Metrajla Bayiden Fiyat Teklifi İsteyin
+                      </button>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
