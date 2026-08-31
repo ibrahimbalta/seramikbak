@@ -3788,17 +3788,59 @@ export default function DealerPortalPage() {
 
                     {/* Logistics checkboxes */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
-                      <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569' }}>Sunulan Şube Hizmetleri (Rozetler)</label>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px', marginTop: '6px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                        <div>
+                          <label style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
+                            Showroom Hizmetleri & Müşteri Ayrıcalıkları Kartları
+                          </label>
+                          <p style={{ fontSize: '0.7rem', color: '#64748b', margin: '2px 0 0 0' }}>
+                            Showroom sayfanızda sergilenmesini istediğiniz müşteri ayrıcalıklarını işaretleyin / kaldırın.
+                          </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button 
+                            type="button" 
+                            onClick={() => setProfileLogisticsServices('studio_3d,shipping,install_support,sample_box,credit_card,b2b_discount,showroom_stock')}
+                            style={{ padding: '4px 10px', fontSize: '0.7rem', background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a', borderRadius: '6px', fontWeight: '700', cursor: 'pointer' }}
+                          >
+                            Tümünü Seç
+                          </button>
+                          <button 
+                            type="button" 
+                            onClick={() => setProfileLogisticsServices('')}
+                            style={{ padding: '4px 10px', fontSize: '0.7rem', background: '#f1f5f9', color: '#64748b', border: '1px solid #cbd5e1', borderRadius: '6px', fontWeight: '600', cursor: 'pointer' }}
+                          >
+                            Temizle
+                          </button>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '10px', marginTop: '8px' }}>
                         {[
-                          { id: 'shipping', label: '🚚 Nakliye/Sevk Desteği' },
-                          { id: 'showroom_stock', label: '🏬 Showroom & Hazır Stok' },
-                          { id: 'credit_card', label: '💳 Kredi Kartına Taksit' },
-                          { id: 'install_support', label: '🛠️ Uygulayıcı / Usta Desteği' }
+                          { id: 'studio_3d', label: '✨ 3D Sanal Banyo & Mimar Destek' },
+                          { id: 'shipping', label: '🚚 Sigortalı Nakliye & Kapıya Teslim' },
+                          { id: 'install_support', label: '🛠️ Sertifikalı Usta & İşçilik Garantisi' },
+                          { id: 'sample_box', label: '📦 Ücretsiz Numune Kargo Desteği' },
+                          { id: 'credit_card', label: '💳 Kart Taksiti & Esnek Ödeme Planı' },
+                          { id: 'b2b_discount', label: '🏢 B2B & Toplu Proje İskontoları' },
+                          { id: 'showroom_stock', label: '🏬 Showroom & Hazır Depo Stoğu' }
                         ].map(service => {
                           const isChecked = (profileLogisticsServices || '').split(',').includes(service.id);
                           return (
-                            <label key={service.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', fontWeight: '600', color: '#1e293b', cursor: 'pointer' }}>
+                            <label key={service.id} style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px',
+                              fontSize: '0.82rem',
+                              fontWeight: '600',
+                              color: '#1e293b',
+                              cursor: 'pointer',
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              background: isChecked ? '#f8fafc' : 'transparent',
+                              border: isChecked ? '1px solid #cbd5e1' : '1px solid transparent',
+                              transition: 'all 0.15s ease'
+                            }}>
                               <input 
                                 type="checkbox" 
                                 checked={isChecked}

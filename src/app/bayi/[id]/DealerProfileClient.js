@@ -286,10 +286,13 @@ export default function DealerProfileClient({ dealer, products }) {
                 <div className="header-services-badges">
                   {servicesList.map(s => {
                     const labelMap = {
+                      studio_3d: '✨ 3D Mimar Destek',
                       shipping: '🚚 Nakliye Desteği',
-                      showroom_stock: '🏬 Hazır Stok',
+                      install_support: '🛠️ Usta Desteği',
+                      sample_box: '📦 Numune Kargo',
                       credit_card: '💳 Kart Taksiti',
-                      install_support: '🛠️ Usta Desteği'
+                      b2b_discount: '🏢 Proje İskontosu',
+                      showroom_stock: '🏬 Hazır Stok'
                     };
                     return labelMap[s] ? (
                       <span key={s} className="service-badge">
@@ -767,80 +770,86 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
 
         {/* SECTION: SHOWROOM PRIVILEGES & SERVICES */}
-        <div className="showroom-services-section" style={{ marginTop: '56px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <span style={{
-              fontSize: '0.78rem',
-              fontWeight: '800',
-              color: 'var(--accent-gold)',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              background: 'rgba(var(--accent-gold-rgb, 179,142,71), 0.1)',
-              padding: '6px 16px',
-              borderRadius: '20px',
-              border: '1px solid rgba(var(--accent-gold-rgb, 179,142,71), 0.25)',
-              display: 'inline-block'
-            }}>
-              MÜŞTERİ AYRICALIKLARI
-            </span>
-            <h2 className="section-main-heading" style={{ marginTop: '12px', marginBottom: '8px' }}>
-              Showroom Hizmetlerimiz & Ayrıcalıklarınız
-            </h2>
-            <p style={{ fontSize: '0.86rem', color: '#64748b', maxWidth: '660px', margin: '0 auto' }}>
-              Seramik seçimi ve mekan yenileme sürecinizde yetkili bayimizin sunduğu ücretsiz mimarlık, sigortalı nakliye ve işçilik garantisi avantajları.
-            </p>
+        {servicesList.length > 0 && (
+          <div className="showroom-services-section" style={{ marginTop: '56px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+              <span style={{
+                fontSize: '0.78rem',
+                fontWeight: '800',
+                color: 'var(--accent-gold)',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                background: 'rgba(var(--accent-gold-rgb, 179,142,71), 0.1)',
+                padding: '6px 16px',
+                borderRadius: '20px',
+                border: '1px solid rgba(var(--accent-gold-rgb, 179,142,71), 0.25)',
+                display: 'inline-block'
+              }}>
+                MÜŞTERİ AYRICALIKLARI
+              </span>
+              <h2 className="section-main-heading" style={{ marginTop: '12px', marginBottom: '8px' }}>
+                Showroom Hizmetlerimiz & Ayrıcalıklarınız
+              </h2>
+              <p style={{ fontSize: '0.86rem', color: '#64748b', maxWidth: '660px', margin: '0 auto' }}>
+                Seramik seçimi ve mekan yenileme sürecinizde yetkili bayimizin sunduğu ücretsiz mimarlık, sigortalı nakliye ve işçilik garantisi avantajları.
+              </p>
+            </div>
+
+            <div className="services-showcase-grid">
+              {servicesList.map(serviceId => {
+                const map = {
+                  studio_3d: {
+                    title: '3D Sanal Banyo & Mimar Destek',
+                    desc: 'Banyonuzun ölçülerine göre karoları 3D sanal stüdyoda canlı döşeyip tasarım ve metraj raporu çıkarıyoruz.',
+                    Icon: Sparkles
+                  },
+                  shipping: {
+                    title: 'Sigortalı Nakliye & Kapıya Teslim',
+                    desc: 'Paletli ve kırılma sigortalı araçlarımızla seramiklerinizi şantiyenize veya adresinize güvenle ulaştırıyoruz.',
+                    Icon: Truck
+                  },
+                  install_support: {
+                    title: 'Sertifikalı Usta & İşçilik Garantisi',
+                    desc: 'Bölgenizdeki tecrübeli seramik ustalarıyla buluşturuyor, derz ve kaplama işçiliğini garantili sunuyoruz.',
+                    Icon: Wrench
+                  },
+                  sample_box: {
+                    title: 'Ücretsiz Numune Kargo Desteği',
+                    desc: 'Beğendiğiniz seramik dokularını yerinde görmek için adresinize gerçek numune karosu talep edebilirsiniz.',
+                    Icon: Package
+                  },
+                  credit_card: {
+                    title: 'Kart Taksiti & Esnek Ödeme Planı',
+                    desc: 'Tüm banka kartlarına özel taksit seçenekleri ve mimari projelere özel vadeli ödeme çözümleri sunuyoruz.',
+                    Icon: CreditCard
+                  },
+                  b2b_discount: {
+                    title: 'B2B & Toplu Proje İskontoları',
+                    desc: 'Müteahhit, mimar ve otel projeleri için fabrika teslimi toptan palet fiyatları ve özel iskonto avantajı.',
+                    Icon: Building2
+                  },
+                  showroom_stock: {
+                    title: 'Showroom & Hazır Depo Stoğu',
+                    desc: 'Binlerce karo çeşidini canlı teşhir alanında inceleme ve depodan anında teslim alabilme imkanı.',
+                    Icon: Building2
+                  }
+                };
+                const s = map[serviceId];
+                if (!s) return null;
+                const IconComponent = s.Icon;
+                return (
+                  <div key={serviceId} className="service-card-modern">
+                    <div className="service-icon-box">
+                      <IconComponent size={22} />
+                    </div>
+                    <h3>{s.title}</h3>
+                    <p>{s.desc}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-
-          <div className="services-showcase-grid">
-            <div className="service-card-modern">
-              <div className="service-icon-box">
-                <Sparkles size={22} />
-              </div>
-              <h3>3D Sanal Banyo & Mimar Destek</h3>
-              <p>Banyonuzun ölçülerine göre karoları 3D sanal stüdyoda canlı döşeyip tasarım ve metraj raporu çıkarıyoruz.</p>
-            </div>
-
-            <div className="service-card-modern">
-              <div className="service-icon-box">
-                <Truck size={22} />
-              </div>
-              <h3>Sigortalı Nakliye & Kapıya Teslim</h3>
-              <p>Paletli ve kırılma sigortalı araçlarımızla seramiklerinizi şantiyenize veya adresinize güvenle ulaştırıyoruz.</p>
-            </div>
-
-            <div className="service-card-modern">
-              <div className="service-icon-box">
-                <Wrench size={22} />
-              </div>
-              <h3>Sertifikalı Usta & İşçilik Garantisi</h3>
-              <p>Bölgenizdeki tecrübeli seramik ustalarıyla buluşturuyor, derz ve kaplama işçiliğini garantili sunuyoruz.</p>
-            </div>
-
-            <div className="service-card-modern">
-              <div className="service-icon-box">
-                <Package size={22} />
-              </div>
-              <h3>Ücretsiz Numune Kargo Desteği</h3>
-              <p>Beğendiğiniz seramik dokularını yerinde görmek için adresinize gerçek numune karosu talep edebilirsiniz.</p>
-            </div>
-
-            <div className="service-card-modern">
-              <div className="service-icon-box">
-                <CreditCard size={22} />
-              </div>
-              <h3>Kart Taksiti & Esnek Ödeme Planı</h3>
-              <p>Tüm banka kartlarına özel taksit seçenekleri ve mimari projelere özel vadeli ödeme çözümleri sunuyoruz.</p>
-            </div>
-
-            <div className="service-card-modern">
-              <div className="service-icon-box">
-                <Building2 size={22} />
-              </div>
-              <h3>B2B & Toplu Proje İskontoları</h3>
-              <p>Müteahhit, mimar ve otel projeleri için fabrika teslimi toptan palet fiyatları ve özel iskonto avantajı.</p>
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* SECTION: OUTLET & PROJE FAZLASI BORSASI */}
         {dealer.outletListings && dealer.outletListings.length > 0 && (
