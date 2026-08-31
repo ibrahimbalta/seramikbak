@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Sparkles, Camera, UploadCloud, X, ArrowRight, RefreshCw, CheckCircle2, Sliders, Image as ImageIcon, MapPin, Download, Check } from 'lucide-react';
+import { Sparkles, UploadCloud, RefreshCw, CheckCircle2, MapPin } from 'lucide-react';
 
 const presetTiles = [
   {
@@ -158,7 +158,6 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
       }
     } catch (err) {
       console.error('AI Remodel client error:', err);
-      // Fallback: Generate style-matched realistic tile transformation visual (NEVER photoPreview!)
       const modelVisual = getFallbackTileVisual(targetTile);
       setAiResultImage(modelVisual);
     } finally {
@@ -402,7 +401,7 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                 boxShadow: '0 8px 24px rgba(212,175,55,0.35)',
                 display: 'flex',
                 alignItems: 'center',
-                justify-content: 'center',
+                justifyContent: 'center',
                 gap: '10px',
                 transition: 'all 0.25s ease'
               }}
@@ -513,7 +512,7 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                   color: '#0f172a',
                   display: 'flex',
                   alignItems: 'center',
-                  justify-content: 'center',
+                  justifyContent: 'center',
                   fontWeight: '900',
                   boxShadow: '0 4px 16px rgba(0,0,0,0.6)',
                   pointerEvents: 'none'
