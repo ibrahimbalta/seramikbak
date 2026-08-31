@@ -3448,25 +3448,6 @@ export default function Home() {
               <HelpCircle size={13} />
               <span>Nasıl Çalışır?</span>
             </button>
-            <button 
-              onClick={() => handleOpenAIRemodel()}
-              className="utility-item portal-link"
-              style={{
-                background: 'rgba(56, 189, 248, 0.12)',
-                border: '1px solid rgba(56, 189, 248, 0.35)',
-                borderRadius: '16px',
-                padding: '2px 10px',
-                color: '#38bdf8',
-                fontWeight: '800',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}
-            >
-              <Sparkles size={13} />
-              <span>AI Banyo Yenileme</span>
-            </button>
             <Link href="/hakkimizda" className="utility-item portal-link">
               <Info size={13} />
               <span>{t('about')}</span>
@@ -3532,6 +3513,29 @@ export default function Home() {
               <button className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <Palette size={14} />
                 <span>{t('studio3d')}</span>
+              </button>
+              <button 
+                onClick={() => handleOpenAIRemodel()} 
+                className="nav-link" 
+                title="Yapay Zeka İle Banyo & Oda Yenileme"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(179,142,71,0.06) 100%)',
+                  border: '1px solid rgba(212,175,55,0.3)',
+                  color: '#b38e47',
+                  fontWeight: '800',
+                  fontSize: '0.82rem',
+                  padding: '6px 14px',
+                  borderRadius: '20px',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  flexShrink: 0
+                }}
+              >
+                <Sparkles size={14} style={{ color: '#d4af37', flexShrink: 0 }} />
+                <span style={{ fontWeight: '800', color: '#b38e47', lineHeight: 1, whiteSpace: 'nowrap' }}>AI Tasarım</span>
               </button>
               <button className={`nav-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <MapPin size={14} />

@@ -147,7 +147,23 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
   ];
 
   return (
-    <div className="modal-overlay animate-fade-in" onClick={onClose} style={{ zIndex: 999999, background: 'rgba(2, 6, 23, 0.88)', backdropFilter: 'blur(14px)' }}>
+    <div 
+      className="modal-overlay animate-fade-in" 
+      onClick={onClose} 
+      style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 999999, 
+        background: 'rgba(2, 6, 23, 0.88)', 
+        backdropFilter: 'blur(14px)' 
+      }}
+    >
       <div 
         className="ai-remodel-modal-card" 
         onClick={(e) => e.stopPropagation()}
