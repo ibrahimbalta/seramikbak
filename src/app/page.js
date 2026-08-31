@@ -3201,6 +3201,7 @@ export default function Home() {
     setActiveProduct(product);
     setActiveTab('dealers');
     logInteraction('CLICK', product.id, product.brandId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCampaignSubmit = async (e) => {
@@ -3497,15 +3498,15 @@ export default function Home() {
             </span>
           ) : (
             <>
-              <button className={`nav-link ${activeTab === 'search' ? 'active' : ''}`} onClick={() => setActiveTab('search')}>
+              <button className={`nav-link ${activeTab === 'search' ? 'active' : ''}`} onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <SearchIcon size={14} />
                 <span>{t('products')}</span>
               </button>
-              <button className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); }}>
+              <button className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <Palette size={14} />
                 <span>{t('studio3d')}</span>
               </button>
-              <button className={`nav-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); }}>
+              <button className={`nav-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
               </button>
@@ -3667,27 +3668,27 @@ export default function Home() {
                 </div>
               )}
 
-              <Link href="/" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => { setActiveTab('search'); setShowMobileMenu(false); }}>
+              <Link href="/" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => { setActiveTab('search'); setShowMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <HomeIcon size={16} />
                 <span style={{ fontWeight: '800' }}>{t('home')}</span>
               </Link>
               <button 
                 className={`mobile-nav-link ${activeTab === 'search' ? 'active' : ''}`} 
-                onClick={() => { setActiveTab('search'); setShowMobileMenu(false); }}
+                onClick={() => { setActiveTab('search'); setShowMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               >
                 <SearchIcon size={16} />
                 <span>{t('products')}</span>
               </button>
               <button 
                 className={`mobile-nav-link ${activeTab === 'studio' ? 'active' : ''}`} 
-                onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); }}
+                onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               >
                 <Palette size={16} />
                 <span>{t('studio3d')}</span>
               </button>
               <button 
                 className={`mobile-nav-link ${activeTab === 'dealers' ? 'active' : ''}`} 
-                onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); }}
+                onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               >
                 <MapPin size={16} />
                 <span>{t('dealers')}</span>
@@ -8461,7 +8462,7 @@ export default function Home() {
           <SearchIcon size={20} />
           <span>Arama</span>
         </button>
-        <button className={`mobile-nav-item ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); }}>
+        <button className={`mobile-nav-item ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
           <Layers size={20} />
           <span>3D Stüdyo</span>
         </button>
@@ -8472,7 +8473,7 @@ export default function Home() {
           </div>
           <span>Favoriler</span>
         </button>
-        <button className={`mobile-nav-item ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); }}>
+        <button className={`mobile-nav-item ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
           <MapPin size={20} />
           <span>Bayiler</span>
         </button>
