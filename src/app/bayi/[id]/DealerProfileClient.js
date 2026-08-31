@@ -259,6 +259,21 @@ export default function DealerProfileClient({ dealer, products }) {
             backgroundRepeat: 'no-repeat'
           }}
         >
+          {/* AI ERA LIVE STATUS HUD BAR */}
+          <div className="ai-hero-live-bar" style={{ width: '100%', zIndex: 3 }}>
+            <div className="ai-status-pill">
+              <span className="live-dot-pulse"></span>
+              <span>CANLI SHOWROOM • AÇIK (09:00 - 19:00)</span>
+            </div>
+            <div className="ai-badge-pill">
+              <Sparkles size={13} />
+              <span>AI 3D SANAL MİMAR AKTİF</span>
+            </div>
+            <div className="ai-stock-pill" style={{ color: '#ffffff', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)' }}>
+              <span>📦 {dealer.inventories?.length || 0}+ Stoklu Seramik Modeli</span>
+            </div>
+          </div>
+
           <div className="profile-banner-info">
             <div className="profile-logo-box">
               {dealer.logoUrl ? (
@@ -413,6 +428,39 @@ export default function DealerProfileClient({ dealer, products }) {
                 )}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* AI ERA INTERACTIVE STYLE PROMPT STRIP */}
+        <div className="ai-style-prompt-strip">
+          <span className="prompt-strip-title">🤖 AI Stil & Trend Önerileri:</span>
+          <div className="prompt-strip-scroll">
+            {[
+              { label: '✨ Calacatta Gold Mermer', query: 'Mermer' },
+              { label: '🏛️ Loft Gri Beton', query: 'Beton' },
+              { label: '🌿 Nordic Meşe Ahşap', query: 'Ahşap' },
+              { label: '👑 Nero Siyah Lüks Slab', query: 'Siyah' },
+              { label: '💎 Travertino Classico', query: 'Taş' },
+              { label: '🔥 Proje Fazlası Outlet', query: 'Outlet' }
+            ].map((item, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => {
+                  if (item.query === 'Outlet') {
+                    const el = document.querySelector('.showroom-outlet-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    setInventoryStyleFilter(item.query);
+                    const el = document.querySelector('.featured-products-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="prompt-chip-btn"
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -738,7 +786,34 @@ export default function DealerProfileClient({ dealer, products }) {
                 )}
 
                 <div className="input-group">
-                  <label className="input-label">Talebiniz / Notlar</label>
+                  <label className="input-label">Hızlı Talep Konusu (Tek Tıkla Seçin)</label>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                    {[
+                      '📐 3D Sanal Banyo Tasarımı İstiyorum',
+                      '🚚 Nakliye & Şantiye Teslimat Bilgisi',
+                      '💰 Toptan Palet Fiyat İskontosu',
+                      '📦 Gerçek Numune Karo Talebi'
+                    ].map((preset, pIdx) => (
+                      <button
+                        key={pIdx}
+                        type="button"
+                        onClick={() => setNotes(prev => prev ? `${prev} • ${preset}` : preset)}
+                        style={{
+                          fontSize: '0.72rem',
+                          fontWeight: '700',
+                          padding: '4px 10px',
+                          borderRadius: '16px',
+                          background: 'rgba(212, 175, 55, 0.12)',
+                          color: 'var(--accent-gold, #b38e47)',
+                          border: '1px solid rgba(212, 175, 55, 0.3)',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
                   <textarea 
                     value={notes} 
                     onChange={(e) => setNotes(e.target.value)} 
