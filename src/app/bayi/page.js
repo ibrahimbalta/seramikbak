@@ -283,10 +283,11 @@ export default function DealerPortalPage() {
   const [profileError, setProfileError] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
-  const safeParseJSON = (str, fallback) => {
-    if (!str) return fallback;
+  const safeParseJSON = (val, fallback) => {
+    if (val === null || val === undefined || val === '') return fallback;
+    if (typeof val === 'object') return val;
     try {
-      return JSON.parse(str);
+      return JSON.parse(val);
     } catch (e) {
       return fallback;
     }
@@ -1446,11 +1447,11 @@ export default function DealerPortalPage() {
           specialConcepts: profileSpecialConcepts,
           aboutText: profileAboutText,
           logisticsServices: profileLogisticsServices,
-          featuredProducts: JSON.stringify(profileFeaturedProducts),
-          dealerCampaigns: JSON.stringify(profileDealerCampaigns),
-          referenceProjects: JSON.stringify(profileReferenceProjects),
-          dealerFaqs: JSON.stringify(profileDealerFaqs),
-          dealerStats: JSON.stringify(profileDealerStats),
+          featuredProducts: typeof profileFeaturedProducts === 'string' ? profileFeaturedProducts : JSON.stringify(profileFeaturedProducts),
+          dealerCampaigns: typeof profileDealerCampaigns === 'string' ? profileDealerCampaigns : JSON.stringify(profileDealerCampaigns),
+          referenceProjects: typeof profileReferenceProjects === 'string' ? profileReferenceProjects : JSON.stringify(profileReferenceProjects),
+          dealerFaqs: typeof profileDealerFaqs === 'string' ? profileDealerFaqs : JSON.stringify(profileDealerFaqs),
+          dealerStats: typeof profileDealerStats === 'string' ? profileDealerStats : JSON.stringify(profileDealerStats),
           pdfCatalogUrl: profilePdfCatalogUrl,
           pdfCatalogName: profilePdfCatalogName,
           themePreset: `${profileThemePreset}|${profileThemeBgColor}`,
@@ -1465,36 +1466,13 @@ export default function DealerPortalPage() {
       });
       
       const data = await res.json();
-      if (data.success) {
+      if (data.success && data.dealer) {
         setProfileSuccess('Profil bilgileriniz başarıyla güncellendi.');
-        // Update local state and storage session
+        // Update local state and storage session with returned DB object
         const updatedSession = {
           ...dealerInfo,
-          phone: profilePhone,
-          address: profileAddress,
-          lat: parseFloat(profileLat) || dealerInfo.lat,
-          lng: parseFloat(profileLng) || dealerInfo.lng,
-          logoUrl: profileLogoUrl,
-          bannerUrl: profileBannerUrl,
-          showroomImages: profileShowroomImages,
-          virtualTourUrl: profileVirtualTourUrl,
-          specialConcepts: profileSpecialConcepts,
-          aboutText: profileAboutText,
-          logisticsServices: profileLogisticsServices,
-          featuredProducts: JSON.stringify(profileFeaturedProducts),
-          dealerCampaigns: JSON.stringify(profileDealerCampaigns),
-          referenceProjects: JSON.stringify(profileReferenceProjects),
-          dealerFaqs: JSON.stringify(profileDealerFaqs),
-          dealerStats: JSON.stringify(profileDealerStats),
-          pdfCatalogUrl: profilePdfCatalogUrl,
-          pdfCatalogName: profilePdfCatalogName,
-          themePreset: `${profileThemePreset}|${profileThemeBgColor}`,
-          themePrimary: profileThemePrimary,
-          socialInstagram: profileSocialInstagram,
-          socialFacebook: profileSocialFacebook,
-          socialLinkedin: profileSocialLinkedin,
-          socialYoutube: profileSocialYoutube,
-          socialWebsite: profileSocialWebsite
+          ...data.dealer,
+          password: profilePassword || dealerInfo.password
         };
         setDealerInfo(updatedSession);
         localStorage.setItem('sb_dealer_session', JSON.stringify(updatedSession));
