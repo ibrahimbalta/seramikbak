@@ -62,7 +62,6 @@ import {
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import WebARModal from '@/components/WebARModal';
-import AIRemodelModal from '@/components/AIRemodelModal';
 
 // Dynamically import client-only components to prevent Next.js SSR hydration mismatches
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
@@ -805,8 +804,6 @@ export default function Home() {
   const [showComparisonModal, setShowComparisonModal] = useState(false);
   const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
   const [howItWorksActiveTab, setHowItWorksActiveTab] = useState('customers');
-  const [showAIRemodelModal, setShowAIRemodelModal] = useState(false);
-  const [aiRemodelProduct, setAiRemodelProduct] = useState(null);
 
   const toggleCompareProduct = (product) => {
     setComparedProducts(prev => {
@@ -1076,11 +1073,6 @@ export default function Home() {
   const handleOpenWebAR = (product) => {
     setWebarProduct(product || null);
     setShowWebARModal(true);
-  };
-
-  const handleOpenAIRemodel = (product) => {
-    setAiRemodelProduct(product || activeProduct || null);
-    setShowAIRemodelModal(true);
   };
 
   // 3D Studio Options
@@ -3514,29 +3506,6 @@ export default function Home() {
                 <Palette size={14} />
                 <span>{t('studio3d')}</span>
               </button>
-              <button 
-                onClick={() => handleOpenAIRemodel()} 
-                className="nav-link" 
-                title="Yapay Zeka İle Banyo & Oda Yenileme"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(179,142,71,0.06) 100%)',
-                  border: '1px solid rgba(212,175,55,0.3)',
-                  color: '#b38e47',
-                  fontWeight: '800',
-                  fontSize: '0.82rem',
-                  padding: '6px 14px',
-                  borderRadius: '20px',
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  flexShrink: 0
-                }}
-              >
-                <Sparkles size={14} style={{ color: '#d4af37', flexShrink: 0 }} />
-                <span style={{ fontWeight: '800', color: '#b38e47', lineHeight: 1, whiteSpace: 'nowrap' }}>AI Tasarım</span>
-              </button>
               <button className={`nav-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
@@ -4020,16 +3989,6 @@ export default function Home() {
                     <Activity size={15} style={{ color: '#94a3b8' }} />
                     <span>150+ Marka</span>
                   </div>
-
-                  <button 
-                    onClick={() => handleOpenAIRemodel()} 
-                    className="hero-feature-btn gold-theme"
-                    title="Yapay Zeka İle Banyonu Gerçekçi Yeniden Çiz (Generative AI)"
-                    style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(179,142,71,0.1) 100%)', border: '1px solid rgba(212,175,55,0.4)', color: '#ffffff' }}
-                  >
-                    <Sparkles size={15} style={{ color: '#d4af37' }} />
-                    <span>AI İle Evinde Gör (Generative)</span>
-                  </button>
 
                   <label htmlFor="hero-visual-search-input" className="hero-feature-btn gold-theme" title="Fotoğraf Yükleyerek Yapay Zeka ile Seramik Bul">
                     <Camera size={15} />
@@ -15214,14 +15173,6 @@ export default function Home() {
         isOpen={showWebARModal} 
         onClose={() => setShowWebARModal(false)} 
         selectedProduct={webarProduct} 
-      />
-
-      {/* GENERATIVE AI ROOM REMODELING MODAL */}
-      <AIRemodelModal 
-        isOpen={showAIRemodelModal}
-        onClose={() => setShowAIRemodelModal(false)}
-        selectedProduct={aiRemodelProduct}
-        onGoToDealers={navigateToDealers}
       />
     </main>
   );
