@@ -3348,6 +3348,9 @@ export default function DealerPortalPage() {
                         placeholder="#d4af37"
                         style={{ width: '100px', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase' }}
                       />
+                    </div>
+                  </div>
+
                   {/* Page Background Color Options */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '20px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
