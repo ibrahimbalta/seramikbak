@@ -7217,27 +7217,6 @@ export default function Home() {
                       <Store size={18} />
                       <span>Hemen Bayi Paneline Gir</span>
                     </Link>
-
-                    <Link 
-                      href="/proje-talep" 
-                      onClick={() => setShowHowItWorksModal(false)} 
-                      style={{
-                        padding: '12px 24px',
-                        fontSize: '0.88rem',
-                        borderRadius: '12px',
-                        textDecoration: 'none',
-                        fontWeight: '700',
-                        background: 'rgba(255,255,255,0.08)',
-                        color: '#ffffff',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}
-                    >
-                      <FileText size={18} />
-                      <span>Kurumsal Demo Talep Et</span>
-                    </Link>
                   </div>
                 </div>
               </div>
