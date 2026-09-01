@@ -232,6 +232,7 @@ export default function ShowroomKioskPage() {
   const [snapshotUrl, setSnapshotUrl] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSurfaceMenuOpen, setIsSurfaceMenuOpen] = useState(false);
 
   // Veritabanından Markaları ve Bayileri Yükle
   useEffect(() => {
@@ -263,8 +264,8 @@ export default function ShowroomKioskPage() {
       setIsLoadingProducts(true);
       try {
         const url = selectedBrandId !== 'all' 
-          ? `/api/products?brandId=${encodeURIComponent(selectedBrandId)}&limit=2000`
-          : `/api/products?limit=2000`;
+          ? `/api/products?brandId=${encodeURIComponent(selectedBrandId)}&limit=150`
+          : `/api/products?limit=150`;
 
         const prodRes = await fetch(url).then(r => r.json()).catch(() => null);
 
@@ -699,31 +700,44 @@ export default function ShowroomKioskPage() {
 
           {/* Surface Target Selection Grid (Hangi Yüzey Kaplanacak?) */}
           <div className="sidebar-top-controls">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-              <div className="section-label-header" style={{ margin: 0 }}>
+            <div 
+              onClick={() => setIsSurfaceMenuOpen(!isSurfaceMenuOpen)}
+              className="surface-accordion-header"
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', cursor: 'pointer', userSelect: 'none' }}
+            >
+              <div className="section-label-header" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                 <Layers size={14} className="icon-gold" />
-                <span>1. Kaplanacak Yüzeyi Seçin:</span>
+                <span className="surface-step-title">1. Yüzey:</span>
+                <span className="active-target-badge">
+                  🎯 {getRoomSurfaces(roomType).find(s => s.id === activeTargetSurface)?.name || 'Zemin'}
+                </span>
               </div>
-              {(applyWalls || applyShower || applyToiletWall || applyAccent || applyStripeWall) && (
-                <button
-                  onClick={() => {
-                    setApplyWalls(false);
-                    setApplyShower(false);
-                    setApplyShowerFloor(false);
-                    setApplyToiletWall(false);
-                    setApplyAccent(false);
-                    setApplyStripeWall(false);
-                  }}
-                  style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
-                  title="Tüm duvar seramiklerini tek tıkla pasif yap / temizle"
-                >
-                  <X size={12} />
-                  <span>Duvarları Temizle</span>
-                </button>
-              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {(applyWalls || applyShower || applyToiletWall || applyAccent || applyStripeWall) && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setApplyWalls(false);
+                      setApplyShower(false);
+                      setApplyShowerFloor(false);
+                      setApplyToiletWall(false);
+                      setApplyAccent(false);
+                      setApplyStripeWall(false);
+                    }}
+                    style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}
+                    title="Tüm duvar seramiklerini tek tıkla pasif yap / temizle"
+                  >
+                    <X size={12} />
+                    <span>Temizle</span>
+                  </button>
+                )}
+                <span className="accordion-toggle-pill">
+                  {isSurfaceMenuOpen ? '▲ Kapat' : '▼ Tüm Yüzeyler'}
+                </span>
+              </div>
             </div>
 
-            <div className="surface-target-grid">
+            <div className={`surface-target-grid ${isSurfaceMenuOpen ? 'is-open' : 'is-collapsed-mobile'}`}>
               {getRoomSurfaces(roomType).map(surf => {
                 const isTarget = activeTargetSurface === surf.id;
                 const isApplied = surf.applied && surf.product;
@@ -868,6 +882,8 @@ export default function ShowroomKioskPage() {
                         src={product.imageUrl || product.textureUrl || '/textures/calacatta_gold.jpg'}
                         alt={product.name}
                         className="card-thumb-img"
+                        loading="lazy"
+                        decoding="async"
                         onError={(e) => {
                           e.target.src = '/textures/calacatta_gold.jpg';
                         }}
@@ -2668,6 +2684,46 @@ export default function ShowroomKioskPage() {
             color: #0f172a;
           }
 
+          .surface-step-title {
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: #fbbf24;
+          }
+
+          .active-target-badge {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: #fbbf24;
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 800;
+          }
+
+          .accordion-toggle-pill {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            background: #1e293b;
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            font-weight: 800;
+          }
+
+          .surface-target-grid.is-collapsed-mobile {
+            display: none !important;
+          }
+
+          .surface-target-grid.is-open {
+            display: grid !important;
+          }
+
+          @media (min-width: 769px) {
+            .surface-target-grid.is-collapsed-mobile {
+              display: grid !important;
+            }
+          }
+
           .surface-target-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 6px;
@@ -2681,37 +2737,42 @@ export default function ShowroomKioskPage() {
           }
 
           .kiosk-brand-dropdown {
-            padding: 10px;
-            font-size: 0.85rem;
-            min-height: 42px;
+            padding: 7px 10px;
+            font-size: 0.8rem;
+            min-height: 36px;
           }
 
           .search-input {
-            padding: 9px 10px 9px 34px;
-            font-size: 0.78rem;
-            min-height: 40px;
+            padding: 7px 10px 7px 32px;
+            font-size: 0.75rem;
+            min-height: 36px;
           }
 
           .filter-pill {
-            padding: 6px 12px;
-            font-size: 0.72rem;
-            min-height: 34px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            min-height: 30px;
           }
 
           .products-scroll-grid {
             flex: 1;
             min-height: 250px;
             overflow-y: auto;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            padding: 2px;
+            content-visibility: auto;
           }
 
           .product-touch-card {
-            padding: 8px;
+            padding: 5px;
+            border-radius: 8px;
           }
 
           .card-thumb-wrapper {
-            height: 95px;
+            height: 75px;
+            border-radius: 6px;
           }
 
           .studio-bottom-bar,
@@ -2772,15 +2833,25 @@ export default function ShowroomKioskPage() {
           }
 
           .products-scroll-grid {
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+          }
+
+          .card-thumb-wrapper {
+            height: 70px;
+          }
+
+          .product-touch-card {
+            padding: 4px;
           }
 
           .product-title {
-            font-size: 0.72rem;
+            font-size: 0.68rem;
+            line-height: 1.15;
           }
 
           .product-specs {
-            font-size: 0.62rem;
+            font-size: 0.58rem;
           }
 
           .overlay-sub-hint {
