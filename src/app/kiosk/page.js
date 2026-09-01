@@ -452,16 +452,43 @@ export default function ShowroomKioskPage() {
     setSelectedStyle('all'); // Marka seçildiğinde stil filtresini sıfırla ki tüm modeller gözüksün
   };
 
+  // Tüm Markaların Listesini ve Toplam Sayılarını Derle
+  const knownBrandNames = ['Kalebodur', 'Graniser', 'VitrA', 'NG Kütahya Seramik', 'Bien Seramik', 'Çanakkale Seramik', 'Yurtbay Seramik', 'Ege Seramik', 'Seramiksan', 'Qua Granite', 'Duratiles', 'Decovita', 'Hitit Seramik', 'Seranit', 'Güral Seramik', 'Termal Seramik', 'Uşak Seramik'];
+  
+  const uniqueBrandList = brands.length > 0 ? brands : knownBrandNames.map(name => ({
+    id: name,
+    name: name,
+    _count: { products: 0 }
+  }));
+
+  const totalProductCountInDb = brands.reduce((acc, b) => acc + (b._count?.products || 0), 0) || products.length;
+
+  const selectedBrandObj = selectedBrandId !== 'all' 
+    ? uniqueBrandList.find(b => b.id === selectedBrandId || b.name === selectedBrandId)
+    : null;
+  const selectedBrandName = selectedBrandObj?.name || (selectedBrandId !== 'all' ? selectedBrandId : '');
+
   // Akıllı Ürün Filtreleme (Marka + Stil + Arama)
   const filteredProducts = products.filter(p => {
     let brandMatch = true;
     if (selectedBrandId !== 'all') {
       const bId = String(selectedBrandId).toLowerCase();
+      const bName = String(selectedBrandName).toLowerCase();
       const pBrandId = String(p.brandId || '').toLowerCase();
       const pBrandName = String(p.brand?.name || '').toLowerCase();
       const pBrandIdObj = String(p.brand?.id || '').toLowerCase();
 
-      brandMatch = pBrandId === bId || pBrandIdObj === bId || pBrandName.includes(bId);
+      brandMatch = 
+        pBrandId === bId || 
+        pBrandIdObj === bId || 
+        (pBrandName && (
+          pBrandName === bId || 
+          pBrandName === bName || 
+          pBrandName.includes(bId) || 
+          (bId && bId.includes(pBrandName)) || 
+          (bName && pBrandName.includes(bName)) || 
+          (bName && bName.includes(pBrandName))
+        ));
     }
 
     let styleLower = (p.style || '').toLowerCase();
@@ -487,8 +514,7 @@ export default function ShowroomKioskPage() {
   let displayProducts = filteredProducts;
   if (displayProducts.length === 0 && !isLoadingProducts) {
     if (selectedBrandId !== 'all') {
-      const selectedBrandObj = uniqueBrandList.find(b => b.id === selectedBrandId || b.name === selectedBrandId);
-      const bName = selectedBrandObj?.name || selectedBrandId;
+      const bName = selectedBrandName || selectedBrandId;
       
       const brandMatchCatalog = BRAND_CATALOG.filter(p => 
         p.brand?.name?.toLowerCase().includes(bName.toLowerCase()) || 
@@ -530,17 +556,6 @@ export default function ShowroomKioskPage() {
       textureUrl: tex
     };
   });
-
-  // Tüm Markaların Listesini ve Toplam Sayılarını Derle
-  const knownBrandNames = ['Kalebodur', 'Graniser', 'VitrA', 'NG Kütahya Seramik', 'Bien Seramik', 'Çanakkale Seramik', 'Yurtbay Seramik', 'Ege Seramik', 'Seramiksan', 'Qua Granite', 'Duratiles', 'Decovita', 'Hitit Seramik', 'Seranit', 'Güral Seramik', 'Termal Seramik', 'Uşak Seramik'];
-  
-  const uniqueBrandList = brands.length > 0 ? brands : knownBrandNames.map(name => ({
-    id: name,
-    name: name,
-    _count: { products: 0 }
-  }));
-
-  const totalProductCountInDb = brands.reduce((acc, b) => acc + (b._count?.products || 0), 0) || products.length;
 
   // Metraj & Canlı Fiyat Hesaplama Matematiği
   const wastePercent = layingStyle === 'baliksirti' ? 15 : layingStyle === 'capraz' ? 12 : 8;
