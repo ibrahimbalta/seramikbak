@@ -378,6 +378,21 @@ export default function ShowroomKioskPage() {
     setIsMobileMenuOpen(false);
   };
 
+  // Mekan Değiştiğinde (Salon, Mutfak, Teras seçilince banyo duvar kaplamalarını pasif yap)
+  const handleRoomTypeChange = (newRoom) => {
+    setRoomType(newRoom);
+    if (newRoom !== 'bathroom') {
+      setApplyWalls(false);
+      setApplyShower(false);
+      setApplyShowerFloor(false);
+      setApplyToiletWall(false);
+      setApplyStripeWall(false);
+      setApplyAccent(false);
+    } else {
+      setApplyWalls(true);
+    }
+  };
+
   // 3D Sahneden Bir Yüzeye Tıklandığında O Yüzeyi Hedef Yap
   const handleToggleTargetFromCanvas = (target) => {
     if (target === 'floor') setActiveTargetSurface('floor');
@@ -606,52 +621,157 @@ export default function ShowroomKioskPage() {
 
             <div className="surface-target-grid">
               <button
-                onClick={() => setActiveTargetSurface('floor')}
-                className={`target-btn ${activeTargetSurface === 'floor' ? 'active' : ''}`}
+                onClick={() => {
+                  if (activeTargetSurface === 'floor') {
+                    setApplyFloor(!applyFloor);
+                  } else {
+                    setActiveTargetSurface('floor');
+                  }
+                }}
+                className={`target-btn ${activeTargetSurface === 'floor' ? 'active' : ''} ${!applyFloor ? 'is-off' : ''}`}
               >
-                <span>Zemin ({floorProduct ? floorProduct.name.split(' ')[0] : 'Seç'})</span>
+                <span>Zemin ({applyFloor && floorProduct ? floorProduct.name.split(' ')[0] : 'Pasif'})</span>
+                {applyFloor && (
+                  <span 
+                    onClick={(e) => { e.stopPropagation(); setApplyFloor(false); }}
+                    style={{ marginLeft: 'auto', background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)', color: '#ef4444', borderRadius: '4px', padding: '1px 5px', fontSize: '0.65rem', fontWeight: '800' }}
+                    title="Zemin kaplamasını kaldır (Pasif Yap)"
+                  >
+                    ✕
+                  </span>
+                )}
               </button>
 
               <button
-                onClick={() => setActiveTargetSurface('walls')}
-                className={`target-btn ${activeTargetSurface === 'walls' ? 'active' : ''}`}
+                onClick={() => {
+                  if (activeTargetSurface === 'walls') {
+                    setApplyWalls(!applyWalls);
+                  } else {
+                    setActiveTargetSurface('walls');
+                  }
+                }}
+                className={`target-btn ${activeTargetSurface === 'walls' ? 'active' : ''} ${!applyWalls ? 'is-off' : ''}`}
               >
-                <span>Duvar ({wallProduct ? wallProduct.name.split(' ')[0] : 'Seç'})</span>
+                <span>Duvar ({applyWalls && wallProduct ? wallProduct.name.split(' ')[0] : 'Pasif'})</span>
+                {applyWalls && (
+                  <span 
+                    onClick={(e) => { e.stopPropagation(); setApplyWalls(false); }}
+                    style={{ marginLeft: 'auto', background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)', color: '#ef4444', borderRadius: '4px', padding: '1px 5px', fontSize: '0.65rem', fontWeight: '800' }}
+                    title="Duvar seramiğini kaldır (Pasif Yap)"
+                  >
+                    ✕
+                  </span>
+                )}
               </button>
 
               <button
-                onClick={() => setActiveTargetSurface('shower')}
-                className={`target-btn ${activeTargetSurface === 'shower' ? 'active' : ''}`}
+                onClick={() => {
+                  if (activeTargetSurface === 'shower') {
+                    setApplyShower(!applyShower);
+                  } else {
+                    setActiveTargetSurface('shower');
+                  }
+                }}
+                className={`target-btn ${activeTargetSurface === 'shower' ? 'active' : ''} ${!applyShower ? 'is-off' : ''}`}
               >
-                <span>Duş Duvarı</span>
+                <span>Duş Duvarı ({applyShower ? 'Aktif' : 'Pasif'})</span>
+                {applyShower && (
+                  <span 
+                    onClick={(e) => { e.stopPropagation(); setApplyShower(false); }}
+                    style={{ marginLeft: 'auto', background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)', color: '#ef4444', borderRadius: '4px', padding: '1px 5px', fontSize: '0.65rem', fontWeight: '800' }}
+                    title="Duş kaplamasını kaldır"
+                  >
+                    ✕
+                  </span>
+                )}
               </button>
 
               <button
-                onClick={() => setActiveTargetSurface('showerFloor')}
-                className={`target-btn ${activeTargetSurface === 'showerFloor' ? 'active' : ''}`}
+                onClick={() => {
+                  if (activeTargetSurface === 'showerFloor') {
+                    setApplyShowerFloor(!applyShowerFloor);
+                  } else {
+                    setActiveTargetSurface('showerFloor');
+                  }
+                }}
+                className={`target-btn ${activeTargetSurface === 'showerFloor' ? 'active' : ''} ${!applyShowerFloor ? 'is-off' : ''}`}
               >
-                <span>Duş Zemini</span>
+                <span>Duş Zemini ({applyShowerFloor ? 'Aktif' : 'Pasif'})</span>
+                {applyShowerFloor && (
+                  <span 
+                    onClick={(e) => { e.stopPropagation(); setApplyShowerFloor(false); }}
+                    style={{ marginLeft: 'auto', background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)', color: '#ef4444', borderRadius: '4px', padding: '1px 5px', fontSize: '0.65rem', fontWeight: '800' }}
+                    title="Duş tabanı kaplamasını kaldır"
+                  >
+                    ✕
+                  </span>
+                )}
               </button>
 
               <button
-                onClick={() => setActiveTargetSurface('toilet')}
-                className={`target-btn ${activeTargetSurface === 'toilet' ? 'active' : ''}`}
+                onClick={() => {
+                  if (activeTargetSurface === 'toilet') {
+                    setApplyToiletWall(!applyToiletWall);
+                  } else {
+                    setActiveTargetSurface('toilet');
+                  }
+                }}
+                className={`target-btn ${activeTargetSurface === 'toilet' ? 'active' : ''} ${!applyToiletWall ? 'is-off' : ''}`}
               >
-                <span>Klozet Arkası</span>
+                <span>Klozet Arkası ({applyToiletWall ? 'Aktif' : 'Pasif'})</span>
+                {applyToiletWall && (
+                  <span 
+                    onClick={(e) => { e.stopPropagation(); setApplyToiletWall(false); }}
+                    style={{ marginLeft: 'auto', background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)', color: '#ef4444', borderRadius: '4px', padding: '1px 5px', fontSize: '0.65rem', fontWeight: '800' }}
+                    title="Klozet arkası seramiğini kaldır"
+                  >
+                    ✕
+                  </span>
+                )}
               </button>
 
               <button
-                onClick={() => setActiveTargetSurface('accent')}
-                className={`target-btn ${activeTargetSurface === 'accent' ? 'active' : ''}`}
+                onClick={() => {
+                  if (activeTargetSurface === 'accent') {
+                    setApplyAccent(!applyAccent);
+                  } else {
+                    setActiveTargetSurface('accent');
+                  }
+                }}
+                className={`target-btn ${activeTargetSurface === 'accent' ? 'active' : ''} ${!applyAccent ? 'is-off' : ''}`}
               >
-                <span>Vurgu Duvarı</span>
+                <span>Vurgu Duvarı ({applyAccent ? 'Aktif' : 'Pasif'})</span>
+                {applyAccent && (
+                  <span 
+                    onClick={(e) => { e.stopPropagation(); setApplyAccent(false); }}
+                    style={{ marginLeft: 'auto', background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)', color: '#ef4444', borderRadius: '4px', padding: '1px 5px', fontSize: '0.65rem', fontWeight: '800' }}
+                    title="Vurgu seramiğini kaldır"
+                  >
+                    ✕
+                  </span>
+                )}
               </button>
 
               <button
-                onClick={() => setActiveTargetSurface('stripe')}
-                className={`target-btn ${activeTargetSurface === 'stripe' ? 'active' : ''}`}
+                onClick={() => {
+                  if (activeTargetSurface === 'stripe') {
+                    setApplyStripeWall(!applyStripeWall);
+                  } else {
+                    setActiveTargetSurface('stripe');
+                  }
+                }}
+                className={`target-btn ${activeTargetSurface === 'stripe' ? 'active' : ''} ${!applyStripeWall ? 'is-off' : ''}`}
               >
-                <span>Yatay Bordür</span>
+                <span>Yatay Bordür ({applyStripeWall ? 'Aktif' : 'Pasif'})</span>
+                {applyStripeWall && (
+                  <span 
+                    onClick={(e) => { e.stopPropagation(); setApplyStripeWall(false); }}
+                    style={{ marginLeft: 'auto', background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)', color: '#ef4444', borderRadius: '4px', padding: '1px 5px', fontSize: '0.65rem', fontWeight: '800' }}
+                    title="Yatay bordürü kaldır"
+                  >
+                    ✕
+                  </span>
+                )}
               </button>
             </div>
 
@@ -813,16 +933,56 @@ export default function ShowroomKioskPage() {
 
             {/* Target Surface Overlay Badge inside 3D Canvas */}
             <div className="canvas-active-target-overlay">
-              <span className="overlay-label">Aktif Yüzey Hedefi:</span>
-              <strong className="overlay-target-name">
-                {activeTargetSurface === 'floor' && 'Zemin Seramiği'}
-                {activeTargetSurface === 'walls' && 'Ana Duvar Seramiği'}
-                {activeTargetSurface === 'shower' && 'Duş Kabini Duvarı'}
-                {activeTargetSurface === 'showerFloor' && 'Duş Kabini Zemini'}
-                {activeTargetSurface === 'toilet' && 'Klozet Arkası Vurgu Duvarı'}
-                {activeTargetSurface === 'accent' && 'Lavabo Arkası Vurgu Duvarı'}
-                {activeTargetSurface === 'stripe' && 'Yatay Bordür Kuşağı'}
-              </strong>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span className="overlay-label">Aktif Yüzey Hedefi:</span>
+                <strong className="overlay-target-name">
+                  {activeTargetSurface === 'floor' && (applyFloor ? `Zemin (${floorProduct?.name?.split(' ')[0] || 'Seramik'})` : 'Zemin (Kaplama Yok)')}
+                  {activeTargetSurface === 'walls' && (applyWalls ? `Duvar (${wallProduct?.name?.split(' ')[0] || 'Seramik'})` : 'Duvar (Kaplama Yok - Pasif)')}
+                  {activeTargetSurface === 'shower' && (applyShower ? 'Duş Duvarı' : 'Duş Duvarı (Kaplama Yok)')}
+                  {activeTargetSurface === 'showerFloor' && (applyShowerFloor ? 'Duş Zemini' : 'Duş Zemini (Kaplama Yok)')}
+                  {activeTargetSurface === 'toilet' && (applyToiletWall ? 'Klozet Arkası' : 'Klozet Arkası (Kaplama Yok)')}
+                  {activeTargetSurface === 'accent' && (applyAccent ? 'Lavabo Arkası' : 'Lavabo Arkası (Kaplama Yok)')}
+                  {activeTargetSurface === 'stripe' && (applyStripeWall ? 'Yatay Bordür' : 'Yatay Bordür (Kaplama Yok)')}
+                </strong>
+                
+                {/* Quick Toggle / Clear button on current target */}
+                {activeTargetSurface === 'walls' && applyWalls && (
+                  <button
+                    onClick={() => setApplyWalls(false)}
+                    style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.5)', color: '#fca5a5', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
+                    title="Duvar seramiğini pasif yap / kaldır"
+                  >
+                    ✕ Duvarı Pasif Yap
+                  </button>
+                )}
+                {activeTargetSurface === 'walls' && !applyWalls && (
+                  <button
+                    onClick={() => setApplyWalls(true)}
+                    style={{ background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.5)', color: '#86efac', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
+                    title="Duvar seramik kaplamasını aktif et"
+                  >
+                    + Duvar Kapla
+                  </button>
+                )}
+                {activeTargetSurface === 'floor' && applyFloor && (
+                  <button
+                    onClick={() => setApplyFloor(false)}
+                    style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.5)', color: '#fca5a5', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
+                    title="Zemin seramiğini pasif yap / kaldır"
+                  >
+                    ✕ Zemini Pasif Yap
+                  </button>
+                )}
+                {activeTargetSurface === 'floor' && !applyFloor && (
+                  <button
+                    onClick={() => setApplyFloor(true)}
+                    style={{ background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.5)', color: '#86efac', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
+                    title="Zemin seramik kaplamasını aktif et"
+                  >
+                    + Zemin Kapla
+                  </button>
+                )}
+              </div>
               <span className="overlay-sub-hint">(Sol menüden seçeceğiniz seramik buraya uygulanır)</span>
             </div>
 
@@ -896,7 +1056,7 @@ export default function ShowroomKioskPage() {
                     ].map(r => (
                       <button
                         key={r.id}
-                        onClick={() => setRoomType(r.id)}
+                        onClick={() => handleRoomTypeChange(r.id)}
                         className={`btn-sm ${roomType === r.id ? 'active' : ''}`}
                       >
                         {r.label}

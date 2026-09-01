@@ -3180,6 +3180,21 @@ export default function Home() {
     reader.readAsDataURL(file);
   };
 
+  const handleStudioRoomTypeChange = (room) => {
+    setStudioRoomType(room);
+    if (room !== 'bathroom') {
+      setStudioApplyWalls(false);
+      setStudioApplyShower(false);
+      setStudioApplyShowerFloor(false);
+      setStudioApplyToiletWall(false);
+      setStudioApplyStripeWall(false);
+      setStudioApplyAccent(false);
+      setStudioApplyLeftWallAccent(false);
+    } else {
+      setStudioApplyWalls(true);
+    }
+  };
+
   const navigateTo3DStudio = (product) => {
     setActiveProduct(product);
     setStudioFloorProduct(product);
@@ -5239,12 +5254,12 @@ export default function Home() {
                     🏛️ Simülasyon Sahnesi & Mekan
                   </label>
                   <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '8px' }}>
-                    <button className={studioRoomType === 'bathroom' ? 'active' : ''} onClick={() => setStudioRoomType('bathroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Banyo</button>
-                    <button className={studioRoomType === 'livingroom' ? 'active' : ''} onClick={() => setStudioRoomType('livingroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Salon</button>
-                    <button className={studioRoomType === 'kitchen' ? 'active' : ''} onClick={() => setStudioRoomType('kitchen')} style={{ fontSize: '0.72rem', padding: '6px' }}>Mutfak</button>
-                    <button className={studioRoomType === 'hallway' ? 'active' : ''} onClick={() => setStudioRoomType('hallway')} style={{ fontSize: '0.72rem', padding: '6px' }}>Antre</button>
-                    <button className={studioRoomType === 'terrace' ? 'active' : ''} onClick={() => setStudioRoomType('terrace')} style={{ fontSize: '0.72rem', padding: '6px' }}>Teras</button>
-                    <button className={studioRoomType === 'bedroom' ? 'active' : ''} onClick={() => setStudioRoomType('bedroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Yatak Odası</button>
+                    <button className={studioRoomType === 'bathroom' ? 'active' : ''} onClick={() => handleStudioRoomTypeChange('bathroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Banyo</button>
+                    <button className={studioRoomType === 'livingroom' ? 'active' : ''} onClick={() => handleStudioRoomTypeChange('livingroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Salon</button>
+                    <button className={studioRoomType === 'kitchen' ? 'active' : ''} onClick={() => handleStudioRoomTypeChange('kitchen')} style={{ fontSize: '0.72rem', padding: '6px' }}>Mutfak</button>
+                    <button className={studioRoomType === 'hallway' ? 'active' : ''} onClick={() => handleStudioRoomTypeChange('hallway')} style={{ fontSize: '0.72rem', padding: '6px' }}>Antre</button>
+                    <button className={studioRoomType === 'terrace' ? 'active' : ''} onClick={() => handleStudioRoomTypeChange('terrace')} style={{ fontSize: '0.72rem', padding: '6px' }}>Teras</button>
+                    <button className={studioRoomType === 'bedroom' ? 'active' : ''} onClick={() => handleStudioRoomTypeChange('bedroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Yatak Odası</button>
                   </div>
                 </div>
 
