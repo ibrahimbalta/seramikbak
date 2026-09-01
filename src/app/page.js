@@ -3186,18 +3186,14 @@ export default function Home() {
     setStudioWallProduct(product);
     setStudioApplyFloor(true);
     setStudioApplyWalls(true);
-    setActiveTab('studio');
     logInteraction('STUDIO_TRY', product.id, product.brandId);
     
-    // Smoothly scroll to the 3D studio canvas panel to center it in view
-    setTimeout(() => {
-      const element = document.querySelector('.studio-canvas-panel');
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    }, 100);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem('kiosk_selected_product', JSON.stringify(product));
+      } catch (e) {}
+      window.location.href = `/kiosk?productId=${encodeURIComponent(product.id)}&code=${encodeURIComponent(product.code || '')}`;
+    }
   };
 
   const navigateToDealers = (product) => {
@@ -3505,10 +3501,10 @@ export default function Home() {
                 <SearchIcon size={14} />
                 <span>{t('products')}</span>
               </button>
-              <button className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+              <Link href="/kiosk" className="nav-link">
                 <Palette size={14} />
                 <span>{t('studio3d')}</span>
-              </button>
+              </Link>
               <button className={`nav-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
@@ -3682,13 +3678,15 @@ export default function Home() {
                 <SearchIcon size={16} />
                 <span>{t('products')}</span>
               </button>
-              <button 
-                className={`mobile-nav-link ${activeTab === 'studio' ? 'active' : ''}`} 
-                onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              <Link 
+                href="/kiosk" 
+                className="mobile-nav-link"
+                onClick={() => setShowMobileMenu(false)}
+                style={{ textDecoration: 'none' }}
               >
                 <Palette size={16} />
                 <span>{t('studio3d')}</span>
-              </button>
+              </Link>
               <button 
                 className={`mobile-nav-link ${activeTab === 'dealers' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}

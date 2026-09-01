@@ -544,22 +544,9 @@ export default function ShowroomKioskPage() {
             <span>Menü & Kaplamalar</span>
           </button>
 
-          <button 
-            onClick={() => setBottomTab(bottomTab === 'quote' ? 'studio' : 'quote')}
-            className={`btn-mode-kiosk ${bottomTab === 'quote' ? 'active-gold' : ''}`}
-          >
-            <Calculator size={16} />
-            <span>Metraj & Fiyat Paneli</span>
-          </button>
-
           <button onClick={() => setShowQrModal(true)} className="btn-secondary-kiosk">
             <QrCode size={16} />
             <span>QR ile İndir</span>
-          </button>
-
-          <button onClick={handleOpenQuoteModal} className="btn-primary-gold-kiosk">
-            <FileText size={16} />
-            <span>PDF Teklif Oluştur</span>
           </button>
 
           <button onClick={toggleFullscreen} className="btn-icon-kiosk" title="Tam Ekran">
@@ -860,28 +847,16 @@ export default function ShowroomKioskPage() {
             </div>
           </div>
 
-          {/* Bottom Panel Toggle Tabs (3D Stüdyo Kontrolleri / Metraj & Fiyatlama) */}
+          {/* Bottom Panel Header */}
           <div className="bottom-panel-tabs">
-            <button
-              onClick={() => setBottomTab('studio')}
-              className={`panel-tab-btn ${bottomTab === 'studio' ? 'active' : ''}`}
-            >
+            <div className="panel-tab-btn active">
               <Palette size={14} />
               <span>3D Stüdyo & Ortam Kontrolleri</span>
-            </button>
-
-            <button
-              onClick={() => setBottomTab('quote')}
-              className={`panel-tab-btn ${bottomTab === 'quote' ? 'active' : ''}`}
-            >
-              <Calculator size={14} />
-              <span>Metraj & Canlı Satış Teklifi Hazırlama</span>
-            </button>
+            </div>
           </div>
 
-          {/* Bottom Live Studio Control Bar (3D Stüdyo Kontrolleri) */}
-          {bottomTab === 'studio' && (
-            <div className="studio-bottom-bar">
+          {/* Bottom Live Studio Control Bar */}
+          <div className="studio-bottom-bar">
               {/* Control Row 1: Mekan Tipi & Dizim Şekli */}
               <div className="controls-row">
                 <div className="ctrl-group">
@@ -1007,134 +982,6 @@ export default function ShowroomKioskPage() {
                 </div>
               </div>
             </div>
-          )}
-
-          {/* Bottom Live Quote & Metraj Sales Assistant Bar (Satış Temsilcisi & Müşteri Teklif Paneli) */}
-          {bottomTab === 'quote' && (
-            <div className="sales-bottom-bar">
-              {/* Row 1: Live Interactive Calculations */}
-              <div className="controls-row">
-                {/* Kaplanacak Alan Slider */}
-                <div className="ctrl-group">
-                  <span className="ctrl-label">Alan (m²):</span>
-                  <div className="slider-box">
-                    <input
-                      type="range"
-                      min="5"
-                      max="150"
-                      value={areaM2}
-                      onChange={(e) => setAreaM2(Number(e.target.value))}
-                      className="kiosk-range-slider"
-                    />
-                    <span className="area-text">{areaM2} m²</span>
-                  </div>
-                </div>
-
-                {/* Birim Fiyat (Satış Temsilcisi Elle Müdahale Edebilir) */}
-                <div className="ctrl-group">
-                  <span className="ctrl-label">Seramik m² Fiyatı:</span>
-                  <div className="price-input-box">
-                    <input
-                      type="number"
-                      value={unitPriceM2}
-                      onChange={(e) => setUnitPriceM2(e.target.value)}
-                      className="kiosk-num-input"
-                    />
-                    <span className="unit-label">₺/m²</span>
-                  </div>
-                </div>
-
-                {/* Dizim Fire Oranı */}
-                <div className="ctrl-group">
-                  <span className="ctrl-label">Dizim Fire %:</span>
-                  <div className="btn-group-sm">
-                    {[
-                      { id: 'duz', label: 'Düz (%8)' },
-                      { id: 'capraz', label: 'Çapraz (%12)' },
-                      { id: 'baliksirti', label: 'Balıksırtı (%15)' }
-                    ].map(style => (
-                      <button
-                        key={style.id}
-                        onClick={() => setLayingStyle(style.id)}
-                        className={`btn-sm ${layingStyle === style.id ? 'active-sky' : ''}`}
-                      >
-                        {style.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Row 2: Totals & Create PDF Quote CTA */}
-              <div className="totals-row">
-                <div className="summary-pills">
-                  <div className="sum-pill">
-                    <span className="sum-title">Gereken Seramik</span>
-                    <span className="sum-val">{totalM2WithWaste} m² ({requiredBoxes} Kutu)</span>
-                  </div>
-                  <div className="divider-v" />
-                  <div className="sum-pill">
-                    <span className="sum-title">Sarfiyat (Harç/Derz)</span>
-                    <span className="sum-val">{adhesiveBags} Çuval / {groutPacks} Pak</span>
-                  </div>
-                  <div className="divider-v" />
-                  
-                  {/* Ustalık İşçilik Toggle */}
-                  <div className="hizmet-box">
-                    <button
-                      onClick={() => setIncludeLabor(!includeLabor)}
-                      className={`toggle-hizmet ${includeLabor ? 'active-green' : ''}`}
-                    >
-                      <Wrench size={14} />
-                      <span>{includeLabor ? 'Ustalık' : '+ Ustalık'}</span>
-                    </button>
-                    {includeLabor && (
-                      <input
-                        type="number"
-                        value={laborRatePerM2}
-                        onChange={(e) => setLaborRatePerM2(e.target.value)}
-                        className="kiosk-num-input-sm"
-                        title="Ustalık ₺/m² bedeli"
-                      />
-                    )}
-                  </div>
-
-                  {/* Nakliye Toggle */}
-                  <div className="hizmet-box">
-                    <button
-                      onClick={() => setIncludeShipping(!includeShipping)}
-                      className={`toggle-hizmet ${includeShipping ? 'active-sky' : ''}`}
-                    >
-                      <Truck size={14} />
-                      <span>{includeShipping ? 'Nakliye' : '+ Nakliye'}</span>
-                    </button>
-                    {includeShipping && (
-                      <input
-                        type="number"
-                        value={shippingCostInput}
-                        onChange={(e) => setShippingCostInput(e.target.value)}
-                        className="kiosk-num-input-sm"
-                        title="Nakliye ₺ tutarı"
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* Total Price & CTA */}
-                <div className="price-cta-box">
-                  <div className="price-col">
-                    <span className="price-label">Tahmini Toplam (KDV Dahil)</span>
-                    <span className="price-val">₺{grandTotal.toLocaleString('tr-TR')}</span>
-                  </div>
-
-                  <button onClick={handleOpenQuoteModal} className="btn-cta-pdf">
-                    <FileText size={16} />
-                    <span>PDF Teklifi Çıkar & Düzenle</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
