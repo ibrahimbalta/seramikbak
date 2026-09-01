@@ -485,9 +485,51 @@ export default function ShowroomKioskPage() {
   });
 
   let displayProducts = filteredProducts;
-  if (displayProducts.length === 0 && !isLoadingProducts && selectedBrandId === 'all') {
-    displayProducts = BRAND_CATALOG;
+  if (displayProducts.length === 0 && !isLoadingProducts) {
+    if (selectedBrandId !== 'all') {
+      const selectedBrandObj = uniqueBrandList.find(b => b.id === selectedBrandId || b.name === selectedBrandId);
+      const bName = selectedBrandObj?.name || selectedBrandId;
+      
+      const brandMatchCatalog = BRAND_CATALOG.filter(p => 
+        p.brand?.name?.toLowerCase().includes(bName.toLowerCase()) || 
+        bName.toLowerCase().includes(p.brand?.name?.toLowerCase())
+      );
+
+      if (brandMatchCatalog.length > 0) {
+        displayProducts = brandMatchCatalog;
+      } else {
+        displayProducts = [
+          { id: `${selectedBrandId}-1`, name: `${bName} Calacatta Gold Porselen`, code: 'CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Rektifiye', color: 'Beyaz / Altın', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 540 },
+          { id: `${selectedBrandId}-2`, name: `${bName} Albatros Antrasit Mermer`, code: 'ALB-60120', width: 60, height: 120, style: 'Mermer', finish: 'Lüks Parlak', color: 'Antrasit Damarlı', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg', unitPrice: 560 },
+          { id: `${selectedBrandId}-3`, name: `${bName} Urban Gri Beton Karo`, code: 'BET-6060', width: 60, height: 60, style: 'Beton', finish: 'Mat Endüstriyel', color: 'Gri', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg', unitPrice: 410 },
+          { id: `${selectedBrandId}-4`, name: `${bName} Loft Antrasit Beton`, code: 'BET-8080', width: 80, height: 80, style: 'Beton', finish: 'Lapatto', color: 'Koyu Antrasit', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/loft_beton.jpg', textureUrl: '/textures/loft_beton.jpg', unitPrice: 450 },
+          { id: `${selectedBrandId}-5`, name: `${bName} Natural Meşe Ahşap Porselen`, code: 'OAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Ahşap', color: 'Doğal Meşe', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg', unitPrice: 480 },
+          { id: `${selectedBrandId}-6`, name: `${bName} Travertino Classico Taş`, code: 'TRAV-60120', width: 60, height: 120, style: 'Taş', finish: 'Rölyef Mat', color: 'Bej Traverten', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 510 },
+          { id: `${selectedBrandId}-7`, name: `${bName} Vista Bej Doğal Taş`, code: 'VIS-60120', width: 60, height: 120, style: 'Taş', finish: 'Mat Rektifiye', color: 'Vizon Bej', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/vista_bej.jpg', textureUrl: '/textures/vista_bej.jpg', unitPrice: 490 },
+          { id: `${selectedBrandId}-8`, name: `${bName} Teak Koyu Meşe Ahşap`, code: 'TEAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Derzli', color: 'Koyu Meşe', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/teak_ahsap.jpg', textureUrl: '/textures/teak_ahsap.jpg', unitPrice: 440 }
+        ];
+      }
+    } else {
+      displayProducts = BRAND_CATALOG;
+    }
   }
+
+  // Her bir ürünün resim adresini doğrula ve garanti et
+  displayProducts = displayProducts.map((p) => {
+    let img = p.imageUrl || p.textureUrl;
+    let tex = p.textureUrl || p.imageUrl;
+    if (!img || img.length < 5 || img.includes('hero_ceramics') || img.includes('luxury_bathroom')) {
+      img = getTextureFallback(p);
+    }
+    if (!tex || tex.length < 5 || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
+      tex = getTextureFallback(p);
+    }
+    return {
+      ...p,
+      imageUrl: img,
+      textureUrl: tex
+    };
+  });
 
   // Tüm Markaların Listesini ve Toplam Sayılarını Derle
   const knownBrandNames = ['Kalebodur', 'Graniser', 'VitrA', 'NG Kütahya Seramik', 'Bien Seramik', 'Çanakkale Seramik', 'Yurtbay Seramik', 'Ege Seramik', 'Seramiksan', 'Qua Granite', 'Duratiles', 'Decovita', 'Hitit Seramik', 'Seranit', 'Güral Seramik', 'Termal Seramik', 'Uşak Seramik'];
@@ -1562,12 +1604,12 @@ export default function ShowroomKioskPage() {
         }
 
         .surface-target-grid {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 4px;
           background: #090d16;
-          padding: 6px;
-          border-radius: 10px;
+          padding: 4px;
+          border-radius: 8px;
           border: 1px solid #1e293b;
         }
 
@@ -1575,8 +1617,8 @@ export default function ShowroomKioskPage() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 6px 10px;
-          border-radius: 8px;
+          padding: 4px 6px;
+          border-radius: 6px;
           background: #0f172a;
           border: 1px solid #1e293b;
           cursor: pointer;
