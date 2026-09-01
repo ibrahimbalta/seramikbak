@@ -4107,31 +4107,33 @@ export default function Home() {
                   <span>Düz Renk</span>
                 </button>
 
-                <button className="category-circle-btn" onClick={() => setActiveTab('studio')}>
+                <Link href="/kiosk" className="category-circle-btn" style={{ textDecoration: 'none' }}>
                   <div className="category-circle-icon-wrapper wireframe-bg" />
                   <span>3D Seriler</span>
-                </button>
+                </Link>
               </div>
 
               {/* 3D Sanal Stüdyo Promo Banner Card */}
-              <div className="studio-promo-card-banner" onClick={() => setActiveTab('studio')} style={{ cursor: 'pointer' }}>
-                <div className="promo-text-column">
-                  <div className="promo-top-badge">
-                    <Sparkles size={11} className="promo-sparkle-icon" />
-                    <span>AI 3D MEKAN</span>
+              <Link href="/kiosk" style={{ textDecoration: 'none', display: 'block' }}>
+                <div className="studio-promo-card-banner" style={{ cursor: 'pointer' }}>
+                  <div className="promo-text-column">
+                    <div className="promo-top-badge">
+                      <Sparkles size={11} className="promo-sparkle-icon" />
+                      <span>AI 3D MEKAN</span>
+                    </div>
+                    <h5>3D Sanal Stüdyo</h5>
+                    <p>Seramiklerinizi mekanınızda canlı görün</p>
+                    <div className="promo-action-btn-gold">
+                      <span>Hemen Deneyin</span>
+                      <ArrowRight size={12} />
+                    </div>
                   </div>
-                  <h5>3D Sanal Stüdyo</h5>
-                  <p>Seramiklerinizi mekanınızda canlı görün</p>
-                  <button className="promo-action-btn-gold">
-                    <span>Hemen Deneyin</span>
-                    <ArrowRight size={12} />
-                  </button>
+                  <div className="promo-image-column">
+                    <img src="/hero/hero_ceramics.jpg" alt="3D Studio Preview" />
+                    <div className="promo-image-badge">3D</div>
+                  </div>
                 </div>
-                <div className="promo-image-column">
-                  <img src="/hero/hero_ceramics.jpg" alt="3D Studio Preview" />
-                  <div className="promo-image-badge">3D</div>
-                </div>
-              </div>
+              </Link>
             </div>
 
             {/* Dynamic Schema.org JSON-LD Structured Data for Google Global & Yandex */}
@@ -7705,7 +7707,7 @@ export default function Home() {
             <h4>Kurumsal & Portallar</h4>
             <ul>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('search'); }}>Arama Motoru</a></li>
-              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('studio'); }}>3D Sanal Stüdyo</a></li>
+              <li><Link href="/kiosk">3D Sanal Stüdyo</Link></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('dealers'); }}>Bayi Bulucu</a></li>
               <li><Link href="/bayi?tab=register">Bayimiz Olun (B2B Başvuru)</Link></li>
               <li><Link href="/bayi">Bayi Giriş Portalı</Link></li>
@@ -8396,10 +8398,10 @@ export default function Home() {
           <SearchIcon size={20} />
           <span>Arama</span>
         </button>
-        <button className={`mobile-nav-item ${activeTab === 'studio' ? 'active' : ''}`} onClick={() => { setActiveTab('studio'); if(activeProduct) logInteraction('VIEW', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+        <Link href="/kiosk" className="mobile-nav-item" style={{ textDecoration: 'none' }}>
           <Layers size={20} />
           <span>3D Stüdyo</span>
-        </button>
+        </Link>
         <button className="mobile-nav-item" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}>
           <div style={{ position: 'relative', display: 'inline-flex' }}>
             <HeartIcon size={20} />
