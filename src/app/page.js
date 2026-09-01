@@ -58,7 +58,9 @@ import {
   CameraOff,
   RotateCcw,
   Smartphone,
-  Store
+  Store,
+  QrCode,
+  Maximize2
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import WebARModal from '@/components/WebARModal';
@@ -1192,6 +1194,7 @@ export default function Home() {
   
   // Leads Form State
   const [showLeadModal, setShowLeadModal] = useState(false);
+  const [showStudioQrModal, setShowStudioQrModal] = useState(false);
   const [leadProduct, setLeadProduct] = useState(null);
   const [leadDealer, setLeadDealer] = useState(null);
   const [leadName, setLeadName] = useState('');
@@ -5097,31 +5100,190 @@ export default function Home() {
         {/* TAB 2: 3D VIRTUAL STUDIO */}
         {activeTab === 'studio' && (
           <div className="studio-portal animate-fade-in">
-            <div className="studio-layout">
-              <div className="studio-control-panel glass-panel">
-                <h3>3D Sanal Stüdyo</h3>
-                <p className="desc">Seçili seramiği banyo/mutfak sahnesine giydirerek specula (parlaklık) ve döşeme etkisini inceleyin.</p>
+            {/* Top Consumer Studio Header Bar */}
+            <div className="studio-hero-bar glass-panel" style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '16px',
+              padding: '16px 24px',
+              marginBottom: '20px',
+              borderRadius: '16px',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.9) 100%)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.05) 100%)',
+                  border: '1px solid rgba(212,175,55,0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--accent-gold)',
+                  flexShrink: 0
+                }}>
+                  <Palette size={22} />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-primary)', margin: 0, fontFamily: 'var(--font-title)' }}>
+                      3D Sanal Stüdyo & Canlı Görselleştirici
+                    </h2>
+                    <span style={{
+                      fontSize: '0.68rem',
+                      fontWeight: '800',
+                      padding: '3px 10px',
+                      borderRadius: '12px',
+                      background: 'rgba(212, 175, 55, 0.15)',
+                      color: 'var(--accent-gold)',
+                      border: '1px solid rgba(212, 175, 55, 0.3)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em'
+                    }}>
+                      Tüketici Modu • Gerçek Zamanlı 3D
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>
+                    Beğendiğiniz seramikleri banyo & mutfak sahnesinde canlı döşeyin, derz ve ışık açılarını kişiselleştirin.
+                  </p>
+                </div>
+              </div>
 
+              {/* Action Buttons Header Strip */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                <button 
+                  onClick={() => setShowStudioQrModal(true)} 
+                  className="btn-secondary" 
+                  style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '6px', 
+                    fontSize: '0.8rem', 
+                    padding: '9px 16px', 
+                    borderRadius: '20px',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                  title="Tasarımı akıllı telefonunuza aktarın"
+                >
+                  <QrCode size={15} style={{ color: 'var(--accent-gold)' }} />
+                  <span>📱 Telefona Aktar</span>
+                </button>
+
+                <button 
+                  onClick={() => { 
+                    if (activeProduct) {
+                      setLeadProduct(activeProduct); 
+                      if (nearestDealers && nearestDealers.length > 0) {
+                        setLeadDealer(nearestDealers[0]);
+                      }
+                    }
+                    setShowLeadModal(true); 
+                  }} 
+                  className="btn-primary" 
+                  style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '6px', 
+                    fontSize: '0.8rem', 
+                    padding: '9px 16px', 
+                    borderRadius: '20px',
+                    fontWeight: '700',
+                    backgroundColor: 'var(--accent-gold)',
+                    borderColor: 'var(--accent-gold)',
+                    color: '#0f172a',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <FileText size={15} />
+                  <span>📄 Ücretsiz Fiyat & Metraj Teklifi Al</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="studio-layout">
+              {/* Left Side Controls Panel */}
+              <div className="studio-control-panel glass-panel">
+                <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-primary)' }}>Tasarım Stüdyosu Kontrolleri</h3>
+                  <p className="desc" style={{ margin: '4px 0 0 0', fontSize: '0.78rem' }}>Seramikleri yüzeylere giydirin ve mekanı dilediğiniz gibi tasarlayın.</p>
+                </div>
+
+                {/* Active Product Summary Box */}
                 {activeProduct ? (
-                  <div className="active-tile-summary glass-panel-gold">
-                    <span className="brand-label">{activeProduct.brand?.name}</span>
-                    <h4>{activeProduct.name}</h4>
-                    <p className="code">Ürün Kodu: {activeProduct.code}</p>
+                  <div className="active-tile-summary glass-panel-gold" style={{ marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+                      <div style={{ width: '48px', height: '48px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, border: '1px solid rgba(212,175,55,0.4)', position: 'relative' }}>
+                        <TileVisualPreview style={activeProduct.style} color={activeProduct.color} finish={activeProduct.finish} width={activeProduct.width} height={activeProduct.height} imageUrl={activeProduct.imageUrl} />
+                      </div>
+                      <div>
+                        <span className="brand-label" style={{ fontSize: '0.68rem', textTransform: 'uppercase', color: 'var(--accent-gold)', fontWeight: '800', display: 'block' }}>{activeProduct.brand?.name}</span>
+                        <h4 style={{ margin: '2px 0 0 0', fontSize: '0.9rem', fontWeight: '800', lineHeight: '1.2' }}>{activeProduct.name}</h4>
+                        <p className="code" style={{ margin: '2px 0 0 0', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Kod: {activeProduct.code}</p>
+                      </div>
+                    </div>
                     <div className="summary-specs">
                       <div><span>Boyut:</span> <strong>{activeProduct.width}x{activeProduct.height} cm</strong></div>
                       <div><span>Bitiş:</span> <strong>{activeProduct.finish}</strong></div>
-                      <div><span>Tip:</span> <strong>{activeProduct.style}</strong></div>
+                      <div><span>Stil:</span> <strong>{activeProduct.style}</strong></div>
                       <div><span>En Düşük Fiyat:</span> <strong style={{ color: 'var(--accent-gold)' }}>{activeProduct.cheapestOffer?.price || '804'} TL/m²</strong></div>
                     </div>
+                    <button 
+                      onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      style={{
+                        width: '100%',
+                        marginTop: '10px',
+                        padding: '6px',
+                        fontSize: '0.72rem',
+                        fontWeight: '700',
+                        borderRadius: '6px',
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <SearchIcon size={12} />
+                      <span>Farklı Seramik Seç / Katalogda Bul</span>
+                    </button>
                   </div>
                 ) : (
-                  <div className="studio-no-product glass-panel">
-                    <p>Lütfen seramik giydirmek için bir ürün seçin.</p>
+                  <div className="studio-no-product glass-panel" style={{ marginBottom: '16px', padding: '16px', textAlign: 'center' }}>
+                    <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-secondary)' }}>Lütfen 3D sahnede giydirmek için katalogdan bir seramik seçin.</p>
+                    <button onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="btn-primary" style={{ marginTop: '10px', fontSize: '0.78rem', padding: '6px 14px' }}>
+                      Kataloğu Aç
+                    </button>
                   </div>
                 )}
 
-                <div className="control-group">
-                  <label>Seramik Giydirme & Ara Seramik Bölgeleri</label>
+                {/* Room Picker */}
+                <div className="control-group" style={{ marginBottom: '16px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--accent-gold)', textTransform: 'uppercase', letterSpacing: '0.02em', display: 'block', marginBottom: '8px' }}>
+                    🏛️ Simülasyon Sahnesi & Mekan
+                  </label>
+                  <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '8px' }}>
+                    <button className={studioRoomType === 'bathroom' ? 'active' : ''} onClick={() => setStudioRoomType('bathroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Banyo</button>
+                    <button className={studioRoomType === 'livingroom' ? 'active' : ''} onClick={() => setStudioRoomType('livingroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Salon</button>
+                    <button className={studioRoomType === 'kitchen' ? 'active' : ''} onClick={() => setStudioRoomType('kitchen')} style={{ fontSize: '0.72rem', padding: '6px' }}>Mutfak</button>
+                    <button className={studioRoomType === 'hallway' ? 'active' : ''} onClick={() => setStudioRoomType('hallway')} style={{ fontSize: '0.72rem', padding: '6px' }}>Antre</button>
+                    <button className={studioRoomType === 'terrace' ? 'active' : ''} onClick={() => setStudioRoomType('terrace')} style={{ fontSize: '0.72rem', padding: '6px' }}>Teras</button>
+                    <button className={studioRoomType === 'bedroom' ? 'active' : ''} onClick={() => setStudioRoomType('bedroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Yatak Odası</button>
+                  </div>
+                </div>
+
+                {/* Surface Coating Selector */}
+                <div className="control-group" style={{ marginBottom: '16px' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--accent-gold)', textTransform: 'uppercase', letterSpacing: '0.02em', display: 'block', marginBottom: '8px' }}>
+                    🧱 Seramik Giydirme Yüzeyleri
+                  </label>
                   <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', padding: '4px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px' }}>
                     <button 
                       className={studioApplyFloor ? 'active' : ''} 
@@ -5199,7 +5361,7 @@ export default function Home() {
                       style={{ padding: '8px 10px', fontSize: '0.75rem', fontWeight: '700', borderRadius: '8px' }}
                       title="Duşakabin İki Tarafı (Arka & Yan Duvar)"
                     >
-                      🚿 Duş İçi (2 Yüzey)
+                      🚿 Duş İçi (2 Duvar)
                     </button>
                     <button 
                       className={studioApplyShowerFloor ? 'active' : ''} 
@@ -5315,65 +5477,13 @@ export default function Home() {
                         <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
                       )}
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Duş Tabanı:</span>
-                      {studioApplyShowerFloor && studioShowerFloorProduct ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontWeight: '600', color: '#06b6d4' }}>
-                            {studioShowerFloorProduct.name.split(' ')[0]} {studioShowerFloorProduct.code}
-                          </span>
-                          <button onClick={() => setStudioApplyShowerFloor(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
-                        </div>
-                      ) : (
-                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Klozet Arkası:</span>
-                      {studioApplyToiletWall && studioToiletWallProduct ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontWeight: '600', color: '#22c55e' }}>
-                            {studioToiletWallProduct.name.split(' ')[0]} {studioToiletWallProduct.code}
-                          </span>
-                          <button onClick={() => setStudioApplyToiletWall(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
-                        </div>
-                      ) : (
-                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Sol Duvar Ara:</span>
-                      {studioApplyLeftWallAccent && studioLeftWallAccentProduct ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontWeight: '600', color: '#fbbf24' }}>
-                            {studioLeftWallAccentProduct.name.split(' ')[0]} {studioLeftWallAccentProduct.code}
-                          </span>
-                          <button onClick={() => setStudioApplyLeftWallAccent(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
-                        </div>
-                      ) : (
-                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Yatay Bordür Kuşağı:</span>
-                      {studioApplyStripeWall && studioStripeWallProduct ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontWeight: '600', color: '#f43f5e' }}>
-                            {studioStripeWallProduct.name.split(' ')[0]} {studioStripeWallProduct.code}
-                          </span>
-                          <button onClick={() => setStudioApplyStripeWall(false)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0 2px' }}>✕</button>
-                        </div>
-                      ) : (
-                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Kaplanmamış</span>
-                      )}
-                    </div>
                   </div>
                 </div>
 
                 {/* 3D COMPARISON & CAMERA MODES */}
                 <div className="control-group" style={{ marginTop: '12px', marginBottom: '12px' }}>
                   <label style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', display: 'block', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
-                    Gelişmiş Modlar & Görünüm
+                    ⚖️ Canlı Kıyaslama & 360° Modu
                   </label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                     <button 
@@ -5455,22 +5565,10 @@ export default function Home() {
                   )}
                 </div>
 
-                <div className="control-group" style={{ marginTop: '14px', marginBottom: '14px' }}>
-                  <label>Simülasyon Sahnesi</label>
-                  <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '8px' }}>
-                    <button className={studioRoomType === 'bathroom' ? 'active' : ''} onClick={() => setStudioRoomType('bathroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Banyo</button>
-                    <button className={studioRoomType === 'livingroom' ? 'active' : ''} onClick={() => setStudioRoomType('livingroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Salon</button>
-                    <button className={studioRoomType === 'kitchen' ? 'active' : ''} onClick={() => setStudioRoomType('kitchen')} style={{ fontSize: '0.72rem', padding: '6px' }}>Mutfak</button>
-                    <button className={studioRoomType === 'hallway' ? 'active' : ''} onClick={() => setStudioRoomType('hallway')} style={{ fontSize: '0.72rem', padding: '6px' }}>Antre</button>
-                    <button className={studioRoomType === 'terrace' ? 'active' : ''} onClick={() => setStudioRoomType('terrace')} style={{ fontSize: '0.72rem', padding: '6px' }}>Teras</button>
-                    <button className={studioRoomType === 'bedroom' ? 'active' : ''} onClick={() => setStudioRoomType('bedroom')} style={{ fontSize: '0.72rem', padding: '6px' }}>Yatak Odası</button>
-                  </div>
-                </div>
-
                 {/* 3D CUSTOMIZER SETTINGS TOOLBOX */}
                 <div className="studio-settings-toolbox" style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
                   <div className="studio-toolbox-section">
-                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Gelişmiş Döşeme Desenleri</span>
+                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>📐 Gelişmiş Döşeme Desenleri & Derz</span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <div className="segmented-control" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', padding: '2px' }}>
                         <button className={studioLayPattern === 'flat' ? 'active' : ''} onClick={() => setStudioLayPattern('flat')} style={{ fontSize: '0.65rem', padding: '4px' }}>Düz (Grid)</button>
@@ -5485,7 +5583,7 @@ export default function Home() {
                   </div>
 
                   <div className="studio-toolbox-section" style={{ borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '10px' }}>
-                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Armatür & Mobilya Dokusu</span>
+                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>🚰 Armatür & Mobilya Dokusu</span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <div>
                         <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Armatür / Batarya Metali</span>
@@ -5509,7 +5607,7 @@ export default function Home() {
                   </div>
 
                   <div className="studio-toolbox-section" style={{ borderTop: '1px dashed rgba(255,255,255,0.05)', paddingTop: '10px' }}>
-                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Işıklandırma & Ortam</span>
+                    <span className="section-label" style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: 'var(--accent-gold)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.02em' }}>☀️ Işıklandırma & Ortam</span>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       <div>
                         <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>Günün Saati & Atmosfer</span>
@@ -5539,14 +5637,14 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="studio-physics-details">
+                <div className="studio-physics-details" style={{ marginTop: '14px' }}>
                   <h4>Malzeme Fizik Özellikleri</h4>
                   <div className="phys-row"><span>Clearcoat:</span><strong>{activeProduct?.finish === 'Parlak' ? '1.0' : activeProduct?.finish === 'Lapatto' ? '0.4' : '0.0'}</strong></div>
                   <div className="phys-row"><span>Roughness:</span><strong>{activeProduct?.finish === 'Parlak' ? '0.08' : activeProduct?.finish === 'Lapatto' ? '0.35' : '0.85'}</strong></div>
                   <div className="phys-row"><span>Karo Tekrarlama Adedi:</span><strong>{activeProduct ? `${Math.round(3.6 / (activeProduct.width/100))}x${Math.round(3.6 / (activeProduct.height/100))}` : '-'}</strong></div>
                 </div>
 
-                <div className="ar-activation-box glass-panel">
+                <div className="ar-activation-box glass-panel" style={{ marginTop: '14px' }}>
                   <Sparkles size={18} className="ar-icon" />
                   <div>
                     <h5>Artırılmış Gerçeklik (AR) Modu</h5>
@@ -5559,6 +5657,7 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Right Side 3D Interactive Canvas */}
               <div className="studio-canvas-panel glass-panel" style={{ position: 'relative' }}>
                 {activeProduct ? (
                   <StudioCanvas 
@@ -5669,15 +5768,24 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="quick-swapper-drawer glass-panel">
-              <h4>Hızlı Seramik Seçimi</h4>
+            {/* Bottom Quick Product Swapper Carousel */}
+            <div className="quick-swapper-drawer glass-panel" style={{ marginTop: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '800' }}>⚡ Hızlı Seramik Seçimi (Dene & Giydir)</h4>
+                <button 
+                  onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+                  style={{ background: 'none', border: 'none', color: 'var(--accent-gold)', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
+                >
+                  Tüm Kataloğu İncele →
+                </button>
+              </div>
               <div className="swapper-grid">
-                {products.slice(0, 6).map((prod) => (
+                {products.slice(0, 8).map((prod) => (
                   <div 
                     key={prod.id} 
-                    onClick={() => setActiveProduct(prod)}
+                    onClick={() => navigateTo3DStudio(prod)}
                     className={`swapper-card ${activeProduct?.id === prod.id ? 'active' : ''}`}
-                    style={{ position: 'relative', overflow: 'hidden' }}
+                    style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
                   >
                     <TileVisualPreview style={prod.style} color={prod.color} finish={prod.finish} width={prod.width} height={prod.height} imageUrl={prod.imageUrl} />
                     <div className="swapper-label">
@@ -6702,6 +6810,38 @@ export default function Home() {
               <button onClick={() => setShowAiPhotoScanModal(false)} className="btn-secondary">İptal</button>
               <button onClick={() => aiFileInputRef.current?.click()} className="btn-primary" disabled={aiPhotoScanning}>
                 {aiPhotoScanning ? 'Taranıyor...' : 'Cihazdan Fotoğraf Seç'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* STUDIO QR CODE MODAL */}
+      {showStudioQrModal && (
+        <div className="modal-overlay animate-fade-in" style={{ zIndex: 9999 }}>
+          <div className="modal-content glass-panel-gold" style={{ maxWidth: '420px', textAlign: 'center', padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
+              <button onClick={() => setShowStudioQrModal(false)} className="close-modal-btn" style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto', color: 'var(--accent-gold)' }}>
+              <Smartphone size={28} />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '8px' }}>3D Tasarımı Telefonunda Aç!</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '20px' }}>
+              Kameranızla QR kodu okutarak hazırladığınız 3D banyo & seramik tasarımını cep telefonunuzda açabilir ve inceleyebilirsiniz.
+            </p>
+            <div style={{ background: '#ffffff', padding: '16px', borderRadius: '16px', display: 'inline-block', boxShadow: '0 10px 25px rgba(0,0,0,0.3)', marginBottom: '20px' }}>
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent('https://www.seramikbak.com')}`}
+                alt="3D Sanal Stüdyo QR"
+                style={{ width: '180px', height: '180px', display: 'block', borderRadius: '8px' }}
+              />
+            </div>
+            <div>
+              <button onClick={() => setShowStudioQrModal(false)} className="btn-primary" style={{ width: '100%', padding: '12px', fontWeight: '700', borderRadius: '10px' }}>
+                Anlaşıldı, Kapat
               </button>
             </div>
           </div>
