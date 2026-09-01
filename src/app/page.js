@@ -3509,28 +3509,6 @@ export default function Home() {
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
               </button>
-              <Link 
-                href="/kiosk" 
-                className="nav-link"
-                title="Bayi Teşhir & Tablet Satış Modu"
-                style={{ 
-                  display: 'inline-flex', 
-                  flexDirection: 'row', 
-                  alignItems: 'center', 
-                  gap: '8px', 
-                  color: '#475569', 
-                  fontWeight: '700', 
-                  fontSize: '0.85rem', 
-                  fontFamily: 'var(--font-title)', 
-                  textDecoration: 'none', 
-                  padding: '8px 24px', 
-                  borderRadius: '24px',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                <Layers size={14} style={{ color: '#64748b', flexShrink: 0 }} />
-                <span style={{ fontWeight: '700', color: '#475569', lineHeight: 1, whiteSpace: 'nowrap' }}>{t('kioskMode')}</span>
-              </Link>
             </>
           )}
         </nav>
@@ -3694,15 +3672,6 @@ export default function Home() {
                 <MapPin size={16} />
                 <span>{t('dealers')}</span>
               </button>
-              <Link 
-                href="/kiosk" 
-                className="mobile-nav-link" 
-                onClick={() => setShowMobileMenu(false)}
-                style={{ textDecoration: 'none' }}
-              >
-                <Layers size={16} />
-                <span>Teşhir Kiosk</span>
-              </Link>
               <Link 
                 href="/global-tanitim"
                 className="mobile-nav-link"
