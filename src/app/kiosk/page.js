@@ -384,7 +384,7 @@ export default function ShowroomKioskPage() {
     if (room === 'bathroom') {
       return [
         { id: 'floor', name: 'Zemin Seramiği', shortName: 'Zemin', applied: applyFloor, product: floorProduct, toggle: () => setApplyFloor(!applyFloor) },
-        { id: 'stripe', name: 'Tezgah Arası / Mutfak Alını', shortName: 'Tezgah Arası', applied: applyStripeWall, product: stripeWallProduct, toggle: () => setApplyStripeWall(!applyStripeWall) },
+        { id: 'stripe', name: 'Mutfak Alını', shortName: 'Mutfak Alını', applied: applyStripeWall, product: stripeWallProduct, toggle: () => setApplyStripeWall(!applyStripeWall) },
         { id: 'walls', name: 'Ana Duvar', shortName: 'Duvar', applied: applyWalls, product: wallProduct, toggle: () => setApplyWalls(!applyWalls) },
         { id: 'shower', name: 'Duş Duvarı', shortName: 'Duş', applied: applyShower, product: showerProduct, toggle: () => setApplyShower(!applyShower) },
         { id: 'showerFloor', name: 'Duş Zemini', shortName: 'Duş Zemin', applied: applyShowerFloor, product: showerFloorProduct, toggle: () => setApplyShowerFloor(!applyShowerFloor) },
@@ -393,7 +393,7 @@ export default function ShowroomKioskPage() {
       ];
     } else if (room === 'kitchen') {
       return [
-        { id: 'stripe', name: 'Tezgah Arası (Mutfak Alını)', shortName: 'Tezgah Arası', applied: applyStripeWall, product: stripeWallProduct, toggle: () => setApplyStripeWall(!applyStripeWall) },
+        { id: 'stripe', name: 'Mutfak Alını', shortName: 'Mutfak Alını', applied: applyStripeWall, product: stripeWallProduct, toggle: () => setApplyStripeWall(!applyStripeWall) },
         { id: 'floor', name: 'Zemin Seramiği', shortName: 'Zemin', applied: applyFloor, product: floorProduct, toggle: () => setApplyFloor(!applyFloor) },
         { id: 'walls', name: 'Mutfak Duvarı', shortName: 'Duvar', applied: applyWalls, product: wallProduct, toggle: () => setApplyWalls(!applyWalls) },
         { id: 'accent', name: 'Mutfak Vurgu Duvarı', shortName: 'Vurgu', applied: applyAccent, product: accentProduct, toggle: () => setApplyAccent(!applyAccent) },
@@ -401,7 +401,7 @@ export default function ShowroomKioskPage() {
     } else {
       return [
         { id: 'floor', name: 'Zemin Seramiği', shortName: 'Zemin', applied: applyFloor, product: floorProduct, toggle: () => setApplyFloor(!applyFloor) },
-        { id: 'stripe', name: 'Tezgah Arası / Bordür', shortName: 'Tezgah Arası', applied: applyStripeWall, product: stripeWallProduct, toggle: () => setApplyStripeWall(!applyStripeWall) },
+        { id: 'stripe', name: 'Mutfak Alını', shortName: 'Mutfak Alını', applied: applyStripeWall, product: stripeWallProduct, toggle: () => setApplyStripeWall(!applyStripeWall) },
         { id: 'walls', name: 'Ana Duvar', shortName: 'Duvar', applied: applyWalls, product: wallProduct, toggle: () => setApplyWalls(!applyWalls) },
         { id: 'accent', name: 'Vurgu / TV Duvarı', shortName: 'Vurgu', applied: applyAccent, product: accentProduct, toggle: () => setApplyAccent(!applyAccent) },
       ];
