@@ -232,7 +232,7 @@ export default function ShowroomKioskPage() {
   const [snapshotUrl, setSnapshotUrl] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSurfaceMenuOpen, setIsSurfaceMenuOpen] = useState(false);
+  const [isSurfaceMenuOpen, setIsSurfaceMenuOpen] = useState(true);
 
   // Veritabanından Markaları ve Bayileri Yükle
   useEffect(() => {
@@ -1103,25 +1103,27 @@ export default function ShowroomKioskPage() {
               <span className="overlay-sub-hint">(3D sahnede yüzeye dokunarak seramiği ekleyebilir veya çıkarabilirsiniz)</span>
             </div>
 
-            {/* Mobile Bottom Quick Surface Chips Bar (Dokunarak Ekle/Çıkar) */}
-            <div className="canvas-mobile-surface-chips">
-              {getRoomSurfaces(roomType).map(surf => {
-                const isTarget = activeTargetSurface === surf.id;
-                const isApplied = surf.applied && surf.product;
+            {/* Mobile Bottom Quick Surface Chips Bar (Dokunarak Ekle/Çıkar - Çekmece Kapalıyken Gösterilir) */}
+            {!isMobileMenuOpen && (
+              <div className="canvas-mobile-surface-chips">
+                {getRoomSurfaces(roomType).map(surf => {
+                  const isTarget = activeTargetSurface === surf.id;
+                  const isApplied = surf.applied && surf.product;
 
-                return (
-                  <button
-                    key={surf.id}
-                    onClick={() => handleToggleTargetFromCanvas(surf.id)}
-                    className={`chip-surface-btn ${isTarget ? 'active' : ''} ${isApplied ? 'applied' : ''}`}
-                    title={`${surf.name} kaplamasını dokunarak ekle/çıkar`}
-                  >
-                    {isApplied ? '✓ ' : '+ '}
-                    {surf.shortName || surf.name.split(' ')[0]}
-                  </button>
-                );
-              })}
-            </div>
+                  return (
+                    <button
+                      key={surf.id}
+                      onClick={() => handleToggleTargetFromCanvas(surf.id)}
+                      className={`chip-surface-btn ${isTarget ? 'active' : ''} ${isApplied ? 'applied' : ''}`}
+                      title={`${surf.name} kaplamasını dokunarak ekle/çıkar`}
+                    >
+                      {isApplied ? '✓ ' : '+ '}
+                      {surf.shortName || surf.name.split(' ')[0]}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Canvas Mobile Expand Button */}
             <button 
@@ -2748,6 +2750,7 @@ export default function ShowroomKioskPage() {
             border-radius: 14px;
             border: 1px solid rgba(245, 158, 11, 0.3);
             -webkit-overflow-scrolling: touch;
+            pointer-events: none;
           }
 
           .chip-surface-btn {
@@ -2761,6 +2764,7 @@ export default function ShowroomKioskPage() {
             border-radius: 8px;
             cursor: pointer;
             white-space: nowrap;
+            pointer-events: auto;
           }
 
           .chip-surface-btn.applied {
