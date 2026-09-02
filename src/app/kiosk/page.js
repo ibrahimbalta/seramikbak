@@ -232,7 +232,7 @@ export default function ShowroomKioskPage() {
   const [snapshotUrl, setSnapshotUrl] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSurfaceMenuOpen, setIsSurfaceMenuOpen] = useState(true);
+  const [isSurfaceMenuOpen, setIsSurfaceMenuOpen] = useState(false);
 
   // Veritabanından Markaları ve Bayileri Yükle
   useEffect(() => {
@@ -1754,9 +1754,9 @@ export default function ShowroomKioskPage() {
         .surface-target-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 4px;
+          gap: 3px;
           background: #090d16;
-          padding: 4px;
+          padding: 3px;
           border-radius: 8px;
           border: 1px solid #1e293b;
         }
@@ -1765,8 +1765,8 @@ export default function ShowroomKioskPage() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 4px 6px;
-          border-radius: 6px;
+          padding: 3px 5px;
+          border-radius: 5px;
           background: #0f172a;
           border: 1px solid #1e293b;
           cursor: pointer;
@@ -1779,41 +1779,41 @@ export default function ShowroomKioskPage() {
         }
 
         .surface-card-btn.is-target {
-          border: 1.5px solid #f59e0b;
+          border: 1px solid #f59e0b;
           background: rgba(245, 158, 11, 0.15);
-          box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+          box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
         }
 
         .surface-info-col {
           display: flex;
           flex-direction: column;
-          gap: 1px;
+          gap: 0px;
         }
 
         .surface-title-row {
           display: flex;
           align-items: center;
-          gap: 4px;
+          gap: 3px;
         }
 
         .surface-name {
-          font-size: 0.76rem;
+          font-size: 0.68rem;
           font-weight: 800;
           color: #f8fafc;
         }
 
         .target-indicator-dot {
-          font-size: 0.75rem;
+          font-size: 0.65rem;
         }
 
         .tile-applied-tag {
-          font-size: 0.65rem;
+          font-size: 0.60rem;
           font-weight: 800;
           color: #4ade80;
         }
 
         .tile-empty-tag {
-          font-size: 0.64rem;
+          font-size: 0.58rem;
           color: #64748b;
         }
 
@@ -2885,11 +2885,17 @@ export default function ShowroomKioskPage() {
 
           .surface-target-grid.is-open {
             display: grid !important;
+            animation: slideDownExpand 0.2s cubic-bezier(0.16, 1, 0.3, 1);
           }
 
-          @media (min-width: 769px) {
-            .surface-target-grid.is-collapsed-mobile {
-              display: grid !important;
+          @keyframes slideDownExpand {
+            from {
+              opacity: 0;
+              transform: translateY(-8px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
             }
           }
 
