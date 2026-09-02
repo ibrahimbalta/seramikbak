@@ -990,24 +990,39 @@ export default function StudioCanvas({
     } else if (roomType === 'kitchen') {
       // --- 1. CABINETRY & COUNTERTOP ---
       const counterBaseGeo = new THREE.BoxGeometry(2.3, 0.85, 0.6);
-      const baseCabinets = new THREE.Mesh(counterBaseGeo, darkCabMat);
+      const baseCabinets = new THREE.Mesh(counterBaseGeo, cabWoodMat);
       baseCabinets.position.set(-ROOM_WIDTH / 2 + 1.15, 0.425, -ROOM_DEPTH / 2 + 0.3); 
       baseCabinets.castShadow = true;
       baseCabinets.receiveShadow = true;
       group.add(baseCabinets);
 
       const topOakGeo = new THREE.BoxGeometry(2.32, 0.04, 0.62);
-      const countertop = new THREE.Mesh(topOakGeo, oakWoodMat);
+      const countertopMat = (cabinetColor === 'white')
+        ? new THREE.MeshStandardMaterial({ color: '#2b2e36', roughness: 0.3 })
+        : new THREE.MeshStandardMaterial({ color: '#f1f5f9', roughness: 0.15 });
+      const countertop = new THREE.Mesh(topOakGeo, countertopMat);
       countertop.position.set(-ROOM_WIDTH / 2 + 1.16, 0.85 + 0.02, -ROOM_DEPTH / 2 + 0.31);
       countertop.castShadow = true;
       countertop.receiveShadow = true;
       group.add(countertop);
 
       const wallCabGeo = new THREE.BoxGeometry(2.3, 0.65, 0.34);
-      const wallCabinets = new THREE.Mesh(wallCabGeo, porcelainMat);
+      const wallCabinets = new THREE.Mesh(wallCabGeo, cabWoodMat);
       wallCabinets.position.set(-ROOM_WIDTH / 2 + 1.15, 1.8 + 0.325, -ROOM_DEPTH / 2 + 0.17);
       wallCabinets.castShadow = true;
       group.add(wallCabinets);
+
+      // Cabinet Handles (Mutfak Dolap Kulpları)
+      const handleGeo = new THREE.BoxGeometry(0.1, 0.02, 0.02);
+      for (let xPos of [-ROOM_WIDTH / 2 + 0.4, -ROOM_WIDTH / 2 + 0.95, -ROOM_WIDTH / 2 + 1.5, -ROOM_WIDTH / 2 + 2.05]) {
+        const handleBase = new THREE.Mesh(handleGeo, activeFaucetMat);
+        handleBase.position.set(xPos, 0.72, -ROOM_DEPTH / 2 + 0.61);
+        group.add(handleBase);
+
+        const handleWall = new THREE.Mesh(handleGeo, activeFaucetMat);
+        handleWall.position.set(xPos, 1.9, -ROOM_DEPTH / 2 + 0.35);
+        group.add(handleWall);
+      }
 
       // --- 2. SINK & COOKTOP ---
       const sinkGeo = new THREE.BoxGeometry(0.52, 0.01, 0.42);
@@ -1017,12 +1032,12 @@ export default function StudioCanvas({
       group.add(sinkBox);
 
       const tapBaseGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.24);
-      const tapBase = new THREE.Mesh(tapBaseGeo, chromeMat);
+      const tapBase = new THREE.Mesh(tapBaseGeo, activeFaucetMat);
       tapBase.position.set(-ROOM_WIDTH / 2 + 0.6, 0.875 + 0.12, -ROOM_DEPTH / 2 + 0.16);
       group.add(tapBase);
 
       const tapArchGeo = new THREE.CylinderGeometry(0.01, 0.01, 0.18);
-      const tapArch = new THREE.Mesh(tapArchGeo, chromeMat);
+      const tapArch = new THREE.Mesh(tapArchGeo, activeFaucetMat);
       tapArch.rotation.x = Math.PI / 2;
       tapArch.position.set(-ROOM_WIDTH / 2 + 0.6, 0.875 + 0.24, -ROOM_DEPTH / 2 + 0.23);
       group.add(tapArch);
