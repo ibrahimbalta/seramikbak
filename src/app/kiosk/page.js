@@ -422,15 +422,93 @@ export default function ShowroomKioskPage() {
     }
   };
 
-  // 3D Sahneden Bir Yüzeye Tıklandığında O Yüzeyi Hedef Yap
+  const [touchToastMsg, setTouchToastMsg] = useState(null);
+  const touchToastTimerRef = useRef(null);
+
+  const showTouchFeedback = (msg) => {
+    if (touchToastTimerRef.current) clearTimeout(touchToastTimerRef.current);
+    setTouchToastMsg(msg);
+    touchToastTimerRef.current = setTimeout(() => {
+      setTouchToastMsg(null);
+    }, 2200);
+  };
+
+  // 3D Sahneden veya Mobil Çiplerden Bir Yüzeye Dokunulduğunda Seramiği Ekle / Çıkar
   const handleToggleTargetFromCanvas = (target) => {
-    if (target === 'floor') setActiveTargetSurface('floor');
-    else if (target === 'walls') setActiveTargetSurface('walls');
-    else if (target === 'shower') setActiveTargetSurface('shower');
-    else if (target === 'showerFloor') setActiveTargetSurface('showerFloor');
-    else if (target === 'toilet') setActiveTargetSurface('toilet');
-    else if (target === 'accent') setActiveTargetSurface('accent');
-    else if (target === 'stripe') setActiveTargetSurface('stripe');
+    const prod = selectedProduct || BRAND_CATALOG[0];
+    const prodShortName = prod?.name ? prod.name.split(' ')[0] : 'Seramik';
+
+    if (target === 'floor') {
+      if (applyFloor && activeTargetSurface === 'floor') {
+        setApplyFloor(false);
+        showTouchFeedback('Zemin seramik kaplaması kaldırıldı ✕');
+      } else {
+        setFloorProduct(prod);
+        setApplyFloor(true);
+        setActiveTargetSurface('floor');
+        showTouchFeedback(`✓ Zemin: ${prodShortName} kaplaması eklendi`);
+      }
+    } else if (target === 'walls') {
+      if (applyWalls && activeTargetSurface === 'walls') {
+        setApplyWalls(false);
+        showTouchFeedback('Ana Duvar kaplaması kaldırıldı ✕');
+      } else {
+        setWallProduct(prod);
+        setApplyWalls(true);
+        setActiveTargetSurface('walls');
+        showTouchFeedback(`✓ Ana Duvar: ${prodShortName} kaplaması eklendi`);
+      }
+    } else if (target === 'shower') {
+      if (applyShower && activeTargetSurface === 'shower') {
+        setApplyShower(false);
+        showTouchFeedback('Duş Duvarı kaplaması kaldırıldı ✕');
+      } else {
+        setShowerProduct(prod);
+        setApplyShower(true);
+        setActiveTargetSurface('shower');
+        showTouchFeedback(`✓ Duş Duvarı: ${prodShortName} kaplaması eklendi`);
+      }
+    } else if (target === 'showerFloor') {
+      if (applyShowerFloor && activeTargetSurface === 'showerFloor') {
+        setApplyShowerFloor(false);
+        showTouchFeedback('Duş Zemini kaplaması kaldırıldı ✕');
+      } else {
+        setShowerFloorProduct(prod);
+        setApplyShowerFloor(true);
+        setActiveTargetSurface('showerFloor');
+        showTouchFeedback(`✓ Duş Zemini: ${prodShortName} kaplaması eklendi`);
+      }
+    } else if (target === 'toilet') {
+      if (applyToiletWall && activeTargetSurface === 'toilet') {
+        setApplyToiletWall(false);
+        showTouchFeedback('Klozet Arkası kaplaması kaldırıldı ✕');
+      } else {
+        setToiletWallProduct(prod);
+        setApplyToiletWall(true);
+        setActiveTargetSurface('toilet');
+        showTouchFeedback(`✓ Klozet Arkası: ${prodShortName} kaplaması eklendi`);
+      }
+    } else if (target === 'accent') {
+      if (applyAccent && activeTargetSurface === 'accent') {
+        setApplyAccent(false);
+        showTouchFeedback('Lavabo Arkası kaplaması kaldırıldı ✕');
+      } else {
+        setAccentProduct(prod);
+        setApplyAccent(true);
+        setActiveTargetSurface('accent');
+        showTouchFeedback(`✓ Lavabo Arkası: ${prodShortName} kaplaması eklendi`);
+      }
+    } else if (target === 'stripe') {
+      if (applyStripeWall && activeTargetSurface === 'stripe') {
+        setApplyStripeWall(false);
+        showTouchFeedback('Yatay Bordür kaplaması kaldırıldı ✕');
+      } else {
+        setStripeWallProduct(prod);
+        setApplyStripeWall(true);
+        setActiveTargetSurface('stripe');
+        showTouchFeedback(`✓ Yatay Bordür: ${prodShortName} kaplaması eklendi`);
+      }
+    }
   };
 
   // Teklif Oluşturma Modalını Aç ve Ekran Görüntüsü Al
@@ -943,6 +1021,14 @@ export default function ShowroomKioskPage() {
               cabinetColor={cabinetColor}
             />
 
+            {/* Touch Toast Notification Popup on 3D Canvas */}
+            {touchToastMsg && (
+              <div className="canvas-touch-toast">
+                <Sparkles size={14} className="icon-gold animate-pulse" />
+                <span>{touchToastMsg}</span>
+              </div>
+            )}
+
             {/* Mobile Floating Left Drawer Trigger Button */}
             <button 
               onClick={() => setIsMobileMenuOpen(true)} 
@@ -956,7 +1042,7 @@ export default function ShowroomKioskPage() {
             {/* Target Surface Overlay Badge inside 3D Canvas */}
             <div className="canvas-active-target-overlay">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span className="overlay-label">Aktif Yüzey Hedefi:</span>
+                <span className="overlay-label">Aktif Yüzey:</span>
                 <strong className="overlay-target-name">
                   {activeTargetSurface === 'floor' && (applyFloor ? `Zemin (${floorProduct?.name?.split(' ')[0] || 'Seramik'})` : 'Zemin (Kaplama Yok)')}
                   {activeTargetSurface === 'walls' && (applyWalls ? `Duvar (${wallProduct?.name?.split(' ')[0] || 'Seramik'})` : 'Duvar (Kaplama Yok - Pasif)')}
@@ -970,16 +1056,16 @@ export default function ShowroomKioskPage() {
                 {/* Quick Toggle / Clear button on current target */}
                 {activeTargetSurface === 'walls' && applyWalls && (
                   <button
-                    onClick={() => setApplyWalls(false)}
+                    onClick={() => handleToggleTargetFromCanvas('walls')}
                     style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.5)', color: '#fca5a5', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
-                    title="Duvar seramiğini pasif yap / kaldır"
+                    title="Duvar seramiğini kaldır"
                   >
-                    ✕ Duvarı Pasif Yap
+                    ✕ Duvarı Kaldır
                   </button>
                 )}
                 {activeTargetSurface === 'walls' && !applyWalls && (
                   <button
-                    onClick={() => setApplyWalls(true)}
+                    onClick={() => handleToggleTargetFromCanvas('walls')}
                     style={{ background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.5)', color: '#86efac', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
                     title="Duvar seramik kaplamasını aktif et"
                   >
@@ -988,16 +1074,16 @@ export default function ShowroomKioskPage() {
                 )}
                 {activeTargetSurface === 'floor' && applyFloor && (
                   <button
-                    onClick={() => setApplyFloor(false)}
+                    onClick={() => handleToggleTargetFromCanvas('floor')}
                     style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.5)', color: '#fca5a5', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
-                    title="Zemin seramiğini pasif yap / kaldır"
+                    title="Zemin seramiğini kaldır"
                   >
-                    ✕ Zemini Pasif Yap
+                    ✕ Zemini Kaldır
                   </button>
                 )}
                 {activeTargetSurface === 'floor' && !applyFloor && (
                   <button
-                    onClick={() => setApplyFloor(true)}
+                    onClick={() => handleToggleTargetFromCanvas('floor')}
                     style={{ background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.5)', color: '#86efac', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
                     title="Zemin seramik kaplamasını aktif et"
                   >
@@ -1005,7 +1091,27 @@ export default function ShowroomKioskPage() {
                   </button>
                 )}
               </div>
-              <span className="overlay-sub-hint">(Sol menüden seçeceğiniz seramik buraya uygulanır)</span>
+              <span className="overlay-sub-hint">(3D sahnede yüzeye dokunarak seramiği ekleyebilir veya çıkarabilirsiniz)</span>
+            </div>
+
+            {/* Mobile Bottom Quick Surface Chips Bar (Dokunarak Ekle/Çıkar) */}
+            <div className="canvas-mobile-surface-chips">
+              {getRoomSurfaces(roomType).map(surf => {
+                const isTarget = activeTargetSurface === surf.id;
+                const isApplied = surf.applied && surf.product;
+
+                return (
+                  <button
+                    key={surf.id}
+                    onClick={() => handleToggleTargetFromCanvas(surf.id)}
+                    className={`chip-surface-btn ${isTarget ? 'active' : ''} ${isApplied ? 'applied' : ''}`}
+                    title={`${surf.name} kaplamasını dokunarak ekle/çıkar`}
+                  >
+                    {isApplied ? '✓ ' : '+ '}
+                    {surf.name.split(' ')[0]}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Canvas Mobile Expand Button */}
@@ -2525,6 +2631,42 @@ export default function ShowroomKioskPage() {
             position: relative;
           }
 
+          /* Touch Toast Notification Popup on 3D Canvas */
+          .canvas-touch-toast {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid #f59e0b;
+            color: #f8fafc;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: toastFadeInDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            white-space: nowrap;
+            pointer-events: none;
+          }
+
+          @keyframes toastFadeInDown {
+            from {
+              opacity: 0;
+              transform: translate(-50%, -12px);
+            }
+            to {
+              opacity: 1;
+              transform: translate(-50%, 0);
+            }
+          }
+
           /* Mobile Floating Drawer Trigger Button over 3D Canvas */
           .canvas-mobile-floating-menu-btn {
             display: flex;
@@ -2612,12 +2754,26 @@ export default function ShowroomKioskPage() {
             white-space: nowrap;
           }
 
+          .chip-surface-btn.applied {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: rgba(34, 197, 94, 0.5);
+            color: #4ade80;
+          }
+
           .chip-surface-btn.active {
             background: #f59e0b;
             color: #0f172a;
             border-color: #f59e0b;
             font-weight: 900;
             box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+          }
+
+          .chip-surface-btn.active.applied {
+            background: #22c55e;
+            color: #0f172a;
+            border-color: #22c55e;
+            font-weight: 900;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
           }
 
           /* Left Slide-out Drawer Panel on Mobile */
