@@ -1989,7 +1989,7 @@ export default function StudioCanvas({
         @media (max-width: 768px) {
           .canvas-overlay {
             position: absolute;
-            bottom: 6px;
+            bottom: 46px;
             left: 6px;
             right: 6px;
             top: auto;
@@ -1998,48 +1998,61 @@ export default function StudioCanvas({
             align-items: flex-end;
             pointer-events: none;
             gap: 6px;
-            z-index: 10;
+            z-index: 30;
           }
           .overlay-left-badges {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 3px;
-            max-width: 48%;
+            gap: 4px;
+            max-width: 58%;
             pointer-events: none;
           }
           .overlay-badge {
             font-size: 0.62rem;
-            padding: 3px 6px;
+            padding: 4px 8px;
             border-radius: 6px;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            color: #ffffff;
             white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
           }
           .overlay-right-actions {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
             gap: 4px;
-            max-width: 50%;
+            max-width: 42%;
             pointer-events: auto;
           }
           .overlay-action-btn {
-            padding: 5px 9px;
-            font-size: 0.64rem;
-            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.66rem;
+            font-weight: 800;
+            border-radius: 8px;
             white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #0f172a;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.5);
+            cursor: pointer;
+            pointer-events: auto;
           }
           .overlay-instructions {
-            font-size: 0.60rem;
-            padding: 3px 6px;
+            font-size: 0.58rem;
+            padding: 4px 6px;
             border-radius: 6px;
-            background: rgba(15, 23, 42, 0.92);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            color: #fbbf24;
+            font-weight: 700;
             text-align: right;
             white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
           }
         }
       `}</style>
