@@ -824,63 +824,65 @@ export default function ShowroomKioskPage() {
               </div>
             </div>
 
-            <div className={`surface-target-grid ${isSurfaceMenuOpen ? 'is-open' : 'is-collapsed-mobile'}`}>
-              {getRoomSurfaces(roomType).map(surf => {
-                const isTarget = activeTargetSurface === surf.id;
-                const isApplied = surf.applied && surf.product;
+            {isSurfaceMenuOpen && (
+              <div className="surface-target-grid is-open">
+                {getRoomSurfaces(roomType).map(surf => {
+                  const isTarget = activeTargetSurface === surf.id;
+                  const isApplied = surf.applied && surf.product;
 
-                return (
-                  <div
-                    key={surf.id}
-                    className={`surface-card-btn ${isTarget ? 'is-target' : ''} ${isApplied ? 'has-tile' : 'no-tile'}`}
-                    onClick={() => {
-                      setActiveTargetSurface(surf.id);
-                      if (!surf.applied && surf.product) {
-                        surf.toggle();
-                      }
-                    }}
-                  >
-                    <div className="surface-info-col">
-                      <div className="surface-title-row">
-                        {isTarget && <span className="target-indicator-dot" title="Aktif Hedef">🎯</span>}
-                        <span className="surface-name">{surf.name}</span>
+                  return (
+                    <div
+                      key={surf.id}
+                      className={`surface-card-btn ${isTarget ? 'is-target' : ''} ${isApplied ? 'has-tile' : 'no-tile'}`}
+                      onClick={() => {
+                        setActiveTargetSurface(surf.id);
+                        if (!surf.applied && surf.product) {
+                          surf.toggle();
+                        }
+                      }}
+                    >
+                      <div className="surface-info-col">
+                        <div className="surface-title-row">
+                          {isTarget && <span className="target-indicator-dot" title="Aktif Hedef">🎯</span>}
+                          <span className="surface-name">{surf.name}</span>
+                        </div>
+                        {isApplied ? (
+                          <span className="tile-applied-tag">
+                            ✓ {surf.product.name.split(' ')[0]}
+                          </span>
+                        ) : (
+                          <span className="tile-empty-tag">Döşenmedi</span>
+                        )}
                       </div>
+
                       {isApplied ? (
-                        <span className="tile-applied-tag">
-                          ✓ {surf.product.name.split(' ')[0]}
-                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            surf.toggle();
+                          }}
+                          className="btn-clear-tile"
+                          title={`${surf.name} seramik kaplamasını kaldır`}
+                        >
+                          <X size={12} />
+                          <span>Kaldır</span>
+                        </button>
                       ) : (
-                        <span className="tile-empty-tag">Döşenmedi</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveTargetSurface(surf.id);
+                          }}
+                          className={`btn-select-target ${isTarget ? 'active' : ''}`}
+                        >
+                          {isTarget ? 'Seçili' : 'Kapla'}
+                        </button>
                       )}
                     </div>
-
-                    {isApplied ? (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          surf.toggle();
-                        }}
-                        className="btn-clear-tile"
-                        title={`${surf.name} seramik kaplamasını kaldır`}
-                      >
-                        <X size={12} />
-                        <span>Kaldır</span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setActiveTargetSurface(surf.id);
-                        }}
-                        className={`btn-select-target ${isTarget ? 'active' : ''}`}
-                      >
-                        {isTarget ? 'Seçili' : 'Kapla'}
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Marka Seçimi Dropdown (Tüm Markalar) */}
             <div className="brand-select-wrapper">
