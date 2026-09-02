@@ -1701,10 +1701,24 @@ export default function StudioCanvas({
       leftWallAccentMeshRef.current.material = new THREE.MeshStandardMaterial({ color: '#181b22', roughness: 0.85 });
     }
 
-    // 7. HORIZONTAL STRIPE ACCENT BAND (YATAY BORDÜR / ŞERİT KUŞAĞI - DUVARLARI SARAN BANT) LOGIC
-    if (stripeWallMeshRef.current) stripeWallMeshRef.current.visible = !!applyStripeWall;
-    if (leftStripeWallMeshRef.current) leftStripeWallMeshRef.current.visible = !!applyStripeWall;
-    if (applyStripeWall && stripeWallProduct && (stripeWallMeshRef.current || leftStripeWallMeshRef.current)) {
+    // 7. HORIZONTAL STRIPE ACCENT BAND / KITCHEN BACKSPLASH (MUTFAK ALINI / TEZGAH ARASI / YATAY BORDÜR) LOGIC
+    const isKitchenMode = roomType === 'kitchen';
+    if (stripeWallMeshRef.current) {
+      stripeWallMeshRef.current.visible = !!applyStripeWall;
+      stripeWallMeshRef.current.geometry.dispose();
+      if (isKitchenMode) {
+        stripeWallMeshRef.current.geometry = new THREE.PlaneGeometry(2.3, 0.91);
+        stripeWallMeshRef.current.position.set(-ROOM_WIDTH / 2 + 1.15, 1.345, -ROOM_DEPTH / 2 + 0.004);
+      } else {
+        stripeWallMeshRef.current.geometry = new THREE.PlaneGeometry(ROOM_WIDTH, 0.6);
+        stripeWallMeshRef.current.position.set(0, ROOM_HEIGHT / 2, -ROOM_DEPTH / 2 + 0.004);
+      }
+    }
+    if (leftStripeWallMeshRef.current) {
+      leftStripeWallMeshRef.current.visible = !isKitchenMode && !!applyStripeWall;
+    }
+
+    if (applyStripeWall && stripeWallProduct && stripeWallMeshRef.current) {
       const w_m = stripeWallProduct.width / 100;
       const h_m = stripeWallProduct.height / 100;
 
@@ -1715,10 +1729,12 @@ export default function StudioCanvas({
         const roughness = stripeWallProduct.finish === 'Parlak' ? 0.08 : 0.85;
         const clearcoat = stripeWallProduct.finish === 'Parlak' ? 1.0 : 0.0;
 
-        // Back Wall Stripe
+        // Back Wall Stripe / Kitchen Backsplash
         if (stripeWallMeshRef.current) {
           const backTex = texture.clone();
-          backTex.repeat.set(ROOM_WIDTH / w_m, 0.6 / h_m);
+          const targetW = isKitchenMode ? 2.3 : ROOM_WIDTH;
+          const targetH = isKitchenMode ? 0.91 : 0.6;
+          backTex.repeat.set(targetW / w_m, targetH / h_m);
           if (stripeWallMeshRef.current.material.map) stripeWallMeshRef.current.material.map.dispose();
           stripeWallMeshRef.current.material.dispose();
           stripeWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
@@ -1728,8 +1744,8 @@ export default function StudioCanvas({
           });
         }
 
-        // Left Wall Stripe
-        if (leftStripeWallMeshRef.current) {
+        // Left Wall Stripe (only for non-kitchen)
+        if (!isKitchenMode && leftStripeWallMeshRef.current) {
           const leftTex = texture.clone();
           leftTex.repeat.set(ROOM_DEPTH / w_m, 0.6 / h_m);
           if (leftStripeWallMeshRef.current.material.map) leftStripeWallMeshRef.current.material.map.dispose();

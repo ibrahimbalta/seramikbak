@@ -385,32 +385,41 @@ export default function ShowroomKioskPage() {
       return [
         { id: 'floor', name: 'Zemin Seramiği', applied: applyFloor, product: floorProduct, toggle: () => setApplyFloor(!applyFloor) },
         { id: 'walls', name: 'Ana Duvar', applied: applyWalls, product: wallProduct, toggle: () => setApplyWalls(!applyWalls) },
+        { id: 'stripe', name: 'Mutfak Alını / Yatay Bordür', applied: applyStripeWall, product: stripeWallProduct, toggle: () => setApplyStripeWall(!applyStripeWall) },
         { id: 'shower', name: 'Duş Duvarı', applied: applyShower, product: showerProduct, toggle: () => setApplyShower(!applyShower) },
         { id: 'showerFloor', name: 'Duş Zemini', applied: applyShowerFloor, product: showerFloorProduct, toggle: () => setApplyShowerFloor(!applyShowerFloor) },
         { id: 'toilet', name: 'Klozet Arkası', applied: applyToiletWall, product: toiletWallProduct, toggle: () => setApplyToiletWall(!applyToiletWall) },
         { id: 'accent', name: 'Lavabo Arkası', applied: applyAccent, product: accentProduct, toggle: () => setApplyAccent(!applyAccent) },
-        { id: 'stripe', name: 'Yatay Bordür', applied: applyStripeWall, product: stripeWallProduct, toggle: () => setApplyStripeWall(!applyStripeWall) },
       ];
     } else if (room === 'kitchen') {
       return [
+        { id: 'stripe', name: 'Mutfak Alını (Tezgah Arası)', applied: applyStripeWall, product: stripeWallProduct, toggle: () => setApplyStripeWall(!applyStripeWall) },
         { id: 'floor', name: 'Zemin Seramiği', applied: applyFloor, product: floorProduct, toggle: () => setApplyFloor(!applyFloor) },
-        { id: 'walls', name: 'Ana Duvar', applied: applyWalls, product: wallProduct, toggle: () => setApplyWalls(!applyWalls) },
-        { id: 'stripe', name: 'Tezgah Arası (Bordür)', applied: applyStripeWall, product: stripeWallProduct, toggle: () => setApplyStripeWall(!applyStripeWall) },
+        { id: 'walls', name: 'Mutfak Duvarı', applied: applyWalls, product: wallProduct, toggle: () => setApplyWalls(!applyWalls) },
         { id: 'accent', name: 'Mutfak Vurgu Duvarı', applied: applyAccent, product: accentProduct, toggle: () => setApplyAccent(!applyAccent) },
       ];
     } else {
       return [
         { id: 'floor', name: 'Zemin Seramiği', applied: applyFloor, product: floorProduct, toggle: () => setApplyFloor(!applyFloor) },
         { id: 'walls', name: 'Ana Duvar', applied: applyWalls, product: wallProduct, toggle: () => setApplyWalls(!applyWalls) },
+        { id: 'stripe', name: 'Mutfak Alını / Bordür', applied: applyStripeWall, product: stripeWallProduct, toggle: () => setApplyStripeWall(!applyStripeWall) },
         { id: 'accent', name: 'Vurgu / TV Duvarı', applied: applyAccent, product: accentProduct, toggle: () => setApplyAccent(!applyAccent) },
       ];
     }
   };
 
-  // Mekan Değiştiğinde (Salon, Mutfak, Teras seçilince banyo duvar kaplamalarını pasif yap)
+  // Mekan Değiştiğinde (Mutfak seçilince Mutfak Alını kaplamasını otomatik aktif et)
   const handleRoomTypeChange = (newRoom) => {
     setRoomType(newRoom);
-    if (newRoom !== 'bathroom') {
+    if (newRoom === 'kitchen') {
+      setApplyWalls(false);
+      setApplyShower(false);
+      setApplyShowerFloor(false);
+      setApplyToiletWall(false);
+      setApplyAccent(false);
+      setApplyStripeWall(true);
+      setActiveTargetSurface('stripe');
+    } else if (newRoom !== 'bathroom') {
       setApplyWalls(false);
       setApplyShower(false);
       setApplyShowerFloor(false);
