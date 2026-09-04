@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { verifyPassword } from '@/lib/auth';
+import { verifyPassword, hashPassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { encryptSession } from '@/lib/session';
 
@@ -9,23 +9,56 @@ export async function POST(request) {
     const body = await request.json();
     const { email, password, username, role } = body;
 
-    // --- Admin Login (username/password) ---
-    if (role === 'admin' && username && password) {
-      const adminUser = process.env.ADMIN_USERNAME || 'admin';
-      const adminPass = process.env.ADMIN_PASSWORD || '6032.,Elif.';
+    // --- Admin Login (DB-based RBAC) ---
+    if (role === 'admin' && (username || email) && password) {
+      const loginIdentifier = username || email;
 
-      if (username !== adminUser || password !== adminPass) {
+      // Find Admin in DB
+      let admin = await prisma.adminUser.findFirst({
+        where: {
+          OR: [
+            { username: loginIdentifier },
+            { email: loginIdentifier }
+          ]
+        }
+      });
+
+      // Seed default Super Admin from env if DB table is completely empty
+      if (!admin) {
+        const totalAdmins = await prisma.adminUser.count();
+        if (totalAdmins === 0) {
+          const envUsername = process.env.ADMIN_USERNAME || 'admin';
+          const envPassword = process.env.ADMIN_PASSWORD || '6032.,Elif.';
+          
+          if (loginIdentifier === envUsername || loginIdentifier === 'admin@seramikbak.com') {
+            admin = await prisma.adminUser.create({
+              data: {
+                username: envUsername,
+                email: 'admin@seramikbak.com',
+                name: 'Süper Admin',
+                password: hashPassword(envPassword),
+                role: 'SUPER_ADMIN',
+                status: 'ACTIVE'
+              }
+            });
+          }
+        }
+      }
+
+      if (!admin || admin.status !== 'ACTIVE' || !verifyPassword(password, admin.password)) {
         return NextResponse.json(
-          { error: 'Hatalı kullanıcı adı veya şifre.' },
+          { error: 'Hatalı kullanıcı adı, e-posta veya şifre.' },
           { status: 401 }
         );
       }
 
       const token = encryptSession({
-        id: 'admin',
-        name: 'Admin',
-        email: 'admin@seramikbak.com',
-        role: 'admin'
+        id: admin.id,
+        name: admin.name,
+        email: admin.email,
+        username: admin.username,
+        role: 'admin',
+        adminRole: admin.role // SUPER_ADMIN, CONTENT_MANAGER, SUPPORT
       });
 
       const cookieStore = await cookies();
@@ -39,7 +72,14 @@ export async function POST(request) {
 
       return NextResponse.json({
         success: true,
-        user: { id: 'admin', name: 'Admin', email: 'admin@seramikbak.com' },
+        user: {
+          id: admin.id,
+          name: admin.name,
+          email: admin.email,
+          username: admin.username,
+          role: 'admin',
+          adminRole: admin.role
+        },
         token
       });
     }
@@ -69,7 +109,8 @@ export async function POST(request) {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role || 'user'
+      role: 'user',
+      emailVerified: user.emailVerified
     });
 
     // Set HTTP-Only Cookie
@@ -87,7 +128,8 @@ export async function POST(request) {
       user: {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        emailVerified: user.emailVerified
       },
       token
     });
@@ -99,4 +141,5 @@ export async function POST(request) {
     );
   }
 }
+
 

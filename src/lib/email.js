@@ -203,3 +203,27 @@ export async function sendInstallerNotification({ name, phone, city, experienceY
 
   return sendEmail({ to: ADMIN_EMAIL, subject, htmlBody });
 }
+
+/**
+ * 6. E-Posta Doğrulama Bağlantısı
+ */
+export async function sendVerificationEmail({ toEmail, userName, verificationLink }) {
+  const subject = 'SeramikBak - E-Posta Adresinizi Doğrulayın';
+  const htmlBody = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px;">
+      <div style="background: #0f172a; padding: 16px 24px; text-align: center; border-radius: 12px; color: #ffffff;">
+        <h2 style="margin: 0; color: #d4af37;">SeramikBak Türkiye</h2>
+      </div>
+      <div style="padding: 24px 0; color: #334155; line-height: 1.6;">
+        <p>Merhaba <strong>${userName || 'Değerli Üyemiz'}</strong>,</p>
+        <p>SeramikBak platformuna hoş geldiniz! Hesabınızı aktifleştirmek ve güvenli bir şekilde kullanmak için lütfen aşağıdaki butona tıklayarak e-posta adresinizi doğrulayın:</p>
+        <div style="text-align: center; margin: 24px 0;">
+          <a href="${verificationLink}" target="_blank" style="background: #0f172a; color: #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: 700; text-decoration: none; display: inline-block;">E-Postamı Doğrula</a>
+        </div>
+        <p style="font-size: 12px; color: #64748b;">Bu bağlantı 24 saat boyunca geçerlidir. Eğer SeramikBak'ta hesap oluşturmadıysanız bu mesajı dikkate almayabilirsiniz.</p>
+      </div>
+    </div>
+  `;
+  return sendEmail({ to: toEmail, subject, htmlBody });
+}
+

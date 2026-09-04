@@ -6,9 +6,10 @@ import { decryptSession } from './session';
  * Supports secure cookies (default) and Authorization header (fallback).
  * @param {Request} request 
  * @param {string|null} requiredRole - 'admin', 'dealer', or 'brand'
+ * @param {string|null} requiredAdminRole - 'SUPER_ADMIN', 'CONTENT_MANAGER', or 'SUPPORT'
  * @returns {Promise<object|null>} The session object if valid, otherwise null.
  */
-export async function verifyAuth(request, requiredRole = null) {
+export async function verifyAuth(request, requiredRole = null, requiredAdminRole = null) {
   try {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get('sb_session');
@@ -33,9 +34,16 @@ export async function verifyAuth(request, requiredRole = null) {
       return null;
     }
 
-    // Role validation
+    // Primary role validation ('admin', 'dealer', 'brand')
     if (requiredRole && session.role !== requiredRole) {
       return null;
+    }
+
+    // Granular Admin sub-role validation (SUPER_ADMIN always passes)
+    if (requiredAdminRole && session.role === 'admin') {
+      if (session.adminRole !== 'SUPER_ADMIN' && session.adminRole !== requiredAdminRole) {
+        return null;
+      }
     }
 
     return session;
@@ -44,3 +52,4 @@ export async function verifyAuth(request, requiredRole = null) {
     return null;
   }
 }
+

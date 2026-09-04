@@ -251,16 +251,31 @@ model SaaSConfig {
   updatedAt      DateTime  @updatedAt
 }
 
+model AdminUser {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("SUPER_ADMIN") // SUPER_ADMIN, CONTENT_MANAGER, SUPPORT, DEALER_MANAGER
+  status    String   @default("ACTIVE") // ACTIVE, INACTIVE, PAUSED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
-  id                String     @id @default(uuid())
-  name              String
-  email             String     @unique
-  password          String
-  resetToken        String?
-  resetTokenExpires DateTime?
-  favorites         Favorite[]
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
+  id                        String     @id @default(uuid())
+  name                      String
+  email                     String     @unique
+  password                  String
+  resetToken                String?
+  resetTokenExpires         DateTime?
+  emailVerified             Boolean    @default(false)
+  verificationToken         String?
+  verificationTokenExpires DateTime?
+  favorites                 Favorite[]
+  createdAt                 DateTime   @default(now())
+  updatedAt                 DateTime   @updatedAt
 }
 
 model Favorite {
