@@ -98,7 +98,19 @@ export default async function sitemap() {
       });
     });
   } catch (err) {
-    console.error('Sitemap product route generation error:', err);
+    console.error('Sitemap product route generation error (using static fallback matrix):', err);
+    TOP_BRANDS.slice(0, 8).forEach(brand => {
+      const brandSlug = slugify(brand);
+      supportedLangs.forEach(lang => {
+        const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
+        productRoutes.push({
+          url: `${baseUrl}/?brand=${brandSlug}${langParam ? `&lang=${lang}` : ''}`,
+          lastModified: new Date(),
+          changeFrequency: 'daily',
+          priority: 0.9
+        });
+      });
+    });
   }
 
   // 4. Dynamic Dealer Showroom Paths from DB
@@ -120,7 +132,15 @@ export default async function sitemap() {
       });
     });
   } catch (err) {
-    console.error('Sitemap dealer route generation error:', err);
+    console.error('Sitemap dealer route generation error (using static fallback matrix):', err);
+    TURKEY_CITIES.slice(0, 10).forEach(city => {
+      dealerRoutes.push({
+        url: `${baseUrl}/bayi?city=${encodeURIComponent(city)}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.85
+      });
+    });
   }
 
   // 5. Dynamic Brand Hub Routes from DB
@@ -142,8 +162,18 @@ export default async function sitemap() {
       });
     });
   } catch (err) {
-    console.error('Sitemap brand route generation error:', err);
+    console.error('Sitemap brand route generation error (using static fallback matrix):', err);
+    TOP_BRANDS.forEach(brand => {
+      const slug = slugify(brand);
+      brandRoutes.push({
+        url: `${baseUrl}/marka/${slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.8
+      });
+    });
   }
+
 
   return [...staticRoutes, ...cityBrandRoutes, ...productRoutes, ...dealerRoutes, ...brandRoutes];
 }

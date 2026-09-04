@@ -126,12 +126,21 @@ export default function ShowroomKioskPage() {
   const [stripeWallProduct, setStripeWallProduct] = useState(null);
   const [comparisonProduct, setComparisonProduct] = useState(null);
 
-  // Showroom'dan seçilip gelinen seramiği zemin ve duvara uygula
+  const [isOffline, setIsOffline] = useState(false);
+
+  // Showroom'dan seçilip gelinen seramiği zemin ve duvara uygula + Online/Offline Dinleyici
   useEffect(() => {
     setMounted(true);
     if (typeof window === 'undefined') return;
 
+    setIsOffline(!navigator.onLine);
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
     let targetProduct = null;
+
 
     // 1. Session Storage kontrolü (Showroom kartına tıklanınca anında yazılan ürün)
     try {
@@ -729,6 +738,12 @@ export default function ShowroomKioskPage() {
 
         {/* Top Header Actions */}
         <div className="header-right">
+          {isOffline && (
+            <span className="kiosk-offline-pill-badge">
+              ⚡ Çevrimdışı Mod (Yerel 3D Aktif)
+            </span>
+          )}
+
           <button 
             onClick={() => setBottomTab(bottomTab === 'quote' ? 'studio' : 'quote')}
             className={`btn-mode-kiosk ${bottomTab === 'quote' ? 'active-gold' : ''}`}
@@ -736,6 +751,7 @@ export default function ShowroomKioskPage() {
             <Calculator size={16} />
             <span>Metraj & Fiyat Paneli</span>
           </button>
+
 
           <button onClick={() => setShowQrModal(true)} className="btn-secondary-kiosk">
             <QrCode size={16} />
@@ -2001,6 +2017,21 @@ export default function ShowroomKioskPage() {
           padding: 1px 5px;
           border-radius: 4px;
         }
+
+        .kiosk-offline-pill-badge {
+          background: rgba(245, 158, 11, 0.15);
+          border: 1px solid rgba(245, 158, 11, 0.4);
+          color: #fbbf24;
+          font-size: 0.68rem;
+          font-weight: 800;
+          padding: 6px 12px;
+          border-radius: 20px;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          backdrop-filter: blur(8px);
+        }
+
 
         .card-info {
           display: flex;
