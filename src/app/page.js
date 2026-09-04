@@ -8410,26 +8410,26 @@ export default function Home() {
       {/* Mobile Sticky Bottom Tab Navigation Bar */}
       <div className="mobile-bottom-nav">
         <button className={`mobile-nav-item ${activeTab === 'search' ? 'active' : ''}`} onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-          <SearchIcon size={22} />
+          <SearchIcon size={20} />
           <span>Arama</span>
         </button>
         <Link href="/kiosk" className="mobile-nav-item studio-highlight" style={{ textDecoration: 'none' }}>
-          <Layers size={22} />
+          <Layers size={20} />
           <span>3D Stüdyo</span>
         </Link>
         <button className="mobile-nav-item" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}>
           <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-            <HeartIcon size={22} />
+            <HeartIcon size={20} />
             {userFavorites.length > 0 && <span className="mobile-nav-badge">{userFavorites.length}</span>}
           </div>
           <span>Favoriler</span>
         </button>
         <button className={`mobile-nav-item ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-          <MapPin size={22} />
+          <MapPin size={20} />
           <span>Bayiler</span>
         </button>
         <button className={`mobile-nav-item ${showMobileMenu ? 'active' : ''}`} onClick={() => setShowMobileMenu(!showMobileMenu)}>
-          <MenuIcon size={22} />
+          <MenuIcon size={20} />
           <span>Menü</span>
         </button>
       </div>
@@ -14992,21 +14992,21 @@ export default function Home() {
             padding-bottom: 74px !important;
           }
           .mobile-bottom-nav {
-            display: flex;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 64px;
-            background: #fbfaf8;
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
-            z-index: 9998;
-            justify-content: space-between;
-            align-items: center;
-            padding: 4px 4px;
-            padding-bottom: max(4px, env(safe-area-inset-bottom, 0px));
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
-            box-sizing: border-box;
+            display: grid !important;
+            grid-template-columns: repeat(5, 1fr) !important;
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 64px !important;
+            background: #fbfaf8 !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+            z-index: 9998 !important;
+            align-items: center !important;
+            padding: 2px 2px !important;
+            padding-bottom: max(4px, env(safe-area-inset-bottom, 0px)) !important;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04) !important;
+            box-sizing: border-box !important;
           }
           .mobile-nav-item {
             display: flex !important;
@@ -15017,21 +15017,21 @@ export default function Home() {
             background: transparent;
             border: none;
             color: #3b4353;
-            font-size: 0.7rem;
+            font-size: 0.63rem !important;
             font-family: var(--font-title);
             font-weight: 600;
-            gap: 4px;
+            gap: 3px;
             cursor: pointer;
             transition: all 0.15s ease;
-            flex: 1 1 0%;
-            min-width: 0;
-            height: 100%;
+            width: 100% !important;
+            height: 100% !important;
             position: relative;
-            padding: 4px 2px;
-            white-space: nowrap;
-            text-decoration: none;
-            border-radius: 12px;
-            box-sizing: border-box;
+            padding: 4px 1px !important;
+            white-space: nowrap !important;
+            text-decoration: none !important;
+            border-radius: 10px;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
           }
           .mobile-nav-item:not(:last-child)::after {
             content: '';
@@ -15044,42 +15044,43 @@ export default function Home() {
           }
           .mobile-nav-item svg {
             color: #3b4353;
-            display: block;
-            margin: 0 auto;
+            display: block !important;
+            margin: 0 auto !important;
             flex-shrink: 0;
             transition: transform 0.15s ease;
           }
           .mobile-nav-item span {
-            display: block;
-            width: 100%;
-            text-align: center;
-            white-space: nowrap;
+            display: block !important;
+            width: 100% !important;
+            text-align: center !important;
+            white-space: nowrap !important;
             line-height: 1.1;
+            letter-spacing: -0.1px;
           }
           .mobile-nav-item.active {
-            background: #f5efe2;
-            color: #b88a38;
-            font-weight: 700;
+            background: #f5efe2 !important;
+            color: #b88a38 !important;
+            font-weight: 700 !important;
           }
           .mobile-nav-item.active svg {
-            color: #b88a38;
+            color: #b88a38 !important;
           }
           .mobile-nav-item.active span {
-            color: #b88a38;
+            color: #b88a38 !important;
           }
           /* Highlighted 3D Studio Item */
           .mobile-nav-item.studio-highlight {
-            color: #c58b1a;
+            color: #b88a38 !important;
           }
           .mobile-nav-item.studio-highlight svg {
-            color: #c58b1a;
+            color: #b88a38 !important;
           }
           .mobile-nav-item.studio-highlight span {
-            color: #c58b1a;
-            font-weight: 700;
+            color: #b88a38 !important;
+            font-weight: 700 !important;
           }
           .mobile-nav-item.studio-highlight:active {
-            background: rgba(197, 139, 26, 0.1);
+            background: rgba(184, 138, 56, 0.12) !important;
           }
           .mobile-nav-item:active svg {
             transform: scale(0.92);
