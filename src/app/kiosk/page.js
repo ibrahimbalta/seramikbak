@@ -707,9 +707,14 @@ export default function ShowroomKioskPage() {
       {/* Top Touch Kiosk Header */}
       <header className="kiosk-header">
         <div className="header-left">
-          <Link href="/" className="btn-exit-kiosk" title="Ana Sayfaya Dön (Çıkış)">
-            <LogOut size={16} />
-            <span>Çıkış</span>
+          <Link 
+            href="/" 
+            className="btn-exit-kiosk" 
+            title="Ana Sayfaya Dön (Çıkış)"
+            style={{ display: 'inline-flex', flexDirection: 'row', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0 }}
+          >
+            <LogOut size={16} style={{ flexShrink: 0 }} />
+            <span style={{ whiteSpace: 'nowrap', display: 'inline-block' }}>Çıkış</span>
           </Link>
           <div>
             <div className="brand-title-row">
@@ -1550,23 +1555,31 @@ export default function ShowroomKioskPage() {
         }
 
         .btn-exit-kiosk {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-          padding: 0 14px;
-          height: 38px;
-          border-radius: 10px;
-          background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.08) 100%);
-          border: 1px solid rgba(239, 68, 68, 0.35);
-          color: #fca5a5;
-          font-weight: 800;
-          font-size: 0.82rem;
-          text-decoration: none;
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+          display: inline-flex !important;
+          flex-direction: row !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 6px !important;
+          padding: 0 12px !important;
+          height: 36px !important;
+          border-radius: 10px !important;
+          background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.08) 100%) !important;
+          border: 1px solid rgba(239, 68, 68, 0.35) !important;
+          color: #fca5a5 !important;
+          font-weight: 800 !important;
+          font-size: 0.82rem !important;
+          text-decoration: none !important;
+          white-space: nowrap !important;
+          flex-shrink: 0 !important;
+          backdrop-filter: blur(12px) !important;
+          -webkit-backdrop-filter: blur(12px) !important;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .btn-exit-kiosk span {
+          white-space: nowrap !important;
+          display: inline-block !important;
         }
 
         .btn-exit-kiosk:hover {
