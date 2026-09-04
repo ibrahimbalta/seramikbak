@@ -15013,23 +15013,25 @@ export default function Home() {
 
         @media (max-width: 768px) {
           :global(body) {
-            padding-bottom: 74px !important;
+            padding-bottom: 86px !important;
           }
           :global(.mobile-bottom-nav) {
             display: grid !important;
             grid-template-columns: repeat(5, 1fr) !important;
             position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
+            bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+            left: 12px !important;
+            right: 12px !important;
             height: 64px !important;
-            background: #fbfaf8 !important;
-            border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+            background: rgba(255, 255, 255, 0.90) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(15, 23, 42, 0.08) !important;
+            border-radius: 24px !important;
             z-index: 9998 !important;
             align-items: center !important;
-            padding: 2px 0 !important;
-            padding-bottom: max(4px, env(safe-area-inset-bottom, 0px)) !important;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04) !important;
+            padding: 4px 6px !important;
+            box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06) !important;
             box-sizing: border-box !important;
           }
           :global(.mobile-nav-item) {
@@ -15040,20 +15042,20 @@ export default function Home() {
             text-align: center !important;
             background: transparent !important;
             border: none !important;
-            color: #3b4353 !important;
-            font-size: 0.58rem !important;
+            color: #334155 !important;
+            font-size: 0.60rem !important;
             font-family: var(--font-title) !important;
             font-weight: 600 !important;
             gap: 2px !important;
             cursor: pointer !important;
-            transition: all 0.15s ease !important;
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s ease, color 0.15s ease !important;
             width: 100% !important;
             height: 100% !important;
             position: relative !important;
             padding: 4px 0 !important;
             white-space: nowrap !important;
             text-decoration: none !important;
-            border-radius: 10px !important;
+            border-radius: 16px !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
           }
@@ -15064,10 +15066,10 @@ export default function Home() {
             top: 20% !important;
             height: 60% !important;
             width: 1px !important;
-            background: rgba(0, 0, 0, 0.08) !important;
+            background: rgba(15, 23, 42, 0.06) !important;
           }
           :global(.mobile-nav-item svg) {
-            color: #3b4353 !important;
+            color: #334155 !important;
             display: block !important;
             margin: 0 auto !important;
             flex-shrink: 0 !important;
@@ -15083,7 +15085,7 @@ export default function Home() {
             line-height: 1.1 !important;
           }
           :global(.mobile-nav-item.active) {
-            background: #f5efe2 !important;
+            background: rgba(245, 239, 226, 0.9) !important;
             color: #b88a38 !important;
             font-weight: 700 !important;
           }
@@ -15109,8 +15111,8 @@ export default function Home() {
           :global(.mobile-nav-item.studio-highlight:active) {
             background: rgba(184, 138, 56, 0.12) !important;
           }
-          :global(.mobile-nav-item:active svg) {
-            transform: scale(0.92) !important;
+          :global(.mobile-nav-item:active) {
+            transform: scale(0.96) !important;
           }
           :global(.mobile-nav-badge) {
             position: absolute !important;
