@@ -725,15 +725,6 @@ export default function ShowroomKioskPage() {
         {/* Top Header Actions */}
         <div className="header-right">
           <button 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-            className="btn-mobile-drawer-toggle"
-            title="Mobil Çekmece Menüyü Aç/Kapat"
-          >
-            <Menu size={16} />
-            <span>Menü & Kaplamalar</span>
-          </button>
-
-          <button 
             onClick={() => setBottomTab(bottomTab === 'quote' ? 'studio' : 'quote')}
             className={`btn-mode-kiosk ${bottomTab === 'quote' ? 'active-gold' : ''}`}
           >
@@ -749,10 +740,6 @@ export default function ShowroomKioskPage() {
           <button onClick={handleOpenQuoteModal} className="btn-primary-gold-kiosk">
             <FileText size={16} />
             <span>PDF Teklif Oluştur</span>
-          </button>
-
-          <button onClick={toggleFullscreen} className="btn-icon-kiosk" title="Tam Ekran">
-            {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
           </button>
         </div>
       </header>
@@ -2543,8 +2530,8 @@ export default function ShowroomKioskPage() {
           }
         }
 
-        /* Mobile & Medium Tablets (<= 768px): Full 3D Viewport + Left Slide-Out Drawer */
-        @media (max-width: 768px) {
+        /* Tablets & Mobile Viewports (<= 1024px): Full 3D Viewport + Left Slide-Out Drawer */
+        @media (max-width: 1024px) {
           .kiosk-pill {
             display: none !important;
           }
