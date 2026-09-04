@@ -2952,11 +2952,218 @@ export default function ShowroomKioskPage() {
             border-radius: 6px;
           }
 
-          .studio-bottom-bar,
-          .sales-bottom-bar {
+          .studio-bottom-bar {
             padding: 10px;
             border-radius: 12px;
             width: 100%;
+          }
+
+          .sales-bottom-bar {
+            padding: 14px;
+            border-radius: 16px;
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+          }
+
+          .sales-bottom-bar .controls-row {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            padding-bottom: 0;
+            overflow: visible;
+          }
+
+          .sales-bottom-bar .ctrl-group {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            width: 100%;
+          }
+
+          .sales-bottom-bar .ctrl-label {
+            font-size: 0.78rem;
+            color: #fbbf24;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+          }
+
+          .sales-bottom-bar .slider-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+          }
+
+          .sales-bottom-bar .kiosk-range-slider {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            accent-color: #f59e0b;
+            cursor: pointer;
+          }
+
+          .sales-bottom-bar .area-text {
+            font-size: 1rem;
+            font-weight: 900;
+            color: #ffffff;
+            background: #090d16;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid #f59e0b;
+            min-width: 65px;
+            text-align: center;
+          }
+
+          .sales-bottom-bar .price-input-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+          }
+
+          .sales-bottom-bar .kiosk-num-input {
+            flex: 1;
+            height: 40px;
+            font-size: 1rem;
+            font-weight: 900;
+            color: #fbbf24;
+            background: #090d16;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 0 10px;
+            text-align: center;
+          }
+
+          .sales-bottom-bar .btn-group-sm {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            width: 100%;
+          }
+
+          .sales-bottom-bar .btn-sm {
+            padding: 8px 6px;
+            font-size: 0.76rem;
+            font-weight: 800;
+            min-height: 38px;
+            text-align: center;
+            border-radius: 8px;
+          }
+
+          .sales-bottom-bar .totals-row {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            margin-top: 4px;
+          }
+
+          .sales-bottom-bar .summary-pills {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            width: 100%;
+          }
+
+          .sales-bottom-bar .sum-pill {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+          }
+
+          .sales-bottom-bar .sum-title {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            font-weight: 700;
+          }
+
+          .sales-bottom-bar .sum-val {
+            font-size: 0.82rem;
+            color: #ffffff;
+            font-weight: 900;
+          }
+
+          .sales-bottom-bar .hizmet-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 6px 8px;
+          }
+
+          .sales-bottom-bar .toggle-hizmet {
+            flex: 1;
+            height: 34px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            border-radius: 6px;
+          }
+
+          .sales-bottom-bar .kiosk-num-input-sm {
+            width: 60px;
+            height: 34px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            border-radius: 6px;
+          }
+
+          .sales-bottom-bar .price-cta-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            border-radius: 14px;
+            padding: 12px;
+            align-items: stretch;
+            width: 100%;
+          }
+
+          .sales-bottom-bar .price-col {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+          }
+
+          .sales-bottom-bar .price-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 700;
+          }
+
+          .sales-bottom-bar .price-val {
+            font-size: 1.3rem;
+            color: #fbbf24;
+            font-weight: 900;
+          }
+
+          .sales-bottom-bar .btn-primary-gold-lg {
+            width: 100%;
+            height: 44px;
+            font-size: 0.88rem;
+            font-weight: 900;
+            justify-content: center;
+            border-radius: 10px;
           }
 
           .controls-row {
