@@ -6963,37 +6963,37 @@ export default function Home() {
         </div>
       )}
 
-      {/* HOW IT WORKS & DEALER ONBOARDING MODAL */}
+      {/* HOW IT WORKS & DEALER/BRAND ONBOARDING EXECUTIVE MODAL */}
       {showHowItWorksModal && (
-        <div className="modal-overlay animate-fade-in" onClick={() => setShowHowItWorksModal(false)} style={{ zIndex: 99999, background: 'rgba(2, 6, 23, 0.85)', backdropFilter: 'blur(12px)' }}>
+        <div className="modal-overlay animate-fade-in" onClick={() => setShowHowItWorksModal(false)} style={{ zIndex: 99999, background: 'rgba(2, 6, 23, 0.88)', backdropFilter: 'blur(16px)' }}>
           <div 
             onClick={(e) => e.stopPropagation()} 
             style={{ 
-              maxWidth: '720px', 
-              width: '92%', 
+              maxWidth: '980px', 
+              width: '94%', 
               borderRadius: '28px', 
               padding: '32px',
-              background: 'linear-gradient(135deg, #090d16 0%, #172033 100%)',
+              background: 'linear-gradient(135deg, #080d1a 0%, #0f172a 50%, #172033 100%)',
               border: '1px solid rgba(212, 175, 55, 0.4)',
-              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(212, 175, 55, 0.15)',
+              boxShadow: '0 25px 70px rgba(0, 0, 0, 0.8), 0 0 50px rgba(212, 175, 55, 0.15)',
               color: '#ffffff',
-              maxHeight: '90vh',
+              maxHeight: '92vh',
               overflowY: 'auto'
             }}
           >
             
             {/* Modal Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '18px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(179,142,71,0.08) 100%)', border: '1px solid rgba(212, 175, 55, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4af37', boxShadow: '0 4px 12px rgba(212,175,55,0.2)' }}>
-                  <Sparkles size={22} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(179,142,71,0.1) 100%)', border: '1px solid rgba(212, 175, 55, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4af37', boxShadow: '0 4px 16px rgba(212,175,55,0.25)' }}>
+                  <Sparkles size={24} />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.35rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)', letterSpacing: '-0.01em' }}>
-                    SeramikBak Rehberi
+                  <h3 style={{ margin: 0, fontSize: '1.45rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)', letterSpacing: '-0.01em' }}>
+                    SeramikBak Platform Rehberi
                   </h3>
-                  <span style={{ fontSize: '0.82rem', color: '#94a3b8', fontWeight: '500' }}>
-                    Türkiye'nin Lider Akıllı Seramik & 3D Teşhir Platformu
+                  <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: '500' }}>
+                    Türkiye'nin ve Dünyanın Lider Akıllı Seramik, 3D Teşhir & İhracat Portalı
                   </span>
                 </div>
               </div>
@@ -7003,8 +7003,8 @@ export default function Home() {
                   background: 'rgba(255, 255, 255, 0.08)', 
                   border: '1px solid rgba(255, 255, 255, 0.15)', 
                   color: '#ffffff', 
-                  width: '36px', 
-                  height: '36px', 
+                  width: '38px', 
+                  height: '38px', 
                   borderRadius: '50%', 
                   cursor: 'pointer', 
                   fontSize: '1.1rem',
@@ -7018,25 +7018,25 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Modal Segmented Tab Switcher */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: 'rgba(0, 0, 0, 0.4)', padding: '5px', borderRadius: '16px', marginBottom: '24px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+            {/* Modal Segmented 3-Tab Switcher */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px', background: 'rgba(0, 0, 0, 0.45)', padding: '6px', borderRadius: '18px', marginBottom: '24px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <button 
                 onClick={() => setHowItWorksActiveTab('customers')}
                 style={{
-                  padding: '12px 18px',
-                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  borderRadius: '14px',
                   border: 'none',
                   background: howItWorksActiveTab === 'customers' ? 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)' : 'transparent',
                   color: howItWorksActiveTab === 'customers' ? '#ffffff' : '#94a3b8',
                   fontWeight: '800',
-                  fontSize: '0.88rem',
+                  fontSize: '0.86rem',
                   cursor: 'pointer',
                   transition: 'all 0.25s ease',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: howItWorksActiveTab === 'customers' ? '0 4px 14px rgba(179,142,71,0.35)' : 'none'
+                  boxShadow: howItWorksActiveTab === 'customers' ? '0 4px 16px rgba(179,142,71,0.35)' : 'none'
                 }}
               >
                 <HomeIcon size={16} />
@@ -7046,108 +7046,141 @@ export default function Home() {
               <button 
                 onClick={() => setHowItWorksActiveTab('dealers')}
                 style={{
-                  padding: '12px 18px',
-                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  borderRadius: '14px',
                   border: 'none',
                   background: howItWorksActiveTab === 'dealers' ? 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)' : 'transparent',
                   color: howItWorksActiveTab === 'dealers' ? '#ffffff' : '#94a3b8',
                   fontWeight: '800',
-                  fontSize: '0.88rem',
+                  fontSize: '0.86rem',
                   cursor: 'pointer',
                   transition: 'all 0.25s ease',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: howItWorksActiveTab === 'dealers' ? '0 4px 14px rgba(179,142,71,0.35)' : 'none'
+                  boxShadow: howItWorksActiveTab === 'dealers' ? '0 4px 16px rgba(179,142,71,0.35)' : 'none'
                 }}
               >
                 <Building2 size={16} />
                 <span>Seramik Bayileri İçin</span>
               </button>
+
+              <button 
+                onClick={() => setHowItWorksActiveTab('brands')}
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: '14px',
+                  border: 'none',
+                  background: howItWorksActiveTab === 'brands' ? 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)' : 'transparent',
+                  color: howItWorksActiveTab === 'brands' ? '#ffffff' : '#94a3b8',
+                  fontWeight: '800',
+                  fontSize: '0.86rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: howItWorksActiveTab === 'brands' ? '0 4px 16px rgba(179,142,71,0.35)' : 'none'
+                }}
+              >
+                <Globe size={16} />
+                <span>Markalar & Üreticiler İçin</span>
+              </button>
             </div>
 
             {/* Tab 1: For Customers */}
-            {howItWorksActiveTab === 'customers' ? (
+            {howItWorksActiveTab === 'customers' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                <div style={{ background: 'rgba(212, 175, 55, 0.06)', border: '1px solid rgba(212, 175, 55, 0.2)', borderRadius: '16px', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <Sparkles size={18} style={{ color: '#d4af37', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.84rem', color: '#fef08a', fontWeight: '700' }}>
-                    Mağaza mağaza gezmeden hayalinizdeki banyo ve zemini evinizin konforunda tasarlayın & teklif alın!
+                <div style={{ background: 'rgba(212, 175, 55, 0.08)', border: '1px solid rgba(212, 175, 55, 0.25)', borderRadius: '16px', padding: '14px 20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Sparkles size={20} style={{ color: '#d4af37', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.88rem', color: '#fef08a', fontWeight: '700', lineHeight: '1.5' }}>
+                    Mağaza mağaza gezmeden hayalinizdeki banyo ve zemin seramiğini evinizin konforunda tasarlayın, canlı stok görün ve en iyi teklifi alın!
                   </span>
                 </div>
 
                 {/* Step 1 */}
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '20px', transition: 'all 0.2s ease' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)', color: '#ffffff', fontWeight: '900', fontSize: '1.05rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(179,142,71,0.35)' }}>1</div>
+                <div style={{ display: 'flex', gap: '18px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '22px', transition: 'all 0.2s ease' }}>
+                  <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)', color: '#ffffff', fontWeight: '900', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(179,142,71,0.35)' }}>1</div>
                   <div>
-                    <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', fontWeight: '800', color: '#ffffff' }}>
-                      🎨 Modeli Seç & 3D Stüdyoda / Kamera (Web-AR) ile Gör
+                    <h4 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', fontWeight: '800', color: '#ffffff' }}>
+                      🎨 Modeli Seç & 3D Stüdyoda / Telefon Kameranla (Web-AR) Canlı Gör
                     </h4>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.6' }}>
-                      VitrA, Ege, Kütahya, Bien, QUA Granite gibi Türkiye'nin en büyük markalarının seramik modellerini tarz, ebat ve renge göre saniyeler içinde inceleyin. <strong>3D Sanal Stüdyo</strong> veya telefon kameranız (Web-AR) ile doğrudan banyonuza/salonunuza döşeyerek canlı inceleyin.
+                    <p style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#cbd5e1', lineHeight: '1.65' }}>
+                      VitrA, Ege Seramik, NG Kütahya, Bien, QUA Granite gibi Türkiye'nin önde gelen seramik markalarının koleksiyonlarını tarz, ebat ve renge göre filtreleyin. <strong>3D Sanal Stüdyo</strong> veya akıllı telefon kameranız (Web-AR) ile doğrudan banyonuza ya da salonunuza döşeyerek 3D canlı inceleyin.
                     </p>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.76rem', color: '#38bdf8', fontWeight: '700', background: 'rgba(56, 189, 248, 0.1)', padding: '3px 10px', borderRadius: '12px' }}>
-                      ✨ Hatalı seramik ve renk seçimi yapma riskine son!
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#38bdf8', fontWeight: '700', background: 'rgba(56, 189, 248, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
+                      ✨ Yanlış seramik veya uyumsuz renk seçme riskine son!
                     </span>
                   </div>
                 </div>
 
                 {/* Step 2 */}
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '20px', transition: 'all 0.2s ease' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)', color: '#ffffff', fontWeight: '900', fontSize: '1.05rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(179,142,71,0.35)' }}>2</div>
+                <div style={{ display: 'flex', gap: '18px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '22px', transition: 'all 0.2s ease' }}>
+                  <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)', color: '#ffffff', fontWeight: '900', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(179,142,71,0.35)' }}>2</div>
                   <div>
-                    <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', fontWeight: '800', color: '#ffffff' }}>
+                    <h4 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', fontWeight: '800', color: '#ffffff' }}>
                       📍 Şehrindeki Yetkili Bayilerden Canlı Fiyat & Stok Al
                     </h4>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.6' }}>
+                    <p style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#cbd5e1', lineHeight: '1.65' }}>
                       Beğendiğiniz seramiğin bulunduğunuz şehirdeki yetkili bayilerdeki canlı stok durumunu ve m² fiyatlarını görüntüleyin. Tek tıkla yetkili bayi ile WhatsApp veya özel teklif formu üzerinden doğrudan iletişim kurun.
                     </p>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.76rem', color: '#34d399', fontWeight: '700', background: 'rgba(52, 211, 153, 0.1)', padding: '3px 10px', borderRadius: '12px' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#34d399', fontWeight: '700', background: 'rgba(52, 211, 153, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
                       💰 Doğrudan en yakın yetkili bayiden aracısız en iyi fiyat teklifi.
                     </span>
                   </div>
                 </div>
 
                 {/* Step 3 */}
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '20px', transition: 'all 0.2s ease' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)', color: '#ffffff', fontWeight: '900', fontSize: '1.05rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(179,142,71,0.35)' }}>3</div>
+                <div style={{ display: 'flex', gap: '18px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '22px', transition: 'all 0.2s ease' }}>
+                  <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)', color: '#ffffff', fontWeight: '900', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(179,142,71,0.35)' }}>3</div>
                   <div>
-                    <h4 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', fontWeight: '800', color: '#ffffff' }}>
-                      🚚 Ücretsiz Numune Karo, Nakliye & Sertifikalı Usta
+                    <h4 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', fontWeight: '800', color: '#ffffff' }}>
+                      🚚 Ücretsiz Numune Karo, Sigortalı Nakliye & Sertifikalı Usta
                     </h4>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.6' }}>
+                    <p style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#cbd5e1', lineHeight: '1.65' }}>
                       Seramiğin dokusunu elinizle hissetmek isterseniz adresinize numune karo talep edin. Sipariş sürecinde sigortalı lojistik ve sertifikalı usta rehberimizle kapınıza kadar güvenle teslim alın.
                     </p>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '0.76rem', color: '#fef08a', fontWeight: '700', background: 'rgba(254, 240, 138, 0.1)', padding: '3px 10px', borderRadius: '12px' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#fef08a', fontWeight: '700', background: 'rgba(254, 240, 138, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
                       🛠️ Kapıda teslim ve 0 kırık garantili lojistik altyapısı.
                     </span>
                   </div>
                 </div>
               </div>
-            ) : (
-              /* Tab 2: For Dealers */
+            )}
+
+            {/* Tab 2: For Dealers */}
+            {howItWorksActiveTab === 'dealers' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                <div style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(30,41,59,0.8) 100%)', border: '1px solid rgba(212,175,55,0.35)', borderRadius: '20px', padding: '24px' }}>
-                  <h4 style={{ margin: '0 0 10px 0', fontSize: '1.2rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)' }}>
-                    🏬 Showroom'unuzu Dijitalleştirin, Müşteri Çekin!
+                <div style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(30,41,59,0.85) 100%)', border: '1px solid rgba(212,175,55,0.35)', borderRadius: '22px', padding: '26px' }}>
+                  <h4 style={{ margin: '0 0 10px 0', fontSize: '1.25rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)' }}>
+                    🏬 Showroom'unuzu Dijitalleştirin, Bölgenizdeki Müşterileri Çekin!
                   </h4>
-                  <p style={{ margin: '0 0 16px 0', fontSize: '0.88rem', color: '#cbd5e1', lineHeight: '1.6' }}>
+                  <p style={{ margin: '0 0 20px 0', fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.65' }}>
                     SeramikBak platformu; yetkili seramik bayilerinin stoklarını sergilediği, bölgenizdeki seramik arayan binlerce ev sahibini mağazanıza çeken ve showroom tabletlerinizde 3D Teşhir Kiosk hizmeti sunan yeni nesil SaaS altyapısıdır.
                   </p>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '20px' }}>
-                    <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '14px' }}>
-                      <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#ffffff', marginBottom: '4px' }}>📍 Harita Görünürlüğü</div>
-                      <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>Şehrinizde seramik arayan müşterilerin doğrudan haritada mağazanızı bulmasını sağlayın.</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fbbf24', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <MapPin size={16} /> Harita Görünürlüğü
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Şehrinizde seramik arayan müşterilerin doğrudan haritada mağazanızı ve stoklarınızı bulmasını sağlayın.</div>
                     </div>
-                    <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '14px' }}>
-                      <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#ffffff', marginBottom: '4px' }}>📱 3D Kiosk Lisansı</div>
-                      <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>Mağazanızdaki tablet ve dokunmatik ekranlarda tüm kataloğu 3D canlı giydirin.</div>
+
+                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fbbf24', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Smartphone size={16} /> 3D Kiosk Lisansı
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Mağazanızdaki tablet ve dokunmatik ekranlarda tüm kataloğu 3D canlı giydirerek müşterilerinize sunun.</div>
                     </div>
-                    <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '14px' }}>
-                      <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#ffffff', marginBottom: '4px' }}>📈 Canlı Teklif Talepleri</div>
-                      <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>Müşterilerin platform üzerinden gönderdiği fiyat teklif taleplerini anında panellerde yanıtlayın.</div>
+
+                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fbbf24', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <TrendingUp size={16} /> Canlı Teklif Talepleri
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Müşterilerin platform üzerinden gönderdiği fiyat teklif taleplerini anında dijital panellerde yanıtlayın.</div>
                     </div>
                   </div>
 
@@ -7157,7 +7190,7 @@ export default function Home() {
                       onClick={() => setShowHowItWorksModal(false)} 
                       style={{
                         padding: '12px 24px',
-                        fontSize: '0.88rem',
+                        fontSize: '0.9rem',
                         borderRadius: '12px',
                         textDecoration: 'none',
                         fontWeight: '800',
@@ -7169,8 +7202,78 @@ export default function Home() {
                         gap: '8px'
                       }}
                     >
-                      <Store size={18} />
+                      <Building2 size={18} />
                       <span>Hemen Bayi Paneline Gir</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Tab 3: For Brands & Manufacturers */}
+            {howItWorksActiveTab === 'brands' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                <div style={{ background: 'linear-gradient(135deg, rgba(56,189,248,0.12) 0%, rgba(15,23,42,0.9) 100%)', border: '1px solid rgba(56,189,248,0.35)', borderRadius: '22px', padding: '26px' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '4px 12px', borderRadius: '20px', fontSize: '0.78rem', fontWeight: '800', marginBottom: '12px' }}>
+                    🏭 Seramik Markaları & İmalatçıları İçin Kurumsal Dijitalleşme
+                  </div>
+                  <h4 style={{ margin: '0 0 10px 0', fontSize: '1.25rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)' }}>
+                    Koleksiyonlarınızı 3D Dijitalleştirin, Global Bayi & İhracat Ağı Kurun!
+                  </h4>
+                  <p style={{ margin: '0 0 20px 0', fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.65' }}>
+                    SeramikBak; VitrA, Kalebodur, Kütahya, Bien, Ege, QUA gibi Türkiye'nin lider üreticilerinin seramik koleksiyonlarını Web-3D ve AR altyapısına dönüştürerek hem yurt içi bayi ağınıza hem de 16+ ülkede ihracat alıcılarına sunar.
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#38bdf8', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Globe size={16} /> Global Dijital Katalog & 3D Teşhir
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Tüm karo ve porselen koleksiyonlarınızı 3D Sanal Stüdyo ve Web-AR formatında canlı sergileyin.</div>
+                    </div>
+
+                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#38bdf8', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Send size={16} /> 16+ Ülke B2B İhracat Hub
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Global Export Hub ve B2B Stok Borsası ile uluslararası distribütör ve ithalatçılara doğrudan ulaşın.</div>
+                    </div>
+
+                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#38bdf8', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <TrendingUp size={16} /> Gerçek Zamanlı Pazar Analitiği
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Hangi bölgede hangi seramik ebadı, deseni ve renginin arandığını canlı veri panelleriyle anlık izleyin.</div>
+                    </div>
+
+                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
+                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#38bdf8', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Building2 size={16} /> Yetkili Bayi Ağı Entegrasyonu
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Türkiye genelindeki tüm yetkili bayilerinizi harita ve dijital stok havuzu ile merkezden destekleyin.</div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+                    <Link 
+                      href="/marka" 
+                      onClick={() => setShowHowItWorksModal(false)} 
+                      style={{
+                        padding: '12px 24px',
+                        fontSize: '0.9rem',
+                        borderRadius: '12px',
+                        textDecoration: 'none',
+                        fontWeight: '800',
+                        background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                        color: '#ffffff',
+                        boxShadow: '0 6px 18px rgba(2,132,199,0.35)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <Globe size={18} />
+                      <span>Marka & Üretici Portalını İncele</span>
                     </Link>
                   </div>
                 </div>
