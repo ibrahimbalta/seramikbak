@@ -8409,28 +8409,52 @@ export default function Home() {
 
       {/* Mobile Sticky Bottom Tab Navigation Bar */}
       <div className="mobile-bottom-nav">
-        <button className={`mobile-nav-item ${activeTab === 'search' ? 'active' : ''}`} onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-          <SearchIcon size={20} />
-          <span>Arama</span>
+        <button 
+          className={`mobile-nav-item ${activeTab === 'search' ? 'active' : ''}`} 
+          onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
+        >
+          <SearchIcon size={19} />
+          <span style={{ whiteSpace: 'nowrap', fontSize: '0.60rem', display: 'block', width: '100%', textAlign: 'center' }}>Arama</span>
         </button>
-        <Link href="/kiosk" className="mobile-nav-item studio-highlight" style={{ textDecoration: 'none' }}>
-          <Layers size={20} />
-          <span>3D Stüdyo</span>
+
+        <Link 
+          href="/kiosk" 
+          className="mobile-nav-item studio-highlight" 
+          style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
+        >
+          <Layers size={19} style={{ color: '#b88a38' }} />
+          <span style={{ whiteSpace: 'nowrap', fontSize: '0.56rem', fontWeight: 700, letterSpacing: '-0.2px', display: 'block', width: '100%', textAlign: 'center', color: '#b88a38' }}>3D Stüdyo</span>
         </Link>
-        <button className="mobile-nav-item" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}>
+
+        <button 
+          className="mobile-nav-item" 
+          onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
+        >
           <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-            <HeartIcon size={20} />
+            <HeartIcon size={19} />
             {userFavorites.length > 0 && <span className="mobile-nav-badge">{userFavorites.length}</span>}
           </div>
-          <span>Favoriler</span>
+          <span style={{ whiteSpace: 'nowrap', fontSize: '0.60rem', display: 'block', width: '100%', textAlign: 'center' }}>Favoriler</span>
         </button>
-        <button className={`mobile-nav-item ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-          <MapPin size={20} />
-          <span>Bayiler</span>
+
+        <button 
+          className={`mobile-nav-item ${activeTab === 'dealers' ? 'active' : ''}`} 
+          onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
+        >
+          <MapPin size={19} />
+          <span style={{ whiteSpace: 'nowrap', fontSize: '0.60rem', display: 'block', width: '100%', textAlign: 'center' }}>Bayiler</span>
         </button>
-        <button className={`mobile-nav-item ${showMobileMenu ? 'active' : ''}`} onClick={() => setShowMobileMenu(!showMobileMenu)}>
-          <MenuIcon size={20} />
-          <span>Menü</span>
+
+        <button 
+          className={`mobile-nav-item ${showMobileMenu ? 'active' : ''}`} 
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
+        >
+          <MenuIcon size={19} />
+          <span style={{ whiteSpace: 'nowrap', fontSize: '0.60rem', display: 'block', width: '100%', textAlign: 'center' }}>Menü</span>
         </button>
       </div>
 
@@ -14991,7 +15015,7 @@ export default function Home() {
           :global(body) {
             padding-bottom: 74px !important;
           }
-          .mobile-bottom-nav {
+          :global(.mobile-bottom-nav) {
             display: grid !important;
             grid-template-columns: repeat(5, 1fr) !important;
             position: fixed !important;
@@ -15003,100 +15027,103 @@ export default function Home() {
             border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
             z-index: 9998 !important;
             align-items: center !important;
-            padding: 2px 2px !important;
+            padding: 2px 0 !important;
             padding-bottom: max(4px, env(safe-area-inset-bottom, 0px)) !important;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04) !important;
             box-sizing: border-box !important;
           }
-          .mobile-nav-item {
+          :global(.mobile-nav-item) {
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
             text-align: center !important;
-            background: transparent;
-            border: none;
-            color: #3b4353;
-            font-size: 0.63rem !important;
-            font-family: var(--font-title);
-            font-weight: 600;
-            gap: 3px;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            background: transparent !important;
+            border: none !important;
+            color: #3b4353 !important;
+            font-size: 0.58rem !important;
+            font-family: var(--font-title) !important;
+            font-weight: 600 !important;
+            gap: 2px !important;
+            cursor: pointer !important;
+            transition: all 0.15s ease !important;
             width: 100% !important;
             height: 100% !important;
-            position: relative;
-            padding: 4px 1px !important;
+            position: relative !important;
+            padding: 4px 0 !important;
             white-space: nowrap !important;
             text-decoration: none !important;
-            border-radius: 10px;
+            border-radius: 10px !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
           }
-          .mobile-nav-item:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 20%;
-            height: 60%;
-            width: 1px;
-            background: rgba(0, 0, 0, 0.08);
+          :global(.mobile-nav-item:not(:last-child)::after) {
+            content: '' !important;
+            position: absolute !important;
+            right: 0 !important;
+            top: 20% !important;
+            height: 60% !important;
+            width: 1px !important;
+            background: rgba(0, 0, 0, 0.08) !important;
           }
-          .mobile-nav-item svg {
-            color: #3b4353;
+          :global(.mobile-nav-item svg) {
+            color: #3b4353 !important;
             display: block !important;
             margin: 0 auto !important;
-            flex-shrink: 0;
-            transition: transform 0.15s ease;
+            flex-shrink: 0 !important;
+            transition: transform 0.15s ease !important;
           }
-          .mobile-nav-item span {
+          :global(.mobile-nav-item span) {
             display: block !important;
             width: 100% !important;
             text-align: center !important;
             white-space: nowrap !important;
-            line-height: 1.1;
-            letter-spacing: -0.1px;
+            word-break: keep-all !important;
+            word-wrap: normal !important;
+            line-height: 1.1 !important;
           }
-          .mobile-nav-item.active {
+          :global(.mobile-nav-item.active) {
             background: #f5efe2 !important;
             color: #b88a38 !important;
             font-weight: 700 !important;
           }
-          .mobile-nav-item.active svg {
+          :global(.mobile-nav-item.active svg) {
             color: #b88a38 !important;
           }
-          .mobile-nav-item.active span {
+          :global(.mobile-nav-item.active span) {
             color: #b88a38 !important;
           }
           /* Highlighted 3D Studio Item */
-          .mobile-nav-item.studio-highlight {
+          :global(.mobile-nav-item.studio-highlight) {
             color: #b88a38 !important;
           }
-          .mobile-nav-item.studio-highlight svg {
+          :global(.mobile-nav-item.studio-highlight svg) {
             color: #b88a38 !important;
           }
-          .mobile-nav-item.studio-highlight span {
+          :global(.mobile-nav-item.studio-highlight span) {
             color: #b88a38 !important;
             font-weight: 700 !important;
+            font-size: 0.56rem !important;
+            white-space: nowrap !important;
           }
-          .mobile-nav-item.studio-highlight:active {
+          :global(.mobile-nav-item.studio-highlight:active) {
             background: rgba(184, 138, 56, 0.12) !important;
           }
-          .mobile-nav-item:active svg {
-            transform: scale(0.92);
+          :global(.mobile-nav-item:active svg) {
+            transform: scale(0.92) !important;
           }
-          .mobile-nav-badge {
-            position: absolute;
-            top: -4px;
-            right: -10px;
-            background: #dc2626;
-            color: #ffffff;
-            font-size: 0.58rem;
-            font-weight: 700;
-            padding: 1px 5px;
-            border-radius: 10px;
-            min-width: 15px;
-            text-align: center;
+          :global(.mobile-nav-badge) {
+            position: absolute !important;
+            top: -4px !important;
+            right: -10px !important;
+            background: #dc2626 !important;
+            color: #ffffff !important;
+            font-size: 0.58rem !important;
+            font-weight: 700 !important;
+            padding: 1px 5px !important;
+            border-radius: 10px !important;
+            min-width: 15px !important;
+            text-align: center !important;
           }
           .ai-chat-header button {
             padding: 8px !important;
