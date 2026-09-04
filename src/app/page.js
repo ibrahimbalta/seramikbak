@@ -8410,26 +8410,26 @@ export default function Home() {
       {/* Mobile Sticky Bottom Tab Navigation Bar */}
       <div className="mobile-bottom-nav">
         <button className={`mobile-nav-item ${activeTab === 'search' ? 'active' : ''}`} onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-          <SearchIcon size={20} />
+          <SearchIcon size={19} />
           <span>Arama</span>
         </button>
-        <Link href="/kiosk" className="mobile-nav-item" style={{ textDecoration: 'none' }}>
-          <Layers size={20} />
+        <Link href="/kiosk" className="mobile-nav-item mobile-nav-studio" style={{ textDecoration: 'none' }}>
+          <Layers size={18} />
           <span>3D Stüdyo</span>
         </Link>
         <button className="mobile-nav-item" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}>
           <div style={{ position: 'relative', display: 'inline-flex' }}>
-            <HeartIcon size={20} />
+            <HeartIcon size={19} />
             {userFavorites.length > 0 && <span className="mobile-nav-badge">{userFavorites.length}</span>}
           </div>
           <span>Favoriler</span>
         </button>
         <button className={`mobile-nav-item ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
-          <MapPin size={20} />
+          <MapPin size={19} />
           <span>Bayiler</span>
         </button>
         <button className={`mobile-nav-item ${showMobileMenu ? 'active' : ''}`} onClick={() => setShowMobileMenu(!showMobileMenu)}>
-          <MenuIcon size={20} />
+          <MenuIcon size={19} />
           <span>Menü</span>
         </button>
       </div>
@@ -14989,24 +14989,25 @@ export default function Home() {
 
         @media (max-width: 768px) {
           :global(body) {
-            padding-bottom: 74px !important;
+            padding-bottom: 84px !important;
           }
           .mobile-bottom-nav {
             display: flex;
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+            left: 12px;
+            right: 12px;
+            height: 62px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 24px;
             z-index: 9998;
             justify-content: space-around;
             align-items: center;
-            padding-bottom: env(safe-area-inset-bottom, 0);
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.03);
+            padding: 0 6px;
+            box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
           }
           .mobile-nav-item {
             display: flex;
@@ -15015,31 +15016,73 @@ export default function Home() {
             justify-content: center;
             background: none;
             border: none;
-            color: var(--text-secondary);
-            font-size: 0.65rem;
+            color: #64748b;
+            font-size: 0.68rem;
             font-family: var(--font-title);
-            font-weight: 500;
-            gap: 4px;
+            font-weight: 600;
+            gap: 3px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             flex: 1;
             position: relative;
-            padding: 4px 0;
+            padding: 6px 0;
+            white-space: nowrap;
+            text-decoration: none;
           }
           .mobile-nav-item.active {
-            color: var(--accent-gold);
+            color: #b38e47;
             font-weight: 700;
+          }
+          .mobile-nav-item.active svg {
+            color: #b38e47;
+            transform: translateY(-1px);
+          }
+          /* Modern Featured 3D Studio Pill Button (Icon & Text Side-by-Side) */
+          .mobile-nav-item.mobile-nav-studio {
+            flex-direction: row;
+            gap: 6px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            padding: 8px 14px;
+            border-radius: 18px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            flex: initial;
+            margin: 0 2px;
+          }
+          .mobile-nav-item.mobile-nav-studio svg {
+            color: #d4af37;
+            flex-shrink: 0;
+          }
+          .mobile-nav-item.mobile-nav-studio span {
+            color: #ffffff;
+            white-space: nowrap;
+          }
+          .mobile-nav-item.mobile-nav-studio:active {
+            transform: scale(0.96);
           }
           .mobile-nav-item svg {
             transition: transform 0.2s ease;
           }
           .mobile-nav-item:active svg {
-            transform: scale(0.85);
+            transform: scale(0.9);
           }
           .mobile-nav-badge {
             position: absolute;
-            top: -2px;
-            right: -8px;
+            top: -4px;
+            right: -10px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 10px;
+            min-width: 16px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(220, 38, 38, 0.3);
+          }
           .ai-chat-header button {
             padding: 8px !important;
             font-size: 1.1rem !important;
