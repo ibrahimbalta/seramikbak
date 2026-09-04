@@ -54,4 +54,27 @@ export async function uploadBuffer(buffer, options = {}) {
   });
 }
 
+/**
+ * Transforms a raw image or Cloudinary URL into an optimized 2K/1K seamless 3D tile texture URL.
+ * Applies auto-format (f_auto), high quality (q_auto:best), and resolution constraints.
+ * @param {string} url - Original image/texture URL
+ * @param {object} options - Optional width, height, format settings
+ * @returns {string} Optimized URL
+ */
+export function getOptimizedTextureUrl(url, options = {}) {
+  if (!url) return '/textures/calacatta_gold.jpg';
+  const width = options.width || 1024;
+  const height = options.height || 1024;
+
+  if (url.includes('res.cloudinary.com')) {
+    // Inject Cloudinary transformations before '/upload/'
+    const transformation = `f_auto,q_auto:best,w_${width},h_${height},c_fill,g_center/`;
+    if (url.includes('/upload/') && !url.includes('/upload/f_auto')) {
+      return url.replace('/upload/', `/upload/${transformation}`);
+    }
+  }
+  return url;
+}
+
 export default cloudinary;
+

@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 import fs from 'fs';
 import path from 'path';
 
-import { uploadImage } from '@/lib/cloudinary';
+import { uploadImage, getOptimizedTextureUrl } from '@/lib/cloudinary';
 import { verifyAuth } from '@/lib/auth-check';
 
 // Helper to save base64 image (tries Cloudinary first, falls back to local storage)
@@ -182,7 +182,10 @@ export async function POST(request) {
       const texName = `${cleanCode.toLowerCase()}_texture.${textureExt}`;
       const savedPath = await saveBase64Image(textureBase64, texName);
       if (savedPath) textureUrl = savedPath;
+    } else {
+      textureUrl = getOptimizedTextureUrl(imageUrl, { width: 1024, height: 1024 });
     }
+
 
     // Save product
     const product = await prisma.product.create({

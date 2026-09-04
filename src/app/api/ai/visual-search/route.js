@@ -19,11 +19,17 @@ export async function POST(request) {
 
     let searchResults = [];
     try {
-      // Fetch from the local Python AI service
-      const aiResponse = await fetch('http://127.0.0.1:8000/search-visual', {
+      const aiServiceUrl = (process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout fallback
+
+      console.log(`[Visual Search API] Connecting to AI Service at: ${aiServiceUrl}/search-visual`);
+      const aiResponse = await fetch(`${aiServiceUrl}/search-visual`, {
         method: 'POST',
         body: forwardFormData,
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
 
       if (aiResponse.ok) {
         searchResults = await aiResponse.json();
@@ -33,7 +39,8 @@ export async function POST(request) {
         throw new Error('AI service returned error status');
       }
     } catch (aiError) {
-      console.warn('Python AI Service is offline or unreachable. Using database fallback logic.', aiError);
+      console.warn('Python AI Service is offline, timing out, or unreachable. Using pre-computed database signature fallback.', aiError.message || aiError);
+
       
       const { searchParams } = new URL(request.url);
       const fallbackColor = searchParams.get('fallbackColor') || 'Gri';
