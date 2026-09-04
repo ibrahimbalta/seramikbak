@@ -8413,12 +8413,12 @@ export default function Home() {
           <SearchIcon size={22} />
           <span>Arama</span>
         </button>
-        <Link href="/kiosk" className="mobile-nav-item" style={{ textDecoration: 'none' }}>
+        <Link href="/kiosk" className="mobile-nav-item studio-highlight" style={{ textDecoration: 'none' }}>
           <Layers size={22} />
           <span>3D Stüdyo</span>
         </Link>
         <button className="mobile-nav-item" onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}>
-          <div style={{ position: 'relative', display: 'inline-flex' }}>
+          <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
             <HeartIcon size={22} />
             {userFavorites.length > 0 && <span className="mobile-nav-badge">{userFavorites.length}</span>}
           </div>
@@ -15003,31 +15003,35 @@ export default function Home() {
             z-index: 9998;
             justify-content: space-between;
             align-items: center;
-            padding: 4px 6px;
+            padding: 4px 4px;
             padding-bottom: max(4px, env(safe-area-inset-bottom, 0px));
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
+            box-sizing: border-box;
           }
           .mobile-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
             background: transparent;
             border: none;
             color: #3b4353;
             font-size: 0.7rem;
             font-family: var(--font-title);
             font-weight: 600;
-            gap: 3px;
+            gap: 4px;
             cursor: pointer;
             transition: all 0.15s ease;
-            flex: 1;
+            flex: 1 1 0%;
+            min-width: 0;
             height: 100%;
             position: relative;
             padding: 4px 2px;
             white-space: nowrap;
             text-decoration: none;
-            border-radius: 14px;
+            border-radius: 12px;
+            box-sizing: border-box;
           }
           .mobile-nav-item:not(:last-child)::after {
             content: '';
@@ -15038,6 +15042,20 @@ export default function Home() {
             width: 1px;
             background: rgba(0, 0, 0, 0.08);
           }
+          .mobile-nav-item svg {
+            color: #3b4353;
+            display: block;
+            margin: 0 auto;
+            flex-shrink: 0;
+            transition: transform 0.15s ease;
+          }
+          .mobile-nav-item span {
+            display: block;
+            width: 100%;
+            text-align: center;
+            white-space: nowrap;
+            line-height: 1.1;
+          }
           .mobile-nav-item.active {
             background: #f5efe2;
             color: #b88a38;
@@ -15046,9 +15064,22 @@ export default function Home() {
           .mobile-nav-item.active svg {
             color: #b88a38;
           }
-          .mobile-nav-item svg {
-            color: #3b4353;
-            transition: transform 0.15s ease;
+          .mobile-nav-item.active span {
+            color: #b88a38;
+          }
+          /* Highlighted 3D Studio Item */
+          .mobile-nav-item.studio-highlight {
+            color: #c58b1a;
+          }
+          .mobile-nav-item.studio-highlight svg {
+            color: #c58b1a;
+          }
+          .mobile-nav-item.studio-highlight span {
+            color: #c58b1a;
+            font-weight: 700;
+          }
+          .mobile-nav-item.studio-highlight:active {
+            background: rgba(197, 139, 26, 0.1);
           }
           .mobile-nav-item:active svg {
             transform: scale(0.92);
