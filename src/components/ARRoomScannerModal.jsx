@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Camera, X, RefreshCw, Layers, CheckCircle2, Sliders, Smartphone,
   Download, Sparkles, Plus, Trash2, Send, MessageCircle, Calculator,
-  Maximize2, ShieldCheck, Store, ChevronRight
+  Maximize2, ShieldCheck, Store, ChevronRight, AlertCircle, ChevronDown, ChevronUp
 } from 'lucide-react';
 
 export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, currentDealer }) {
@@ -13,19 +13,21 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   const [stream, setStream] = useState(null);
   const [cameraLoading, setCameraLoading] = useState(true);
   const [cameraError, setCameraError] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
+  const [showMobilePanel, setShowMobilePanel] = useState(true);
 
   // Surface Type: 'WALL' or 'FLOOR'
   const [surfaceType, setSurfaceType] = useState('WALL');
 
-  // Physical Room Measurement State (in meters)
+  // Room Measurement State (in meters)
   const [roomWidth, setRoomWidth] = useState(3.5);  // meters
   const [roomHeight, setRoomHeight] = useState(2.6); // meters
 
   // Active Tile Product info
-  const tileW = (selectedProduct?.width || 60) / 100; // in meters (e.g. 0.6)
-  const tileH = (selectedProduct?.height || 120) / 100; // in meters (e.g. 1.2)
-  const tileM2PerBox = (tileW * tileH * 2) || 1.44; // estimated 2 pcs per box = 1.44m²
-  const tilePricePerM2 = selectedProduct?.trendyolPrice || selectedProduct?.koctasPrice || 450; // TL/m² fallback
+  const tileW = (selectedProduct?.width || 60) / 100;
+  const tileH = (selectedProduct?.height || 120) / 100;
+  const tileM2PerBox = (tileW * tileH * 2) || 1.44;
+  const tilePricePerM2 = selectedProduct?.trendyolPrice || selectedProduct?.koctasPrice || 450;
 
   // Cutout Subtractions List (Doors, Windows, Shower enclosures)
   const [cutouts, setCutouts] = useState([
@@ -37,8 +39,8 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   const [activeTileTexture, setActiveTileTexture] = useState(
     selectedProduct?.textureUrl || selectedProduct?.imageUrl || '/textures/calacatta_gold.jpg'
   );
-  const [layStyle, setLayStyle] = useState('straight'); // 'straight', 'diagonal', 'herringbone'
-  const [groutColor, setGroutColor] = useState('#d4af37'); // Gold, White, Gray, Dark
+  const [layStyle, setLayStyle] = useState('straight');
+  const [groutColor, setGroutColor] = useState('#d4af37');
   const [perspectiveTilt, setPerspectiveTilt] = useState(50);
 
   // Quote & Lead Submission State
@@ -55,12 +57,22 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     cutouts.reduce((acc, curr) => acc + curr.w * curr.h, 0).toFixed(2)
   );
   const netAreaM2 = Math.max(0, parseFloat((grossAreaM2 - cutoutAreaM2).toFixed(2)));
-  const netWithWasteM2 = parseFloat((netAreaM2 * 1.10).toFixed(2)); // %10 fire dahil
+  const netWithWasteM2 = parseFloat((netAreaM2 * 1.10).toFixed(2));
   const boxCount = Math.ceil(netWithWasteM2 / tileM2PerBox);
   const totalTileCost = Math.round(netWithWasteM2 * tilePricePerM2);
-  const adhesiveBags = Math.ceil(netWithWasteM2 / 5); // 1 bag per 5m²
-  const groutKg = Math.ceil(netWithWasteM2 * 0.4);   // 0.4kg grout per m²
-  const totalEstMaterialCost = totalTileCost + (adhesiveBags * 280) + (groutKg * 45); // Yapıştırıcı 280₺, Derz 45₺/kg
+  const adhesiveBags = Math.ceil(netWithWasteM2 / 5);
+  const groutKg = Math.ceil(netWithWasteM2 * 0.4);
+  const totalEstMaterialCost = totalTileCost + (adhesiveBags * 280) + (groutKg * 45);
+
+  // Detect mobile screen width
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (selectedProduct?.imageUrl || selectedProduct?.textureUrl) {
@@ -68,7 +80,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     }
   }, [selectedProduct]);
 
-  // Handle Camera Feed
+  // Handle Camera Feed with Multiple Fallback Options
   useEffect(() => {
     if (!isOpen) {
       stopCamera();
@@ -81,32 +93,42 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   const startCamera = async () => {
     setCameraLoading(true);
     setCameraError('');
+    
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setCameraError('Tarayıcınız canlı kamera akışını desteklemiyor. İnteraktif Sanal Showroom modu aktif.');
+      setCameraLoading(false);
+      return;
+    }
+
+    let mediaStream = null;
+
+    // Constraint Strategy 1: Rear environment camera
     try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Tarayıcınız kamera erişimini desteklemiyor.');
-      }
-      
-      let mediaStream = null;
-      
-      // 1. Try environment / rear camera (ideal for mobile room scan)
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+    } catch (e1) {
+      // Constraint Strategy 2: User/front camera
       try {
         mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          video: { facingMode: 'user' },
           audio: false
         });
-      } catch (e1) {
-        // 2. Fallback to any available video camera (webcam / front camera)
-        console.warn('Rear camera unavailable, trying any camera:', e1);
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false
-        });
+      } catch (e2) {
+        // Constraint Strategy 3: Any available video device
+        try {
+          mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+          });
+        } catch (e3) {
+          console.warn('All camera constraints failed:', e3);
+        }
       }
+    }
 
-      if (!mediaStream) {
-        throw new Error('Kamera akışı alınamadı.');
-      }
-
+    if (mediaStream) {
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -119,12 +141,8 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           setCameraLoading(false);
         };
       }
-    } catch (err) {
-      console.error('AR Camera Error:', err);
-      const errMsg = err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'
-        ? 'Kamera izni verimedi. Lütfen adres çubuğundaki kilit ikonuna tıklayıp kamera iznini "İzin Ver" olarak değiştirin.'
-        : 'Cihazınızda kamera bulunamadı veya başka bir uygulama tarafından kullanılıyor.';
-      setCameraError(errMsg);
+    } else {
+      setCameraError('Canlı kamera izni kısıtlı. Dokunmatik İnteraktif Sanal Showroom modu aktif.');
       setCameraLoading(false);
     }
   };
@@ -136,9 +154,9 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     }
   };
 
-  // Render Canvas Laser AR Overlay
+  // Always Render Canvas Laser AR Overlay (Works with Live Camera AND Virtual Showroom Fallback)
   useEffect(() => {
-    if (!isOpen || cameraLoading || cameraError) return;
+    if (!isOpen) return;
 
     let animId;
     const canvas = canvasRef.current;
@@ -151,34 +169,67 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
 
     const renderARScanner = () => {
       const video = videoRef.current;
-      if (video && video.readyState === 4) {
+      const hasLiveVideo = video && video.readyState === 4 && stream;
+
+      if (hasLiveVideo) {
         if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
           canvas.width = video.videoWidth || 1280;
           canvas.height = video.videoHeight || 720;
         }
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       } else {
+        // Render Procedural High-Fidelity 3D Showroom Background
         if (canvas.width !== 1280) {
           canvas.width = 1280;
           canvas.height = 720;
         }
-        ctx.fillStyle = '#0f172a';
+        
+        // Dark Showroom Environment Background
+        const grad = ctx.createRadialGradient(
+          canvas.width / 2, canvas.height / 3, 100,
+          canvas.width / 2, canvas.height / 2, canvas.width / 1.2
+        );
+        grad.addColorStop(0, '#1e293b');
+        grad.addColorStop(0.6, '#0f172a');
+        grad.addColorStop(1, '#020617');
+        ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Render Showroom Perspective Wall & Floor Guidelines
+        ctx.save();
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.15)';
+        ctx.lineWidth = 1;
+
+        // Horizon Perspective line
+        const horizY = canvas.height * 0.45;
+        ctx.beginPath();
+        ctx.moveTo(0, horizY);
+        ctx.lineTo(canvas.width, horizY);
+        ctx.stroke();
+
+        // Corner Perspective Rays
+        ctx.beginPath();
+        ctx.moveTo(canvas.width * 0.1, 0); ctx.lineTo(canvas.width * 0.1, horizY);
+        ctx.moveTo(canvas.width * 0.9, 0); ctx.lineTo(canvas.width * 0.9, horizY);
+        ctx.moveTo(canvas.width * 0.1, horizY); ctx.lineTo(0, canvas.height);
+        ctx.moveTo(canvas.width * 0.9, horizY); ctx.lineTo(canvas.width, canvas.height);
+        ctx.stroke();
+        ctx.restore();
       }
 
       const w = canvas.width;
       const h = canvas.height;
 
       // 1. Draw Surface Bounding Box & Laser Pins
-      const paddingX = w * 0.15;
+      const paddingX = w * (isMobile ? 0.08 : 0.15);
       const topY = h * (1 - perspectiveTilt / 100);
       const botY = h * 0.85;
 
       ctx.save();
-      
+
       // Laser Scanning Grid Box
       ctx.strokeStyle = '#d4af37';
-      ctx.lineWidth = 3;
+      ctx.lineWidth = isMobile ? 2 : 3;
       ctx.setLineDash([8, 6]);
       ctx.strokeRect(paddingX, topY, w - (paddingX * 2), botY - topY);
       ctx.setLineDash([]);
@@ -213,8 +264,8 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       ctx.lineWidth = 2;
       ctx.globalAlpha = 0.7;
 
-      const cols = Math.round(roomWidth * 2);
-      const rows = Math.round(roomHeight * 2);
+      const cols = Math.max(2, Math.round(roomWidth * 1.8));
+      const rows = Math.max(2, Math.round(roomHeight * 1.8));
       const stepX = (w - paddingX * 2) / cols;
       const stepY = (botY - topY) / rows;
 
@@ -234,57 +285,48 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
 
       // Laser Pins Corner Crosshairs
       const corners = [
-        { x: paddingX, y: topY, label: 'P1' },
-        { x: w - paddingX, y: topY, label: 'P2' },
-        { x: w - paddingX, y: botY, label: 'P3' },
-        { x: paddingX, y: botY, label: 'P4' }
+        { x: paddingX, y: topY },
+        { x: w - paddingX, y: topY },
+        { x: w - paddingX, y: botY },
+        { x: paddingX, y: botY }
       ];
 
       corners.forEach(c => {
         ctx.fillStyle = '#d4af37';
         ctx.beginPath();
-        ctx.arc(c.x, c.y, 8, 0, Math.PI * 2);
+        ctx.arc(c.x, c.y, isMobile ? 6 : 8, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(c.x, c.y, 14, 0, Math.PI * 2);
+        ctx.arc(c.x, c.y, isMobile ? 10 : 14, 0, Math.PI * 2);
         ctx.stroke();
       });
 
-      // Live Dimension Measurement Tags
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+      // Dimension Badges
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
       ctx.strokeStyle = '#d4af37';
       ctx.lineWidth = 1;
 
       // Top Width Badge
       ctx.beginPath();
-      ctx.roundRect(w / 2 - 60, topY - 36, 120, 28, 8);
+      ctx.roundRect(w / 2 - (isMobile ? 50 : 60), topY - (isMobile ? 30 : 36), isMobile ? 100 : 120, isMobile ? 24 : 28, 8);
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 13px Outfit, sans-serif';
+      ctx.font = `bold ${isMobile ? '11px' : '13px'} Outfit, sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText(`↔ ${roomWidth} m`, w / 2, topY - 18);
-
-      // Left Height Badge
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
-      ctx.beginPath();
-      ctx.roundRect(paddingX - 110, (topY + botY) / 2 - 14, 100, 28, 8);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText(`↕ ${roomHeight} m`, paddingX - 60, (topY + botY) / 2 + 4);
+      ctx.fillText(`↔ ${roomWidth} m`, w / 2, topY - (isMobile ? 14 : 18));
 
       // Center Area Badge
       ctx.fillStyle = 'rgba(212, 175, 55, 0.95)';
       ctx.beginPath();
-      ctx.roundRect(w / 2 - 90, (topY + botY) / 2 - 20, 180, 40, 12);
+      ctx.roundRect(w / 2 - (isMobile ? 75 : 90), (topY + botY) / 2 - (isMobile ? 16 : 20), isMobile ? 150 : 180, isMobile ? 32 : 40, 10);
       ctx.fill();
       ctx.fillStyle = '#000000';
-      ctx.font = '900 15px Outfit, sans-serif';
-      ctx.fillText(`Net Kaplama: ${netAreaM2} m²`, w / 2, (topY + botY) / 2 + 5);
+      ctx.font = `900 ${isMobile ? '13px' : '15px'} Outfit, sans-serif`;
+      ctx.fillText(`Net Kaplama: ${netAreaM2} m²`, w / 2, (topY + botY) / 2 + (isMobile ? 4 : 5));
 
       ctx.restore();
 
@@ -295,7 +337,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     return () => {
       if (animId) cancelAnimationFrame(animId);
     };
-  }, [isOpen, cameraLoading, cameraError, roomWidth, roomHeight, netAreaM2, activeTileTexture, layStyle, groutColor, perspectiveTilt]);
+  }, [isOpen, roomWidth, roomHeight, netAreaM2, activeTileTexture, layStyle, groutColor, perspectiveTilt, stream, isMobile]);
 
   // Cutout Handlers
   const addCutout = (type) => {
@@ -312,7 +354,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     setCutouts(cutouts.filter(c => c.id !== id));
   };
 
-  // Submit Quote & Save Lead
+  // Submit Lead API
   const handleSaveLead = async () => {
     if (!clientName || !clientPhone) {
       alert('Lütfen Ad Soyad ve Telefon numaranızı giriniz.');
@@ -354,7 +396,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     }
   };
 
-  // Generate Pre-filled WhatsApp Share URL
+  // WhatsApp Link
   const getWhatsAppShareUrl = () => {
     const dealerPhone = currentDealer?.phone?.replace(/\D/g, '') || '905555555555';
     const text = encodeURIComponent(
@@ -382,57 +424,81 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       display: 'flex',
       flexDirection: 'column',
       color: '#ffffff',
-      fontFamily: 'Outfit, system-ui, sans-serif'
+      fontFamily: 'Outfit, system-ui, -apple-system, sans-serif',
+      height: '100dvh',
+      overflow: 'hidden'
     }}>
-      {/* Top Header Bar */}
+      {/* Top Header Bar - Responsive */}
       <div style={{
-        padding: '12px 20px',
+        padding: isMobile ? '10px 14px' : '12px 20px',
         background: 'rgba(15, 23, 42, 0.95)',
         backdropFilter: 'blur(12px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         display: 'flex',
-        alignItems: 'center',
+        flexDirection: isMobile ? 'column' : 'row',
+        alignItems: isMobile ? 'stretch' : 'center',
         justifyContent: 'space-between',
-        zIndex: 20
+        gap: isMobile ? '8px' : '12px',
+        zIndex: 30
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-            color: '#000',
-            padding: '6px 12px',
-            borderRadius: '10px',
-            fontWeight: '900',
-            fontSize: '0.82rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px'
-          }}>
-            <Sparkles size={16} />
-            <span>AR LiDAR Scanner</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{
+              background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+              color: '#000',
+              padding: '4px 10px',
+              borderRadius: '8px',
+              fontWeight: '900',
+              fontSize: isMobile ? '0.75rem' : '0.82rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              <Sparkles size={14} />
+              <span>AR LiDAR</span>
+            </div>
+            <div>
+              <h3 style={{ margin: 0, fontSize: isMobile ? '0.85rem' : '0.95rem', fontWeight: '800', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: isMobile ? '180px' : '300px' }}>
+                {selectedProduct?.name || 'Canlı AR Oda Tarayıcısı'}
+              </h3>
+            </div>
           </div>
-          <div>
-            <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '800', color: '#fff' }}>
-              {selectedProduct?.name || 'Canlı AR Oda & Duvar Tarayıcısı'}
-            </h3>
-            <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-              {currentDealer?.name ? `Showroom Kiosk: ${currentDealer.name}` : 'Mobil Evde Ölç & Gör Modu'}
-            </span>
-          </div>
+
+          <button
+            onClick={onClose}
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: 'none',
+              color: '#fff',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }}
+          >
+            <X size={18} />
+          </button>
         </div>
 
-        {/* Tab Switchers */}
-        <div style={{ display: 'flex', background: 'rgba(255,255,255,0.06)', padding: '4px', borderRadius: '10px', gap: '4px' }}>
+        {/* Responsive Mobile Tab Switcher */}
+        <div style={{ display: 'flex', background: 'rgba(255,255,255,0.06)', padding: '3px', borderRadius: '10px', gap: '4px', width: '100%' }}>
           <button
             onClick={() => setActiveTab('SCANNER')}
             style={{
-              padding: '6px 14px',
+              flex: 1,
+              padding: '8px 4px',
               borderRadius: '8px',
               border: 'none',
               background: activeTab === 'SCANNER' ? '#d4af37' : 'transparent',
               color: activeTab === 'SCANNER' ? '#000' : '#cbd5e1',
               fontWeight: '800',
-              fontSize: '0.78rem',
-              cursor: 'pointer'
+              fontSize: isMobile ? '0.72rem' : '0.78rem',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              textAlign: 'center'
             }}
           >
             📷 AR Kamera
@@ -440,56 +506,44 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           <button
             onClick={() => setActiveTab('CALCULATOR')}
             style={{
-              padding: '6px 14px',
+              flex: 1,
+              padding: '8px 4px',
               borderRadius: '8px',
               border: 'none',
               background: activeTab === 'CALCULATOR' ? '#d4af37' : 'transparent',
               color: activeTab === 'CALCULATOR' ? '#000' : '#cbd5e1',
               fontWeight: '800',
-              fontSize: '0.78rem',
-              cursor: 'pointer'
+              fontSize: isMobile ? '0.72rem' : '0.78rem',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              textAlign: 'center'
             }}
           >
-            📐 Metraj & Boşluklar ({netAreaM2} m²)
+            📐 Metraj ({netAreaM2}m²)
           </button>
           <button
             onClick={() => setActiveTab('QUOTE')}
             style={{
-              padding: '6px 14px',
+              flex: 1,
+              padding: '8px 4px',
               borderRadius: '8px',
               border: 'none',
               background: activeTab === 'QUOTE' ? '#10b981' : 'transparent',
               color: activeTab === 'QUOTE' ? '#fff' : '#cbd5e1',
               fontWeight: '800',
-              fontSize: '0.78rem',
-              cursor: 'pointer'
+              fontSize: isMobile ? '0.72rem' : '0.78rem',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              textAlign: 'center'
             }}
           >
-            📄 Teklif & WhatsApp
+            📄 Teklif Al
           </button>
         </div>
-
-        <button
-          onClick={onClose}
-          style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            border: 'none',
-            color: '#fff',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer'
-          }}
-        >
-          <X size={20} />
-        </button>
       </div>
 
       {/* Main Container Content */}
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex' }}>
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         
         {/* TAB 1: AR CAMERA & SCANNER VIEW */}
         <div style={{
@@ -497,116 +551,162 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           position: 'relative',
           display: activeTab === 'SCANNER' ? 'flex' : 'none',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          overflow: 'hidden'
         }}>
+          {/* Video Stream Element */}
           <video ref={videoRef} playsInline muted style={{ display: 'none' }} />
+          
+          {/* Live / Fallback Interactive Canvas */}
           <canvas ref={canvasRef} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 
-          {/* Floating Live Dimensions Controller Panel on Camera */}
+          {/* Camera Notice Bar if non-HTTPS or denied */}
+          {cameraError && (
+            <div style={{
+              position: 'absolute',
+              top: '12px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: 'rgba(15, 23, 42, 0.92)',
+              border: '1px solid rgba(212, 175, 55, 0.4)',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              fontSize: '0.72rem',
+              color: '#d4af37',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              zIndex: 25,
+              whiteSpace: 'nowrap',
+              maxWidth: '90%'
+            }}>
+              <AlertCircle size={14} />
+              <span>Sanal Showroom Modu Aktif (Kamerayı Açmak için İzin Verin veya HTTPS Kullanın)</span>
+            </div>
+          )}
+
+          {/* Mobile & Desktop Floating Controls Panel */}
           <div style={{
             position: 'absolute',
-            top: '20px',
-            left: '20px',
-            background: 'rgba(15, 23, 42, 0.88)',
-            backdropFilter: 'blur(12px)',
+            bottom: isMobile ? '12px' : '20px',
+            left: isMobile ? '12px' : '20px',
+            right: isMobile ? '12px' : 'auto',
+            background: 'rgba(15, 23, 42, 0.92)',
+            backdropFilter: 'blur(14px)',
             border: '1px solid rgba(212, 175, 55, 0.4)',
             borderRadius: '16px',
-            padding: '16px',
-            width: '280px',
-            zIndex: 15,
-            boxShadow: '0 12px 32px rgba(0,0,0,0.5)'
+            padding: isMobile ? '12px' : '16px',
+            width: isMobile ? 'auto' : '290px',
+            zIndex: 20,
+            boxShadow: '0 12px 32px rgba(0,0,0,0.6)'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#d4af37' }}>YÜZEY TİPİ SEÇİN</span>
-              <div style={{ display: 'flex', gap: '4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showMobilePanel ? '10px' : '0' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#d4af37' }}>ÖLÇÜM & YÜZEY SEÇİMİ</span>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  <button
+                    onClick={() => setSurfaceType('WALL')}
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.7rem',
+                      fontWeight: '800',
+                      border: 'none',
+                      background: surfaceType === 'WALL' ? '#d4af37' : 'rgba(255,255,255,0.1)',
+                      color: surfaceType === 'WALL' ? '#000' : '#fff',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Duvar
+                  </button>
+                  <button
+                    onClick={() => setSurfaceType('FLOOR')}
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.7rem',
+                      fontWeight: '800',
+                      border: 'none',
+                      background: surfaceType === 'FLOOR' ? '#d4af37' : 'rgba(255,255,255,0.1)',
+                      color: surfaceType === 'FLOOR' ? '#000' : '#fff',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Zemin
+                  </button>
+                </div>
+
+                {isMobile && (
+                  <button
+                    onClick={() => setShowMobilePanel(!showMobilePanel)}
+                    style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}
+                  >
+                    {showMobilePanel ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {showMobilePanel && (
+              <>
+                {/* Width Slider */}
+                <div style={{ marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#cbd5e1', marginBottom: '2px' }}>
+                    <span>Genişlik (En):</span>
+                    <strong style={{ color: '#d4af37' }}>{roomWidth} Metre</strong>
+                  </div>
+                  <input
+                    type="range"
+                    min="1.0"
+                    max="12.0"
+                    step="0.1"
+                    value={roomWidth}
+                    onChange={(e) => setRoomWidth(parseFloat(e.target.value))}
+                    style={{ width: '100%', accentColor: '#d4af37', height: '6px' }}
+                  />
+                </div>
+
+                {/* Height Slider */}
+                <div style={{ marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#cbd5e1', marginBottom: '2px' }}>
+                    <span>Yükseklik (Boy):</span>
+                    <strong style={{ color: '#d4af37' }}>{roomHeight} Metre</strong>
+                  </div>
+                  <input
+                    type="range"
+                    min="1.0"
+                    max="10.0"
+                    step="0.1"
+                    value={roomHeight}
+                    onChange={(e) => setRoomHeight(parseFloat(e.target.value))}
+                    style={{ width: '100%', accentColor: '#d4af37', height: '6px' }}
+                  />
+                </div>
+
                 <button
-                  onClick={() => setSurfaceType('WALL')}
+                  onClick={() => setActiveTab('CALCULATOR')}
                   style={{
-                    padding: '4px 8px',
-                    borderRadius: '6px',
-                    fontSize: '0.7rem',
-                    fontWeight: '800',
+                    width: '100%',
+                    background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                    color: '#000',
                     border: 'none',
-                    background: surfaceType === 'WALL' ? '#d4af37' : 'rgba(255,255,255,0.1)',
-                    color: surfaceType === 'WALL' ? '#000' : '#fff',
-                    cursor: 'pointer'
+                    padding: '10px',
+                    borderRadius: '10px',
+                    fontWeight: '900',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
                   }}
                 >
-                  Duvar
+                  <Calculator size={16} />
+                  <span>Boşluk Düş & Metrajı Gör</span>
                 </button>
-                <button
-                  onClick={() => setSurfaceType('FLOOR')}
-                  style={{
-                    padding: '4px 8px',
-                    borderRadius: '6px',
-                    fontSize: '0.7rem',
-                    fontWeight: '800',
-                    border: 'none',
-                    background: surfaceType === 'FLOOR' ? '#d4af37' : 'rgba(255,255,255,0.1)',
-                    color: surfaceType === 'FLOOR' ? '#000' : '#fff',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Zemin
-                </button>
-              </div>
-            </div>
-
-            {/* Width Slider */}
-            <div style={{ marginBottom: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#cbd5e1', marginBottom: '4px' }}>
-                <span>Genişlik (En):</span>
-                <span style={{ fontWeight: '800', color: '#d4af37' }}>{roomWidth} Metre</span>
-              </div>
-              <input
-                type="range"
-                min="1.0"
-                max="12.0"
-                step="0.1"
-                value={roomWidth}
-                onChange={(e) => setRoomWidth(parseFloat(e.target.value))}
-                style={{ width: '100%', accentColor: '#d4af37' }}
-              />
-            </div>
-
-            {/* Height Slider */}
-            <div style={{ marginBottom: '12px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#cbd5e1', marginBottom: '4px' }}>
-                <span>Yükseklik (Boy):</span>
-                <span style={{ fontWeight: '800', color: '#d4af37' }}>{roomHeight} Metre</span>
-              </div>
-              <input
-                type="range"
-                min="1.0"
-                max="10.0"
-                step="0.1"
-                value={roomHeight}
-                onChange={(e) => setRoomHeight(parseFloat(e.target.value))}
-                style={{ width: '100%', accentColor: '#d4af37' }}
-              />
-            </div>
-
-            <button
-              onClick={() => setActiveTab('CALCULATOR')}
-              style={{
-                width: '100%',
-                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                color: '#000',
-                border: 'none',
-                padding: '10px',
-                borderRadius: '10px',
-                fontWeight: '900',
-                fontSize: '0.82rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px'
-              }}
-            >
-              <Calculator size={16} />
-              <span>Boşluk Düş & Metrajı Gör</span>
-            </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -614,28 +714,29 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         <div style={{
           flex: 1,
           display: activeTab === 'CALCULATOR' ? 'flex' : 'none',
-          padding: '24px',
+          flexDirection: isMobile ? 'column' : 'row',
+          padding: isMobile ? '14px' : '24px',
           overflowY: 'auto',
-          gap: '24px',
+          gap: isMobile ? '16px' : '24px',
           maxWidth: '1200px',
           margin: '0 auto',
           width: '100%'
         }}>
           {/* Left Column: Dimensions & Cutouts */}
-          <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{
               background: 'rgba(30, 41, 59, 0.7)',
               border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: '16px',
-              padding: '20px'
+              padding: isMobile ? '16px' : '20px'
             }}>
-              <h4 style={{ margin: '0 0 16px 0', fontSize: '1.05rem', color: '#d4af37', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Maximize2 size={18} />
+              <h4 style={{ margin: '0 0 14px 0', fontSize: '1rem', color: '#d4af37', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Maximize2 size={16} />
                 <span>Oda & Duvar Brüt Alanı</span>
               </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Duvar / Zemin Genişliği (m)</label>
+                  <label style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Genişlik (m)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -645,16 +746,16 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                       width: '100%',
                       background: 'rgba(15, 23, 42, 0.8)',
                       border: '1px solid rgba(255,255,255,0.2)',
-                      padding: '10px 14px',
-                      borderRadius: '10px',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
                       color: '#fff',
-                      fontSize: '1rem',
+                      fontSize: '0.95rem',
                       fontWeight: '700'
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>Yükseklik / Derinlik (m)</label>
+                  <label style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Yükseklik (m)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -664,16 +765,16 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                       width: '100%',
                       background: 'rgba(15, 23, 42, 0.8)',
                       border: '1px solid rgba(255,255,255,0.2)',
-                      padding: '10px 14px',
-                      borderRadius: '10px',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
                       color: '#fff',
-                      fontSize: '1rem',
+                      fontSize: '0.95rem',
                       fontWeight: '700'
                     }}
                   />
                 </div>
               </div>
-              <div style={{ marginTop: '14px', fontSize: '0.85rem', color: '#cbd5e1' }}>
+              <div style={{ marginTop: '12px', fontSize: '0.8rem', color: '#cbd5e1' }}>
                 Brüt Yüzey Alanı: <strong style={{ color: '#fff' }}>{grossAreaM2} m²</strong>
               </div>
             </div>
@@ -683,29 +784,29 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
               background: 'rgba(30, 41, 59, 0.7)',
               border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: '16px',
-              padding: '20px'
+              padding: isMobile ? '16px' : '20px'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h4 style={{ margin: 0, fontSize: '1.05rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Layers size={18} />
-                  <span>Düşülecek Boşluklar (Kapı, Pencere, Duşakabin)</span>
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap: '8px', marginBottom: '14px' }}>
+                <h4 style={{ margin: 0, fontSize: '0.95rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Layers size={16} />
+                  <span>Düşülecek Boşluklar</span>
                 </h4>
-                <div style={{ display: 'flex', gap: '6px' }}>
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                   <button
                     onClick={() => addCutout('Kapı')}
-                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '6px 10px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer' }}
+                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '4px 8px', borderRadius: '6px', fontSize: '0.72rem', cursor: 'pointer' }}
                   >
                     + Kapı
                   </button>
                   <button
                     onClick={() => addCutout('Pencere')}
-                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '6px 10px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer' }}
+                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '4px 8px', borderRadius: '6px', fontSize: '0.72rem', cursor: 'pointer' }}
                   >
                     + Pencere
                   </button>
                   <button
                     onClick={() => addCutout('Duşakabin')}
-                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '6px 10px', borderRadius: '8px', fontSize: '0.75rem', cursor: 'pointer' }}
+                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '4px 8px', borderRadius: '6px', fontSize: '0.72rem', cursor: 'pointer' }}
                   >
                     + Duşakabin
                   </button>
@@ -713,21 +814,21 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
               </div>
 
               {cutouts.length === 0 ? (
-                <p style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic' }}>Henüz düşülen boşluk yok.</p>
+                <p style={{ fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic' }}>Henüz düşülen boşluk yok.</p>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {cutouts.map((item) => (
                     <div key={item.id} style={{
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       background: 'rgba(15, 23, 42, 0.6)',
-                      padding: '10px 14px',
-                      borderRadius: '10px',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
                       border: '1px solid rgba(255,255,255,0.06)'
                     }}>
-                      <span style={{ fontWeight: '700', fontSize: '0.88rem', color: '#fff', width: '100px' }}>{item.type}</span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontWeight: '700', fontSize: '0.82rem', color: '#fff' }}>{item.type}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <input
                           type="number"
                           step="0.1"
@@ -736,9 +837,9 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                             const val = parseFloat(e.target.value) || 0;
                             setCutouts(cutouts.map(c => c.id === item.id ? { ...c, w: val } : c));
                           }}
-                          style={{ width: '60px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 8px', borderRadius: '6px', color: '#fff' }}
+                          style={{ width: '50px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 6px', borderRadius: '6px', color: '#fff', fontSize: '0.8rem' }}
                         />
-                        <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>m x</span>
+                        <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>m x</span>
                         <input
                           type="number"
                           step="0.1"
@@ -747,16 +848,16 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                             const val = parseFloat(e.target.value) || 0;
                             setCutouts(cutouts.map(c => c.id === item.id ? { ...c, h: val } : c));
                           }}
-                          style={{ width: '60px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 8px', borderRadius: '6px', color: '#fff' }}
+                          style={{ width: '50px', background: '#0f172a', border: '1px solid rgba(255,255,255,0.2)', padding: '4px 6px', borderRadius: '6px', color: '#fff', fontSize: '0.8rem' }}
                         />
-                        <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>m =</span>
-                        <strong style={{ color: '#f87171', width: '60px', textAlign: 'right' }}>{(item.w * item.h).toFixed(2)} m²</strong>
+                        <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>m =</span>
+                        <strong style={{ color: '#f87171', fontSize: '0.82rem' }}>{(item.w * item.h).toFixed(2)} m²</strong>
                       </div>
                       <button
                         onClick={() => removeCutout(item.id)}
                         style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={14} />
                       </button>
                     </div>
                   ))}
@@ -765,56 +866,56 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             </div>
           </div>
 
-          {/* Right Column: Calculations & Material Basket */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Right Column: Material Calculations */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{
               background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(30, 41, 59, 0.9) 100%)',
               border: '1px solid #d4af37',
-              borderRadius: '20px',
-              padding: '24px'
+              borderRadius: '16px',
+              padding: isMobile ? '16px' : '24px'
             }}>
-              <h4 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: '#d4af37', fontWeight: '900' }}>
-                📊 Otematik Malzeme & Metraj Özeti
+              <h4 style={{ margin: '0 0 14px 0', fontSize: '1.1rem', color: '#d4af37', fontWeight: '900' }}>
+                📊 Otomatik Malzeme Özeti
               </h4>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                  <span style={{ color: '#cbd5e1' }}>Brüt Yüzey Alanı:</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <span style={{ color: '#cbd5e1' }}>Brüt Alan:</span>
                   <strong style={{ color: '#fff' }}>{grossAreaM2} m²</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                  <span style={{ color: '#f87171' }}>Düşülen Boşluklar Toplamı:</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <span style={{ color: '#f87171' }}>Boşluklar Toplamı:</span>
                   <strong style={{ color: '#f87171' }}>- {cutoutAreaM2} m²</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                   <span style={{ color: '#10b981', fontWeight: '800' }}>Net Kaplama Alanı:</span>
-                  <strong style={{ color: '#10b981', fontSize: '1.2rem' }}>{netAreaM2} m²</strong>
+                  <strong style={{ color: '#10b981', fontSize: '1.1rem' }}>{netAreaM2} m²</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                   <span style={{ color: '#cbd5e1' }}>Gerekli Seramik (%10 Fire Dahil):</span>
                   <strong style={{ color: '#d4af37' }}>{netWithWasteM2} m² ({boxCount} Kutu)</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                  <span style={{ color: '#cbd5e1' }}>C2TE Seramik Yapıştırıcısı (25kg):</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <span style={{ color: '#cbd5e1' }}>Yapıştırıcı (25kg Çuval):</span>
                   <strong style={{ color: '#fff' }}>{adhesiveBags} Çuval</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                   <span style={{ color: '#cbd5e1' }}>Derz Dolgusu:</span>
                   <strong style={{ color: '#fff' }}>{groutKg} kg</strong>
                 </div>
 
                 <div style={{
-                  marginTop: '12px',
-                  padding: '14px',
+                  marginTop: '10px',
+                  padding: '12px',
                   background: 'rgba(15, 23, 42, 0.8)',
-                  borderRadius: '12px',
+                  borderRadius: '10px',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
                   <div>
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'block' }}>Tahmini Toplam Malzeme Tutarı</span>
-                    <strong style={{ fontSize: '1.4rem', color: '#d4af37', fontWeight: '900' }}>{totalEstMaterialCost.toLocaleString('tr-TR')} ₺</strong>
+                    <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block' }}>Tahmini Toplam Tutar</span>
+                    <strong style={{ fontSize: '1.25rem', color: '#d4af37', fontWeight: '900' }}>{totalEstMaterialCost.toLocaleString('tr-TR')} ₺</strong>
                   </div>
                   <button
                     onClick={() => setActiveTab('QUOTE')}
@@ -822,18 +923,18 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                       background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                       color: '#fff',
                       border: 'none',
-                      padding: '12px 20px',
-                      borderRadius: '12px',
+                      padding: '10px 16px',
+                      borderRadius: '10px',
                       fontWeight: '800',
-                      fontSize: '0.85rem',
+                      fontSize: '0.8rem',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '6px'
+                      gap: '4px'
                     }}
                   >
-                    <span>Teklif Oluştur</span>
-                    <ChevronRight size={18} />
+                    <span>Teklif Al</span>
+                    <ChevronRight size={16} />
                   </button>
                 </div>
               </div>
@@ -845,36 +946,37 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         <div style={{
           flex: 1,
           display: activeTab === 'QUOTE' ? 'flex' : 'none',
-          padding: '32px',
+          padding: isMobile ? '16px' : '32px',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          overflowY: 'auto'
         }}>
           <div style={{
             background: 'rgba(30, 41, 59, 0.95)',
             border: '1px solid var(--accent-gold)',
-            borderRadius: '24px',
-            padding: '32px',
+            borderRadius: '20px',
+            padding: isMobile ? '20px' : '32px',
             maxWidth: '560px',
             width: '100%',
             boxShadow: '0 20px 60px rgba(0,0,0,0.6)'
           }}>
             {!submitSuccess ? (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-                  <Store size={28} style={{ color: '#d4af37' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                  <Store size={24} style={{ color: '#d4af37' }} />
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#fff', fontWeight: '900' }}>
+                    <h3 style={{ margin: 0, fontSize: isMobile ? '1.1rem' : '1.25rem', color: '#fff', fontWeight: '900' }}>
                       Bayiden Anında Fiyat & Teklif Alın
                     </h3>
-                    <span style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>
+                    <span style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
                       {currentDealer?.name ? `${currentDealer.name} Bayisine Gönderiliyor` : 'En Yakın Yetkili Bayi Eşleşiyor'}
                     </span>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'block', marginBottom: '6px' }}>Adınız Soyadınız *</label>
+                    <label style={{ fontSize: '0.78rem', color: '#cbd5e1', display: 'block', marginBottom: '4px' }}>Adınız Soyadınız *</label>
                     <input
                       type="text"
                       placeholder="Örn: Ahmet Yılmaz"
@@ -884,16 +986,16 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                         width: '100%',
                         background: '#0f172a',
                         border: '1px solid rgba(255,255,255,0.2)',
-                        padding: '12px 16px',
-                        borderRadius: '10px',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
                         color: '#fff',
-                        fontSize: '0.95rem'
+                        fontSize: '0.9rem'
                       }}
                     />
                   </div>
 
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'block', marginBottom: '6px' }}>Telefon Numaranız *</label>
+                    <label style={{ fontSize: '0.78rem', color: '#cbd5e1', display: 'block', marginBottom: '4px' }}>Telefon Numaranız *</label>
                     <input
                       type="tel"
                       placeholder="Örn: 0532 123 45 67"
@@ -903,16 +1005,16 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                         width: '100%',
                         background: '#0f172a',
                         border: '1px solid rgba(255,255,255,0.2)',
-                        padding: '12px 16px',
-                        borderRadius: '10px',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
                         color: '#fff',
-                        fontSize: '0.95rem'
+                        fontSize: '0.9rem'
                       }}
                     />
                   </div>
 
                   <div>
-                    <label style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'block', marginBottom: '6px' }}>Özel Not / Proje Detayı</label>
+                    <label style={{ fontSize: '0.78rem', color: '#cbd5e1', display: 'block', marginBottom: '4px' }}>Özel Not / Proje Detayı</label>
                     <textarea
                       rows="2"
                       placeholder="Örn: Usta montaj hizmeti de istiyorum..."
@@ -922,16 +1024,16 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                         width: '100%',
                         background: '#0f172a',
                         border: '1px solid rgba(255,255,255,0.2)',
-                        padding: '10px 16px',
-                        borderRadius: '10px',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
                         color: '#fff',
-                        fontSize: '0.9rem'
+                        fontSize: '0.85rem'
                       }}
                     />
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <a
                     href={getWhatsAppShareUrl()}
                     target="_blank"
@@ -940,19 +1042,19 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                     style={{
                       background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
                       color: '#fff',
-                      padding: '14px',
-                      borderRadius: '14px',
+                      padding: '12px',
+                      borderRadius: '12px',
                       fontWeight: '900',
-                      fontSize: '1rem',
+                      fontSize: '0.95rem',
                       textDecoration: 'none',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '10px',
-                      boxShadow: '0 8px 24px rgba(37,211,102,0.4)'
+                      gap: '8px',
+                      boxShadow: '0 6px 20px rgba(37,211,102,0.4)'
                     }}
                   >
-                    <MessageCircle size={20} />
+                    <MessageCircle size={18} />
                     <span>WhatsApp'tan Bayiye Gönder & Teklif Al</span>
                   </a>
 
@@ -963,28 +1065,28 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                       background: 'rgba(212, 175, 55, 0.15)',
                       border: '1px solid #d4af37',
                       color: '#d4af37',
-                      padding: '14px',
-                      borderRadius: '14px',
+                      padding: '12px',
+                      borderRadius: '12px',
                       fontWeight: '800',
-                      fontSize: '0.95rem',
+                      fontSize: '0.9rem',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '10px'
+                      gap: '8px'
                     }}
                   >
-                    <Send size={18} />
+                    <Send size={16} />
                     <span>{isSubmitting ? 'Kaydediliyor...' : 'Sadece Kaydet & Bayiye İlet'}</span>
                   </button>
                 </div>
               </>
             ) : (
-              <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                <CheckCircle2 size={56} style={{ color: '#10b981', margin: '0 auto 16px auto' }} />
-                <h3 style={{ margin: '0 0 8px 0', fontSize: '1.4rem', color: '#fff' }}>AR Ölçüm Teklifiniz Alındı!</h3>
-                <p style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.6', marginBottom: '24px' }}>
-                  {netAreaM2} m² net kaplama alanınız ve malzeme sepetiniz ilgili bayimize iletildi. En kısa sürede sizinle iletişime geçilecektir.
+              <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                <CheckCircle2 size={48} style={{ color: '#10b981', margin: '0 auto 12px auto' }} />
+                <h3 style={{ margin: '0 0 6px 0', fontSize: '1.25rem', color: '#fff' }}>AR Ölçüm Teklifiniz Alındı!</h3>
+                <p style={{ fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5', marginBottom: '20px' }}>
+                  {netAreaM2} m² net kaplama alanınız ve malzeme sepetiniz ilgili bayimize iletildi.
                 </p>
                 <button
                   onClick={onClose}
@@ -992,8 +1094,8 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                     background: '#d4af37',
                     color: '#000',
                     border: 'none',
-                    padding: '12px 32px',
-                    borderRadius: '12px',
+                    padding: '10px 24px',
+                    borderRadius: '10px',
                     fontWeight: '900',
                     cursor: 'pointer'
                   }}

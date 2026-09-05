@@ -100,7 +100,7 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
 
   // Render Web-AR Perspective Floor Grid on Canvas
   useEffect(() => {
-    if (!isOpen || cameraLoading || cameraError || capturedPhoto) return;
+    if (!isOpen || capturedPhoto) return;
 
     let animationFrameId;
     const canvas = canvasRef.current;
@@ -113,22 +113,33 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
 
     const renderAROverlay = () => {
       const video = videoRef.current;
-      if (!video || video.readyState !== 4) {
-        animationFrameId = requestAnimationFrame(renderAROverlay);
-        return;
-      }
+      const hasLiveVideo = video && video.readyState === 4 && stream;
 
-      // Match canvas dimensions to video
-      if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-        canvas.width = video.videoWidth || 1280;
-        canvas.height = video.videoHeight || 720;
+      if (hasLiveVideo) {
+        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+          canvas.width = video.videoWidth || 1280;
+          canvas.height = video.videoHeight || 720;
+        }
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      } else {
+        if (canvas.width !== 1280) {
+          canvas.width = 1280;
+          canvas.height = 720;
+        }
+        // Dark Showroom Room Canvas Fallback Fill
+        const roomGrad = ctx.createRadialGradient(
+          canvas.width / 2, canvas.height / 3, 100,
+          canvas.width / 2, canvas.height / 2, canvas.width / 1.2
+        );
+        roomGrad.addColorStop(0, '#1e293b');
+        roomGrad.addColorStop(0.6, '#0f172a');
+        roomGrad.addColorStop(1, '#020617');
+        ctx.fillStyle = roomGrad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
       const w = canvas.width;
       const h = canvas.height;
-
-      // 1. Draw live camera video frame
-      ctx.drawImage(video, 0, 0, w, h);
 
       // 2. Calculate perspective trapezoid for floor plane (lower 55% of screen)
       const horizonY = h * (1 - tilePerspectiveAngle / 100); // Floor starts here
