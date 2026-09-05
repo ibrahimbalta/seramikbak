@@ -11,6 +11,8 @@
   "lang": "tr",
   "dir": "ltr",
   "categories": ["shopping", "business", "lifestyle"],
+  "permissions": ["camera", "geolocation"],
+  "features": ["camera"],
   "icons": [
     {
       "src": "/icon-192.png",

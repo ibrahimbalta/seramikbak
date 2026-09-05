@@ -7,10 +7,24 @@ import ARRoomScannerModal from './ARRoomScannerModal';
 export default function WebARModal({ isOpen, onClose, selectedProduct, currentDealer }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [stream, setStream] = useState(null);
   const [cameraError, setCameraError] = useState('');
   const [cameraLoading, setCameraLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [userPhotoBg, setUserPhotoBg] = useState(null);
+
+  // Native Camera Photo Upload Handler (Bypasses PWA WebAPK permission restrictions)
+  const handleNativePhotoCapture = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        setUserPhotoBg(evt.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // AR View Mode: 'STUDIO' (Live 2D Tile Grid) or 'SCANNER' (LiDAR & Cutout Measurement)
   const [viewMode, setViewMode] = useState('STUDIO');
@@ -124,6 +138,11 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
     img.crossOrigin = 'anonymous';
     img.src = activeTileTexture;
 
+    const userBgImg = new Image();
+    if (userPhotoBg) {
+      userBgImg.src = userPhotoBg;
+    }
+
     const renderAROverlay = () => {
       const video = videoRef.current;
       const hasLiveVideo = video && video.readyState === 4 && stream;
@@ -134,6 +153,12 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
           canvas.height = video.videoHeight || 720;
         }
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      } else if (userPhotoBg && userBgImg.complete && userBgImg.naturalWidth > 0) {
+        if (canvas.width !== 1280) {
+          canvas.width = 1280;
+          canvas.height = 720;
+        }
+        ctx.drawImage(userBgImg, 0, 0, canvas.width, canvas.height);
       } else {
         if (canvas.width !== 1280) {
           canvas.width = 1280;
@@ -383,6 +408,16 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
         {/* Hidden HTML5 Video element */}
         <video ref={videoRef} playsInline muted style={{ display: 'none' }} />
 
+        {/* Native Camera Capture File Input (Bypasses WebRTC PWA OS permission blocks) */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          capture="environment"
+          onChange={handleNativePhotoCapture}
+          style={{ display: 'none' }}
+        />
+
         {/* Live / Fallback Render Canvas */}
         {!capturedPhoto && (
           <canvas
@@ -395,8 +430,8 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
           />
         )}
 
-        {/* Camera Permission Retry Button only if camera fails */}
-        {cameraError && !capturedPhoto && (
+        {/* Camera Permission / Action Banner */}
+        {cameraError && !capturedPhoto && !userPhotoBg && (
           <div style={{
             position: 'absolute',
             top: '16px',
@@ -404,30 +439,50 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
             transform: 'translateX(-50%)',
             zIndex: 25,
             width: 'calc(100% - 32px)',
-            maxWidth: '360px'
+            maxWidth: '420px',
+            background: 'rgba(15, 23, 42, 0.95)',
+            border: '1px solid rgba(239, 68, 68, 0.5)',
+            backdropFilter: 'blur(12px)',
+            borderRadius: '14px',
+            padding: '12px 14px',
+            textAlign: 'center',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.6)'
           }}>
-            <button
-              onClick={startCamera}
-              style={{
-                width: '100%',
-                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                color: '#000',
-                border: 'none',
-                padding: '10px 16px',
-                borderRadius: '25px',
-                fontWeight: '900',
-                fontSize: '0.8rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
-                boxShadow: '0 8px 24px rgba(212, 175, 55, 0.4)'
-              }}
-            >
-              <Camera size={16} />
-              <span>📷 Canlı Kamerayı Başlat (Tekrar Deneyin)</span>
-            </button>
+            <div style={{ fontSize: '0.78rem', color: '#fca5a5', fontWeight: '700', marginBottom: '8px' }}>
+              {cameraError}
+            </div>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+              <button
+                onClick={startCamera}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: '#fff',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.75rem',
+                  fontWeight: '800',
+                  cursor: 'pointer'
+                }}
+              >
+                🔄 Canlı Kamerayı Yeniden Dene
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                  border: 'none',
+                  color: '#000',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.75rem',
+                  fontWeight: '900',
+                  cursor: 'pointer'
+                }}
+              >
+                📸 Fotoğraf Çek & Odana Döşe
+              </button>
+            </div>
           </div>
         )}
 

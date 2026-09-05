@@ -11,11 +11,13 @@ import {
 export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, currentDealer }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [stream, setStream] = useState(null);
   const [cameraLoading, setCameraLoading] = useState(true);
   const [cameraError, setCameraError] = useState('');
   const [isMobile, setIsMobile] = useState(false);
   const [showMobilePanel, setShowMobilePanel] = useState(true);
+  const [userPhotoBg, setUserPhotoBg] = useState(null);
 
   // Surface Type: 'WALL' or 'FLOOR'
   const [surfaceType, setSurfaceType] = useState('WALL');
@@ -171,6 +173,18 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     }
   };
 
+  // Native Camera Photo Upload Handler (Bypasses PWA WebAPK permission restrictions)
+  const handleNativePhotoCapture = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        setUserPhotoBg(evt.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Render Canvas Laser AR Overlay & Live Camera Feed
   useEffect(() => {
     if (!isOpen) return;
@@ -184,6 +198,11 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     tileImg.crossOrigin = 'anonymous';
     tileImg.src = activeTileTexture;
 
+    const userBgImg = new Image();
+    if (userPhotoBg) {
+      userBgImg.src = userPhotoBg;
+    }
+
     const renderARScanner = () => {
       const video = videoRef.current;
       const hasLiveVideo = video && video.readyState === 4 && stream;
@@ -194,6 +213,12 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           canvas.height = video.videoHeight || 720;
         }
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      } else if (userPhotoBg && userBgImg.complete && userBgImg.naturalWidth > 0) {
+        if (canvas.width !== 1280) {
+          canvas.width = 1280;
+          canvas.height = 720;
+        }
+        ctx.drawImage(userBgImg, 0, 0, canvas.width, canvas.height);
       } else {
         if (canvas.width !== 1280) {
           canvas.width = 1280;
@@ -608,10 +633,20 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           {/* Video Stream Element */}
           <video ref={videoRef} playsInline muted style={{ display: 'none' }} />
           
+          {/* Native Camera Capture File Input (Bypasses WebRTC PWA OS permission blocks) */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            capture="environment"
+            onChange={handleNativePhotoCapture}
+            style={{ display: 'none' }}
+          />
+
           {/* Live / Fallback Interactive Canvas */}
           <canvas ref={canvasRef} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 
-          {/* Quick Laser Pin Corner Action Button Floating over Live Camera */}
+          {/* Floating Top Action Bar: Corner Pinning & Native Camera Capture */}
           <div style={{
             position: 'absolute',
             top: '16px',
@@ -619,7 +654,11 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             transform: 'translateX(-50%)',
             zIndex: 25,
             display: 'flex',
-            gap: '8px'
+            gap: '8px',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            width: 'calc(100% - 32px)',
+            maxWidth: '480px'
           }}>
             <button
               onClick={handlePinNextPoint}
@@ -627,10 +666,10 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                 background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
                 color: '#000',
                 border: 'none',
-                padding: '8px 16px',
+                padding: '8px 14px',
                 borderRadius: '20px',
                 fontWeight: '900',
-                fontSize: '0.8rem',
+                fontSize: '0.78rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -641,7 +680,86 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
               <Target size={16} />
               <span>{pinnedPointCount === 0 ? '📍 1. Köşeyı İşaretle' : pinnedPointCount === 1 ? '📍 2. Köşeyi İşaretle' : '🔄 Yeniden Ölç'}</span>
             </button>
+
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                background: 'rgba(15, 23, 42, 0.88)',
+                color: '#38bdf8',
+                border: '1px solid rgba(56, 189, 248, 0.4)',
+                backdropFilter: 'blur(8px)',
+                padding: '8px 14px',
+                borderRadius: '20px',
+                fontWeight: '800',
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 6px 16px rgba(0,0,0,0.4)'
+              }}
+            >
+              <Camera size={16} />
+              <span>📸 Fotoğraf Çek & Odana Döşe</span>
+            </button>
           </div>
+
+          {/* Camera Permission / Fallback Information Banner */}
+          {cameraError && !userPhotoBg && (
+            <div style={{
+              position: 'absolute',
+              top: '64px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 25,
+              width: 'calc(100% - 32px)',
+              maxWidth: '420px',
+              background: 'rgba(15, 23, 42, 0.95)',
+              border: '1px solid rgba(239, 68, 68, 0.5)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: '14px',
+              padding: '12px 14px',
+              textAlign: 'center',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.6)'
+            }}>
+              <div style={{ fontSize: '0.78rem', color: '#fca5a5', fontWeight: '700', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                <AlertCircle size={16} />
+                <span>{cameraError}</span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                <button
+                  onClick={startCamera}
+                  style={{
+                    background: 'rgba(255,255,255,0.1)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    color: '#fff',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    fontSize: '0.72rem',
+                    fontWeight: '800',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🔄 Canlı Kamerayı Yeniden Dene
+                </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{
+                    background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                    border: 'none',
+                    color: '#000',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    fontSize: '0.72rem',
+                    fontWeight: '900',
+                    cursor: 'pointer'
+                  }}
+                >
+                  📸 Fotoğraf Çek & Odana Döşe
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Mobile & Desktop Floating Controls Panel */}
           <div style={{
