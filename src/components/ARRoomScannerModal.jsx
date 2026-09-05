@@ -560,28 +560,43 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           {/* Live / Fallback Interactive Canvas */}
           <canvas ref={canvasRef} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 
-          {/* Camera Notice Bar if non-HTTPS or denied */}
-          {cameraError && (
+          {/* Camera Notice Bar & Tap to Start Camera Button if stream not active */}
+          {!stream && (
             <div style={{
               position: 'absolute',
               top: '12px',
               left: '50%',
               transform: 'translateX(-50%)',
-              background: 'rgba(15, 23, 42, 0.92)',
-              border: '1px solid rgba(212, 175, 55, 0.4)',
-              padding: '6px 14px',
-              borderRadius: '20px',
-              fontSize: '0.72rem',
-              color: '#d4af37',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
               zIndex: 25,
-              whiteSpace: 'nowrap',
-              maxWidth: '90%'
+              width: 'calc(100% - 32px)',
+              maxWidth: '360px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              alignItems: 'center'
             }}>
-              <AlertCircle size={14} />
-              <span>Sanal Showroom Modu Aktif (Kamerayı Açmak için İzin Verin veya HTTPS Kullanın)</span>
+              <button
+                onClick={startCamera}
+                style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                  color: '#000',
+                  border: 'none',
+                  padding: '10px 16px',
+                  borderRadius: '25px',
+                  fontWeight: '900',
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  boxShadow: '0 8px 24px rgba(212, 175, 55, 0.4)'
+                }}
+              >
+                <Camera size={16} />
+                <span>📷 Canlı Kamerayı Etkinleştir (İzin Ver)</span>
+              </button>
             </div>
           )}
 
