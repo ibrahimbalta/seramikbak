@@ -281,58 +281,61 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
       color: '#ffffff',
       fontFamily: 'Outfit, sans-serif'
     }}>
-      {/* Top Header Controls Bar */}
+      {/* Top Header Controls Bar - Responsive */}
       <div style={{
-        padding: '16px 20px',
+        padding: '10px 14px',
         background: 'rgba(15, 23, 42, 0.95)',
         backdropFilter: 'blur(12px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         display: 'flex',
+        flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
-        zIndex: 10
+        gap: '8px',
+        zIndex: 20
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
           <div style={{
             background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
             color: '#000',
-            padding: '6px 12px',
-            borderRadius: '10px',
+            padding: '4px 8px',
+            borderRadius: '8px',
             fontWeight: '900',
-            fontSize: '0.82rem',
+            fontSize: '0.75rem',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px'
+            gap: '4px',
+            flexShrink: 0
           }}>
             <Sparkles size={14} />
-            <span>WebAR Studio</span>
+            <span>WebAR</span>
           </div>
-          <span style={{ fontSize: '0.88rem', color: '#cbd5e1', fontWeight: '600' }}>
-            {selectedProduct?.name || 'Canlı Zemin Seramik Önizleme'}
+          <span style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {selectedProduct?.name || 'Zemin Seramik Önizleme'}
           </span>
         </div>
 
-        {/* View Mode Switcher Header Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Mode Switcher & Close */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           <button
             onClick={() => setViewMode('SCANNER')}
             style={{
               background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               color: '#fff',
               border: 'none',
-              padding: '8px 16px',
-              borderRadius: '10px',
+              padding: '6px 12px',
+              borderRadius: '8px',
               fontWeight: '800',
-              fontSize: '0.8rem',
+              fontSize: '0.75rem',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '4px',
               boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)'
             }}
           >
-            <Maximize2 size={14} />
-            <span>📱 LiDAR & Oda Ölçüm Taraması</span>
+            <Maximize2 size={13} />
+            <span>Oda Ölçüm Taraması</span>
           </button>
 
           <button
@@ -341,8 +344,8 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
               background: 'rgba(255, 255, 255, 0.1)',
               border: 'none',
               color: '#fff',
-              width: '36px',
-              height: '36px',
+              width: '32px',
+              height: '32px',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -350,13 +353,13 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
               cursor: 'pointer'
             }}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
       </div>
 
       {/* Main Viewport Area */}
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
         {/* Hidden HTML5 Video element */}
         <video
           ref={videoRef}
