@@ -22,9 +22,15 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   // Surface Type: 'WALL' or 'FLOOR'
   const [surfaceType, setSurfaceType] = useState('WALL');
 
-  // Room Measurement State (in meters)
-  const [roomWidth, setRoomWidth] = useState(3.5);  // meters (En)
+  // Room Measurement State (in meters) - Default Standard Bathroom (2.4m x 2.6m)
+  const [roomWidth, setRoomWidth] = useState(2.4);  // meters (En)
   const [roomHeight, setRoomHeight] = useState(2.6); // meters (Boy)
+
+  // Gyroscope / Motion Sensor Measurement States
+  const [deviceAngles, setDeviceAngles] = useState({ alpha: 0, beta: 0, gamma: 0 });
+  const [startOrientation, setStartOrientation] = useState(null);
+  const [liveScannedWidth, setLiveScannedWidth] = useState(null);
+  const [liveScannedHeight, setLiveScannedHeight] = useState(null);
 
   // Interactive Laser Pinning State (Points P1, P2 set via camera reticle tap)
   const [pinnedPointCount, setPinnedPointCount] = useState(0);
@@ -36,11 +42,8 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   const tileM2PerBox = (tileW * tileH * 2) || 1.44;
   const tilePricePerM2 = selectedProduct?.trendyolPrice || selectedProduct?.koctasPrice || 450;
 
-  // Cutout Subtractions List (Doors, Windows, Shower enclosures)
-  const [cutouts, setCutouts] = useState([
-    { id: 1, type: 'Pencere', w: 1.2, h: 1.2 },
-    { id: 2, type: 'Kapı', w: 0.9, h: 2.1 }
-  ]);
+  // Cutout Subtractions List (Starts empty so Net Area = exact scanned room area)
+  const [cutouts, setCutouts] = useState([]);
 
   // Tile Customization
   const [activeTileTexture, setActiveTileTexture] = useState(
@@ -161,17 +164,81 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     }
   };
 
+  // Listen to mobile DeviceOrientation (Gyroscope) for room scanning
+  useEffect(() => {
+    const handleOrientation = (e) => {
+      if (e.alpha !== null && e.beta !== null) {
+        setDeviceAngles({
+          alpha: e.alpha,
+          beta: e.beta,
+          gamma: e.gamma || 0
+        });
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', handleOrientation);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('deviceorientation', handleOrientation);
+      }
+    };
+  }, []);
+
+  // Update dynamic measurement as user turns or tilts phone
+  useEffect(() => {
+    if (pinnedPointCount === 1 && startOrientation) {
+      let diffAlpha = Math.abs(deviceAngles.alpha - startOrientation.alpha);
+      if (diffAlpha > 180) diffAlpha = 360 - diffAlpha;
+      // Angle to meters conversion (assuming ~1.8m distance from bathroom wall)
+      const calculatedW = Math.max(1.0, Math.min(10.0, parseFloat((1.2 + (diffAlpha * 0.08)).toFixed(1))));
+      setLiveScannedWidth(calculatedW);
+      setRoomWidth(calculatedW);
+    } else if (pinnedPointCount === 2 && startOrientation) {
+      const diffBeta = Math.abs(deviceAngles.beta - startOrientation.beta);
+      const calculatedH = Math.max(1.2, Math.min(6.0, parseFloat((1.6 + (diffBeta * 0.05)).toFixed(1))));
+      setLiveScannedHeight(calculatedH);
+      setRoomHeight(calculatedH);
+    }
+  }, [deviceAngles, pinnedPointCount, startOrientation]);
+
   // Pin Point Action for Camera Laser Reticle
   const handlePinNextPoint = () => {
     if (pinnedPointCount === 0) {
+      // Step 1: Pin left wall corner
+      setStartOrientation({ ...deviceAngles });
       setPinnedPointCount(1);
+      if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(50);
     } else if (pinnedPointCount === 1) {
+      // Step 2: Pin right wall corner (locks Width)
+      if (liveScannedWidth) setRoomWidth(liveScannedWidth);
+      setStartOrientation({ ...deviceAngles });
       setPinnedPointCount(2);
+      if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(70);
+    } else if (pinnedPointCount === 2) {
+      // Step 3: Pin ceiling / height (locks Height & finishes measurement)
+      if (liveScannedHeight) setRoomHeight(liveScannedHeight);
+      setPinnedPointCount(3);
       setIsScanningActive(false);
+      if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate([60, 50, 100]);
     } else {
+      // Reset & measure again
       setPinnedPointCount(0);
+      setStartOrientation(null);
+      setLiveScannedWidth(null);
+      setLiveScannedHeight(null);
       setIsScanningActive(true);
     }
+  };
+
+  // Quick Preset Room Sizer
+  const applyRoomPreset = (w, h) => {
+    setRoomWidth(w);
+    setRoomHeight(h);
+    setPinnedPointCount(3);
+    setIsScanningActive(false);
+    if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(40);
   };
 
   // Native Camera Photo Upload Handler (Bypasses PWA WebAPK permission restrictions)
@@ -394,14 +461,27 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       ctx.fillStyle = '#ffffff';
       ctx.fillText(`↕ Boy: ${roomHeight} m`, paddingX - (isMobile ? 48 : 60), (topY + botY) / 2 + 4);
 
-      // Center Net Area Badge
-      ctx.fillStyle = 'rgba(212, 175, 55, 0.95)';
+      // Center Net Area & Live Material Cost Badge
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.roundRect(w / 2 - (isMobile ? 80 : 95), (topY + botY) / 2 - (isMobile ? 16 : 20), isMobile ? 160 : 190, isMobile ? 32 : 40, 10);
+      const badgeW = isMobile ? 220 : 260;
+      const badgeH = isMobile ? 48 : 54;
+      ctx.roundRect(w / 2 - badgeW / 2, (topY + botY) / 2 - badgeH / 2, badgeW, badgeH, 12);
       ctx.fill();
-      ctx.fillStyle = '#000000';
+      ctx.stroke();
+
+      // Line 1: Net Area & Boxes
+      ctx.fillStyle = '#d4af37';
       ctx.font = `900 ${isMobile ? '13px' : '15px'} Outfit, sans-serif`;
-      ctx.fillText(`Net Kaplama: ${netAreaM2} m²`, w / 2, (topY + botY) / 2 + (isMobile ? 4 : 5));
+      ctx.textAlign = 'center';
+      ctx.fillText(`Net: ${netAreaM2} m² (${boxCount} Kutu)`, w / 2, (topY + botY) / 2 - (isMobile ? 5 : 6));
+
+      // Line 2: Estimated Cost (Material + Labor)
+      ctx.fillStyle = '#34d399';
+      ctx.font = `800 ${isMobile ? '11px' : '12px'} Outfit, sans-serif`;
+      ctx.fillText(`Tahmini: ~${totalEstMaterialCost.toLocaleString('tr-TR')} TL`, w / 2, (topY + botY) / 2 + (isMobile ? 14 : 16));
 
       ctx.restore();
 
@@ -412,7 +492,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     return () => {
       if (animId) cancelAnimationFrame(animId);
     };
-  }, [isOpen, roomWidth, roomHeight, netAreaM2, activeTileTexture, layStyle, groutColor, perspectiveTilt, stream, isMobile, isScanningActive]);
+  }, [isOpen, roomWidth, roomHeight, netAreaM2, boxCount, totalEstMaterialCost, userPhotoBg, activeTileTexture, layStyle, groutColor, perspectiveTilt, stream, isMobile, isScanningActive]);
 
   // Cutout Handlers
   const addCutout = (type) => {
@@ -664,8 +744,8 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             <button
               onClick={handlePinNextPoint}
               style={{
-                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                color: '#000',
+                background: pinnedPointCount === 3 ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                color: pinnedPointCount === 3 ? '#fff' : '#000',
                 border: 'none',
                 padding: '8px 14px',
                 borderRadius: '20px',
@@ -675,11 +755,16 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                boxShadow: '0 6px 20px rgba(212, 175, 55, 0.4)'
+                boxShadow: '0 6px 20px rgba(0,0,0,0.4)'
               }}
             >
               <Target size={16} />
-              <span>{pinnedPointCount === 0 ? '📍 1. Köşeyı İşaretle' : pinnedPointCount === 1 ? '📍 2. Köşeyi İşaretle' : '🔄 Yeniden Ölç'}</span>
+              <span>
+                {pinnedPointCount === 0 && '📍 1. Sol Duvarı İşaretle'}
+                {pinnedPointCount === 1 && `📍 2. Sağ Duvarı İşaretle (${liveScannedWidth || roomWidth}m)`}
+                {pinnedPointCount === 2 && `📍 3. Tavanı İşaretle (${liveScannedHeight || roomHeight}m)`}
+                {pinnedPointCount === 3 && `✅ Ölçüldü: ${netAreaM2}m² | 🔄 Yeniden Tara`}
+              </span>
             </button>
 
             <button
@@ -827,6 +912,105 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
 
             {showMobilePanel && (
               <>
+                {/* 1-Tap Quick Bathroom & Room Sizing Presets */}
+                <div style={{ marginBottom: '10px' }}>
+                  <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: '800', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Sparkles size={12} color="#d4af37" />
+                    <span>HIZLI ALAN ŞABLONLARI:</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
+                    <button
+                      onClick={() => applyRoomPreset(1.8, 2.2)}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(212,175,55,0.3)',
+                        background: roomWidth === 1.8 && roomHeight === 2.2 ? '#d4af37' : 'rgba(255,255,255,0.08)',
+                        color: roomWidth === 1.8 && roomHeight === 2.2 ? '#000' : '#fff',
+                        fontSize: '0.68rem',
+                        fontWeight: '800',
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🚿 Küçük (4m²)
+                    </button>
+                    <button
+                      onClick={() => applyRoomPreset(2.4, 2.6)}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(212,175,55,0.3)',
+                        background: roomWidth === 2.4 && roomHeight === 2.6 ? '#d4af37' : 'rgba(255,255,255,0.08)',
+                        color: roomWidth === 2.4 && roomHeight === 2.6 ? '#000' : '#fff',
+                        fontSize: '0.68rem',
+                        fontWeight: '800',
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🛁 Standart (6.2m²)
+                    </button>
+                    <button
+                      onClick={() => applyRoomPreset(3.2, 2.8)}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(212,175,55,0.3)',
+                        background: roomWidth === 3.2 && roomHeight === 2.8 ? '#d4af37' : 'rgba(255,255,255,0.08)',
+                        color: roomWidth === 3.2 && roomHeight === 2.8 ? '#000' : '#fff',
+                        fontSize: '0.68rem',
+                        fontWeight: '800',
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      👑 Ebeveyn (9m²)
+                    </button>
+                    <button
+                      onClick={() => applyRoomPreset(3.0, 0.6)}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(212,175,55,0.3)',
+                        background: roomWidth === 3.0 && roomHeight === 0.6 ? '#d4af37' : 'rgba(255,255,255,0.08)',
+                        color: roomWidth === 3.0 && roomHeight === 0.6 ? '#000' : '#fff',
+                        fontSize: '0.68rem',
+                        fontWeight: '800',
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🍳 Tezgah (1.8m²)
+                    </button>
+                  </div>
+                </div>
+
+                {/* Live Real-time Calculation Summary Strip */}
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '8px',
+                  padding: '6px 10px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '10px',
+                  fontSize: '0.72rem'
+                }}>
+                  <div>
+                    <span style={{ color: '#94a3b8' }}>Alan: </span>
+                    <strong style={{ color: '#d4af37' }}>{grossAreaM2} m²</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: '#94a3b8' }}>Kutu: </span>
+                    <strong style={{ color: '#fff' }}>{boxCount} Kutu</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: '#94a3b8' }}>Maliyet: </span>
+                    <strong style={{ color: '#34d399' }}>~{totalEstMaterialCost.toLocaleString('tr-TR')} ₺</strong>
+                  </div>
+                </div>
+
                 {/* Width Slider */}
                 <div style={{ marginBottom: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#cbd5e1', marginBottom: '2px' }}>
