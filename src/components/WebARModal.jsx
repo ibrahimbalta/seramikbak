@@ -1,15 +1,19 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, X, RefreshCw, Layers, CheckCircle2, Sliders, Smartphone, Download, Sparkles } from 'lucide-react';
+import { Camera, X, RefreshCw, Layers, CheckCircle2, Sliders, Smartphone, Download, Sparkles, Maximize2 } from 'lucide-react';
+import ARRoomScannerModal from './ARRoomScannerModal';
 
-export default function WebARModal({ isOpen, onClose, selectedProduct }) {
+export default function WebARModal({ isOpen, onClose, selectedProduct, currentDealer }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [stream, setStream] = useState(null);
   const [cameraError, setCameraError] = useState('');
   const [cameraLoading, setCameraLoading] = useState(true);
   
+  // AR View Mode: 'STUDIO' (Live 2D Tile Grid) or 'SCANNER' (LiDAR & Cutout Measurement)
+  const [viewMode, setViewMode] = useState('STUDIO');
+
   // AR Customization Controls
   const [activeTileTexture, setActiveTileTexture] = useState(selectedProduct?.imageUrl || '/textures/calacatta_gold.jpg');
   const [tileSize, setTileSize] = useState(selectedProduct?.width && selectedProduct?.height ? `${selectedProduct.width}x${selectedProduct.height}` : '60x120');
@@ -233,6 +237,17 @@ export default function WebARModal({ isOpen, onClose, selectedProduct }) {
 
   if (!isOpen) return null;
 
+  if (viewMode === 'SCANNER') {
+    return (
+      <ARRoomScannerModal
+        isOpen={isOpen}
+        onClose={onClose}
+        selectedProduct={selectedProduct}
+        currentDealer={currentDealer}
+      />
+    );
+  }
+
   return (
     <div style={{
       position: 'fixed',
@@ -275,24 +290,47 @@ export default function WebARModal({ isOpen, onClose, selectedProduct }) {
           </span>
         </div>
 
-        <button
-          onClick={onClose}
-          style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            border: 'none',
-            color: '#fff',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
-        >
-          <X size={20} />
-        </button>
+        {/* View Mode Switcher Header Button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            onClick={() => setViewMode('SCANNER')}
+            style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: '#fff',
+              border: 'none',
+              padding: '8px 16px',
+              borderRadius: '10px',
+              fontWeight: '800',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)'
+            }}
+          >
+            <Maximize2 size={14} />
+            <span>📱 LiDAR & Oda Ölçüm Taraması</span>
+          </button>
+
+          <button
+            onClick={onClose}
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: 'none',
+              color: '#fff',
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }}
+          >
+            <X size={20} />
+          </button>
+        </div>
       </div>
 
       {/* Main Viewport Area */}
