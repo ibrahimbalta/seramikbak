@@ -5042,7 +5042,7 @@ export default function Home() {
                         navigateToDealers={navigateToDealers}
                         getProductBadge={getProductBadge}
                         handleProductCardClick={handleProductCardClick}
-                        onOpenAR={(p) => setArModalProduct(p)}
+                        onOpenAR={(p) => handleOpenWebAR(p)}
                       />
                     ))
                   )}
@@ -9062,6 +9062,7 @@ export default function Home() {
         <ModelViewerAR 
           product={arModalProduct} 
           onClose={() => setArModalProduct(null)} 
+          onLaunchWebAR={(p) => handleOpenWebAR(p)}
         />
       )}
 
