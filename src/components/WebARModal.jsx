@@ -395,11 +395,11 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
           />
         )}
 
-        {/* Sleek Mobile Centered Camera Permission Button (When stream not active) */}
-        {!stream && !capturedPhoto && (
+        {/* Camera Permission Retry Button only if camera fails */}
+        {cameraError && !capturedPhoto && (
           <div style={{
             position: 'absolute',
-            top: '20px',
+            top: '16px',
             left: '50%',
             transform: 'translateX(-50%)',
             zIndex: 25,
@@ -413,20 +413,20 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
                 background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
                 color: '#000',
                 border: 'none',
-                padding: '12px 18px',
+                padding: '10px 16px',
                 borderRadius: '25px',
                 fontWeight: '900',
-                fontSize: '0.85rem',
+                fontSize: '0.8rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px',
+                gap: '6px',
                 boxShadow: '0 8px 24px rgba(212, 175, 55, 0.4)'
               }}
             >
-              <Camera size={18} />
-              <span>📷 Canlı Kamerayı Etkinleştir (İzin Ver)</span>
+              <Camera size={16} />
+              <span>📷 Canlı Kamerayı Başlat (Tekrar Deneyin)</span>
             </button>
           </div>
         )}

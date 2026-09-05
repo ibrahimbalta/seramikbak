@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Camera, X, RefreshCw, Layers, CheckCircle2, Sliders, Smartphone,
   Download, Sparkles, Plus, Trash2, Send, MessageCircle, Calculator,
-  Maximize2, ShieldCheck, Store, ChevronRight, AlertCircle, ChevronDown, ChevronUp
+  Maximize2, ShieldCheck, Store, ChevronRight, AlertCircle, ChevronDown, ChevronUp,
+  Target, Compass, CornerDownRight, Check
 } from 'lucide-react';
 
 export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, currentDealer }) {
@@ -20,8 +21,12 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   const [surfaceType, setSurfaceType] = useState('WALL');
 
   // Room Measurement State (in meters)
-  const [roomWidth, setRoomWidth] = useState(3.5);  // meters
-  const [roomHeight, setRoomHeight] = useState(2.6); // meters
+  const [roomWidth, setRoomWidth] = useState(3.5);  // meters (En)
+  const [roomHeight, setRoomHeight] = useState(2.6); // meters (Boy)
+
+  // Interactive Laser Pinning State (Points P1, P2 set via camera reticle tap)
+  const [pinnedPointCount, setPinnedPointCount] = useState(0);
+  const [isScanningActive, setIsScanningActive] = useState(true);
 
   // Active Tile Product info
   const tileW = (selectedProduct?.width || 60) / 100;
@@ -64,7 +69,6 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   const groutKg = Math.ceil(netWithWasteM2 * 0.4);
   const totalEstMaterialCost = totalTileCost + (adhesiveBags * 280) + (groutKg * 45);
 
-  // Detect mobile screen width
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -80,7 +84,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     }
   }, [selectedProduct]);
 
-  // Handle Camera Feed with Multiple Fallback Options
+  // Handle Camera Feed Direct Auto-Start on Mount
   useEffect(() => {
     if (!isOpen) {
       stopCamera();
@@ -95,7 +99,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     setCameraError('');
     
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setCameraError('Tarayıcınız canlı kamera akışını desteklemiyor. İnteraktif Sanal Showroom modu aktif.');
+      setCameraError('Kamera erişimi desteklenmiyor. Sanal Showroom modu aktif.');
       setCameraLoading(false);
       return;
     }
@@ -105,7 +109,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     // Constraint Strategy 1: Rear environment camera
     try {
       mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: { ideal: 'environment' } },
         audio: false
       });
     } catch (e1) {
@@ -116,7 +120,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           audio: false
         });
       } catch (e2) {
-        // Constraint Strategy 3: Any available video device
+        // Constraint Strategy 3: Any video track
         try {
           mediaStream = await navigator.mediaDevices.getUserMedia({
             video: true,
@@ -142,7 +146,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         };
       }
     } else {
-      setCameraError('Canlı kamera izni kısıtlı. Dokunmatik İnteraktif Sanal Showroom modu aktif.');
+      setCameraError('Kamera izni kısıtlı. Dokunmatik Lazer Sanal Showroom aktif.');
       setCameraLoading(false);
     }
   };
@@ -154,7 +158,20 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     }
   };
 
-  // Always Render Canvas Laser AR Overlay (Works with Live Camera AND Virtual Showroom Fallback)
+  // Pin Point Action for Camera Laser Reticle
+  const handlePinNextPoint = () => {
+    if (pinnedPointCount === 0) {
+      setPinnedPointCount(1);
+    } else if (pinnedPointCount === 1) {
+      setPinnedPointCount(2);
+      setIsScanningActive(false);
+    } else {
+      setPinnedPointCount(0);
+      setIsScanningActive(true);
+    }
+  };
+
+  // Render Canvas Laser AR Overlay & Live Camera Feed
   useEffect(() => {
     if (!isOpen) return;
 
@@ -178,16 +195,15 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         }
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       } else {
-        // Render Procedural High-Fidelity 3D Showroom Background
         if (canvas.width !== 1280) {
           canvas.width = 1280;
           canvas.height = 720;
         }
         
-        // Dark Showroom Environment Background
+        // Dark Procedural Showroom Backdrop
         const grad = ctx.createRadialGradient(
           canvas.width / 2, canvas.height / 3, 100,
-          canvas.width / 2, canvas.height / 2, canvas.width / 1.2
+          canvas.width / 2, canvas.height / 2, canvas.width / 1.1
         );
         grad.addColorStop(0, '#1e293b');
         grad.addColorStop(0.6, '#0f172a');
@@ -195,19 +211,17 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Render Showroom Perspective Wall & Floor Guidelines
+        // Perspective Guidelines
         ctx.save();
         ctx.strokeStyle = 'rgba(212, 175, 55, 0.15)';
         ctx.lineWidth = 1;
 
-        // Horizon Perspective line
         const horizY = canvas.height * 0.45;
         ctx.beginPath();
         ctx.moveTo(0, horizY);
         ctx.lineTo(canvas.width, horizY);
         ctx.stroke();
 
-        // Corner Perspective Rays
         ctx.beginPath();
         ctx.moveTo(canvas.width * 0.1, 0); ctx.lineTo(canvas.width * 0.1, horizY);
         ctx.moveTo(canvas.width * 0.9, 0); ctx.lineTo(canvas.width * 0.9, horizY);
@@ -220,15 +234,15 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       const w = canvas.width;
       const h = canvas.height;
 
-      // 1. Draw Surface Bounding Box & Laser Pins
+      // 1. Draw Surface Bounding Box & Laser Mesh
       const paddingX = w * (isMobile ? 0.08 : 0.15);
       const topY = h * (1 - perspectiveTilt / 100);
       const botY = h * 0.85;
 
       ctx.save();
 
-      // Laser Scanning Grid Box
-      ctx.strokeStyle = '#d4af37';
+      // Laser Scanning Outer Boundary Box
+      ctx.strokeStyle = isScanningActive ? '#d4af37' : '#10b981';
       ctx.lineWidth = isMobile ? 2 : 3;
       ctx.setLineDash([8, 6]);
       ctx.strokeRect(paddingX, topY, w - (paddingX * 2), botY - topY);
@@ -304,25 +318,60 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         ctx.stroke();
       });
 
+      // Center Laser Reticle Target Pointer
+      ctx.save();
+      const centerX = w / 2;
+      const centerY = (topY + botY) / 2;
+
+      // Pulsing Center Target Ring
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, isMobile ? 16 : 22, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#d4af37';
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Laser Crosshair lines
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.6)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(centerX - 30, centerY); ctx.lineTo(centerX + 30, centerY);
+      ctx.moveTo(centerX, centerY - 30); ctx.lineTo(centerX, centerY + 30);
+      ctx.stroke();
+      ctx.restore();
+
       // Dimension Badges
       ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
       ctx.strokeStyle = '#d4af37';
       ctx.lineWidth = 1;
 
-      // Top Width Badge
+      // Top Width Badge (En)
       ctx.beginPath();
-      ctx.roundRect(w / 2 - (isMobile ? 50 : 60), topY - (isMobile ? 30 : 36), isMobile ? 100 : 120, isMobile ? 24 : 28, 8);
+      ctx.roundRect(w / 2 - (isMobile ? 55 : 65), topY - (isMobile ? 30 : 36), isMobile ? 110 : 130, isMobile ? 24 : 28, 8);
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = '#ffffff';
       ctx.font = `bold ${isMobile ? '11px' : '13px'} Outfit, sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText(`↔ ${roomWidth} m`, w / 2, topY - (isMobile ? 14 : 18));
+      ctx.fillText(`↔ En: ${roomWidth} m`, w / 2, topY - (isMobile ? 14 : 18));
 
-      // Center Area Badge
+      // Left Height Badge (Boy)
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+      ctx.beginPath();
+      ctx.roundRect(paddingX - (isMobile ? 90 : 110), (topY + botY) / 2 - 14, isMobile ? 85 : 100, 28, 8);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`↕ Boy: ${roomHeight} m`, paddingX - (isMobile ? 48 : 60), (topY + botY) / 2 + 4);
+
+      // Center Net Area Badge
       ctx.fillStyle = 'rgba(212, 175, 55, 0.95)';
       ctx.beginPath();
-      ctx.roundRect(w / 2 - (isMobile ? 75 : 90), (topY + botY) / 2 - (isMobile ? 16 : 20), isMobile ? 150 : 180, isMobile ? 32 : 40, 10);
+      ctx.roundRect(w / 2 - (isMobile ? 80 : 95), (topY + botY) / 2 - (isMobile ? 16 : 20), isMobile ? 160 : 190, isMobile ? 32 : 40, 10);
       ctx.fill();
       ctx.fillStyle = '#000000';
       ctx.font = `900 ${isMobile ? '13px' : '15px'} Outfit, sans-serif`;
@@ -337,7 +386,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     return () => {
       if (animId) cancelAnimationFrame(animId);
     };
-  }, [isOpen, roomWidth, roomHeight, netAreaM2, activeTileTexture, layStyle, groutColor, perspectiveTilt, stream, isMobile]);
+  }, [isOpen, roomWidth, roomHeight, netAreaM2, activeTileTexture, layStyle, groutColor, perspectiveTilt, stream, isMobile, isScanningActive]);
 
   // Cutout Handlers
   const addCutout = (type) => {
@@ -426,9 +475,10 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       color: '#ffffff',
       fontFamily: 'Outfit, system-ui, -apple-system, sans-serif',
       height: '100dvh',
+      width: '100vw',
       overflow: 'hidden'
     }}>
-      {/* Top Header Bar - Responsive */}
+      {/* Responsive Mobile Header Bar */}
       <div style={{
         padding: isMobile ? '10px 14px' : '12px 20px',
         background: 'rgba(15, 23, 42, 0.95)',
@@ -439,7 +489,8 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         alignItems: isMobile ? 'stretch' : 'center',
         justifyContent: 'space-between',
         gap: isMobile ? '8px' : '12px',
-        zIndex: 30
+        zIndex: 30,
+        boxSizing: 'border-box'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -467,7 +518,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           <button
             onClick={onClose}
             style={{
-              background: 'rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.15)',
               border: 'none',
               color: '#fff',
               width: '32px',
@@ -483,7 +534,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           </button>
         </div>
 
-        {/* Responsive Mobile Tab Switcher */}
+        {/* Tab Switcher */}
         <div style={{ display: 'flex', background: 'rgba(255,255,255,0.06)', padding: '3px', borderRadius: '10px', gap: '4px', width: '100%' }}>
           <button
             onClick={() => setActiveTab('SCANNER')}
@@ -542,7 +593,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         </div>
       </div>
 
-      {/* Main Container Content */}
+      {/* Main Viewport Container */}
       <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         
         {/* TAB 1: AR CAMERA & SCANNER VIEW */}
@@ -560,45 +611,37 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           {/* Live / Fallback Interactive Canvas */}
           <canvas ref={canvasRef} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 
-          {/* Camera Notice Bar & Tap to Start Camera Button if stream not active */}
-          {!stream && (
-            <div style={{
-              position: 'absolute',
-              top: '12px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: 25,
-              width: 'calc(100% - 32px)',
-              maxWidth: '360px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '6px',
-              alignItems: 'center'
-            }}>
-              <button
-                onClick={startCamera}
-                style={{
-                  width: '100%',
-                  background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                  color: '#000',
-                  border: 'none',
-                  padding: '10px 16px',
-                  borderRadius: '25px',
-                  fontWeight: '900',
-                  fontSize: '0.82rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  boxShadow: '0 8px 24px rgba(212, 175, 55, 0.4)'
-                }}
-              >
-                <Camera size={16} />
-                <span>📷 Canlı Kamerayı Etkinleştir (İzin Ver)</span>
-              </button>
-            </div>
-          )}
+          {/* Quick Laser Pin Corner Action Button Floating over Live Camera */}
+          <div style={{
+            position: 'absolute',
+            top: '16px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 25,
+            display: 'flex',
+            gap: '8px'
+          }}>
+            <button
+              onClick={handlePinNextPoint}
+              style={{
+                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                color: '#000',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '20px',
+                fontWeight: '900',
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 6px 20px rgba(212, 175, 55, 0.4)'
+              }}
+            >
+              <Target size={16} />
+              <span>{pinnedPointCount === 0 ? '📍 1. Köşeyı İşaretle' : pinnedPointCount === 1 ? '📍 2. Köşeyi İşaretle' : '🔄 Yeniden Ölç'}</span>
+            </button>
+          </div>
 
           {/* Mobile & Desktop Floating Controls Panel */}
           <div style={{
@@ -751,7 +794,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
               </h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Genişlik (m)</label>
+                  <label style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Genişlik En (m)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -770,7 +813,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Yükseklik (m)</label>
+                  <label style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block', marginBottom: '4px' }}>Yükseklik Boy (m)</label>
                   <input
                     type="number"
                     step="0.1"
