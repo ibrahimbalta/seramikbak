@@ -136,6 +136,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
 
     if (mediaStream) {
       setStream(mediaStream);
+      setCameraError('');
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         videoRef.current.onloadedmetadata = async () => {
@@ -631,7 +632,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           overflow: 'hidden'
         }}>
           {/* Video Stream Element */}
-          <video ref={videoRef} playsInline muted style={{ display: 'none' }} />
+          <video ref={videoRef} playsInline muted autoPlay style={{ display: 'none' }} />
           
           {/* Native Camera Capture File Input (Bypasses WebRTC PWA OS permission blocks) */}
           <input

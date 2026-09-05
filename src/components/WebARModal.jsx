@@ -406,7 +406,7 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
         justifyContent: 'center'
       }}>
         {/* Hidden HTML5 Video element */}
-        <video ref={videoRef} playsInline muted style={{ display: 'none' }} />
+        <video ref={videoRef} playsInline muted autoPlay style={{ display: 'none' }} />
 
         {/* Native Camera Capture File Input (Bypasses WebRTC PWA OS permission blocks) */}
         <input
