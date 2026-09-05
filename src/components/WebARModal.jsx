@@ -48,34 +48,45 @@ export default function WebARModal({ isOpen, onClose, selectedProduct, currentDe
 
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Cihazınızda HTML5 kamera erişim desteği bulunamadı.');
+        throw new Error('Tarayıcınız kamera erişimini desteklemiyor.');
       }
 
-      // Request rear camera for environment floor scanning
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: false
-      });
+      let mediaStream = null;
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        });
+      } catch (e1) {
+        console.warn('Rear camera unavailable, trying any camera:', e1);
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false
+        });
+      }
+
+      if (!mediaStream) {
+        throw new Error('Kamera akışı alınamadı.');
+      }
 
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play();
+        videoRef.current.onloadedmetadata = async () => {
+          try {
+            await videoRef.current.play();
+          } catch (pErr) {
+            console.error('Video play error:', pErr);
+          }
           setCameraLoading(false);
         };
       }
     } catch (err) {
       console.error('WebAR Camera Error:', err);
-      setCameraError(
-        err.name === 'NotAllowedError'
-          ? 'Kamera izni reddedildi. Lütfen tarayıcı ayarlarınızdan kamera izni veriniz.'
-          : 'Canlı arka kamera başlatılamadı. (Mobil cihaz veya desteklenen tarayıcı kullanınız).'
-      );
+      const errMsg = err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'
+        ? 'Kamera izni reddedildi. Lütfen adres çubuğundaki kilit (veya ayarlar) ikonuna tıklayıp kamera iznini "İzin Ver" olarak değiştirin.'
+        : 'Canlı kamera başlatılamadı (Kamera kullanılamıyor veya kapalı).';
+      setCameraError(errMsg);
       setCameraLoading(false);
     }
   };

@@ -83,23 +83,48 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     setCameraError('');
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Cihazınızda HTML5 kamera erişimi bulunamadı.');
+        throw new Error('Tarayıcınız kamera erişimini desteklemiyor.');
       }
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false
-      });
+      
+      let mediaStream = null;
+      
+      // 1. Try environment / rear camera (ideal for mobile room scan)
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false
+        });
+      } catch (e1) {
+        // 2. Fallback to any available video camera (webcam / front camera)
+        console.warn('Rear camera unavailable, trying any camera:', e1);
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false
+        });
+      }
+
+      if (!mediaStream) {
+        throw new Error('Kamera akışı alınamadı.');
+      }
+
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play();
+        videoRef.current.onloadedmetadata = async () => {
+          try {
+            await videoRef.current.play();
+          } catch (pErr) {
+            console.error('Video play error:', pErr);
+          }
           setCameraLoading(false);
         };
       }
     } catch (err) {
       console.error('AR Camera Error:', err);
-      setCameraError('Canlı kamera başlatılamadı. Dokunmatik ölçüm ve simülatör modu aktif.');
+      const errMsg = err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'
+        ? 'Kamera izni verimedi. Lütfen adres çubuğundaki kilit ikonuna tıklayıp kamera iznini "İzin Ver" olarak değiştirin.'
+        : 'Cihazınızda kamera bulunamadı veya başka bir uygulama tarafından kullanılıyor.';
+      setCameraError(errMsg);
       setCameraLoading(false);
     }
   };
