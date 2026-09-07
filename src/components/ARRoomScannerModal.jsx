@@ -6,7 +6,7 @@ import {
   Download, Sparkles, Plus, Trash2, Send, MessageCircle, Calculator,
   Maximize2, ShieldCheck, Store, ChevronRight, AlertCircle, ChevronDown, ChevronUp,
   Target, Compass, CornerDownRight, Check, Move, Eye, Upload, MapPin, CheckCircle,
-  Info, SlidersHorizontal
+  Palette, Grid, Image as ImageIcon, SlidersHorizontal, ArrowRight, Share2
 } from 'lucide-react';
 
 export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, currentDealer }) {
@@ -19,43 +19,25 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   const [cameraLoading, setCameraLoading] = useState(true);
   const [cameraError, setCameraError] = useState('');
   const [isMobile, setIsMobile] = useState(false);
-  const [showMobilePanel, setShowMobilePanel] = useState(true);
   const [userPhotoBg, setUserPhotoBg] = useState(null);
   const [capturedSnapshot, setCapturedSnapshot] = useState(null);
 
-  // Active Tab: 'SCANNER' | 'CALCULATOR' | 'QUOTE'
-  const [activeTab, setActiveTab] = useState('SCANNER');
+  // Active Tab: 'VISUALIZER' (Odamda Gör) | 'CALCULATOR' (Metraj & Malzeme) | 'QUOTE' (En Yakın Bayi)
+  const [activeTab, setActiveTab] = useState('VISUALIZER');
 
-  // Surface Type: 'WALL' or 'FLOOR'
+  // Surface Type: 'WALL' (Duvar Kaplama) or 'FLOOR' (Zemin Kaplama)
   const [surfaceType, setSurfaceType] = useState('WALL');
 
-  // =========================================================================
-  // OPTICAL CAMERA FOV & DISTANCE MEASUREMENT ENGINE
-  // =========================================================================
-  // Camera Distance to Surface in Meters (Standard room standing distance is 2.2m)
-  const [cameraDistance, setCameraDistance] = useState(2.2);
+  // Tile Laying Style & Customization
+  const [layStyle, setLayStyle] = useState('straight'); // straight, diagonal, herringbone
+  const [groutColor, setGroutColor] = useState('#d4af37'); // Gold, White, Grey, Anthracite, Beige
+  const [tileScale, setTileScale] = useState(1.0); // 0.6x to 1.6x zoom scale
+  const [perspectiveTilt, setPerspectiveTilt] = useState(55); // Perspective horizon angle
 
-  // Status: 'SWEEPING' (User panning camera) | 'LOCKED' (Surface automatically identified)
-  const [scanStatus, setScanStatus] = useState('SWEEPING');
-  const [scanProgress, setScanProgress] = useState(0); // 0 to 100
-  const [sweepMessage, setSweepMessage] = useState('Kameranızı alana gezdirin (Optik Alan Taranıyor)...');
-
-  // Auto-calculated Dimensions (Meters)
-  const [roomWidth, setRoomWidth] = useState(2.5);  // meters (En)
-  const [roomHeight, setRoomHeight] = useState(2.4); // meters (Boy)
-
-  // 4 Interactive Corner Pins in Normalized Coordinates (0.0 to 1.0)
-  const [corners, setCorners] = useState([
-    { x: 0.15, y: 0.82, id: 'p0', label: 'Sol Alt' },
-    { x: 0.85, y: 0.82, id: 'p1', label: 'Sağ Alt' },
-    { x: 0.80, y: 0.26, id: 'p2', label: 'Sağ Üst' },
-    { x: 0.20, y: 0.26, id: 'p3', label: 'Sol Üst' }
-  ]);
-
-  // Nearest Dealer Matching State
-  const [assignedDealer, setAssignedDealer] = useState(currentDealer || null);
-  const [nearbyDealers, setNearbyDealers] = useState([]);
-  const [loadingDealers, setLoadingDealers] = useState(false);
+  // Active Tile Product Texture
+  const [activeTileTexture, setActiveTileTexture] = useState(
+    selectedProduct?.textureUrl || selectedProduct?.imageUrl || '/textures/calacatta_gold.jpg'
+  );
 
   // Tile Dimensions & Calculation Info
   const tileW = (selectedProduct?.width || 60) / 100;
@@ -63,22 +45,12 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   const tileM2PerBox = (tileW * tileH * 2) || 1.44;
   const tilePricePerM2 = selectedProduct?.trendyolPrice || selectedProduct?.koctasPrice || 450;
 
-  // Cutout Subtractions List (Kapı, Pencere vb.)
+  // Room Sizing (Meters)
+  const [roomWidth, setRoomWidth] = useState(2.4);  // En (m)
+  const [roomHeight, setRoomHeight] = useState(2.6); // Boy (m)
+
+  // Cutout Deductions List (Kapı, Pencere, vb.)
   const [cutouts, setCutouts] = useState([]);
-
-  // Tile Customization
-  const [activeTileTexture, setActiveTileTexture] = useState(
-    selectedProduct?.textureUrl || selectedProduct?.imageUrl || '/textures/calacatta_gold.jpg'
-  );
-  const [layStyle, setLayStyle] = useState('straight'); // straight, diagonal, herringbone
-  const [groutColor, setGroutColor] = useState('#d4af37');
-
-  // Quote & Lead Submission State
-  const [clientName, setClientName] = useState('');
-  const [clientPhone, setClientPhone] = useState('');
-  const [clientNotes, setClientNotes] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Calculated Metrics
   const grossAreaM2 = parseFloat((roomWidth * roomHeight).toFixed(2));
@@ -86,16 +58,28 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     cutouts.reduce((acc, curr) => acc + curr.w * curr.h, 0).toFixed(2)
   );
   const netAreaM2 = Math.max(0, parseFloat((grossAreaM2 - cutoutAreaM2).toFixed(2)));
-  const netWithWasteM2 = parseFloat((netAreaM2 * 1.10).toFixed(2));
+  const netWithWasteM2 = parseFloat((netAreaM2 * 1.10).toFixed(2)); // +%10 fire payı
   const boxCount = Math.ceil(netWithWasteM2 / tileM2PerBox);
   const totalTileCost = Math.round(netWithWasteM2 * tilePricePerM2);
   const adhesiveBags = Math.ceil(netWithWasteM2 / 5); // 1 çuval ~ 5m²
   const groutKg = Math.ceil(netWithWasteM2 * 0.4);   // ~0.4 kg/m²
-  const estLaborCost = Math.round(netWithWasteM2 * 350); // Ortalama 350 TL/m²
+  const estLaborCost = Math.round(netWithWasteM2 * 350); // Ortalama 350 TL/m² işçilik
   const totalEstMaterialCost = totalTileCost + (adhesiveBags * 280) + (groutKg * 45);
   const totalEstRenovationCost = totalEstMaterialCost + estLaborCost;
 
-  // Track Mobile Screen
+  // Nearest Dealer Matching State
+  const [assignedDealer, setAssignedDealer] = useState(currentDealer || null);
+  const [nearbyDealers, setNearbyDealers] = useState([]);
+  const [loadingDealers, setLoadingDealers] = useState(false);
+
+  // Quote / Lead Submission State
+  const [clientName, setClientName] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [clientNotes, setClientNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Mobile detection
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -105,65 +89,12 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Update Tile Texture
+  // Update texture when product changes
   useEffect(() => {
     if (selectedProduct?.imageUrl || selectedProduct?.textureUrl) {
       setActiveTileTexture(selectedProduct.textureUrl || selectedProduct.imageUrl);
     }
   }, [selectedProduct]);
-
-  // =========================================================================
-  // OPTICAL FOV CALCULATION FORMULA
-  // =========================================================================
-  // Computes physical visible width & height in meters from camera distance & lens FOV
-  const recalculateOpticalDimensions = useCallback((dist, surf = surfaceType) => {
-    // Typical smartphone/webcam horizontal FOV ~ 68° (tan(34°) ~ 0.6745)
-    const fovFactor = 0.6745;
-    const fullPhysicalWidth = 2 * dist * fovFactor;
-
-    // Kadraj içi aktif yüzey oranı (orta %80 kadraj alanı)
-    let compW = parseFloat((fullPhysicalWidth * 0.82).toFixed(1));
-    let compH = parseFloat((compW * (surf === 'WALL' ? 0.95 : 0.75)).toFixed(1));
-
-    // Clamp to realistic architectural ranges (0.8m to 14m)
-    compW = Math.max(0.8, Math.min(14.0, compW));
-    compH = Math.max(0.8, Math.min(10.0, compH));
-
-    setRoomWidth(compW);
-    setRoomHeight(compH);
-
-    // Update corner pins to reflect detected surface bounds
-    if (surf === 'WALL') {
-      setCorners([
-        { x: 0.14, y: 0.84, id: 'p0', label: 'Sol Alt' },
-        { x: 0.86, y: 0.84, id: 'p1', label: 'Sağ Alt' },
-        { x: 0.82, y: 0.24, id: 'p2', label: 'Sağ Üst' },
-        { x: 0.18, y: 0.24, id: 'p3', label: 'Sol Üst' }
-      ]);
-    } else {
-      setCorners([
-        { x: 0.08, y: 0.92, id: 'p0', label: 'Sol Ön' },
-        { x: 0.92, y: 0.92, id: 'p1', label: 'Sağ Ön' },
-        { x: 0.75, y: 0.46, id: 'p2', label: 'Sağ Arka' },
-        { x: 0.25, y: 0.46, id: 'p3', label: 'Sol Arka' }
-      ]);
-    }
-  }, [surfaceType]);
-
-  // When distance changes, recalculate optical dimensions
-  const handleDistanceChange = (newDist) => {
-    setCameraDistance(newDist);
-    recalculateOpticalDimensions(newDist);
-  };
-
-  // Fine-tuning +/- 10cm steps
-  const adjustDimension = (dim, delta) => {
-    if (dim === 'width') {
-      setRoomWidth((prev) => Math.max(0.5, parseFloat((prev + delta).toFixed(1))));
-    } else {
-      setRoomHeight((prev) => Math.max(0.5, parseFloat((prev + delta).toFixed(1))));
-    }
-  };
 
   // =========================================================================
   // AUTOMATIC NEAREST PRODUCT-DEALER DETECTION
@@ -250,7 +181,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     setCameraError('');
 
     if (typeof navigator === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setCameraError('Kamera erişimi tarayıcınızda desteklenmiyor. Sanal Showroom modu aktif.');
+      setCameraError('Kamera erişimi desteklenmiyor. Sanal Showroom modu devrede.');
       setCameraLoading(false);
       return;
     }
@@ -279,7 +210,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             audio: false
           });
         } catch (e3) {
-          console.warn('All camera constraints failed:', e3);
+          console.warn('Camera constraints failed:', e3);
         }
       }
     }
@@ -301,7 +232,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         };
       }
     } else {
-      setCameraError('Kamera izni kısıtlı. Dokunmatik Sanal Showroom aktif.');
+      setCameraError('Kamera izni kısıtlı. Sanal Showroom moduyla devam edebilirsiniz.');
       setCameraLoading(false);
     }
   }, [stopCamera]);
@@ -340,63 +271,32 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   }, [isOpen, handleClose]);
 
   // =========================================================================
-  // AUTOMATIC OPTICAL SWEEP SCANNER PROGRESSION
+  // ACTIONS: PRESETS, SNAPSHOTS & PHOTO UPLOADS
   // =========================================================================
-  useEffect(() => {
-    if (!isOpen || scanStatus === 'LOCKED') return;
-
-    let progressTimer;
-    let step = 0;
-
-    progressTimer = setInterval(() => {
-      step += 1;
-      const newProgress = Math.min(100, step * 8);
-      setScanProgress(newProgress);
-
-      if (newProgress < 30) {
-        setSweepMessage('🔍 Kamera görüş açısı (68° FOV) kalibre ediliyor...');
-      } else if (newProgress < 70) {
-        setSweepMessage(`📐 ${cameraDistance}m mesafeden kadrajdaki alan taranıyor...`);
-      } else if (newProgress < 100) {
-        setSweepMessage('✨ Duvar yüzeyi ve seramikler hizalanıyor...');
-      } else {
-        clearInterval(progressTimer);
-        setScanStatus('LOCKED');
-        setSweepMessage(`✅ Kadrajdaki alan tespit edildi: ${cameraDistance}m mesafeden ölçüldü`);
-
-        if (typeof navigator !== 'undefined' && navigator.vibrate) {
-          navigator.vibrate([40, 60, 100]);
-        }
-
-        recalculateOpticalDimensions(cameraDistance, surfaceType);
-      }
-    }, 130);
-
-    return () => clearInterval(progressTimer);
-  }, [isOpen, scanStatus, cameraDistance, surfaceType, recalculateOpticalDimensions]);
-
-  const handleResetAndScan = () => {
-    setScanStatus('SWEEPING');
-    setScanProgress(0);
-    setSweepMessage('🔍 Kameranızı alana gezdirin (Optik Alan Taranıyor)...');
-  };
-
-  const handleSurfaceChange = (type) => {
-    setSurfaceType(type);
-    recalculateOpticalDimensions(cameraDistance, type);
-    handleResetAndScan();
-  };
-
-  // Quick Preset Room Sizer
-  const applyRoomPreset = (w, h, dist) => {
+  // 1-Tap Quick Room Sizer
+  const applyRoomPreset = (w, h) => {
     setRoomWidth(w);
     setRoomHeight(h);
-    if (dist) setCameraDistance(dist);
-    setScanStatus('LOCKED');
     if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(30);
   };
 
-  // Take Snapshot
+  // Add / Remove Cutouts
+  const addCutout = (type) => {
+    const defaults = {
+      'Kapı': { w: 0.9, h: 2.0 },
+      'Pencere': { w: 1.2, h: 1.2 },
+      'Duşakabin': { w: 1.0, h: 2.0 },
+      'Mutfak Tezgahı': { w: 2.5, h: 0.6 }
+    };
+    const size = defaults[type] || { w: 1.0, h: 1.0 };
+    setCutouts([...cutouts, { id: Date.now(), type, w: size.w, h: size.h }]);
+  };
+
+  const removeCutout = (id) => {
+    setCutouts(cutouts.filter((c) => c.id !== id));
+  };
+
+  // Freeze Frame / Snapshot
   const handleTakeSnapshot = () => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -405,7 +305,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     }
   };
 
-  // Upload Local Room Photo
+  // Upload Local Room Photo (Gallery)
   const handleNativePhotoUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -413,20 +313,18 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       reader.onload = (evt) => {
         setUserPhotoBg(evt.target.result);
         setCapturedSnapshot(null);
-        setScanStatus('LOCKED');
       };
       reader.readAsDataURL(file);
     }
   };
 
   // =========================================================================
-  // CANVAS RENDERING (OPTICAL LIDAR SWEEP + AUTOMATIC TILE OVERLAY)
+  // CANVAS RENDERING ENGINE (PHOTOREALISTIC ROOM TILING)
   // =========================================================================
   useEffect(() => {
     if (!isOpen) return;
 
     let animId;
-    let sweepSweepY = 0;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -441,7 +339,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     const snapshotImg = new Image();
     if (capturedSnapshot) snapshotImg.src = capturedSnapshot;
 
-    const renderARScanner = () => {
+    const renderVisualizer = () => {
       const video = videoRef.current;
       const hasLiveVideo = !capturedSnapshot && !userPhotoBg && video && video.readyState === 4 && stream;
 
@@ -469,7 +367,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           canvas.width = 1280;
           canvas.height = 720;
         }
-        // Procedural Virtual Showroom Backdrop
+        // Procedural Luxury Showroom Room Background
         const grad = ctx.createRadialGradient(
           canvas.width / 2, canvas.height / 3, 100,
           canvas.width / 2, canvas.height / 2, canvas.width / 1.1
@@ -496,247 +394,159 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       const h = canvas.height;
 
       // -------------------------------------------------------------
-      // 1. ACTIVE LIDAR SWEEPING BEAM (AUTOMATIC SCAN IN PROGRESS)
+      // 1. CALCULATE SURFACE POLYGON (WALL vs FLOOR PERSPECTIVE)
       // -------------------------------------------------------------
-      if (scanStatus === 'SWEEPING') {
-        sweepSweepY = (sweepSweepY + 6) % h;
+      let p0, p1, p2, p3;
 
-        ctx.save();
-        // Dynamic horizontal laser beam
-        const beamGrad = ctx.createLinearGradient(0, sweepSweepY - 30, 0, sweepSweepY + 30);
-        beamGrad.addColorStop(0, 'rgba(16, 185, 129, 0)');
-        beamGrad.addColorStop(0.5, 'rgba(16, 185, 129, 0.45)');
-        beamGrad.addColorStop(1, 'rgba(16, 185, 129, 0)');
-        ctx.fillStyle = beamGrad;
-        ctx.fillRect(0, sweepSweepY - 30, w, 60);
-
-        // Bright laser center line
-        ctx.strokeStyle = '#34d399';
-        ctx.lineWidth = 2;
-        ctx.shadowColor = '#10b981';
-        ctx.shadowBlur = 12;
-        ctx.beginPath();
-        ctx.moveTo(0, sweepSweepY);
-        ctx.lineTo(w, sweepSweepY);
-        ctx.stroke();
-
-        // Simulated LiDAR point cloud particles detecting surfaces
-        ctx.fillStyle = '#6ee7b7';
-        for (let i = 0; i < 28; i++) {
-          const px = (Math.sin(i * 99 + sweepSweepY * 0.02) * 0.5 + 0.5) * w;
-          const py = (Math.cos(i * 47 + sweepSweepY * 0.03) * 0.4 + 0.5) * h;
-          ctx.beginPath();
-          ctx.arc(px, py, 2.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // Central scanning reticle
-        const cx = w / 2;
-        const cy = h / 2;
-        ctx.strokeStyle = 'rgba(16, 185, 129, 0.8)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(cx, cy, 34, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(cx - 45, cy); ctx.lineTo(cx + 45, cy);
-        ctx.moveTo(cx, cy - 45); ctx.lineTo(cx, cy + 45);
-        ctx.stroke();
-
-        ctx.restore();
+      if (surfaceType === 'WALL') {
+        // Wall Surface: Covers central and upper area with subtle perspective
+        const topY = h * 0.12;
+        const botY = h * 0.88;
+        const padX = w * 0.10;
+        p0 = { x: padX, y: botY };
+        p1 = { x: w - padX, y: botY };
+        p2 = { x: w - padX * 0.95, y: topY };
+        p3 = { x: padX * 0.95, y: topY };
+      } else {
+        // Floor Surface: Perspective trapezoid stretching towards the camera
+        const horizonY = h * (1 - perspectiveTilt / 100);
+        const topWidth = w * 0.40;
+        const bottomWidth = w * 1.10;
+        p0 = { x: (w - bottomWidth) / 2, y: h };
+        p1 = { x: (w + bottomWidth) / 2, y: h };
+        p2 = { x: (w + topWidth) / 2, y: horizonY };
+        p3 = { x: (w - topWidth) / 2, y: horizonY };
       }
 
       // -------------------------------------------------------------
-      // 2. LOCKED AUTOMATIC SURFACE & TILE OVERLAY
+      // 2. RENDER TILES INSIDE PERSPECTIVE POLYGON
       // -------------------------------------------------------------
-      if (scanStatus === 'LOCKED') {
-        const p0 = { x: corners[0].x * w, y: corners[0].y * h };
-        const p1 = { x: corners[1].x * w, y: corners[1].y * h };
-        const p2 = { x: corners[2].x * w, y: corners[2].y * h };
-        const p3 = { x: corners[3].x * w, y: corners[3].y * h };
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.lineTo(p3.x, p3.y);
+      ctx.closePath();
+      ctx.clip();
 
-        // 1. Fill detected surface with selected tile pattern
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.lineTo(p3.x, p3.y);
-        ctx.closePath();
-        ctx.clip();
+      if (tileImg.complete && tileImg.naturalWidth > 0) {
+        ctx.globalAlpha = 0.90;
+        const pattern = ctx.createPattern(tileImg, 'repeat');
+        if (pattern) {
+          ctx.save();
+          const centerX = (p0.x + p1.x + p2.x + p3.x) / 4;
+          const centerY = (p0.y + p1.y + p2.y + p3.y) / 4;
+          ctx.translate(centerX, centerY);
 
-        if (tileImg.complete && tileImg.naturalWidth > 0) {
-          ctx.globalAlpha = 0.88;
-          const pattern = ctx.createPattern(tileImg, 'repeat');
-          if (pattern) {
-            ctx.save();
-            const centerX = (p0.x + p1.x + p2.x + p3.x) / 4;
-            const centerY = (p0.y + p1.y + p2.y + p3.y) / 4;
-            ctx.translate(centerX, centerY);
+          if (layStyle === 'diagonal') ctx.rotate(Math.PI / 4);
+          if (layStyle === 'herringbone') ctx.rotate(Math.PI / 6);
 
-            if (layStyle === 'diagonal') ctx.rotate(Math.PI / 4);
-            if (layStyle === 'herringbone') ctx.rotate(Math.PI / 6);
+          const scaleX = 0.36 * tileScale;
+          const scaleY = (surfaceType === 'FLOOR' ? 0.22 : 0.36) * tileScale;
+          ctx.scale(scaleX, scaleY);
+          ctx.translate(-centerX, -centerY);
 
-            ctx.scale(0.36, surfaceType === 'FLOOR' ? 0.22 : 0.36);
-            ctx.translate(-centerX, -centerY);
-
-            ctx.fillStyle = pattern;
-            ctx.fillRect(-w * 2, -h * 2, w * 5, h * 5);
-            ctx.restore();
-          }
-        } else {
-          ctx.fillStyle = 'rgba(212, 175, 55, 0.45)';
-          ctx.fillRect(0, 0, w, h);
+          ctx.fillStyle = pattern;
+          ctx.fillRect(-w * 2, -h * 2, w * 5, h * 5);
+          ctx.restore();
         }
-
-        // Realistic Grout Lines
-        ctx.strokeStyle = groutColor || '#d4af37';
-        ctx.lineWidth = 1.8;
-        ctx.globalAlpha = 0.65;
-
-        const cols = Math.max(3, Math.round(roomWidth * 2.2));
-        const rows = Math.max(3, Math.round(roomHeight * 2.2));
-
-        for (let i = 1; i < cols; i++) {
-          const t = i / cols;
-          const botX = p0.x + (p1.x - p0.x) * t;
-          const botY = p0.y + (p1.y - p0.y) * t;
-          const topX = p3.x + (p2.x - p3.x) * t;
-          const topY = p3.y + (p2.y - p3.y) * t;
-          ctx.beginPath();
-          ctx.moveTo(botX, botY);
-          ctx.lineTo(topX, topY);
-          ctx.stroke();
-        }
-
-        for (let j = 1; j < rows; j++) {
-          const t = j / rows;
-          const leftX = p0.x + (p3.x - p0.x) * t;
-          const leftY = p0.y + (p3.y - p0.y) * t;
-          const rightX = p1.x + (p2.x - p1.x) * t;
-          const rightY = p1.y + (p2.y - p1.y) * t;
-          ctx.beginPath();
-          ctx.moveTo(leftX, leftY);
-          ctx.lineTo(rightX, rightY);
-          ctx.stroke();
-        }
-        ctx.restore();
-
-        // 2. Neon Laser Perimeter
-        ctx.save();
-        ctx.strokeStyle = '#10b981';
-        ctx.shadowColor = '#10b981';
-        ctx.shadowBlur = isMobile ? 8 : 12;
-        ctx.lineWidth = isMobile ? 2.5 : 3.5;
-        ctx.beginPath();
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.lineTo(p3.x, p3.y);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.restore();
-
-        // 3. Live Auto-Detected Dimension Badges
-        ctx.save();
-        ctx.font = `bold ${isMobile ? '12px' : '14px'} Outfit, system-ui, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        // Bottom Width Badge
-        const midBotX = (p0.x + p1.x) / 2;
-        const midBotY = (p0.y + p1.y) / 2 + (isMobile ? 20 : 26);
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
-        ctx.strokeStyle = '#10b981';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.roundRect(midBotX - (isMobile ? 55 : 65), midBotY - 14, isMobile ? 110 : 130, 28, 8);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(`↔ En: ${roomWidth} m`, midBotX, midBotY);
-
-        // Left Height Badge
-        const midLeftX = (p0.x + p3.x) / 2 - (isMobile ? 52 : 62);
-        const midLeftY = (p0.y + p3.y) / 2;
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
-        ctx.strokeStyle = '#10b981';
-        ctx.beginPath();
-        ctx.roundRect(midLeftX - (isMobile ? 48 : 58), midLeftY - 14, isMobile ? 96 : 116, 28, 8);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(`↕ Boy: ${roomHeight} m`, midLeftX, midLeftY);
-
-        // Center Live Summary Pill
-        const centerPolyX = (p0.x + p1.x + p2.x + p3.x) / 4;
-        const centerPolyY = (p0.y + p1.y + p2.y + p3.y) / 4;
-        const badgeW = isMobile ? 220 : 260;
-        const badgeH = isMobile ? 50 : 56;
-
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
-        ctx.strokeStyle = '#d4af37';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.roundRect(centerPolyX - badgeW / 2, centerPolyY - badgeH / 2, badgeW, badgeH, 12);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#d4af37';
-        ctx.font = `900 ${isMobile ? '13px' : '15px'} Outfit, sans-serif`;
-        ctx.fillText(`Net: ${netAreaM2} m² (${boxCount} Kutu)`, centerPolyX, centerPolyY - 8);
-
-        ctx.fillStyle = '#34d399';
-        ctx.font = `800 ${isMobile ? '11px' : '12px'} Outfit, sans-serif`;
-        ctx.fillText(`Tahmini: ~${totalEstMaterialCost.toLocaleString('tr-TR')} ₺`, centerPolyX, centerPolyY + 12);
-
-        ctx.restore();
+      } else {
+        ctx.fillStyle = 'rgba(212, 175, 55, 0.45)';
+        ctx.fillRect(0, 0, w, h);
       }
 
-      animId = requestAnimationFrame(renderARScanner);
+      // -------------------------------------------------------------
+      // 3. REALISTIC GROUT GRID LINES
+      // -------------------------------------------------------------
+      ctx.strokeStyle = groutColor || '#d4af37';
+      ctx.lineWidth = 1.8;
+      ctx.globalAlpha = 0.70;
+
+      const cols = Math.max(3, Math.round(roomWidth * 2.2));
+      const rows = Math.max(3, Math.round(roomHeight * 2.2));
+
+      for (let i = 1; i < cols; i++) {
+        const t = i / cols;
+        const botX = p0.x + (p1.x - p0.x) * t;
+        const botY = p0.y + (p1.y - p0.y) * t;
+        const topX = p3.x + (p2.x - p3.x) * t;
+        const topY = p3.y + (p2.y - p3.y) * t;
+        ctx.beginPath();
+        ctx.moveTo(botX, botY);
+        ctx.lineTo(topX, topY);
+        ctx.stroke();
+      }
+
+      for (let j = 1; j < rows; j++) {
+        const t = j / rows;
+        const leftX = p0.x + (p3.x - p0.x) * t;
+        const leftY = p0.y + (p3.y - p0.y) * t;
+        const rightX = p1.x + (p2.x - p1.x) * t;
+        const rightY = p1.y + (p2.y - p1.y) * t;
+        ctx.beginPath();
+        ctx.moveTo(leftX, leftY);
+        ctx.lineTo(rightX, rightY);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // -------------------------------------------------------------
+      // 4. ELEGANT GOLD PERIMETER BORDER & SHADOW
+      // -------------------------------------------------------------
+      ctx.save();
+      ctx.strokeStyle = '#d4af37';
+      ctx.shadowColor = 'rgba(212, 175, 55, 0.5)';
+      ctx.shadowBlur = 10;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.lineTo(p3.x, p3.y);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+
+      // -------------------------------------------------------------
+      // 5. WATERMARK BADGE FOR SCREENSHOTS
+      // -------------------------------------------------------------
+      ctx.save();
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.beginPath();
+      ctx.roundRect(14, 14, isMobile ? 180 : 260, 34, 10);
+      ctx.fill();
+
+      ctx.fillStyle = '#d4af37';
+      ctx.font = `bold ${isMobile ? '11px' : '13px'} Outfit, system-ui, sans-serif`;
+      ctx.fillText(`✨ SeramikBak | ${selectedProduct?.name || 'Odamda Canlı Gör'}`, 24, 36);
+      ctx.restore();
+
+      animId = requestAnimationFrame(renderVisualizer);
     };
 
-    renderARScanner();
+    renderVisualizer();
     return () => {
       if (animId) cancelAnimationFrame(animId);
     };
   }, [
     isOpen,
-    scanStatus,
-    corners,
-    roomWidth,
-    roomHeight,
-    netAreaM2,
-    boxCount,
-    totalEstMaterialCost,
-    userPhotoBg,
-    capturedSnapshot,
-    activeTileTexture,
+    surfaceType,
     layStyle,
     groutColor,
-    surfaceType,
+    tileScale,
+    perspectiveTilt,
+    activeTileTexture,
+    roomWidth,
+    roomHeight,
+    capturedSnapshot,
+    userPhotoBg,
     stream,
-    isMobile
+    isMobile,
+    selectedProduct
   ]);
 
-  // Cutout Subtractions Handlers
-  const addCutout = (type) => {
-    const defaults = {
-      'Kapı': { w: 0.9, h: 2.0 },
-      'Pencere': { w: 1.2, h: 1.2 },
-      'Duşakabin': { w: 1.0, h: 2.0 },
-      'Mutfak Tezgahı': { w: 2.5, h: 0.6 }
-    };
-    const size = defaults[type] || { w: 1.0, h: 1.0 };
-    setCutouts([...cutouts, { id: Date.now(), type, w: size.w, h: size.h }]);
-  };
-
-  const removeCutout = (id) => {
-    setCutouts(cutouts.filter((c) => c.id !== id));
-  };
-
-  // Submit Lead API
+  // Submit Lead to API
   const handleSaveLead = async () => {
     if (!clientName || !clientPhone) {
       alert('Lütfen Ad Soyad ve Telefon numaranızı giriniz.');
@@ -778,22 +588,21 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
     }
   };
 
-  // WhatsApp Link Builder targeted to the NEAREST PRODUCT DEALER
+  // WhatsApp Link Builder targeted to the Nearest Dealer
   const getWhatsAppShareUrl = () => {
     const dealerPhone = assignedDealer?.phone?.replace(/\D/g, '') || '905555555555';
     const text = encodeURIComponent(
-      `Selamlar, SeramikBak Otomatik AR Taraması ile odamın net metrajını çıkardım:\n\n` +
-      `📦 *Seçilen Ürün:* ${selectedProduct?.name || 'Seramik Karo'} (${selectedProduct?.width || 60}x${selectedProduct?.height || 120} cm)\n` +
-      `🏢 *Hedef Yetkili Bayi:* ${assignedDealer?.name || 'Yetkili Bayi'} (${assignedDealer?.city || 'İstanbul'})\n` +
-      `📐 *Yüzey:* ${surfaceType === 'WALL' ? 'Duvar Kaplama' : 'Zemin Kaplama'}\n` +
-      `📏 *Otomatik Ölçü:* En ${roomWidth}m x Boy ${roomHeight}m (Mesafe: ${cameraDistance}m)\n` +
-      `📊 *Metraj:* Brüt ${grossAreaM2}m² | Düşülen Boşluk ${cutoutAreaM2}m² | *Net ${netAreaM2}m²*\n` +
-      `📦 *Gerekli Kutu:* ${boxCount} Kutu (%10 fire payı dahil)\n` +
-      `🧱 *Sarf Malzemesi:* ${adhesiveBags} Çuval Kalekim Yapıştırıcı + ${groutKg}kg Derz Dolgusu\n` +
-      `💰 *Tahmini Malzeme Tutarı:* ${totalEstMaterialCost.toLocaleString('tr-TR')} ₺\n` +
-      `🔨 *Tahmini Toplam (İşçilik Dahil):* ${totalEstRenovationCost.toLocaleString('tr-TR')} ₺\n\n` +
+      `Selamlar, SeramikBak Odamda Gör uygulamasında beğendiğim ürün için metraj ve fiyat teklifi almak istiyorum:\n\n` +
+      `📦 *Seçtiğim Ürün:* ${selectedProduct?.name || 'Seramik Karo'} (${selectedProduct?.width || 60}x${selectedProduct?.height || 120} cm)\n` +
+      `🏢 *Hedef Bayi:* ${assignedDealer?.name || 'Yetkili Bayi'} (${assignedDealer?.city || 'İstanbul'})\n` +
+      `📐 *Uygulama Yüzeyi:* ${surfaceType === 'WALL' ? 'Duvar Kaplama' : 'Zemin Kaplama'}\n` +
+      `📏 *Oda Ölçüsü:* En ${roomWidth}m x Boy ${roomHeight}m\n` +
+      `📊 *Hesaplanan Net Metraj:* ${netAreaM2} m² (+%10 fire ile ${netWithWasteM2} m²)\n` +
+      `📦 *Gerekli Kutu:* ${boxCount} Kutu\n` +
+      `🧱 *Gerekli Sarfiyat:* ${adhesiveBags} Çuval Kalekim Yapıştırıcı + ${groutKg}kg Derz Dolgusu\n` +
+      `💰 *Tahmini Malzeme Tutarı:* ${totalEstMaterialCost.toLocaleString('tr-TR')} ₺\n\n` +
       `Müşteri: ${clientName || 'İsimsiz Müşteri'} (${clientPhone || 'Telefon belirtilmedi'})\n` +
-      `Bu ürünün stoğu ve teslimat teklifini almak istiyorum.`
+      `Bu ürünün bayi stok durumu ve nakliye/teslimat teklifinizi rica ederim.`
     );
     return `https://wa.me/${dealerPhone}?text=${text}`;
   };
@@ -828,35 +637,39 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         zIndex: 30,
         boxSizing: 'border-box'
       }}>
+        {/* Left: Brand / Product Title */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              color: '#fff',
-              padding: '4px 10px',
+              background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+              color: '#000',
+              padding: '5px 10px',
               borderRadius: '8px',
               fontWeight: '900',
               fontSize: isMobile ? '0.75rem' : '0.82rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '4px'
+              gap: '5px'
             }}>
               <Sparkles size={14} />
-              <span>Optik AR Tarayıcı</span>
+              <span>Odamda Canlı Gör</span>
             </div>
             <div>
               <h3 style={{
                 margin: 0,
-                fontSize: isMobile ? '0.85rem' : '0.95rem',
+                fontSize: isMobile ? '0.88rem' : '0.98rem',
                 fontWeight: '800',
                 color: '#fff',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                maxWidth: isMobile ? '180px' : '320px'
+                maxWidth: isMobile ? '180px' : '340px'
               }}>
-                {selectedProduct?.name || 'Kameradaki Alanı Otomatik Ölç'}
+                {selectedProduct?.name || 'Lüks Seramik Kaplama'}
               </h3>
+              <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                {selectedProduct?.width || 60}x{selectedProduct?.height || 120} cm • {surfaceType === 'WALL' ? 'Duvar Modu' : 'Zemin Modu'}
+              </div>
             </div>
           </div>
 
@@ -867,13 +680,14 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
               background: 'rgba(255, 255, 255, 0.15)',
               border: 'none',
               color: '#fff',
-              width: '32px',
-              height: '32px',
+              width: '34px',
+              height: '34px',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'background 0.2s'
             }}
           >
             <X size={18} />
@@ -888,49 +702,59 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           borderRadius: '10px',
           gap: '4px',
           width: '100%',
-          maxWidth: isMobile ? '100%' : '460px'
+          maxWidth: isMobile ? '100%' : '480px'
         }}>
           <button
-            onClick={() => setActiveTab('SCANNER')}
+            onClick={() => setActiveTab('VISUALIZER')}
             style={{
               flex: 1,
-              padding: '7px 4px',
+              padding: '8px 4px',
               borderRadius: '8px',
               border: 'none',
-              background: activeTab === 'SCANNER' ? '#10b981' : 'transparent',
-              color: activeTab === 'SCANNER' ? '#fff' : '#cbd5e1',
-              fontWeight: '800',
+              background: activeTab === 'VISUALIZER' ? '#d4af37' : 'transparent',
+              color: activeTab === 'VISUALIZER' ? '#000' : '#cbd5e1',
+              fontWeight: '900',
               fontSize: isMobile ? '0.72rem' : '0.78rem',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
-              textAlign: 'center'
+              textAlign: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
             }}
           >
-            📷 Otomatik AR
+            <Eye size={14} />
+            <span>Odamda Gör</span>
           </button>
           <button
             onClick={() => setActiveTab('CALCULATOR')}
             style={{
               flex: 1,
-              padding: '7px 4px',
+              padding: '8px 4px',
               borderRadius: '8px',
               border: 'none',
               background: activeTab === 'CALCULATOR' ? '#d4af37' : 'transparent',
               color: activeTab === 'CALCULATOR' ? '#000' : '#cbd5e1',
-              fontWeight: '800',
+              fontWeight: '900',
               fontSize: isMobile ? '0.72rem' : '0.78rem',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
-              textAlign: 'center'
+              textAlign: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
             }}
           >
-            📐 Metraj ({netAreaM2}m²)
+            <Calculator size={14} />
+            <span>Metraj ({netAreaM2}m²)</span>
           </button>
           <button
             onClick={() => setActiveTab('QUOTE')}
             style={{
               flex: 1.2,
-              padding: '7px 4px',
+              padding: '8px 4px',
               borderRadius: '8px',
               border: 'none',
               background: activeTab === 'QUOTE' ? '#25D366' : 'transparent',
@@ -946,22 +770,22 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
               gap: '4px'
             }}
           >
-            <MapPin size={13} />
+            <MapPin size={14} />
             <span>En Yakın Bayi Teklifi</span>
           </button>
         </div>
       </div>
 
-      {/* Main Container */}
+      {/* Main Viewport Container */}
       <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        
+
         {/* ================================================================= */}
-        {/* TAB 1: AUTOMATIC OPTICAL AR SCANNER                               */}
+        {/* TAB 1: INSTANT ROOM VISUALIZER (ODAMDA CANLI GÖR)                 */}
         {/* ================================================================= */}
         <div style={{
           flex: 1,
           position: 'relative',
-          display: activeTab === 'SCANNER' ? 'flex' : 'none',
+          display: activeTab === 'VISUALIZER' ? 'flex' : 'none',
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden'
@@ -969,7 +793,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           {/* Hidden HTML5 Video Stream */}
           <video ref={videoRef} playsInline muted autoPlay style={{ display: 'none' }} />
 
-          {/* Hidden File Input for Native Camera Photo Upload */}
+          {/* Hidden File Input for Native Photo Upload */}
           <input
             type="file"
             ref={fileInputRef}
@@ -989,7 +813,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             }}
           />
 
-          {/* Top Banner: Real-time Scanning Progress & Optical Formula Indicator */}
+          {/* Top Floating Control Capsule */}
           <div style={{
             position: 'absolute',
             top: '12px',
@@ -997,164 +821,106 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             transform: 'translateX(-50%)',
             zIndex: 25,
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
             gap: '8px',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
             width: 'calc(100% - 24px)',
             maxWidth: '540px'
           }}>
-            {/* Real-time Status Card with Optical Explanatory Badge */}
-            <div style={{
-              background: 'rgba(15, 23, 42, 0.94)',
-              border: scanStatus === 'LOCKED' ? '1px solid #10b981' : '1px solid #d4af37',
-              backdropFilter: 'blur(12px)',
-              padding: '8px 14px',
-              borderRadius: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '10px',
-              width: '100%',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.5)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {scanStatus === 'SWEEPING' ? (
-                  <div style={{
-                    width: '10px',
-                    height: '10px',
-                    borderRadius: '50%',
-                    background: '#d4af37',
-                    boxShadow: '0 0 10px #d4af37'
-                  }} />
-                ) : (
-                  <CheckCircle size={16} color="#10b981" />
-                )}
-                <span style={{ fontSize: '0.78rem', fontWeight: '800', color: scanStatus === 'LOCKED' ? '#34d399' : '#fff' }}>
-                  {sweepMessage}
-                </span>
-              </div>
-
-              {scanStatus === 'SWEEPING' ? (
-                <span style={{ fontSize: '0.75rem', fontWeight: '900', color: '#d4af37' }}>
-                  %{scanProgress}
-                </span>
-              ) : (
+            {/* Freeze Frame Button */}
+            {!capturedSnapshot ? (
+              <button
+                onClick={handleTakeSnapshot}
+                style={{
+                  background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                  color: '#000',
+                  border: 'none',
+                  padding: '7px 16px',
+                  borderRadius: '20px',
+                  fontWeight: '900',
+                  fontSize: '0.78rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.5)'
+                }}
+              >
+                <Camera size={15} />
+                <span>📸 Fotoğrafı Dondur & Odana Döşe</span>
+              </button>
+            ) : (
+              <div style={{ display: 'flex', gap: '6px' }}>
                 <button
-                  onClick={handleResetAndScan}
+                  onClick={() => setCapturedSnapshot(null)}
                   style={{
-                    background: 'rgba(255,255,255,0.1)',
-                    border: '1px solid rgba(255,255,255,0.2)',
+                    background: 'rgba(239, 68, 68, 0.9)',
                     color: '#fff',
-                    padding: '4px 8px',
-                    borderRadius: '8px',
-                    fontSize: '0.7rem',
+                    border: 'none',
+                    padding: '7px 14px',
+                    borderRadius: '20px',
                     fontWeight: '800',
+                    fontSize: '0.75rem',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '4px'
                   }}
                 >
-                  <RefreshCw size={12} />
-                  <span>Tekrar Tara</span>
+                  <RefreshCw size={14} />
+                  <span>Canlı Kameraya Dön</span>
                 </button>
-              )}
-            </div>
-
-            {/* Quick Action Pills: Snapshot & Gallery */}
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
-              {!capturedSnapshot ? (
-                <button
-                  onClick={handleTakeSnapshot}
+                <a
+                  href={capturedSnapshot}
+                  download={`seramikbak-oda-${Date.now()}.png`}
                   style={{
-                    background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                    color: '#000',
-                    border: 'none',
-                    padding: '6px 14px',
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    color: '#fff',
+                    padding: '7px 14px',
                     borderRadius: '20px',
-                    fontWeight: '900',
+                    fontWeight: '800',
                     fontSize: '0.75rem',
-                    cursor: 'pointer',
+                    textDecoration: 'none',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    boxShadow: '0 4px 14px rgba(0,0,0,0.4)'
+                    gap: '4px',
+                    boxShadow: '0 4px 14px rgba(16,185,129,0.4)'
                   }}
                 >
-                  <Camera size={14} />
-                  <span>📸 Fotoğrafı Dondur & Döşe</span>
-                </button>
-              ) : (
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <button
-                    onClick={() => setCapturedSnapshot(null)}
-                    style={{
-                      background: 'rgba(239, 68, 68, 0.9)',
-                      color: '#fff',
-                      border: 'none',
-                      padding: '6px 12px',
-                      borderRadius: '20px',
-                      fontWeight: '800',
-                      fontSize: '0.75rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    <RefreshCw size={14} />
-                    <span>Canlı Kameraya Dön</span>
-                  </button>
-                  <a
-                    href={capturedSnapshot}
-                    download={`seramikbak-olcum-${Date.now()}.png`}
-                    style={{
-                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                      color: '#fff',
-                      padding: '6px 12px',
-                      borderRadius: '20px',
-                      fontWeight: '800',
-                      fontSize: '0.75rem',
-                      textDecoration: 'none',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    <Download size={14} />
-                    <span>İndir</span>
-                  </a>
-                </div>
-              )}
+                  <Download size={14} />
+                  <span>İndir</span>
+                </a>
+              </div>
+            )}
 
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                style={{
-                  background: 'rgba(15, 23, 42, 0.85)',
-                  color: '#cbd5e1',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  backdropFilter: 'blur(8px)',
-                  padding: '6px 12px',
-                  borderRadius: '20px',
-                  fontWeight: '700',
-                  fontSize: '0.72rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
-              >
-                <Upload size={13} />
-                <span>Fotoğraf Yükle</span>
-              </button>
-            </div>
+            {/* Upload Room Photo Button */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                background: 'rgba(15, 23, 42, 0.88)',
+                color: '#cbd5e1',
+                border: '1px solid rgba(255,255,255,0.2)',
+                backdropFilter: 'blur(10px)',
+                padding: '7px 14px',
+                borderRadius: '20px',
+                fontWeight: '700',
+                fontSize: '0.75rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              <Upload size={14} />
+              <span>Galeriden Fotoğraf Yükle</span>
+            </button>
           </div>
 
           {/* Camera Permission / Fallback Information Banner */}
           {cameraError && !userPhotoBg && (
             <div style={{
               position: 'absolute',
-              top: '80px',
+              top: '74px',
               left: '50%',
               transform: 'translateX(-50%)',
               zIndex: 25,
@@ -1201,267 +967,149 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                     cursor: 'pointer'
                   }}
                 >
-                  🖼️ Fotoğraf Yükle
+                  🖼️ Galeriden Fotoğraf Yükle
                 </button>
               </div>
             </div>
           )}
 
-          {/* Floating Nearest Dealer Pill */}
-          {assignedDealer && (
-            <div style={{
-              position: 'absolute',
-              top: isMobile ? 'auto' : '14px',
-              bottom: isMobile ? '160px' : 'auto',
-              left: isMobile ? '10px' : '14px',
-              background: 'rgba(15, 23, 42, 0.92)',
-              border: '1px solid rgba(16, 185, 129, 0.5)',
-              borderRadius: '12px',
-              padding: '6px 10px',
-              zIndex: 22,
-              backdropFilter: 'blur(10px)',
-              maxWidth: isMobile ? '230px' : '280px',
-              boxShadow: '0 6px 16px rgba(0,0,0,0.4)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', color: '#10b981', fontWeight: '900' }}>
-                <Store size={13} />
-                <span>EN YAKIN YETKİLİ BAYİ</span>
-              </div>
-              <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {assignedDealer.name}
-              </div>
-              <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
-                {assignedDealer.district}, {assignedDealer.city} ({assignedDealer.distanceKm} km)
-              </div>
-            </div>
-          )}
-
-          {/* Floating Optical Calibration & Controls Panel */}
+          {/* Bottom Floating Visualizer Tool Bar (Styles & Surface) */}
           <div style={{
             position: 'absolute',
-            bottom: isMobile ? '8px' : '16px',
-            left: isMobile ? '8px' : '16px',
-            right: isMobile ? '8px' : 'auto',
+            bottom: isMobile ? '12px' : '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
             background: 'rgba(15, 23, 42, 0.94)',
             backdropFilter: 'blur(14px)',
-            border: '1px solid rgba(16, 185, 129, 0.4)',
-            borderRadius: '16px',
-            padding: isMobile ? '10px 12px' : '14px 16px',
-            width: isMobile ? 'auto' : '330px',
+            border: '1px solid rgba(212, 175, 55, 0.35)',
+            borderRadius: '18px',
+            padding: isMobile ? '10px 14px' : '14px 20px',
+            width: 'calc(100% - 24px)',
+            maxWidth: '560px',
             zIndex: 20,
-            boxShadow: '0 12px 32px rgba(0,0,0,0.6)'
+            boxShadow: '0 12px 32px rgba(0,0,0,0.6)',
+            boxSizing: 'border-box'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showMobilePanel ? '8px' : '0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: '900', color: '#10b981' }}>📐 KADRAJ ALANI</span>
-                <span style={{ fontSize: '0.68rem', color: '#cbd5e1' }}>({roomWidth}m × {roomHeight}m = {grossAreaM2}m²)</span>
+            {/* Top row: Surface Type & Laying Styles */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              {/* Surface Toggle */}
+              <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.06)', padding: '3px', borderRadius: '8px' }}>
+                <button
+                  onClick={() => setSurfaceType('WALL')}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontSize: '0.72rem',
+                    fontWeight: '800',
+                    border: 'none',
+                    background: surfaceType === 'WALL' ? '#d4af37' : 'transparent',
+                    color: surfaceType === 'WALL' ? '#000' : '#cbd5e1',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🧱 Duvar
+                </button>
+                <button
+                  onClick={() => setSurfaceType('FLOOR')}
+                  style={{
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontSize: '0.72rem',
+                    fontWeight: '800',
+                    border: 'none',
+                    background: surfaceType === 'FLOOR' ? '#d4af37' : 'transparent',
+                    color: surfaceType === 'FLOOR' ? '#000' : '#cbd5e1',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🔲 Zemin
+                </button>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                {/* Surface Toggle */}
-                <div style={{ display: 'flex', gap: '3px' }}>
+              {/* Laying Style Pills */}
+              <div style={{ display: 'flex', gap: '4px' }}>
+                {[
+                  { id: 'straight', label: 'Düz' },
+                  { id: 'diagonal', label: 'Çapraz' },
+                  { id: 'herringbone', label: 'Balıksırtı' }
+                ].map((s) => (
                   <button
-                    onClick={() => handleSurfaceChange('WALL')}
+                    key={s.id}
+                    onClick={() => setLayStyle(s.id)}
                     style={{
-                      padding: '3px 7px',
+                      padding: '4px 8px',
                       borderRadius: '6px',
-                      fontSize: '0.68rem',
-                      fontWeight: '800',
                       border: 'none',
-                      background: surfaceType === 'WALL' ? '#10b981' : 'rgba(255,255,255,0.08)',
-                      color: surfaceType === 'WALL' ? '#fff' : '#cbd5e1',
+                      background: layStyle === s.id ? 'rgba(212, 175, 55, 0.25)' : 'rgba(255,255,255,0.06)',
+                      border: layStyle === s.id ? '1px solid #d4af37' : '1px solid transparent',
+                      color: layStyle === s.id ? '#d4af37' : '#cbd5e1',
+                      fontWeight: '800',
+                      fontSize: '0.7rem',
                       cursor: 'pointer'
                     }}
                   >
-                    Duvar
+                    {s.label}
                   </button>
-                  <button
-                    onClick={() => handleSurfaceChange('FLOOR')}
-                    style={{
-                      padding: '3px 7px',
-                      borderRadius: '6px',
-                      fontSize: '0.68rem',
-                      fontWeight: '800',
-                      border: 'none',
-                      background: surfaceType === 'FLOOR' ? '#10b981' : 'rgba(255,255,255,0.08)',
-                      color: surfaceType === 'FLOOR' ? '#fff' : '#cbd5e1',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Zemin
-                  </button>
-                </div>
-
-                {isMobile && (
-                  <button
-                    onClick={() => setShowMobilePanel(!showMobilePanel)}
-                    style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', padding: '2px' }}
-                  >
-                    {showMobilePanel ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
-                  </button>
-                )}
+                ))}
               </div>
             </div>
 
-            {showMobilePanel && (
-              <>
-                {/* OPTICAL DISTANCE PRESET SELECTOR (HOW CAMERA CALCULATES AREA) */}
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  borderRadius: '10px',
-                  padding: '8px',
-                  marginBottom: '8px'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <div style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <SlidersHorizontal size={12} />
-                      <span>DUVARA/ZEMİNE MESAFENİZ:</span>
-                    </div>
-                    <strong style={{ fontSize: '0.78rem', color: '#fff' }}>{cameraDistance} Metre</strong>
-                  </div>
-
-                  {/* Distance Quick Buttons */}
-                  <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
-                    {[
-                      { dist: 1.5, label: '1.5m (Yakın)' },
-                      { dist: 2.2, label: '2.2m (Standart)' },
-                      { dist: 3.0, label: '3.0m (Orta)' },
-                      { dist: 4.0, label: '4.0m (Uzak)' }
-                    ].map((d) => (
-                      <button
-                        key={d.dist}
-                        onClick={() => handleDistanceChange(d.dist)}
-                        style={{
-                          flex: 1,
-                          padding: '4px 2px',
-                          borderRadius: '6px',
-                          border: cameraDistance === d.dist ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
-                          background: cameraDistance === d.dist ? '#10b981' : 'rgba(255,255,255,0.06)',
-                          color: cameraDistance === d.dist ? '#fff' : '#cbd5e1',
-                          fontSize: '0.62rem',
-                          fontWeight: '800',
-                          cursor: 'pointer',
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {d.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Distance Slider */}
-                  <input
-                    type="range"
-                    min="1.0"
-                    max="6.0"
-                    step="0.1"
-                    value={cameraDistance}
-                    onChange={(e) => handleDistanceChange(parseFloat(e.target.value))}
-                    style={{ width: '100%', accentColor: '#10b981', height: '4px', cursor: 'pointer' }}
+            {/* Bottom Row: Grout Color & Direct Metraj / Quote CTA */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
+              {/* Grout Color Palette */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: '800' }}>Derz:</span>
+                {[
+                  { color: '#d4af37', label: 'Altın' },
+                  { color: '#ffffff', label: 'Beyaz' },
+                  { color: '#cbd5e1', label: 'Gri' },
+                  { color: '#334155', label: 'Antrasit' },
+                  { color: '#e2d9c8', label: 'Bej' }
+                ].map((g) => (
+                  <button
+                    key={g.color}
+                    onClick={() => setGroutColor(g.color)}
+                    title={g.label}
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '50%',
+                      background: g.color,
+                      border: groutColor === g.color ? '2px solid #fff' : '1px solid rgba(255,255,255,0.3)',
+                      boxShadow: groutColor === g.color ? '0 0 8px ' + g.color : 'none',
+                      cursor: 'pointer',
+                      padding: 0
+                    }}
                   />
+                ))}
+              </div>
 
-                  <div style={{ fontSize: '0.62rem', color: '#94a3b8', marginTop: '4px', lineHeight: '1.3' }}>
-                    💡 Kameranın 68° görüş açısına göre kadrajdaki alan otomatik hesaplanır. Mesafeyi değiştirerek tam eşitleyin.
-                  </div>
-                </div>
-
-                {/* Direct Width/Height Precision Steps */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginBottom: '8px' }}>
-                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginBottom: '3px' }}>Genişlik (En):</div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <button
-                        onClick={() => adjustDimension('width', -0.1)}
-                        style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: '4px', width: '22px', height: '22px', cursor: 'pointer', fontWeight: '900' }}
-                      >
-                        -
-                      </button>
-                      <strong style={{ fontSize: '0.8rem', color: '#10b981' }}>{roomWidth} m</strong>
-                      <button
-                        onClick={() => adjustDimension('width', 0.1)}
-                        style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: '4px', width: '22px', height: '22px', cursor: 'pointer', fontWeight: '900' }}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: '8px' }}>
-                    <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginBottom: '3px' }}>Yükseklik (Boy):</div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <button
-                        onClick={() => adjustDimension('height', -0.1)}
-                        style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: '4px', width: '22px', height: '22px', cursor: 'pointer', fontWeight: '900' }}
-                      >
-                        -
-                      </button>
-                      <strong style={{ fontSize: '0.8rem', color: '#10b981' }}>{roomHeight} m</strong>
-                      <button
-                        onClick={() => adjustDimension('height', 0.1)}
-                        style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: '4px', width: '22px', height: '22px', cursor: 'pointer', fontWeight: '900' }}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Laying Style Select */}
-                <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
-                  {[
-                    { id: 'straight', label: 'Düz Döşe' },
-                    { id: 'diagonal', label: 'Çapraz' },
-                    { id: 'herringbone', label: 'Balıksırtı' }
-                  ].map((s) => (
-                    <button
-                      key={s.id}
-                      onClick={() => setLayStyle(s.id)}
-                      style={{
-                        flex: 1,
-                        padding: '4px 6px',
-                        borderRadius: '6px',
-                        border: 'none',
-                        background: layStyle === s.id ? '#d4af37' : 'rgba(255,255,255,0.08)',
-                        color: layStyle === s.id ? '#000' : '#cbd5e1',
-                        fontWeight: '800',
-                        fontSize: '0.68rem',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Direct Action: Go to Quote for Nearest Dealer */}
-                <button
-                  onClick={() => setActiveTab('QUOTE')}
-                  style={{
-                    width: '100%',
-                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                    color: '#fff',
-                    border: 'none',
-                    padding: '8px',
-                    borderRadius: '8px',
-                    fontWeight: '900',
-                    fontSize: '0.78rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  <MapPin size={15} />
-                  <span>En Yakın Bayiden Fiyat & Teklif Al</span>
-                </button>
-              </>
-            )}
+              {/* Next Step Button */}
+              <button
+                onClick={() => setActiveTab('CALCULATOR')}
+                style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '7px 14px',
+                  borderRadius: '10px',
+                  fontWeight: '900',
+                  fontSize: '0.75rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}
+              >
+                <span>Metrajı Gör</span>
+                <ArrowRight size={14} />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* ================================================================= */}
-        {/* TAB 2: VATANDAŞ İÇİN NET METRAJ & MALZEME HESABI                  */}
+        {/* TAB 2: VATANDAŞ İÇİN BASİT METRAJ & MALZEME HESABI                */}
         {/* ================================================================= */}
         <div style={{
           flex: 1,
@@ -1475,17 +1123,60 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           width: '100%',
           boxSizing: 'border-box'
         }}>
-          {/* Left Column: Dimensions & Cutouts */}
+          {/* Left Column: Dimensions, Presets & Cutouts */}
           <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {/* Quick Sizing Presets */}
             <div style={{
               background: 'rgba(30, 41, 59, 0.7)',
               border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: '16px',
-              padding: isMobile ? '14px' : '20px'
+              padding: isMobile ? '14px' : '18px'
             }}>
-              <h4 style={{ margin: '0 0 12px 0', fontSize: '1rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Maximize2 size={16} />
-                <span>Optik Olarak Ölçülen Alan</span>
+              <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95rem', color: '#d4af37', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Sparkles size={16} />
+                <span>Hızlı Oda / Alan Şablonları</span>
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, 1fr)', gap: '8px' }}>
+                {[
+                  { label: '🚿 Küçük Banyo / WC', w: 1.8, h: 2.2, m2: '4.0 m²' },
+                  { label: '🛁 Standart Banyo', w: 2.4, h: 2.6, m2: '6.2 m²' },
+                  { label: '👑 Ebeveyn Banyosu', w: 3.2, h: 2.8, m2: '9.0 m²' },
+                  { label: '🍳 Mutfak Tezgah Arası', w: 3.0, h: 0.6, m2: '1.8 m²' },
+                  { label: '🌿 Balkon / Teras', w: 2.0, h: 4.0, m2: '8.0 m²' },
+                  { label: '🏛️ Salon / Antre', w: 4.0, h: 5.0, m2: '20.0 m²' }
+                ].map((preset) => (
+                  <button
+                    key={preset.label}
+                    onClick={() => applyRoomPreset(preset.w, preset.h)}
+                    style={{
+                      background: roomWidth === preset.w && roomHeight === preset.h ? 'rgba(212, 175, 55, 0.25)' : 'rgba(15, 23, 42, 0.6)',
+                      border: roomWidth === preset.w && roomHeight === preset.h ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.08)',
+                      borderRadius: '10px',
+                      padding: '8px 10px',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '2px'
+                    }}
+                  >
+                    <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#fff' }}>{preset.label}</span>
+                    <span style={{ fontSize: '0.68rem', color: '#d4af37' }}>{preset.m2}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Custom En x Boy Inputs */}
+            <div style={{
+              background: 'rgba(30, 41, 59, 0.7)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '16px',
+              padding: isMobile ? '14px' : '18px'
+            }}>
+              <h4 style={{ margin: '0 0 12px 0', fontSize: '0.95rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Maximize2 size={16} color="#10b981" />
+                <span>Oda Boyutlarınız (Manuel Giriş)</span>
               </h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <div>
@@ -1530,7 +1221,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                 </div>
               </div>
               <div style={{ marginTop: '10px', fontSize: '0.82rem', color: '#cbd5e1' }}>
-                Brüt Yüzey Alanı: <strong style={{ color: '#fff' }}>{grossAreaM2} m²</strong> (Kamera Mesafesi: {cameraDistance}m)
+                Brüt Yüzey Alanı: <strong style={{ color: '#fff' }}>{grossAreaM2} m²</strong>
               </div>
             </div>
 
@@ -1539,7 +1230,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
               background: 'rgba(30, 41, 59, 0.7)',
               border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: '16px',
-              padding: isMobile ? '14px' : '20px'
+              padding: isMobile ? '14px' : '18px'
             }}>
               <div style={{
                 display: 'flex',
@@ -1552,9 +1243,9 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                 <div>
                   <h4 style={{ margin: 0, fontSize: '0.95rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Layers size={16} />
-                    <span>Düşülecek Boşluklar (Net Metraj İçin)</span>
+                    <span>Düşülecek Boşluklar (Kapı / Pencere)</span>
                   </h4>
-                  <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>Kapı, pencere veya dolap alanlarını seramikten düşün</span>
+                  <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>Seramik döşenmeyecek alanları düşerek tasarruf edin</span>
                 </div>
                 <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                   <button
@@ -1636,17 +1327,17 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
           {/* Right Column: Citizen Material & Cost Summary */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div style={{
-              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(30, 41, 59, 0.9) 100%)',
-              border: '1px solid #10b981',
+              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(30, 41, 59, 0.9) 100%)',
+              border: '1px solid #d4af37',
               borderRadius: '16px',
               padding: isMobile ? '16px' : '22px'
             }}>
-              <h4 style={{ margin: '0 0 12px 0', fontSize: '1.05rem', color: '#10b981', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CheckCircle2 size={20} />
-                <span>Otomatik Malzeme & Maliyet Özeti</span>
+              <h4 style={{ margin: '0 0 12px 0', fontSize: '1.05rem', color: '#d4af37', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CheckCircle2 size={20} color="#10b981" />
+                <span>Net Malzeme ve Maliyet Dökümü</span>
               </h4>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '9px', fontSize: '0.84rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.84rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                   <span style={{ color: '#cbd5e1' }}>Brüt Alan:</span>
                   <strong style={{ color: '#fff' }}>{grossAreaM2} m²</strong>
@@ -1677,7 +1368,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                 </div>
 
                 <div style={{
-                  marginTop: '8px',
+                  marginTop: '10px',
                   padding: '12px',
                   background: 'rgba(15, 23, 42, 0.85)',
                   borderRadius: '10px',
@@ -1687,7 +1378,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                 }}>
                   <div>
                     <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block' }}>Tahmini Toplam Malzeme</span>
-                    <strong style={{ fontSize: '1.2rem', color: '#10b981', fontWeight: '900' }}>
+                    <strong style={{ fontSize: '1.25rem', color: '#d4af37', fontWeight: '900' }}>
                       {totalEstMaterialCost.toLocaleString('tr-TR')} ₺
                     </strong>
                   </div>
@@ -1697,14 +1388,14 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                       background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                       color: '#fff',
                       border: 'none',
-                      padding: '10px 16px',
+                      padding: '10px 18px',
                       borderRadius: '10px',
                       fontWeight: '800',
-                      fontSize: '0.8rem',
+                      fontSize: '0.82rem',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '4px'
+                      gap: '5px'
                     }}
                   >
                     <span>Bayiden Teklif Al</span>
@@ -1717,7 +1408,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         </div>
 
         {/* ================================================================= */}
-        {/* TAB 3: EN YAKIN BU ÜRÜNÜN BULUNDUĞU BAYİ & WHATSAPP TEKLİFİ       */}
+        {/* TAB 3: EN YAKIN BAYİ & WHATSAPP TEKLİF AL                         */}
         {/* ================================================================= */}
         <div style={{
           flex: 1,
@@ -1745,7 +1436,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                       En Yakın Yetkili Bayiden Teklif Alın
                     </h3>
                     <span style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
-                      Seçtiğiniz bu ürünün stoğu/teşhiri bulunan en yakın yetkili bayi eşleştirildi
+                      Seçtiğiniz seramiği bulunduran en yakın yetkili bayi eşleştirildi
                     </span>
                   </div>
                 </div>
@@ -1773,7 +1464,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: '0.95rem', fontWeight: '900', color: '#fff' }}>
+                    <div style={{ fontSize: '0.98rem', fontWeight: '900', color: '#fff' }}>
                       {assignedDealer.name}
                     </div>
                     <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
@@ -1825,9 +1516,9 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                   marginBottom: '14px',
                   border: '1px solid rgba(255,255,255,0.08)'
                 }}>
-                  <div style={{ color: '#10b981', fontWeight: '800', marginBottom: '4px' }}>Bayiye Gönderilecek Metraj:</div>
+                  <div style={{ color: '#10b981', fontWeight: '800', marginBottom: '4px' }}>Bayiye Gönderilecek Metraj Bilgisi:</div>
                   <div style={{ color: '#fff' }}>• Ürün: {selectedProduct?.name || 'Seramik Karo'}</div>
-                  <div style={{ color: '#fff' }}>• Ölçülen Net Alan: {netAreaM2} m² (+%10 fire dahil {netWithWasteM2} m²)</div>
+                  <div style={{ color: '#fff' }}>• Net Kaplama Alanı: {netAreaM2} m² (+%10 fire dahil {netWithWasteM2} m²)</div>
                   <div style={{ color: '#fff' }}>• Kutu Sayısı: {boxCount} Kutu | Yapıştırıcı: {adhesiveBags} Çuval | Derz: {groutKg} kg</div>
                   <div style={{ color: '#34d399', fontWeight: '800', marginTop: '2px' }}>• Tahmini Malzeme Tutarı: ~{totalEstMaterialCost.toLocaleString('tr-TR')} ₺</div>
                 </div>
@@ -1895,7 +1586,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                   </div>
                 </div>
 
-                {/* Direct Quote Buttons */}
+                {/* Direct Quote Action Buttons */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <a
                     href={getWhatsAppShareUrl()}
