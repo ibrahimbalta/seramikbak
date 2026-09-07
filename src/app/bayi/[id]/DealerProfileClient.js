@@ -408,7 +408,7 @@ export default function DealerProfileClient({ dealer, products }) {
               3D Banyo Stüdyosu'nda Kapla
             </Link>
             <a 
-              href={`https://wa.me/${dealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20profil%20sayfan%C4%B1zdan%20ula%C5%9F%C4%B1yorum.%20Showroom%27daki%20seramikleriniz%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`} 
+              href={`https://wa.me/${(dealer.phone || '').replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20profil%20sayfan%C4%B1zdan%20ula%C5%9F%C4%B1yorum.%20Showroom%27daki%20seramikleriniz%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`} 
               target="_blank" 
               rel="noopener noreferrer"
               onClick={() => trackAction('WHATSAPP')}
@@ -552,7 +552,7 @@ export default function DealerProfileClient({ dealer, products }) {
             )}
 
             <a
-              href={`https://wa.me/${dealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20Showroom%20sayfan%C4%B1zdaki%20seramik%20stoklar%C4%B1%20ve%20m%C2%B2%20fiyatlar%C4%B1%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`}
+              href={`https://wa.me/${(dealer.phone || '').replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20Showroom%20sayfan%C4%B1zdaki%20seramik%20stoklar%C4%B1%20ve%20m%C2%B2%20fiyatlar%C4%B1%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`}
               target="_blank"
               rel="noopener noreferrer"
               className="quick-action-chip whatsapp-chip"
@@ -1222,7 +1222,7 @@ export default function DealerProfileClient({ dealer, products }) {
                         {/* Buttons */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '6px' }}>
                           <a
-                            href={`https://wa.me/${dealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=${encodeURIComponent(`Merhaba, ${dealer.name} showroom sayfanızdaki "${item.title}" (${item.quantityM2} m², ₺${item.unitPrice}/m²) outlet stoğunuzu satın almak / bilgi almak istiyorum.`)}`}
+                            href={`https://wa.me/${(dealer.phone || '').replace(/[\s\-\(\)\+]/g, '')}?text=${encodeURIComponent(`Merhaba, ${dealer.name} showroom sayfanızdaki "${item.title}" (${item.quantityM2} m², ₺${item.unitPrice}/m²) outlet stoğunuzu satın almak / bilgi almak istiyorum.`)}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={() => trackAction('WHATSAPP')}
@@ -1700,7 +1700,7 @@ export default function DealerProfileClient({ dealer, products }) {
           <span>Ara</span>
         </a>
         <a 
-          href={`https://wa.me/${dealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20profil%20sayfan%C4%B1zdan%20ula%C5%9F%C4%B1yorum.%20Showroom%27daki%20seramikleriniz%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`} 
+          href={`https://wa.me/${(dealer.phone || '').replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20profil%20sayfan%C4%B1zdan%20ula%C5%9F%C4%B1yorum.%20Showroom%27daki%20seramikleriniz%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`} 
           target="_blank" 
           rel="noopener noreferrer"
           className="btn-whatsapp-mobile"

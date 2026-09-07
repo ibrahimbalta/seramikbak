@@ -94,7 +94,7 @@ export default function BayilerPage() {
   // Fetch real approved dealers from API
   useEffect(() => {
     setIsLoading(true);
-    fetch('/api/admin/dealers')
+    fetch('/api/dealers')
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
@@ -124,13 +124,22 @@ export default function BayilerPage() {
   const brandsList = Array.from(new Set(dealers.map((d) => d.brand).filter(Boolean)));
 
   const filteredDealers = dealers.filter((d) => {
-    const matchCity = !selectedCity || d.city.toLowerCase() === selectedCity.toLowerCase();
-    const matchBrand = !selectedBrand || d.brand.toLowerCase() === selectedBrand.toLowerCase();
+    if (!d) return false;
+    const dCity = (d.city || '').toLowerCase();
+    const dBrand = (d.brand || '').toLowerCase();
+    const dName = (d.name || '').toLowerCase();
+    const dDistrict = (d.district || '').toLowerCase();
+    const dAddress = (d.address || '').toLowerCase();
+
+    const matchCity = !selectedCity || dCity === selectedCity.toLowerCase();
+    const matchBrand = !selectedBrand || dBrand === selectedBrand.toLowerCase();
+    const q = (searchQuery || '').toLowerCase().trim();
     const matchQuery =
-      !searchQuery ||
-      d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.district.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.address.toLowerCase().includes(searchQuery.toLowerCase());
+      !q ||
+      dName.includes(q) ||
+      dDistrict.includes(q) ||
+      dAddress.includes(q) ||
+      dCity.includes(q);
     return matchCity && matchBrand && matchQuery;
   });
 

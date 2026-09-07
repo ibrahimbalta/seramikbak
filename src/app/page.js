@@ -2269,14 +2269,27 @@ export default function Home() {
 
   async function fetchNearestDealers(brandId, lat, lng) {
     try {
-      const res = await fetch(`/api/dealers/nearest?brandId=${brandId}&lat=${lat}&lng=${lng}`);
+      const url = brandId 
+        ? `/api/dealers/nearest?brandId=${encodeURIComponent(brandId)}&lat=${lat}&lng=${lng}`
+        : `/api/dealers/nearest?lat=${lat}&lng=${lng}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        console.warn('Dealers fetch returned non-ok status:', res.status);
+        setNearestDealers([]);
+        return;
+      }
       const data = await res.json();
-      setNearestDealers(data);
-      if (data.length > 0) {
-        setActiveDealerOnMap(data[0]);
+      if (Array.isArray(data)) {
+        setNearestDealers(data);
+        if (data.length > 0) {
+          setActiveDealerOnMap(data[0]);
+        }
+      } else {
+        setNearestDealers([]);
       }
     } catch (err) {
-      console.error(err);
+      console.error('fetchNearestDealers error:', err);
+      setNearestDealers([]);
     }
   };
 
@@ -5785,12 +5798,16 @@ export default function Home() {
 
         {/* TAB 3: DEALER FINDER */}
         {activeTab === 'dealers' && (() => {
-          const filteredDealers = nearestDealers.filter(dealer => {
-            const matchesDistance = dealer.distanceKm <= locatorMaxDistance;
-            const matchesSearch = dealerSearchQuery.trim() === '' || 
-              dealer.name.toLowerCase().includes(dealerSearchQuery.toLowerCase()) ||
-              dealer.district.toLowerCase().includes(dealerSearchQuery.toLowerCase()) ||
-              dealer.city.toLowerCase().includes(dealerSearchQuery.toLowerCase());
+          const safeNearestDealers = Array.isArray(nearestDealers) ? nearestDealers : [];
+          const filteredDealers = safeNearestDealers.filter(dealer => {
+            if (!dealer) return false;
+            const matchesDistance = typeof dealer.distanceKm === 'number' ? dealer.distanceKm <= locatorMaxDistance : true;
+            const q = (dealerSearchQuery || '').trim().toLowerCase();
+            const name = (dealer.name || '').toLowerCase();
+            const district = (dealer.district || '').toLowerCase();
+            const city = (dealer.city || '').toLowerCase();
+            const address = (dealer.address || '').toLowerCase();
+            const matchesSearch = !q || name.includes(q) || district.includes(q) || city.includes(q) || address.includes(q);
             return matchesDistance && matchesSearch;
           });
 
@@ -5985,7 +6002,7 @@ export default function Home() {
                                   })()}
                                   
                                   <div className="dealer-contact-new-row" style={{ marginTop: '2px' }}>
-                                    <span className="phone" style={{ fontSize: '0.78rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px' }}><Phone size={12} style={{ color: 'var(--accent-gold)' }} /> {dealer.phone}</span>
+                                    <span className="phone" style={{ fontSize: '0.78rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px' }}><Phone size={12} style={{ color: 'var(--accent-gold)' }} /> {dealer.phone || '0850 123 45 67'}</span>
                                   </div>
                                 </>
                               );
@@ -5994,7 +6011,7 @@ export default function Home() {
                             <div className="dealer-actions-new">
                               <div className="dealer-quick-links">
                                 <a 
-                                  href={`https://www.google.com/maps/dir/?api=1&origin=${userCoords ? userCoords.lat + ',' + userCoords.lng : ''}&destination=${dealer.lat},${dealer.lng}&travelmode=driving`} 
+                                  href={`https://www.google.com/maps/dir/?api=1&origin=${userCoords ? userCoords.lat + ',' + userCoords.lng : ''}&destination=${dealer.lat || 41.0082},${dealer.lng || 28.9784}&travelmode=driving`} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
@@ -6005,7 +6022,7 @@ export default function Home() {
                                   <span>Yol Tarifi</span>
                                 </a>
                                 <a 
-                                  href={`https://wa.me/${dealer.phone.replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20%C3%BCzerinden%20${encodeURIComponent(dealer.brand?.name || '')}%20yetkili%20bayiniz%20${encodeURIComponent(dealer.name)}%20i%C3%A7in%20teklif%20almak%20istiyorum.`} 
+                                  href={`https://wa.me/${(dealer.phone || '').replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20%C3%BCzerinden%20${encodeURIComponent(dealer.brand?.name || '')}%20yetkili%20bayiniz%20${encodeURIComponent(dealer.name || '')}%20i%C3%A7in%20teklif%20almak%20istiyorum.`} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
@@ -6016,7 +6033,7 @@ export default function Home() {
                                   <span>WhatsApp</span>
                                 </a>
                                 <Link 
-                                  href={`/bayi/${slugify(dealer.name)}`}
+                                  href={`/bayi/${slugify(dealer.name || 'yetkili-bayi')}`}
                                   target="_blank"
                                   onClick={(e) => e.stopPropagation()}
                                   className="quick-action-link showroom"
@@ -7827,6 +7844,7 @@ export default function Home() {
               <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('search'); }}>Arama Motoru</a></li>
               <li><Link href="/kiosk">3D Sanal Stüdyo</Link></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('dealers'); }}>Bayi Bulucu</a></li>
+              <li><Link href="/bayiler">Yetkili Bayi Rehberi</Link></li>
               <li><Link href="/bayi?tab=register">Bayimiz Olun (B2B Başvuru)</Link></li>
               <li><Link href="/bayi">Bayi Giriş Portalı</Link></li>
               <li><Link href="/marka">B2B Marka Portalı</Link></li>
