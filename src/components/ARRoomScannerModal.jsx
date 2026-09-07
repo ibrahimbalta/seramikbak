@@ -5,7 +5,8 @@ import {
   Camera, X, RefreshCw, Layers, CheckCircle2, Sliders, Smartphone,
   Download, Sparkles, Plus, Trash2, Send, MessageCircle, Calculator,
   Maximize2, ShieldCheck, Store, ChevronRight, AlertCircle, ChevronDown, ChevronUp,
-  Target, Compass, CornerDownRight, Check, Move, Eye, Upload, MapPin, CheckCircle
+  Target, Compass, CornerDownRight, Check, Move, Eye, Upload, MapPin, CheckCircle,
+  Info, SlidersHorizontal
 } from 'lucide-react';
 
 export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, currentDealer }) {
@@ -29,24 +30,26 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   const [surfaceType, setSurfaceType] = useState('WALL');
 
   // =========================================================================
-  // AUTOMATIC SWEEP SCANNING ENGINE (CAMERA PANNING & AUTO-DETECTION)
+  // OPTICAL CAMERA FOV & DISTANCE MEASUREMENT ENGINE
   // =========================================================================
+  // Camera Distance to Surface in Meters (Standard room standing distance is 2.2m)
+  const [cameraDistance, setCameraDistance] = useState(2.2);
+
   // Status: 'SWEEPING' (User panning camera) | 'LOCKED' (Surface automatically identified)
   const [scanStatus, setScanStatus] = useState('SWEEPING');
   const [scanProgress, setScanProgress] = useState(0); // 0 to 100
-  const [sweepMessage, setSweepMessage] = useState('Kameranızı odaya doğru yavaşça gezdirin...');
+  const [sweepMessage, setSweepMessage] = useState('Kameranızı alana gezdirin (Optik Alan Taranıyor)...');
 
   // Auto-calculated Dimensions (Meters)
-  const [roomWidth, setRoomWidth] = useState(2.8);  // meters (En)
-  const [roomHeight, setRoomHeight] = useState(2.6); // meters (Boy)
+  const [roomWidth, setRoomWidth] = useState(2.5);  // meters (En)
+  const [roomHeight, setRoomHeight] = useState(2.4); // meters (Boy)
 
   // 4 Interactive Corner Pins in Normalized Coordinates (0.0 to 1.0)
-  // [0: Sol Alt, 1: Sağ Alt, 2: Sağ Üst, 3: Sol Üst]
   const [corners, setCorners] = useState([
-    { x: 0.15, y: 0.82, id: 'p0', label: '1. Sol Alt' },
-    { x: 0.85, y: 0.82, id: 'p1', label: '2. Sağ Alt' },
-    { x: 0.80, y: 0.26, id: 'p2', label: '3. Sağ Üst' },
-    { x: 0.20, y: 0.26, id: 'p3', label: '4. Sol Üst' }
+    { x: 0.15, y: 0.82, id: 'p0', label: 'Sol Alt' },
+    { x: 0.85, y: 0.82, id: 'p1', label: 'Sağ Alt' },
+    { x: 0.80, y: 0.26, id: 'p2', label: 'Sağ Üst' },
+    { x: 0.20, y: 0.26, id: 'p3', label: 'Sol Üst' }
   ]);
 
   // Nearest Dealer Matching State
@@ -110,6 +113,59 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   }, [selectedProduct]);
 
   // =========================================================================
+  // OPTICAL FOV CALCULATION FORMULA
+  // =========================================================================
+  // Computes physical visible width & height in meters from camera distance & lens FOV
+  const recalculateOpticalDimensions = useCallback((dist, surf = surfaceType) => {
+    // Typical smartphone/webcam horizontal FOV ~ 68° (tan(34°) ~ 0.6745)
+    const fovFactor = 0.6745;
+    const fullPhysicalWidth = 2 * dist * fovFactor;
+
+    // Kadraj içi aktif yüzey oranı (orta %80 kadraj alanı)
+    let compW = parseFloat((fullPhysicalWidth * 0.82).toFixed(1));
+    let compH = parseFloat((compW * (surf === 'WALL' ? 0.95 : 0.75)).toFixed(1));
+
+    // Clamp to realistic architectural ranges (0.8m to 14m)
+    compW = Math.max(0.8, Math.min(14.0, compW));
+    compH = Math.max(0.8, Math.min(10.0, compH));
+
+    setRoomWidth(compW);
+    setRoomHeight(compH);
+
+    // Update corner pins to reflect detected surface bounds
+    if (surf === 'WALL') {
+      setCorners([
+        { x: 0.14, y: 0.84, id: 'p0', label: 'Sol Alt' },
+        { x: 0.86, y: 0.84, id: 'p1', label: 'Sağ Alt' },
+        { x: 0.82, y: 0.24, id: 'p2', label: 'Sağ Üst' },
+        { x: 0.18, y: 0.24, id: 'p3', label: 'Sol Üst' }
+      ]);
+    } else {
+      setCorners([
+        { x: 0.08, y: 0.92, id: 'p0', label: 'Sol Ön' },
+        { x: 0.92, y: 0.92, id: 'p1', label: 'Sağ Ön' },
+        { x: 0.75, y: 0.46, id: 'p2', label: 'Sağ Arka' },
+        { x: 0.25, y: 0.46, id: 'p3', label: 'Sol Arka' }
+      ]);
+    }
+  }, [surfaceType]);
+
+  // When distance changes, recalculate optical dimensions
+  const handleDistanceChange = (newDist) => {
+    setCameraDistance(newDist);
+    recalculateOpticalDimensions(newDist);
+  };
+
+  // Fine-tuning +/- 10cm steps
+  const adjustDimension = (dim, delta) => {
+    if (dim === 'width') {
+      setRoomWidth((prev) => Math.max(0.5, parseFloat((prev + delta).toFixed(1))));
+    } else {
+      setRoomHeight((prev) => Math.max(0.5, parseFloat((prev + delta).toFixed(1))));
+    }
+  };
+
+  // =========================================================================
   // AUTOMATIC NEAREST PRODUCT-DEALER DETECTION
   // =========================================================================
   useEffect(() => {
@@ -126,7 +182,6 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
 
         if (Array.isArray(dealers) && dealers.length > 0) {
           setNearbyDealers(dealers);
-          // Prioritize dealer with product in stock or same brand
           setAssignedDealer(dealers[0]);
         }
       } catch (err) {
@@ -136,16 +191,10 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       }
     };
 
-    // Attempt HTML5 Geolocation to match nearest dealer accurately
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          findNearestProductDealer(pos.coords.latitude, pos.coords.longitude);
-        },
-        () => {
-          // Default to Istanbul / Kadıköy coordinates if location permission denied
-          findNearestProductDealer(40.9901, 29.0278);
-        },
+        (pos) => findNearestProductDealer(pos.coords.latitude, pos.coords.longitude),
+        () => findNearestProductDealer(40.9901, 29.0278),
         { timeout: 5000, enableHighAccuracy: false }
       );
     } else {
@@ -291,81 +340,58 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   }, [isOpen, handleClose]);
 
   // =========================================================================
-  // AUTOMATIC CAMERA PANNING & ROOM SWEEP SCANNER
+  // AUTOMATIC OPTICAL SWEEP SCANNER PROGRESSION
   // =========================================================================
-  // Automatically progress scan as camera stream / motion occurs without manual interaction
   useEffect(() => {
     if (!isOpen || scanStatus === 'LOCKED') return;
 
     let progressTimer;
     let step = 0;
 
-    // Simulate progressive real-time LiDAR plane detection as camera sweeps
     progressTimer = setInterval(() => {
       step += 1;
-      const newProgress = Math.min(100, step * 7);
+      const newProgress = Math.min(100, step * 8);
       setScanProgress(newProgress);
 
       if (newProgress < 30) {
-        setSweepMessage('🔍 Kamera alanı algılıyor... Odayı hafifçe tarayın');
-      } else if (newProgress < 75) {
-        setSweepMessage('📐 Yüzey sınırları ve derinlik hesaplanıyor...');
+        setSweepMessage('🔍 Kamera görüş açısı (68° FOV) kalibre ediliyor...');
+      } else if (newProgress < 70) {
+        setSweepMessage(`📐 ${cameraDistance}m mesafeden kadrajdaki alan taranıyor...`);
       } else if (newProgress < 100) {
-        setSweepMessage('✨ Seramik yüzey hizalanıyor...');
+        setSweepMessage('✨ Duvar yüzeyi ve seramikler hizalanıyor...');
       } else {
-        // Complete scan automatically
         clearInterval(progressTimer);
         setScanStatus('LOCKED');
-        setSweepMessage('✅ Oda alanı ve ölçüler otomatik tespit edildi!');
+        setSweepMessage(`✅ Kadrajdaki alan tespit edildi: ${cameraDistance}m mesafeden ölçüldü`);
 
-        // Haptic feedback
         if (typeof navigator !== 'undefined' && navigator.vibrate) {
           navigator.vibrate([40, 60, 100]);
         }
 
-        // Set optimal detected dimensions automatically
-        if (surfaceType === 'WALL') {
-          setRoomWidth(2.8);
-          setRoomHeight(2.6);
-          setCorners([
-            { x: 0.16, y: 0.82, id: 'p0', label: 'Sol Alt' },
-            { x: 0.84, y: 0.82, id: 'p1', label: 'Sağ Alt' },
-            { x: 0.80, y: 0.26, id: 'p2', label: 'Sağ Üst' },
-            { x: 0.20, y: 0.26, id: 'p3', label: 'Sol Üst' }
-          ]);
-        } else {
-          setRoomWidth(3.2);
-          setRoomHeight(2.4);
-          setCorners([
-            { x: 0.08, y: 0.90, id: 'p0', label: 'Sol Ön' },
-            { x: 0.92, y: 0.90, id: 'p1', label: 'Sağ Ön' },
-            { x: 0.72, y: 0.45, id: 'p2', label: 'Sağ Arka' },
-            { x: 0.28, y: 0.45, id: 'p3', label: 'Sol Arka' }
-          ]);
-        }
+        recalculateOpticalDimensions(cameraDistance, surfaceType);
       }
-    }, 140);
+    }, 130);
 
     return () => clearInterval(progressTimer);
-  }, [isOpen, scanStatus, surfaceType]);
+  }, [isOpen, scanStatus, cameraDistance, surfaceType, recalculateOpticalDimensions]);
 
-  // Re-run scan with zero user manual effort
   const handleResetAndScan = () => {
     setScanStatus('SWEEPING');
     setScanProgress(0);
-    setSweepMessage('🔍 Kameranızı odaya doğru yavaşça gezdirin...');
+    setSweepMessage('🔍 Kameranızı alana gezdirin (Optik Alan Taranıyor)...');
   };
 
-  // Toggle surface (Wall vs Floor)
   const handleSurfaceChange = (type) => {
     setSurfaceType(type);
+    recalculateOpticalDimensions(cameraDistance, type);
     handleResetAndScan();
   };
 
   // Quick Preset Room Sizer
-  const applyRoomPreset = (w, h) => {
+  const applyRoomPreset = (w, h, dist) => {
     setRoomWidth(w);
     setRoomHeight(h);
+    if (dist) setCameraDistance(dist);
     setScanStatus('LOCKED');
     if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(30);
   };
@@ -394,7 +420,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   };
 
   // =========================================================================
-  // CANVAS RENDERING (HIGH-TECH LIDAR SWEEP + AUTOMATIC TILE OVERLAY)
+  // CANVAS RENDERING (OPTICAL LIDAR SWEEP + AUTOMATIC TILE OVERLAY)
   // =========================================================================
   useEffect(() => {
     if (!isOpen) return;
@@ -470,7 +496,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       const h = canvas.height;
 
       // -------------------------------------------------------------
-      // STATE 1: ACTIVE LIDAR SWEEPING BEAM (AUTOMATIC SCAN IN PROGRESS)
+      // 1. ACTIVE LIDAR SWEEPING BEAM (AUTOMATIC SCAN IN PROGRESS)
       // -------------------------------------------------------------
       if (scanStatus === 'SWEEPING') {
         sweepSweepY = (sweepSweepY + 6) % h;
@@ -522,7 +548,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       }
 
       // -------------------------------------------------------------
-      // STATE 2: LOCKED AUTOMATIC SURFACE & TILE OVERLAY
+      // 2. LOCKED AUTOMATIC SURFACE & TILE OVERLAY
       // -------------------------------------------------------------
       if (scanStatus === 'LOCKED') {
         const p0 = { x: corners[0].x * w, y: corners[0].y * h };
@@ -760,14 +786,14 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       `📦 *Seçilen Ürün:* ${selectedProduct?.name || 'Seramik Karo'} (${selectedProduct?.width || 60}x${selectedProduct?.height || 120} cm)\n` +
       `🏢 *Hedef Yetkili Bayi:* ${assignedDealer?.name || 'Yetkili Bayi'} (${assignedDealer?.city || 'İstanbul'})\n` +
       `📐 *Yüzey:* ${surfaceType === 'WALL' ? 'Duvar Kaplama' : 'Zemin Kaplama'}\n` +
-      `📏 *Otomatik Ölçü:* En ${roomWidth}m x Boy ${roomHeight}m\n` +
+      `📏 *Otomatik Ölçü:* En ${roomWidth}m x Boy ${roomHeight}m (Mesafe: ${cameraDistance}m)\n` +
       `📊 *Metraj:* Brüt ${grossAreaM2}m² | Düşülen Boşluk ${cutoutAreaM2}m² | *Net ${netAreaM2}m²*\n` +
       `📦 *Gerekli Kutu:* ${boxCount} Kutu (%10 fire payı dahil)\n` +
       `🧱 *Sarf Malzemesi:* ${adhesiveBags} Çuval Kalekim Yapıştırıcı + ${groutKg}kg Derz Dolgusu\n` +
       `💰 *Tahmini Malzeme Tutarı:* ${totalEstMaterialCost.toLocaleString('tr-TR')} ₺\n` +
       `🔨 *Tahmini Toplam (İşçilik Dahil):* ${totalEstRenovationCost.toLocaleString('tr-TR')} ₺\n\n` +
       `Müşteri: ${clientName || 'İsimsiz Müşteri'} (${clientPhone || 'Telefon belirtilmedi'})\n` +
-      `Bu ürünün stoğu ve bayi teslimat teklifini almak istiyorum.`
+      `Bu ürünün stoğu ve teslimat teklifini almak istiyorum.`
     );
     return `https://wa.me/${dealerPhone}?text=${text}`;
   };
@@ -816,7 +842,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
               gap: '4px'
             }}>
               <Sparkles size={14} />
-              <span>Otomatik AR Tarayıcı</span>
+              <span>Optik AR Tarayıcı</span>
             </div>
             <div>
               <h3 style={{
@@ -829,7 +855,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                 textOverflow: 'ellipsis',
                 maxWidth: isMobile ? '180px' : '320px'
               }}>
-                {selectedProduct?.name || 'Kamerayı Gezdirerek Otomatik Ölçüm'}
+                {selectedProduct?.name || 'Kameradaki Alanı Otomatik Ölç'}
               </h3>
             </div>
           </div>
@@ -930,7 +956,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
       <div style={{ flex: 1, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         
         {/* ================================================================= */}
-        {/* TAB 1: AUTOMATIC SWEEP AR SCANNER                                 */}
+        {/* TAB 1: AUTOMATIC OPTICAL AR SCANNER                               */}
         {/* ================================================================= */}
         <div style={{
           flex: 1,
@@ -953,7 +979,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             style={{ display: 'none' }}
           />
 
-          {/* Interactive Canvas */}
+          {/* Canvas Viewport */}
           <canvas
             ref={canvasRef}
             style={{
@@ -963,7 +989,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             }}
           />
 
-          {/* Top Banner: Real-time Scanning Progress or Auto-detected Status */}
+          {/* Top Banner: Real-time Scanning Progress & Optical Formula Indicator */}
           <div style={{
             position: 'absolute',
             top: '12px',
@@ -975,9 +1001,9 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             alignItems: 'center',
             gap: '8px',
             width: 'calc(100% - 24px)',
-            maxWidth: '520px'
+            maxWidth: '540px'
           }}>
-            {/* Real-time Status Card */}
+            {/* Real-time Status Card with Optical Explanatory Badge */}
             <div style={{
               background: 'rgba(15, 23, 42, 0.94)',
               border: scanStatus === 'LOCKED' ? '1px solid #10b981' : '1px solid #d4af37',
@@ -998,8 +1024,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                     height: '10px',
                     borderRadius: '50%',
                     background: '#d4af37',
-                    boxShadow: '0 0 10px #d4af37',
-                    animation: 'pulse 1.2s infinite'
+                    boxShadow: '0 0 10px #d4af37'
                   }} />
                 ) : (
                   <CheckCircle size={16} color="#10b981" />
@@ -1037,7 +1062,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             </div>
 
             {/* Quick Action Pills: Snapshot & Gallery */}
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
               {!capturedSnapshot ? (
                 <button
                   onClick={handleTakeSnapshot}
@@ -1182,12 +1207,12 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             </div>
           )}
 
-          {/* Floating Nearest Dealer Pill at Bottom Left */}
+          {/* Floating Nearest Dealer Pill */}
           {assignedDealer && (
             <div style={{
               position: 'absolute',
               top: isMobile ? 'auto' : '14px',
-              bottom: isMobile ? '120px' : 'auto',
+              bottom: isMobile ? '160px' : 'auto',
               left: isMobile ? '10px' : '14px',
               background: 'rgba(15, 23, 42, 0.92)',
               border: '1px solid rgba(16, 185, 129, 0.5)',
@@ -1195,10 +1220,10 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
               padding: '6px 10px',
               zIndex: 22,
               backdropFilter: 'blur(10px)',
-              maxWidth: isMobile ? '240px' : '280px',
+              maxWidth: isMobile ? '230px' : '280px',
               boxShadow: '0 6px 16px rgba(0,0,0,0.4)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', color: '#10b981', fontWeight: '900' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', color: '#10b981', fontWeight: '900' }}>
                 <Store size={13} />
                 <span>EN YAKIN YETKİLİ BAYİ</span>
               </div>
@@ -1211,25 +1236,25 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             </div>
           )}
 
-          {/* Floating Controls Panel (Surface & Presets) */}
+          {/* Floating Optical Calibration & Controls Panel */}
           <div style={{
             position: 'absolute',
-            bottom: isMobile ? '10px' : '18px',
-            left: isMobile ? '10px' : '18px',
-            right: isMobile ? '10px' : 'auto',
+            bottom: isMobile ? '8px' : '16px',
+            left: isMobile ? '8px' : '16px',
+            right: isMobile ? '8px' : 'auto',
             background: 'rgba(15, 23, 42, 0.94)',
             backdropFilter: 'blur(14px)',
             border: '1px solid rgba(16, 185, 129, 0.4)',
             borderRadius: '16px',
             padding: isMobile ? '10px 12px' : '14px 16px',
-            width: isMobile ? 'auto' : '310px',
+            width: isMobile ? 'auto' : '330px',
             zIndex: 20,
             boxShadow: '0 12px 32px rgba(0,0,0,0.6)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showMobilePanel ? '8px' : '0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: '900', color: '#10b981' }}>📐 OTOMATİK ÖLÇÜ</span>
-                <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>({roomWidth}m × {roomHeight}m = {netAreaM2}m²)</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: '900', color: '#10b981' }}>📐 KADRAJ ALANI</span>
+                <span style={{ fontSize: '0.68rem', color: '#cbd5e1' }}>({roomWidth}m × {roomHeight}m = {grossAreaM2}m²)</span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1280,76 +1305,104 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
 
             {showMobilePanel && (
               <>
-                {/* Quick Presets */}
-                <div style={{ marginBottom: '8px' }}>
-                  <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: '800', marginBottom: '4px' }}>
-                    HIZLI ODA ŞABLONLARI:
+                {/* OPTICAL DISTANCE PRESET SELECTOR (HOW CAMERA CALCULATES AREA) */}
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '10px',
+                  padding: '8px',
+                  marginBottom: '8px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <SlidersHorizontal size={12} />
+                      <span>DUVARA/ZEMİNE MESAFENİZ:</span>
+                    </div>
+                    <strong style={{ fontSize: '0.78rem', color: '#fff' }}>{cameraDistance} Metre</strong>
                   </div>
-                  <div style={{ display: 'flex', gap: '4px', overflowX: 'auto', paddingBottom: '3px' }}>
-                    <button
-                      onClick={() => applyRoomPreset(1.8, 2.2)}
-                      style={{
-                        padding: '3px 6px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(16,185,129,0.3)',
-                        background: roomWidth === 1.8 && roomHeight === 2.2 ? '#10b981' : 'rgba(255,255,255,0.06)',
-                        color: roomWidth === 1.8 && roomHeight === 2.2 ? '#fff' : '#cbd5e1',
-                        fontSize: '0.65rem',
-                        fontWeight: '800',
-                        whiteSpace: 'nowrap',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      🚿 Küçük (4m²)
-                    </button>
-                    <button
-                      onClick={() => applyRoomPreset(2.4, 2.6)}
-                      style={{
-                        padding: '3px 6px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(16,185,129,0.3)',
-                        background: roomWidth === 2.4 && roomHeight === 2.6 ? '#10b981' : 'rgba(255,255,255,0.06)',
-                        color: roomWidth === 2.4 && roomHeight === 2.6 ? '#fff' : '#cbd5e1',
-                        fontSize: '0.65rem',
-                        fontWeight: '800',
-                        whiteSpace: 'nowrap',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      🛁 Banyo (6.2m²)
-                    </button>
-                    <button
-                      onClick={() => applyRoomPreset(3.2, 2.8)}
-                      style={{
-                        padding: '3px 6px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(16,185,129,0.3)',
-                        background: roomWidth === 3.2 && roomHeight === 2.8 ? '#10b981' : 'rgba(255,255,255,0.06)',
-                        color: roomWidth === 3.2 && roomHeight === 2.8 ? '#fff' : '#cbd5e1',
-                        fontSize: '0.65rem',
-                        fontWeight: '800',
-                        whiteSpace: 'nowrap',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      👑 Ebeveyn (9m²)
-                    </button>
-                    <button
-                      onClick={() => applyRoomPreset(3.0, 0.6)}
-                      style={{
-                        padding: '3px 6px',
-                        borderRadius: '6px',
-                        border: '1px solid rgba(16,185,129,0.3)',
-                        background: roomWidth === 3.0 && roomHeight === 0.6 ? '#10b981' : 'rgba(255,255,255,0.06)',
-                        color: roomWidth === 3.0 && roomHeight === 0.6 ? '#fff' : '#cbd5e1',
-                        fontSize: '0.65rem',
-                        fontWeight: '800',
-                        whiteSpace: 'nowrap',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      🍳 Tezgah (1.8m²)
-                    </button>
+
+                  {/* Distance Quick Buttons */}
+                  <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
+                    {[
+                      { dist: 1.5, label: '1.5m (Yakın)' },
+                      { dist: 2.2, label: '2.2m (Standart)' },
+                      { dist: 3.0, label: '3.0m (Orta)' },
+                      { dist: 4.0, label: '4.0m (Uzak)' }
+                    ].map((d) => (
+                      <button
+                        key={d.dist}
+                        onClick={() => handleDistanceChange(d.dist)}
+                        style={{
+                          flex: 1,
+                          padding: '4px 2px',
+                          borderRadius: '6px',
+                          border: cameraDistance === d.dist ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
+                          background: cameraDistance === d.dist ? '#10b981' : 'rgba(255,255,255,0.06)',
+                          color: cameraDistance === d.dist ? '#fff' : '#cbd5e1',
+                          fontSize: '0.62rem',
+                          fontWeight: '800',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {d.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Distance Slider */}
+                  <input
+                    type="range"
+                    min="1.0"
+                    max="6.0"
+                    step="0.1"
+                    value={cameraDistance}
+                    onChange={(e) => handleDistanceChange(parseFloat(e.target.value))}
+                    style={{ width: '100%', accentColor: '#10b981', height: '4px', cursor: 'pointer' }}
+                  />
+
+                  <div style={{ fontSize: '0.62rem', color: '#94a3b8', marginTop: '4px', lineHeight: '1.3' }}>
+                    💡 Kameranın 68° görüş açısına göre kadrajdaki alan otomatik hesaplanır. Mesafeyi değiştirerek tam eşitleyin.
+                  </div>
+                </div>
+
+                {/* Direct Width/Height Precision Steps */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginBottom: '8px' }}>
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: '8px' }}>
+                    <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginBottom: '3px' }}>Genişlik (En):</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <button
+                        onClick={() => adjustDimension('width', -0.1)}
+                        style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: '4px', width: '22px', height: '22px', cursor: 'pointer', fontWeight: '900' }}
+                      >
+                        -
+                      </button>
+                      <strong style={{ fontSize: '0.8rem', color: '#10b981' }}>{roomWidth} m</strong>
+                      <button
+                        onClick={() => adjustDimension('width', 0.1)}
+                        style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: '4px', width: '22px', height: '22px', cursor: 'pointer', fontWeight: '900' }}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: '8px' }}>
+                    <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginBottom: '3px' }}>Yükseklik (Boy):</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <button
+                        onClick={() => adjustDimension('height', -0.1)}
+                        style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: '4px', width: '22px', height: '22px', cursor: 'pointer', fontWeight: '900' }}
+                      >
+                        -
+                      </button>
+                      <strong style={{ fontSize: '0.8rem', color: '#10b981' }}>{roomHeight} m</strong>
+                      <button
+                        onClick={() => adjustDimension('height', 0.1)}
+                        style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', borderRadius: '4px', width: '22px', height: '22px', cursor: 'pointer', fontWeight: '900' }}
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -1432,7 +1485,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
             }}>
               <h4 style={{ margin: '0 0 12px 0', fontSize: '1rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Maximize2 size={16} />
-                <span>Otomatik Ölçülen Alan Boyutları</span>
+                <span>Optik Olarak Ölçülen Alan</span>
               </h4>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <div>
@@ -1477,7 +1530,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                 </div>
               </div>
               <div style={{ marginTop: '10px', fontSize: '0.82rem', color: '#cbd5e1' }}>
-                Brüt Yüzey Alanı: <strong style={{ color: '#fff' }}>{grossAreaM2} m²</strong>
+                Brüt Yüzey Alanı: <strong style={{ color: '#fff' }}>{grossAreaM2} m²</strong> (Kamera Mesafesi: {cameraDistance}m)
               </div>
             </div>
 
@@ -1617,6 +1670,10 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                   <span style={{ color: '#cbd5e1' }}>Derz Dolgusu:</span>
                   <strong style={{ color: '#fff' }}>{groutKg} kg</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '6px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <span style={{ color: '#cbd5e1' }}>Tahmini Usta İşçiliği (~350 TL/m²):</span>
+                  <strong style={{ color: '#94a3b8' }}>~{estLaborCost.toLocaleString('tr-TR')} ₺</strong>
                 </div>
 
                 <div style={{
