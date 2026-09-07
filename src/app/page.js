@@ -109,9 +109,9 @@ function enrichProductData(p) {
   const basePrice = p.width * p.height * 0.08 + (p.finish === 'Parlak' ? 120 : 0) + (p.style === 'Mermer' ? 150 : 80);
   
   const dealerOffers = [
-    { dealerName: 'Kadıköy Bayi', price: Math.round(basePrice * 0.95), stock: 'Stokta Var' },
-    { dealerName: 'Beşiktaş Showroom', price: Math.round(basePrice), stock: 'Stokta Var' },
-    { dealerName: 'Şişli Concept Store', price: Math.round(basePrice * 1.05), stock: 'Sınırlı Stok' }
+    { dealerName: 'Kadıköy VitrA Konsept Showroom', price: Math.round(basePrice * 0.95), stock: 'Stokta Var' },
+    { dealerName: 'Beşiktaş Çanakkale Seramik Showroom', price: Math.round(basePrice), stock: 'Stokta Var' },
+    { dealerName: 'VitrA Nişantaşı Concept Store', price: Math.round(basePrice * 1.05), stock: 'Sınırlı Stok' }
   ];
 
   const sortedOffers = [...dealerOffers].sort((a, b) => a.price - b.price);
@@ -15502,7 +15502,11 @@ export default function Home() {
       <WebARModal 
         isOpen={showWebARModal} 
         onClose={() => setShowWebARModal(false)} 
-        selectedProduct={webarProduct} 
+        selectedProduct={webarProduct}
+        userLocationCoords={userCoords}
+        userLocationName={userLocationName}
+        currentDealer={activeDealerOnMap}
+        initialNearbyDealers={nearestDealers}
       />
     </main>
   );

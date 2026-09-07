@@ -81,8 +81,21 @@ export async function GET(request) {
       return NextResponse.json([]);
     }
 
+    // Filter candidate dealers:
+    // If a brand is specified and there are registered dealers for this brand,
+    // only return authorized dealers of this brand (or dealers holding this product in stock).
+    let candidateDealers = dealers;
+    if (targetBrandId && targetBrandId !== 'all') {
+      const brandDealers = dealers.filter(
+        (d) => d.brandId === targetBrandId || (d.inventories && d.inventories.length > 0)
+      );
+      if (brandDealers.length > 0) {
+        candidateDealers = brandDealers;
+      }
+    }
+
     // Compute distance and product availability for each dealer
-    const dealersWithMetadata = dealers.map((dealer) => {
+    const dealersWithMetadata = candidateDealers.map((dealer) => {
       const dLat = typeof dealer.lat === 'number' ? dealer.lat : (parseFloat(dealer.lat) || 41.0082);
       const dLng = typeof dealer.lng === 'number' ? dealer.lng : (parseFloat(dealer.lng) || 28.9784);
       const rawDistance = haversineDistance(userLat, userLng, dLat, dLng);

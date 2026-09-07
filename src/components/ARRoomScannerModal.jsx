@@ -6,10 +6,18 @@ import {
   Download, Sparkles, Plus, Trash2, Send, MessageCircle, Calculator,
   Maximize2, ShieldCheck, Store, ChevronRight, AlertCircle, ChevronDown, ChevronUp,
   Target, Compass, CornerDownRight, Check, Move, Eye, Upload, MapPin, CheckCircle,
-  Palette, Grid, Image as ImageIcon, SlidersHorizontal, ArrowRight, Share2
+  Palette, Grid, Image as ImageIcon, SlidersHorizontal, ArrowRight, Share2, Navigation
 } from 'lucide-react';
 
-export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, currentDealer }) {
+export default function ARRoomScannerModal({ 
+  isOpen, 
+  onClose, 
+  selectedProduct, 
+  currentDealer,
+  userLocationCoords,
+  userLocationName,
+  initialNearbyDealers
+}) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -67,9 +75,20 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   const totalEstMaterialCost = totalTileCost + (adhesiveBags * 280) + (groutKg * 45);
   const totalEstRenovationCost = totalEstMaterialCost + estLaborCost;
 
+  // User Location State (Synced with Bayi Bul in Main App)
+  const [userCoords, setUserCoords] = useState(
+    userLocationCoords || { lat: 40.9901, lng: 29.0278 }
+  );
+  const [userLocName, setUserLocName] = useState(
+    userLocationName || 'Kadıköy Merkez'
+  );
+  const [isLocatingGps, setIsLocatingGps] = useState(false);
+
   // Nearest Dealer Matching State
   const [assignedDealer, setAssignedDealer] = useState(currentDealer || null);
-  const [nearbyDealers, setNearbyDealers] = useState([]);
+  const [nearbyDealers, setNearbyDealers] = useState(
+    Array.isArray(initialNearbyDealers) ? initialNearbyDealers : []
+  );
   const [loadingDealers, setLoadingDealers] = useState(false);
 
   // Quote / Lead Submission State
@@ -78,6 +97,19 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   const [clientNotes, setClientNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Sync with incoming props from parent
+  useEffect(() => {
+    if (userLocationCoords?.lat && userLocationCoords?.lng) {
+      setUserCoords(userLocationCoords);
+    }
+    if (userLocationName) {
+      setUserLocName(userLocationName);
+    }
+    if (currentDealer) {
+      setAssignedDealer(currentDealer);
+    }
+  }, [userLocationCoords, userLocationName, currentDealer]);
 
   // Mobile detection
   useEffect(() => {
@@ -97,41 +129,71 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
   }, [selectedProduct]);
 
   // =========================================================================
-  // AUTOMATIC NEAREST PRODUCT-DEALER DETECTION
+  // AUTOMATIC NEAREST PRODUCT-DEALER DETECTION (LOCATION AWARE)
   // =========================================================================
+  const fetchDealersForCoords = useCallback(async (lat, lng) => {
+    setLoadingDealers(true);
+    try {
+      const prodId = selectedProduct?.id || '';
+      const brandId = selectedProduct?.brandId || '';
+      const url = `/api/dealers/nearest?lat=${lat}&lng=${lng}&productId=${encodeURIComponent(prodId)}&brandId=${encodeURIComponent(brandId)}`;
+      const res = await fetch(url);
+      const dealers = await res.json();
+
+      if (Array.isArray(dealers) && dealers.length > 0) {
+        setNearbyDealers(dealers);
+        // If assignedDealer is already in returned list, retain it; otherwise select closest
+        setAssignedDealer((prev) => {
+          if (prev && dealers.some((d) => d.id === prev.id)) {
+            return dealers.find((d) => d.id === prev.id) || prev;
+          }
+          return dealers[0];
+        });
+      } else {
+        setNearbyDealers([]);
+        setAssignedDealer(null);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch nearest dealer for product:', err);
+    } finally {
+      setLoadingDealers(false);
+    }
+  }, [selectedProduct]);
+
   useEffect(() => {
     if (!isOpen) return;
+    fetchDealersForCoords(userCoords.lat, userCoords.lng);
+  }, [isOpen, selectedProduct, userCoords.lat, userCoords.lng, fetchDealersForCoords]);
 
-    const findNearestProductDealer = async (userLat, userLng) => {
-      setLoadingDealers(true);
-      try {
-        const prodId = selectedProduct?.id || '';
-        const brandId = selectedProduct?.brandId || '';
-        const url = `/api/dealers/nearest?lat=${userLat}&lng=${userLng}&productId=${encodeURIComponent(prodId)}&brandId=${encodeURIComponent(brandId)}`;
-        const res = await fetch(url);
-        const dealers = await res.json();
+  // Quick switch location (Kadıköy, Beşiktaş, Ataşehir, Ankara, etc.)
+  const handleSwitchLocation = (locName, lat, lng) => {
+    setUserLocName(locName);
+    setUserCoords({ lat, lng });
+    fetchDealersForCoords(lat, lng);
+  };
 
-        if (Array.isArray(dealers) && dealers.length > 0) {
-          setNearbyDealers(dealers);
-          setAssignedDealer(dealers[0]);
-        }
-      } catch (err) {
-        console.warn('Failed to fetch nearest dealer for product:', err);
-      } finally {
-        setLoadingDealers(false);
-      }
-    };
-
+  // Switch to GPS location
+  const handleGetGpsLocation = () => {
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      setIsLocatingGps(true);
       navigator.geolocation.getCurrentPosition(
-        (pos) => findNearestProductDealer(pos.coords.latitude, pos.coords.longitude),
-        () => findNearestProductDealer(40.9901, 29.0278),
-        { timeout: 5000, enableHighAccuracy: false }
+        (pos) => {
+          setIsLocatingGps(false);
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setUserLocName('Cihaz Konumunuz (GPS)');
+          setUserCoords({ lat, lng });
+          fetchDealersForCoords(lat, lng);
+        },
+        (err) => {
+          setIsLocatingGps(false);
+          console.warn('GPS location error in AR modal:', err);
+          alert('GPS konumu alınamadı. Lütfen listeden teslimat bölgenizi seçiniz.');
+        },
+        { timeout: 8000, enableHighAccuracy: true }
       );
-    } else {
-      findNearestProductDealer(40.9901, 29.0278);
     }
-  }, [isOpen, selectedProduct]);
+  };
 
   // =========================================================================
   // CAMERA STREAM LIFECYCLE MANAGEMENT (ZERO HARDWARE LEAK)
@@ -635,7 +697,8 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         justifyContent: 'space-between',
         gap: isMobile ? '8px' : '12px',
         zIndex: 30,
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        flexShrink: 0
       }}>
         {/* Left: Brand / Product Title */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
@@ -1413,19 +1476,24 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
         <div style={{
           flex: 1,
           display: activeTab === 'QUOTE' ? 'flex' : 'none',
-          padding: isMobile ? '14px' : '28px',
+          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
-          overflowY: 'auto'
+          justifyContent: 'flex-start',
+          padding: isMobile ? '16px 12px 60px 12px' : '28px 20px 60px 20px',
+          overflowY: 'auto',
+          width: '100%',
+          boxSizing: 'border-box'
         }}>
           <div style={{
             background: 'rgba(30, 41, 59, 0.95)',
             border: '1px solid #10b981',
             borderRadius: '20px',
-            padding: isMobile ? '18px' : '28px',
+            padding: isMobile ? '18px 14px' : '28px',
             maxWidth: '560px',
             width: '100%',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.6)'
+            boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+            boxSizing: 'border-box',
+            marginTop: '0'
           }}>
             {!submitSuccess ? (
               <>
@@ -1436,13 +1504,87 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                       En Yakın Yetkili Bayiden Teklif Alın
                     </h3>
                     <span style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
-                      Seçtiğiniz seramiği bulunduran en yakın yetkili bayi eşleştirildi
+                      Seçtiğiniz seramiği bulunduran en yakın resmi bayi eşleştirildi
                     </span>
                   </div>
                 </div>
 
+                {/* Location Bar synced with Bayi Bul in main portal */}
+                <div style={{
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: '12px',
+                  padding: '10px 12px',
+                  marginBottom: '14px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#e2e8f0' }}>
+                      <MapPin size={15} style={{ color: '#d4af37' }} />
+                      <span style={{ color: '#94a3b8' }}>Hesaplanan Konum:</span>
+                      <strong style={{ color: '#d4af37' }}>{userLocName}</strong>
+                    </div>
+                    {isLocatingGps && (
+                      <span style={{ fontSize: '0.7rem', color: '#38bdf8' }}>📡 Konum taranıyor...</span>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={handleGetGpsLocation}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        background: userLocName.includes('GPS') ? '#10b981' : 'rgba(255,255,255,0.06)',
+                        color: '#fff',
+                        fontSize: '0.72rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '3px'
+                      }}
+                    >
+                      <Navigation size={11} />
+                      <span>GPS Konumum</span>
+                    </button>
+                    {[
+                      { name: 'Kadıköy', full: 'Kadıköy Merkez', lat: 40.9901, lng: 29.0278 },
+                      { name: 'Beşiktaş', full: 'Beşiktaş Showroom', lat: 41.0428, lng: 29.0075 },
+                      { name: 'Ataşehir', full: 'Ataşehir Merkez', lat: 40.9950, lng: 29.1170 },
+                      { name: 'Ankara', full: 'Ankara Çankaya', lat: 39.9074, lng: 32.7758 },
+                      { name: 'İzmir', full: 'İzmir Konak', lat: 38.4312, lng: 27.1425 },
+                      { name: 'Bursa', full: 'Bursa Nilüfer', lat: 40.2185, lng: 28.9832 },
+                      { name: 'Antalya', full: 'Antalya Muratpaşa', lat: 36.8841, lng: 30.7056 },
+                      { name: 'Kocaeli', full: 'Kocaeli Gebze', lat: 40.8027, lng: 29.4307 },
+                      { name: 'Bartın', full: 'Bartın Merkez', lat: 41.4734, lng: 32.3415 }
+                    ].map((loc) => (
+                      <button
+                        key={loc.name}
+                        type="button"
+                        onClick={() => handleSwitchLocation(loc.full, loc.lat, loc.lng)}
+                        style={{
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          border: '1px solid rgba(255,255,255,0.15)',
+                          background: userLocName === loc.full ? '#d4af37' : 'rgba(255,255,255,0.05)',
+                          color: userLocName === loc.full ? '#000' : '#cbd5e1',
+                          fontSize: '0.72rem',
+                          fontWeight: '700',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {loc.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Nearest Matched Dealer Card */}
-                {assignedDealer && (
+                {assignedDealer ? (
                   <div style={{
                     background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.9) 100%)',
                     border: '1px solid #10b981',
@@ -1451,28 +1593,65 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                     marginBottom: '14px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '4px'
+                    gap: '5px'
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
                       <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <CheckCircle2 size={13} />
-                        <span>EŞLEŞEN EN YAKIN BAYİ</span>
+                        <span>EŞLEŞEN EN YAKIN YETKİLİ BAYİ</span>
                       </span>
-                      {assignedDealer.distanceKm && (
-                        <span style={{ fontSize: '0.75rem', color: '#fff', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '12px', fontWeight: '800' }}>
+                      {typeof assignedDealer.distanceKm === 'number' && (
+                        <span style={{ fontSize: '0.75rem', color: '#fff', background: 'rgba(255,255,255,0.12)', padding: '2px 8px', borderRadius: '12px', fontWeight: '800' }}>
                           📍 {assignedDealer.distanceKm} km mesafede
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: '0.98rem', fontWeight: '900', color: '#fff' }}>
+                    <div style={{ fontSize: '1.02rem', fontWeight: '900', color: '#fff' }}>
                       {assignedDealer.name}
                     </div>
                     <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
                       {assignedDealer.address || `${assignedDealer.district}, ${assignedDealer.city}`}
                     </div>
-                    <div style={{ fontSize: '0.74rem', color: '#34d399', fontWeight: '700', marginTop: '2px' }}>
-                      ✅ Bu seramik bu bayinin yetkili stoğunda / teşhirinde mevcuttur
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '2px' }}>
+                      <span style={{ fontSize: '0.72rem', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', border: '1px solid rgba(212, 175, 55, 0.3)', padding: '2px 6px', borderRadius: '6px', fontWeight: '800' }}>
+                        🏛️ {assignedDealer.brand?.name || 'Yetkili Marka'} Resmi Bayisi
+                      </span>
+                      {assignedDealer.phone && (
+                        <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                          📞 {assignedDealer.phone}
+                        </span>
+                      )}
                     </div>
+                    {assignedDealer.hasProductInStock ? (
+                      <div style={{ fontSize: '0.75rem', color: '#34d399', fontWeight: '800', marginTop: '3px' }}>
+                        ✅ Bu seramik bu bayinin yetkili stok envanterindedir (Hemen Teslim)
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: '700', marginTop: '3px' }}>
+                        📦 Bayi üzerinden doğrudan fabrika siparişi ve adrese sevkiyat teklifi verilir
+                      </div>
+                    )}
+                  </div>
+                ) : loadingDealers ? (
+                  <div style={{
+                    padding: '20px',
+                    textAlign: 'center',
+                    color: '#94a3b8',
+                    fontSize: '0.85rem'
+                  }}>
+                    En yakın yetkili bayiler hesaplanıyor...
+                  </div>
+                ) : (
+                  <div style={{
+                    padding: '14px',
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    borderRadius: '10px',
+                    color: '#fca5a5',
+                    fontSize: '0.8rem',
+                    marginBottom: '14px'
+                  }}>
+                    ⚠️ Bu bölgede kayıtlı yetkili bayi bulunamadı. Lütfen yukarıdan farklı bir teslimat konumu seçiniz.
                   </div>
                 )}
 
@@ -1500,7 +1679,7 @@ export default function ARRoomScannerModal({ isOpen, onClose, selectedProduct, c
                     >
                       {nearbyDealers.map((d) => (
                         <option key={d.id} value={d.id}>
-                          {d.name} ({d.district}, {d.city} - {d.distanceKm} km)
+                          {d.name} ({d.district}, {d.city} - {d.distanceKm} km) [{d.brand?.name || 'Yetkili Marka'}]
                         </option>
                       ))}
                     </select>
