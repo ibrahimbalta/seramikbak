@@ -25,7 +25,8 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const latStr = searchParams.get('lat');
     const lngStr = searchParams.get('lng');
-    const brandId = searchParams.get('brandId');
+    const brandIdParam = searchParams.get('brandId');
+    const productId = searchParams.get('productId');
 
     // Default to Kadıköy / Istanbul coordinates if missing or invalid
     let userLat = parseFloat(latStr);
@@ -35,49 +36,60 @@ export async function GET(request) {
       userLng = 29.0278;
     }
 
-    // Build flexible query for approved dealers
-    const whereClause = {
-      status: {
-        in: ['APPROVED', 'approved']
-      }
-    };
+    let targetBrandId = brandIdParam;
 
-    if (brandId && brandId.trim() !== '' && brandId !== 'all' && brandId !== 'undefined' && brandId !== 'null') {
-      whereClause.brandId = brandId;
+    // If productId is provided, query product details to retrieve associated brandId
+    let productDetails = null;
+    if (productId && productId.trim() !== '' && productId !== 'demo-product-id') {
+      try {
+        productDetails = await prisma.product.findUnique({
+          where: { id: productId },
+          select: { id: true, name: true, brandId: true, brand: { select: { id: true, name: true } } }
+        });
+        if (productDetails?.brandId && (!targetBrandId || targetBrandId === 'all')) {
+          targetBrandId = productDetails.brandId;
+        }
+      } catch (pErr) {
+        console.warn('Product lookup for nearest dealer failed:', pErr);
+      }
     }
 
-    // Retrieve approved dealers
-    let dealers = await prisma.dealer.findMany({
-      where: whereClause,
+    // Retrieve approved dealers with their brand and inventories
+    const dealers = await prisma.dealer.findMany({
+      where: {
+        status: {
+          in: ['APPROVED', 'approved']
+        }
+      },
       include: {
         brand: {
-          select: { name: true }
+          select: { id: true, name: true }
+        },
+        inventories: {
+          where: productId ? { productId } : undefined,
+          select: {
+            productId: true,
+            status: true,
+            stock: true,
+            price: true
+          }
         }
       }
     });
 
-    // If no dealers found for this specific brand, fallback to all approved dealers so users always see options
-    if (dealers.length === 0 && whereClause.brandId) {
-      dealers = await prisma.dealer.findMany({
-        where: {
-          status: {
-            in: ['APPROVED', 'approved']
-          }
-        },
-        include: {
-          brand: {
-            select: { name: true }
-          }
-        }
-      });
+    if (dealers.length === 0) {
+      return NextResponse.json([]);
     }
 
-    // Compute distance for each dealer safely
-    const dealersWithDistance = dealers.map((dealer) => {
+    // Compute distance and product availability for each dealer
+    const dealersWithMetadata = dealers.map((dealer) => {
       const dLat = typeof dealer.lat === 'number' ? dealer.lat : (parseFloat(dealer.lat) || 41.0082);
       const dLng = typeof dealer.lng === 'number' ? dealer.lng : (parseFloat(dealer.lng) || 28.9784);
       const rawDistance = haversineDistance(userLat, userLng, dLat, dLng);
       const distance = isNaN(rawDistance) ? 10 : rawDistance;
+
+      const hasProductInInventory = dealer.inventories && dealer.inventories.length > 0;
+      const isSameBrand = targetBrandId ? dealer.brandId === targetBrandId : false;
 
       return {
         id: dealer.id,
@@ -94,17 +106,30 @@ export async function GET(request) {
         status: dealer.status,
         logoUrl: dealer.logoUrl,
         bannerUrl: dealer.bannerUrl,
-        distanceKm: round(distance, 1)
+        distanceKm: round(distance, 1),
+        hasProductInStock: hasProductInInventory,
+        isAuthorizedBrandDealer: isSameBrand,
+        matchedProduct: productDetails?.name || null
       };
     });
 
-    // Sort by distance (nearest first)
-    const nearestDealers = dealersWithDistance.sort((a, b) => a.distanceKm - b.distanceKm);
+    // Intelligent Sorting:
+    // 1. Dealers holding the product directly in inventory first
+    // 2. Authorized dealers of the same brand second
+    // 3. Closest distance third
+    const sortedDealers = dealersWithMetadata.sort((a, b) => {
+      if (a.hasProductInStock && !b.hasProductInStock) return -1;
+      if (!a.hasProductInStock && b.hasProductInStock) return 1;
 
-    return NextResponse.json(nearestDealers);
+      if (a.isAuthorizedBrandDealer && !b.isAuthorizedBrandDealer) return -1;
+      if (!a.isAuthorizedBrandDealer && b.isAuthorizedBrandDealer) return 1;
+
+      return a.distanceKm - b.distanceKm;
+    });
+
+    return NextResponse.json(sortedDealers);
   } catch (error) {
     console.error('Nearest Dealers API Error:', error);
-    // Never crash the client with 500 error object, return safe empty array
     return NextResponse.json([]);
   }
 }
