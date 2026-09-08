@@ -2396,8 +2396,8 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
                 { id: 'stock-exchange', label: '🤝 Bayi Stok Borsası', icon: <Building2 size={18} /> },
-                { id: 'quick-quote', label: '💬 WhatsApp & PDF Teklif', icon: <Calculator size={18} /> },
-                { id: 'showroom-qr', label: '📱 Showroom QR Etiketleri', icon: <QrCode size={18} /> },
+                { id: 'quick-quote', label: '💬 WhatsApp & PDF Teklif', icon: <Calculator size={18} />, isPremiumFeature: true },
+                { id: 'showroom-qr', label: '📱 Showroom QR Etiketleri', icon: <QrCode size={18} />, isPremiumFeature: true },
                 { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
                 { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
                 { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
@@ -2406,6 +2406,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                 { id: 'settings', label: 'Şube Ayarları', icon: <Settings size={18} /> },
               ].map(link => {
                 const isActive = activePortalTab === link.id;
+                const isLocked = link.isPremiumFeature && saasInfo?.plan !== 'PREMIUM';
                 return (
                   <button
                     key={link.id}
@@ -2442,7 +2443,28 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                     className={isActive ? "" : "hover-gold-text"}
                   >
                     {link.icon}
-                    {!isSidebarCollapsed && <span>{link.label}</span>}
+                    {!isSidebarCollapsed && (
+                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1, gap: '6px' }}>
+                        <span>{link.label}</span>
+                        {link.isPremiumFeature && (
+                          <span style={{
+                            fontSize: '0.6rem',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            background: isLocked ? 'rgba(212, 175, 55, 0.15)' : 'linear-gradient(135deg, #111 0%, #333 100%)',
+                            color: '#d4af37',
+                            border: '1px solid rgba(212, 175, 55, 0.3)',
+                            fontWeight: '800',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px'
+                          }}>
+                            {isLocked ? <Lock size={9} /> : <Crown size={9} />}
+                            {isLocked ? 'KİLİTLİ' : 'PRO'}
+                          </span>
+                        )}
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -2663,7 +2685,89 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
         {/* PORTAL MAIN CONTENT */}
         <main className="dealer-main-content" style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
           {activePortalTab === 'quick-quote' ? (
-            /* QUICK QUOTE BUILDER TAB */
+            /* QUICK QUOTE BUILDER TAB - PREMIUM FEATURE */
+            saasInfo?.plan !== 'PREMIUM' ? (
+              <div style={{
+                background: 'rgba(17, 24, 39, 0.75)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(212, 175, 55, 0.3)',
+                borderRadius: '20px',
+                padding: isMobile ? '36px 20px' : '56px 32px',
+                textAlign: 'center',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.35)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '20px',
+                maxWidth: '650px',
+                margin: '30px auto'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '16px',
+                  background: 'linear-gradient(135deg, #111 0%, #333 100%)',
+                  border: '1px solid #d4af37',
+                  color: '#d4af37',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 0 25px rgba(212, 175, 55, 0.25)'
+                }}>
+                  <Crown size={32} />
+                </div>
+                <div>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '20px', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', fontSize: '0.72rem', fontWeight: '800', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <Lock size={12} /> Premium VIP Özelliği
+                  </div>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 8px 0', color: '#fff', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                    WhatsApp Hızlı Teklif Motoru & Mini CRM
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: '#94a3b8', maxWidth: '480px', margin: '0 auto', lineHeight: '1.6' }}>
+                    Showroomunuza gelen müşterilere m², yapıştırıcı, derz ve işçilik dahil saniyeler içinde formatlı teklif hazırlayıp tek tıkla 3D stüdyo linkiyle WhatsApp'tan gönderme ve teklif durumlarını takip etme özelliği yalnızca <strong style={{ color: '#d4af37' }}>Premium Bayilerimize</strong> açıktır.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <button
+                    onClick={() => setActivePortalTab('subscription')}
+                    style={{
+                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                      color: '#090d16',
+                      border: 'none',
+                      borderRadius: '10px',
+                      padding: '12px 24px',
+                      fontSize: '0.85rem',
+                      fontWeight: '800',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <Crown size={16} />
+                    <span>Premium Pakete Yükselt</span>
+                  </button>
+                  <button
+                    onClick={() => setActivePortalTab('dashboard')}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      color: '#cbd5e1',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '10px',
+                      padding: '12px 20px',
+                      fontSize: '0.85rem',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Panoya Dön
+                  </button>
+                </div>
+              </div>
+            ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
@@ -3171,10 +3275,92 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                 </div>
               </div>
             </div>
-          ) : activePortalTab === 'showroom-qr' ? (
+          )) : activePortalTab === 'showroom-qr' ? (
             /* =========================================================================
-               SHOWROOM AKILLI QR ETİKET ÜRETİCİ TAB
+               SHOWROOM AKILLI QR ETİKET ÜRETİCİ TAB - PREMIUM FEATURE
                ========================================================================= */
+            saasInfo?.plan !== 'PREMIUM' ? (
+              <div style={{
+                background: 'rgba(17, 24, 39, 0.75)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(212, 175, 55, 0.3)',
+                borderRadius: '20px',
+                padding: isMobile ? '36px 20px' : '56px 32px',
+                textAlign: 'center',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.35)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '20px',
+                maxWidth: '650px',
+                margin: '30px auto'
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '16px',
+                  background: 'linear-gradient(135deg, #111 0%, #333 100%)',
+                  border: '1px solid #d4af37',
+                  color: '#d4af37',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 0 25px rgba(212, 175, 55, 0.25)'
+                }}>
+                  <Crown size={32} />
+                </div>
+                <div>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '20px', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', fontSize: '0.72rem', fontWeight: '800', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <Lock size={12} /> Premium VIP Özelliği
+                  </div>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: '800', margin: '0 0 8px 0', color: '#fff', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
+                    Showroom Akıllı QR Etiket Üretici
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: '#94a3b8', maxWidth: '480px', margin: '0 auto', lineHeight: '1.6' }}>
+                    Mağazanızdaki seramik stantları ve kayar panolar için müşterilerinizi hiçbir uygulama indirmeden doğrudan <strong style={{ color: '#d4af37' }}>3D Sanal Stüdyoya</strong> bağlayan lüks A4 QR etiketler oluşturma ve yazdırma özelliği yalnızca <strong style={{ color: '#d4af37' }}>Premium Bayilerimize</strong> özeldir.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <button
+                    onClick={() => setActivePortalTab('subscription')}
+                    style={{
+                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                      color: '#090d16',
+                      border: 'none',
+                      borderRadius: '10px',
+                      padding: '12px 24px',
+                      fontSize: '0.85rem',
+                      fontWeight: '800',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <Crown size={16} />
+                    <span>Premium Pakete Yükselt</span>
+                  </button>
+                  <button
+                    onClick={() => setActivePortalTab('dashboard')}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      color: '#cbd5e1',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      borderRadius: '10px',
+                      padding: '12px 20px',
+                      fontSize: '0.85rem',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Panoya Dön
+                  </button>
+                </div>
+              </div>
+            ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {/* Header & Control Bar */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
@@ -3679,6 +3865,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                 );
               })()}
             </div>
+           )
           ) : activePortalTab === 'b2b-projects' ? (
           /* B2B PROJECTS TAB */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -5497,6 +5684,8 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                   </div>
                   <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 auto 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {[
+                      { text: '📱 Showroom Akıllı QR Kod Etiket Üretici (3D Destekli)', included: true },
+                      { text: '💬 WhatsApp Hızlı Teklif Motoru & Mini CRM', included: true },
                       { text: 'Tam müşteri bilgisi + adres detayı', included: true },
                       { text: 'Sınırsız müşteri talebi', included: true },
                       { text: 'Gelişmiş CRM entegrasyonu', included: true },
@@ -8207,8 +8396,8 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
                 { id: 'stock-exchange', label: '🤝 Bayi Stok Borsası', icon: <RefreshCw size={18} /> },
-                { id: 'quick-quote', label: '💬 WhatsApp & PDF Teklif', icon: <Calculator size={18} /> },
-                { id: 'showroom-qr', label: '📱 Showroom QR', icon: <QrCode size={18} /> },
+                { id: 'quick-quote', label: '💬 WhatsApp Teklif', icon: <Calculator size={18} />, isPremiumFeature: true },
+                { id: 'showroom-qr', label: '📱 Showroom QR', icon: <QrCode size={18} />, isPremiumFeature: true },
                 { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
                 { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
                 { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
@@ -8217,6 +8406,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                 { id: 'settings', label: 'Şube Ayarları', icon: <Settings size={18} /> }
               ].map(item => {
                 const isActive = activePortalTab === item.id;
+                const isLocked = item.isPremiumFeature && saasInfo?.plan !== 'PREMIUM';
                 return (
                   <button
                     key={item.id}
@@ -8224,7 +8414,8 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '10px',
+                      justifyContent: 'space-between',
+                      gap: '8px',
                       padding: '12px 14px',
                       background: isActive ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'rgba(255, 255, 255, 0.03)',
                       border: isActive ? 'none' : '1px solid rgba(255, 255, 255, 0.05)',
@@ -8236,8 +8427,23 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                       textAlign: 'left'
                     }}
                   >
-                    {item.icon}
-                    <span>{item.label}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
+                      {item.icon}
+                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</span>
+                    </div>
+                    {item.isPremiumFeature && (
+                      <span style={{
+                        fontSize: '0.58rem',
+                        padding: '1px 5px',
+                        borderRadius: '4px',
+                        background: isLocked ? 'rgba(212,175,55,0.2)' : 'linear-gradient(135deg, #111 0%, #333 100%)',
+                        color: '#d4af37',
+                        fontWeight: '800',
+                        flexShrink: 0
+                      }}>
+                        {isLocked ? 'KİLİT' : 'PRO'}
+                      </span>
+                    )}
                   </button>
                 );
               })}
