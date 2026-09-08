@@ -44,7 +44,11 @@ import {
   MessageSquare,
   Compass,
   Download,
-  FileSpreadsheet
+  FileSpreadsheet,
+  QrCode,
+  Eye,
+  Copy,
+  CheckCheck
 } from 'lucide-react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
@@ -151,6 +155,133 @@ export default function DealerPortalPage() {
   const [generatedQuote, setGeneratedQuote] = useState(null);
   const [savedQuotesList, setSavedQuotesList] = useState([]);
 
+  // Showroom QR Code Generator States
+  const [qrSearchQuery, setQrSearchQuery] = useState('');
+  const [qrSelectedProductIds, setQrSelectedProductIds] = useState([]);
+  const [qrCustomPrices, setQrCustomPrices] = useState({});
+  const [qrTagStyle, setQrTagStyle] = useState('luxury-gold'); // 'luxury-gold' | 'minimal-dark' | 'clean-white'
+  const [qrTagLayout, setQrTagLayout] = useState('grid-6'); // 'grid-6' | 'single-large' | 'sticker'
+  const [qrIncludePrice, setQrIncludePrice] = useState(true);
+  const [qrCopiedId, setQrCopiedId] = useState(null);
+  const [qrActivePreviewProduct, setQrActivePreviewProduct] = useState(null);
+
+  useEffect(() => {
+    if (dealerInfo?.id && typeof window !== 'undefined') {
+      const cached = localStorage.getItem(`sb_dealer_quotes_${dealerInfo.id}`);
+      if (cached) {
+        try {
+          setSavedQuotesList(JSON.parse(cached));
+        } catch (e) {}
+      }
+    }
+  }, [dealerInfo?.id]);
+
+  const updateQuoteStatus = (quoteId, newStatus) => {
+    setSavedQuotesList(prev => {
+      const updated = prev.map(q => q.id === quoteId ? { ...q, status: newStatus } : q);
+      if (typeof window !== 'undefined' && dealerInfo?.id) {
+        localStorage.setItem(`sb_dealer_quotes_${dealerInfo.id}`, JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
+
+  const handleSendWhatsAppQuote = (q) => {
+    const targetQuote = q || {
+      customerName: quoteCustomerName,
+      customerPhone: quoteCustomerPhone,
+      projectName: quoteProjectName,
+      productName: quoteProductName,
+      productCode: quoteProductCode,
+      areaM2: quoteAreaM2,
+      wastePercent: quoteWastePercent,
+      unitPriceM2: quoteUnitPriceM2,
+      discountPercent: quoteDiscountPercent,
+      includeAdhesive: quoteIncludeAdhesive,
+      adhesiveUnitPriceBag: quoteAdhesiveUnitPriceBag,
+      includeGrout: quoteIncludeGrout,
+      groutUnitPriceKg: quoteGroutUnitPriceKg,
+      laborCostTotal: quoteLaborCostTotal,
+      shippingCostTotal: quoteShippingCostTotal,
+      notes: quoteNotes
+    };
+
+    const phone = (targetQuote.customerPhone || '').replace(/[^\d]/g, '');
+    const cleanPhone = phone.startsWith('0') ? '9' + phone : (phone.startsWith('90') ? phone : (phone.length === 10 ? '90' + phone : phone));
+    
+    const calc = targetQuote.calculations || calculateQuote({
+      areaM2: targetQuote.areaM2 || quoteAreaM2,
+      wastePercent: targetQuote.wastePercent || quoteWastePercent,
+      unitPriceM2: targetQuote.unitPriceM2 || quoteUnitPriceM2,
+      discountPercent: targetQuote.discountPercent || quoteDiscountPercent,
+      includeAdhesive: targetQuote.includeAdhesive !== undefined ? targetQuote.includeAdhesive : quoteIncludeAdhesive,
+      adhesiveUnitPriceBag: targetQuote.adhesiveUnitPriceBag || quoteAdhesiveUnitPriceBag,
+      adhesiveManualBags: targetQuote.adhesiveManualBags || quoteAdhesiveManualBags || null,
+      includeGrout: targetQuote.includeGrout !== undefined ? targetQuote.includeGrout : quoteIncludeGrout,
+      groutUnitPriceKg: targetQuote.groutUnitPriceKg || quoteGroutUnitPriceKg,
+      groutManualKg: targetQuote.groutManualKg || quoteGroutManualKg || null,
+      laborCostTotal: targetQuote.laborCostTotal !== undefined ? targetQuote.laborCostTotal : quoteLaborCostTotal,
+      shippingCostTotal: targetQuote.shippingCostTotal !== undefined ? targetQuote.shippingCostTotal : quoteShippingCostTotal
+    });
+
+    const dealerName = dealerInfo?.name || 'Yetkili Seramik Bayisi';
+    const dealerCity = dealerInfo?.city ? `(${dealerInfo.district || ''}, ${dealerInfo.city})` : '';
+    const custName = (targetQuote.customerName || 'Değerli Müşterimiz').toUpperCase();
+    const prodName = targetQuote.productName || 'Seramik Porselen Karo';
+    const prodCode = targetQuote.productCode || 'SB-60120';
+    const dealerSlug = dealerInfo?.slug || (dealerInfo?.name ? slugify(dealerInfo.name) : '');
+    const studioUrl = `https://www.seramikbak.com/?code=${encodeURIComponent(prodCode)}&tab=studio&dealer=${dealerSlug}`;
+
+    const text = 
+`*SAYIN ${custName} - RESMİ TEKLİF FORMU*
+🏢 *${dealerName}* ${dealerCity}
+
+Değerli müşterimiz, mağazamızı ziyaret ettiğiniz için teşekkür ederiz. Beğendiğiniz model için hazırlanan özel teklif detaylarınız aşağıdadır:
+
+━━━━━━━━━━━━━━━━━━━━━
+📦 *Seçilen Model:* ${prodName}
+🏷️ *Model Kodu:* ${prodCode}
+📐 *Net Alan:* ${calc.netAreaM2} m² (+%${calc.wastePercent} fire dahil)
+🧱 *Sipariş Metrajı:* ${calc.totalTileM2} m² (${calc.tileBoxesCount} Kutu)
+${calc.includeAdhesive ? `🧪 *Yapıştırıcı Harç:* ${calc.adhesiveBagsCount} Torba (${calc.totalAdhesiveKg} kg)\n` : ''}${calc.includeGrout ? `🎨 *Derz Dolgusu:* ${calc.totalGroutKg} kg\n` : ''}${Number(targetQuote.laborCostTotal) > 0 ? `🔨 *Uygulama & İşçilik:* ₺${Number(targetQuote.laborCostTotal).toLocaleString('tr-TR')}\n` : ''}${Number(targetQuote.shippingCostTotal) > 0 ? `🚚 *Lojistik / Sevk:* ₺${Number(targetQuote.shippingCostTotal).toLocaleString('tr-TR')}\n` : ''}
+💰 *GENEL TOPLAM:* ₺${calc.grandTotal.toLocaleString('tr-TR')} (KDV Dahil)
+━━━━━━━━━━━━━━━━━━━━━
+
+🛁 *Mekanınızda 3D Canlı Görün & İnceleyin:*
+👉 ${studioUrl}
+
+${targetQuote.notes ? `📌 *Not:* ${targetQuote.notes}\n` : ''}
+Sorularınız ve sipariş onayı için bu mesaj üzerinden bizimle iletişime geçebilirsiniz.`;
+
+    const waUrl = cleanPhone 
+      ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`
+      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(waUrl, '_blank');
+  };
+
+  const handleSendWhatsAppReminder = (q) => {
+    if (!q) return;
+    const phone = (q.customerPhone || '').replace(/[^\d]/g, '');
+    const cleanPhone = phone.startsWith('0') ? '9' + phone : (phone.startsWith('90') ? phone : (phone.length === 10 ? '90' + phone : phone));
+    const dealerName = dealerInfo?.name || 'Yetkili Seramik Bayisi';
+    const custName = q.customerName || 'Değerli Müşterimiz';
+    const prodName = q.productName || 'seramik modelimiz';
+
+    const text = 
+`Merhaba Sayın ${custName},
+
+${dealerName} olarak mağazamızda ${prodName} için hazırladığımız teklifimizi inceleme fırsatınız oldu mu?
+
+Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız varsa memnuniyetle yardımcı olmak isteriz.
+
+İyi günler dileriz.`;
+
+    const waUrl = cleanPhone 
+      ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`
+      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(waUrl, '_blank');
+  };
+
   const handleGenerateQuote = async (e) => {
     e.preventDefault();
     if (!dealerInfo) return;
@@ -187,8 +318,15 @@ export default function DealerPortalPage() {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        setGeneratedQuote(data.quote);
-        setSavedQuotesList(prev => [data.quote, ...prev]);
+        const newQuoteWithStatus = { ...data.quote, status: 'PENDING' };
+        setGeneratedQuote(newQuoteWithStatus);
+        setSavedQuotesList(prev => {
+          const updated = [newQuoteWithStatus, ...prev.filter(x => x.id !== newQuoteWithStatus.id)];
+          if (typeof window !== 'undefined' && dealerInfo?.id) {
+            localStorage.setItem(`sb_dealer_quotes_${dealerInfo.id}`, JSON.stringify(updated));
+          }
+          return updated;
+        });
         setShowQuoteModal(false);
       } else {
         alert(data.error || 'Teklif oluşturulurken bir hata oluştu.');
@@ -2258,7 +2396,8 @@ export default function DealerPortalPage() {
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
                 { id: 'stock-exchange', label: '🤝 Bayi Stok Borsası', icon: <Building2 size={18} /> },
-                { id: 'quick-quote', label: 'PDF Teklif Oluştur', icon: <Calculator size={18} /> },
+                { id: 'quick-quote', label: '💬 WhatsApp & PDF Teklif', icon: <Calculator size={18} /> },
+                { id: 'showroom-qr', label: '📱 Showroom QR Etiketleri', icon: <QrCode size={18} /> },
                 { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
                 { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
                 { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
@@ -2325,12 +2464,13 @@ export default function DealerPortalPage() {
               color: '#ef4444',
               cursor: 'pointer',
               fontSize: '0.82rem',
-              fontWeight: '600',
+              fontWeight: '700',
               textAlign: 'left',
               justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
               transition: 'all 0.2s'
             }}
-            title="Güvenli Çıkış"
+            title="Çıkış Yap"
+            className="hover-gold-text"
           >
             <LogOut size={18} />
             {!isSidebarCollapsed && <span>Çıkış Yap</span>}
@@ -2338,100 +2478,129 @@ export default function DealerPortalPage() {
         </aside>
       )}
 
-      {/* Content Area on the right */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        {/* Sticky Top Header */}
-        <header style={{
-          background: 'rgba(17, 24, 39, 0.8)',
-          backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 90,
-          padding: isMobile ? '12px 16px' : '16px 24px'
+        {/* Main Workspace */}
+        <main style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: 0,
+          background: '#090d16'
         }}>
-          {isMobile ? (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '6px',
-                  background: 'linear-gradient(135deg, #111 0%, #1e293b 100%)',
-                  color: '#d4af37',
-                  border: '1px solid #d4af37',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: '900',
-                  fontSize: '0.85rem'
-                }}>SB</div>
-                <div>
-                  <h4 style={{ fontSize: '0.85rem', fontWeight: '800', color: '#fff', margin: 0 }}>{dealerInfo ? dealerInfo.name : 'SeramikBak'}</h4>
-                  <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700' }}>
-                    {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
-                    {activePortalTab === 'quick-quote' && 'PDF Teklif'}
-                    {activePortalTab === 'b2b-projects' && 'Proje Talepleri'}
-                    {activePortalTab === 'analytics' && 'Arama Analitiği'}
-                    {activePortalTab === 'inventory' && 'Envanter & Stok'}
-                    {activePortalTab === 'outlet-exchange' && 'Outlet & Proje Fazlası'}
-                    {activePortalTab === 'subscription' && 'Abonelik & SaaS'}
-                    {activePortalTab === 'settings' && 'Şube Ayarları'}
-                  </span>
+          {/* Top Bar Header */}
+          <header style={{
+            height: isMobile ? 'auto' : '64px',
+            minHeight: isMobile ? '56px' : '64px',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+            background: 'rgba(9, 13, 22, 0.7)',
+            backdropFilter: 'blur(20px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: isMobile ? '10px 14px' : '0 28px',
+            position: 'sticky',
+            top: 0,
+            zIndex: 90
+          }}>
+            {isMobile ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <button
+                    onClick={() => setShowMobileMoreMenu(true)}
+                    style={{
+                      background: 'rgba(212, 175, 55, 0.15)',
+                      border: '1px solid rgba(212, 175, 55, 0.3)',
+                      color: '#d4af37',
+                      padding: '8px',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer'
+                    }}
+                    aria-label="Menü"
+                  >
+                    <Menu size={18} />
+                  </button>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    color: '#090d16',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '900',
+                    fontSize: '0.85rem'
+                  }}>SB</div>
+                  <div>
+                    <h4 style={{ fontSize: '0.85rem', fontWeight: '800', color: '#fff', margin: 0 }}>{dealerInfo ? dealerInfo.name : 'SeramikBak'}</h4>
+                    <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700' }}>
+                      {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
+                      {activePortalTab === 'quick-quote' && 'WhatsApp & PDF Teklif'}
+                      {activePortalTab === 'showroom-qr' && 'Showroom QR Etiketleri'}
+                      {activePortalTab === 'b2b-projects' && 'Proje Talepleri'}
+                      {activePortalTab === 'analytics' && 'Arama Analitiği'}
+                      {activePortalTab === 'inventory' && 'Envanter & Stok'}
+                      {activePortalTab === 'outlet-exchange' && 'Outlet & Proje Fazlası'}
+                      {activePortalTab === 'subscription' && 'Abonelik & SaaS'}
+                      {activePortalTab === 'settings' && 'Şube Ayarları'}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {dealerInfo && (
+                    <a
+                      href={`/bayi/${dealerInfo.name ? slugify(dealerInfo.name) : dealerInfo.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        background: 'rgba(212, 175, 55, 0.15)',
+                        border: '1px solid rgba(212, 175, 55, 0.35)',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        fontSize: '0.62rem',
+                        color: '#d4af37',
+                        fontWeight: '700',
+                        textDecoration: 'none'
+                      }}
+                      title="Showroom Sayfası"
+                    >
+                      <ExternalLink size={10} />
+                      <span>Showroom</span>
+                    </a>
+                  )}
+                  {saasInfo && (
+                    <span style={{
+                      fontSize: '0.6rem',
+                      padding: '3px 8px',
+                      borderRadius: '10px',
+                      background: saasInfo.plan === 'PREMIUM' ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.05)',
+                      color: saasInfo.plan === 'PREMIUM' ? '#d4af37' : '#cbd5e1',
+                      fontWeight: '700'
+                    }}>
+                      {saasInfo.plan}
+                    </span>
+                  )}
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {dealerInfo && (
-                  <a
-                    href={`/bayi/${dealerInfo.name ? slugify(dealerInfo.name) : dealerInfo.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      background: 'rgba(212, 175, 55, 0.15)',
-                      border: '1px solid rgba(212, 175, 55, 0.35)',
-                      padding: '4px 8px',
-                      borderRadius: '6px',
-                      fontSize: '0.62rem',
-                      color: '#d4af37',
-                      fontWeight: '700',
-                      textDecoration: 'none'
-                    }}
-                    title="Showroom Sayfası"
-                  >
-                    <ExternalLink size={10} />
-                    <span>Showroom</span>
-                  </a>
-                )}
-                {saasInfo && (
-                  <span style={{
-                    fontSize: '0.6rem',
-                    padding: '3px 8px',
-                    borderRadius: '10px',
-                    background: saasInfo.plan === 'PREMIUM' ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.05)',
-                    color: saasInfo.plan === 'PREMIUM' ? '#d4af37' : '#cbd5e1',
-                    fontWeight: '700'
-                  }}>
-                    {saasInfo.plan}
-                  </span>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', width: '100%' }}>
-              <div>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#fff', margin: 0 }}>
-                  {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
-                  {activePortalTab === 'quick-quote' && 'PDF Teklif Oluştur'}
-                  {activePortalTab === 'b2b-projects' && 'B2B Proje Talepleri'}
-                  {activePortalTab === 'analytics' && 'Bölgesel Arama Analitiği'}
-                  {activePortalTab === 'inventory' && 'Envanter & Stok Yönetimi'}
-                  {activePortalTab === 'outlet-exchange' && 'Bayiden Outlet & Proje Fazlası Borsası'}
-                  {activePortalTab === 'subscription' && 'Abonelik & SaaS Yönetimi'}
-                  {activePortalTab === 'settings' && 'Şube Ayarları & Görünüm'}
-                </h2>
+            ) : (
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', width: '100%' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#fff', margin: 0 }}>
+                    {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
+                    {activePortalTab === 'quick-quote' && 'WhatsApp & PDF Teklif Motoru'}
+                    {activePortalTab === 'showroom-qr' && 'Showroom Akıllı QR Etiket Üretici'}
+                    {activePortalTab === 'b2b-projects' && 'B2B Proje Talepleri'}
+                    {activePortalTab === 'analytics' && 'Bölgesel Arama Analitiği'}
+                    {activePortalTab === 'inventory' && 'Envanter & Stok Yönetimi'}
+                    {activePortalTab === 'outlet-exchange' && 'Bayiden Outlet & Proje Fazlası Borsası'}
+                    {activePortalTab === 'subscription' && 'Abonelik & SaaS Yönetimi'}
+                    {activePortalTab === 'settings' && 'Şube Ayarları & Görünüm'}
+                  </h2>
                 {dealerInfo && (
                   <p style={{ fontSize: '0.75rem', color: '#cbd5e1', margin: '4px 0 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <MapPin size={11} style={{ color: '#d4af37' }} />
@@ -2742,38 +2911,66 @@ export default function DealerPortalPage() {
                       </div>
                     </div>
 
-                    <button 
-                      type="submit" 
-                      disabled={quoteCreating} 
-                      style={{
-                        background: '#0f172a',
-                        color: '#ffffff',
-                        border: 'none',
-                        padding: '14px 20px',
-                        borderRadius: '10px',
-                        fontWeight: '800',
-                        fontSize: '0.9rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        cursor: 'pointer',
-                        marginTop: '10px',
-                        boxShadow: '0 4px 14px rgba(0,0,0,0.15)'
-                      }}
-                    >
-                      {quoteCreating ? (
-                        <>
-                          <Loader2 size={18} className="animate-spin" />
-                          <span>PDF Teklif Hazırlanıyor...</span>
-                        </>
-                      ) : (
-                        <>
-                          <FileCheck size={18} style={{ color: '#d4af37' }} />
-                          <span>PDF Teklif Üret & Onayla</span>
-                        </>
-                      )}
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexDirection: isMobile ? 'column' : 'row' }}>
+                      <button 
+                        type="button" 
+                        onClick={() => handleSendWhatsAppQuote()}
+                        style={{
+                          flex: 1,
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          color: '#ffffff',
+                          border: 'none',
+                          padding: '14px 18px',
+                          borderRadius: '10px',
+                          fontWeight: '800',
+                          fontSize: '0.88rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 14px rgba(16,185,129,0.25)',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <MessageSquare size={18} />
+                        <span>WhatsApp ile Gönder</span>
+                      </button>
+
+                      <button 
+                        type="submit" 
+                        disabled={quoteCreating} 
+                        style={{
+                          flex: 1,
+                          background: '#0f172a',
+                          color: '#ffffff',
+                          border: 'none',
+                          padding: '14px 18px',
+                          borderRadius: '10px',
+                          fontWeight: '800',
+                          fontSize: '0.88rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {quoteCreating ? (
+                          <>
+                            <Loader2 size={18} className="animate-spin" />
+                            <span>PDF Hazırlanıyor...</span>
+                          </>
+                        ) : (
+                          <>
+                            <FileCheck size={18} style={{ color: '#d4af37' }} />
+                            <span>PDF Teklif Üret</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </form>
                 </div>
 
@@ -2851,32 +3048,636 @@ export default function DealerPortalPage() {
                             <span style={{ color: '#b38e47' }}>₺{calc.grandTotal.toLocaleString('tr-TR')}</span>
                           </div>
                         </div>
+
+                        {/* Quick Action in Card */}
+                        <button
+                          type="button"
+                          onClick={() => handleSendWhatsAppQuote()}
+                          style={{
+                            background: '#10b981',
+                            color: '#fff',
+                            border: 'none',
+                            padding: '10px 14px',
+                            borderRadius: '8px',
+                            fontWeight: '800',
+                            fontSize: '0.82rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px',
+                            cursor: 'pointer',
+                            marginTop: '6px'
+                          }}
+                        >
+                          <MessageSquare size={16} />
+                          <span>Bu Özeti Müşteriye WhatsApp'la</span>
+                        </button>
                       </div>
                     );
                   })()}
 
-                  {/* List of Recent Quotes */}
+                  {/* List of Recent Quotes (Mini CRM) */}
                   {savedQuotesList.length > 0 && (
-                    <div style={{ background: '#ffffff', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                      <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: '800', color: '#0f172a' }}>Hazırlanan Son Teklifler</h4>
-                      {savedQuotesList.map(q => (
-                        <div key={q.id} style={{ background: '#f8fafc', padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div>
-                            <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#0f172a' }}>{q.customerName}</div>
-                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{q.projectName} • ₺{(q?.calculations?.grandTotal || 0).toLocaleString('tr-TR')}</div>
-                          </div>
-                          <button 
-                            onClick={() => setGeneratedQuote(q)}
-                            style={{ background: '#0f172a', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
-                          >
-                            PDF Göster
-                          </button>
-                        </div>
-                      ))}
+                    <div style={{ background: '#ffffff', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: '800', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Activity size={16} style={{ color: '#d4af37' }} />
+                          <span>Teklif Takip Paneli (Mini CRM)</span>
+                        </h4>
+                        <span style={{ fontSize: '0.72rem', background: '#f1f5f9', padding: '2px 8px', borderRadius: '6px', fontWeight: '700', color: '#64748b' }}>
+                          {savedQuotesList.length} Teklif
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {savedQuotesList.map(q => {
+                          const currentStatus = q.status || 'PENDING';
+                          const grandTotal = q?.calculations?.grandTotal || q?.grandTotal || 0;
+                          return (
+                            <div key={q.id} style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+                                <div>
+                                  <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#0f172a' }}>{q.customerName}</div>
+                                  <div style={{ fontSize: '0.74rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <span>{q.customerPhone}</span>
+                                    <span>•</span>
+                                    <span>{q.projectName}</span>
+                                  </div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                  <div style={{ fontSize: '0.95rem', fontWeight: '900', color: '#b38e47' }}>₺{grandTotal.toLocaleString('tr-TR')}</div>
+                                </div>
+                              </div>
+
+                              {/* Status Badges & Quick Action Row */}
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', borderTop: '1px solid #e2e8f0', paddingTop: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: '600' }}>Durum:</span>
+                                  <select 
+                                    value={currentStatus} 
+                                    onChange={(e) => updateQuoteStatus(q.id, e.target.value)}
+                                    style={{
+                                      fontSize: '0.72rem',
+                                      fontWeight: '700',
+                                      padding: '3px 8px',
+                                      borderRadius: '6px',
+                                      border: '1px solid #cbd5e1',
+                                      background: currentStatus === 'WON' ? '#dcfce7' : currentStatus === 'VIEWED' ? '#dbeafe' : currentStatus === 'LOST' ? '#fee2e2' : '#fef9c3',
+                                      color: currentStatus === 'WON' ? '#15803d' : currentStatus === 'VIEWED' ? '#1d4ed8' : currentStatus === 'LOST' ? '#b91c1c' : '#854d0e',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    <option value="PENDING">⏳ Beklemede</option>
+                                    <option value="VIEWED">👀 İncelendi</option>
+                                    <option value="WON">🎉 Satış Yapıldı</option>
+                                    <option value="LOST">❌ Vazgeçti</option>
+                                  </select>
+                                </div>
+
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  <button 
+                                    type="button"
+                                    onClick={() => handleSendWhatsAppQuote(q)}
+                                    title="WhatsApp ile Teklifi Gönder"
+                                    style={{ background: '#10b981', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                  >
+                                    <MessageSquare size={12} />
+                                    <span>WhatsApp</span>
+                                  </button>
+                                  <button 
+                                    type="button"
+                                    onClick={() => handleSendWhatsAppReminder(q)}
+                                    title="Müşteriye Takip / Hatırlatma Mesajı Gönder"
+                                    style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '5px 8px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                  >
+                                    <Clock size={12} />
+                                    <span>Hatırlat</span>
+                                  </button>
+                                  <button 
+                                    type="button"
+                                    onClick={() => setGeneratedQuote(q)}
+                                    style={{ background: '#0f172a', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '700', cursor: 'pointer' }}
+                                  >
+                                    PDF
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
               </div>
+            </div>
+          ) : activePortalTab === 'showroom-qr' ? (
+            /* =========================================================================
+               SHOWROOM AKILLI QR ETİKET ÜRETİCİ TAB
+               ========================================================================= */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {/* Header & Control Bar */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#fff' }}>
+                    <QrCode size={24} style={{ color: '#d4af37' }} />
+                    Showroom Akıllı QR Etiket Üretici
+                  </h2>
+                  <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
+                    Mağazanızdaki seramik stantları ve kayar panolar için müşterilerinizi anında 3D Sanal Stüdyoya bağlayan lüks QR etiketler oluşturun ve yazdırın.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button 
+                    onClick={() => {
+                      if (brandProducts.length === 0) loadBrandProducts();
+                      if (typeof window !== 'undefined') window.print();
+                    }}
+                    style={{
+                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                      color: '#090d16',
+                      border: 'none',
+                      padding: '10px 18px',
+                      borderRadius: '8px',
+                      fontWeight: '800',
+                      fontSize: '0.82rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 14px rgba(212,175,55,0.3)'
+                    }}
+                  >
+                    <Printer size={16} />
+                    <span>Seçilenleri A4 Yazdır ({qrSelectedProductIds.length > 0 ? qrSelectedProductIds.length : 'Tümü'})</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Instructions Banner */}
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(15,23,42,0.6) 100%)',
+                border: '1px solid rgba(212, 175, 55, 0.35)',
+                borderRadius: '14px',
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+                flexWrap: isMobile ? 'wrap' : 'nowrap'
+              }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '10px',
+                  background: 'rgba(212,175,55,0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#d4af37',
+                  flexShrink: 0
+                }}>
+                  <Sparkles size={22} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#fff', marginBottom: '2px' }}>
+                    Mağazanızdaki Müşterilere 3D Deneyim Yaşatın
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: '#cbd5e1', lineHeight: '1.4' }}>
+                    1. Teşhirinizdeki modelleri aşağıdan seçin. &bull; 2. İsterseniz mağaza liste fiyatınızı girin. &bull; 3. <strong>"Yazdır"</strong> butonuna basıp A4 etiket çıktısı alın ve panolara yapıştırın. Müşteri telefon kamerasını tuttuğu an odayı 3D görür!
+                  </div>
+                </div>
+              </div>
+
+              {/* Style & Layout Toolbar */}
+              <div style={{
+                background: 'rgba(17, 24, 39, 0.8)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '14px',
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '14px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8' }}>Tema:</span>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {[
+                        { id: 'luxury-gold', label: '🏆 Lüks Altın' },
+                        { id: 'minimal-dark', label: '🌑 Elite Siyah' },
+                        { id: 'clean-white', label: '⚪ Temiz Beyaz' }
+                      ].map(t => (
+                        <button
+                          key={t.id}
+                          onClick={() => setQrTagStyle(t.id)}
+                          style={{
+                            background: qrTagStyle === t.id ? '#d4af37' : 'rgba(255,255,255,0.05)',
+                            color: qrTagStyle === t.id ? '#090d16' : '#cbd5e1',
+                            border: 'none',
+                            padding: '5px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.72rem',
+                            fontWeight: '700',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {t.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8' }}>Düzen:</span>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {[
+                        { id: 'grid-6', label: 'A4 6\'lı Stand Kartı' },
+                        { id: 'single-large', label: 'A5 Büyük Afiş' },
+                        { id: 'sticker', label: 'Kutu Çıkartması' }
+                      ].map(l => (
+                        <button
+                          key={l.id}
+                          onClick={() => setQrTagLayout(l.id)}
+                          style={{
+                            background: qrTagLayout === l.id ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.05)',
+                            color: qrTagLayout === l.id ? '#d4af37' : '#cbd5e1',
+                            border: qrTagLayout === l.id ? '1px solid rgba(212,175,55,0.5)' : '1px solid transparent',
+                            padding: '5px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.72rem',
+                            fontWeight: '700',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {l.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#cbd5e1', cursor: 'pointer' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={qrIncludePrice} 
+                      onChange={e => setQrIncludePrice(e.target.checked)} 
+                    />
+                    <span>Fiyat Bilgisi Basılsın</span>
+                  </label>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Teşhir seramik modeli ara..."
+                    value={qrSearchQuery}
+                    onChange={e => setQrSearchQuery(e.target.value)}
+                    style={{
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '0.78rem',
+                      outline: 'none',
+                      width: '200px'
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      if (brandProducts.length === 0) loadBrandProducts();
+                      const allIds = brandProducts.map(p => p.id);
+                      if (qrSelectedProductIds.length === allIds.length) {
+                        setQrSelectedProductIds([]);
+                      } else {
+                        setQrSelectedProductIds(allIds);
+                      }
+                    }}
+                    style={{
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      color: '#cbd5e1',
+                      padding: '8px 12px',
+                      borderRadius: '8px',
+                      fontSize: '0.75rem',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {qrSelectedProductIds.length === brandProducts.length && brandProducts.length > 0 ? 'Seçimi Kaldır' : 'Tümünü Seç'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Printable Tags Preview Grid */}
+              {(() => {
+                const filtered = brandProducts.filter(p => {
+                  if (!qrSearchQuery) return true;
+                  const q = qrSearchQuery.toLowerCase();
+                  return (p.name || '').toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q) || (p.brand || '').toLowerCase().includes(q);
+                });
+
+                const displayList = qrSelectedProductIds.length > 0 
+                  ? filtered.filter(p => qrSelectedProductIds.includes(p.id))
+                  : filtered;
+
+                const dealerName = dealerInfo?.name || 'Yetkili Showroom';
+                const dealerSlug = dealerInfo?.slug || (dealerInfo?.name ? slugify(dealerInfo.name) : '');
+                const dealerCity = dealerInfo?.city ? `${dealerInfo.district || ''} / ${dealerInfo.city}` : 'Türkiye';
+
+                return (
+                  <div className="printable-showroom-qr-area" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#94a3b8' }}>
+                        Basıma Hazır Etiketler ({displayList.length} Model Listeleniyor)
+                      </span>
+                      {displayList.length === 0 && (
+                        <button 
+                          onClick={() => loadBrandProducts()}
+                          style={{ background: 'transparent', border: 'none', color: '#d4af37', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
+                        >
+                          Modelleri Yeniden Yükle
+                        </button>
+                      )}
+                    </div>
+
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: isMobile ? '1fr' : (qrTagLayout === 'single-large' ? '1fr 1fr' : 'repeat(auto-fill, minmax(320px, 1fr))'),
+                      gap: '20px'
+                    }}>
+                      {displayList.map(prod => {
+                        const targetUrl = `https://www.seramikbak.com/?code=${encodeURIComponent(prod.code || '')}&tab=studio&dealer=${dealerSlug}&ref=showroom_qr`;
+                        const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(targetUrl)}&margin=8`;
+                        const customPrice = qrCustomPrices[prod.id];
+                        const isSelected = qrSelectedProductIds.includes(prod.id);
+
+                        return (
+                          <div 
+                            key={prod.id} 
+                            className={`showroom-qr-card tag-theme-${qrTagStyle}`}
+                            style={{
+                              background: qrTagStyle === 'luxury-gold' 
+                                ? 'linear-gradient(135deg, #111827 0%, #090d16 100%)' 
+                                : qrTagStyle === 'minimal-dark' 
+                                ? '#0b0f19' 
+                                : '#ffffff',
+                              color: qrTagStyle === 'clean-white' ? '#0f172a' : '#ffffff',
+                              border: qrTagStyle === 'luxury-gold' 
+                                ? '2px solid rgba(212, 175, 55, 0.6)' 
+                                : qrTagStyle === 'minimal-dark' 
+                                ? '2px solid rgba(255, 255, 255, 0.15)' 
+                                : '2px solid #e2e8f0',
+                              borderRadius: '16px',
+                              padding: '20px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '14px',
+                              position: 'relative',
+                              boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                              pageBreakInside: 'avoid'
+                            }}
+                          >
+                            {/* Card Control Bar (Hidden in Print) */}
+                            <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
+                              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', cursor: 'pointer' }}>
+                                <input 
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => {
+                                    setQrSelectedProductIds(prev => 
+                                      prev.includes(prod.id) ? prev.filter(x => x !== prod.id) : [...prev, prod.id]
+                                    );
+                                  }}
+                                />
+                                <span style={{ fontWeight: '700', color: isSelected ? '#d4af37' : '#94a3b8' }}>
+                                  {isSelected ? 'Baskıya Eklendi' : 'Baskı İçin Seç'}
+                                </span>
+                              </label>
+
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(targetUrl);
+                                    setQrCopiedId(prod.id);
+                                    setTimeout(() => setQrCopiedId(null), 2000);
+                                  }}
+                                  title="3D Showroom Linkini Kopyala"
+                                  style={{
+                                    background: 'rgba(255,255,255,0.06)',
+                                    border: '1px solid rgba(255,255,255,0.12)',
+                                    color: '#cbd5e1',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.7rem',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                  }}
+                                >
+                                  {qrCopiedId === prod.id ? <CheckCheck size={12} style={{ color: '#10b981' }} /> : <Copy size={12} />}
+                                  <span>{qrCopiedId === prod.id ? 'Kopyalandı' : 'Linki Al'}</span>
+                                </button>
+                                <a 
+                                  href={targetUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  title="3D Stüdyoda Müşteri Gibi Aç"
+                                  style={{
+                                    background: 'rgba(212,175,55,0.15)',
+                                    border: '1px solid rgba(212,175,55,0.3)',
+                                    color: '#d4af37',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.7rem',
+                                    textDecoration: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    fontWeight: '700'
+                                  }}
+                                >
+                                  <ExternalLink size={12} />
+                                  <span>Test Et</span>
+                                </a>
+                              </div>
+                            </div>
+
+                            {/* Tag Header (Print Visible) */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                              <div>
+                                <div style={{
+                                  fontSize: '0.65rem',
+                                  fontWeight: '900',
+                                  color: '#d4af37',
+                                  letterSpacing: '0.08em',
+                                  textTransform: 'uppercase',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}>
+                                  <span>✦</span>
+                                  <span>SERAMİKBAK 3D SHOWROOM</span>
+                                </div>
+                                <h3 style={{
+                                  margin: '4px 0 2px 0',
+                                  fontSize: '1.05rem',
+                                  fontWeight: '900',
+                                  color: qrTagStyle === 'clean-white' ? '#0f172a' : '#ffffff',
+                                  lineHeight: '1.2'
+                                }}>
+                                  {prod.name}
+                                </h3>
+                                <div style={{ fontSize: '0.75rem', color: qrTagStyle === 'clean-white' ? '#475569' : '#94a3b8', fontWeight: '600' }}>
+                                  {prod.brand || dealerInfo?.brandName} &bull; {prod.dimensions || '60x120 cm'} &bull; {prod.finish || 'Porselen Karo'}
+                                </div>
+                              </div>
+
+                              <div style={{
+                                padding: '4px 8px',
+                                borderRadius: '6px',
+                                background: 'rgba(212,175,55,0.15)',
+                                border: '1px solid rgba(212,175,55,0.35)',
+                                color: '#d4af37',
+                                fontSize: '0.65rem',
+                                fontWeight: '800'
+                              }}>
+                                KOD: {prod.code || 'SB-KARO'}
+                              </div>
+                            </div>
+
+                            {/* Central QR Code & Scan Prompt */}
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: '16px',
+                              background: qrTagStyle === 'clean-white' ? '#f8fafc' : 'rgba(255,255,255,0.03)',
+                              padding: '14px',
+                              borderRadius: '12px',
+                              border: qrTagStyle === 'clean-white' ? '1px solid #e2e8f0' : '1px solid rgba(255,255,255,0.06)'
+                            }}>
+                              <div style={{
+                                width: '110px',
+                                height: '110px',
+                                background: '#ffffff',
+                                padding: '6px',
+                                borderRadius: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                              }}>
+                                <img 
+                                  src={qrImgUrl} 
+                                  alt={`${prod.name} 3D QR Kod`} 
+                                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                />
+                              </div>
+
+                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <div style={{
+                                  fontSize: '0.85rem',
+                                  fontWeight: '900',
+                                  color: qrTagStyle === 'clean-white' ? '#0f172a' : '#ffffff',
+                                  lineHeight: '1.25'
+                                }}>
+                                  📱 Kameranla Tara, Banyonda Canlı Gör!
+                                </div>
+                                <div style={{
+                                  fontSize: '0.72rem',
+                                  color: qrTagStyle === 'clean-white' ? '#64748b' : '#94a3b8',
+                                  lineHeight: '1.3'
+                                }}>
+                                  Telefonunuzun kamerasıyla QR kodu okutarak bu seramiğin 3D sanal odadaki döşenmiş halini inceleyin.
+                                </div>
+                                <div style={{
+                                  fontSize: '0.68rem',
+                                  fontWeight: '800',
+                                  color: '#059669',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  marginTop: '2px'
+                                }}>
+                                  <span>✓</span>
+                                  <span>Uygulama İndirmek Gerekmez</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Tag Footer & Showroom Information */}
+                            <div style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              borderTop: qrTagStyle === 'clean-white' ? '1px solid #e2e8f0' : '1px solid rgba(255,255,255,0.08)',
+                              paddingTop: '10px'
+                            }}>
+                              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                <span style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                  SHOWROOM TEŞHİR NOKTASI
+                                </span>
+                                <span style={{ fontSize: '0.82rem', fontWeight: '800', color: qrTagStyle === 'clean-white' ? '#0f172a' : '#d4af37' }}>
+                                  {dealerName}
+                                </span>
+                                <span style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                                  {dealerCity} &bull; {dealerInfo?.phone || ''}
+                                </span>
+                              </div>
+
+                              {qrIncludePrice && (
+                                <div style={{ textAlign: 'right' }}>
+                                  <span style={{ fontSize: '0.62rem', color: '#94a3b8', textTransform: 'uppercase' }}>
+                                    LİSTE / KAMPANYA
+                                  </span>
+                                  <div style={{
+                                    fontSize: '1.1rem',
+                                    fontWeight: '900',
+                                    color: '#10b981'
+                                  }}>
+                                    ₺{customPrice || prod.price || '650'}
+                                    <span style={{ fontSize: '0.7rem', fontWeight: '600', color: '#64748b' }}> / m²</span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Price Input in Card (No Print) */}
+                            <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                              <label style={{ fontSize: '0.68rem', color: '#94a3b8', whiteSpace: 'nowrap' }}>Özel Fiyat Gir (₺):</label>
+                              <input 
+                                type="number" 
+                                placeholder={prod.price || '650'}
+                                value={customPrice || ''}
+                                onChange={e => {
+                                  const val = e.target.value;
+                                  setQrCustomPrices(prev => ({ ...prev, [prod.id]: val }));
+                                }}
+                                style={{
+                                  width: '90px',
+                                  background: 'rgba(255,255,255,0.06)',
+                                  border: '1px solid rgba(255,255,255,0.15)',
+                                  borderRadius: '6px',
+                                  padding: '3px 8px',
+                                  fontSize: '0.72rem',
+                                  color: '#fff',
+                                  outline: 'none'
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           ) : activePortalTab === 'b2b-projects' ? (
           /* B2B PROJECTS TAB */
@@ -6857,6 +7658,66 @@ export default function DealerPortalPage() {
             gap: 12px !important;
           }
         }
+
+        /* ===== PRINT STYLES FOR SHOWROOM QR CARDS ===== */
+        @media print {
+          body {
+            background: #ffffff !important;
+            color: #000000 !important;
+          }
+          aside,
+          header,
+          nav,
+          .no-print,
+          .modal-overlay,
+          .payment-modal-card,
+          button {
+            display: none !important;
+          }
+          main {
+            background: #ffffff !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+          }
+          .printable-showroom-qr-area {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 10mm !important;
+            background: #ffffff !important;
+          }
+          .printable-showroom-qr-area > div:first-child {
+            display: none !important;
+          }
+          .printable-showroom-qr-area > div:last-child {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12mm !important;
+            width: 100% !important;
+          }
+          .showroom-qr-card {
+            border: 2px solid #b38e47 !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            box-shadow: none !important;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+            padding: 15px !important;
+            border-radius: 12px !important;
+          }
+          .showroom-qr-card h3 {
+            color: #000000 !important;
+          }
+          .tag-theme-luxury-gold,
+          .tag-theme-minimal-dark,
+          .tag-theme-clean-white {
+            background: #ffffff !important;
+            color: #000000 !important;
+          }
+        }
       `}</style>
 
       {/* Bank Transfer Payment Modal */}
@@ -7346,7 +8207,8 @@ export default function DealerPortalPage() {
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
                 { id: 'stock-exchange', label: '🤝 Bayi Stok Borsası', icon: <RefreshCw size={18} /> },
-                { id: 'quick-quote', label: 'PDF Teklif Oluştur', icon: <Calculator size={18} /> },
+                { id: 'quick-quote', label: '💬 WhatsApp & PDF Teklif', icon: <Calculator size={18} /> },
+                { id: 'showroom-qr', label: '📱 Showroom QR', icon: <QrCode size={18} /> },
                 { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
                 { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
                 { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
@@ -7418,7 +8280,7 @@ export default function DealerPortalPage() {
           onClose={() => setGeneratedQuote(null)} 
         />
       )}
+        </main>
       </div>
-    </div>
-  );
-}
+    );
+  }

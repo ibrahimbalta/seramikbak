@@ -1746,6 +1746,19 @@ export default function Home() {
         setIsKioskMode(true);
       }
 
+      // Check for direct product code or showroom QR scans
+      const codeParam = params.get('code');
+      const tabParam = params.get('tab');
+      if (codeParam) {
+        openProductByCode(codeParam).then(() => {
+          if (tabParam === 'studio') {
+            setActiveTab('studio');
+          }
+        });
+      } else if (tabParam) {
+        setActiveTab(tabParam);
+      }
+
       // Load preselected favorite product in studio
       const preselected = localStorage.getItem('seramikbak_preselected_product');
       if (preselected) {
