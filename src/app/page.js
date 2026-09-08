@@ -1253,6 +1253,31 @@ export default function Home() {
   const [authLoading, setAuthLoading] = useState(false);
   const [authSuccess, setAuthSuccess] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [activeUtilityDropdown, setActiveUtilityDropdown] = useState(null); // 'kurumsal' | 'portallar' | null
+  const utilityDropdownTimer = useRef(null);
+
+  const handleUtilityDropdownOpen = (menuKey) => {
+    if (utilityDropdownTimer.current) {
+      clearTimeout(utilityDropdownTimer.current);
+      utilityDropdownTimer.current = null;
+    }
+    setActiveUtilityDropdown(menuKey);
+  };
+
+  const handleUtilityDropdownClose = () => {
+    utilityDropdownTimer.current = setTimeout(() => {
+      setActiveUtilityDropdown(null);
+    }, 180);
+  };
+
+  const toggleUtilityDropdown = (menuKey) => {
+    if (utilityDropdownTimer.current) {
+      clearTimeout(utilityDropdownTimer.current);
+      utilityDropdownTimer.current = null;
+    }
+    setActiveUtilityDropdown(prev => prev === menuKey ? null : menuKey);
+  };
+
   const [userFavorites, setUserFavorites] = useState([]);
   const [showFavoritesPanel, setShowFavoritesPanel] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -1500,16 +1525,19 @@ export default function Home() {
     }
   }, [currentUser]);
 
-  // Close user dropdown menu when clicking outside
+  // Close user dropdown menu and utility dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (showUserMenu && !e.target.closest('.user-menu-wrapper')) {
         setShowUserMenu(false);
       }
+      if (activeUtilityDropdown && !e.target.closest('.utility-dropdown-wrapper')) {
+        setActiveUtilityDropdown(null);
+      }
     };
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
-  }, [showUserMenu]);
+  }, [showUserMenu, activeUtilityDropdown]);
 
   const handleAuthLogin = async (e) => {
     e.preventDefault();
@@ -3448,41 +3476,128 @@ export default function Home() {
               <HomeIcon size={13} />
               <span style={{ fontWeight: '800' }}>{t('home')}</span>
             </Link>
-            <button 
-              onClick={() => { setShowHowItWorksModal(true); setHowItWorksActiveTab('customers'); }}
-              className="utility-item portal-link"
-              style={{
-                background: 'rgba(212, 175, 55, 0.12)',
-                border: '1px solid rgba(212, 175, 55, 0.35)',
-                borderRadius: '16px',
-                padding: '2px 10px',
-                color: 'var(--accent-gold, #d4af37)',
-                fontWeight: '800',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}
+
+            {/* Kurumsal Dropdown (Nasıl Çalışır? & Hakkımızda) */}
+            <div 
+              className="utility-dropdown-wrapper"
+              onMouseEnter={() => handleUtilityDropdownOpen('kurumsal')}
+              onMouseLeave={handleUtilityDropdownClose}
             >
-              <HelpCircle size={13} />
-              <span>Nasıl Çalışır?</span>
-            </button>
-            <Link href="/hakkimizda" className="utility-item portal-link">
-              <Info size={13} />
-              <span>{t('about')}</span>
-            </Link>
+              <button 
+                type="button"
+                className={`utility-item utility-dropdown-btn ${activeUtilityDropdown === 'kurumsal' ? 'active' : ''}`}
+                onClick={() => toggleUtilityDropdown('kurumsal')}
+                aria-haspopup="true"
+                aria-expanded={activeUtilityDropdown === 'kurumsal'}
+              >
+                <Info size={13} />
+                <span>{t('corporate') || 'Kurumsal'}</span>
+                <ChevronDown size={11} className={`dropdown-chevron ${activeUtilityDropdown === 'kurumsal' ? 'rotated' : ''}`} />
+              </button>
+
+              {activeUtilityDropdown === 'kurumsal' && (
+                <div className="utility-dropdown-menu">
+                  <button 
+                    type="button"
+                    className="utility-dropdown-item"
+                    onClick={() => { 
+                      setShowHowItWorksModal(true); 
+                      setHowItWorksActiveTab('customers'); 
+                      setActiveUtilityDropdown(null); 
+                    }}
+                  >
+                    <div className="dropdown-item-icon gold-icon">
+                      <HelpCircle size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">{t('howItWorks') || 'Nasıl Çalışır?'}</span>
+                        <span className="dropdown-item-badge gold-badge">Rehber</span>
+                      </div>
+                      <span className="dropdown-item-desc">3D stüdyo ve platform kullanım rehberi</span>
+                    </div>
+                  </button>
+
+                  <Link 
+                    href="/hakkimizda" 
+                    className="utility-dropdown-item"
+                    onClick={() => setActiveUtilityDropdown(null)}
+                  >
+                    <div className="dropdown-item-icon">
+                      <Info size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">{t('about')}</span>
+                      </div>
+                      <span className="dropdown-item-desc">SeramikBak vizyonu ve kurumsal bilgiler</span>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
+
             <Link href="/proje-talep" className="utility-item b2b-btn-link">
               <Building2 size={13} />
               <span>{t('b2bQuotes')}</span>
             </Link>
-            <Link href="/bayi" className="utility-item portal-link">
-              <UserIcon size={13} />
-              <span>{t('dealerPortal')}</span>
-            </Link>
-            <Link href="/marka" className="utility-item portal-link">
-              <TrendingUp size={13} />
-              <span>{t('brandPortal')}</span>
-            </Link>
+
+            {/* Portallar Dropdown (Bayi Portalı & Marka Portalı) */}
+            <div 
+              className="utility-dropdown-wrapper"
+              onMouseEnter={() => handleUtilityDropdownOpen('portallar')}
+              onMouseLeave={handleUtilityDropdownClose}
+            >
+              <button 
+                type="button"
+                className={`utility-item utility-dropdown-btn ${activeUtilityDropdown === 'portallar' ? 'active' : ''}`}
+                onClick={() => toggleUtilityDropdown('portallar')}
+                aria-haspopup="true"
+                aria-expanded={activeUtilityDropdown === 'portallar'}
+              >
+                <Store size={13} />
+                <span>{t('portals') || 'Portallar'}</span>
+                <ChevronDown size={11} className={`dropdown-chevron ${activeUtilityDropdown === 'portallar' ? 'rotated' : ''}`} />
+              </button>
+
+              {activeUtilityDropdown === 'portallar' && (
+                <div className="utility-dropdown-menu">
+                  <Link 
+                    href="/bayi" 
+                    className="utility-dropdown-item"
+                    onClick={() => setActiveUtilityDropdown(null)}
+                  >
+                    <div className="dropdown-item-icon blue-icon">
+                      <UserIcon size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">{t('dealerPortal')}</span>
+                        <span className="dropdown-item-badge blue-badge">B2B</span>
+                      </div>
+                      <span className="dropdown-item-desc">Bayi yönetim paneli ve stok borsası</span>
+                    </div>
+                  </Link>
+
+                  <Link 
+                    href="/marka" 
+                    className="utility-dropdown-item"
+                    onClick={() => setActiveUtilityDropdown(null)}
+                  >
+                    <div className="dropdown-item-icon purple-icon">
+                      <TrendingUp size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">{t('brandPortal')}</span>
+                        <span className="dropdown-item-badge purple-badge">Üretici</span>
+                      </div>
+                      <span className="dropdown-item-desc">Üretici marka kataloğu ve analitikler</span>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="utility-right">
@@ -3726,6 +3841,19 @@ export default function Home() {
                 <Info size={16} />
                 <span>{t('about')}</span>
               </Link>
+              <button 
+                type="button"
+                className="mobile-nav-link" 
+                onClick={() => { 
+                  setShowMobileMenu(false); 
+                  setShowHowItWorksModal(true); 
+                  setHowItWorksActiveTab('customers'); 
+                }}
+                style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit', color: 'inherit', display: 'flex', alignItems: 'center', gap: '10px' }}
+              >
+                <HelpCircle size={16} style={{ color: 'var(--accent-gold, #d4af37)' }} />
+                <span>{t('howItWorks') || 'Nasıl Çalışır?'}</span>
+              </button>
 
               <div className="mobile-menu-divider" />
               
@@ -9109,9 +9237,8 @@ export default function Home() {
           z-index: 1001;
           position: relative;
           box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
-          overflow-x: auto;
+          overflow: visible;
           white-space: nowrap !important;
-          scrollbar-width: none;
           gap: 12px;
         }
 
@@ -9126,6 +9253,173 @@ export default function Home() {
           gap: 6px;
           flex-shrink: 0;
           white-space: nowrap !important;
+        }
+
+        /* Utility Dropdown Components */
+        :global(.utility-dropdown-wrapper) {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+        }
+
+        :global(.utility-dropdown-btn) {
+          gap: 5px !important;
+        }
+
+        :global(.dropdown-chevron) {
+          transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+          color: #94a3b8;
+          flex-shrink: 0;
+        }
+
+        :global(.dropdown-chevron.rotated) {
+          transform: rotate(180deg);
+          color: #b38e47 !important;
+        }
+
+        :global(.utility-dropdown-btn.active) {
+          background: #ffffff !important;
+          border-color: rgba(179, 142, 71, 0.45) !important;
+          color: #0f172a !important;
+          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.12) !important;
+        }
+
+        :global(.utility-dropdown-menu) {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 0;
+          min-width: 270px;
+          background: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(25px) saturate(190%);
+          -webkit-backdrop-filter: blur(25px) saturate(190%);
+          border: 1px solid rgba(226, 232, 240, 0.95);
+          border-radius: 14px;
+          padding: 6px;
+          box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.05);
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          animation: utilityDropdownFade 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes utilityDropdownFade {
+          from {
+            opacity: 0;
+            transform: translateY(-5px) scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        :global(.utility-dropdown-item) {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 10px;
+          border-radius: 10px;
+          border: 1px solid transparent;
+          background: transparent;
+          text-decoration: none !important;
+          text-align: left;
+          cursor: pointer;
+          width: 100%;
+          box-sizing: border-box;
+          transition: all 0.18s ease;
+          font-family: var(--font-title);
+        }
+
+        :global(.utility-dropdown-item:hover) {
+          background: rgba(248, 250, 252, 0.95);
+          border-color: rgba(226, 232, 240, 0.85);
+          transform: translateX(2px);
+        }
+
+        :global(.dropdown-item-icon) {
+          width: 32px;
+          height: 32px;
+          border-radius: 9px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(241, 245, 249, 0.9);
+          color: #64748b;
+          flex-shrink: 0;
+          transition: all 0.2s ease;
+        }
+
+        :global(.dropdown-item-icon.gold-icon) {
+          background: rgba(212, 175, 55, 0.12);
+          color: #b38e47;
+        }
+
+        :global(.dropdown-item-icon.blue-icon) {
+          background: rgba(59, 130, 246, 0.1);
+          color: #2563eb;
+        }
+
+        :global(.dropdown-item-icon.purple-icon) {
+          background: rgba(139, 92, 246, 0.1);
+          color: #7c3aed;
+        }
+
+        :global(.utility-dropdown-item:hover .dropdown-item-icon) {
+          transform: scale(1.08);
+        }
+
+        :global(.dropdown-item-content) {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          flex: 1;
+          overflow: hidden;
+        }
+
+        :global(.dropdown-title-row) {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        :global(.dropdown-item-title) {
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: #0f172a;
+          line-height: 1.2;
+        }
+
+        :global(.dropdown-item-desc) {
+          font-size: 0.68rem;
+          color: #64748b;
+          line-height: 1.25;
+          font-weight: 400;
+          white-space: normal;
+        }
+
+        :global(.dropdown-item-badge) {
+          font-size: 0.58rem;
+          font-weight: 800;
+          padding: 1px 6px;
+          border-radius: 5px;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+        }
+
+        :global(.dropdown-item-badge.gold-badge) {
+          background: rgba(212, 175, 55, 0.15);
+          color: #92722b;
+        }
+
+        :global(.dropdown-item-badge.blue-badge) {
+          background: rgba(59, 130, 246, 0.12);
+          color: #1d4ed8;
+        }
+
+        :global(.dropdown-item-badge.purple-badge) {
+          background: rgba(139, 92, 246, 0.12);
+          color: #6d28d9;
         }
 
         :global(.utility-item) {
