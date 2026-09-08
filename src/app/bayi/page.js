@@ -2265,7 +2265,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
     }}>
       {/* Sol Sidebar Navigasyon */}
       {!isMobile && (
-        <aside style={{
+        <aside className="no-print dealer-sidebar" style={{
           width: isSidebarCollapsed ? '70px' : '280px',
           background: 'rgba(17, 24, 39, 0.95)',
           backdropFilter: 'blur(20px)',
@@ -2509,7 +2509,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
           background: '#090d16'
         }}>
           {/* Top Bar Header */}
-          <header style={{
+          <header className="no-print dealer-header" style={{
             height: isMobile ? 'auto' : '64px',
             minHeight: isMobile ? '56px' : '64px',
             borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
@@ -3363,7 +3363,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
             ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {/* Header & Control Bar */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+              <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
                   <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '8px', color: '#fff' }}>
                     <QrCode size={24} style={{ color: '#d4af37' }} />
@@ -3378,7 +3378,12 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                   <button 
                     onClick={() => {
                       if (brandProducts.length === 0) loadBrandProducts();
-                      if (typeof window !== 'undefined') window.print();
+                      setShowMobileMoreMenu(false);
+                      if (typeof window !== 'undefined') {
+                        setTimeout(() => {
+                          window.print();
+                        }, 50);
+                      }
                     }}
                     style={{
                       background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
@@ -3402,7 +3407,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
               </div>
 
               {/* Instructions Banner */}
-              <div style={{
+              <div className="no-print" style={{
                 background: 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(15,23,42,0.6) 100%)',
                 border: '1px solid rgba(212, 175, 55, 0.35)',
                 borderRadius: '14px',
@@ -3436,7 +3441,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
               </div>
 
               {/* Style & Layout Toolbar */}
-              <div style={{
+              <div className="no-print" style={{
                 background: 'rgba(17, 24, 39, 0.8)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '14px',
@@ -3575,8 +3580,8 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                 const dealerCity = dealerInfo?.city ? `${dealerInfo.district || ''} / ${dealerInfo.city}` : 'Türkiye';
 
                 return (
-                  <div className="printable-showroom-qr-area" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div className={`printable-showroom-qr-area print-layout-${qrTagLayout}`} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#94a3b8' }}>
                         Basıma Hazır Etiketler ({displayList.length} Model Listeleniyor)
                       </span>
@@ -3590,7 +3595,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                       )}
                     </div>
 
-                    <div style={{
+                    <div className="qr-grid-container" style={{
                       display: 'grid',
                       gridTemplateColumns: isMobile ? '1fr' : (qrTagLayout === 'single-large' ? '1fr 1fr' : 'repeat(auto-fill, minmax(320px, 1fr))'),
                       gap: '20px'
@@ -3697,7 +3702,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                             {/* Tag Header (Print Visible) */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                               <div>
-                                <div style={{
+                                <div className="print-brand-badge" style={{
                                   fontSize: '0.65rem',
                                   fontWeight: '900',
                                   color: '#d4af37',
@@ -3710,7 +3715,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                                   <span>✦</span>
                                   <span>SERAMİKBAK 3D SHOWROOM</span>
                                 </div>
-                                <h3 style={{
+                                <h3 className="print-prod-title" style={{
                                   margin: '4px 0 2px 0',
                                   fontSize: '1.05rem',
                                   fontWeight: '900',
@@ -3719,12 +3724,12 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                                 }}>
                                   {prod.name}
                                 </h3>
-                                <div style={{ fontSize: '0.75rem', color: qrTagStyle === 'clean-white' ? '#475569' : '#94a3b8', fontWeight: '600' }}>
+                                <div className="print-prod-sub" style={{ fontSize: '0.75rem', color: qrTagStyle === 'clean-white' ? '#475569' : '#94a3b8', fontWeight: '600' }}>
                                   {(typeof prod.brand === 'object' ? prod.brand?.name : prod.brand) || dealerInfo?.brandName || 'Seramik'} &bull; {prod.dimensions || '60x120 cm'} &bull; {prod.finish || 'Porselen Karo'}
                                 </div>
                               </div>
 
-                              <div style={{
+                              <div className="print-prod-code" style={{
                                 padding: '4px 8px',
                                 borderRadius: '6px',
                                 background: 'rgba(212,175,55,0.15)',
@@ -3738,7 +3743,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                             </div>
 
                             {/* Central QR Code & Scan Prompt */}
-                            <div style={{
+                            <div className="print-qr-container" style={{
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
@@ -3748,7 +3753,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                               borderRadius: '12px',
                               border: qrTagStyle === 'clean-white' ? '1px solid #e2e8f0' : '1px solid rgba(255,255,255,0.06)'
                             }}>
-                              <div style={{
+                              <div className="print-qr-img-box" style={{
                                 width: '110px',
                                 height: '110px',
                                 background: '#ffffff',
@@ -3768,7 +3773,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                               </div>
 
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                <div style={{
+                                <div className="print-qr-title" style={{
                                   fontSize: '0.85rem',
                                   fontWeight: '900',
                                   color: qrTagStyle === 'clean-white' ? '#0f172a' : '#ffffff',
@@ -3776,14 +3781,14 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                                 }}>
                                   📱 Kameranla Tara, Banyonda Canlı Gör!
                                 </div>
-                                <div style={{
+                                <div className="print-qr-desc" style={{
                                   fontSize: '0.72rem',
                                   color: qrTagStyle === 'clean-white' ? '#64748b' : '#94a3b8',
                                   lineHeight: '1.3'
                                 }}>
                                   Telefonunuzun kamerasıyla QR kodu okutarak bu seramiğin 3D sanal odadaki döşenmiş halini inceleyin.
                                 </div>
-                                <div style={{
+                                <div className="print-qr-badge" style={{
                                   fontSize: '0.68rem',
                                   fontWeight: '800',
                                   color: '#059669',
@@ -3799,7 +3804,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                             </div>
 
                             {/* Tag Footer & Showroom Information */}
-                            <div style={{
+                            <div className="print-card-footer" style={{
                               display: 'flex',
                               justifyContent: 'space-between',
                               alignItems: 'center',
@@ -3807,23 +3812,23 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                               paddingTop: '10px'
                             }}>
                               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <span style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                <span className="print-dealer-sub" style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                                   SHOWROOM TEŞHİR NOKTASI
                                 </span>
-                                <span style={{ fontSize: '0.82rem', fontWeight: '800', color: qrTagStyle === 'clean-white' ? '#0f172a' : '#d4af37' }}>
+                                <span className="print-dealer-title" style={{ fontSize: '0.82rem', fontWeight: '800', color: qrTagStyle === 'clean-white' ? '#0f172a' : '#d4af37' }}>
                                   {dealerName}
                                 </span>
-                                <span style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                                <span className="print-dealer-contact" style={{ fontSize: '0.68rem', color: '#64748b' }}>
                                   {dealerCity} &bull; {dealerInfo?.phone || ''}
                                 </span>
                               </div>
 
                               {qrIncludePrice && (
                                 <div style={{ textAlign: 'right' }}>
-                                  <span style={{ fontSize: '0.62rem', color: '#94a3b8', textTransform: 'uppercase' }}>
+                                  <span className="print-price-label" style={{ fontSize: '0.62rem', color: '#94a3b8', textTransform: 'uppercase' }}>
                                     LİSTE / KAMPANYA
                                   </span>
-                                  <div style={{
+                                  <div className="print-price-val" style={{
                                     fontSize: '1.1rem',
                                     fontWeight: '900',
                                     color: '#10b981'
@@ -7848,64 +7853,234 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
             gap: 12px !important;
           }
         }
+      `}</style>
 
-        /* ===== PRINT STYLES FOR SHOWROOM QR CARDS ===== */
+      {/* ===== GLOBAL PRINT STYLES FOR SHOWROOM QR CARDS ===== */}
+      <style jsx global>{`
         @media print {
-          body {
-            background: #ffffff !important;
-            color: #000000 !important;
+          @page {
+            size: A4 portrait;
+            margin: 10mm;
           }
+
+          *, *:before, *:after {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+
+          html, body {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 100% !important;
+            overflow: visible !important;
+          }
+
+          /* Hide ALL page elements by default */
+          body * {
+            visibility: hidden !important;
+          }
+
+          /* Unhide printable showroom QR area and its children */
+          .printable-showroom-qr-area,
+          .printable-showroom-qr-area * {
+            visibility: visible !important;
+          }
+
+          /* Completely eliminate non-printable UI elements */
           aside,
           header,
           nav,
+          footer,
           .no-print,
+          .no-print *,
+          .dealer-sidebar,
+          .dealer-header,
+          .mobile-drawer-overlay,
           .modal-overlay,
           .payment-modal-card,
-          button {
+          button,
+          input,
+          select {
             display: none !important;
+            visibility: hidden !important;
           }
-          main {
-            background: #ffffff !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            width: 100% !important;
-          }
+
+          /* Position printable showroom area at top-left of page */
           .printable-showroom-qr-area {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
             width: 100% !important;
             margin: 0 !important;
-            padding: 10mm !important;
+            padding: 0 !important;
             background: #ffffff !important;
+            display: block !important;
           }
-          .printable-showroom-qr-area > div:first-child {
-            display: none !important;
-          }
-          .printable-showroom-qr-area > div:last-child {
+
+          /* Grid for printable cards */
+          .printable-showroom-qr-area .qr-grid-container {
             display: grid !important;
             grid-template-columns: repeat(2, 1fr) !important;
-            gap: 12mm !important;
+            gap: 12mm 10mm !important;
             width: 100% !important;
           }
+
+          .printable-showroom-qr-area.print-layout-single-large .qr-grid-container {
+            grid-template-columns: 1fr !important;
+            gap: 16mm !important;
+          }
+
+          .printable-showroom-qr-area.print-layout-sticker .qr-grid-container {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 8mm !important;
+          }
+
+          /* Luxury stand tag card in print (Matching Screenshot 2) */
           .showroom-qr-card {
-            border: 2px solid #b38e47 !important;
+            border: 2.5px solid #d4af37 !important;
             background: #ffffff !important;
-            color: #000000 !important;
+            color: #0f172a !important;
             box-shadow: none !important;
             break-inside: avoid !important;
             page-break-inside: avoid !important;
-            padding: 15px !important;
-            border-radius: 12px !important;
+            padding: 16px 18px !important;
+            border-radius: 16px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            box-sizing: border-box !important;
           }
+
+          .print-brand-badge {
+            color: #b38e47 !important;
+            font-size: 0.68rem !important;
+            font-weight: 900 !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+          }
+
+          .print-prod-title,
           .showroom-qr-card h3 {
-            color: #000000 !important;
+            color: #0f172a !important;
+            font-size: 1.15rem !important;
+            font-weight: 900 !important;
+            margin: 4px 0 2px 0 !important;
+            line-height: 1.2 !important;
           }
-          .tag-theme-luxury-gold,
-          .tag-theme-minimal-dark,
-          .tag-theme-clean-white {
+
+          .print-prod-sub {
+            color: #475569 !important;
+            font-size: 0.76rem !important;
+            font-weight: 600 !important;
+          }
+
+          .print-prod-code {
+            border: 1.5px solid #d4af37 !important;
+            background: #fdfaf3 !important;
+            color: #854d0e !important;
+            font-size: 0.68rem !important;
+            font-weight: 800 !important;
+            border-radius: 6px !important;
+            padding: 4px 8px !important;
+          }
+
+          .print-qr-container {
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            padding: 12px !important;
+            border-radius: 12px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 14px !important;
+          }
+
+          .print-qr-img-box {
+            width: 100px !important;
+            height: 100px !important;
+            min-width: 100px !important;
             background: #ffffff !important;
-            color: #000000 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 8px !important;
+            padding: 4px !important;
+            box-shadow: none !important;
+            flex-shrink: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+
+          .print-qr-img-box img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+          }
+
+          .print-qr-title {
+            color: #0f172a !important;
+            font-size: 0.85rem !important;
+            font-weight: 900 !important;
+            line-height: 1.25 !important;
+          }
+
+          .print-qr-desc {
+            color: #475569 !important;
+            font-size: 0.72rem !important;
+            line-height: 1.35 !important;
+          }
+
+          .print-qr-badge {
+            color: #059669 !important;
+            font-size: 0.7rem !important;
+            font-weight: 800 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+          }
+
+          .print-card-footer {
+            border-top: 1px solid #e2e8f0 !important;
+            padding-top: 8px !important;
+            display: flex !important;
+            justifyContent: space-between !important;
+            align-items: center !important;
+          }
+
+          .print-dealer-sub {
+            color: #64748b !important;
+            font-size: 0.62rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.04em !important;
+          }
+
+          .print-dealer-title {
+            color: #0f172a !important;
+            font-weight: 900 !important;
+            font-size: 0.88rem !important;
+          }
+
+          .print-dealer-contact {
+            color: #475569 !important;
+            font-size: 0.7rem !important;
+          }
+
+          .print-price-label {
+            color: #64748b !important;
+            font-size: 0.62rem !important;
+            text-transform: uppercase !important;
+          }
+
+          .print-price-val {
+            color: #059669 !important;
+            font-size: 1.15rem !important;
+            font-weight: 900 !important;
           }
         }
       `}</style>
@@ -8300,7 +8475,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
 
       {/* Mobile Bottom Navigation Bar */}
       {isMobile && (
-        <div style={{
+        <div className="no-print" style={{
           position: 'fixed',
           bottom: 0,
           left: 0,
@@ -8359,7 +8534,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
 
       {/* Mobile More Menu Drawer */}
       {isMobile && showMobileMoreMenu && (
-        <div style={{
+        <div className="no-print mobile-drawer-overlay" style={{
           position: 'fixed',
           top: 0,
           left: 0,
