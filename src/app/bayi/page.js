@@ -2683,7 +2683,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
         </header>
 
         {/* PORTAL MAIN CONTENT */}
-        <main className="dealer-main-content" style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
+        <div className="dealer-main-content" style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
           {activePortalTab === 'quick-quote' ? (
             /* QUICK QUOTE BUILDER TAB - PREMIUM FEATURE */
             saasInfo?.plan !== 'PREMIUM' ? (
@@ -3562,7 +3562,8 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                 const filtered = brandProducts.filter(p => {
                   if (!qrSearchQuery) return true;
                   const q = qrSearchQuery.toLowerCase();
-                  return (p.name || '').toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q) || (p.brand || '').toLowerCase().includes(q);
+                  const brandStr = typeof p.brand === 'object' ? (p.brand?.name || '') : (p.brand || '');
+                  return (p.name || '').toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q) || brandStr.toLowerCase().includes(q);
                 });
 
                 const displayList = qrSelectedProductIds.length > 0 
@@ -3719,7 +3720,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
                                   {prod.name}
                                 </h3>
                                 <div style={{ fontSize: '0.75rem', color: qrTagStyle === 'clean-white' ? '#475569' : '#94a3b8', fontWeight: '600' }}>
-                                  {prod.brand || dealerInfo?.brandName} &bull; {prod.dimensions || '60x120 cm'} &bull; {prod.finish || 'Porselen Karo'}
+                                  {(typeof prod.brand === 'object' ? prod.brand?.name : prod.brand) || dealerInfo?.brandName || 'Seramik'} &bull; {prod.dimensions || '60x120 cm'} &bull; {prod.finish || 'Porselen Karo'}
                                 </div>
                               </div>
 
@@ -7337,7 +7338,7 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
             </div>
           </div>
         )}
-      </main>
+      </div>
 
       {/* RESPONSIVE STYLES */}
       <style jsx>{`
