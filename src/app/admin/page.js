@@ -336,6 +336,16 @@ export default function AdminPage() {
   const [brandActionLoading, setBrandActionLoading] = useState(false);
   const [visiblePasswordId, setVisiblePasswordId] = useState('');
 
+  // New Brand Modal & Form State
+  const [showNewBrandModal, setShowNewBrandModal] = useState(false);
+  const [newBrandName, setNewBrandName] = useState('');
+  const [newBrandUrl, setNewBrandUrl] = useState('');
+  const [newBrandLogo, setNewBrandLogo] = useState('');
+  const [newBrandUsername, setNewBrandUsername] = useState('');
+  const [newBrandPassword, setNewBrandPassword] = useState('');
+  const [newBrandLoading, setNewBrandLoading] = useState(false);
+  const [newBrandError, setNewBrandError] = useState('');
+
   const loadAdminBrands = async () => {
     try {
       const res = await fetch('/api/admin/brands');
@@ -385,6 +395,82 @@ export default function AdminPage() {
     }
   };
 
+  const handleCreateNewBrand = async (e, goToScraper = false) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!newBrandName.trim()) {
+      setNewBrandError('Lütfen marka adını girin.');
+      return;
+    }
+    setNewBrandLoading(true);
+    setNewBrandError('');
+    try {
+      const res = await fetch('/api/admin/brands', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create',
+          name: newBrandName.trim(),
+          logoUrl: newBrandLogo.trim() || undefined,
+          username: newBrandUsername.trim() || undefined,
+          password: newBrandPassword.trim() || undefined
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        const createdBrand = data.brand;
+        await loadBrands();
+        await loadAdminBrands();
+        setShowNewBrandModal(false);
+        setNewBrandName('');
+        setNewBrandLogo('');
+        setNewBrandUsername('');
+        setNewBrandPassword('');
+
+        if (goToScraper) {
+          setSelectedBrand(createdBrand.id);
+          if (newBrandUrl.trim()) {
+            setScrapeUrl(newBrandUrl.trim());
+          }
+          setActiveTab('scraper');
+          setScraperSubTab('crawler');
+          setSuccessMsg(`"${createdBrand.name}" markası oluşturuldu! Katalog veya web sitesi linkini girerek kazımayı başlatabilirsiniz.`);
+        } else {
+          setBrandActionSuccess(`"${createdBrand.name}" markası başarıyla oluşturuldu.`);
+        }
+        setNewBrandUrl('');
+      } else {
+        setNewBrandError(data.error || 'Marka eklenemedi.');
+      }
+    } catch (err) {
+      console.error(err);
+      setNewBrandError('Sunucu bağlantı hatası.');
+    } finally {
+      setNewBrandLoading(false);
+    }
+  };
+
+  const handleDeleteBrand = async (brandId, brandName) => {
+    if (!window.confirm(`"${brandName}" markasını silmek istediğinize emin misiniz? Markaya bağlı ürünler de etkilenecektir.`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/admin/brands?id=${brandId}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setBrandActionSuccess(data.message || 'Marka silindi.');
+        loadBrands();
+        loadAdminBrands();
+      } else {
+        setBrandActionError(data.error || 'Silme işlemi başarısız.');
+      }
+    } catch (err) {
+      console.error(err);
+      setBrandActionError('Bağlantı hatası.');
+    }
+  };
+
   // Fetch initial datasets
   const loadBrands = async () => {
     try {
@@ -392,13 +478,13 @@ export default function AdminPage() {
       const data = await res.json();
       setBrands(data);
       if (data.length > 0) {
-        setSelectedBrand(data[0].id);
-        setNewDealerBrandId(data[0].id);
-        setSaasBrandId(data[0].id);
-        setExcelBrandId(data[0].id);
-        setPdfBrandId(data[0].id);
-        setManualBrandId(data[0].id);
-        setFeedBrandId(data[0].id);
+        setSelectedBrand(prev => (prev && data.some(b => b.id === prev)) ? prev : data[0].id);
+        setNewDealerBrandId(prev => (prev && data.some(b => b.id === prev)) ? prev : data[0].id);
+        setSaasBrandId(prev => (prev && data.some(b => b.id === prev)) ? prev : data[0].id);
+        setExcelBrandId(prev => (prev && data.some(b => b.id === prev)) ? prev : data[0].id);
+        setPdfBrandId(prev => (prev && data.some(b => b.id === prev)) ? prev : data[0].id);
+        setManualBrandId(prev => (prev && data.some(b => b.id === prev)) ? prev : data[0].id);
+        setFeedBrandId(prev => (prev && data.some(b => b.id === prev)) ? prev : data[0].id);
       }
     } catch (err) {
       console.error('Failed to load brands:', err);
@@ -2522,7 +2608,32 @@ export default function AdminPage() {
                   )}
 
                   <div className="form-group">
-                    <label>Hedef Marka</label>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <label style={{ margin: 0 }}>Hedef Marka</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowNewBrandModal(true);
+                          setNewBrandError('');
+                        }}
+                        style={{
+                          background: 'rgba(212, 175, 55, 0.12)',
+                          border: '1px solid rgba(212, 175, 55, 0.35)',
+                          color: '#b38e47',
+                          fontSize: '0.72rem',
+                          fontWeight: '700',
+                          padding: '3px 9px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Plus size={13} />
+                        <span>+ Yeni Marka Ekle</span>
+                      </button>
+                    </div>
                     <select 
                       value={selectedBrand} 
                       onChange={(e) => setSelectedBrand(e.target.value)} 
@@ -2536,15 +2647,24 @@ export default function AdminPage() {
                   </div>
 
                   <div className="form-group">
-                    <label>Katalog / Kategori URL&apos;si</label>
+                    <label>Katalog / Web Sitesi / Sitemap URL&apos;si</label>
                     <input 
                       type="url" 
                       value={scrapeUrl} 
                       onChange={(e) => setScrapeUrl(e.target.value)} 
                       required 
-                      placeholder="https://ngkutahyaseramik.com.tr/urunler veya https://www.vitra.com.tr/c-duvar-karolari" 
+                      placeholder="https://marka.com/urunler veya https://marka.com/sitemap.xml" 
                       className="form-input"
                     />
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
+                      <span style={{ fontSize: '0.68rem', color: '#64748b' }}>Hızlı Örnekler:</span>
+                      <button type="button" onClick={() => setScrapeUrl('https://www.bienseramik.com.tr/')} style={{ background: 'none', border: 'none', color: '#b38e47', fontSize: '0.68rem', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}>Bien</button>
+                      <button type="button" onClick={() => setScrapeUrl('https://www.vitra.com.tr/c-duvar-karolari')} style={{ background: 'none', border: 'none', color: '#b38e47', fontSize: '0.68rem', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}>VitrA</button>
+                      <button type="button" onClick={() => setScrapeUrl('https://ngkutahyaseramik.com.tr/urunler')} style={{ background: 'none', border: 'none', color: '#b38e47', fontSize: '0.68rem', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}>NG Kütahya</button>
+                      <button type="button" onClick={() => setScrapeUrl('https://www.egeseramik.com/')} style={{ background: 'none', border: 'none', color: '#b38e47', fontSize: '0.68rem', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}>Ege</button>
+                      <button type="button" onClick={() => setScrapeUrl('https://www.quagranite.com/')} style={{ background: 'none', border: 'none', color: '#b38e47', fontSize: '0.68rem', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}>Qua</button>
+                      <button type="button" onClick={() => setScrapeUrl('https://www.hititseramik.com/')} style={{ background: 'none', border: 'none', color: '#b38e47', fontSize: '0.68rem', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}>Hitit</button>
+                    </div>
                   </div>
 
                   <div className="form-group">
@@ -5290,14 +5410,38 @@ export default function AdminPage() {
       {/* TAB 6: BRAND USER ACCOUNTS */}
       {activeTab === 'brands' && (
         <div className="admin-card glass-panel w-full animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px', background: '#ffffff', borderRadius: 'var(--border-radius-sm)', border: '1px solid var(--border-color)', padding: '24px' }}>
-          <div className="card-header" style={{ display: 'flex', gap: '12px', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px' }}>
-            <Building2 size={24} style={{ color: 'var(--accent-gold)' }} />
-            <div>
-              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>Marka Kullanıcı Hesapları</h3>
-              <p style={{ margin: '4px 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
-                Fabrika yetkililerinin B2B Marka Portalı&apos;na giriş yaparken kullanacağı kullanıcı adı ve şifre bilgilerini yönetin.
-              </p>
+          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <Building2 size={24} style={{ color: 'var(--accent-gold)' }} />
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>Marka Kullanıcı Hesapları & Ürün Yönetimi</h3>
+                <p style={{ margin: '4px 0 0 0', fontSize: '0.82rem', color: '#64748b' }}>
+                  Sistemdeki markaları yönetin, yeni marka ekleyin veya web sitesinden/katalogdan scraper ile ürünlerini çekin.
+                </p>
+              </div>
             </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowNewBrandModal(true);
+                setNewBrandError('');
+              }}
+              className="btn-primary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 16px',
+                fontSize: '0.82rem',
+                fontWeight: '700',
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(212,175,55,0.25)'
+              }}
+            >
+              <Plus size={16} />
+              <span>+ Yeni Marka Ekle</span>
+            </button>
           </div>
 
           {brandActionSuccess && (
@@ -5360,17 +5504,19 @@ export default function AdminPage() {
                   <th style={{ textAlign: 'left', padding: '12px' }}>Marka Adı</th>
                   <th style={{ textAlign: 'left', padding: '12px' }}>Kullanıcı Adı</th>
                   <th style={{ textAlign: 'left', padding: '12px' }}>Giriş Şifresi</th>
-                  <th style={{ textAlign: 'center', padding: '12px', width: '120px' }}>İşlemler</th>
+                  <th style={{ textAlign: 'center', padding: '12px', width: '110px' }}>Kayıtlı Ürün</th>
+                  <th style={{ textAlign: 'center', padding: '12px', width: '220px' }}>İşlemler</th>
                 </tr>
               </thead>
               <tbody>
                 {adminBrands.length === 0 ? (
                   <tr>
-                    <td colSpan="4" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>Yükleniyor veya kayıtlı marka bulunamadı.</td>
+                    <td colSpan="5" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>Yükleniyor veya kayıtlı marka bulunamadı.</td>
                   </tr>
                 ) : (
                   adminBrands.map((b) => {
                     const isPasswordVisible = visiblePasswordId === b.id;
+                    const prodCount = b._count?.products || 0;
                     return (
                       <tr key={b.id}>
                         <td style={{ padding: '12px', fontWeight: '700' }}>
@@ -5401,20 +5547,79 @@ export default function AdminPage() {
                           )}
                         </td>
                         <td style={{ padding: '12px', textAlign: 'center' }}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingBrandId(b.id);
-                              setEditingUsername(b.username || '');
-                              setEditingPassword(b.password || '');
-                              setBrandActionSuccess('');
-                              setBrandActionError('');
-                            }}
-                            className="btn-primary"
-                            style={{ padding: '4px 10px', fontSize: '0.72rem', fontWeight: '600', borderRadius: '4px' }}
-                          >
-                            Düzenle
-                          </button>
+                          <span style={{
+                            padding: '3px 8px',
+                            borderRadius: '12px',
+                            fontSize: '0.74rem',
+                            fontWeight: '800',
+                            background: prodCount > 0 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.1)',
+                            color: prodCount > 0 ? '#059669' : '#ef4444',
+                            border: `1px solid ${prodCount > 0 ? 'rgba(16, 185, 129, 0.25)' : 'rgba(239, 68, 68, 0.2)'}`
+                          }}>
+                            {prodCount} Ürün
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px', textAlign: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedBrand(b.id);
+                                setActiveTab('scraper');
+                                setScraperSubTab('crawler');
+                                setSuccessMsg(`"${b.name}" seçildi. Web sitesi veya katalog URL'sini girerek kazımayı başlatabilirsiniz.`);
+                              }}
+                              title="Bu markaya ait ürünleri Web Scraper ile çek"
+                              style={{
+                                background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                                color: '#090d16',
+                                border: 'none',
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                fontSize: '0.72rem',
+                                fontWeight: '750',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}
+                            >
+                              <Sparkles size={12} />
+                              <span>Ürün Çek</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingBrandId(b.id);
+                                setEditingUsername(b.username || '');
+                                setEditingPassword(b.password || '');
+                                setBrandActionSuccess('');
+                                setBrandActionError('');
+                              }}
+                              className="btn-primary"
+                              style={{ padding: '4px 8px', fontSize: '0.72rem', fontWeight: '600', borderRadius: '4px' }}
+                            >
+                              Düzenle
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteBrand(b.id, b.name)}
+                              title="Markayı Sil"
+                              style={{
+                                background: 'rgba(239, 68, 68, 0.1)',
+                                border: '1px solid rgba(239, 68, 68, 0.25)',
+                                color: '#ef4444',
+                                padding: '4px 6px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -7749,6 +7954,263 @@ export default function AdminPage() {
                     </>
                   )}
                 </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* New Brand Modal */}
+      {showNewBrandModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(5px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '16px',
+            border: '1.5px solid #d4af37',
+            width: '100%',
+            maxWidth: '520px',
+            padding: '28px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            position: 'relative'
+          }}>
+            <button 
+              type="button"
+              onClick={() => setShowNewBrandModal(false)}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'none',
+                border: 'none',
+                color: '#64748b',
+                cursor: 'pointer'
+              }}
+            >
+              <X size={20} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
+                background: 'rgba(212, 175, 55, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#b38e47'
+              }}>
+                <Building2 size={22} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.18rem', fontWeight: '850', color: '#0f172a' }}>
+                  Yeni Marka Tanımla
+                </h3>
+                <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: '#64748b' }}>
+                  Markayı sisteme kaydedin ve web sitesi linkiyle ürünlerini kazıyın.
+                </p>
+              </div>
+            </div>
+
+            {newBrandError && (
+              <div style={{
+                margin: '16px 0',
+                padding: '10px 14px',
+                background: 'rgba(239, 68, 68, 0.08)',
+                color: '#ef4444',
+                borderRadius: '8px',
+                fontSize: '0.8rem',
+                fontWeight: '600'
+              }}>
+                {newBrandError}
+              </div>
+            )}
+
+            <form onSubmit={(e) => handleCreateNewBrand(e, false)} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '750', color: '#334155', marginBottom: '5px' }}>
+                  Marka Adı <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input 
+                  type="text" 
+                  value={newBrandName} 
+                  onChange={(e) => {
+                    setNewBrandName(e.target.value);
+                    if (!newBrandUsername) {
+                      setNewBrandUsername(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''));
+                    }
+                  }} 
+                  required 
+                  placeholder="Örn: Hitit Seramik, Decovita, Ece Seramik, Seranit..."
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.88rem'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '750', color: '#334155', marginBottom: '5px' }}>
+                  Katalog / Web Sitesi URL&apos;si <span style={{ color: '#94a3b8', fontWeight: '500' }}>(Opsiyonel - Scraper İçin)</span>
+                </label>
+                <input 
+                  type="url" 
+                  value={newBrandUrl} 
+                  onChange={(e) => setNewBrandUrl(e.target.value)} 
+                  placeholder="https://www.hititseramik.com/urunler veya sitemap.xml"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.88rem'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '750', color: '#334155', marginBottom: '5px' }}>
+                  Logo Görsel URL&apos;si <span style={{ color: '#94a3b8', fontWeight: '500' }}>(Opsiyonel)</span>
+                </label>
+                <input 
+                  type="url" 
+                  value={newBrandLogo} 
+                  onChange={(e) => setNewBrandLogo(e.target.value)} 
+                  placeholder="https://.../logo.png"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.88rem'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>
+                    Kullanıcı Adı <span style={{ color: '#94a3b8', fontWeight: '400' }}>(Opsiyonel)</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    value={newBrandUsername} 
+                    onChange={(e) => setNewBrandUsername(e.target.value.toLowerCase().replace(/\s+/g, ''))} 
+                    placeholder="Otomatik oluşturulur"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.82rem'
+                    }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>
+                    Giriş Şifresi <span style={{ color: '#94a3b8', fontWeight: '400' }}>(Opsiyonel)</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    value={newBrandPassword} 
+                    onChange={(e) => setNewBrandPassword(e.target.value)} 
+                    placeholder="Otomatik oluşturulur"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.82rem'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
+                <button 
+                  type="button" 
+                  onClick={(e) => handleCreateNewBrand(e, true)}
+                  disabled={newBrandLoading || !newBrandName.trim()}
+                  style={{
+                    width: '100%',
+                    padding: '11px 16px',
+                    borderRadius: '8px',
+                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    color: '#090d16',
+                    border: 'none',
+                    fontSize: '0.85rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 12px rgba(212,175,55,0.3)'
+                  }}
+                >
+                  {newBrandLoading ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Kaydediliyor...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={16} />
+                      <span>⚡ Markayı Kaydet & Scraper ile Ürün Çek</span>
+                    </>
+                  )}
+                </button>
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowNewBrandModal(false)}
+                    style={{
+                      flex: 1,
+                      padding: '9px 16px',
+                      borderRadius: '8px',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#475569',
+                      fontSize: '0.82rem',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    İptal
+                  </button>
+                  <button 
+                    type="submit" 
+                    disabled={newBrandLoading || !newBrandName.trim()}
+                    className="btn-secondary"
+                    style={{
+                      flex: 1,
+                      padding: '9px 16px',
+                      borderRadius: '8px',
+                      fontSize: '0.82rem',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Sadece Markayı Kaydet
+                  </button>
+                </div>
               </div>
             </form>
           </div>
