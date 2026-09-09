@@ -2232,17 +2232,20 @@ Yetkili Satış & Showroom Departmanı`;
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: '24px 16px',
+          padding: isSidebarCollapsed ? '16px 8px' : '16px 14px',
           boxSizing: 'border-box',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'sticky',
           top: 0,
           height: '100vh',
+          maxHeight: '100vh',
+          overflowY: 'auto',
+          overflowX: 'hidden',
           zIndex: 100,
           flexShrink: 0
         }}>
-          {/* Top Part of Sidebar */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          {/* Top Part of Sidebar: Logo & Dealer Profile */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flexShrink: 0, marginBottom: '10px' }}>
             {/* Logo & Toggle */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: isSidebarCollapsed ? 'center' : 'space-between' }}>
               {!isSidebarCollapsed && (
@@ -2290,10 +2293,10 @@ Yetkili Satış & Showroom Departmanı`;
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.05)',
                 borderRadius: '12px',
-                padding: '12px 14px',
+                padding: '10px 12px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '8px'
+                gap: '6px'
               }}>
                 <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {dealerInfo.name}
@@ -2302,7 +2305,7 @@ Yetkili Satış & Showroom Departmanı`;
                   <MapPin size={10} />
                   <span>{dealerInfo.district}, {dealerInfo.city}</span>
                 </div>
-                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px' }}>
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '2px' }}>
                   <span style={{ fontSize: '0.62rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', fontWeight: '700' }}>
                     {dealerInfo.brandName} Bayisi
                   </span>
@@ -2331,14 +2334,14 @@ Yetkili Satış & Showroom Departmanı`;
                     justifyContent: 'center',
                     gap: '6px',
                     width: '100%',
-                    padding: '7px 10px',
+                    padding: '6px 10px',
                     borderRadius: '8px',
                     background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                     color: '#090d16',
                     fontSize: '0.74rem',
                     fontWeight: '800',
                     textDecoration: 'none',
-                    marginTop: '4px',
+                    marginTop: '2px',
                     transition: 'all 0.2s ease',
                     boxShadow: '0 2px 8px rgba(212, 175, 55, 0.2)'
                   }}
@@ -2349,113 +2352,131 @@ Yetkili Satış & Showroom Departmanı`;
                 </a>
               </div>
             )}
-
-            {/* Navigation Links */}
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {[
-                { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
-                { id: 'stock-exchange', label: '🤝 Bayi Stok Borsası', icon: <Building2 size={18} /> },
-                { id: 'quick-quote', label: '💬 WhatsApp & PDF Teklif', icon: <Calculator size={18} />, isPremiumFeature: true },
-                { id: 'showroom-qr', label: '📱 Showroom QR Etiketleri', icon: <QrCode size={18} />, isPremiumFeature: true },
-                { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
-                { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
-                { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
-                { id: 'outlet-exchange', label: 'Outlet & Proje Fazlası', icon: <Sparkles size={18} /> },
-                { id: 'subscription', label: 'Abonelik Yönetimi', icon: <CreditCard size={18} /> },
-                { id: 'settings', label: 'Şube Ayarları', icon: <Settings size={18} /> },
-              ].map(link => {
-                const isActive = activePortalTab === link.id;
-                const isLocked = link.isPremiumFeature && saasInfo?.plan !== 'PREMIUM';
-                return (
-                  <button
-                    key={link.id}
-                    onClick={() => {
-                      if (link.id === 'stock-exchange') {
-                        window.location.href = '/bayi/stok-borsasi';
-                        return;
-                      }
-                      setActivePortalTab(link.id);
-                      if (link.id === 'settings') {
-                        setShowSettings(true);
-                      } else {
-                        setShowSettings(false);
-                      }
-                    }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      width: '100%',
-                      padding: '12px 14px',
-                      background: isActive ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'transparent',
-                      border: 'none',
-                      borderRadius: '8px',
-                      color: isActive ? '#090d16' : '#94a3b8',
-                      cursor: 'pointer',
-                      fontSize: '0.82rem',
-                      fontWeight: isActive ? '800' : '600',
-                      textAlign: 'left',
-                      justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                      transition: 'all 0.2s'
-                    }}
-                    title={link.label}
-                    className={isActive ? "" : "hover-gold-text"}
-                  >
-                    {link.icon}
-                    {!isSidebarCollapsed && (
-                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1, gap: '6px' }}>
-                        <span>{link.label}</span>
-                        {link.isPremiumFeature && (
-                          <span style={{
-                            fontSize: '0.6rem',
-                            padding: '2px 6px',
-                            borderRadius: '4px',
-                            background: isLocked ? 'rgba(212, 175, 55, 0.15)' : 'linear-gradient(135deg, #111 0%, #333 100%)',
-                            color: '#d4af37',
-                            border: '1px solid rgba(212, 175, 55, 0.3)',
-                            fontWeight: '800',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '3px'
-                          }}>
-                            {isLocked ? <Lock size={9} /> : <Crown size={9} />}
-                            {isLocked ? 'KİLİTLİ' : 'PRO'}
-                          </span>
-                        )}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
           </div>
 
+          {/* Navigation Links - Scrollable Middle Area */}
+          <nav className="dealer-sidebar-nav" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            paddingRight: isSidebarCollapsed ? '0' : '2px'
+          }}>
+            {[
+              { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
+              { id: 'stock-exchange', label: '🤝 Bayi Stok Borsası', icon: <Building2 size={18} /> },
+              { id: 'quick-quote', label: '💬 WhatsApp & PDF Teklif', icon: <Calculator size={18} />, isPremiumFeature: true },
+              { id: 'showroom-qr', label: '📱 Showroom QR Etiketleri', icon: <QrCode size={18} />, isPremiumFeature: true },
+              { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
+              { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
+              { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
+              { id: 'outlet-exchange', label: 'Outlet & Proje Fazlası', icon: <Sparkles size={18} /> },
+              { id: 'subscription', label: 'Abonelik Yönetimi', icon: <CreditCard size={18} /> },
+              { id: 'settings', label: 'Şube Ayarları', icon: <Settings size={18} /> },
+            ].map(link => {
+              const isActive = activePortalTab === link.id;
+              const isLocked = link.isPremiumFeature && saasInfo?.plan !== 'PREMIUM';
+              return (
+                <button
+                  key={link.id}
+                  onClick={() => {
+                    if (link.id === 'stock-exchange') {
+                      window.location.href = '/bayi/stok-borsasi';
+                      return;
+                    }
+                    setActivePortalTab(link.id);
+                    if (link.id === 'settings') {
+                      setShowSettings(true);
+                    } else {
+                      setShowSettings(false);
+                    }
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    width: '100%',
+                    padding: isSidebarCollapsed ? '10px 8px' : '10px 12px',
+                    background: isActive ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'transparent',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: isActive ? '#090d16' : '#94a3b8',
+                    cursor: 'pointer',
+                    fontSize: '0.82rem',
+                    fontWeight: isActive ? '800' : '600',
+                    textAlign: 'left',
+                    justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                    transition: 'all 0.2s',
+                    flexShrink: 0
+                  }}
+                  title={link.label}
+                  className={isActive ? "" : "hover-gold-text"}
+                >
+                  {link.icon}
+                  {!isSidebarCollapsed && (
+                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1, gap: '6px', overflow: 'hidden' }}>
+                      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{link.label}</span>
+                      {link.isPremiumFeature && (
+                        <span style={{
+                          fontSize: '0.6rem',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          background: isLocked ? 'rgba(212, 175, 55, 0.15)' : 'linear-gradient(135deg, #111 0%, #333 100%)',
+                          color: '#d4af37',
+                          border: '1px solid rgba(212, 175, 55, 0.3)',
+                          fontWeight: '800',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          flexShrink: 0
+                        }}>
+                          {isLocked ? <Lock size={9} /> : <Crown size={9} />}
+                          {isLocked ? 'KİLİTLİ' : 'PRO'}
+                        </span>
+                      )}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+
           {/* Bottom Part of Sidebar - Logout */}
-          <button
-            onClick={handleLogout}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              width: '100%',
-              padding: '12px 14px',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: '8px',
-              color: '#ef4444',
-              cursor: 'pointer',
-              fontSize: '0.82rem',
-              fontWeight: '700',
-              textAlign: 'left',
-              justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-              transition: 'all 0.2s'
-            }}
-            title="Çıkış Yap"
-            className="hover-gold-text"
-          >
-            <LogOut size={18} />
-            {!isSidebarCollapsed && <span>Çıkış Yap</span>}
-          </button>
+          <div style={{
+            flexShrink: 0,
+            marginTop: 'auto',
+            paddingTop: '10px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)'
+          }}>
+            <button
+              onClick={handleLogout}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                width: '100%',
+                padding: isSidebarCollapsed ? '10px 8px' : '10px 12px',
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                borderRadius: '8px',
+                color: '#ef4444',
+                cursor: 'pointer',
+                fontSize: '0.82rem',
+                fontWeight: '700',
+                textAlign: 'left',
+                justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                transition: 'all 0.2s'
+              }}
+              title="Çıkış Yap"
+              className="hover-gold-text"
+            >
+              <LogOut size={18} />
+              {!isSidebarCollapsed && <span>Çıkış Yap</span>}
+            </button>
+          </div>
         </aside>
       )}
 
@@ -7306,6 +7327,30 @@ Yetkili Satış & Showroom Departmanı`;
 
       {/* RESPONSIVE STYLES */}
       <style jsx>{`
+        /* ===== SIDEBAR SMOOTH SCROLLBAR ===== */
+        .dealer-sidebar::-webkit-scrollbar,
+        .dealer-sidebar-nav::-webkit-scrollbar {
+          width: 4px;
+        }
+        .dealer-sidebar::-webkit-scrollbar-track,
+        .dealer-sidebar-nav::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .dealer-sidebar::-webkit-scrollbar-thumb,
+        .dealer-sidebar-nav::-webkit-scrollbar-thumb {
+          background: rgba(212, 175, 55, 0.25);
+          border-radius: 4px;
+        }
+        .dealer-sidebar::-webkit-scrollbar-thumb:hover,
+        .dealer-sidebar-nav::-webkit-scrollbar-thumb:hover {
+          background: rgba(212, 175, 55, 0.55);
+        }
+        .dealer-sidebar,
+        .dealer-sidebar-nav {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(212, 175, 55, 0.25) transparent;
+        }
+
         /* ===== PORTAL GLASSMORPHIC DARK THEME ===== */
         .glass-panel {
           background: rgba(17, 24, 39, 0.7) !important;
