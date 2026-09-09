@@ -53,7 +53,7 @@ import {
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
 import QuotePDFTemplate from '@/components/QuotePDFTemplate';
-import { calculateQuote } from '@/lib/quoteCalculator';
+import { calculateQuote, formatQuoteWhatsAppText, getWhatsAppUrl } from '@/lib/quoteCalculator';
 
 export default function DealerPortalPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -199,86 +199,40 @@ export default function DealerPortalPage() {
       discountPercent: quoteDiscountPercent,
       includeAdhesive: quoteIncludeAdhesive,
       adhesiveUnitPriceBag: quoteAdhesiveUnitPriceBag,
+      adhesiveManualBags: quoteAdhesiveManualBags || null,
       includeGrout: quoteIncludeGrout,
       groutUnitPriceKg: quoteGroutUnitPriceKg,
+      groutManualKg: quoteGroutManualKg || null,
       laborCostTotal: quoteLaborCostTotal,
       shippingCostTotal: quoteShippingCostTotal,
       notes: quoteNotes
     };
 
-    const phone = (targetQuote.customerPhone || '').replace(/[^\d]/g, '');
-    const cleanPhone = phone.startsWith('0') ? '9' + phone : (phone.startsWith('90') ? phone : (phone.length === 10 ? '90' + phone : phone));
-    
-    const calc = targetQuote.calculations || calculateQuote({
-      areaM2: targetQuote.areaM2 || quoteAreaM2,
-      wastePercent: targetQuote.wastePercent || quoteWastePercent,
-      unitPriceM2: targetQuote.unitPriceM2 || quoteUnitPriceM2,
-      discountPercent: targetQuote.discountPercent || quoteDiscountPercent,
-      includeAdhesive: targetQuote.includeAdhesive !== undefined ? targetQuote.includeAdhesive : quoteIncludeAdhesive,
-      adhesiveUnitPriceBag: targetQuote.adhesiveUnitPriceBag || quoteAdhesiveUnitPriceBag,
-      adhesiveManualBags: targetQuote.adhesiveManualBags || quoteAdhesiveManualBags || null,
-      includeGrout: targetQuote.includeGrout !== undefined ? targetQuote.includeGrout : quoteIncludeGrout,
-      groutUnitPriceKg: targetQuote.groutUnitPriceKg || quoteGroutUnitPriceKg,
-      groutManualKg: targetQuote.groutManualKg || quoteGroutManualKg || null,
-      laborCostTotal: targetQuote.laborCostTotal !== undefined ? targetQuote.laborCostTotal : quoteLaborCostTotal,
-      shippingCostTotal: targetQuote.shippingCostTotal !== undefined ? targetQuote.shippingCostTotal : quoteShippingCostTotal
-    });
-
-    const dealerName = dealerInfo?.name || 'Yetkili Seramik Bayisi';
-    const dealerCity = dealerInfo?.city ? `(${dealerInfo.district || ''}, ${dealerInfo.city})` : '';
-    const custName = (targetQuote.customerName || 'Değerli Müşterimiz').toUpperCase();
-    const prodName = targetQuote.productName || 'Seramik Porselen Karo';
-    const prodCode = targetQuote.productCode || 'SB-60120';
-    const dealerSlug = dealerInfo?.slug || (dealerInfo?.name ? slugify(dealerInfo.name) : '');
-    const studioUrl = `https://www.seramikbak.com/?code=${encodeURIComponent(prodCode)}&tab=studio&dealer=${dealerSlug}`;
-
-    const text = 
-`*SAYIN ${custName} - RESMİ TEKLİF FORMU*
-🏢 *${dealerName}* ${dealerCity}
-
-Değerli müşterimiz, mağazamızı ziyaret ettiğiniz için teşekkür ederiz. Beğendiğiniz model için hazırlanan özel teklif detaylarınız aşağıdadır:
-
-━━━━━━━━━━━━━━━━━━━━━
-📦 *Seçilen Model:* ${prodName}
-🏷️ *Model Kodu:* ${prodCode}
-📐 *Net Alan:* ${calc.netAreaM2} m² (+%${calc.wastePercent} fire dahil)
-🧱 *Sipariş Metrajı:* ${calc.totalTileM2} m² (${calc.tileBoxesCount} Kutu)
-${calc.includeAdhesive ? `🧪 *Yapıştırıcı Harç:* ${calc.adhesiveBagsCount} Torba (${calc.totalAdhesiveKg} kg)\n` : ''}${calc.includeGrout ? `🎨 *Derz Dolgusu:* ${calc.totalGroutKg} kg\n` : ''}${Number(targetQuote.laborCostTotal) > 0 ? `🔨 *Uygulama & İşçilik:* ₺${Number(targetQuote.laborCostTotal).toLocaleString('tr-TR')}\n` : ''}${Number(targetQuote.shippingCostTotal) > 0 ? `🚚 *Lojistik / Sevk:* ₺${Number(targetQuote.shippingCostTotal).toLocaleString('tr-TR')}\n` : ''}
-💰 *GENEL TOPLAM:* ₺${calc.grandTotal.toLocaleString('tr-TR')} (KDV Dahil)
-━━━━━━━━━━━━━━━━━━━━━
-
-🛁 *Mekanınızda 3D Canlı Görün & İnceleyin:*
-👉 ${studioUrl}
-
-${targetQuote.notes ? `📌 *Not:* ${targetQuote.notes}\n` : ''}
-Sorularınız ve sipariş onayı için bu mesaj üzerinden bizimle iletişime geçebilirsiniz.`;
-
-    const waUrl = cleanPhone 
-      ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`
-      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+    const text = formatQuoteWhatsAppText(targetQuote, dealerInfo);
+    const waUrl = getWhatsAppUrl(targetQuote.customerPhone, text);
     window.open(waUrl, '_blank');
   };
 
   const handleSendWhatsAppReminder = (q) => {
     if (!q) return;
-    const phone = (q.customerPhone || '').replace(/[^\d]/g, '');
-    const cleanPhone = phone.startsWith('0') ? '9' + phone : (phone.startsWith('90') ? phone : (phone.length === 10 ? '90' + phone : phone));
     const dealerName = dealerInfo?.name || 'Yetkili Seramik Bayisi';
-    const custName = q.customerName || 'Değerli Müşterimiz';
+    const custName = (q.customerName || 'Değerli Müşterimiz').trim();
     const prodName = q.productName || 'seramik modelimiz';
 
     const text = 
-`Merhaba Sayın ${custName},
+`Sayın *${custName}*,
 
-${dealerName} olarak mağazamızda ${prodName} için hazırladığımız teklifimizi inceleme fırsatınız oldu mu?
+${dealerName} olarak mağazamızda ${prodName} için hazırladığımız özel fiyat teklifimizi inceleme fırsatınız oldu mu?
 
-Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız varsa memnuniyetle yardımcı olmak isteriz.
+Herhangi bir sorunuz, renk/ebat revizesi veya uygulama & montaj desteği talebiniz olursa memnuniyetle yardımcı olmak isteriz.
 
-İyi günler dileriz.`;
+Detaylar ve sipariş onayı için bu mesaj üzerinden bizimle iletişime geçebilirsiniz.
 
-    const waUrl = cleanPhone 
-      ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`
-      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+Saygılarımızla,
+*${dealerName}*
+Yetkili Satış & Showroom Departmanı`;
+
+    const waUrl = getWhatsAppUrl(q.customerPhone, text);
     window.open(waUrl, '_blank');
   };
 
@@ -318,7 +272,12 @@ Herhangi bir sorunuz, renk/ebat revizeniz veya uygulama desteği ihtiyacınız v
 
       const data = await res.json();
       if (res.ok && data.success) {
-        const newQuoteWithStatus = { ...data.quote, status: 'PENDING' };
+        const newQuoteWithStatus = { 
+          ...data.quote, 
+          whatsappMessage: data.whatsappMessage,
+          whatsappMessageRaw: data.whatsappMessageRaw,
+          status: 'PENDING' 
+        };
         setGeneratedQuote(newQuoteWithStatus);
         setSavedQuotesList(prev => {
           const updated = [newQuoteWithStatus, ...prev.filter(x => x.id !== newQuoteWithStatus.id)];

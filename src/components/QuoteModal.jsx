@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { FileText, User, Phone, Mail, FileCheck, X, Sparkles, Building2, CheckCircle2, Percent, Edit3, Plus, Trash2 } from 'lucide-react';
 import QuotePDFTemplate from './QuotePDFTemplate';
+import { formatQuoteWhatsAppText } from '@/lib/quoteCalculator';
 
 export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedDealer, calculationData, snapshotUrl }) {
   const [customerName, setCustomerName] = useState('');
@@ -133,11 +134,18 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         customItems: customItems
       },
       notes: notes,
-      createdAt: new Date().toISOString(),
-      whatsappMessage: encodeURIComponent(
-        `Merhaba ${customerName}, SeramikBak Showroom'da hazırladığımız fiyat teklifiniz hazır! Teklif No: ${quoteId}, Tutar: ₺${finalGrandTotal.toLocaleString('tr-TR')} KDV Dahil.`
-      )
+      createdAt: new Date().toISOString()
     };
+
+    const rawWa = formatQuoteWhatsAppText(quotePayload, {
+      name: selectedDealer?.name,
+      district: selectedDealer?.district,
+      city: selectedDealer?.city,
+      slug: selectedDealer?.slug
+    });
+
+    quotePayload.whatsappMessageRaw = rawWa;
+    quotePayload.whatsappMessage = encodeURIComponent(rawWa);
 
     setGeneratedQuote(quotePayload);
     setShowPdf(true);

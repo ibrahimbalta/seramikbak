@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { calculateQuote } from '@/lib/quoteCalculator';
+import { calculateQuote, formatQuoteWhatsAppText } from '@/lib/quoteCalculator';
 
 export async function POST(request) {
   try {
@@ -101,26 +101,17 @@ export async function POST(request) {
       console.warn('Analytics log failed for quote:', e);
     }
 
+    const rawText = formatQuoteWhatsAppText(quoteData, dealer);
+
     return NextResponse.json({
       success: true,
       quote: quoteData,
-      whatsappMessage: generateWhatsAppText(quoteData)
+      whatsappMessage: encodeURIComponent(rawText),
+      whatsappMessageRaw: rawText
     });
 
   } catch (error) {
     console.error('Quote POST Error:', error);
     return NextResponse.json({ error: 'Teklif oluşturulurken bir hata oluştu.' }, { status: 500 });
   }
-}
-
-function generateWhatsAppText(quote) {
-  const totalStr = `₺${quote.calculations.grandTotal.toLocaleString('tr-TR')}`;
-  return encodeURIComponent(
-    `Sayın ${quote.customerName},\n\n` +
-    `*${quote.dealerName}* tarafından hazırlanan *${quote.projectName}* projenize ait seramik & uygulama teklifiniz hazırdır.\n\n` +
-    `📌 *Seçilen Seramik:* ${quote.productName}\n` +
-    `📐 *Metraj (Fire Dahil):* ${quote.calculations.totalTileM2} m²\n` +
-    `💰 *Genel Toplam (KDV Dahil):* ${totalStr}\n\n` +
-    `Teklifinizi PDF olarak incelemek ve onaylamak için bizimle iletişime geçebilirsiniz.`
-  );
 }

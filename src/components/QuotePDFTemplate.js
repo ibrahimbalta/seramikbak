@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Printer, Share2, CheckCircle, FileText, MapPin, Phone, Mail, Building2 } from 'lucide-react';
+import { formatQuoteWhatsAppText, getWhatsAppUrl } from '@/lib/quoteCalculator';
 
 export default function QuotePDFTemplate({ quote, onClose }) {
   if (!quote) return null;
@@ -56,8 +57,12 @@ export default function QuotePDFTemplate({ quote, onClose }) {
     window.print();
   };
 
-  const phoneDigits = (customerPhone || '').replace(/[^0-9]/g, '');
-  const whatsappUrl = `https://wa.me/${phoneDigits}?text=${quote.whatsappMessage || ''}`;
+  const rawText = quote.whatsappMessageRaw || (
+    quote.whatsappMessage 
+      ? decodeURIComponent(quote.whatsappMessage)
+      : formatQuoteWhatsAppText(quote, { name: dealerName, city: dealerCity, phone: dealerPhone })
+  );
+  const whatsappUrl = getWhatsAppUrl(customerPhone, rawText);
 
   return (
     <div className="quote-pdf-modal-backdrop">
