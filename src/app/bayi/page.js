@@ -160,7 +160,8 @@ export default function DealerPortalPage() {
   const [qrSelectedProductIds, setQrSelectedProductIds] = useState([]);
   const [qrCustomPrices, setQrCustomPrices] = useState({});
   const [qrTagStyle, setQrTagStyle] = useState('luxury-gold'); // 'luxury-gold' | 'minimal-dark' | 'clean-white'
-  const [qrTagLayout, setQrTagLayout] = useState('grid-6'); // 'grid-6' | 'single-large' | 'sticker'
+  const [qrTagLayout, setQrTagLayout] = useState('grid-4'); // 'grid-4' | 'grid-6' | 'single-large' | 'sticker'
+  const [qrFilterMode, setQrFilterMode] = useState('all'); // 'all' | 'selected'
   const [qrIncludePrice, setQrIncludePrice] = useState(true);
   const [qrCopiedId, setQrCopiedId] = useState(null);
   const [qrActivePreviewProduct, setQrActivePreviewProduct] = useState(null);
@@ -3381,7 +3382,7 @@ Yetkili Satış & Showroom Departmanı`;
                     }}
                   >
                     <Printer size={16} />
-                    <span>Seçilenleri A4 Yazdır ({qrSelectedProductIds.length > 0 ? qrSelectedProductIds.length : 'Tümü'})</span>
+                    <span>{qrSelectedProductIds.length > 0 ? `Seçilen ${qrSelectedProductIds.length} Modeli A4 Yazdır` : 'Tüm Modelleri A4 Yazdır'}</span>
                   </button>
                 </div>
               </div>
@@ -3463,11 +3464,12 @@ Yetkili Satış & Showroom Departmanı`;
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#94a3b8' }}>Düzen:</span>
-                    <div style={{ display: 'flex', gap: '4px' }}>
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                       {[
-                        { id: 'grid-6', label: 'A4 6\'lı Stand Kartı' },
-                        { id: 'single-large', label: 'A5 Büyük Afiş' },
-                        { id: 'sticker', label: 'Kutu Çıkartması' }
+                        { id: 'grid-4', label: "A4 4'lü Stand (2x2)" },
+                        { id: 'grid-6', label: "A4 6'lı Stand (2x3)" },
+                        { id: 'single-large', label: "A4 2'li Büyük Afiş (1x2)" },
+                        { id: 'sticker', label: "A4 9'lu Kutu Çıkartması (3x3)" }
                       ].map(l => (
                         <button
                           key={l.id}
@@ -3499,10 +3501,44 @@ Yetkili Satış & Showroom Departmanı`;
                   </label>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  {/* Selection Filter Tabs */}
+                  <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.05)', padding: '3px', borderRadius: '8px' }}>
+                    <button
+                      onClick={() => setQrFilterMode('all')}
+                      style={{
+                        background: qrFilterMode === 'all' ? '#d4af37' : 'transparent',
+                        color: qrFilterMode === 'all' ? '#090d16' : '#cbd5e1',
+                        border: 'none',
+                        padding: '5px 10px',
+                        borderRadius: '6px',
+                        fontSize: '0.72rem',
+                        fontWeight: '800',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Tüm Modeller
+                    </button>
+                    <button
+                      onClick={() => setQrFilterMode('selected')}
+                      style={{
+                        background: qrFilterMode === 'selected' ? '#d4af37' : 'transparent',
+                        color: qrFilterMode === 'selected' ? '#090d16' : '#cbd5e1',
+                        border: 'none',
+                        padding: '5px 10px',
+                        borderRadius: '6px',
+                        fontSize: '0.72rem',
+                        fontWeight: '800',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Seçilenler ({qrSelectedProductIds.length})
+                    </button>
+                  </div>
+
                   <input 
                     type="text" 
-                    placeholder="Teşhir seramik modeli ara..."
+                    placeholder="Model veya kod ara..."
                     value={qrSearchQuery}
                     onChange={e => setQrSearchQuery(e.target.value)}
                     style={{
@@ -3513,7 +3549,7 @@ Yetkili Satış & Showroom Departmanı`;
                       color: '#fff',
                       fontSize: '0.78rem',
                       outline: 'none',
-                      width: '200px'
+                      width: '180px'
                     }}
                   />
                   <button
@@ -3551,7 +3587,7 @@ Yetkili Satış & Showroom Departmanı`;
                   return (p.name || '').toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q) || brandStr.toLowerCase().includes(q);
                 });
 
-                const displayList = qrSelectedProductIds.length > 0 
+                const displayList = qrFilterMode === 'selected'
                   ? filtered.filter(p => qrSelectedProductIds.includes(p.id))
                   : filtered;
 
@@ -3560,18 +3596,46 @@ Yetkili Satış & Showroom Departmanı`;
                 const dealerCity = dealerInfo?.city ? `${dealerInfo.district || ''} / ${dealerInfo.city}` : 'Türkiye';
 
                 return (
-                  <div className={`printable-showroom-qr-area print-layout-${qrTagLayout}`} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#94a3b8' }}>
-                        Basıma Hazır Etiketler ({displayList.length} Model Listeleniyor)
-                      </span>
+                  <div className={`printable-showroom-qr-area print-layout-${qrTagLayout} ${qrSelectedProductIds.length > 0 ? 'has-selection' : 'print-all'}`} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#94a3b8' }}>
+                          {qrFilterMode === 'selected' 
+                            ? `Baskı İçin Seçilen Modeller (${displayList.length} Model)`
+                            : `Showroom Seramik Modelleri (${displayList.length} Model Listeleniyor)`}
+                        </span>
+                        {qrSelectedProductIds.length > 0 && (
+                          <span style={{
+                            fontSize: '0.68rem',
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                            background: 'rgba(212, 175, 55, 0.15)',
+                            color: '#d4af37',
+                            border: '1px solid rgba(212, 175, 55, 0.3)',
+                            fontWeight: '800'
+                          }}>
+                            ✓ {qrSelectedProductIds.length} model baskı için seçildi
+                          </span>
+                        )}
+                      </div>
                       {displayList.length === 0 && (
-                        <button 
-                          onClick={() => loadBrandProducts()}
-                          style={{ background: 'transparent', border: 'none', color: '#d4af37', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
-                        >
-                          Modelleri Yeniden Yükle
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          {qrFilterMode === 'selected' ? (
+                            <button 
+                              onClick={() => setQrFilterMode('all')}
+                              style={{ background: 'transparent', border: 'none', color: '#d4af37', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
+                            >
+                              Tüm Modelleri Göster
+                            </button>
+                          ) : (
+                            <button 
+                              onClick={() => loadBrandProducts()}
+                              style={{ background: 'transparent', border: 'none', color: '#d4af37', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
+                            >
+                              Modelleri Yeniden Yükle
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
 
@@ -3589,7 +3653,7 @@ Yetkili Satış & Showroom Departmanı`;
                         return (
                           <div 
                             key={prod.id} 
-                            className={`showroom-qr-card tag-theme-${qrTagStyle}`}
+                            className={`showroom-qr-card tag-theme-${qrTagStyle} ${isSelected ? 'is-selected-for-print' : 'not-selected-for-print'}`}
                             style={{
                               background: qrTagStyle === 'luxury-gold' 
                                 ? 'linear-gradient(135deg, #111827 0%, #090d16 100%)' 
@@ -3597,24 +3661,27 @@ Yetkili Satış & Showroom Departmanı`;
                                 ? '#0b0f19' 
                                 : '#ffffff',
                               color: qrTagStyle === 'clean-white' ? '#0f172a' : '#ffffff',
-                              border: qrTagStyle === 'luxury-gold' 
-                                ? '2px solid rgba(212, 175, 55, 0.6)' 
-                                : qrTagStyle === 'minimal-dark' 
-                                ? '2px solid rgba(255, 255, 255, 0.15)' 
-                                : '2px solid #e2e8f0',
+                              border: isSelected
+                                ? '2.5px solid #d4af37'
+                                : (qrTagStyle === 'luxury-gold' 
+                                    ? '2px solid rgba(212, 175, 55, 0.5)' 
+                                    : qrTagStyle === 'minimal-dark' 
+                                    ? '2px solid rgba(255, 255, 255, 0.15)' 
+                                    : '2px solid #e2e8f0'),
                               borderRadius: '16px',
                               padding: '20px',
                               display: 'flex',
                               flexDirection: 'column',
                               gap: '14px',
                               position: 'relative',
-                              boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-                              pageBreakInside: 'avoid'
+                              boxShadow: isSelected ? '0 0 20px rgba(212, 175, 55, 0.35)' : '0 8px 24px rgba(0,0,0,0.2)',
+                              pageBreakInside: 'avoid',
+                              transition: 'all 0.2s ease'
                             }}
                           >
                             {/* Card Control Bar (Hidden in Print) */}
                             <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
-                              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', cursor: 'pointer' }}>
+                              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', cursor: 'pointer', userSelect: 'none' }}>
                                 <input 
                                   type="checkbox"
                                   checked={isSelected}
@@ -3623,9 +3690,10 @@ Yetkili Satış & Showroom Departmanı`;
                                       prev.includes(prod.id) ? prev.filter(x => x !== prod.id) : [...prev, prod.id]
                                     );
                                   }}
+                                  style={{ width: '16px', height: '16px', accentColor: '#d4af37', cursor: 'pointer' }}
                                 />
-                                <span style={{ fontWeight: '700', color: isSelected ? '#d4af37' : '#94a3b8' }}>
-                                  {isSelected ? 'Baskıya Eklendi' : 'Baskı İçin Seç'}
+                                <span style={{ fontWeight: '800', color: isSelected ? '#d4af37' : '#94a3b8' }}>
+                                  {isSelected ? '✓ Baskıya Eklendi' : 'Baskı İçin Seç'}
                                 </span>
                               </label>
 
@@ -3847,6 +3915,94 @@ Yetkili Satış & Showroom Departmanı`;
                         );
                       })}
                     </div>
+
+                    {/* Sticky Floating Print Action Bar when items are selected */}
+                    {qrSelectedProductIds.length > 0 && (
+                      <div className="no-print" style={{
+                        position: 'fixed',
+                        bottom: '24px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: 999,
+                        background: 'rgba(15, 23, 42, 0.95)',
+                        backdropFilter: 'blur(16px)',
+                        border: '1.5px solid #d4af37',
+                        borderRadius: '16px',
+                        padding: '10px 18px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '14px',
+                        boxShadow: '0 12px 35px rgba(0,0,0,0.6)',
+                        maxWidth: '92vw',
+                        flexWrap: 'wrap'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
+                          <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#fff' }}>
+                            {qrSelectedProductIds.length} Model Baskı İçin Seçildi
+                          </span>
+                          <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                            (A4 kağıdına {qrTagLayout === 'grid-4' ? "4'lü (2x2)" : qrTagLayout === 'grid-6' ? "6'lı (2x3)" : "2'li"} yerleşecek)
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <button
+                            onClick={() => {
+                              setTimeout(() => window.print(), 50);
+                            }}
+                            style={{
+                              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                              color: '#090d16',
+                              border: 'none',
+                              padding: '8px 16px',
+                              borderRadius: '8px',
+                              fontWeight: '800',
+                              fontSize: '0.78rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              cursor: 'pointer',
+                              boxShadow: '0 2px 10px rgba(212,175,55,0.3)'
+                            }}
+                          >
+                            <Printer size={15} />
+                            <span>A4 Yazdır ({qrSelectedProductIds.length})</span>
+                          </button>
+                          <button
+                            onClick={() => setQrFilterMode(prev => prev === 'selected' ? 'all' : 'selected')}
+                            style={{
+                              background: qrFilterMode === 'selected' ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.08)',
+                              color: qrFilterMode === 'selected' ? '#d4af37' : '#cbd5e1',
+                              border: '1px solid rgba(255,255,255,0.15)',
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              fontWeight: '700',
+                              fontSize: '0.75rem',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {qrFilterMode === 'selected' ? 'Tümünü Göster' : 'Sadece Seçilenleri İncele'}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setQrSelectedProductIds([]);
+                              setQrFilterMode('all');
+                            }}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#ef4444',
+                              fontSize: '0.75rem',
+                              fontWeight: '700',
+                              cursor: 'pointer',
+                              padding: '6px 8px'
+                            }}
+                          >
+                            Temizle
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 );
               })()}
@@ -7926,38 +8082,163 @@ Yetkili Satış & Showroom Departmanı`;
             display: block !important;
           }
 
-          /* Grid for printable cards */
-          .printable-showroom-qr-area .qr-grid-container {
+          /* Filter non-selected cards if dealer chose specific items */
+          .printable-showroom-qr-area.has-selection .showroom-qr-card.not-selected-for-print {
+            display: none !important;
+            visibility: hidden !important;
+          }
+
+          /* Grid for printable cards - Default & Grid-4: 2x2 = 4 cards per A4 page */
+          .printable-showroom-qr-area .qr-grid-container,
+          .printable-showroom-qr-area.print-layout-grid-4 .qr-grid-container {
             display: grid !important;
             grid-template-columns: repeat(2, 1fr) !important;
-            gap: 12mm 10mm !important;
+            gap: 6mm 8mm !important;
+            width: 100% !important;
+          }
+
+          .printable-showroom-qr-area.print-layout-grid-6 .qr-grid-container {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 4mm 6mm !important;
             width: 100% !important;
           }
 
           .printable-showroom-qr-area.print-layout-single-large .qr-grid-container {
+            display: grid !important;
             grid-template-columns: 1fr !important;
-            gap: 16mm !important;
+            gap: 12mm !important;
+            width: 100% !important;
           }
 
           .printable-showroom-qr-area.print-layout-sticker .qr-grid-container {
+            display: grid !important;
             grid-template-columns: repeat(3, 1fr) !important;
-            gap: 8mm !important;
+            gap: 4mm !important;
+            width: 100% !important;
           }
 
           /* Luxury stand tag card in print (Matching Screenshot 2) */
           .showroom-qr-card {
-            border: 2.5px solid #d4af37 !important;
+            border: 2px solid #d4af37 !important;
             background: #ffffff !important;
             color: #0f172a !important;
             box-shadow: none !important;
             break-inside: avoid !important;
             page-break-inside: avoid !important;
-            padding: 16px 18px !important;
-            border-radius: 16px !important;
+            padding: 12px 14px !important;
+            border-radius: 12px !important;
             display: flex !important;
             flex-direction: column !important;
-            gap: 12px !important;
+            gap: 8px !important;
             box-sizing: border-box !important;
+            max-height: 128mm !important;
+          }
+
+          /* Grid-4 specific adjustments: 2x2 per page */
+          .print-layout-grid-4 .showroom-qr-card {
+            padding: 12px 14px !important;
+            gap: 8px !important;
+            max-height: 128mm !important;
+          }
+
+          .print-layout-grid-4 .print-qr-container {
+            padding: 8px 10px !important;
+            gap: 10px !important;
+          }
+
+          .print-layout-grid-4 .print-qr-img-box {
+            width: 82px !important;
+            height: 82px !important;
+            min-width: 82px !important;
+          }
+
+          /* Grid-6 specific adjustments: 2x3 per page */
+          .print-layout-grid-6 .showroom-qr-card {
+            padding: 8px 10px !important;
+            gap: 5px !important;
+            border-radius: 10px !important;
+            max-height: 84mm !important;
+          }
+
+          .print-layout-grid-6 .print-brand-badge {
+            font-size: 0.58rem !important;
+          }
+
+          .print-layout-grid-6 .print-prod-title,
+          .print-layout-grid-6 .showroom-qr-card h3 {
+            font-size: 0.88rem !important;
+            margin: 1px 0 !important;
+          }
+
+          .print-layout-grid-6 .print-prod-sub {
+            font-size: 0.65rem !important;
+          }
+
+          .print-layout-grid-6 .print-prod-code {
+            font-size: 0.6rem !important;
+            padding: 2px 5px !important;
+          }
+
+          .print-layout-grid-6 .print-qr-container {
+            padding: 6px 8px !important;
+            gap: 8px !important;
+            border-radius: 8px !important;
+          }
+
+          .print-layout-grid-6 .print-qr-img-box {
+            width: 62px !important;
+            height: 62px !important;
+            min-width: 62px !important;
+          }
+
+          .print-layout-grid-6 .print-qr-title {
+            font-size: 0.72rem !important;
+          }
+
+          .print-layout-grid-6 .print-qr-desc {
+            font-size: 0.58rem !important;
+            line-height: 1.2 !important;
+          }
+
+          .print-layout-grid-6 .print-qr-badge {
+            font-size: 0.58rem !important;
+          }
+
+          .print-layout-grid-6 .print-card-footer {
+            padding-top: 4px !important;
+          }
+
+          .print-layout-grid-6 .print-dealer-title {
+            font-size: 0.76rem !important;
+          }
+
+          .print-layout-grid-6 .print-dealer-contact {
+            font-size: 0.6rem !important;
+          }
+
+          .print-layout-grid-6 .print-price-val {
+            font-size: 0.95rem !important;
+          }
+
+          /* Single Large (A5 / 2 per sheet) */
+          .print-layout-single-large .showroom-qr-card {
+            padding: 16px 20px !important;
+            max-height: 130mm !important;
+          }
+
+          /* Sticker format: 3x3 per page */
+          .print-layout-sticker .showroom-qr-card {
+            padding: 6px 8px !important;
+            gap: 4px !important;
+            border-radius: 8px !important;
+            max-height: 82mm !important;
+          }
+
+          .print-layout-sticker .print-qr-img-box {
+            width: 52px !important;
+            height: 52px !important;
+            min-width: 52px !important;
           }
 
           .print-brand-badge {
