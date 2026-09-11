@@ -559,28 +559,38 @@ export default function ArchitectPortalPage() {
   // Download BIM / CAD / 4K Textures package (also triggers SpecInLead radar for brand!)
   const handleDownloadAsset = async (product, assetFormat) => {
     try {
-      // Fire SpecInLead creation on the brand portal
+      // 1. Notify Brand SpecInLead radar
       fetch('/api/bim/spec-in-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           brandId: product.brandId || product.brand?.id,
           productId: product.id,
-          officeName: architectInfo.officeName,
-          architectName: architectInfo.name,
-          email: architectInfo.email,
-          phone: architectInfo.phone,
-          city: architectInfo.city,
+          officeName: architectInfo?.officeName || 'Mimarlık Ofisi',
+          architectName: architectInfo?.name || 'Mimar',
+          email: architectInfo?.email || '',
+          phone: architectInfo?.phone || '',
+          city: architectInfo?.city || 'İstanbul',
           projectType: activeProject?.projectType || 'Mimari Tasarım',
           projectName: activeProject?.title || 'ArchStudio Projesi',
           fileType: assetFormat
         })
       }).catch(e => console.warn('BIM lead sync err:', e));
 
+      // 2. Trigger real browser file download
+      const downloadUrl = `/api/architect/download-asset?productId=${product.id}&format=${encodeURIComponent(assetFormat)}`;
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', '');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // 3. Show confirmation modal
       setDownloadSuccessModal({
         product,
         assetFormat,
-        fileName: `${product.code || 'SERAMIK'}_${assetFormat}.zip`
+        fileName: `${product.code || 'SERAMIK'}_${assetFormat}`
       });
     } catch (err) {
       console.error('Download error:', err);
