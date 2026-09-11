@@ -81,6 +81,9 @@ export default function ArchitectPortalPage() {
   const [catalogProducts, setCatalogProducts] = useState([]);
   const [catalogSearch, setCatalogSearch] = useState('');
   const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogBrands, setCatalogBrands] = useState([]);
+  const [selectedBrandFilter, setSelectedBrandFilter] = useState('');
+  const [selectedStyleFilter, setSelectedStyleFilter] = useState('');
   const [showAddTileModal, setShowAddTileModal] = useState(false);
   const [selectedTargetProjectId, setSelectedTargetProjectId] = useState(null);
   const [addTileUsageArea, setAddTileUsageArea] = useState('Zemin Kaplama');
@@ -140,15 +143,33 @@ export default function ArchitectPortalPage() {
     }
   }, []);
 
-  // Initial load catalog products for search/vault
+  // Initial load catalog products and brands for search/vault
   useEffect(() => {
+    fetchBrands();
     fetchCatalog();
   }, []);
 
-  const fetchCatalog = async (query = '') => {
+  const fetchBrands = async () => {
+    try {
+      const res = await fetch('/api/brands');
+      if (res.ok) {
+        const data = await res.json();
+        setCatalogBrands(data || []);
+      }
+    } catch (err) {
+      console.error('Brands fetch error:', err);
+    }
+  };
+
+  const fetchCatalog = async (query = '', brandId = selectedBrandFilter, style = selectedStyleFilter) => {
     setCatalogLoading(true);
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=48`);
+      let url = `/api/search?limit=60`;
+      if (query && query.trim() !== '') url += `&q=${encodeURIComponent(query.trim())}`;
+      if (brandId) url += `&brandId=${encodeURIComponent(brandId)}`;
+      if (style) url += `&style=${encodeURIComponent(style)}`;
+      
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         const prods = data.products || (Array.isArray(data) ? data : []);
@@ -2461,164 +2482,511 @@ export default function ArchitectPortalPage() {
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(0, 0, 0, 0.85)',
-          backdropFilter: 'blur(8px)',
+          background: 'rgba(0, 0, 0, 0.88)',
+          backdropFilter: 'blur(12px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1000,
-          padding: '16px'
+          padding: isMobile ? '8px' : '24px',
+          boxSizing: 'border-box'
         }}>
           <div style={{
-            background: '#0d1322',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '20px',
+            background: '#0a0f1d',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            borderRadius: isMobile ? '16px' : '22px',
             width: '100%',
-            maxWidth: '750px',
-            maxHeight: '85vh',
+            maxWidth: '1100px',
+            height: isMobile ? '96vh' : '90vh',
+            maxHeight: '900px',
             display: 'flex',
             flexDirection: 'column',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 175, 55, 0.1)'
           }}>
-            {/* Header */}
+            {/* Modal Header */}
             <div style={{
-              padding: '20px',
+              padding: isMobile ? '14px 16px' : '20px 24px',
+              background: 'linear-gradient(180deg, rgba(19, 28, 47, 0.9) 0%, rgba(13, 21, 39, 0.9) 100%)',
               borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              flexShrink: 0
             }}>
-              <div>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: '#fff' }}>
-                  Projeye Seramik Seç & Ekle
-                </h3>
-                <span style={{ fontSize: '0.75rem', color: '#d4af37' }}>
-                  Hedef Proje: {activeProject?.title}
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                  color: '#090d16',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '800'
+                }}>
+                  <Layers size={22} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: isMobile ? '1.05rem' : '1.25rem', fontWeight: '800', margin: 0, color: '#fff', letterSpacing: '-0.02em' }}>
+                    Katalogdan Projeye Karo Ekle
+                  </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px', fontSize: '0.78rem' }}>
+                    <span style={{ color: '#94a3b8' }}>Hedef Proje:</span>
+                    <span style={{ color: '#d4af37', fontWeight: '700' }}>
+                      {activeProject?.title || 'Seçili Proje'}
+                    </span>
+                    <span style={{ color: '#64748b' }}>•</span>
+                    <span style={{ color: '#cbd5e1' }}>Toplam {catalogProducts.length} Karo Gösteriliyor</span>
+                  </div>
+                </div>
               </div>
               <button
                 onClick={() => setShowAddTileModal(false)}
-                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '10px',
+                  width: '36px',
+                  height: '36px',
+                  color: '#cbd5e1',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.15s'
+                }}
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
-            {/* Sub-bar inputs for usage area and areaM2 */}
+            {/* Project Context Bar: Usage Area & M2 */}
             <div style={{
-              padding: '14px 20px',
-              background: 'rgba(0, 0, 0, 0.2)',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr',
-              gap: '12px'
+              padding: isMobile ? '12px 16px' : '14px 24px',
+              background: 'rgba(212, 175, 55, 0.05)',
+              borderBottom: '1px solid rgba(212, 175, 55, 0.18)',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: '14px',
+              flexShrink: 0
             }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.72rem', color: '#94a3b8', marginBottom: '4px' }}>Uygulama Alanı</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  UYGULAMA ALANI:
+                </span>
                 <select
                   value={addTileUsageArea}
                   onChange={(e) => setAddTileUsageArea(e.target.value)}
                   style={{
-                    width: '100%',
-                    padding: '8px',
+                    padding: '8px 12px',
                     borderRadius: '8px',
-                    background: '#1e293b',
+                    background: '#131c2f',
                     color: '#fff',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    fontSize: '0.8rem'
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    fontSize: '0.82rem',
+                    fontWeight: '600',
+                    outline: 'none',
+                    cursor: 'pointer'
                   }}
                 >
                   <option value="Zemin Kaplama">Zemin Kaplama</option>
                   <option value="Banyo Duvarı">Banyo Duvarı</option>
                   <option value="Mutfak Tezgahı / Alın">Mutfak Tezgahı / Alın</option>
-                  <option value="Dış Cephe">Dış Cephe</option>
-                  <option value="Teras / Havuz Kenarı">Teras / Havuz Kenarı</option>
+                  <option value="Lobi / Karşılama Alanı">Lobi / Karşılama Alanı</option>
+                  <option value="Dış Cephe Kaplama">Dış Cephe Kaplama</option>
+                  <option value="Teras & Havuz Kenarı">Teras & Havuz Kenarı</option>
+                  <option value="Islak Hacim Zemin">Islak Hacim Zemin</option>
                 </select>
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.72rem', color: '#94a3b8', marginBottom: '4px' }}>Metraj (m²)</label>
-                <input
-                  type="number"
-                  value={addTileAreaM2}
-                  onChange={(e) => setAddTileAreaM2(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    borderRadius: '8px',
-                    background: '#1e293b',
-                    color: '#fff',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    fontSize: '0.8rem'
-                  }}
-                />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  TAHMİNİ METRAJ:
+                </span>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <input
+                    type="number"
+                    min="1"
+                    value={addTileAreaM2}
+                    onChange={(e) => setAddTileAreaM2(e.target.value)}
+                    style={{
+                      width: '100px',
+                      padding: '8px 30px 8px 12px',
+                      borderRadius: '8px',
+                      background: '#131c2f',
+                      color: '#fff',
+                      border: '1px solid rgba(212, 175, 55, 0.3)',
+                      fontSize: '0.82rem',
+                      fontWeight: '700',
+                      outline: 'none'
+                    }}
+                  />
+                  <span style={{ position: 'absolute', right: '10px', fontSize: '0.72rem', color: '#94a3b8', pointerEvents: 'none' }}>m²</span>
+                </div>
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '0.72rem', color: '#94a3b8', marginBottom: '4px' }}>Karo Ara</label>
-                <input
-                  type="text"
-                  placeholder="Ara..."
-                  value={catalogSearch}
-                  onChange={(e) => {
-                    setCatalogSearch(e.target.value);
-                    fetchCatalog(e.target.value);
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    borderRadius: '8px',
-                    background: '#1e293b',
-                    color: '#fff',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    fontSize: '0.8rem'
-                  }}
-                />
+              <div style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#94a3b8' }}>
+                Seçtiğiniz karo otomatik olarak projenin şartname ve numune sepetine eklenecektir.
               </div>
             </div>
 
-            {/* Products List */}
+            {/* Filter Toolbar: Brands pills & Search */}
             <div style={{
-              flex: 1,
-              overflowY: 'auto',
-              padding: '20px',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-              gap: '14px'
+              padding: isMobile ? '12px 16px' : '14px 24px',
+              background: 'rgba(0, 0, 0, 0.25)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              flexShrink: 0
             }}>
-              {catalogProducts.map(p => (
-                <div
-                  key={p.id}
-                  onClick={() => handleAddItemToProject(p)}
+              {/* Search input + Style dropdown */}
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
+                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                  <input
+                    type="text"
+                    placeholder="Seri adı, renk, ebat (örn. 60x120, calacatta, antrasit)..."
+                    value={catalogSearch}
+                    onChange={(e) => {
+                      setCatalogSearch(e.target.value);
+                      fetchCatalog(e.target.value, selectedBrandFilter, selectedStyleFilter);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px 10px 38px',
+                      borderRadius: '10px',
+                      background: '#131c2f',
+                      color: '#fff',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      fontSize: '0.85rem',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                  {catalogSearch && (
+                    <button
+                      onClick={() => {
+                        setCatalogSearch('');
+                        fetchCatalog('', selectedBrandFilter, selectedStyleFilter);
+                      }}
+                      style={{
+                        position: 'absolute',
+                        right: '10px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#94a3b8',
+                        cursor: 'pointer',
+                        fontSize: '0.75rem'
+                      }}
+                    >
+                      Temizle
+                    </button>
+                  )}
+                </div>
+
+                {/* Style filter */}
+                <select
+                  value={selectedStyleFilter}
+                  onChange={(e) => {
+                    setSelectedStyleFilter(e.target.value);
+                    fetchCatalog(catalogSearch, selectedBrandFilter, e.target.value);
+                  }}
                   style={{
+                    padding: '10px 14px',
+                    borderRadius: '10px',
                     background: '#131c2f',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    overflow: 'hidden',
+                    color: '#fff',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    fontSize: '0.85rem',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="">Tüm Dokular & Stiller</option>
+                  <option value="Mermer">Mermer Dokulu</option>
+                  <option value="Beton">Beton / Çimento</option>
+                  <option value="Ahşap">Ahşap Dokulu</option>
+                  <option value="Taş">Doğal Taş / Traverten</option>
+                  <option value="Metalik">Metalik / Pas</option>
+                  <option value="Düz / Monokrom">Düz / Monokrom</option>
+                </select>
+              </div>
+
+              {/* Brand Filter Pills Bar */}
+              <div style={{
+                display: 'flex',
+                gap: '8px',
+                overflowX: 'auto',
+                paddingBottom: '4px',
+                scrollbarWidth: 'none'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedBrandFilter('');
+                    fetchCatalog(catalogSearch, '', selectedStyleFilter);
+                  }}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '20px',
+                    fontSize: '0.78rem',
+                    fontWeight: '700',
+                    border: selectedBrandFilter === '' ? '1px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.1)',
+                    background: selectedBrandFilter === '' ? 'rgba(212, 175, 55, 0.18)' : 'rgba(255, 255, 255, 0.04)',
+                    color: selectedBrandFilter === '' ? '#d4af37' : '#cbd5e1',
                     cursor: 'pointer',
+                    whiteSpace: 'nowrap',
                     transition: 'all 0.15s'
                   }}
                 >
-                  <div style={{ height: '110px', background: '#1e293b' }}>
-                    <img
-                      src={p.imageUrl || '/textures/calacatta_gold.jpg'}
-                      alt=""
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  </div>
-                  <div style={{ padding: '10px' }}>
-                    <span style={{ fontSize: '0.65rem', color: '#d4af37', fontWeight: '700' }}>
-                      {p.brand?.name}
-                    </span>
-                    <h5 style={{ fontSize: '0.82rem', fontWeight: '700', margin: '2px 0', color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {p.name}
-                    </h5>
-                    <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-                      {p.width}x{p.height} cm • {p.finish}
-                    </span>
-                  </div>
+                  Tüm Markalar
+                </button>
+                {catalogBrands.map(b => {
+                  const isSelected = selectedBrandFilter === b.id;
+                  return (
+                    <button
+                      key={b.id}
+                      type="button"
+                      onClick={() => {
+                        const newBrand = isSelected ? '' : b.id;
+                        setSelectedBrandFilter(newBrand);
+                        fetchCatalog(catalogSearch, newBrand, selectedStyleFilter);
+                      }}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '20px',
+                        fontSize: '0.78rem',
+                        fontWeight: '700',
+                        border: isSelected ? '1px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.1)',
+                        background: isSelected ? 'rgba(212, 175, 55, 0.18)' : 'rgba(255, 255, 255, 0.04)',
+                        color: isSelected ? '#d4af37' : '#cbd5e1',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        transition: 'all 0.15s'
+                      }}
+                    >
+                      <span>{b.name}</span>
+                      {b._count?.products !== undefined && (
+                        <span style={{
+                          fontSize: '0.68rem',
+                          padding: '1px 6px',
+                          borderRadius: '10px',
+                          background: isSelected ? 'rgba(212, 175, 55, 0.3)' : 'rgba(255, 255, 255, 0.08)',
+                          color: isSelected ? '#fff' : '#94a3b8'
+                        }}>
+                          {b._count.products}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Products Grid Area */}
+            <div style={{
+              flex: 1,
+              overflowY: 'auto',
+              padding: isMobile ? '14px' : '22px',
+              position: 'relative'
+            }}>
+              {catalogLoading ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '240px', gap: '12px' }}>
+                  <Loader2 size={32} className="animate-spin" style={{ color: '#d4af37' }} />
+                  <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Karo kataloğu taranıyor...</span>
                 </div>
-              ))}
+              ) : catalogProducts.length > 0 ? (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? 'repeat(auto-fill, minmax(160px, 1fr))' : 'repeat(auto-fill, minmax(220px, 1fr))',
+                  gap: '16px'
+                }}>
+                  {catalogProducts.map(p => {
+                    const brandName = p.brand?.name || 'Üretici Marka';
+                    const img = p.imageUrl || p.textureUrl || '/textures/calacatta_gold.jpg';
+                    return (
+                      <div
+                        key={p.id}
+                        onClick={() => handleAddItemToProject(p)}
+                        style={{
+                          background: '#11192b',
+                          borderRadius: '14px',
+                          border: '1px solid rgba(255, 255, 255, 0.08)',
+                          overflow: 'hidden',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                          position: 'relative'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.5)';
+                          e.currentTarget.style.transform = 'translateY(-3px)';
+                          e.currentTarget.style.boxShadow = '0 10px 24px -4px rgba(0, 0, 0, 0.6), 0 0 16px rgba(212, 175, 55, 0.15)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        {/* Thumbnail Container */}
+                        <div style={{
+                          position: 'relative',
+                          width: '100%',
+                          height: isMobile ? '130px' : '150px',
+                          background: '#1e293b',
+                          overflow: 'hidden',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          <img
+                            src={img}
+                            alt={p.name}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              display: 'block'
+                            }}
+                            onError={(e) => {
+                              e.currentTarget.src = '/textures/calacatta_gold.jpg';
+                            }}
+                          />
+
+                          {/* Top Left Brand Badge */}
+                          <div style={{
+                            position: 'absolute',
+                            top: '8px',
+                            left: '8px',
+                            background: 'rgba(10, 15, 29, 0.85)',
+                            backdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(212, 175, 55, 0.3)',
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            fontSize: '0.68rem',
+                            fontWeight: '800',
+                            color: '#d4af37',
+                            letterSpacing: '0.4px'
+                          }}>
+                            {brandName}
+                          </div>
+
+                          {/* Hover Add Overlay Icon */}
+                          <div style={{
+                            position: 'absolute',
+                            bottom: '8px',
+                            right: '8px',
+                            background: '#d4af37',
+                            color: '#090d16',
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.4)'
+                          }}>
+                            <Plus size={16} strokeWidth={3} />
+                          </div>
+                        </div>
+
+                        {/* Details */}
+                        <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                          <h4 style={{
+                            fontSize: '0.86rem',
+                            fontWeight: '700',
+                            margin: '0 0 6px 0',
+                            color: '#fff',
+                            lineHeight: 1.35,
+                            overflow: 'hidden',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            minHeight: '2.4em'
+                          }}>
+                            {p.name}
+                          </h4>
+
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: 'auto', paddingTop: '8px' }}>
+                            <span style={{
+                              fontSize: '0.68rem',
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              color: '#cbd5e1'
+                            }}>
+                              {p.width}x{p.height} cm
+                            </span>
+                            {p.finish && (
+                              <span style={{
+                                fontSize: '0.68rem',
+                                background: 'rgba(255, 255, 255, 0.05)',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                color: '#94a3b8'
+                              }}>
+                                {p.finish}
+                              </span>
+                            )}
+                            {p.style && (
+                              <span style={{
+                                fontSize: '0.68rem',
+                                background: 'rgba(212, 175, 55, 0.1)',
+                                color: '#d4af37',
+                                padding: '2px 6px',
+                                borderRadius: '4px'
+                              }}>
+                                {p.style}
+                              </span>
+                            )}
+                          </div>
+
+                          <div style={{
+                            marginTop: '10px',
+                            paddingTop: '8px',
+                            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                          }}>
+                            <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                              {addTileUsageArea}
+                            </span>
+                            <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#d4af37' }}>
+                              + Projeye Ekle
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div style={{
+                  textAlign: 'center',
+                  padding: '60px 20px',
+                  color: '#94a3b8'
+                }}>
+                  <Compass size={40} style={{ color: '#d4af37', margin: '0 auto 12px auto' }} />
+                  <h4 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#fff', margin: '0 0 6px 0' }}>
+                    Kriterlere Uygun Seramik Bulunamadı
+                  </h4>
+                  <p style={{ fontSize: '0.82rem', margin: 0 }}>
+                    Lütfen arama terimini değiştirin veya diğer marka filtrelerini seçin.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
