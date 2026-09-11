@@ -505,41 +505,53 @@ export default function ArchitectPortalPage() {
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'radial-gradient(circle at 10% 20%, #0f172a 0%, #050811 100%)',
+        background: 'linear-gradient(135deg, #070b14 0%, #0d1527 50%, #0a0f1d 100%)',
         color: '#f8fafc',
         fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '24px 16px',
+        padding: isMobile ? '16px 12px 32px 12px' : '24px 16px',
         position: 'relative',
-        overflow: 'hidden'
+        boxSizing: 'border-box'
       }}>
         {/* Subtle Architectural Grid Background */}
         <div style={{
           position: 'absolute',
           inset: 0,
           backgroundImage: `
-            linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
+            linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)
           `,
-          backgroundSize: '36px 36px',
+          backgroundSize: '24px 24px',
           pointerEvents: 'none'
         }} />
 
         {/* Back Link */}
-        <div style={{ position: 'absolute', top: '24px', left: '24px', zIndex: 10 }}>
+        <div style={{
+          width: '100%',
+          maxWidth: '460px',
+          display: 'flex',
+          justifyContent: 'flex-start',
+          marginBottom: '16px',
+          position: 'relative',
+          zIndex: 10
+        }}>
           <Link href="/" style={{
-            display: 'flex',
+            display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
             color: '#94a3b8',
             textDecoration: 'none',
-            fontSize: '0.85rem',
-            fontWeight: '600'
+            fontSize: '0.82rem',
+            fontWeight: '600',
+            padding: '6px 12px',
+            borderRadius: '8px',
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid rgba(255, 255, 255, 0.06)'
           }}>
-            <ArrowRight size={16} style={{ transform: 'rotate(180deg)' }} />
+            <ArrowRight size={14} style={{ transform: 'rotate(180deg)' }} />
             <span>Ana Sayfaya Dön</span>
           </Link>
         </div>
@@ -549,57 +561,59 @@ export default function ArchitectPortalPage() {
           position: 'relative',
           zIndex: 10,
           width: '100%',
-          maxWidth: '520px',
-          background: 'rgba(15, 23, 42, 0.85)',
+          maxWidth: '460px',
+          background: 'rgba(13, 21, 39, 0.85)',
           backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(212, 175, 55, 0.25)',
-          borderRadius: '24px',
-          padding: '36px 32px',
-          boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(212, 175, 55, 0.1)'
+          border: '1px solid rgba(212, 175, 55, 0.22)',
+          borderRadius: isMobile ? '20px' : '24px',
+          padding: isMobile ? '24px 18px' : '36px 32px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 35px rgba(212, 175, 55, 0.06)',
+          boxSizing: 'border-box'
         }}>
           {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '22px' }}>
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '56px',
-              height: '56px',
-              borderRadius: '16px',
+              width: '50px',
+              height: '50px',
+              borderRadius: '14px',
               background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
               color: '#090d16',
-              boxShadow: '0 10px 25px rgba(212, 175, 55, 0.3)',
-              marginBottom: '16px'
+              boxShadow: '0 8px 20px rgba(212, 175, 55, 0.3)',
+              marginBottom: '14px'
             }}>
-              <Compass size={28} />
+              <Compass size={26} />
             </div>
             <h1 style={{
-              fontSize: '1.75rem',
+              fontSize: isMobile ? '1.45rem' : '1.75rem',
               fontWeight: '800',
               fontFamily: 'var(--font-title, "Outfit", sans-serif)',
               margin: '0 0 6px 0',
-              letterSpacing: '-0.5px'
+              letterSpacing: '-0.02em',
+              color: '#fff'
             }}>
               SeramikBak <span style={{ color: '#d4af37' }}>ArchStudio</span>
             </h1>
-            <p style={{ fontSize: '0.88rem', color: '#94a3b8', margin: 0, lineHeight: 1.5 }}>
-              Mimarlık ofisleri, iç mimarlar ve proje liderleri için B2B şartname ve 3D varlık stüdyosu.
+            <p style={{ fontSize: isMobile ? '0.8rem' : '0.86rem', color: '#94a3b8', margin: 0, lineHeight: 1.45 }}>
+              Mimarlık ofisleri ve tasarımcılar için B2B şartname, numune ve 3D BIM stüdyosu.
             </p>
           </div>
 
           {/* Quick Demo Login Hero Button */}
           <div style={{
-            background: 'rgba(212, 175, 55, 0.08)',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            borderRadius: '16px',
-            padding: '16px',
-            marginBottom: '24px',
+            background: 'rgba(212, 175, 55, 0.07)',
+            border: '1px solid rgba(212, 175, 55, 0.25)',
+            borderRadius: '14px',
+            padding: '14px 12px',
+            marginBottom: '20px',
             textAlign: 'center'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
-              <Sparkles size={16} style={{ color: '#d4af37' }} />
-              <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Hızlı İnceleme
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '8px' }}>
+              <Sparkles size={14} style={{ color: '#d4af37' }} />
+              <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+                Hızlı Demo İnceleme
               </span>
             </div>
             <button
@@ -610,46 +624,50 @@ export default function ArchitectPortalPage() {
                 background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                 color: '#090d16',
                 border: 'none',
-                borderRadius: '12px',
-                padding: '12px 16px',
+                borderRadius: '10px',
+                padding: '12px 14px',
                 fontWeight: '800',
-                fontSize: '0.9rem',
+                fontSize: isMobile ? '0.82rem' : '0.88rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '10px',
-                transition: 'all 0.2s'
+                gap: '8px',
+                lineHeight: 1.3,
+                boxShadow: '0 4px 14px rgba(212, 175, 55, 0.2)',
+                boxSizing: 'border-box'
               }}
             >
-              {authLoading ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
-              <span>Örnek Mimar Olarak Giriş Yap (Tabanlıoğlu Mimarlık)</span>
+              {authLoading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
+              <span>Örnek Mimar Olarak Giriş Yap</span>
             </button>
-            <span style={{ display: 'block', marginTop: '6px', fontSize: '0.72rem', color: '#94a3b8' }}>
-              Tek tıkla hazır projeler, BIM dokuları ve şartname motorunu test edin.
+            <span style={{ display: 'block', marginTop: '6px', fontSize: '0.7rem', color: '#94a3b8' }}>
+              Tabanlıoğlu Mimarlık demo oturumuyla tüm modülleri hemen test edin.
             </span>
           </div>
 
           {/* Tabs */}
           <div style={{
-            display: 'flex',
-            background: 'rgba(255, 255, 255, 0.05)',
-            borderRadius: '12px',
-            padding: '4px',
-            marginBottom: '24px'
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            background: 'rgba(255, 255, 255, 0.04)',
+            borderRadius: '10px',
+            padding: '3px',
+            marginBottom: '20px',
+            border: '1px solid rgba(255, 255, 255, 0.06)'
           }}>
             <button
               onClick={() => { setAuthTab('login'); setAuthError(''); }}
               style={{
-                flex: 1,
-                padding: '10px',
+                padding: '9px',
                 border: 'none',
                 borderRadius: '8px',
                 background: authTab === 'login' ? '#d4af37' : 'transparent',
                 color: authTab === 'login' ? '#090d16' : '#94a3b8',
                 fontWeight: '700',
-                fontSize: '0.85rem',
-                cursor: 'pointer'
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                transition: 'all 0.15s'
               }}
             >
               Mimar Girişi
@@ -657,15 +675,15 @@ export default function ArchitectPortalPage() {
             <button
               onClick={() => { setAuthTab('register'); setAuthError(''); }}
               style={{
-                flex: 1,
-                padding: '10px',
+                padding: '9px',
                 border: 'none',
                 borderRadius: '8px',
                 background: authTab === 'register' ? '#d4af37' : 'transparent',
                 color: authTab === 'register' ? '#090d16' : '#94a3b8',
                 fontWeight: '700',
-                fontSize: '0.85rem',
-                cursor: 'pointer'
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                transition: 'all 0.15s'
               }}
             >
               Yeni Ofis Kaydı
@@ -692,53 +710,59 @@ export default function ArchitectPortalPage() {
 
           {/* LOGIN FORM */}
           {authTab === 'login' ? (
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: '600' }}>
-                  Kurumsal E-posta Adresi
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  KURUMSAL E-POSTA ADRESİ
                 </label>
-                <input
-                  type="email"
-                  required
-                  placeholder="mimar@ofisiniz.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    background: 'rgba(0, 0, 0, 0.3)',
-                    color: '#fff',
-                    fontSize: '0.9rem',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="email"
+                    required
+                    placeholder="mimar@ofisiniz.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px 12px 40px',
+                      borderRadius: '10px',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      color: '#fff',
+                      fontSize: '0.88rem',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                  <User size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: '#94a3b8' }} />
+                </div>
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: '600' }}>
-                  Şifre
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  ŞİFRE
                 </label>
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '12px 14px',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    background: 'rgba(0, 0, 0, 0.3)',
-                    color: '#fff',
-                    fontSize: '0.9rem',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px 12px 40px',
+                      borderRadius: '10px',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      color: '#fff',
+                      fontSize: '0.88rem',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                  <Lock size={16} style={{ position: 'absolute', left: '14px', top: '14px', color: '#94a3b8' }} />
+                </div>
               </div>
 
               <button
@@ -746,55 +770,59 @@ export default function ArchitectPortalPage() {
                 disabled={authLoading}
                 style={{
                   width: '100%',
-                  background: '#1e293b',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  color: '#fff',
-                  padding: '14px',
-                  borderRadius: '12px',
-                  fontWeight: '700',
-                  fontSize: '0.92rem',
+                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                  color: '#090d16',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '13px',
+                  fontWeight: '800',
+                  fontSize: '0.9rem',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  marginTop: '8px'
+                  marginTop: '6px',
+                  boxShadow: '0 4px 16px rgba(212, 175, 55, 0.25)'
                 }}
               >
-                {authLoading ? <Loader2 size={18} className="animate-spin" /> : <Lock size={18} />}
-                <span>Giriş Yap</span>
+                {authLoading ? <Loader2 size={16} className="animate-spin" /> : <Lock size={16} />}
+                <span>ArchStudio'ya Giriş Yap</span>
               </button>
             </form>
           ) : (
             /* REGISTER FORM */
-            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
-                  Mimarlık Ofisi / Şirket Unvanı *
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                  MİMARLIK OFİSİ / ŞİRKET UNVANI *
                 </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Örn: Tabanlıoğlu Mimarlık"
-                  value={regOfficeName}
-                  onChange={(e) => setRegOfficeName(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    background: 'rgba(0, 0, 0, 0.3)',
-                    color: '#fff',
-                    fontSize: '0.85rem',
-                    boxSizing: 'border-box'
-                  }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Örn: Tabanlıoğlu Mimarlık"
+                    value={regOfficeName}
+                    onChange={(e) => setRegOfficeName(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px 10px 38px',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      color: '#fff',
+                      fontSize: '0.82rem',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                  <Building2 size={15} style={{ position: 'absolute', left: '12px', top: '12px', color: '#94a3b8' }} />
+                </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
-                    Yetkili Mimar Adı *
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                    YETKİLİ MİMAR ADI *
                   </label>
                   <input
                     type="text"
@@ -806,17 +834,17 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      background: 'rgba(0, 0, 0, 0.3)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: 'rgba(255, 255, 255, 0.05)',
                       color: '#fff',
-                      fontSize: '0.85rem',
+                      fontSize: '0.82rem',
                       boxSizing: 'border-box'
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
-                    Unvan
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                    UNVAN
                   </label>
                   <select
                     value={regTitle}
@@ -825,10 +853,10 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      background: 'rgba(0, 0, 0, 0.3)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: '#1e293b',
                       color: '#fff',
-                      fontSize: '0.85rem',
+                      fontSize: '0.82rem',
                       boxSizing: 'border-box'
                     }}
                   >
@@ -841,10 +869,10 @@ export default function ArchitectPortalPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
-                    E-posta *
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                    E-POSTA *
                   </label>
                   <input
                     type="email"
@@ -856,17 +884,17 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      background: 'rgba(0, 0, 0, 0.3)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: 'rgba(255, 255, 255, 0.05)',
                       color: '#fff',
-                      fontSize: '0.85rem',
+                      fontSize: '0.82rem',
                       boxSizing: 'border-box'
                     }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
-                    Telefon *
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                    TELEFON *
                   </label>
                   <input
                     type="tel"
@@ -878,20 +906,20 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      background: 'rgba(0, 0, 0, 0.3)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: 'rgba(255, 255, 255, 0.05)',
                       color: '#fff',
-                      fontSize: '0.85rem',
+                      fontSize: '0.82rem',
                       boxSizing: 'border-box'
                     }}
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
-                    Şehir
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                    ŞEHİR
                   </label>
                   <select
                     value={regCity}
@@ -900,10 +928,10 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      background: 'rgba(0, 0, 0, 0.3)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: '#1e293b',
                       color: '#fff',
-                      fontSize: '0.85rem',
+                      fontSize: '0.82rem',
                       boxSizing: 'border-box'
                     }}
                   >
@@ -911,8 +939,8 @@ export default function ArchitectPortalPage() {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
-                    Mimarlar Odası Sicil (Opsiyonel)
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                    ODA SİCİL (OPSİYONEL)
                   </label>
                   <input
                     type="text"
@@ -923,10 +951,10 @@ export default function ArchitectPortalPage() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      background: 'rgba(0, 0, 0, 0.3)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: 'rgba(255, 255, 255, 0.05)',
                       color: '#fff',
-                      fontSize: '0.85rem',
+                      fontSize: '0.82rem',
                       boxSizing: 'border-box'
                     }}
                   />
@@ -934,8 +962,8 @@ export default function ArchitectPortalPage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
-                  Giriş Şifresi *
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '4px', textTransform: 'uppercase' }}>
+                  ŞİFRE *
                 </label>
                 <input
                   type="password"
@@ -947,10 +975,10 @@ export default function ArchitectPortalPage() {
                     width: '100%',
                     padding: '10px 12px',
                     borderRadius: '8px',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    background: 'rgba(0, 0, 0, 0.3)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    background: 'rgba(255, 255, 255, 0.05)',
                     color: '#fff',
-                    fontSize: '0.85rem',
+                    fontSize: '0.82rem',
                     boxSizing: 'border-box'
                   }}
                 />
@@ -964,19 +992,20 @@ export default function ArchitectPortalPage() {
                   background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                   color: '#090d16',
                   border: 'none',
-                  borderRadius: '12px',
-                  padding: '14px',
+                  borderRadius: '10px',
+                  padding: '12px',
                   fontWeight: '800',
-                  fontSize: '0.92rem',
+                  fontSize: '0.9rem',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  marginTop: '8px'
+                  marginTop: '6px',
+                  boxShadow: '0 4px 16px rgba(212, 175, 55, 0.25)'
                 }}
               >
-                {authLoading ? <Loader2 size={18} className="animate-spin" /> : <User size={18} />}
+                {authLoading ? <Loader2 size={16} className="animate-spin" /> : <User size={16} />}
                 <span>ArchStudio Hesabı Oluştur</span>
               </button>
             </form>
@@ -1187,7 +1216,7 @@ export default function ArchitectPortalPage() {
         
         {/* Top Header Bar */}
         <header style={{
-          background: 'rgba(10, 15, 29, 0.9)',
+          background: 'rgba(10, 15, 29, 0.95)',
           backdropFilter: 'blur(16px)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           padding: isMobile ? '12px 16px' : '16px 32px',
@@ -1196,50 +1225,107 @@ export default function ArchitectPortalPage() {
           zIndex: 100,
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          boxSizing: 'border-box'
         }}>
-          <div>
-            <h1 style={{
-              fontSize: isMobile ? '1.1rem' : '1.35rem',
-              fontWeight: '800',
-              margin: 0,
-              fontFamily: 'var(--font-title, "Outfit", sans-serif)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px'
-            }}>
-              {activeTab === 'projects' && '📐 Projelerim & Moodboard Çalışma Alanı'}
-              {activeTab === 'vault' && '🧱 3D / BIM & Render Varlık Kasası (4K PBR)'}
-              {activeTab === 'spec-writer' && '📄 TS EN 14411 Teknik Şartname Sihirbazı'}
-              {activeTab === 'samples' && '📦 Ücretsiz Mimari Numune Kutusu'}
-              {activeTab === 'quotes' && '💰 Proje İskontolu B2B Teklif Masası'}
-            </h1>
-            <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '3px 0 0 0' }}>
-              {architectInfo?.officeName} • {architectInfo?.city}
-            </p>
-          </div>
+          {isMobile ? (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                  color: '#090d16',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <Compass size={18} />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '0.88rem', fontWeight: '800', margin: 0, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>
+                    {architectInfo?.officeName}
+                  </h4>
+                  <span style={{ fontSize: '0.65rem', color: '#d4af37', fontWeight: '700' }}>
+                    {activeTab === 'projects' && 'Projeler & Moodboard'}
+                    {activeTab === 'vault' && '3D & BIM Varlıklar'}
+                    {activeTab === 'spec-writer' && 'Şartname Motoru'}
+                    {activeTab === 'samples' && 'Numune Kutum'}
+                    {activeTab === 'quotes' && 'Proje İskontosu'}
+                  </span>
+                </div>
+              </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button
-              onClick={() => setShowNewProjectModal(true)}
-              style={{
-                background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                color: '#090d16',
-                border: 'none',
-                borderRadius: '10px',
-                padding: '8px 14px',
-                fontSize: '0.82rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <Plus size={16} />
-              <span>Yeni Proje Başlat</span>
-            </button>
-          </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  onClick={() => setShowNewProjectModal(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    color: '#090d16',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '6px 10px',
+                    fontSize: '0.75rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <Plus size={14} />
+                  <span>Proje</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div>
+                <h1 style={{
+                  fontSize: '1.35rem',
+                  fontWeight: '800',
+                  margin: 0,
+                  fontFamily: 'var(--font-title, "Outfit", sans-serif)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  {activeTab === 'projects' && '📐 Projelerim & Moodboard Çalışma Alanı'}
+                  {activeTab === 'vault' && '🧱 3D / BIM & Render Varlık Kasası (4K PBR)'}
+                  {activeTab === 'spec-writer' && '📄 TS EN 14411 Teknik Şartname Sihirbazı'}
+                  {activeTab === 'samples' && '📦 Ücretsiz Mimari Numune Kutusu'}
+                  {activeTab === 'quotes' && '💰 Proje İskontolu B2B Teklif Masası'}
+                </h1>
+                <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '3px 0 0 0' }}>
+                  {architectInfo?.officeName} • {architectInfo?.city}
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <button
+                  onClick={() => setShowNewProjectModal(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    color: '#090d16',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '8px 14px',
+                    fontSize: '0.82rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Plus size={16} />
+                  <span>Yeni Proje Başlat</span>
+                </button>
+              </div>
+            </>
+          )}
         </header>
 
         {/* Global Notifications */}
@@ -1276,7 +1362,7 @@ export default function ArchitectPortalPage() {
         )}
 
         {/* Main Content Body */}
-        <main style={{ padding: isMobile ? '16px 12px' : '32px', flex: 1 }}>
+        <main style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', flex: 1, boxSizing: 'border-box' }}>
 
           {/* ======================================================== */}
           {/* TAB 1: PROJECTS & MOODBOARDS */}
@@ -2715,6 +2801,59 @@ export default function ArchitectPortalPage() {
               Tamam
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Mobile Bottom Navigation Bar */}
+      {isMobile && (
+        <div style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '62px',
+          background: 'rgba(7, 11, 20, 0.95)',
+          backdropFilter: 'blur(12px)',
+          borderTop: '1px solid rgba(212, 175, 55, 0.25)',
+          display: 'flex',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+          zIndex: 900,
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.6)'
+        }}>
+          {[
+            { id: 'projects', label: 'Projeler', icon: <Layers size={18} /> },
+            { id: 'vault', label: '3D BIM', icon: <Box size={18} /> },
+            { id: 'spec-writer', label: 'Şartname', icon: <FileText size={18} /> },
+            { id: 'samples', label: 'Numune', icon: <Package size={18} /> },
+            { id: 'quotes', label: 'İskonto', icon: <Building2 size={18} /> }
+          ].map(tab => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: isActive ? '#d4af37' : '#94a3b8',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.65rem',
+                  fontWeight: isActive ? '700' : '500',
+                  padding: '6px 10px',
+                  transition: 'color 0.2s'
+                }}
+              >
+                {tab.icon}
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
       )}
 
