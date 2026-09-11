@@ -60,7 +60,8 @@ import {
   Smartphone,
   Store,
   QrCode,
-  Maximize2
+  Maximize2,
+  Compass
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import WebARModal from '@/components/WebARModal';
