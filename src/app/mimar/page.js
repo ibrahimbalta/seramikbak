@@ -182,7 +182,7 @@ export default function ArchitectPortalPage() {
     }
   };
 
-  const fetchProjects = async (archId) => {
+  const fetchProjects = async (archId, preferredActiveProjectId = null) => {
     const id = archId || architectInfo?.id;
     if (!id) return;
     setProjectsLoading(true);
@@ -190,9 +190,20 @@ export default function ArchitectPortalPage() {
       const res = await fetch(`/api/architect/projects?architectId=${id}`);
       if (res.ok) {
         const data = await res.json();
-        setProjects(data.projects || []);
-        if (data.projects && data.projects.length > 0 && !activeProject) {
-          setActiveProject(data.projects[0]);
+        const projectList = data.projects || [];
+        setProjects(projectList);
+        
+        // Keep currently active project synchronized with fresh items
+        const currentActiveId = preferredActiveProjectId || activeProject?.id;
+        if (currentActiveId) {
+          const updatedActive = projectList.find(p => p.id === currentActiveId);
+          if (updatedActive) {
+            setActiveProject(updatedActive);
+          } else if (projectList.length > 0) {
+            setActiveProject(projectList[0]);
+          }
+        } else if (projectList.length > 0) {
+          setActiveProject(projectList[0]);
         }
       }
     } catch (err) {
@@ -356,11 +367,48 @@ export default function ArchitectPortalPage() {
     }
   };
 
-  // Add Item to Project
+  // Add Item to Project (Instant UI update + Server Sync)
   const handleAddItemToProject = async (product) => {
     const targetProjId = selectedTargetProjectId || activeProject?.id;
     if (!targetProjId) return;
 
+    // Temporary item for instantaneous UI feedback
+    const tempItemId = 'temp_' + Date.now();
+    const newItem = {
+      id: tempItemId,
+      projectId: targetProjId,
+      productId: product.id,
+      usageArea: addTileUsageArea,
+      areaM2: parseFloat(addTileAreaM2) || 100,
+      createdAt: new Date().toISOString(),
+      product: {
+        ...product,
+        brand: product.brand || { name: 'Üretici Marka' }
+      }
+    };
+
+    // 1. Instant Optimistic State Update
+    setActiveProject(prev => {
+      if (!prev || prev.id !== targetProjId) return prev;
+      return {
+        ...prev,
+        items: [newItem, ...(prev.items || [])]
+      };
+    });
+
+    setProjects(prevList => {
+      return prevList.map(proj => {
+        if (proj.id !== targetProjId) return proj;
+        return {
+          ...proj,
+          items: [newItem, ...(proj.items || [])]
+        };
+      });
+    });
+
+    setShowAddTileModal(false);
+
+    // 2. Server Request
     try {
       const res = await fetch('/api/architect/projects', {
         method: 'POST',
@@ -373,28 +421,72 @@ export default function ArchitectPortalPage() {
           areaM2: addTileAreaM2
         })
       });
-      if (res.ok) {
-        setShowAddTileModal(false);
-        await fetchProjects(architectInfo.id);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        // Replace temp item with real DB item
+        const realItem = data.item;
+        setActiveProject(prev => {
+          if (!prev || prev.id !== targetProjId) return prev;
+          return {
+            ...prev,
+            items: (prev.items || []).map(it => it.id === tempItemId ? realItem : it)
+          };
+        });
+        setProjects(prevList => {
+          return prevList.map(proj => {
+            if (proj.id !== targetProjId) return proj;
+            return {
+              ...proj,
+              items: (proj.items || []).map(it => it.id === tempItemId ? realItem : it)
+            };
+          });
+        });
+      } else {
+        // Rollback on error
+        await fetchProjects(architectInfo?.id, targetProjId);
       }
     } catch (err) {
       console.error('Add item error:', err);
+      await fetchProjects(architectInfo?.id, targetProjId);
     }
   };
 
-  // Remove Item from Project
+  // Remove Item from Project (Instant UI update + Server Sync)
   const handleRemoveItem = async (itemId) => {
+    if (!itemId) return;
+
+    // 1. Instant Optimistic State Update
+    setActiveProject(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        items: (prev.items || []).filter(it => it.id !== itemId)
+      };
+    });
+
+    setProjects(prevList => {
+      return prevList.map(proj => {
+        return {
+          ...proj,
+          items: (proj.items || []).filter(it => it.id !== itemId)
+        };
+      });
+    });
+
+    // 2. Server Request
     try {
       const res = await fetch('/api/architect/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'remove_item', itemId })
       });
-      if (res.ok) {
-        await fetchProjects(architectInfo.id);
+      if (!res.ok) {
+        // Rollback on failure
+        await fetchProjects(architectInfo?.id);
       }
     } catch (err) {
       console.error('Remove item error:', err);
+      await fetchProjects(architectInfo?.id);
     }
   };
 
