@@ -1640,20 +1640,23 @@ export default function BrandPortalPage() {
           position: 'sticky',
           top: 0,
           height: '100vh',
+          maxHeight: '100vh',
+          overflow: 'hidden',
           zIndex: 200
         }}>
-          {/* Sidebar Header */}
+          {/* Sidebar Header (Fixed at top) */}
           <div style={{
-            padding: '24px 16px',
+            padding: '18px 16px',
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-            overflow: 'hidden'
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            overflow: 'hidden',
+            flexShrink: 0
           }}>
             <div style={{
-              width: '36px',
-              height: '36px',
+              width: '34px',
+              height: '34px',
               borderRadius: '8px',
               background: '#fff',
               color: '#090d16',
@@ -1661,13 +1664,13 @@ export default function BrandPortalPage() {
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '900',
-              fontSize: '1.2rem',
+              fontSize: '1.1rem',
               flexShrink: 0,
               boxShadow: '0 0 10px rgba(255,255,255,0.1)'
             }}>SB</div>
             {!isSidebarCollapsed && (
               <div style={{ minWidth: 0 }}>
-                <h2 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <h2 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {brandInfo.name}
                 </h2>
                 <span style={{ 
@@ -1675,7 +1678,7 @@ export default function BrandPortalPage() {
                   padding: '2px 6px', 
                   borderRadius: '8px', 
                   display: 'inline-block',
-                  marginTop: '3px',
+                  marginTop: '2px',
                   ...getPlanBadgeStyle(currentPlan)
                 }}>
                   {currentPlan} ÜYE
@@ -1684,20 +1687,33 @@ export default function BrandPortalPage() {
             )}
           </div>
 
-          {/* Sidebar Nav Items */}
-          <nav style={{ flex: 1, padding: '16px 8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {/* Sidebar Nav Items (Scrollable when needed) */}
+          <nav 
+            className="brand-sidebar-nav"
+            style={{ 
+              flex: 1, 
+              padding: '10px 8px', 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '2px',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(212, 175, 55, 0.3) transparent'
+            }}
+          >
             {[
-              { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
-              { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={18} /> },
-              { id: 'bulk-import', label: 'Toplu Ürün & ERP', icon: <UploadCloud size={18} /> },
-              { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={18} /> },
-              { id: 'spec-in-radar', label: 'BIM Şartname Radarı', icon: <FileText size={18} /> },
-              { id: 'country-analytics', label: 'Küresel Ülke Analitiği', icon: <Globe size={18} /> },
-              { id: 'trends', label: 'Bölgesel Trendler', icon: <TrendingUp size={18} /> },
-              { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={18} /> },
-              { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={18} /> },
-              { id: 'outlet', label: 'Outlet & Seri Sonu', icon: <Tag size={18} /> },
-              { id: 'saas', label: 'Lisans & Ödemeler', icon: <CreditCard size={18} /> }
+              { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={17} /> },
+              { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={17} /> },
+              { id: 'bulk-import', label: 'Toplu Ürün & ERP', icon: <UploadCloud size={17} /> },
+              { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={17} /> },
+              { id: 'spec-in-radar', label: 'BIM Şartname Radarı', icon: <FileText size={17} /> },
+              { id: 'country-analytics', label: 'Küresel Ülke Analitiği', icon: <Globe size={17} /> },
+              { id: 'trends', label: 'Bölgesel Trendler', icon: <TrendingUp size={17} /> },
+              { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={17} /> },
+              { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={17} /> },
+              { id: 'outlet', label: 'Outlet & Seri Sonu', icon: <Tag size={17} /> },
+              { id: 'saas', label: 'Lisans & Ödemeler', icon: <CreditCard size={17} /> }
             ].map(item => {
               const isActive = activePortalTab === item.id;
               return (
@@ -1708,17 +1724,17 @@ export default function BrandPortalPage() {
                     width: '100%',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px',
-                    padding: '12px',
+                    gap: '10px',
+                    padding: '8px 12px',
                     borderRadius: '8px',
                     border: 'none',
                     background: isActive ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
                     color: isActive ? '#d4af37' : '#94a3b8',
                     cursor: 'pointer',
-                    fontSize: '0.85rem',
+                    fontSize: '0.82rem',
                     fontWeight: isActive ? '700' : '500',
                     textAlign: 'left',
-                    transition: 'all 0.2s',
+                    transition: 'all 0.15s',
                     boxSizing: 'border-box'
                   }}
                   title={isSidebarCollapsed ? item.label : undefined}
@@ -1731,13 +1747,15 @@ export default function BrandPortalPage() {
             })}
           </nav>
 
-          {/* Sidebar Collapse Toggle & Logout */}
+          {/* Sidebar Collapse Toggle & Logout (Fixed at bottom) */}
           <div style={{
-            padding: '12px 8px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            padding: '10px 8px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '4px'
+            gap: '4px',
+            flexShrink: 0,
+            background: '#090d16'
           }}>
             <button
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -1745,8 +1763,8 @@ export default function BrandPortalPage() {
                 width: '100%',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
-                padding: '10px',
+                gap: '10px',
+                padding: '8px 12px',
                 borderRadius: '8px',
                 border: 'none',
                 background: 'transparent',
@@ -1754,7 +1772,7 @@ export default function BrandPortalPage() {
                 cursor: 'pointer',
                 fontSize: '0.78rem',
                 textAlign: 'left',
-                transition: 'all 0.2s'
+                transition: 'all 0.15s'
               }}
             >
               <Menu size={16} />
@@ -1766,8 +1784,8 @@ export default function BrandPortalPage() {
                 width: '100%',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
-                padding: '10px',
+                gap: '10px',
+                padding: '8px 12px',
                 borderRadius: '8px',
                 border: 'none',
                 background: 'rgba(239, 68, 68, 0.08)',
@@ -1776,7 +1794,7 @@ export default function BrandPortalPage() {
                 fontSize: '0.78rem',
                 fontWeight: '700',
                 textAlign: 'left',
-                transition: 'all 0.2s'
+                transition: 'all 0.15s'
               }}
             >
               <LogOut size={16} />
@@ -6030,6 +6048,7 @@ export default function BrandPortalPage() {
                 { id: 'trends', label: 'Pazar Trendleri', icon: <TrendingUp size={18} /> },
                 { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={18} /> },
                 { id: 'campaigns', label: 'Reklam Yönetimi', icon: <Megaphone size={18} /> },
+                { id: 'outlet', label: 'Outlet & Seri Sonu', icon: <Tag size={18} /> },
                 { id: 'saas', label: 'Lisans & Ödemeler', icon: <CreditCard size={18} /> }
               ].map(item => {
                 const isActive = activePortalTab === item.id;
@@ -6104,6 +6123,19 @@ export default function BrandPortalPage() {
             width: 100% !important;
             box-sizing: border-box !important;
           }
+        }
+        .brand-sidebar-nav::-webkit-scrollbar {
+          width: 5px;
+        }
+        .brand-sidebar-nav::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .brand-sidebar-nav::-webkit-scrollbar-thumb {
+          background: rgba(212, 175, 55, 0.25);
+          border-radius: 4px;
+        }
+        .brand-sidebar-nav::-webkit-scrollbar-thumb:hover {
+          background: rgba(212, 175, 55, 0.5);
         }
       `}</style>
     </div>
