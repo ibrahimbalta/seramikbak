@@ -20,6 +20,7 @@ model Brand {
   saas      SaaSConfig[]
   podiumBids PodiumBid[]
   outletListings OutletListing[]
+  specInLeads    SpecInLead[]
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 }
@@ -62,6 +63,7 @@ model Product {
   dealerInventories DealerInventory[]
   outletListings OutletListing[]
   podiumBids PodiumBid[]
+  specInLeads SpecInLead[]
   
   // Technical Specifications
   peiRating        Int?           // Wear resistance rating (1-5)
@@ -442,5 +444,29 @@ model DealerStockExchange {
   status       String   @default("OPEN") // OPEN, MATCHED, CLOSED
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model SpecInLead {
+  id            String    @id @default(uuid())
+  brandId       String
+  brand         Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  productId     String?
+  product       Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  officeName    String    // Mimarlık Ofisi / Şirket Adı
+  architectName String    // Yetkili Mimar / Tasarımcı
+  email         String
+  phone         String
+  city          String    @default("İstanbul")
+  projectType   String?   // "Otel", "Konut", "Ticari / Ofis", "Villa", "Restoran", "Karma Proje"
+  projectName   String?   // Proje Adı e.g. "Bodrum Resort Hotel"
+  fileType      String    @default("REVIT_BIM") // REVIT_BIM, AUTOCAD_DWG, 4K_TEXTURES, SKETCHUP
+  status        String    @default("NEW") // NEW, CONTACTED, SPEC_IN, OFFER_SENT, WON, CLOSED
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([brandId])
+  @@index([createdAt])
+  @@index([status])
 }
 

@@ -64,6 +64,7 @@ import {
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import WebARModal from '@/components/WebARModal';
+import BimSpecDownloadModal from '@/components/BimSpecDownloadModal';
 
 // Dynamically import client-only components to prevent Next.js SSR hydration mismatches
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
@@ -721,6 +722,10 @@ export default function Home() {
   const [selectedThickness, setSelectedThickness] = useState(''); // '', 'thin', 'standard', 'thick'
   const [selectedPeiRating, setSelectedPeiRating] = useState(''); // '', '3', '4', '5'
   const [selectedIsPremium, setSelectedIsPremium] = useState(''); // '', 'true'
+
+  // BIM & Architectural Spec Download Modal
+  const [bimModalProduct, setBimModalProduct] = useState(null);
+  const [isBimModalOpen, setIsBimModalOpen] = useState(false);
 
   // Navigation
   const [activeTab, setActiveTab] = useState('search'); // search, studio, dealers, b2b
@@ -2630,20 +2635,8 @@ export default function Home() {
 
   const handleDownloadCAD = (prod) => {
     if (!prod) return;
-    setIsDownloadingCAD(true);
-    setCadDownloadSuccess(false);
-    
-    setTimeout(() => {
-      setIsDownloadingCAD(false);
-      setCadDownloadSuccess(true);
-      
-      const link = document.createElement('a');
-      link.href = '#';
-      link.setAttribute('download', `${prod.code}_3D_Textures_CAD.zip`);
-      alert(`[CAD Portal] ${prod.brand?.name} - ${prod.name} (.ZIP) Seamless texture paketi, CAD blokları ve Revit BIM dosyası başarıyla bilgisayarınıza indirildi.`);
-      
-      setTimeout(() => setCadDownloadSuccess(false), 3000);
-    }, 1500);
+    setBimModalProduct(prod);
+    setIsBimModalOpen(true);
   };
 
   const processRoomTiling = (imgRoom, imgTile, polygonPercentages, excludePercentages = [], tileScale = 1.0, blendMode = 'multiply', rotation = 0) => {
@@ -15814,6 +15807,13 @@ export default function Home() {
         userLocationName={userLocationName}
         currentDealer={activeDealerOnMap}
         initialNearbyDealers={nearestDealers}
+      />
+
+      {/* BIM & ARCHITECTURAL SPEC DOWNLOAD MODAL */}
+      <BimSpecDownloadModal
+        isOpen={isBimModalOpen}
+        onClose={() => setIsBimModalOpen(false)}
+        product={bimModalProduct}
       />
     </main>
   );
