@@ -27,6 +27,7 @@ import {
   X, 
   Search, 
   ChevronRight, 
+  ChevronLeft,
   ArrowRight,
   ShieldCheck,
   Send,
@@ -88,6 +89,14 @@ export default function ArchitectPortalPage() {
   const [selectedTargetProjectId, setSelectedTargetProjectId] = useState(null);
   const [addTileUsageArea, setAddTileUsageArea] = useState('Zemin Kaplama');
   const [addTileAreaM2, setAddTileAreaM2] = useState('150');
+  const brandScrollRef = useRef(null);
+
+  const scrollBrands = (direction) => {
+    if (brandScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -260 : 260;
+      brandScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   // Spec-Writer State
   const [specLoading, setSpecLoading] = useState(false);
@@ -2810,77 +2819,146 @@ export default function ArchitectPortalPage() {
                 </select>
               </div>
 
-              {/* Brand Filter Pills Bar */}
-              <div style={{
-                display: 'flex',
-                gap: '8px',
-                overflowX: 'auto',
-                paddingBottom: '4px',
-                scrollbarWidth: 'none'
-              }}>
+              {/* Brand Filter Pills Bar with Scroll Controls & Visible Scrollbar */}
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <button
                   type="button"
-                  onClick={() => {
-                    setSelectedBrandFilter('');
-                    fetchCatalog(catalogSearch, '', selectedStyleFilter);
-                  }}
+                  onClick={() => scrollBrands('left')}
+                  title="Sola Kaydır"
                   style={{
-                    padding: '6px 14px',
-                    borderRadius: '20px',
-                    fontSize: '0.78rem',
-                    fontWeight: '700',
-                    border: selectedBrandFilter === '' ? '1px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.1)',
-                    background: selectedBrandFilter === '' ? 'rgba(212, 175, 55, 0.18)' : 'rgba(255, 255, 255, 0.04)',
-                    color: selectedBrandFilter === '' ? '#d4af37' : '#cbd5e1',
+                    background: 'rgba(212, 175, 55, 0.12)',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    color: '#d4af37',
+                    borderRadius: '50%',
+                    width: '30px',
+                    height: '30px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     cursor: 'pointer',
-                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
                     transition: 'all 0.15s'
                   }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#d4af37';
+                    e.currentTarget.style.color = '#090d16';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(212, 175, 55, 0.12)';
+                    e.currentTarget.style.color = '#d4af37';
+                  }}
                 >
-                  Tüm Markalar
+                  <ChevronLeft size={16} />
                 </button>
-                {catalogBrands.map(b => {
-                  const isSelected = selectedBrandFilter === b.id;
-                  return (
-                    <button
-                      key={b.id}
-                      type="button"
-                      onClick={() => {
-                        const newBrand = isSelected ? '' : b.id;
-                        setSelectedBrandFilter(newBrand);
-                        fetchCatalog(catalogSearch, newBrand, selectedStyleFilter);
-                      }}
-                      style={{
-                        padding: '6px 14px',
-                        borderRadius: '20px',
-                        fontSize: '0.78rem',
-                        fontWeight: '700',
-                        border: isSelected ? '1px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.1)',
-                        background: isSelected ? 'rgba(212, 175, 55, 0.18)' : 'rgba(255, 255, 255, 0.04)',
-                        color: isSelected ? '#d4af37' : '#cbd5e1',
-                        cursor: 'pointer',
-                        whiteSpace: 'nowrap',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        transition: 'all 0.15s'
-                      }}
-                    >
-                      <span>{b.name}</span>
-                      {b._count?.products !== undefined && (
-                        <span style={{
-                          fontSize: '0.68rem',
-                          padding: '1px 6px',
-                          borderRadius: '10px',
-                          background: isSelected ? 'rgba(212, 175, 55, 0.3)' : 'rgba(255, 255, 255, 0.08)',
-                          color: isSelected ? '#fff' : '#94a3b8'
-                        }}>
-                          {b._count.products}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+
+                <div 
+                  ref={brandScrollRef}
+                  className="brand-pill-scroll"
+                  style={{
+                    display: 'flex',
+                    gap: '8px',
+                    overflowX: 'auto',
+                    paddingBottom: '8px',
+                    flex: 1,
+                    scrollBehavior: 'smooth'
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedBrandFilter('');
+                      fetchCatalog(catalogSearch, '', selectedStyleFilter);
+                    }}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '20px',
+                      fontSize: '0.78rem',
+                      fontWeight: '700',
+                      border: selectedBrandFilter === '' ? '1px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.1)',
+                      background: selectedBrandFilter === '' ? 'rgba(212, 175, 55, 0.18)' : 'rgba(255, 255, 255, 0.04)',
+                      color: selectedBrandFilter === '' ? '#d4af37' : '#cbd5e1',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    Tüm Markalar
+                  </button>
+                  {catalogBrands.map(b => {
+                    const isSelected = selectedBrandFilter === b.id;
+                    return (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => {
+                          const newBrand = isSelected ? '' : b.id;
+                          setSelectedBrandFilter(newBrand);
+                          fetchCatalog(catalogSearch, newBrand, selectedStyleFilter);
+                        }}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '20px',
+                          fontSize: '0.78rem',
+                          fontWeight: '700',
+                          border: isSelected ? '1px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.1)',
+                          background: isSelected ? 'rgba(212, 175, 55, 0.18)' : 'rgba(255, 255, 255, 0.04)',
+                          color: isSelected ? '#d4af37' : '#cbd5e1',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          flexShrink: 0,
+                          transition: 'all 0.15s'
+                        }}
+                      >
+                        <span>{b.name}</span>
+                        {b._count?.products !== undefined && (
+                          <span style={{
+                            fontSize: '0.68rem',
+                            padding: '1px 6px',
+                            borderRadius: '10px',
+                            background: isSelected ? 'rgba(212, 175, 55, 0.3)' : 'rgba(255, 255, 255, 0.08)',
+                            color: isSelected ? '#fff' : '#94a3b8'
+                          }}>
+                            {b._count.products}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => scrollBrands('right')}
+                  title="Sağa Kaydır"
+                  style={{
+                    background: 'rgba(212, 175, 55, 0.12)',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    color: '#d4af37',
+                    borderRadius: '50%',
+                    width: '30px',
+                    height: '30px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    transition: 'all 0.15s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#d4af37';
+                    e.currentTarget.style.color = '#090d16';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(212, 175, 55, 0.12)';
+                    e.currentTarget.style.color = '#d4af37';
+                  }}
+                >
+                  <ChevronRight size={16} />
+                </button>
               </div>
             </div>
 
@@ -3345,6 +3423,24 @@ export default function ArchitectPortalPage() {
           })}
         </div>
       )}
+
+      {/* Custom styles for brand horizontal scrollbar */}
+      <style jsx global>{`
+        .brand-pill-scroll::-webkit-scrollbar {
+          height: 6px !important;
+        }
+        .brand-pill-scroll::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.04) !important;
+          border-radius: 10px !important;
+        }
+        .brand-pill-scroll::-webkit-scrollbar-thumb {
+          background: rgba(212, 175, 55, 0.4) !important;
+          border-radius: 10px !important;
+        }
+        .brand-pill-scroll::-webkit-scrollbar-thumb:hover {
+          background: #d4af37 !important;
+        }
+      `}</style>
 
     </div>
   );
