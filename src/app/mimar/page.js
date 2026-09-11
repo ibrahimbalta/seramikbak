@@ -557,6 +557,25 @@ export default function ArchitectPortalPage() {
     }
   };
 
+  // Open product directly in 3D Kiosk Visualizer Studio
+  const handleOpenIn3DKiosk = (product) => {
+    if (!product) return;
+    try {
+      const selectedObj = {
+        ...product,
+        textureUrl: product.textureUrl || product.imageUrl || '/textures/calacatta_gold.jpg',
+        imageUrl: product.imageUrl || product.textureUrl || '/textures/calacatta_gold.jpg',
+        unitPrice: product.unitPrice || 480
+      };
+      sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
+      localStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
+    } catch (e) {
+      console.error('Kiosk storage error:', e);
+    }
+    const url = `/kiosk?productId=${encodeURIComponent(product.id)}&code=${encodeURIComponent(product.code || '')}`;
+    window.open(url, '_blank');
+  };
+
   // Download BIM / CAD / 4K Textures package (also triggers SpecInLead radar for brand!)
   const handleDownloadAsset = async (product, assetFormat) => {
     try {
@@ -1755,8 +1774,31 @@ export default function ArchitectPortalPage() {
                                 paddingTop: '12px',
                                 borderTop: '1px solid rgba(255, 255, 255, 0.06)',
                                 display: 'flex',
-                                gap: '8px'
+                                gap: '6px'
                               }}>
+                                <button
+                                  onClick={() => handleOpenIn3DKiosk(p)}
+                                  title="3D Kiosk'ta Canlı Odaya Uygula"
+                                  style={{
+                                    flex: 1,
+                                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.08) 100%)',
+                                    color: '#d4af37',
+                                    border: '1px solid rgba(212, 175, 55, 0.4)',
+                                    borderRadius: '8px',
+                                    padding: '6px 6px',
+                                    fontSize: '0.7rem',
+                                    fontWeight: '700',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '4px'
+                                  }}
+                                >
+                                  <Box size={12} />
+                                  <span>3D Gör</span>
+                                </button>
+
                                 <button
                                   onClick={() => handleDownloadAsset(p, 'REVIT_BIM')}
                                   style={{
@@ -1765,8 +1807,8 @@ export default function ArchitectPortalPage() {
                                     color: '#cbd5e1',
                                     border: '1px solid rgba(255, 255, 255, 0.1)',
                                     borderRadius: '8px',
-                                    padding: '6px 8px',
-                                    fontSize: '0.72rem',
+                                    padding: '6px 6px',
+                                    fontSize: '0.7rem',
                                     fontWeight: '600',
                                     cursor: 'pointer',
                                     display: 'flex',
@@ -1790,8 +1832,8 @@ export default function ArchitectPortalPage() {
                                     color: '#d4af37',
                                     border: '1px solid rgba(212, 175, 55, 0.25)',
                                     borderRadius: '8px',
-                                    padding: '6px 8px',
-                                    fontSize: '0.72rem',
+                                    padding: '6px 6px',
+                                    fontSize: '0.7rem',
                                     fontWeight: '700',
                                     cursor: 'pointer',
                                     display: 'flex',
@@ -1801,7 +1843,7 @@ export default function ArchitectPortalPage() {
                                   }}
                                 >
                                   <Package size={12} />
-                                  <span>Numune İste</span>
+                                  <span>Numune</span>
                                 </button>
                               </div>
                             </div>
@@ -1947,6 +1989,37 @@ export default function ArchitectPortalPage() {
                         alt={p.name}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
+                      
+                      {/* Floating 3D Kiosk Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenIn3DKiosk(p);
+                        }}
+                        title="3D Kiosk Odasında Canlı İncele"
+                        style={{
+                          position: 'absolute',
+                          top: '8px',
+                          right: '8px',
+                          background: 'rgba(9, 13, 22, 0.88)',
+                          backdropFilter: 'blur(8px)',
+                          border: '1px solid rgba(212, 175, 55, 0.5)',
+                          color: '#d4af37',
+                          borderRadius: '6px',
+                          padding: '3px 8px',
+                          fontSize: '0.68rem',
+                          fontWeight: '800',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.5)'
+                        }}
+                      >
+                        <Box size={12} />
+                        <span>3D Kiosk</span>
+                      </button>
+
                       <span style={{
                         position: 'absolute',
                         bottom: '8px',
@@ -1975,56 +2048,89 @@ export default function ArchitectPortalPage() {
                         </span>
                       </div>
 
-                      {/* Download Buttons */}
+                      {/* Action Buttons: 3D Kiosk View + BIM/Texture Downloads */}
                       <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: '6px',
                         marginTop: 'auto',
                         paddingTop: '8px',
-                        borderTop: '1px solid rgba(255, 255, 255, 0.06)'
+                        borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px'
                       }}>
+                        {/* 3D Kiosk Studio Button */}
                         <button
-                          onClick={() => handleDownloadAsset(p, 'REVIT_BIM')}
+                          onClick={() => handleOpenIn3DKiosk(p)}
                           style={{
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            color: '#cbd5e1',
+                            width: '100%',
+                            background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                            color: '#090d16',
+                            border: 'none',
                             borderRadius: '8px',
-                            padding: '6px',
-                            fontSize: '0.7rem',
-                            fontWeight: '600',
+                            padding: '7px 10px',
+                            fontSize: '0.74rem',
+                            fontWeight: '800',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '4px'
+                            gap: '6px',
+                            boxShadow: '0 2px 8px rgba(212, 175, 55, 0.25)',
+                            transition: 'all 0.15s ease'
                           }}
                         >
-                          <Download size={11} />
-                          <span>Revit .rvt</span>
+                          <Box size={13} />
+                          <span>3D Kiosk'ta Gör</span>
+                          <ExternalLink size={11} style={{ opacity: 0.8 }} />
                         </button>
 
-                        <button
-                          onClick={() => handleDownloadAsset(p, '4K_PBR_TEXTURES')}
-                          style={{
-                            background: 'rgba(212, 175, 55, 0.12)',
-                            border: '1px solid rgba(212, 175, 55, 0.25)',
-                            color: '#d4af37',
-                            borderRadius: '8px',
-                            padding: '6px',
-                            fontSize: '0.7rem',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '4px'
-                          }}
-                        >
-                          <Download size={11} />
-                          <span>4K Doku (.zip)</span>
-                        </button>
+                        {/* Download Buttons */}
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: '6px'
+                        }}>
+                          <button
+                            onClick={() => handleDownloadAsset(p, 'REVIT_BIM')}
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              color: '#cbd5e1',
+                              borderRadius: '8px',
+                              padding: '6px',
+                              fontSize: '0.7rem',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '4px'
+                            }}
+                          >
+                            <Download size={11} />
+                            <span>Revit .rvt</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleDownloadAsset(p, '4K_PBR_TEXTURES')}
+                            style={{
+                              background: 'rgba(212, 175, 55, 0.12)',
+                              border: '1px solid rgba(212, 175, 55, 0.25)',
+                              color: '#d4af37',
+                              borderRadius: '8px',
+                              padding: '6px',
+                              fontSize: '0.7rem',
+                              fontWeight: '700',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '4px'
+                            }}
+                          >
+                            <Download size={11} />
+                            <span>4K Doku (.zip)</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -3414,6 +3520,37 @@ export default function ArchitectPortalPage() {
                           }}>
                             {brandName}
                           </div>
+
+                          {/* Top Right 3D Kiosk Button */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenIn3DKiosk(p);
+                            }}
+                            title="3D Kiosk'ta İncele"
+                            style={{
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              background: 'rgba(9, 13, 22, 0.88)',
+                              backdropFilter: 'blur(8px)',
+                              border: '1px solid rgba(212, 175, 55, 0.4)',
+                              color: '#d4af37',
+                              borderRadius: '6px',
+                              padding: '3px 8px',
+                              fontSize: '0.66rem',
+                              fontWeight: '800',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              cursor: 'pointer',
+                              zIndex: 10
+                            }}
+                          >
+                            <Box size={11} />
+                            <span>3D</span>
+                          </button>
 
                           {/* Hover Add Overlay Icon */}
                           <div style={{

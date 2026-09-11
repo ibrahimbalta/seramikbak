@@ -142,20 +142,25 @@ export default function ShowroomKioskPage() {
     let targetProduct = null;
 
 
-    // 1. Session Storage kontrolü (Showroom kartına tıklanınca anında yazılan ürün)
+    // 1. Session / Local Storage kontrolü (Showroom ve Mimar portalından tıklanınca anında aktarılan ürün)
     try {
-      const stored = sessionStorage.getItem('kiosk_selected_product');
+      const stored = sessionStorage.getItem('kiosk_selected_product') || localStorage.getItem('kiosk_selected_product');
       if (stored) {
         targetProduct = JSON.parse(stored);
       }
     } catch (e) {
-      console.error('Kiosk sessionStorage read error:', e);
+      console.error('Kiosk storage read error:', e);
     }
 
     // 2. URL searchParams kontrolü (?productId=... &code=...)
     const urlParams = new URLSearchParams(window.location.search);
     const paramProductId = urlParams.get('productId') || urlParams.get('product') || urlParams.get('id');
     const paramCode = urlParams.get('code');
+
+    if (paramProductId && targetProduct && String(targetProduct.id) !== String(paramProductId)) {
+      const match = BRAND_CATALOG.find(p => String(p.id) === String(paramProductId));
+      if (match) targetProduct = match;
+    }
 
     if (!targetProduct && (paramProductId || paramCode)) {
       targetProduct = BRAND_CATALOG.find(p =>
