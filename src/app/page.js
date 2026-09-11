@@ -3601,6 +3601,23 @@ export default function Home() {
                       <span className="dropdown-item-desc">Üretici marka kataloğu ve analitikler</span>
                     </div>
                   </Link>
+
+                  <Link 
+                    href="/mimar" 
+                    className="utility-dropdown-item"
+                    onClick={() => setActiveUtilityDropdown(null)}
+                  >
+                    <div className="dropdown-item-icon gold-icon" style={{ background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37' }}>
+                      <Compass size={14} />
+                    </div>
+                    <div className="dropdown-item-content">
+                      <div className="dropdown-title-row">
+                        <span className="dropdown-item-title">Mimar Portalı</span>
+                        <span className="dropdown-item-badge gold-badge" style={{ background: 'rgba(212, 175, 55, 0.2)', color: '#d4af37' }}>ArchStudio</span>
+                      </div>
+                      <span className="dropdown-item-desc">3D BIM, moodboard ve şartname motoru</span>
+                    </div>
+                  </Link>
                 </div>
               )}
             </div>
@@ -3874,6 +3891,10 @@ export default function Home() {
               <Link href="/marka" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
                 <TrendingUp size={16} />
                 <span>{t('brandPortal')}</span>
+              </Link>
+              <Link href="/mimar" className="mobile-nav-link" onClick={() => setShowMobileMenu(false)}>
+                <Compass size={16} style={{ color: '#d4af37' }} />
+                <span style={{ color: '#d4af37', fontWeight: '700' }}>Mimar Portalı (ArchStudio)</span>
               </Link>
               
               <div className="mobile-menu-divider" />
@@ -7982,6 +8003,7 @@ export default function Home() {
               <li><Link href="/bayi?tab=register">Bayimiz Olun (B2B Başvuru)</Link></li>
               <li><Link href="/bayi">Bayi Giriş Portalı</Link></li>
               <li><Link href="/marka">B2B Marka Portalı</Link></li>
+              <li><Link href="/mimar" style={{ color: '#d4af37', fontWeight: '700' }}>📐 Mimar Portalı (ArchStudio)</Link></li>
             </ul>
           </div>
 

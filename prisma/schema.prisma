@@ -64,6 +64,8 @@ model Product {
   outletListings OutletListing[]
   podiumBids PodiumBid[]
   specInLeads SpecInLead[]
+  architectProjectItems ArchitectProjectItem[]
+  architectSamples      ArchitectSample[]
   
   // Technical Specifications
   peiRating        Int?           // Wear resistance rating (1-5)
@@ -469,4 +471,80 @@ model SpecInLead {
   @@index([createdAt])
   @@index([status])
 }
+
+// -------------------------------------------------------------
+// ARCHITECT & DESIGNER PORTAL (ArchStudio) MODELS
+// -------------------------------------------------------------
+
+model Architect {
+  id           String             @id @default(uuid())
+  officeName   String             // Mimarlık Ofisi / Şirket Adı
+  name         String             // Mimar / Tasarımcı Adı Soyadı
+  title        String?            @default("Mimar") // "Yüksek Mimar", "İç Mimar", "Tasarım Direktörü"
+  email        String             @unique
+  phone        String
+  password     String
+  city         String             @default("İstanbul")
+  address      String?
+  chamberNo    String?            // TMMOB Mimarlar Odası Sicil No
+  website      String?
+  projects     ArchitectProject[]
+  samples      ArchitectSample[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+model ArchitectProject {
+  id           String                 @id @default(uuid())
+  architectId  String
+  architect    Architect              @relation(fields: [architectId], references: [id], onDelete: Cascade)
+  title        String                 // "Bodrum Luxury Villa"
+  projectType  String                 @default("Konut") // "Otel", "Konut", "Ticari / Ofis", "Villa", "Restoran", "Karma Proje"
+  city         String                 @default("İstanbul")
+  totalAreaM2  Float?                 @default(350)
+  items        ArchitectProjectItem[]
+  notes        String?
+  status       String                 @default("DESIGN") // DESIGN, SPEC_IN, TENDER, COMPLETED
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  @@index([architectId])
+  @@index([status])
+}
+
+model ArchitectProjectItem {
+  id         String            @id @default(uuid())
+  projectId  String
+  project    ArchitectProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  usageArea  String            @default("Zemin") // "Zemin", "Banyo Duvar", "Mutfak Tezgah", "Dış Cephe", "Teras / Islak Hacim"
+  areaM2     Float?            @default(120)
+  notes      String?
+  createdAt  DateTime          @default(now())
+
+  @@index([projectId])
+  @@index([productId])
+}
+
+model ArchitectSample {
+  id            String    @id @default(uuid())
+  architectId   String
+  architect     Architect @relation(fields: [architectId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  officeAddress String
+  city          String
+  notes         String?
+  status        String    @default("PENDING") // PENDING, PREPARING, SHIPPED, DELIVERED
+  trackingNo    String?
+  cargoCompany  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([architectId])
+  @@index([productId])
+  @@index([status])
+}
+
 
