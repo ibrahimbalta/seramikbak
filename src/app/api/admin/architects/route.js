@@ -23,7 +23,7 @@ export async function GET(request) {
         projects: {
           select: { id: true, title: true }
         },
-        sampleOrders: {
+        samples: {
           select: { id: true, status: true }
         }
       },

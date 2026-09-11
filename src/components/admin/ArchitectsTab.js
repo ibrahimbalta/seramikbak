@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { 
@@ -349,7 +349,7 @@ export default function ArchitectsTab() {
                         </span>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '6px', background: 'rgba(255, 255, 255, 0.05)' }}>
                           <Package size={12} style={{ color: '#a855f7' }} />
-                          <strong>{arch.sampleOrders?.length || 0}</strong> Numune
+                          <strong>{arch.samples?.length || 0}</strong> Numune
                         </span>
                       </div>
                     </td>
