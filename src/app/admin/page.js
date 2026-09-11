@@ -38,10 +38,12 @@ import {
   Key,
   Pencil,
   Eye,
-  EyeOff
+  EyeOff,
+  Compass
 } from 'lucide-react';
 import Link from 'next/link';
 import SecurityBackupTab from '@/components/admin/SecurityBackupTab';
+import ArchitectsTab from '@/components/admin/ArchitectsTab';
 
 export default function AdminPage() {
   // Authentication State
@@ -75,6 +77,7 @@ export default function AdminPage() {
     scraper: 'Ürün Kazıma',
     products: 'Ürün Yönetimi',
     dealers: 'Bayi Teşkilatı',
+    architects: 'Mimarlık & Tasarım',
     leads: 'Teklif Talepleri',
     projects: 'Proje Talepleri',
     saas: 'SaaS Abonelikleri',
@@ -91,6 +94,7 @@ export default function AdminPage() {
     scraper: Terminal,
     products: Package,
     dealers: MapPin,
+    architects: Compass,
     leads: FileText,
     projects: Building2,
     saas: CreditCard,
@@ -2317,6 +2321,10 @@ export default function AdminPage() {
                   <MapPin size={16} />
                   <span>Bayi Teşkilatı</span>
                 </button>
+                <button className={`nav-item ${activeTab === 'architects' ? 'active' : ''}`} onClick={() => handleTabSelect('architects')}>
+                  <Compass size={16} />
+                  <span>Mimarlık & Tasarım</span>
+                </button>
                 <button className={`nav-item ${activeTab === 'leads' ? 'active' : ''}`} onClick={() => handleTabSelect('leads')}>
                   <FileText size={16} />
                   <span>Teklif Talepleri</span>
@@ -3684,6 +3692,11 @@ export default function AdminPage() {
             )}
           </div>
         </div>
+      )}
+
+      {/* TAB: ARCHITECTS (MİMARLAR & TASARIMCILAR) */}
+      {activeTab === 'architects' && (
+        <ArchitectsTab />
       )}
 
       {/* TAB 3: LEADS (TEKLİF TALEPLERİ) TRACKING */}

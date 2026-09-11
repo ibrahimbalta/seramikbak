@@ -253,11 +253,12 @@ export default function ArchitectPortalPage() {
     }
   };
 
-  // Register handler
+  // Register handler (Pending admin approval)
   const handleRegister = async (e) => {
     e.preventDefault();
     setAuthLoading(true);
     setAuthError('');
+    setAuthSuccess('');
     try {
       const res = await fetch('/api/architect/auth', {
         method: 'POST',
@@ -276,10 +277,16 @@ export default function ArchitectPortalPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        setArchitectInfo(data.architect);
-        setIsLoggedIn(true);
-        localStorage.setItem('seramikbak_architect', JSON.stringify(data.architect));
-        fetchProjects(data.architect.id);
+        if (data.pendingApproval) {
+          setAuthSuccess(data.message || 'Mimarlık ofisi başvurunuz alındı. Sistem yöneticisi onayının ardından giriş yapabilirsiniz.');
+          setAuthTab('login');
+          setPassword('');
+        } else {
+          setArchitectInfo(data.architect);
+          setIsLoggedIn(true);
+          localStorage.setItem('seramikbak_architect', JSON.stringify(data.architect));
+          fetchProjects(data.architect.id);
+        }
       } else {
         setAuthError(data.error || 'Kayıt başarısız.');
       }
@@ -689,6 +696,28 @@ export default function ArchitectPortalPage() {
               Yeni Ofis Kaydı
             </button>
           </div>
+
+          {authSuccess && (
+            <div style={{
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
+              color: '#34d399',
+              borderRadius: '12px',
+              padding: '12px 16px',
+              fontSize: '0.82rem',
+              marginBottom: '18px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '10px',
+              lineHeight: 1.45
+            }}>
+              <CheckCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
+              <div>
+                <strong style={{ display: 'block', color: '#6ee7b7', marginBottom: '2px' }}>Başvurunuz Alındı</strong>
+                <span>{authSuccess}</span>
+              </div>
+            </div>
+          )}
 
           {authError && (
             <div style={{

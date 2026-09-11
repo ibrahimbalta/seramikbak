@@ -488,6 +488,7 @@ model Architect {
   address      String?
   chamberNo    String?            // TMMOB Mimarlar Odası Sicil No
   website      String?
+  status       String             @default("PENDING_APPROVAL") // PENDING_APPROVAL, APPROVED, REJECTED
   projects     ArchitectProject[]
   samples      ArchitectSample[]
   createdAt    DateTime           @default(now())

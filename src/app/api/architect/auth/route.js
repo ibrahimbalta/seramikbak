@@ -27,7 +27,8 @@ export async function POST(request) {
             city: 'İstanbul',
             address: 'Levent Mah. Cömert Sk. No:1 Beşiktaş / İstanbul',
             chamberNo: 'TMMOB-34821',
-            website: 'https://tabanlioglu.com'
+            website: 'https://tabanlioglu.com',
+            status: 'APPROVED'
           }
         });
 
@@ -127,7 +128,7 @@ export async function POST(request) {
       });
     }
 
-    // 2. REGISTER NEW ARCHITECT
+    // 2. REGISTER NEW ARCHITECT (Requires Admin Approval like Dealers)
     if (action === 'register') {
       if (!email || !password || !officeName || !name || !phone) {
         return NextResponse.json({ error: 'Lütfen tüm zorunlu alanları doldurun.' }, { status: 400 });
@@ -150,38 +151,16 @@ export async function POST(request) {
           phone: phone.trim(),
           password: hashPassword(password),
           city: city ? city.trim() : 'İstanbul',
-          chamberNo: chamberNo ? chamberNo.trim() : null
+          chamberNo: chamberNo ? chamberNo.trim() : null,
+          status: 'PENDING_APPROVAL'
         }
       });
 
-      const token = encryptSession({
-        id: newArchitect.id,
-        name: newArchitect.name,
-        officeName: newArchitect.officeName,
-        email: newArchitect.email,
-        role: 'architect'
-      });
-
-      const cookieStore = await cookies();
-      cookieStore.set('sb_session', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 7 * 24 * 60 * 60
-      });
-
+      // DO NOT set login session cookie! Inform user about admin approval
       return NextResponse.json({
         success: true,
-        architect: {
-          id: newArchitect.id,
-          officeName: newArchitect.officeName,
-          name: newArchitect.name,
-          email: newArchitect.email,
-          title: newArchitect.title,
-          city: newArchitect.city
-        },
-        token
+        pendingApproval: true,
+        message: 'Mimarlık ofisi başvurunuz başarıyla alındı. Sistem yöneticisi onayının ardından hesabınız aktifleşecek ve giriş yapabileceksiniz.'
       });
     }
 
@@ -196,6 +175,19 @@ export async function POST(request) {
 
     if (!architect || !verifyPassword(password, architect.password)) {
       return NextResponse.json({ error: 'E-posta veya şifre hatalı.' }, { status: 401 });
+    }
+
+    // Check approval status
+    if (architect.status === 'PENDING_APPROVAL') {
+      return NextResponse.json({
+        error: 'Mimar / Ofis kaydınız henüz onaylanmamıştır. Sistem yöneticisi onayının ardından portala erişebilirsiniz.'
+      }, { status: 403 });
+    }
+
+    if (architect.status === 'REJECTED') {
+      return NextResponse.json({
+        error: 'Mimarlık ofisi başvuru talebiniz sistem yöneticisi tarafından reddedilmiştir.'
+      }, { status: 403 });
     }
 
     const token = encryptSession({
@@ -223,7 +215,8 @@ export async function POST(request) {
         name: architect.name,
         email: architect.email,
         title: architect.title,
-        city: architect.city
+        city: architect.city,
+        status: architect.status
       },
       token
     });
