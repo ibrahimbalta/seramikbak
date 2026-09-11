@@ -40,7 +40,9 @@ import {
   Download,
   BarChart3,
   Clock,
-  RefreshCw
+  RefreshCw,
+  UploadCloud,
+  FileText
 } from 'lucide-react';
 import Link from 'next/link';
 
