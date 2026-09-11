@@ -3366,4 +3366,338 @@ select option:hover {
   min-height: 100vh !important;
 }
 
+/* ============================================================ */
+/* ARCHITECT SPEC-WRITER (TS EN 14411) PRINT & DOCUMENT STYLES  */
+/* ============================================================ */
+.spec-print-document {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm 15mm 15mm 15mm;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', Arial, sans-serif !important;
+    font-size: 9pt !important;
+    line-height: 1.45 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Completely eliminate non-print portal elements */
+  .no-print,
+  aside,
+  header,
+  nav,
+  button,
+  .mimar-sidebar,
+  .mimar-header,
+  .mobile-bottom-bar,
+  .brand-pill-scroll,
+  div[style*="position: fixed"],
+  div[style*="position: sticky"] {
+    display: none !important;
+  }
+
+  /* Unconstrain portal layout for full page width */
+  .mimar-dashboard-root {
+    display: block !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .mimar-content-wrapper {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .mimar-main {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .spec-tab-container {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Display the official document */
+  .spec-print-document {
+    display: block !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    padding-bottom: 8px !important;
+  }
+
+  .print-header-left {
+    flex: 1 !important;
+  }
+
+  .print-republic {
+    font-size: 7.5pt !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    margin-bottom: 3px !important;
+  }
+
+  .print-main-title {
+    font-size: 13.5pt !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    margin: 0 0 2px 0 !important;
+    letter-spacing: -0.2px !important;
+  }
+
+  .print-standard-tag {
+    font-size: 8.5pt !important;
+    font-weight: 800 !important;
+    color: #b45309 !important;
+  }
+
+  .print-header-right {
+    text-align: right !important;
+    min-width: 190px !important;
+  }
+
+  .print-brand-badge {
+    font-size: 11pt !important;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 3px !important;
+  }
+
+  .print-meta-item {
+    font-size: 7.5pt !important;
+    color: #475569 !important;
+    line-height: 1.35 !important;
+  }
+
+  .print-divider-thick {
+    height: 2.5px !important;
+    background: #0f172a !important;
+    margin: 6px 0 10px 0 !important;
+  }
+
+  .print-meta-grid {
+    display: flex !important;
+    gap: 16px !important;
+    border: 1px solid #cbd5e1 !important;
+    background: #f8fafc !important;
+    padding: 8px 12px !important;
+    border-radius: 4px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .print-meta-col {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+
+  .print-row {
+    font-size: 8pt !important;
+    display: flex !important;
+    gap: 6px !important;
+  }
+
+  .print-row .label {
+    color: #64748b !important;
+    min-width: 105px !important;
+    font-weight: 600 !important;
+  }
+
+  .print-row .val {
+    color: #0f172a !important;
+  }
+
+  .print-row .val.bold {
+    font-weight: 700 !important;
+  }
+
+  .print-section {
+    margin-bottom: 12px !important;
+    page-break-inside: auto !important;
+  }
+
+  .print-section-title {
+    font-size: 9pt !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+    padding-bottom: 3px !important;
+    margin: 0 0 6px 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+  }
+
+  .print-clause p {
+    font-size: 8pt !important;
+    line-height: 1.45 !important;
+    margin: 0 0 5px 0 !important;
+    color: #1e293b !important;
+    text-align: justify !important;
+  }
+
+  .print-item-box {
+    border: 1px solid #cbd5e1 !important;
+    border-left: 3.5px solid #0f172a !important;
+    padding: 8px 10px !important;
+    margin-bottom: 8px !important;
+    background: #ffffff !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-item-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    border-bottom: 1px dashed #cbd5e1 !important;
+    padding-bottom: 3px !important;
+    margin-bottom: 5px !important;
+  }
+
+  .print-item-tag {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    font-size: 7pt !important;
+    font-weight: 800 !important;
+    padding: 1px 5px !important;
+    border-radius: 2px !important;
+  }
+
+  .print-item-title {
+    font-size: 8pt !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    flex: 1 !important;
+  }
+
+  .print-item-m2 {
+    font-size: 7.5pt !important;
+    font-weight: 700 !important;
+    color: #b45309 !important;
+  }
+
+  .print-item-clause-text {
+    font-size: 7.8pt !important;
+    line-height: 1.4 !important;
+    color: #334155 !important;
+    white-space: pre-wrap !important;
+  }
+
+  .print-raw-text {
+    font-size: 7.8pt !important;
+    line-height: 1.38 !important;
+    white-space: pre-wrap !important;
+    color: #0f172a !important;
+    font-family: 'Courier New', Courier, monospace !important;
+  }
+
+  .print-signatures {
+    display: flex !important;
+    gap: 10px !important;
+    margin-top: 14px !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-sig-col {
+    flex: 1 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 4px !important;
+    padding: 8px !important;
+    text-align: center !important;
+    background: #f8fafc !important;
+  }
+
+  .print-sig-title {
+    font-size: 7.5pt !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+  }
+
+  .print-sig-sub {
+    font-size: 6.5pt !important;
+    color: #64748b !important;
+    margin-bottom: 4px !important;
+  }
+
+  .print-sig-office {
+    font-size: 7.5pt !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+  }
+
+  .print-sig-name {
+    font-size: 7pt !important;
+    color: #475569 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .print-sig-box {
+    border: 1px dashed #94a3b8 !important;
+    border-radius: 4px !important;
+    height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 6.5pt !important;
+    color: #94a3b8 !important;
+    margin-bottom: 4px !important;
+    background: #ffffff !important;
+  }
+
+  .print-sig-date {
+    font-size: 6.5pt !important;
+    color: #64748b !important;
+  }
+
+  .print-footer {
+    display: flex !important;
+    justify-content: space-between !important;
+    font-size: 6.5pt !important;
+    color: #94a3b8 !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding-top: 4px !important;
+    margin-top: 12px !important;
+    page-break-inside: avoid !important;
+  }
+}
+
+
 

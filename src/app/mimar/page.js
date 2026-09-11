@@ -102,6 +102,7 @@ export default function ArchitectPortalPage() {
   const [specLoading, setSpecLoading] = useState(false);
   const [specResult, setSpecResult] = useState(null);
   const [copiedSpec, setCopiedSpec] = useState(false);
+  const [specViewMode, setSpecViewMode] = useState('document'); // 'document' | 'raw'
 
   // Sample Box State
   const [samples, setSamples] = useState([]);
@@ -1185,18 +1186,23 @@ export default function ArchitectPortalPage() {
   // VIEW: LOGGED-IN ARCHSTUDIO DASHBOARD
   // -------------------------------------------------------------
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#0a0f1d',
-      color: '#f8fafc',
-      fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
-      display: 'flex',
-      flexDirection: isMobile ? 'column' : 'row',
-      overflowX: 'hidden'
-    }}>
+    <div 
+      className="mimar-dashboard-root"
+      style={{
+        minHeight: '100vh',
+        background: '#0a0f1d',
+        color: '#f8fafc',
+        fontFamily: 'var(--font-body, "Plus Jakarta Sans", sans-serif)',
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        overflowX: 'hidden'
+      }}
+    >
       {/* 1. SOLID LEFT SIDEBAR */}
       {!isMobile && (
-        <aside style={{
+        <aside 
+          className="mimar-sidebar no-print"
+          style={{
           width: isSidebarCollapsed ? '76px' : '280px',
           background: '#070b14',
           color: '#cbd5e1',
@@ -1373,10 +1379,10 @@ export default function ArchitectPortalPage() {
       )}
 
       {/* 2. MAIN CONTENT WRAPPER */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <div className="mimar-content-wrapper" style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         
         {/* Top Header Bar */}
-        <header style={{
+        <header className="mimar-header no-print" style={{
           background: 'rgba(10, 15, 29, 0.95)',
           backdropFilter: 'blur(16px)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
@@ -1491,7 +1497,7 @@ export default function ArchitectPortalPage() {
 
         {/* Global Notifications */}
         {sampleSuccessMsg && (
-          <div style={{
+          <div className="no-print" style={{
             background: 'rgba(34, 197, 94, 0.15)',
             borderBottom: '1px solid rgba(34, 197, 94, 0.3)',
             color: '#4ade80',
@@ -1507,7 +1513,7 @@ export default function ArchitectPortalPage() {
         )}
 
         {tenderSuccessMsg && (
-          <div style={{
+          <div className="no-print" style={{
             background: 'rgba(34, 197, 94, 0.15)',
             borderBottom: '1px solid rgba(34, 197, 94, 0.3)',
             color: '#4ade80',
@@ -1523,7 +1529,7 @@ export default function ArchitectPortalPage() {
         )}
 
         {/* Main Content Body */}
-        <main style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', flex: 1, boxSizing: 'border-box' }}>
+        <main className="mimar-main" style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', flex: 1, boxSizing: 'border-box' }}>
 
           {/* ======================================================== */}
           {/* TAB 1: PROJECTS & MOODBOARDS */}
@@ -2031,8 +2037,10 @@ export default function ArchitectPortalPage() {
           {/* TAB 3: SPEC-WRITER (TS EN 14411) */}
           {/* ======================================================== */}
           {activeTab === 'spec-writer' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{
+            <div className="spec-tab-container" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              
+              {/* Screen Toolbar (Hidden on Print) */}
+              <div className="no-print" style={{
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '16px',
@@ -2048,11 +2056,54 @@ export default function ArchitectPortalPage() {
                     TS EN 14411 Teknik Şartname Sihirbazı
                   </h3>
                   <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
-                    İhale şartnameleri, müteahhit sözleşmeleri ve mahal listeleri için resmi formatta şartname metni.
+                    İhale şartnameleri, müteahhit sözleşmeleri ve mahal listeleri için resmi formatta teknik şartname belgesi.
                   </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  {specResult && (
+                    <div style={{
+                      display: 'flex',
+                      background: 'rgba(255, 255, 255, 0.06)',
+                      borderRadius: '8px',
+                      padding: '3px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                    }}>
+                      <button
+                        onClick={() => setSpecViewMode('document')}
+                        style={{
+                          background: specViewMode === 'document' ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'transparent',
+                          color: specViewMode === 'document' ? '#090d16' : '#cbd5e1',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '6px 12px',
+                          fontSize: '0.78rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        Resmi Belge
+                      </button>
+                      <button
+                        onClick={() => setSpecViewMode('raw')}
+                        style={{
+                          background: specViewMode === 'raw' ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'transparent',
+                          color: specViewMode === 'raw' ? '#090d16' : '#cbd5e1',
+                          border: 'none',
+                          borderRadius: '6px',
+                          padding: '6px 12px',
+                          fontSize: '0.78rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        Metin (Kod)
+                      </button>
+                    </div>
+                  )}
+
                   <button
                     onClick={handleCopySpec}
                     disabled={!specResult}
@@ -2078,74 +2129,376 @@ export default function ArchitectPortalPage() {
                     onClick={() => window.print()}
                     disabled={!specResult}
                     style={{
-                      background: '#1e293b',
-                      color: '#fff',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                      color: '#090d16',
+                      border: 'none',
                       borderRadius: '8px',
-                      padding: '8px 16px',
+                      padding: '8px 18px',
                       fontSize: '0.82rem',
-                      fontWeight: '600',
+                      fontWeight: '800',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '6px'
+                      gap: '8px',
+                      boxShadow: '0 4px 15px rgba(212, 175, 55, 0.25)'
                     }}
                   >
                     <Printer size={16} />
-                    <span>Yazdır / PDF</span>
+                    <span>Yazdır / PDF İndir</span>
                   </button>
                 </div>
               </div>
 
-              {specResult ? (
-                <div style={{
-                  background: '#090d18',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.5)'
-                }}>
-                  <pre style={{
-                    color: '#e2e8f0',
-                    fontFamily: 'monospace',
-                    fontSize: '0.85rem',
-                    lineHeight: '1.6',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word',
-                    margin: 0
-                  }}>
-                    {specResult.fullSpecDoc}
-                  </pre>
-                </div>
-              ) : (
-                <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                  <FileText size={40} style={{ color: '#64748b', margin: '0 auto 12px auto' }} />
-                  <h4 style={{ fontSize: '1.05rem', fontWeight: '700', margin: '0 0 6px 0' }}>
-                    Henüz Şartname Oluşturulmadı
-                  </h4>
-                  <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '0 0 16px 0' }}>
-                    {activeProject ? `"${activeProject.title}" projesi için otomatik teknik şartname derleyin.` : 'Lütfen önce bir proje seçin.'}
-                  </p>
-                  {activeProject && (
-                    <button
-                      onClick={() => handleGenerateSpec(activeProject)}
-                      disabled={specLoading}
-                      style={{
-                        background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                        color: '#090d16',
-                        border: 'none',
-                        borderRadius: '10px',
-                        padding: '10px 20px',
-                        fontWeight: '700',
+              {/* Screen Preview (Hidden on Print) */}
+              <div className="no-print">
+                {specResult ? (
+                  specViewMode === 'document' ? (
+                    /* Elegant A4 Screen Preview Card */
+                    <div style={{
+                      background: '#ffffff',
+                      color: '#0f172a',
+                      borderRadius: '16px',
+                      padding: isMobile ? '24px 16px' : '48px 56px',
+                      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
+                      maxWidth: '960px',
+                      margin: '0 auto',
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif'
+                    }}>
+                      {/* Document Header */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2.5px solid #0f172a', paddingBottom: '14px', marginBottom: '16px', gap: '20px' }}>
+                        <div>
+                          <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                            T.C. ÇEVRE, ŞEHİRCİLİK VE İKLİM DEĞİŞİKLİĞİ BAKANLIĞI STANDARTLARINA UYGUN
+                          </div>
+                          <h2 style={{ fontSize: '1.45rem', fontWeight: '900', color: '#0f172a', margin: '4px 0 2px 0', letterSpacing: '-0.3px' }}>
+                            MİMARİ TEKNİK ŞARTNAME & MAHAL LİSTESİ
+                          </h2>
+                          <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#b45309' }}>
+                            TS EN 14411 (GRUP BIA PORSELEN & SERAMİK KARO STANDARDI)
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#0f172a', letterSpacing: '1px' }}>
+                            SERAMİKBAK
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>
+                            <div><strong>Belge No:</strong> SB-SPEC-{activeProject?.id ? activeProject.id.slice(0, 8).toUpperCase() : 'DOC'}-{new Date().getFullYear()}</div>
+                            <div><strong>Tarih:</strong> {new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                            <div><strong>Durum:</strong> Nihai İhale & Sözleşme Eki</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Metadata Table */}
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                        gap: '12px 24px',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        padding: '14px 18px',
+                        marginBottom: '24px',
+                        fontSize: '0.82rem'
+                      }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <div><span style={{ color: '#64748b', fontWeight: '600', display: 'inline-block', minWidth: '110px' }}>Proje Adı:</span> <strong style={{ color: '#0f172a' }}>{activeProject?.title || specResult?.projectTitle || 'Mimari Yapı Projesi'}</strong></div>
+                          <div><span style={{ color: '#64748b', fontWeight: '600', display: 'inline-block', minWidth: '110px' }}>Proje Lokasyonu:</span> <span style={{ color: '#0f172a' }}>{activeProject?.city || 'Türkiye'}</span></div>
+                          <div><span style={{ color: '#64748b', fontWeight: '600', display: 'inline-block', minWidth: '110px' }}>Yapı Tipi:</span> <span style={{ color: '#0f172a' }}>{activeProject?.projectType || 'Genel Proje'}</span></div>
+                          <div><span style={{ color: '#64748b', fontWeight: '600', display: 'inline-block', minWidth: '110px' }}>Toplam Alan:</span> <span style={{ color: '#0f172a' }}>{activeProject?.totalAreaM2 ? `${activeProject.totalAreaM2} m²` : 'Belirtilmedi'}</span></div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <div><span style={{ color: '#64748b', fontWeight: '600', display: 'inline-block', minWidth: '120px' }}>Mimari Müellif:</span> <strong style={{ color: '#0f172a' }}>{architectInfo?.officeName || 'Yetkili Mimar'}</strong></div>
+                          <div><span style={{ color: '#64748b', fontWeight: '600', display: 'inline-block', minWidth: '120px' }}>Proje Müellifi:</span> <span style={{ color: '#0f172a' }}>{architectInfo?.name || 'Mimar'}</span></div>
+                          <div><span style={{ color: '#64748b', fontWeight: '600', display: 'inline-block', minWidth: '120px' }}>Sicil / İletişim:</span> <span style={{ color: '#0f172a' }}>{architectInfo?.chamberNo ? `Sicil: ${architectInfo.chamberNo}` : (architectInfo?.phone || architectInfo?.email || 'Proje Müellifi')}</span></div>
+                          <div><span style={{ color: '#64748b', fontWeight: '600', display: 'inline-block', minWidth: '120px' }}>Şartname Türü:</span> <span style={{ color: '#0f172a' }}>Resmi İmalat ve İhale Eki</span></div>
+                        </div>
+                      </div>
+
+                      {/* Section 1 */}
+                      <div style={{ marginBottom: '22px' }}>
+                        <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', borderBottom: '1.5px solid #cbd5e1', paddingBottom: '6px', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+                          BÖLÜM 1: GENEL HÜKÜMLER VE İMALAT STANDARTLARI
+                        </h4>
+                        <div style={{ fontSize: '0.84rem', color: '#334155', lineHeight: '1.6', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <p style={{ margin: 0 }}><strong>1.1. Malzeme Standardı:</strong> Bütün seramik ve porselen karolar <strong>TS EN 14411 Grup BIa (Su emme oranı E ≤ %0.5)</strong> uluslararası normlarına tam haiz, 1. sınıf (A kalite) orijinal ambalajında şantiyeye teslim edilecektir.</p>
+                          <p style={{ margin: 0 }}><strong>1.2. Yapıştırıcı Standardı:</strong> Kaplama uygulamasında TS EN 12004 standardına uygun, <strong>C2TE S1 sınıfı</strong> (çimento esaslı, kayma özelliği azaltılmış, açıkta bekleme süresi uzatılmış, yüksek elastikiyetli flex) yapıştırıcı kullanılacaktır.</p>
+                          <p style={{ margin: 0 }}><strong>1.3. Derz Genişliği ve Dolgusu:</strong> Karolar rektifiyeli (lazer kesim) olup, homojen derz hattı için en az 2 mm derz artısı kullanılacaktır. Derz dolgusu <strong>TS EN 13888 CG2WA sınıfı</strong> (yüksek aşınma dayanımlı, su emmesi minimize edilmiş, leke tutmaz) harç ile tatbik edilecektir.</p>
+                          <p style={{ margin: 0 }}><strong>1.4. Su Yalıtımı ve Yüzey Hazırlığı:</strong> Islak hacimlerde seramik kaplama öncesi süpürgelik kotuna kadar en az 2 kat polimer emülsiyon esaslı elastik su yalıtım membranı uygulanacaktır. Alt şap 350 dozlu, terazi ve gönyesinde olacaktır.</p>
+                        </div>
+                      </div>
+
+                      {/* Section 2: Items */}
+                      <div style={{ marginBottom: '22px' }}>
+                        <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', borderBottom: '1.5px solid #cbd5e1', paddingBottom: '6px', margin: '0 0 12px 0', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+                          BÖLÜM 2: MAHAL LİSTESİ VE MALZEME TEKNİK ŞARTLARI
+                        </h4>
+                        {specResult?.specClauses && specResult.specClauses.length > 0 ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                            {specResult.specClauses.map((clause, idx) => (
+                              <div key={idx} style={{
+                                border: '1px solid #e2e8f0',
+                                borderLeft: '4px solid #0f172a',
+                                borderRadius: '6px',
+                                padding: '14px 16px',
+                                background: '#fbfcfd'
+                              }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed #cbd5e1', paddingBottom: '6px', marginBottom: '10px' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span style={{ background: '#0f172a', color: '#fff', fontSize: '0.72rem', fontWeight: '800', padding: '2px 8px', borderRadius: '4px' }}>
+                                      Madde {clause.clauseNo}
+                                    </span>
+                                    <span style={{ fontSize: '0.88rem', fontWeight: '800', color: '#0f172a' }}>
+                                      {(clause.usageArea || 'KAPLAMA').toUpperCase()} — {clause.productName} ({clause.brandName})
+                                    </span>
+                                  </div>
+                                  {clause.areaM2 && (
+                                    <span style={{ fontSize: '0.82rem', fontWeight: '700', color: '#b45309' }}>
+                                      {clause.areaM2} m² (+ %8 Fire)
+                                    </span>
+                                  )}
+                                </div>
+                                <div style={{ fontSize: '0.82rem', color: '#334155', lineHeight: '1.55', whiteSpace: 'pre-wrap' }}>
+                                  {clause.clauseText}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <pre style={{ color: '#0f172a', fontFamily: 'monospace', fontSize: '0.82rem', lineHeight: '1.5', whiteSpace: 'pre-wrap', margin: 0 }}>
+                            {specResult.fullSpecDoc}
+                          </pre>
+                        )}
+                      </div>
+
+                      {/* Section 3 */}
+                      <div style={{ marginBottom: '28px' }}>
+                        <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', borderBottom: '1.5px solid #cbd5e1', paddingBottom: '6px', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+                          BÖLÜM 3: KONTROL, KABUL VE NUMUNE ONAY PROSEDÜRÜ
+                        </h4>
+                        <div style={{ fontSize: '0.84rem', color: '#334155', lineHeight: '1.6', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <p style={{ margin: 0 }}><strong>3.1. Numune Onayı:</strong> İşe başlanmadan önce yüklenici firma tarafından işbu şartnamede tariflenen karolara ait üretici teknik bilgi föyleri (TDS) ve 15x15 cm kesit numuneler mimari kontrollüğün yazılı onayına sunulacaktır.</p>
+                          <p style={{ margin: 0 }}><strong>3.2. Parti / Tonaj Bütünlüğü:</strong> Sahaya indirilen karoların tümü aynı üretim partisine (şarj/ton ve kalibre no) ait olacaktır. Farklı kalibre veya tonajdaki ürünlerin kabulü yapılmayacaktır.</p>
+                          <p style={{ margin: 0 }}><strong>3.3. Yüzey Koruma:</strong> İmalatı tamamlanan zeminler teslim anına dek ağır hizmet tipi zemin koruma örtüleri ile tam koruma altına alınacaktır.</p>
+                        </div>
+                      </div>
+
+                      {/* Section 4: Signatures */}
+                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '14px', marginTop: '24px' }}>
+                        <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '14px', textAlign: 'center', background: '#f8fafc' }}>
+                          <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>MİMARİ PROJE MÜELLİFİ</div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '8px' }}>(Tasarım & Kontrollük)</div>
+                          <div style={{ fontSize: '0.82rem', fontWeight: '700', color: '#0f172a' }}>{architectInfo?.officeName}</div>
+                          <div style={{ fontSize: '0.75rem', color: '#475569', marginBottom: '14px' }}>{architectInfo?.name}</div>
+                          <div style={{ border: '1px dashed #94a3b8', borderRadius: '6px', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', color: '#94a3b8', background: '#fff', marginBottom: '8px' }}>
+                            Kaşe / Islak İmza
+                          </div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Tarih: ..... / ..... / 202...</div>
+                        </div>
+
+                        <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '14px', textAlign: 'center', background: '#f8fafc' }}>
+                          <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>YÜKLENİCİ / MÜTEAHHİT</div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '8px' }}>(Uygulama ve Taahhüt)</div>
+                          <div style={{ fontSize: '0.82rem', fontWeight: '700', color: '#0f172a' }}>Yetkili Yüklenici</div>
+                          <div style={{ fontSize: '0.75rem', color: '#475569', marginBottom: '14px' }}>Firma Yetkilisi</div>
+                          <div style={{ border: '1px dashed #94a3b8', borderRadius: '6px', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', color: '#94a3b8', background: '#fff', marginBottom: '8px' }}>
+                            Kaşe / Islak İmza
+                          </div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Tarih: ..... / ..... / 202...</div>
+                        </div>
+
+                        <div style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '14px', textAlign: 'center', background: '#f8fafc' }}>
+                          <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>İŞVEREN / DENETİM</div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '8px' }}>(Kabul ve Onay Yetkilisi)</div>
+                          <div style={{ fontSize: '0.82rem', fontWeight: '700', color: '#0f172a' }}>Yapı Denetim / Kontrol</div>
+                          <div style={{ fontSize: '0.75rem', color: '#475569', marginBottom: '14px' }}>Yetkili Mühendis</div>
+                          <div style={{ border: '1px dashed #94a3b8', borderRadius: '6px', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.72rem', color: '#94a3b8', background: '#fff', marginBottom: '8px' }}>
+                            Kaşe / Islak İmza
+                          </div>
+                          <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Tarih: ..... / ..... / 202...</div>
+                        </div>
+                      </div>
+
+                      {/* Footer Note */}
+                      <div style={{ borderTop: '1px solid #e2e8f0', marginTop: '24px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#94a3b8' }}>
+                        <span>İşbu şartname TS EN 14411 yapı standartlarına uygun olarak SeramikBak Mimari Motoru ile derlenmiştir.</span>
+                        <span>Resmi Sözleşme & İhale Eki</span>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Raw Monospace Dark Box */
+                    <div style={{
+                      background: '#090d18',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '16px',
+                      padding: '24px',
+                      boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.5)'
+                    }}>
+                      <pre style={{
+                        color: '#e2e8f0',
+                        fontFamily: 'monospace',
                         fontSize: '0.85rem',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {specLoading ? 'Derleniyor...' : 'Şartnameyi Şimdi Üret'}
-                    </button>
-                  )}
+                        lineHeight: '1.6',
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        margin: 0
+                      }}>
+                        {specResult.fullSpecDoc}
+                      </pre>
+                    </div>
+                  )
+                ) : (
+                  /* Empty state */
+                  <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                    <FileText size={40} style={{ color: '#64748b', margin: '0 auto 12px auto' }} />
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: '700', margin: '0 0 6px 0' }}>
+                      Henüz Şartname Oluşturulmadı
+                    </h4>
+                    <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '0 0 16px 0' }}>
+                      {activeProject ? `"${activeProject.title}" projesi için otomatik teknik şartname derleyin.` : 'Lütfen önce bir proje seçin.'}
+                    </p>
+                    {activeProject && (
+                      <button
+                        onClick={() => handleGenerateSpec(activeProject)}
+                        disabled={specLoading}
+                        style={{
+                          background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                          color: '#090d16',
+                          border: 'none',
+                          borderRadius: '10px',
+                          padding: '10px 20px',
+                          fontWeight: '700',
+                          fontSize: '0.85rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {specLoading ? 'Derleniyor...' : 'Şartnameyi Şimdi Üret'}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Dedicated Print Layout (Rendered in DOM, visible ONLY on @media print) */}
+              {specResult && (
+                <div className="spec-print-document">
+                  {/* Print Document Header */}
+                  <div className="print-header">
+                    <div className="print-header-left">
+                      <div className="print-republic">T.C. ÇEVRE, ŞEHİRCİLİK VE İKLİM DEĞİŞİKLİĞİ BAKANLIĞI STANDARTLARINA UYGUN</div>
+                      <h1 className="print-main-title">MİMARİ TEKNİK ŞARTNAME & MAHAL LİSTESİ</h1>
+                      <div className="print-standard-tag">TS EN 14411 (GRUP BIA PORSELEN & SERAMİK KAROLAR)</div>
+                    </div>
+                    <div className="print-header-right">
+                      <div className="print-brand-badge">SERAMİKBAK</div>
+                      <div className="print-meta-item"><strong>Belge No:</strong> SB-SPEC-{activeProject?.id ? activeProject.id.slice(0, 8).toUpperCase() : 'DOC'}-{new Date().getFullYear()}</div>
+                      <div className="print-meta-item"><strong>Tarih:</strong> {new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                      <div className="print-meta-item"><strong>Durum:</strong> Nihai İhale Formatı</div>
+                    </div>
+                  </div>
+
+                  <div className="print-divider-thick" />
+
+                  {/* Print Metadata Table */}
+                  <div className="print-meta-grid">
+                    <div className="print-meta-col">
+                      <div className="print-row"><span className="label">Proje Adı:</span> <span className="val bold">{activeProject?.title || specResult?.projectTitle || 'Mimari Yapı Projesi'}</span></div>
+                      <div className="print-row"><span className="label">Proje Lokasyonu:</span> <span className="val">{activeProject?.city || 'Türkiye'}</span></div>
+                      <div className="print-row"><span className="label">Yapı Türü:</span> <span className="val">{activeProject?.projectType || 'Konut / Ticari'}</span></div>
+                      <div className="print-row"><span className="label">Toplam Alan:</span> <span className="val">{activeProject?.totalAreaM2 ? `${activeProject.totalAreaM2} m²` : 'Belirtilmedi'}</span></div>
+                    </div>
+                    <div className="print-meta-col">
+                      <div className="print-row"><span className="label">Mimari Müellif Ofis:</span> <span className="val bold">{architectInfo?.officeName || 'Yetkili Mimarlık'}</span></div>
+                      <div className="print-row"><span className="label">Müellif Mimar:</span> <span className="val">{architectInfo?.name || 'Mimar'}</span></div>
+                      <div className="print-row"><span className="label">Sicil / İletişim:</span> <span className="val">{architectInfo?.chamberNo ? `Sicil No: ${architectInfo.chamberNo}` : (architectInfo?.phone || architectInfo?.email || 'Proje Müellifi')}</span></div>
+                      <div className="print-row"><span className="label">Şartname Niteliği:</span> <span className="val">Resmi Sözleşme & İhale Eki</span></div>
+                    </div>
+                  </div>
+
+                  {/* Section 1 */}
+                  <div className="print-section">
+                    <h2 className="print-section-title">BÖLÜM 1: GENEL HÜKÜMLER VE İMALAT STANDARTLARI</h2>
+                    <div className="print-clause">
+                      <p><strong>1.1. Malzeme Standardı ve Kalite Sınıfı:</strong> Bu şartnamede geçen bütün seramik ve porselen karolar, <strong>TS EN 14411 Grup BIa (Su emme oranı E ≤ %0.5)</strong> uluslararası standartlarına tam haiz, 1. sınıf (A kalite) orijinal ambalajında şantiyeye teslim edilecektir. Standart dışı, defolu veya kalibre hatası olan ürünler kabul edilmeyecektir.</p>
+                      <p><strong>1.2. Yapıştırıcı ve Harç Standartları:</strong> Zemin ve duvar kaplama imalatlarında TS EN 12004 standardına uygun, <strong>C2TE S1 sınıfı</strong> (çimento esaslı, kayma özelliği azaltılmış, açıkta bekleme süresi uzatılmış, yüksek elastikiyetli) flex yapıştırıcılar kullanılacaktır.</p>
+                      <p><strong>1.3. Derz Genişliği ve Dolgusu:</strong> Karolar rektifiyeli (lazer kesim) olup derz kalınlığını homojen kılmak adına en az 2 mm derz artısı kullanılacaktır. Derz dolgusu <strong>TS EN 13888 CG2WA sınıfı</strong> (yüksek aşınma mukavemetli, su emmesi minimize edilmiş, leke tutmaz) harç ile eksiz tatbik edilecektir.</p>
+                      <p><strong>1.4. Yalıtım ve Yüzey Hazırlığı:</strong> Islak hacimlerde seramik kaplama öncesi süpürgelik kotuna kadar en az 2 kat polimer emülsiyon esaslı elastik su yalıtım membranı tatbik edilecektir. Alt tesviye şapı 350 dozlu, terazi ve gönyesinde teslim alınacaktır.</p>
+                    </div>
+                  </div>
+
+                  {/* Section 2 */}
+                  <div className="print-section">
+                    <h2 className="print-section-title">BÖLÜM 2: MAHAL LİSTESİ VE MALZEME TEKNİK ŞARTLARI</h2>
+                    {specResult?.specClauses && specResult.specClauses.length > 0 ? (
+                      specResult.specClauses.map((clause, idx) => (
+                        <div key={idx} className="print-item-box">
+                          <div className="print-item-header">
+                            <span className="print-item-tag">Madde {clause.clauseNo}</span>
+                            <span className="print-item-title">
+                              {(clause.usageArea || 'KAPLAMA').toUpperCase()} — {clause.productName} ({clause.brandName})
+                            </span>
+                            {clause.areaM2 && <span className="print-item-m2">{clause.areaM2} m² (+ %8 Fire)</span>}
+                          </div>
+                          <div className="print-item-body">
+                            <div className="print-item-clause-text">
+                              {clause.clauseText}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <pre className="print-raw-text">{specResult.fullSpecDoc}</pre>
+                    )}
+                  </div>
+
+                  {/* Section 3 */}
+                  <div className="print-section">
+                    <h2 className="print-section-title">BÖLÜM 3: KONTROL, KABUL VE NUMUNE ONAYI</h2>
+                    <div className="print-clause">
+                      <p><strong>3.1. Numune Onayı:</strong> İşe başlanmadan evvel yüklenici firma tarafından işbu şartnamede belirlenen karolara ait numuneler ve üretici teknik bilgi föyleri (TDS) mimari kontrollüğün yazılı onayına sunulacak; yazılı onay alınmadan imalata başlanmayacaktır.</p>
+                      <p><strong>3.2. Parti / Tonaj Bütünlüğü:</strong> Sahaya sevk edilen karoların tümü aynı üretim şarjına (tonaj ve kalibre) ait olacaktır. Renk veya ebat farklılığı olan ürünlerin kabulü yapılmayacaktır.</p>
+                      <p><strong>3.3. Yüzey Koruma:</strong> İmalatı tamamlanan zeminler teslim anına dek ağır hizmet tipi koruma örtüleri ile tam muhafaza altına alınacaktır.</p>
+                    </div>
+                  </div>
+
+                  {/* Section 4: Signatures */}
+                  <div className="print-signatures">
+                    <div className="print-sig-col">
+                      <div className="print-sig-title">MİMARİ PROJE MÜELLİFİ</div>
+                      <div className="print-sig-sub">(Tasarım & Kontrollük)</div>
+                      <div className="print-sig-office">{architectInfo?.officeName}</div>
+                      <div className="print-sig-name">{architectInfo?.name}</div>
+                      <div className="print-sig-box">Kaşe / Islak İmza</div>
+                      <div className="print-sig-date">Tarih: ..... / ..... / 202...</div>
+                    </div>
+                    <div className="print-sig-col">
+                      <div className="print-sig-title">YÜKLENİCİ / MÜTEAHHİT</div>
+                      <div className="print-sig-sub">(Uygulama ve Taahhüt)</div>
+                      <div className="print-sig-office">Yetkili Yüklenici</div>
+                      <div className="print-sig-name">Firma Yetkilisi</div>
+                      <div className="print-sig-box">Kaşe / Islak İmza</div>
+                      <div className="print-sig-date">Tarih: ..... / ..... / 202...</div>
+                    </div>
+                    <div className="print-sig-col">
+                      <div className="print-sig-title">İŞVEREN / DENETİM</div>
+                      <div className="print-sig-sub">(Kabul ve Onay)</div>
+                      <div className="print-sig-office">Yapı Denetim / İdare</div>
+                      <div className="print-sig-name">Yetkili Mühendis</div>
+                      <div className="print-sig-box">Kaşe / Islak İmza</div>
+                      <div className="print-sig-date">Tarih: ..... / ..... / 202...</div>
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="print-footer">
+                    <span>İşbu şartname TS EN 14411 yapı standartlarına uygun olarak SeramikBak Mimari Motoru ile derlenmiştir.</span>
+                    <span>Sözleşme & İhale Eki</span>
+                  </div>
                 </div>
               )}
+
             </div>
           )}
 
@@ -3383,7 +3736,7 @@ export default function ArchitectPortalPage() {
 
       {/* Mobile Bottom Navigation Bar */}
       {isMobile && (
-        <div style={{
+        <div className="no-print mobile-bottom-bar" style={{
           position: 'fixed',
           bottom: 0,
           left: 0,
@@ -3434,7 +3787,7 @@ export default function ArchitectPortalPage() {
         </div>
       )}
 
-      {/* Custom styles for brand horizontal scrollbar */}
+      {/* Custom Styles & Professional A4 Print Stylesheet */}
       <style jsx global>{`
         .brand-pill-scroll::-webkit-scrollbar {
           height: 6px !important;
@@ -3449,6 +3802,338 @@ export default function ArchitectPortalPage() {
         }
         .brand-pill-scroll::-webkit-scrollbar-thumb:hover {
           background: #d4af37 !important;
+        }
+
+        /* Screen Document Default (Hidden on Screen, visible on print) */
+        .spec-print-document {
+          display: none;
+        }
+
+        /* Official TS EN 14411 A4 Technical Specification Print Styles */
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 14mm 15mm 15mm 15mm;
+          }
+
+          html, body {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', Arial, sans-serif !important;
+            font-size: 9pt !important;
+            line-height: 1.45 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          /* Hide ALL non-print portal elements */
+          .no-print,
+          aside,
+          header,
+          nav,
+          button,
+          .mimar-sidebar,
+          .mimar-header,
+          .mobile-bottom-bar,
+          .brand-pill-scroll,
+          div[style*="position: fixed"],
+          div[style*="position: sticky"] {
+            display: none !important;
+          }
+
+          /* Unconstrain portal layout for full page width */
+          .mimar-dashboard-root {
+            display: block !important;
+            background: #ffffff !important;
+            color: #0f172a !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+          }
+
+          .mimar-content-wrapper {
+            display: block !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+          }
+
+          .mimar-main {
+            display: block !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+          }
+
+          .spec-tab-container {
+            display: block !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+
+          /* Display the official document */
+          .spec-print-document {
+            display: block !important;
+            width: 100% !important;
+            background: #ffffff !important;
+            color: #0f172a !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+
+          .print-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            padding-bottom: 8px !important;
+          }
+
+          .print-header-left {
+            flex: 1 !important;
+          }
+
+          .print-republic {
+            font-size: 7.5pt !important;
+            font-weight: 700 !important;
+            color: #475569 !important;
+            letter-spacing: 0.5px !important;
+            text-transform: uppercase !important;
+            margin-bottom: 3px !important;
+          }
+
+          .print-main-title {
+            font-size: 13.5pt !important;
+            font-weight: 900 !important;
+            color: #0f172a !important;
+            margin: 0 0 2px 0 !important;
+            letter-spacing: -0.2px !important;
+          }
+
+          .print-standard-tag {
+            font-size: 8.5pt !important;
+            font-weight: 800 !important;
+            color: #b45309 !important;
+          }
+
+          .print-header-right {
+            text-align: right !important;
+            min-width: 190px !important;
+          }
+
+          .print-brand-badge {
+            font-size: 11pt !important;
+            font-weight: 900 !important;
+            color: #0f172a !important;
+            letter-spacing: 1px !important;
+            margin-bottom: 3px !important;
+          }
+
+          .print-meta-item {
+            font-size: 7.5pt !important;
+            color: #475569 !important;
+            line-height: 1.35 !important;
+          }
+
+          .print-divider-thick {
+            height: 2.5px !important;
+            background: #0f172a !important;
+            margin: 6px 0 10px 0 !important;
+          }
+
+          .print-meta-grid {
+            display: flex !important;
+            gap: 16px !important;
+            border: 1px solid #cbd5e1 !important;
+            background: #f8fafc !important;
+            padding: 8px 12px !important;
+            border-radius: 4px !important;
+            margin-bottom: 12px !important;
+          }
+
+          .print-meta-col {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 2px !important;
+          }
+
+          .print-row {
+            font-size: 8pt !important;
+            display: flex !important;
+            gap: 6px !important;
+          }
+
+          .print-row .label {
+            color: #64748b !important;
+            min-width: 105px !important;
+            font-weight: 600 !important;
+          }
+
+          .print-row .val {
+            color: #0f172a !important;
+          }
+
+          .print-row .val.bold {
+            font-weight: 700 !important;
+          }
+
+          .print-section {
+            margin-bottom: 12px !important;
+            page-break-inside: auto !important;
+          }
+
+          .print-section-title {
+            font-size: 9pt !important;
+            font-weight: 800 !important;
+            color: #0f172a !important;
+            border-bottom: 1px solid #cbd5e1 !important;
+            padding-bottom: 3px !important;
+            margin: 0 0 6px 0 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.3px !important;
+          }
+
+          .print-clause p {
+            font-size: 8pt !important;
+            line-height: 1.45 !important;
+            margin: 0 0 5px 0 !important;
+            color: #1e293b !important;
+            text-align: justify !important;
+          }
+
+          .print-item-box {
+            border: 1px solid #cbd5e1 !important;
+            border-left: 3.5px solid #0f172a !important;
+            padding: 8px 10px !important;
+            margin-bottom: 8px !important;
+            background: #ffffff !important;
+            page-break-inside: avoid !important;
+          }
+
+          .print-item-header {
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            border-bottom: 1px dashed #cbd5e1 !important;
+            padding-bottom: 3px !important;
+            margin-bottom: 5px !important;
+          }
+
+          .print-item-tag {
+            background: #0f172a !important;
+            color: #ffffff !important;
+            font-size: 7pt !important;
+            font-weight: 800 !important;
+            padding: 1px 5px !important;
+            border-radius: 2px !important;
+          }
+
+          .print-item-title {
+            font-size: 8pt !important;
+            font-weight: 700 !important;
+            color: #0f172a !important;
+            flex: 1 !important;
+          }
+
+          .print-item-m2 {
+            font-size: 7.5pt !important;
+            font-weight: 700 !important;
+            color: #b45309 !important;
+          }
+
+          .print-item-clause-text {
+            font-size: 7.8pt !important;
+            line-height: 1.4 !important;
+            color: #334155 !important;
+            white-space: pre-wrap !important;
+          }
+
+          .print-raw-text {
+            font-size: 7.8pt !important;
+            line-height: 1.38 !important;
+            white-space: pre-wrap !important;
+            color: #0f172a !important;
+            font-family: 'Courier New', Courier, monospace !important;
+          }
+
+          .print-signatures {
+            display: flex !important;
+            gap: 10px !important;
+            margin-top: 14px !important;
+            page-break-inside: avoid !important;
+          }
+
+          .print-sig-col {
+            flex: 1 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 4px !important;
+            padding: 8px !important;
+            text-align: center !important;
+            background: #f8fafc !important;
+          }
+
+          .print-sig-title {
+            font-size: 7.5pt !important;
+            font-weight: 800 !important;
+            color: #0f172a !important;
+          }
+
+          .print-sig-sub {
+            font-size: 6.5pt !important;
+            color: #64748b !important;
+            margin-bottom: 4px !important;
+          }
+
+          .print-sig-office {
+            font-size: 7.5pt !important;
+            font-weight: 700 !important;
+            color: #0f172a !important;
+          }
+
+          .print-sig-name {
+            font-size: 7pt !important;
+            color: #475569 !important;
+            margin-bottom: 8px !important;
+          }
+
+          .print-sig-box {
+            border: 1px dashed #94a3b8 !important;
+            border-radius: 4px !important;
+            height: 42px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 6.5pt !important;
+            color: #94a3b8 !important;
+            margin-bottom: 4px !important;
+            background: #ffffff !important;
+          }
+
+          .print-sig-date {
+            font-size: 6.5pt !important;
+            color: #64748b !important;
+          }
+
+          .print-footer {
+            display: flex !important;
+            justify-content: space-between !important;
+            font-size: 6.5pt !important;
+            color: #94a3b8 !important;
+            border-top: 1px solid #e2e8f0 !important;
+            padding-top: 4px !important;
+            margin-top: 12px !important;
+            page-break-inside: avoid !important;
+          }
         }
       `}</style>
 
