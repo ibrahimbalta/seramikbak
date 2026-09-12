@@ -5272,6 +5272,39 @@ export default function BrandPortalPage() {
                                   <td style={{ padding: '14px 18px', verticalAlign: 'top' }}>
                                     <div style={{ fontWeight: '800', color: '#0f172a' }}>{lead.product?.name || 'Genel Katalog'}</div>
                                     <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontFamily: 'monospace' }}>{lead.product?.code || 'GENEL'}</div>
+                                    {(() => {
+                                      let m2Val = null;
+                                      if (lead.notes) {
+                                        const m = lead.notes.match(/(?:\[İHTİYAÇ:\s*|İhtiyaç:\s*|METRAJ:\s*|Metraj:\s*)(\d+[\d.,]*)\s*m[²2]/i) ||
+                                                  lead.notes.match(/(\d+[\d.,]*)\s*m[²2]/i);
+                                        if (m && m[1]) m2Val = m[1];
+                                      }
+                                      if (!m2Val && lead.projectName) {
+                                        const m = lead.projectName.match(/(\d+[\d.,]*)\s*m[²2]/i);
+                                        if (m && m[1]) m2Val = m[1];
+                                      }
+                                      if (m2Val) {
+                                        return (
+                                          <div style={{ marginTop: '5px' }}>
+                                            <span style={{
+                                              display: 'inline-flex',
+                                              alignItems: 'center',
+                                              gap: '3px',
+                                              background: 'rgba(212, 175, 55, 0.14)',
+                                              color: '#b45309',
+                                              border: '1px solid rgba(212, 175, 55, 0.35)',
+                                              padding: '2px 8px',
+                                              borderRadius: '6px',
+                                              fontSize: '0.73rem',
+                                              fontWeight: '800'
+                                            }}>
+                                              📐 İhtiyaç: {m2Val} m²
+                                            </span>
+                                          </div>
+                                        );
+                                      }
+                                      return null;
+                                    })()}
                                   </td>
 
                                   <td style={{ padding: '14px 18px', verticalAlign: 'top' }}>

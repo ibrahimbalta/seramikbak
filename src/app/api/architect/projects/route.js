@@ -56,6 +56,18 @@ export async function POST(request) {
           totalAreaM2: totalAreaM2 ? parseFloat(totalAreaM2) : 350,
           notes: notes ? notes.trim() : null,
           status: 'DESIGN'
+        },
+        include: {
+          items: {
+            include: {
+              product: {
+                include: {
+                  brand: { select: { id: true, name: true, logoUrl: true } }
+                }
+              }
+            },
+            orderBy: { createdAt: 'desc' }
+          }
         }
       });
 

@@ -34,7 +34,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { architectId, productIds, officeAddress, city, notes, projectName } = body;
+    const { architectId, productIds, officeAddress, city, notes, projectName, neededM2 } = body;
 
     if (!architectId || !productIds || !Array.isArray(productIds) || productIds.length === 0) {
       return NextResponse.json({ error: 'Mimar ID ve en az bir ürün seçilmelidir.' }, { status: 400 });
@@ -112,6 +112,25 @@ export async function POST(request) {
       });
       createdSamples.push(sample);
 
+      // Determine needed m2 from input or project item
+      let effectiveM2 = neededM2 ? parseFloat(neededM2) : null;
+      if (!effectiveM2 && architectId && productId) {
+        try {
+          const item = await prisma.architectProjectItem.findFirst({
+            where: {
+              productId: productId,
+              project: { architectId: architectId }
+            },
+            select: { areaM2: true, project: { select: { totalAreaM2: true } } }
+          });
+          if (item) {
+            effectiveM2 = item.areaM2 || item.project?.totalAreaM2;
+          }
+        } catch (m2Err) {
+          console.warn('Could not resolve project areaM2:', m2Err.message);
+        }
+      }
+
       // 4. Send Lead to the Assigned Dealer's Portal (/bayi)
       if (matchedDealer) {
         try {
@@ -122,10 +141,10 @@ export async function POST(request) {
               clientName: `${architect.officeName} (${architect.name})`,
               clientPhone: architect.phone || '-',
               clientEmail: architect.email,
-              notes: `📦 [MİMARİ NUMUNE KUTUSU TALEBİ] Ofis: ${architect.officeName}, Mimar: ${architect.name}. Teslimat Adresi: ${officeAddress}, ${city}. ${projectName ? `Proje: ${projectName}. ` : ''}${notes ? `Mimar Notu: ${notes}. ` : ''}Lütfen numuneyi 24 saat içinde mimarın ofisine ulaştırarak projeyi showroom'unuza bağlayın!`,
+              notes: `📦 [MİMARİ NUMUNE KUTUSU TALEBİ] Ofis: ${architect.officeName}, Mimar: ${architect.name}. ${effectiveM2 ? `[PROJE İHTİYAÇ METRAJI: ${effectiveM2} m²] ` : ''}Teslimat Adresi: ${officeAddress}, ${city}. ${projectName ? `Proje: ${projectName}. ` : ''}${notes ? `Mimar Notu: ${notes}. ` : ''}Lütfen numuneyi 24 saat içinde mimarın ofisine ulaştırarak projeyi showroom'unuza bağlayın!`,
               status: 'PENDING',
               requestedArchitect: true,
-              projectDimensions: '15x15 Kesit Numune Kutusu'
+              projectDimensions: effectiveM2 ? `${effectiveM2} m² İhtiyaç` : '15x15 Kesit Numune Kutusu'
             }
           });
 
@@ -139,7 +158,7 @@ export async function POST(request) {
               city: city.trim(),
               district: matchedDealer.district || architect.city || city.trim(),
               address: officeAddress.trim(),
-              notes: `[Mimari Numune] Ofis: ${architect.officeName}. Proje: ${projectName || 'Mimari Tasarım'}. Not: ${notes || '-'}`,
+              notes: `[Mimari Numune] Ofis: ${architect.officeName}. Proje: ${projectName || 'Mimari Tasarım'}. ${effectiveM2 ? `İhtiyaç: ${effectiveM2} m². ` : ''}Not: ${notes || '-'}`,
               status: 'PENDING'
             }
           });
@@ -161,10 +180,12 @@ export async function POST(request) {
               phone: architect.phone,
               city: city,
               projectType: 'Mimari Numune Kutusu',
-              projectName: projectName || 'Numune İnceleme & Şartname Hazırlığı',
+              projectName: projectName 
+                ? (effectiveM2 ? `${projectName} (${effectiveM2} m²)` : projectName)
+                : (effectiveM2 ? `Mimari Proje (${effectiveM2} m²)` : 'Numune İnceleme & Şartname Hazırlığı'),
               fileType: 'NUMUNE_KUTUSU_TALEBI',
               status: 'SPEC_IN',
-              notes: `📦 Mimari Numune Talebi: ${architect.officeName} (${architect.name}). Teslimat: ${officeAddress}, ${city}. ${matchedDealer ? `En Yakın Yetkili Bayiye İletildi: ${matchedDealer.name} (${matchedDealer.city} - Tel: ${matchedDealer.phone || ''})` : 'Doğrudan Fabrika Sevk'}. ${notes ? `Mimar Notu: ${notes}` : ''}`
+              notes: `📦 Mimari Numune Talebi: ${architect.officeName} (${architect.name}). ${effectiveM2 ? `[İHTİYAÇ: ${effectiveM2} m²] ` : ''}Teslimat: ${officeAddress}, ${city}. ${matchedDealer ? `En Yakın Yetkili Bayiye İletildi: ${matchedDealer.name} (${matchedDealer.city} - Tel: ${matchedDealer.phone || ''})` : 'Doğrudan Fabrika Sevk'}. ${notes ? `Mimar Notu: ${notes}` : ''}`
             }
           });
         } catch (specErr) {

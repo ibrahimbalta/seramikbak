@@ -118,6 +118,7 @@ export default function ArchitectPortalPage() {
   const [sampleSelectedProducts, setSampleSelectedProducts] = useState([]);
   const [sampleAddress, setSampleAddress] = useState('');
   const [sampleCity, setSampleCity] = useState('İstanbul');
+  const [sampleAreaM2, setSampleAreaM2] = useState('');
   const [sampleNotes, setSampleNotes] = useState('');
   const [sampleSubmitting, setSampleSubmitting] = useState(false);
   const [sampleSuccessMsg, setSampleSuccessMsg] = useState('');
@@ -349,12 +350,14 @@ export default function ArchitectPortalPage() {
         })
       });
       const data = await res.json();
-      if (res.ok && data.success) {
+      if (res.ok && data.success && data.project) {
+        const createdProj = { ...data.project, items: data.project.items || [] };
         setShowNewProjectModal(false);
         setNewProjectTitle('');
         setNewProjectNotes('');
-        await fetchProjects(architectInfo.id);
-        setActiveProject(data.project);
+        setProjects(prev => [createdProj, ...prev.filter(p => p.id !== createdProj.id)]);
+        setActiveProject(createdProj);
+        await fetchProjects(architectInfo.id, createdProj.id);
       }
     } catch (err) {
       console.error('Create project failed:', err);
@@ -531,6 +534,7 @@ export default function ArchitectPortalPage() {
           productIds: sampleSelectedProducts.map(p => p.id),
           officeAddress: sampleAddress,
           city: sampleCity,
+          neededM2: sampleAreaM2 || (activeProject?.totalAreaM2 ? String(activeProject.totalAreaM2) : ''),
           notes: sampleNotes,
           projectName: activeProject?.title || 'Mimari Proje'
         })
@@ -1842,6 +1846,9 @@ export default function ArchitectPortalPage() {
                                 <button
                                   onClick={() => {
                                     setSampleSelectedProducts([p]);
+                                    const itemInProj = activeProject?.items?.find(it => it.productId === p.id || it.product?.id === p.id);
+                                    const m2 = itemInProj?.areaM2 || activeProject?.totalAreaM2 || '';
+                                    setSampleAreaM2(m2 ? String(m2) : '');
                                     setShowSampleModal(true);
                                   }}
                                   style={{
@@ -3157,7 +3164,10 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                 </div>
 
                 <button
-                  onClick={() => setShowSampleModal(true)}
+                  onClick={() => {
+                    setSampleAreaM2(activeProject?.totalAreaM2 ? String(activeProject.totalAreaM2) : '');
+                    setShowSampleModal(true);
+                  }}
                   style={{
                     background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                     color: '#090d16',
@@ -4119,6 +4129,34 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                   {sampleSelectedProducts.length > 0 
                     ? sampleSelectedProducts.map(p => p.name).join(', ') 
                     : (activeProject?.items?.[0]?.product?.name || 'Projedeki İlk Karo')}
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
+                  Projede Kullanılacak Tahmini Metraj (m²) *
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  step="any"
+                  required
+                  placeholder="Örn: 1500"
+                  value={sampleAreaM2}
+                  onChange={(e) => setSampleAreaM2(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    background: 'rgba(0, 0, 0, 0.3)',
+                    color: '#fff',
+                    fontSize: '0.85rem',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '4px' }}>
+                  Marka ve bayinin proje rezervasyonu ve teklif hazırlayabilmesi için tahmini metrajı girin.
                 </div>
               </div>
 
