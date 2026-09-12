@@ -510,7 +510,16 @@ export default function ArchitectPortalPage() {
       const res = await fetch('/api/architect/spec-generator', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectId: target.id })
+        body: JSON.stringify({ 
+          projectId: target.id,
+          projectMeta: {
+            title: target.title,
+            city: target.city,
+            projectType: target.projectType,
+            officeName: architectInfo?.officeName,
+            name: architectInfo?.name
+          }
+        })
       });
       if (res.ok) {
         const data = await res.json();
@@ -2286,11 +2295,11 @@ export default function ArchitectPortalPage() {
                           </div>
                         </div>
                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                          <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#0f172a', letterSpacing: '1px' }}>
-                            SERAMİKBAK
+                          <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#0f172a', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                            {architectInfo?.officeName || 'MİMARİ PROJE OFİSİ'}
                           </div>
                           <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>
-                            <div><strong>Belge No:</strong> SB-SPEC-{activeProject?.id ? activeProject.id.slice(0, 8).toUpperCase() : 'DOC'}-{new Date().getFullYear()}</div>
+                            <div><strong>Belge No:</strong> SPEC-{activeProject?.id ? activeProject.id.slice(0, 8).toUpperCase() : 'DOC'}-{new Date().getFullYear()}</div>
                             <div><strong>Tarih:</strong> {new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                             <div><strong>Durum:</strong> Nihai İhale & Sözleşme Eki</div>
                           </div>
@@ -2429,7 +2438,7 @@ export default function ArchitectPortalPage() {
 
                       {/* Footer Note */}
                       <div style={{ borderTop: '1px solid #e2e8f0', marginTop: '24px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#94a3b8' }}>
-                        <span>İşbu şartname TS EN 14411 yapı standartlarına uygun olarak SeramikBak Mimari Motoru ile derlenmiştir.</span>
+                        <span>İşbu şartname TS EN 14411 yapı standartlarına uygun resmi teknik şartname ve mahal listesidir.</span>
                         <span>Resmi Sözleşme & İhale Eki</span>
                       </div>
                     </div>
@@ -2498,8 +2507,8 @@ export default function ArchitectPortalPage() {
                       <div className="print-standard-tag">TS EN 14411 (GRUP BIA PORSELEN & SERAMİK KAROLAR)</div>
                     </div>
                     <div className="print-header-right">
-                      <div className="print-brand-badge">SERAMİKBAK</div>
-                      <div className="print-meta-item"><strong>Belge No:</strong> SB-SPEC-{activeProject?.id ? activeProject.id.slice(0, 8).toUpperCase() : 'DOC'}-{new Date().getFullYear()}</div>
+                      <div className="print-brand-badge">{architectInfo?.officeName ? architectInfo.officeName.toUpperCase() : 'MİMARİ PROJE OFİSİ'}</div>
+                      <div className="print-meta-item"><strong>Belge No:</strong> SPEC-{activeProject?.id ? activeProject.id.slice(0, 8).toUpperCase() : 'DOC'}-{new Date().getFullYear()}</div>
                       <div className="print-meta-item"><strong>Tarih:</strong> {new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                       <div className="print-meta-item"><strong>Durum:</strong> Nihai İhale Formatı</div>
                     </div>
@@ -2599,7 +2608,7 @@ export default function ArchitectPortalPage() {
 
                   {/* Footer */}
                   <div className="print-footer">
-                    <span>İşbu şartname TS EN 14411 yapı standartlarına uygun olarak SeramikBak Mimari Motoru ile derlenmiştir.</span>
+                    <span>İşbu şartname TS EN 14411 yapı standartlarına uygun resmi teknik şartname ve mahal listesidir.</span>
                     <span>Sözleşme & İhale Eki</span>
                   </div>
                 </div>

@@ -11,6 +11,8 @@ export async function POST(request) {
     let projectTitle = projectMeta?.title || 'Mimari Yapı Projesi';
     let projectCity = projectMeta?.city || 'Türkiye';
     let projectType = projectMeta?.projectType || 'Genel Proje';
+    let officeName = projectMeta?.officeName || '';
+    let authorName = projectMeta?.name || '';
 
     if (projectId) {
       const project = await prisma.architectProject.findUnique({
@@ -34,6 +36,8 @@ export async function POST(request) {
         projectTitle = project.title;
         projectCity = project.city;
         projectType = project.projectType;
+        if (project.architect?.officeName) officeName = project.architect.officeName;
+        if (project.architect?.name) authorName = project.architect.name;
       }
     }
 
@@ -66,7 +70,7 @@ B. Boyut ve Kenar Toleransı: Anma ebatları ${sizeStr}, kalınlık ${thickness}
 C. Yüzey Özelliği ve Dokusu: ${finish} yüzeyli, ${style} dokulu olacaktır.
 D. Mekanik & Emniyet Parametreleri: Yüzey aşınma direnci minimum ${pei}; kayma direnci değeri en az ${slip} sınıfında olacaktır.
 E. Kimyasal & Çevresel Mukavemet: Evsel kimyasallara ve lekelenmeye karşı TS EN ISO 10545-13 standardında minimum Sınıf A mukavemetinde; ${frost} olacaktır.
-F. Referans Ürün / Emsal: ${brand} - ${p.name} (Kod: ${p.code || 'SB-' + p.id.slice(0, 8)}) veya idarenin onaylayacağı teknik eşdeğeri.
+F. Referans Ürün / Emsal: ${brand} - ${p.name} (Kod: ${p.code || 'PRD-' + p.id.slice(0, 8)}) veya idarenin onaylayacağı teknik eşdeğeri.
 G. Tahmini Metraj & Fire: ${item.areaM2 || 100} m² (İdarece %8 fire payı ilave edilecektir).
 `.trim();
 
@@ -81,14 +85,15 @@ G. Tahmini Metraj & Fire: ${item.areaM2 || 100} m² (İdarece %8 fire payı ilav
     });
 
     const fullSpecDoc = `
-T.C. ÇEVRE, ŞEHİRCİLİK VE İKLİM DEĞİŞİKLİĞİ STANDARTLARINA UYGUN
-TEKNİK ŞARTNAME (TS EN 14411 BIA SERAMİK VE PORSELEN KARO)
+T.C. ÇEVRE, ŞEHİRCİLİK VE İKLİM DEĞİŞİKLİĞİ BAKANLIĞI STANDARTLARINA UYGUN
+MİMARİ TEKNİK ŞARTNAME & MAHAL LİSTESİ (TS EN 14411)
 
 PROJE ADI: ${projectTitle}
 PROJE LOKASYONU: ${projectCity}
 YAPI TİPİ: ${projectType}
 TARİH: ${new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
-DÜZENLEYEN: SeramikBak Mimarlık & Tasarım Şartname Motoru (ArchStudio)
+DÜZENLEYEN: ${officeName ? `${officeName} (Mimari Proje Müellifi)` : (authorName ? `${authorName} (Mimari Proje Müellifi)` : 'Mimari Proje Müellifi')}
+DURUM: Nihai İhale & Sözleşme Eki
 
 --------------------------------------------------------------------------------
 BÖLÜM 1: GENEL HÜKÜMLER VE UYGULAMA KURALLARI
