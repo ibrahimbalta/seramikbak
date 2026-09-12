@@ -37,7 +37,6 @@ import {
   Maximize2,
   Calculator,
   Share2,
-  Award,
   Sliders
 } from 'lucide-react';
 import Link from 'next/link';
@@ -67,7 +66,7 @@ export default function ArchitectPortalPage() {
   const [authSuccess, setAuthSuccess] = useState('');
 
   // Portal Layout States
-  const [activeTab, setActiveTab] = useState('projects'); // 'projects', 'vault', 'samples', 'spec-writer', 'quotes'
+  const [activeTab, setActiveTab] = useState('projects'); // 'projects', 'calculator', 'vault', 'spec-writer', 'samples'
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -119,16 +118,6 @@ export default function ArchitectPortalPage() {
   const [sampleNotes, setSampleNotes] = useState('');
   const [sampleSubmitting, setSampleSubmitting] = useState(false);
   const [sampleSuccessMsg, setSampleSuccessMsg] = useState('');
-
-  // Project Wholesale Tender Quote State
-  const [tenderProjectName, setTenderProjectName] = useState('');
-  const [tenderProjectType, setTenderProjectType] = useState('Lüks Konut / Rezidans');
-  const [tenderCity, setTenderCity] = useState('İstanbul');
-  const [tenderM2, setTenderM2] = useState('2500');
-  const [tenderTargetDate, setTenderTargetDate] = useState('3 Ay İçinde');
-  const [tenderNotes, setTenderNotes] = useState('');
-  const [tenderLoading, setTenderLoading] = useState(false);
-  const [tenderSuccessMsg, setTenderSuccessMsg] = useState('');
 
   // 3D & BIM Asset Vault State
   const [vaultSearch, setVaultSearch] = useState('');
@@ -642,38 +631,6 @@ export default function ArchitectPortalPage() {
       });
     } catch (err) {
       console.error('Download error:', err);
-    }
-  };
-
-  // Submit Tender Quote
-  const handleSubmitTender = async (e) => {
-    e.preventDefault();
-    setTenderLoading(true);
-    try {
-      const res = await fetch('/api/architect/quotes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          architectId: architectInfo.id,
-          projectName: tenderProjectName,
-          projectType: tenderProjectType,
-          city: tenderCity,
-          totalM2: tenderM2,
-          targetCompletionDate: tenderTargetDate,
-          notes: tenderNotes
-        })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setTenderSuccessMsg(data.message);
-        setTenderProjectName('');
-        setTenderNotes('');
-        setTimeout(() => setTenderSuccessMsg(''), 8000);
-      }
-    } catch (err) {
-      console.error('Tender quote error:', err);
-    } finally {
-      setTenderLoading(false);
     }
   };
 
@@ -1321,8 +1278,7 @@ export default function ArchitectPortalPage() {
               { id: 'calculator', label: 'Akıllı Metraj & Sarf Malzeme', icon: <Calculator size={18} /> },
               { id: 'vault', label: '3D, BIM & PBR Malzeme', icon: <Box size={18} /> },
               { id: 'spec-writer', label: 'Şartname & ÇŞB Poz Sihirbazı', icon: <FileText size={18} /> },
-              { id: 'samples', label: 'Numune Kutum', icon: <Package size={18} /> },
-              { id: 'quotes', label: 'Proje Koruma & Teşvik', icon: <Building2 size={18} /> }
+              { id: 'samples', label: 'Numune Kutum', icon: <Package size={18} /> }
             ].map(item => {
               const isActive = activeTab === item.id;
               return (
@@ -1469,7 +1425,6 @@ export default function ArchitectPortalPage() {
                     {activeTab === 'vault' && '3D & BIM Varlıklar'}
                     {activeTab === 'spec-writer' && 'Şartname & ÇŞB Poz'}
                     {activeTab === 'samples' && 'Numune Kutum'}
-                    {activeTab === 'quotes' && 'Proje Koruma & Teşvik'}
                   </span>
                 </div>
               </div>
@@ -1513,7 +1468,6 @@ export default function ArchitectPortalPage() {
                   {activeTab === 'vault' && '🧱 3D / BIM & Render Varlık Kasası (4K PBR)'}
                   {activeTab === 'spec-writer' && '📄 TS EN 14411 Şartname & ÇŞB Poz Sihirbazı'}
                   {activeTab === 'samples' && '📦 Ücretsiz Mimari Numune Kutusu'}
-                  {activeTab === 'quotes' && '🔒 Proje Koruma (Spec-Lock) & Teşvik Masası'}
                 </h1>
                 <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '3px 0 0 0' }}>
                   {architectInfo?.officeName} • {architectInfo?.city}
@@ -1559,22 +1513,6 @@ export default function ArchitectPortalPage() {
           }}>
             <CheckCircle size={18} />
             <span>{sampleSuccessMsg}</span>
-          </div>
-        )}
-
-        {tenderSuccessMsg && (
-          <div className="no-print" style={{
-            background: 'rgba(34, 197, 94, 0.15)',
-            borderBottom: '1px solid rgba(34, 197, 94, 0.3)',
-            color: '#4ade80',
-            padding: '12px 24px',
-            fontSize: '0.85rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
-          }}>
-            <CheckCircle size={18} />
-            <span>{tenderSuccessMsg}</span>
           </div>
         )}
 
@@ -3376,239 +3314,6 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
             </div>
           )}
 
-          {/* ======================================================== */}
-          {/* TAB 5: B2B TENDER & PROJECT PRICING */}
-          {/* ======================================================== */}
-          {activeTab === 'quotes' && (
-            <div style={{ maxWidth: '860px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              {/* Spec-Lock & Rewards Highlights */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr',
-                gap: '16px'
-              }}>
-                {/* Spec-Lock Card */}
-                <div style={{
-                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 78, 59, 0.25) 100%)',
-                  border: '1px solid rgba(16, 185, 129, 0.35)',
-                  borderRadius: '16px',
-                  padding: '20px',
-                  display: 'flex',
-                  gap: '14px'
-                }}>
-                  <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '10px',
-                    background: 'rgba(16, 185, 129, 0.2)',
-                    color: '#34d399',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    <ShieldCheck size={22} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: '800', textTransform: 'uppercase' }}>
-                      PROJE KORUMA SİSTEMİ (SPEC-LOCK)
-                    </div>
-                    <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#fff', margin: '2px 0 6px 0' }}>
-                      Şartnameniz Fabrika Düzeyinde Kilitlenir
-                    </h4>
-                    <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: 0, lineHeight: 1.45 }}>
-                      Şartnameye yazdığınız ürünler üretici fabrikaların B2B masasında ofisiniz adına rezerve edilir. Müteahhit başka markaya kaçamaz, ofisinizin şartname hakkı korunur.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Reward Points Card */}
-                <div style={{
-                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(180, 83, 9, 0.2) 100%)',
-                  border: '1px solid rgba(212, 175, 55, 0.35)',
-                  borderRadius: '16px',
-                  padding: '20px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Award size={18} style={{ color: '#d4af37' }} />
-                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase' }}>
-                        Mimar Teşvik Puanı
-                      </span>
-                    </div>
-                    <span style={{ fontSize: '1.15rem', fontWeight: '900', color: '#fff' }}>
-                      {activeProject?.totalAreaM2 ? Math.round(activeProject.totalAreaM2) : 2500} P
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '0.72rem', color: '#cbd5e1', margin: '8px 0' }}>
-                    Projelerinizde şartnameye giren her 1 m² seramik için 1 Mimar Puanı kazanırsınız.
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px', fontSize: '0.68rem' }}>
-                    <span style={{ background: 'rgba(0,0,0,0.3)', padding: '3px 6px', borderRadius: '4px', color: '#fbbf24' }}>🎟️ Cersaie İtalya Bileti</span>
-                    <span style={{ background: 'rgba(0,0,0,0.3)', padding: '3px 6px', borderRadius: '4px', color: '#fbbf24' }}>💻 3D Lisans Desteği</span>
-                  </div>
-                </div>
-              </div>
-
-              <div style={{
-                background: '#0d1322',
-                border: '1px solid rgba(212, 175, 55, 0.25)',
-                borderRadius: '20px',
-                padding: '32px',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-                  <div style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '12px',
-                    background: 'rgba(212, 175, 55, 0.15)',
-                    color: '#d4af37',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <Building2 size={22} />
-                  </div>
-                  <div>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#fff' }}>
-                      Fabrikadan Doğrudan Proje İskontosu Talep Edin
-                    </h3>
-                    <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '2px 0 0 0' }}>
-                      500 m² ve üzeri mimari projeleriniz için doğrudan üretici fabrikaların kurumsal satış birimlerinden özel teklif alın.
-                    </p>
-                  </div>
-                </div>
-
-                <form onSubmit={handleSubmitTender} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: '600' }}>
-                      Proje Adı *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Örn: Bodrum Mandarin Luxury Villa Projesi"
-                      value={tenderProjectName}
-                      onChange={(e) => setTenderProjectName(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '12px 14px',
-                        borderRadius: '10px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        background: 'rgba(0, 0, 0, 0.3)',
-                        color: '#fff',
-                        fontSize: '0.88rem',
-                        boxSizing: 'border-box'
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: '600' }}>
-                        Yapı Tipi
-                      </label>
-                      <select
-                        value={tenderProjectType}
-                        onChange={(e) => setTenderProjectType(e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '12px 14px',
-                          borderRadius: '10px',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          background: 'rgba(0, 0, 0, 0.3)',
-                          color: '#fff',
-                          fontSize: '0.88rem',
-                          boxSizing: 'border-box'
-                        }}
-                      >
-                        <option value="Otel / Resort">Otel / Resort</option>
-                        <option value="Lüks Konut / Rezidans">Lüks Konut / Rezidans</option>
-                        <option value="Ticari / Ofis / Plaza">Ticari / Ofis / Plaza</option>
-                        <option value="Restoran / Kafe / Mağaza">Restoran / Kafe / Mağaza</option>
-                        <option value="Sağlık / Hastane">Sağlık / Hastane</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: '600' }}>
-                        Toplam Seramik Metrajı (m²) *
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        placeholder="Örn: 3500"
-                        value={tenderM2}
-                        onChange={(e) => setTenderM2(e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '12px 14px',
-                          borderRadius: '10px',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          background: 'rgba(0, 0, 0, 0.3)',
-                          color: '#fff',
-                          fontSize: '0.88rem',
-                          boxSizing: 'border-box'
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '6px', fontWeight: '600' }}>
-                      Özel Şartlar ve Talepler
-                    </label>
-                    <textarea
-                      rows={3}
-                      placeholder="Örn: Zeminlerde 120x240 Calacatta, ıslak hacimlerde R10 kaymazlık gerekmektedir. Şantiye teslim fiyatı talep ediyoruz."
-                      value={tenderNotes}
-                      onChange={(e) => setTenderNotes(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '12px 14px',
-                        borderRadius: '10px',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        background: 'rgba(0, 0, 0, 0.3)',
-                        color: '#fff',
-                        fontSize: '0.88rem',
-                        boxSizing: 'border-box',
-                        resize: 'vertical'
-                      }}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={tenderLoading}
-                    style={{
-                      width: '100%',
-                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                      color: '#090d16',
-                      border: 'none',
-                      borderRadius: '12px',
-                      padding: '14px',
-                      fontWeight: '800',
-                      fontSize: '0.95rem',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      marginTop: '8px'
-                    }}
-                  >
-                    {tenderLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                    <span>Üretici Fabrikalara Proje Teklifi Gönder</span>
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-
         </main>
       </div>
 
@@ -4930,8 +4635,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
             { id: 'calculator', label: 'Metraj', icon: <Calculator size={18} /> },
             { id: 'vault', label: '3D PBR', icon: <Box size={18} /> },
             { id: 'spec-writer', label: 'Şartname', icon: <FileText size={18} /> },
-            { id: 'samples', label: 'Numune', icon: <Package size={18} /> },
-            { id: 'quotes', label: 'Koruma', icon: <Building2 size={18} /> }
+            { id: 'samples', label: 'Numune', icon: <Package size={18} /> }
           ].map(tab => {
             const isActive = activeTab === tab.id;
             return (
