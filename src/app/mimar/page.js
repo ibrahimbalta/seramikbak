@@ -2727,55 +2727,31 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                             style={{
                               background: 'rgba(255, 255, 255, 0.05)',
                               border: '1px solid rgba(255, 255, 255, 0.1)',
-                                color: '#cbd5e1',
-                                borderRadius: '8px',
-                                padding: '6px',
-                                fontSize: '0.7rem',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '4px'
-                              }}
-                            >
-                              <Download size={11} />
-                              <span>Revit .rvt</span>
-                            </button>
-
-                            <button
-                              onClick={() => handleDownloadAsset(p, '4K_PBR_TEXTURES')}
-                              style={{
-                                background: 'rgba(212, 175, 55, 0.12)',
-                                border: '1px solid rgba(212, 175, 55, 0.25)',
-                                color: '#d4af37',
-                                borderRadius: '8px',
-                                padding: '6px',
-                                fontSize: '0.7rem',
-                                fontWeight: '700',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '4px'
-                              }}
-                            >
-                              <Download size={11} />
-                              <span>4K Doku (.zip)</span>
-                            </button>
-                          </div>
-
-                          {/* Interactive PBR Preview Modal Trigger */}
-                          <button
-                            onClick={() => setPbrProductModal(p)}
-                            style={{
-                              width: '100%',
-                              background: 'rgba(168, 85, 247, 0.12)',
-                              border: '1px solid rgba(168, 85, 247, 0.3)',
-                              color: '#c084fc',
+                              color: '#cbd5e1',
                               borderRadius: '8px',
-                              padding: '5px 8px',
-                              fontSize: '0.68rem',
+                              padding: '6px',
+                              fontSize: '0.7rem',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '4px'
+                            }}
+                          >
+                            <Download size={11} />
+                            <span>Revit .rvt</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleDownloadAsset(p, '4K_PBR_TEXTURES')}
+                            style={{
+                              background: 'rgba(212, 175, 55, 0.12)',
+                              border: '1px solid rgba(212, 175, 55, 0.25)',
+                              color: '#d4af37',
+                              borderRadius: '8px',
+                              padding: '6px',
+                              fontSize: '0.7rem',
                               fontWeight: '700',
                               cursor: 'pointer',
                               display: 'flex',
@@ -2788,6 +2764,29 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                             <span>4K Doku (.zip)</span>
                           </button>
                         </div>
+
+                        {/* Interactive PBR Preview Modal Trigger */}
+                        <button
+                          onClick={() => setPbrProductModal(p)}
+                          style={{
+                            width: '100%',
+                            background: 'rgba(168, 85, 247, 0.12)',
+                            border: '1px solid rgba(168, 85, 247, 0.3)',
+                            color: '#c084fc',
+                            borderRadius: '8px',
+                            padding: '6px 8px',
+                            fontSize: '0.68rem',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <Sliders size={12} />
+                          <span>PBR Doku Haritaları & Render Ayarları</span>
+                        </button>
                       </div>
                     </div>
                   </div>
