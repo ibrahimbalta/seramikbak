@@ -56,7 +56,43 @@ export async function POST(request) {
     const createdSamples = [];
 
     for (const productId of productIds) {
-      // 1. Create ArchitectSample record
+      // 1. Fetch product and its brand
+      const prod = await prisma.product.findUnique({
+        where: { id: productId },
+        include: { brand: { select: { id: true, name: true } } }
+      });
+
+      // 2. Find nearest authorized dealer for this brand in the architect's city
+      let matchedDealer = null;
+      if (prod?.brandId) {
+        try {
+          matchedDealer = await prisma.dealer.findFirst({
+            where: {
+              brandId: prod.brandId,
+              status: 'APPROVED',
+              city: { contains: city.trim(), mode: 'insensitive' }
+            }
+          });
+
+          // Fallback: If no dealer in that specific city, find any approved dealer of this brand
+          if (!matchedDealer) {
+            matchedDealer = await prisma.dealer.findFirst({
+              where: {
+                brandId: prod.brandId,
+                status: 'APPROVED'
+              }
+            });
+          }
+        } catch (dealerErr) {
+          console.warn('Dealer lookup failed:', dealerErr.message);
+        }
+      }
+
+      // 3. Create ArchitectSample record with assigned dealer information
+      const assignedDealerLabel = matchedDealer 
+        ? `Yetkili Bayi: ${matchedDealer.name} (${matchedDealer.city})` 
+        : 'Üretici Fabrika Doğrudan Sevk';
+
       const sample = await prisma.architectSample.create({
         data: {
           architectId,
@@ -64,7 +100,9 @@ export async function POST(request) {
           officeAddress: officeAddress.trim(),
           city: city.trim(),
           notes: notes ? notes.trim() : null,
-          status: 'PENDING'
+          status: 'PENDING',
+          cargoCompany: assignedDealerLabel,
+          trackingNo: matchedDealer ? `Bayi Tel: ${matchedDealer.phone || '-'}` : 'Fabrika Sevk Sırasında'
         },
         include: {
           product: {
@@ -74,12 +112,43 @@ export async function POST(request) {
       });
       createdSamples.push(sample);
 
-      // 2. Also register a SpecInLead for the Brand Portal radar!
-      const prod = await prisma.product.findUnique({
-        where: { id: productId },
-        select: { brandId: true, name: true }
-      });
+      // 4. Send Lead to the Assigned Dealer's Portal (/bayi)
+      if (matchedDealer) {
+        try {
+          await prisma.lead.create({
+            data: {
+              productId: productId,
+              dealerId: matchedDealer.id,
+              clientName: `${architect.officeName} (${architect.name})`,
+              clientPhone: architect.phone || '-',
+              clientEmail: architect.email,
+              notes: `📦 [MİMARİ NUMUNE KUTUSU TALEBİ] Ofis: ${architect.officeName}, Mimar: ${architect.name}. Teslimat Adresi: ${officeAddress}, ${city}. ${projectName ? `Proje: ${projectName}. ` : ''}${notes ? `Mimar Notu: ${notes}. ` : ''}Lütfen numuneyi 24 saat içinde mimarın ofisine ulaştırarak projeyi showroom'unuza bağlayın!`,
+              status: 'PENDING',
+              requestedArchitect: true,
+              projectDimensions: '15x15 Kesit Numune Kutusu'
+            }
+          });
 
+          await prisma.sampleOrder.create({
+            data: {
+              productId: productId,
+              dealerId: matchedDealer.id,
+              clientName: `${architect.officeName} - ${architect.name}`,
+              clientPhone: architect.phone || '-',
+              clientEmail: architect.email,
+              city: city.trim(),
+              district: matchedDealer.district || architect.city || city.trim(),
+              address: officeAddress.trim(),
+              notes: `[Mimari Numune] Ofis: ${architect.officeName}. Proje: ${projectName || 'Mimari Tasarım'}. Not: ${notes || '-'}`,
+              status: 'PENDING'
+            }
+          });
+        } catch (leadErr) {
+          console.warn('Could not sync to dealer lead:', leadErr.message);
+        }
+      }
+
+      // 5. Send SpecInLead to the Manufacturer / Brand Portal (/marka)
       if (prod && prod.brandId) {
         try {
           await prisma.specInLead.create({
@@ -95,7 +164,7 @@ export async function POST(request) {
               projectName: projectName || 'Numune İnceleme & Şartname Hazırlığı',
               fileType: 'NUMUNE_KUTUSU_TALEBI',
               status: 'SPEC_IN',
-              notes: `Numune Kutusu Talebi: ${architect.officeName} (${architect.name}). Teslimat Adresi: ${officeAddress}. Notlar: ${notes || '-'}`
+              notes: `📦 Mimari Numune Talebi: ${architect.officeName} (${architect.name}). Teslimat: ${officeAddress}, ${city}. ${matchedDealer ? `En Yakın Yetkili Bayiye İletildi: ${matchedDealer.name} (${matchedDealer.city} - Tel: ${matchedDealer.phone || ''})` : 'Doğrudan Fabrika Sevk'}. ${notes ? `Mimar Notu: ${notes}` : ''}`
             }
           });
         } catch (specErr) {
@@ -106,7 +175,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      message: `${createdSamples.length} adet karo için numune kutusu talebiniz alındı. İlgili üretici fabrikalara sevk emri iletildi.`,
+      message: `${createdSamples.length} adet karo için numune talebiniz alındı. Şehrinizdeki en yakın yetkili bayiye ve üretici fabrika portalına eşzamanlı sevk emri iletildi.`,
       samples: createdSamples
     });
 

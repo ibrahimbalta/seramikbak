@@ -3205,9 +3205,17 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                           <h4 style={{ fontSize: '0.92rem', fontWeight: '700', margin: '2px 0 0 0', color: '#fff' }}>
                             {s.product?.name} (15x15 Kesit Numune)
                           </h4>
-                          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                          <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'block' }}>
                             Teslimat: {s.officeAddress} ({s.city})
                           </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '0.7rem', color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255, 255, 255, 0.05)', padding: '2px 6px', borderRadius: '4px' }}>
+                              📍 {s.cargoCompany || 'En Yakın Yetkili Bayiye İletildi'}
+                            </span>
+                            <span style={{ fontSize: '0.68rem', color: '#60a5fa', background: 'rgba(59, 130, 246, 0.12)', padding: '2px 6px', borderRadius: '4px', fontWeight: '600' }}>
+                              🏭 Fabrika Onaylı
+                            </span>
+                          </div>
                         </div>
                       </div>
 
@@ -3215,12 +3223,16 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                         <span style={{
                           fontSize: '0.75rem',
                           fontWeight: '700',
-                          padding: '4px 10px',
+                          padding: '6px 12px',
                           borderRadius: '8px',
-                          background: s.status === 'PENDING' ? 'rgba(234, 179, 8, 0.15)' : 'rgba(34, 197, 94, 0.15)',
-                          color: s.status === 'PENDING' ? '#eab308' : '#4ade80'
+                          background: s.status === 'PENDING' ? 'rgba(212, 175, 55, 0.15)' : 'rgba(34, 197, 94, 0.15)',
+                          color: s.status === 'PENDING' ? '#d4af37' : '#4ade80',
+                          border: s.status === 'PENDING' ? '1px solid rgba(212, 175, 55, 0.3)' : '1px solid rgba(34, 197, 94, 0.3)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
                         }}>
-                          {s.status === 'PENDING' ? 'Fabrikadan Sevk Bekleniyor' : 'Kargoya Verildi'}
+                          {s.status === 'PENDING' ? 'En Yakın Bayiden Hazırlanıyor' : 'Kargoya / Kuryeye Verildi'}
                         </span>
                       </div>
                     </div>
@@ -4063,9 +4075,27 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
             <h3 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 6px 0', color: '#fff' }}>
               Ücretsiz Mimari Numune Kutusu İste
             </h3>
-            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '0 0 18px 0' }}>
-              Seçilen karolardan 15x15 cm kesit numune kutusu doğrudan ofisinize gönderilir.
+            <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '0 0 14px 0' }}>
+              Talebiniz şehrinizdeki en yakın yetkili bayiye ve üretici fabrika merkezine eşzamanlı iletilir; 15x15 cm kesit numuneler hızlı kurye/kargo ile ofisinize ulaştırılır.
             </p>
+
+            <div style={{
+              background: 'rgba(212, 175, 55, 0.08)',
+              border: '1px solid rgba(212, 175, 55, 0.25)',
+              borderRadius: '10px',
+              padding: '10px 12px',
+              marginBottom: '16px',
+              fontSize: '0.76rem',
+              color: '#cbd5e1',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <Building2 size={16} style={{ color: '#d4af37', flexShrink: 0 }} />
+              <span>
+                <strong>Akıllı Yönlendirme:</strong> Talebiniz hem <strong>en yakın yetkili bayiye</strong> 24 saatte hızlı teslimat için, hem de <strong>fabrika portalına</strong> onay için düşer.
+              </span>
+            </div>
 
             <form onSubmit={handleOrderSampleBox} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
