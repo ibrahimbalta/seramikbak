@@ -34,9 +34,14 @@ import {
   Calendar,
   Grid,
   Palette,
-  Maximize2
+  Maximize2,
+  Calculator,
+  Share2,
+  Award,
+  Sliders
 } from 'lucide-react';
 import Link from 'next/link';
+import { matchCSBPoz, CSB_POZ_LIST } from '@/lib/csbPozMatcher';
 
 const TURKEY_CITIES = [
   "Adana", "Ankara", "Antalya", "Aydın", "Balıkesir", "Bursa", "Çanakkale", "Denizli", 
@@ -128,6 +133,20 @@ export default function ArchitectPortalPage() {
   // 3D & BIM Asset Vault State
   const [vaultSearch, setVaultSearch] = useState('');
   const [downloadSuccessModal, setDownloadSuccessModal] = useState(null);
+  const [pbrProductModal, setPbrProductModal] = useState(null);
+
+  // Client Presentation Share State
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  // Smart Quantity & Material BOQ Calculator State
+  const [calcArea, setCalcArea] = useState('120');
+  const [calcPattern, setCalcPattern] = useState('straight'); // straight (%7), diagonal (%10), herringbone (%12)
+  const [calcTilePreset, setCalcTilePreset] = useState('60x120');
+  const [calcJointMm, setCalcJointMm] = useState('2');
+  const [calcIncludeSkirting, setCalcIncludeSkirting] = useState(true);
+  const [calcIsWetArea, setCalcIsWetArea] = useState(false);
+  const [calcCopiedBreakdown, setCalcCopiedBreakdown] = useState(false);
 
   // Resize listener
   useEffect(() => {
@@ -1299,10 +1318,11 @@ export default function ArchitectPortalPage() {
           }}>
             {[
               { id: 'projects', label: 'Projelerim & Moodboard', icon: <Layers size={18} /> },
-              { id: 'vault', label: '3D & BIM Varlık Kasası', icon: <Box size={18} /> },
-              { id: 'spec-writer', label: 'Şartname Sihirbazı', icon: <FileText size={18} /> },
+              { id: 'calculator', label: 'Akıllı Metraj & Sarf Malzeme', icon: <Calculator size={18} /> },
+              { id: 'vault', label: '3D, BIM & PBR Malzeme', icon: <Box size={18} /> },
+              { id: 'spec-writer', label: 'Şartname & ÇŞB Poz Sihirbazı', icon: <FileText size={18} /> },
               { id: 'samples', label: 'Numune Kutum', icon: <Package size={18} /> },
-              { id: 'quotes', label: 'Proje Fiyat & İskonto', icon: <Building2 size={18} /> }
+              { id: 'quotes', label: 'Proje Koruma & Teşvik', icon: <Building2 size={18} /> }
             ].map(item => {
               const isActive = activeTab === item.id;
               return (
@@ -1445,10 +1465,11 @@ export default function ArchitectPortalPage() {
                   </h4>
                   <span style={{ fontSize: '0.65rem', color: '#d4af37', fontWeight: '700' }}>
                     {activeTab === 'projects' && 'Projeler & Moodboard'}
+                    {activeTab === 'calculator' && 'Akıllı Metraj & Sarf'}
                     {activeTab === 'vault' && '3D & BIM Varlıklar'}
-                    {activeTab === 'spec-writer' && 'Şartname Motoru'}
+                    {activeTab === 'spec-writer' && 'Şartname & ÇŞB Poz'}
                     {activeTab === 'samples' && 'Numune Kutum'}
-                    {activeTab === 'quotes' && 'Proje İskontosu'}
+                    {activeTab === 'quotes' && 'Proje Koruma & Teşvik'}
                   </span>
                 </div>
               </div>
@@ -1488,10 +1509,11 @@ export default function ArchitectPortalPage() {
                   gap: '10px'
                 }}>
                   {activeTab === 'projects' && '📐 Projelerim & Moodboard Çalışma Alanı'}
+                  {activeTab === 'calculator' && '🧮 Akıllı Metraj, Fire & Sarf Malzeme Hesaplayıcı'}
                   {activeTab === 'vault' && '🧱 3D / BIM & Render Varlık Kasası (4K PBR)'}
-                  {activeTab === 'spec-writer' && '📄 TS EN 14411 Teknik Şartname Sihirbazı'}
+                  {activeTab === 'spec-writer' && '📄 TS EN 14411 Şartname & ÇŞB Poz Sihirbazı'}
                   {activeTab === 'samples' && '📦 Ücretsiz Mimari Numune Kutusu'}
-                  {activeTab === 'quotes' && '💰 Proje İskontolu B2B Teklif Masası'}
+                  {activeTab === 'quotes' && '🔒 Proje Koruma (Spec-Lock) & Teşvik Masası'}
                 </h1>
                 <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '3px 0 0 0' }}>
                   {architectInfo?.officeName} • {architectInfo?.city}
@@ -1604,7 +1626,51 @@ export default function ArchitectPortalPage() {
                 </div>
 
                 {activeProject && (
-                  <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => setShowShareModal(true)}
+                      style={{
+                        background: 'rgba(212, 175, 55, 0.15)',
+                        color: '#d4af37',
+                        border: '1px solid rgba(212, 175, 55, 0.35)',
+                        borderRadius: '8px',
+                        padding: '8px 14px',
+                        fontSize: '0.8rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                      title="İşverene onaylatmak için logosuz, beyaz etiketli sunum linki üretir"
+                    >
+                      <Share2 size={14} />
+                      <span>Müşteri Sunum Linki</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setCalcArea(activeProject.totalAreaM2 ? String(activeProject.totalAreaM2) : '150');
+                        setActiveTab('calculator');
+                      }}
+                      style={{
+                        background: 'rgba(56, 189, 248, 0.15)',
+                        color: '#38bdf8',
+                        border: '1px solid rgba(56, 189, 248, 0.35)',
+                        borderRadius: '8px',
+                        padding: '8px 14px',
+                        fontSize: '0.8rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <Calculator size={14} />
+                      <span>Metraj & Sarfiyat</span>
+                    </button>
+
                     <button
                       onClick={() => handleGenerateSpec(activeProject)}
                       disabled={specLoading}
@@ -1623,7 +1689,7 @@ export default function ArchitectPortalPage() {
                       }}
                     >
                       {specLoading ? <Loader2 size={14} className="animate-spin" /> : <FileText size={14} />}
-                      <span>Şartname Metni Oluştur</span>
+                      <span>Şartname Metni</span>
                     </button>
 
                     <button
@@ -1646,7 +1712,7 @@ export default function ArchitectPortalPage() {
                       }}
                     >
                       <Plus size={14} />
-                      <span>Projeye Seramik Ekle</span>
+                      <span>Seramik Ekle</span>
                     </button>
                   </div>
                 )}
@@ -1691,24 +1757,30 @@ export default function ArchitectPortalPage() {
                       gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
                       gap: '20px'
                     }}>
-                      {activeProject.items.map((item) => {
+                      {activeProject.items.map(item => {
                         const p = item.product;
+                        const csb = matchCSBPoz(p, item.usageArea);
+                        const isApproved = item.notes?.includes('[ONAYLANDI');
+                        const hasRevision = item.notes?.includes('[REVİZYON');
+
                         return (
                           <div
                             key={item.id}
                             style={{
-                              background: '#0e1526',
+                              background: 'rgba(255, 255, 255, 0.03)',
+                              border: isApproved ? '1.5px solid #22c55e' : (hasRevision ? '1.5px solid #f59e0b' : '1px solid rgba(255, 255, 255, 0.08)'),
                               borderRadius: '16px',
-                              border: '1px solid rgba(255, 255, 255, 0.08)',
                               overflow: 'hidden',
                               display: 'flex',
-                              flexDirection: 'column'
+                              flexDirection: 'column',
+                              transition: 'all 0.2s',
+                              position: 'relative'
                             }}
                           >
-                            {/* Image Header with Usage Area Badge */}
-                            <div style={{ position: 'relative', height: '180px', background: '#1e293b' }}>
+                            {/* Tile Image & Badges */}
+                            <div style={{ height: '170px', position: 'relative', background: '#090d18' }}>
                               <img
-                                src={p.imageUrl || p.textureUrl || '/textures/calacatta_gold.jpg'}
+                                src={p.imageUrl}
                                 alt={p.name}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                               />
@@ -1727,6 +1799,46 @@ export default function ArchitectPortalPage() {
                               }}>
                                 {item.usageArea} ({item.areaM2} m²)
                               </div>
+
+                              {isApproved && (
+                                <div style={{
+                                  position: 'absolute',
+                                  bottom: '8px',
+                                  left: '10px',
+                                  background: 'rgba(34, 197, 94, 0.95)',
+                                  color: '#fff',
+                                  fontSize: '0.68rem',
+                                  fontWeight: '800',
+                                  padding: '3px 8px',
+                                  borderRadius: '6px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}>
+                                  <CheckCircle size={12} />
+                                  <span>İşveren Onayladı</span>
+                                </div>
+                              )}
+
+                              {hasRevision && (
+                                <div style={{
+                                  position: 'absolute',
+                                  bottom: '8px',
+                                  left: '10px',
+                                  background: 'rgba(245, 158, 11, 0.95)',
+                                  color: '#090d16',
+                                  fontSize: '0.68rem',
+                                  fontWeight: '800',
+                                  padding: '3px 8px',
+                                  borderRadius: '6px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px'
+                                }}>
+                                  <AlertCircle size={12} />
+                                  <span>Revizyon İletildi</span>
+                                </div>
+                              )}
 
                               <button
                                 onClick={() => handleRemoveItem(item.id)}
@@ -1762,7 +1874,7 @@ export default function ArchitectPortalPage() {
                                 </h4>
                               </div>
 
-                              {/* Specs Tags */}
+                              {/* Specs Tags & Official CSB Poz */}
                               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
                                 <span style={{ fontSize: '0.68rem', background: 'rgba(255, 255, 255, 0.05)', padding: '2px 6px', borderRadius: '4px', color: '#cbd5e1' }}>
                                   {p.width}x{p.height} cm
@@ -1770,12 +1882,17 @@ export default function ArchitectPortalPage() {
                                 <span style={{ fontSize: '0.68rem', background: 'rgba(255, 255, 255, 0.05)', padding: '2px 6px', borderRadius: '4px', color: '#cbd5e1' }}>
                                   {p.finish || 'Mat'}
                                 </span>
-                                {p.slipResistance && (
-                                  <span style={{ fontSize: '0.68rem', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', padding: '2px 6px', borderRadius: '4px', fontWeight: '700' }}>
-                                    {p.slipResistance}
-                                  </span>
-                                )}
+                                <span style={{ fontSize: '0.68rem', background: 'rgba(180, 83, 9, 0.2)', color: '#fbbf24', border: '1px solid rgba(180, 83, 9, 0.4)', padding: '2px 6px', borderRadius: '4px', fontWeight: '700' }} title={csb.title}>
+                                  🏛️ ÇŞB: {csb.pozNo}
+                                </span>
                               </div>
+
+                              {/* Item Notes */}
+                              {item.notes && (
+                                <div style={{ fontSize: '0.72rem', color: '#94a3b8', background: 'rgba(0,0,0,0.25)', padding: '6px 8px', borderRadius: '4px', lineHeight: 1.35 }}>
+                                  {item.notes}
+                                </div>
+                              )}
 
                               {/* Actions Bar */}
                               <div style={{
@@ -1806,6 +1923,29 @@ export default function ArchitectPortalPage() {
                                 >
                                   <Box size={12} />
                                   <span>3D Gör</span>
+                                </button>
+
+                                <button
+                                  onClick={() => setPbrProductModal(p)}
+                                  title="PBR Doku Haritaları ve Render Ayarları"
+                                  style={{
+                                    flex: 1,
+                                    background: 'rgba(168, 85, 247, 0.15)',
+                                    color: '#c084fc',
+                                    border: '1px solid rgba(168, 85, 247, 0.3)',
+                                    borderRadius: '8px',
+                                    padding: '6px 6px',
+                                    fontSize: '0.7rem',
+                                    fontWeight: '700',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '4px'
+                                  }}
+                                >
+                                  <Sliders size={12} />
+                                  <span>PBR Doku</span>
                                 </button>
 
                                 <button
@@ -1923,6 +2063,490 @@ export default function ArchitectPortalPage() {
               )}
             </div>
           )}
+
+          {/* ======================================================== */}
+          {/* TAB: SMART QUANTITY & MATERIAL CALCULATOR (BOQ) */}
+          {/* ======================================================== */}
+          {activeTab === 'calculator' && (() => {
+            const netAreaVal = Math.max(1, parseFloat(calcArea) || 0);
+            const wasteRate = calcPattern === 'straight' ? 0.07 : (calcPattern === 'diagonal' ? 0.10 : 0.12);
+            const wasteM2 = Math.round(netAreaVal * wasteRate * 10) / 10;
+            const grossAreaVal = Math.round((netAreaVal + wasteM2) * 10) / 10;
+
+            let boxM2 = 1.44;
+            let tileW = 60, tileH = 120, tileThickMm = 9;
+            if (calcTilePreset === '60x60') { boxM2 = 1.44; tileW = 60; tileH = 60; }
+            else if (calcTilePreset === '30x60') { boxM2 = 1.44; tileW = 30; tileH = 60; }
+            else if (calcTilePreset === '80x80') { boxM2 = 1.28; tileW = 80; tileH = 80; }
+            else if (calcTilePreset === '120x280') { boxM2 = 3.36; tileW = 120; tileH = 280; tileThickMm = 6; }
+
+            const boxCount = Math.ceil(grossAreaVal / boxM2);
+            const palletCount = Math.ceil(boxCount / 32);
+
+            const adhesiveRateKg = (tileW >= 60 && tileH >= 60) ? 5.2 : 4.5;
+            const totalAdhesiveKg = Math.round(grossAreaVal * adhesiveRateKg);
+            const adhesiveBags = Math.ceil(totalAdhesiveKg / 25);
+
+            const jointMmVal = parseFloat(calcJointMm) || 2;
+            const groutKgPerM2 = ((tileW * 10 + tileH * 10) / ((tileW * 10) * (tileH * 10))) * tileThickMm * jointMmVal * 1.6;
+            const totalGroutKg = Math.max(2, Math.round(grossAreaVal * groutKgPerM2 * 10) / 10);
+            const groutBags5Kg = Math.ceil(totalGroutKg / 5);
+
+            const skirtingMeters = calcIncludeSkirting ? Math.round(Math.sqrt(netAreaVal) * 4 * 0.85) : 0;
+            const skirtingPieces = Math.ceil(skirtingMeters / (tileH / 100));
+
+            const waterproofingKg = calcIsWetArea ? Math.round(netAreaVal * 2.5) : 0;
+
+            const handleCopyBOQ = () => {
+              const text = `
+MİMARİ METRAJ & SARF MALZEME RAPORU (BOQ)
+Standart: TS EN 14411 / TS EN 12004 C2TE S1 / TS EN 13888 CG2WA
+--------------------------------------------------------------------------------
+1. SERAMİK / PORSELEN KARO:
+- Net Alan: ${netAreaVal} m²
+- Döşeme Deseni: ${calcPattern === 'straight' ? 'Düz Döşeme (%7 Fire)' : (calcPattern === 'diagonal' ? '45° Diyagonal Döşeme (%10 Fire)' : 'Balıksırtı / Modüler (%12 Fire)')}
+- Fire Miktarı: ${wasteM2} m²
+- Brüt Sipariş Metrajı: ${grossAreaVal} m²
+- Seçilen Ebat: ${calcTilePreset} cm (${boxM2} m²/kutu)
+- Kutu (Paket) Adedi: ${boxCount} Kutu
+- Tahmini Palet Sayısı: ${palletCount} Palet (32 kutu/palet)
+
+2. YAPIŞTIRICI SARFİYATI (TS EN 12004 C2TE S1 FLEX):
+- Toplam Harç: ~${totalAdhesiveKg} kg
+- 25 kg Kraft Torba İhtiyacı: ${adhesiveBags} Torba
+
+3. DERZ DOLGUSU (TS EN 13888 CG2WA):
+- Derz Genişliği: ${jointMmVal} mm
+- Toplam Derz Dolgusu: ~${totalGroutKg} kg
+- 5 kg Paket İhtiyacı: ${groutBags5Kg} Paket
+
+4. EK MALZEMELER:
+- Süpürgelik: ${calcIncludeSkirting ? `${skirtingMeters} tül metre (~${skirtingPieces} adet)` : 'Dahil Değil'}
+- Su Yalıtımı (TS EN 14891 Çift Kat Membran): ${calcIsWetArea ? `${waterproofingKg} kg (${Math.ceil(waterproofingKg / 20)} set)` : 'Dahil Değil'}
+--------------------------------------------------------------------------------
+Düzenleyen: ${architectInfo?.officeName || 'Mimari Proje Ofisi'}
+Tarih: ${new Date().toLocaleDateString('tr-TR')}
+`.trim();
+
+              navigator.clipboard.writeText(text);
+              setCalcCopiedBreakdown(true);
+              setTimeout(() => setCalcCopiedBreakdown(false), 2500);
+            };
+
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                {/* Header Banner */}
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '16px'
+                }}>
+                  <div>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '4px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '800', marginBottom: '8px' }}>
+                      <Calculator size={13} />
+                      MİMARİ METRAJ & BOQ MOTORU
+                    </div>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#fff' }}>
+                      Akıllı Metraj, Kesim Firesi & Sarf Malzeme Hesaplayıcı
+                    </h3>
+                    <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '4px 0 0 0' }}>
+                      Mekan net alanını girin; döşeme modeline göre fire oranını, paket/palet sayısını, C2TE S1 yapıştırıcı ve CG2WA derz dolgu sarfiyatını saniyeler içinde çıkarın.
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      onClick={handleCopyBOQ}
+                      style={{
+                        background: calcCopiedBreakdown ? '#22c55e' : 'rgba(212, 175, 55, 0.15)',
+                        color: calcCopiedBreakdown ? '#fff' : '#d4af37',
+                        border: '1px solid rgba(212, 175, 55, 0.3)',
+                        borderRadius: '8px',
+                        padding: '10px 16px',
+                        fontSize: '0.82rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      {calcCopiedBreakdown ? <CheckCheck size={16} /> : <Copy size={16} />}
+                      <span>{calcCopiedBreakdown ? 'Metraj Kopyalandı ✓' : 'Metraj Raporunu Kopyala'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Calculator Grid: Inputs on Left, Output BOQ on Right */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? '1fr' : '1.1fr 1fr',
+                  gap: '24px'
+                }}>
+                  {/* Left: Input Form */}
+                  <div style={{
+                    background: '#0d1322',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '20px'
+                  }}>
+                    <h4 style={{ fontSize: '1rem', fontWeight: '800', color: '#fff', margin: 0, borderBottom: '1px solid rgba(255, 255, 255, 0.06)', paddingBottom: '12px' }}>
+                      1. Mekan & Uygulama Parametreleri
+                    </h4>
+
+                    {/* Quick project loader if active project exists */}
+                    {activeProject && (
+                      <div style={{
+                        background: 'rgba(212, 175, 55, 0.08)',
+                        border: '1px solid rgba(212, 175, 55, 0.2)',
+                        borderRadius: '10px',
+                        padding: '10px 14px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <span style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
+                          Aktif Proje: <strong>{activeProject.title}</strong> ({activeProject.totalAreaM2 || 150} m²)
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setCalcArea(String(activeProject.totalAreaM2 || 150))}
+                          style={{
+                            background: '#d4af37',
+                            color: '#090d16',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '4px 10px',
+                            fontSize: '0.72rem',
+                            fontWeight: '800',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Verileri Aktar
+                        </button>
+                      </div>
+                    )}
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '6px' }}>
+                        NET KAPLAMA ALANI (M²) *
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={calcArea}
+                        onChange={(e) => setCalcArea(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '12px 14px',
+                          borderRadius: '10px',
+                          border: '1px solid rgba(255, 255, 255, 0.15)',
+                          background: 'rgba(0, 0, 0, 0.3)',
+                          color: '#fff',
+                          fontSize: '1.1rem',
+                          fontWeight: '800',
+                          boxSizing: 'border-box'
+                        }}
+                      />
+                    </div>
+
+                    {/* Laying Pattern & Waste Ratio */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '8px' }}>
+                        DÖŞEME MODELİ & KESİM FİRESİ
+                      </label>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                        {[
+                          { id: 'straight', label: 'Düz Döşeme', waste: '+ %7 Fire' },
+                          { id: 'diagonal', label: '45° Diyagonal', waste: '+ %10 Fire' },
+                          { id: 'herringbone', label: 'Balıksırtı', waste: '+ %12 Fire' }
+                        ].map(p => {
+                          const isSel = calcPattern === p.id;
+                          return (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => setCalcPattern(p.id)}
+                              style={{
+                                background: isSel ? 'rgba(212, 175, 55, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                                border: isSel ? '1.5px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.1)',
+                                color: isSel ? '#d4af37' : '#cbd5e1',
+                                borderRadius: '10px',
+                                padding: '10px 8px',
+                                textAlign: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.15s'
+                              }}
+                            >
+                              <div style={{ fontSize: '0.8rem', fontWeight: '700' }}>{p.label}</div>
+                              <div style={{ fontSize: '0.7rem', color: isSel ? '#fbbf24' : '#64748b', marginTop: '2px' }}>{p.waste}</div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Tile Preset */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '8px' }}>
+                        SERAMİK / PORSELEN KARO EBADI
+                      </label>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '8px' }}>
+                        {['60x120', '60x60', '30x60', '80x80', '120x280'].map(sz => {
+                          const isSel = calcTilePreset === sz;
+                          return (
+                            <button
+                              key={sz}
+                              type="button"
+                              onClick={() => setCalcTilePreset(sz)}
+                              style={{
+                                background: isSel ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                                border: isSel ? '1.5px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
+                                color: isSel ? '#38bdf8' : '#cbd5e1',
+                                borderRadius: '8px',
+                                padding: '8px 6px',
+                                fontSize: '0.8rem',
+                                fontWeight: isSel ? '800' : '600',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {sz} cm
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Joint Width */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '8px' }}>
+                        DERZ ARTI DERİNLİĞİ / GENİŞLİĞİ
+                      </label>
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        {[
+                          { val: '1.5', label: '1.5 mm (Lazer Rektifiye)' },
+                          { val: '2', label: '2.0 mm (Standart)' },
+                          { val: '3', label: '3.0 mm (Dış Mekan)' }
+                        ].map(j => (
+                          <button
+                            key={j.val}
+                            type="button"
+                            onClick={() => setCalcJointMm(j.val)}
+                            style={{
+                              flex: 1,
+                              background: calcJointMm === j.val ? 'rgba(212, 175, 55, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                              border: calcJointMm === j.val ? '1.5px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.1)',
+                              color: calcJointMm === j.val ? '#d4af37' : '#cbd5e1',
+                              borderRadius: '8px',
+                              padding: '8px',
+                              fontSize: '0.75rem',
+                              fontWeight: '700',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {j.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Toggles: Skirting & Waterproofing */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '6px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.82rem', color: '#cbd5e1' }}>
+                        <input
+                          type="checkbox"
+                          checked={calcIncludeSkirting}
+                          onChange={(e) => setCalcIncludeSkirting(e.target.checked)}
+                          style={{ width: '16px', height: '16px', accentColor: '#d4af37' }}
+                        />
+                        <span>Porselen Süpürgelik İhtiyacını Otomatik Hesapla (Oda Çevre Tahmini)</span>
+                      </label>
+
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.82rem', color: '#cbd5e1' }}>
+                        <input
+                          type="checkbox"
+                          checked={calcIsWetArea}
+                          onChange={(e) => setCalcIsWetArea(e.target.checked)}
+                          style={{ width: '16px', height: '16px', accentColor: '#d4af37' }}
+                        />
+                        <span>Islak Hacim / Banyo (Çift Kat TS EN 14891 Su Yalıtım Membranı Dahil)</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Right: Output BOQ Breakdown Table */}
+                  <div style={{
+                    background: '#0d1322',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '18px'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.06)', paddingBottom: '12px' }}>
+                      <h4 style={{ fontSize: '1rem', fontWeight: '800', color: '#fff', margin: 0 }}>
+                        2. Resmi Malzeme & Sarfiyat Listesi (BOQ)
+                      </h4>
+                      <span style={{ fontSize: '0.72rem', color: '#4ade80', fontWeight: '700' }}>
+                        TS EN Uyumlu
+                      </span>
+                    </div>
+
+                    {/* Result Cards */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {/* Tile Metric */}
+                      <div style={{
+                        background: 'rgba(212, 175, 55, 0.06)',
+                        border: '1px solid rgba(212, 175, 55, 0.25)',
+                        borderRadius: '12px',
+                        padding: '14px 16px'
+                      }}>
+                        <div style={{ fontSize: '0.75rem', color: '#d4af37', fontWeight: '800', textTransform: 'uppercase', marginBottom: '4px' }}>
+                          Seramik / Porselen Karo Sipariş Metrajı
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                          <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#fff' }}>
+                            {grossAreaVal} <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>m²</span>
+                          </div>
+                          <div style={{ textAlign: 'right', fontSize: '0.8rem', color: '#cbd5e1' }}>
+                            <div>Net: <strong>{netAreaVal} m²</strong> + Fire: <strong>{wasteM2} m²</strong></div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '16px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', fontSize: '0.78rem', color: '#94a3b8' }}>
+                          <span>Koli / Kutu: <strong style={{ color: '#fff' }}>{boxCount} Kutu</strong> ({boxM2} m²/kutu)</span>
+                          <span>Palet: <strong style={{ color: '#fff' }}>~{palletCount} Palet</strong> (32 kutu)</span>
+                        </div>
+                      </div>
+
+                      {/* Adhesive Metric */}
+                      <div style={{
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '12px',
+                        padding: '14px 16px'
+                      }}>
+                        <div style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: '800', textTransform: 'uppercase', marginBottom: '4px' }}>
+                          TS EN 12004 C2TE S1 Flex Yapıştırıcı
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                          <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#fff' }}>
+                            {adhesiveBags} <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Torba (25 kg)</span>
+                          </div>
+                          <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                            Toplam: <strong style={{ color: '#fff' }}>~{totalAdhesiveKg} kg</strong> harç
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '6px' }}>
+                          Büyük ebat porselen karolarda çift taraflı (taraklı) yapıştırma sarfiyatına uygundur.
+                        </div>
+                      </div>
+
+                      {/* Grout Metric */}
+                      <div style={{
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '12px',
+                        padding: '14px 16px'
+                      }}>
+                        <div style={{ fontSize: '0.75rem', color: '#a855f7', fontWeight: '800', textTransform: 'uppercase', marginBottom: '4px' }}>
+                          TS EN 13888 CG2WA Yüksek Mukavemetli Derz Dolgusu
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                          <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#fff' }}>
+                            {groutBags5Kg} <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Kova / Paket (5 kg)</span>
+                          </div>
+                          <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                            Net Sarfiyat: <strong style={{ color: '#fff' }}>~{totalGroutKg} kg</strong> ({jointMmVal} mm derz)
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Optional Skirting & Waterproofing */}
+                      {(calcIncludeSkirting || calcIsWetArea) && (
+                        <div style={{
+                          background: 'rgba(255, 255, 255, 0.02)',
+                          border: '1px solid rgba(255, 255, 255, 0.06)',
+                          borderRadius: '12px',
+                          padding: '12px 16px',
+                          fontSize: '0.78rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px'
+                        }}>
+                          {calcIncludeSkirting && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span style={{ color: '#94a3b8' }}>Süpürgelik:</span>
+                              <strong style={{ color: '#fff' }}>{skirtingMeters} tül metre (~{skirtingPieces} adet {tileH} cm)</strong>
+                            </div>
+                          )}
+                          {calcIsWetArea && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span style={{ color: '#94a3b8' }}>TS EN 14891 Su Yalıtım Membranı:</span>
+                              <strong style={{ color: '#38bdf8' }}>~{waterproofingKg} kg ({Math.ceil(waterproofingKg / 20)} takım çift komponent)</strong>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ marginTop: 'auto', display: 'flex', gap: '10px', paddingTop: '10px' }}>
+                      <button
+                        onClick={handleCopyBOQ}
+                        style={{
+                          flex: 1,
+                          background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                          color: '#090d16',
+                          border: 'none',
+                          borderRadius: '8px',
+                          padding: '12px',
+                          fontSize: '0.85rem',
+                          fontWeight: '800',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <Copy size={16} />
+                        <span>{calcCopiedBreakdown ? 'Panoya Kopyalandı ✓' : 'Metraj Tablosunu Kopyala'}</span>
+                      </button>
+
+                      <button
+                        onClick={() => setActiveTab('spec-writer')}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.06)',
+                          border: '1px solid rgba(255, 255, 255, 0.12)',
+                          color: '#cbd5e1',
+                          borderRadius: '8px',
+                          padding: '12px 16px',
+                          fontSize: '0.85rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <FileText size={16} />
+                        <span>Şartnameye Git</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* ======================================================== */}
           {/* TAB 2: 3D & BIM ASSET VAULT (4K PBR TEXTURES) */}
@@ -2103,31 +2727,55 @@ export default function ArchitectPortalPage() {
                             style={{
                               background: 'rgba(255, 255, 255, 0.05)',
                               border: '1px solid rgba(255, 255, 255, 0.1)',
-                              color: '#cbd5e1',
-                              borderRadius: '8px',
-                              padding: '6px',
-                              fontSize: '0.7rem',
-                              fontWeight: '600',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '4px'
-                            }}
-                          >
-                            <Download size={11} />
-                            <span>Revit .rvt</span>
-                          </button>
+                                color: '#cbd5e1',
+                                borderRadius: '8px',
+                                padding: '6px',
+                                fontSize: '0.7rem',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '4px'
+                              }}
+                            >
+                              <Download size={11} />
+                              <span>Revit .rvt</span>
+                            </button>
 
+                            <button
+                              onClick={() => handleDownloadAsset(p, '4K_PBR_TEXTURES')}
+                              style={{
+                                background: 'rgba(212, 175, 55, 0.12)',
+                                border: '1px solid rgba(212, 175, 55, 0.25)',
+                                color: '#d4af37',
+                                borderRadius: '8px',
+                                padding: '6px',
+                                fontSize: '0.7rem',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '4px'
+                              }}
+                            >
+                              <Download size={11} />
+                              <span>4K Doku (.zip)</span>
+                            </button>
+                          </div>
+
+                          {/* Interactive PBR Preview Modal Trigger */}
                           <button
-                            onClick={() => handleDownloadAsset(p, '4K_PBR_TEXTURES')}
+                            onClick={() => setPbrProductModal(p)}
                             style={{
-                              background: 'rgba(212, 175, 55, 0.12)',
-                              border: '1px solid rgba(212, 175, 55, 0.25)',
-                              color: '#d4af37',
+                              width: '100%',
+                              background: 'rgba(168, 85, 247, 0.12)',
+                              border: '1px solid rgba(168, 85, 247, 0.3)',
+                              color: '#c084fc',
                               borderRadius: '8px',
-                              padding: '6px',
-                              fontSize: '0.7rem',
+                              padding: '5px 8px',
+                              fontSize: '0.68rem',
                               fontWeight: '700',
                               cursor: 'pointer',
                               display: 'flex',
@@ -2733,7 +3381,79 @@ export default function ArchitectPortalPage() {
           {/* TAB 5: B2B TENDER & PROJECT PRICING */}
           {/* ======================================================== */}
           {activeTab === 'quotes' && (
-            <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+            <div style={{ maxWidth: '860px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {/* Spec-Lock & Rewards Highlights */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr',
+                gap: '16px'
+              }}>
+                {/* Spec-Lock Card */}
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 78, 59, 0.25) 100%)',
+                  border: '1px solid rgba(16, 185, 129, 0.35)',
+                  borderRadius: '16px',
+                  padding: '20px',
+                  display: 'flex',
+                  gap: '14px'
+                }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '10px',
+                    background: 'rgba(16, 185, 129, 0.2)',
+                    color: '#34d399',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <ShieldCheck size={22} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: '800', textTransform: 'uppercase' }}>
+                      PROJE KORUMA SİSTEMİ (SPEC-LOCK)
+                    </div>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#fff', margin: '2px 0 6px 0' }}>
+                      Şartnameniz Fabrika Düzeyinde Kilitlenir
+                    </h4>
+                    <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: 0, lineHeight: 1.45 }}>
+                      Şartnameye yazdığınız ürünler üretici fabrikaların B2B masasında ofisiniz adına rezerve edilir. Müteahhit başka markaya kaçamaz, ofisinizin şartname hakkı korunur.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Reward Points Card */}
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(180, 83, 9, 0.2) 100%)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
+                  borderRadius: '16px',
+                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Award size={18} style={{ color: '#d4af37' }} />
+                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase' }}>
+                        Mimar Teşvik Puanı
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '1.15rem', fontWeight: '900', color: '#fff' }}>
+                      {activeProject?.totalAreaM2 ? Math.round(activeProject.totalAreaM2) : 2500} P
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#cbd5e1', margin: '8px 0' }}>
+                    Projelerinizde şartnameye giren her 1 m² seramik için 1 Mimar Puanı kazanırsınız.
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', fontSize: '0.68rem' }}>
+                    <span style={{ background: 'rgba(0,0,0,0.3)', padding: '3px 6px', borderRadius: '4px', color: '#fbbf24' }}>🎟️ Cersaie İtalya Bileti</span>
+                    <span style={{ background: 'rgba(0,0,0,0.3)', padding: '3px 6px', borderRadius: '4px', color: '#fbbf24' }}>💻 3D Lisans Desteği</span>
+                  </div>
+                </div>
+              </div>
+
               <div style={{
                 background: '#0d1322',
                 border: '1px solid rgba(212, 175, 55, 0.25)',
@@ -3880,6 +4600,314 @@ export default function ArchitectPortalPage() {
         </div>
       )}
 
+      {/* ----------------------------------------------------------- */}
+      {/* MODAL 5: WHITE-LABEL CLIENT PRESENTATION SHARE */}
+      {/* ----------------------------------------------------------- */}
+      {showShareModal && activeProject && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '16px'
+        }}>
+          <div style={{
+            background: '#0d1322',
+            border: '1px solid rgba(212, 175, 55, 0.35)',
+            borderRadius: '20px',
+            maxWidth: '520px',
+            width: '100%',
+            padding: '28px',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.8)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: 'rgba(212, 175, 55, 0.15)',
+                  color: '#d4af37',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Share2 size={18} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: '#fff' }}>
+                    Müşteri Sunum & Onay Linki
+                  </h3>
+                  <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{activeProject.title}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowShareModal(false)}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{
+              background: 'rgba(16, 185, 129, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
+              borderRadius: '10px',
+              padding: '12px 14px',
+              marginBottom: '18px',
+              fontSize: '0.78rem',
+              color: '#6ee7b7',
+              lineHeight: 1.45
+            }}>
+              ✨ <strong>Tamamen White-Label (Markasız):</strong> Bu linkte SeramikBak adı yer almaz. Sayfa sizin mimarlık ofisinizin logosuyla açılır. İşveren karoları inceler, tek tıkla onaylar veya revizyon notu yazar.
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '6px' }}>
+                PAYLAŞILABİLİR ÖZEL ONAY BAĞLANTISI
+              </label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  readOnly
+                  value={typeof window !== 'undefined' ? `${window.location.origin}/mimar/sunum/${activeProject.id}` : `/mimar/sunum/${activeProject.id}`}
+                  style={{
+                    flex: 1,
+                    background: 'rgba(0,0,0,0.35)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                    color: '#cbd5e1',
+                    fontSize: '0.8rem'
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    const url = typeof window !== 'undefined' ? `${window.location.origin}/mimar/sunum/${activeProject.id}` : `/mimar/sunum/${activeProject.id}`;
+                    navigator.clipboard.writeText(url);
+                    setShareCopied(true);
+                    setTimeout(() => setShareCopied(false), 2500);
+                  }}
+                  style={{
+                    background: shareCopied ? '#22c55e' : 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    color: '#090d16',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '10px 16px',
+                    fontWeight: '800',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {shareCopied ? 'Kopyalandı ✓' : 'Linki Kopyala'}
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`${activeProject.title} projemiz için hazırladığımız mimari malzeme ve seramik seçimleri dosyasını inceleyip onaylayabilirsiniz: ${typeof window !== 'undefined' ? window.location.origin : ''}/mimar/sunum/${activeProject.id}`)}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  flex: 1,
+                  background: '#25D366',
+                  color: '#fff',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  fontSize: '0.82rem',
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <span>WhatsApp ile İlet</span>
+              </a>
+
+              <a
+                href={`/mimar/sunum/${activeProject.id}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  flex: 1,
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  color: '#fff',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  fontSize: '0.82rem',
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <ExternalLink size={14} />
+                <span>Önizlemeyi Aç</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ----------------------------------------------------------- */}
+      {/* MODAL 6: PBR MATERIAL TEXTURES & RENDER CONFIG */}
+      {/* ----------------------------------------------------------- */}
+      {pbrProductModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '16px'
+        }}>
+          <div style={{
+            background: '#0d1322',
+            border: '1px solid rgba(168, 85, 247, 0.35)',
+            borderRadius: '20px',
+            maxWidth: '640px',
+            width: '100%',
+            padding: '28px',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.8)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div>
+                <div style={{ fontSize: '0.72rem', color: '#c084fc', fontWeight: '800', textTransform: 'uppercase' }}>
+                  {pbrProductModal.brand?.name || 'Porselen'} • 4K PBR HARİTALARI
+                </div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '2px 0 0 0', color: '#fff' }}>
+                  {pbrProductModal.name}
+                </h3>
+              </div>
+              <button
+                onClick={() => setPbrProductModal(null)}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* 4-Map Grid Showcase */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '10px', marginBottom: '20px' }}>
+              <div style={{ background: '#090d18', borderRadius: '10px', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+                <div style={{ height: '90px', borderRadius: '6px', overflow: 'hidden', marginBottom: '6px' }}>
+                  <img src={pbrProductModal.imageUrl} alt="Albedo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#fff' }}>Albedo</div>
+                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Base Color</div>
+              </div>
+
+              <div style={{ background: '#090d18', borderRadius: '10px', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+                <div style={{ height: '90px', borderRadius: '6px', overflow: 'hidden', marginBottom: '6px', background: 'linear-gradient(135deg, #1e293b, #475569)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#cbd5e1', fontSize: '0.75rem', fontWeight: '700' }}>
+                  Roughness
+                </div>
+                <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#fff' }}>Roughness</div>
+                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>{pbrProductModal.finish || 'Mat'} (0.35)</div>
+              </div>
+
+              <div style={{ background: '#090d18', borderRadius: '10px', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+                <div style={{ height: '90px', borderRadius: '6px', overflow: 'hidden', marginBottom: '6px', background: 'linear-gradient(135deg, #818cf8, #c084fc)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.75rem', fontWeight: '800' }}>
+                  Normal
+                </div>
+                <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#fff' }}>Normal / Bump</div>
+                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Derz & Rölyef</div>
+              </div>
+
+              <div style={{ background: '#090d18', borderRadius: '10px', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
+                <div style={{ height: '90px', borderRadius: '6px', overflow: 'hidden', marginBottom: '6px', background: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#cbd5e1', fontSize: '0.75rem', fontWeight: '700' }}>
+                  AO Map
+                </div>
+                <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#fff' }}>Ambient Occlusion</div>
+                <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Gölge & Derinlik</div>
+              </div>
+            </div>
+
+            {/* Ready Engine Settings */}
+            <div style={{
+              background: 'rgba(0,0,0,0.3)',
+              borderRadius: '12px',
+              border: '1px solid rgba(255,255,255,0.08)',
+              padding: '14px',
+              marginBottom: '18px',
+              fontSize: '0.78rem'
+            }}>
+              <div style={{ fontWeight: '800', color: '#d4af37', marginBottom: '6px' }}>
+                🎯 V-Ray / Corona / Enscape / Lumion Hazır Ayar Parametreleri:
+              </div>
+              <div style={{ color: '#cbd5e1', lineHeight: '1.5' }}>
+                • <strong>IOR (Kırılma İndisi):</strong> 1.54 (Standart Sırlı Porselen)<br />
+                • <strong>Reflection / Glossiness:</strong> {pbrProductModal.finish === 'Parlak' ? '0.94 (High Polish)' : '0.72 (Satin/Mat)'}<br />
+                • <strong>Bump / Normal Amount:</strong> 15% (2 mm mikro derz rölyefi)<br />
+                • <strong>Diffuse UVW Tiling:</strong> {pbrProductModal.width || 60}x{pbrProductModal.height || 120} cm gerçek ölçek
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`// V-Ray / Corona PBR Settings for ${pbrProductModal.name}\nIOR: 1.54\nGlossiness: ${pbrProductModal.finish === 'Parlak' ? '0.94' : '0.72'}\nReflection: 0.95\nBump: Normal_Map_15%\nScale: ${pbrProductModal.width}x${pbrProductModal.height}cm`);
+                  alert('Render parametreleri panoya kopyalandı.');
+                }}
+                style={{
+                  flex: 1,
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  color: '#cbd5e1',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  fontWeight: '700',
+                  fontSize: '0.82rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Parametreleri Kopyala
+              </button>
+
+              <button
+                onClick={() => {
+                  handleDownloadAsset(pbrProductModal, 'PBR_TEXTURES');
+                  setPbrProductModal(null);
+                }}
+                style={{
+                  flex: 1.2,
+                  background: 'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  fontWeight: '800',
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Download size={14} />
+                <span>PBR Paketini İndir (.ZIP)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Bottom Navigation Bar */}
       {isMobile && (
         <div className="no-print mobile-bottom-bar" style={{
@@ -3900,10 +4928,11 @@ export default function ArchitectPortalPage() {
         }}>
           {[
             { id: 'projects', label: 'Projeler', icon: <Layers size={18} /> },
-            { id: 'vault', label: '3D BIM', icon: <Box size={18} /> },
+            { id: 'calculator', label: 'Metraj', icon: <Calculator size={18} /> },
+            { id: 'vault', label: '3D PBR', icon: <Box size={18} /> },
             { id: 'spec-writer', label: 'Şartname', icon: <FileText size={18} /> },
             { id: 'samples', label: 'Numune', icon: <Package size={18} /> },
-            { id: 'quotes', label: 'İskonto', icon: <Building2 size={18} /> }
+            { id: 'quotes', label: 'Koruma', icon: <Building2 size={18} /> }
           ].map(tab => {
             const isActive = activeTab === tab.id;
             return (

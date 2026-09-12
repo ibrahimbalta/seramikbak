@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { matchCSBPoz } from '@/lib/csbPozMatcher';
 
 // POST: Generate official TS EN 14411 technical specification text and export report for a project
 export async function POST(request) {
@@ -62,6 +63,7 @@ export async function POST(request) {
       const rectified = p.rectified !== false ? 'Rektifiyeli (Lazer Kesim)' : 'Standart Kenar';
       const frost = p.frostResistance !== false ? 'Dona Dayanıklı (TS EN ISO 10545-12)' : 'İç Mekan';
       const thickness = p.thickness ? `${p.thickness} mm` : '9 - 10 mm';
+      const csb = matchCSBPoz(p, item.usageArea);
 
       const clauseText = `
 Madde 3.${idx + 1} - ${item.usageArea.toUpperCase()} KAPLAMASI (${p.name}):
@@ -72,6 +74,7 @@ D. Mekanik & Emniyet Parametreleri: Yüzey aşınma direnci minimum ${pei}; kaym
 E. Kimyasal & Çevresel Mukavemet: Evsel kimyasallara ve lekelenmeye karşı TS EN ISO 10545-13 standardında minimum Sınıf A mukavemetinde; ${frost} olacaktır.
 F. Referans Ürün / Emsal: ${brand} - ${p.name} (Kod: ${p.code || 'PRD-' + p.id.slice(0, 8)}) veya idarenin onaylayacağı teknik eşdeğeri.
 G. Tahmini Metraj & Fire: ${item.areaM2 || 100} m² (İdarece %8 fire payı ilave edilecektir).
+H. Resmi ÇŞB Pozu: ${csb.pozNo} — ${csb.title}
 `.trim();
 
       return {
@@ -80,6 +83,7 @@ G. Tahmini Metraj & Fire: ${item.areaM2 || 100} m² (İdarece %8 fire payı ilav
         brandName: brand,
         usageArea: item.usageArea,
         areaM2: item.areaM2,
+        csbPoz: csb,
         clauseText
       };
     });
