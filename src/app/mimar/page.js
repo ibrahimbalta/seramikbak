@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { 
-  Sparkles, 
   Layers, 
   Box, 
   FileText, 
@@ -294,7 +293,7 @@ export default function ArchitectPortalPage() {
         fetchProjects(data.architect.id);
         fetchSamples(data.architect.id);
       } else {
-        setAuthError(data.error || 'Demo giriş açılamadı.');
+        setAuthError(data.error || 'Örnek giriş açılamadı.');
       }
     } catch (err) {
       setAuthError('Sunucu bağlantı hatası.');
@@ -745,21 +744,8 @@ export default function ArchitectPortalPage() {
             </p>
           </div>
 
-          {/* Quick Demo Login Hero Button */}
-          <div style={{
-            background: 'rgba(212, 175, 55, 0.07)',
-            border: '1px solid rgba(212, 175, 55, 0.25)',
-            borderRadius: '14px',
-            padding: '14px 12px',
-            marginBottom: '20px',
-            textAlign: 'center'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '8px' }}>
-              <Sparkles size={14} style={{ color: '#d4af37' }} />
-              <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
-                Hızlı Demo İnceleme
-              </span>
-            </div>
+          {/* Quick Architect Preview Button */}
+          <div style={{ marginBottom: '20px' }}>
             <button
               onClick={handleDemoLogin}
               disabled={authLoading}
@@ -768,26 +754,23 @@ export default function ArchitectPortalPage() {
                 background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                 color: '#090d16',
                 border: 'none',
-                borderRadius: '10px',
-                padding: '12px 14px',
+                borderRadius: '12px',
+                padding: '13px 14px',
                 fontWeight: '800',
-                fontSize: isMobile ? '0.82rem' : '0.88rem',
+                fontSize: isMobile ? '0.84rem' : '0.9rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
                 lineHeight: 1.3,
-                boxShadow: '0 4px 14px rgba(212, 175, 55, 0.2)',
+                boxShadow: '0 4px 14px rgba(212, 175, 55, 0.25)',
                 boxSizing: 'border-box'
               }}
             >
               {authLoading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
               <span>Örnek Mimar Olarak Giriş Yap</span>
             </button>
-            <span style={{ display: 'block', marginTop: '6px', fontSize: '0.7rem', color: '#94a3b8' }}>
-              Tabanlıoğlu Mimarlık demo oturumuyla tüm modülleri hemen test edin.
-            </span>
           </div>
 
           {/* Tabs */}
