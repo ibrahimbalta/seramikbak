@@ -28,7 +28,6 @@ import {
   ChevronRight, 
   ChevronLeft,
   ArrowRight,
-  ShieldCheck,
   Send,
   Calendar,
   Grid,
@@ -267,33 +266,6 @@ export default function ArchitectPortalPage() {
         fetchSamples(data.architect.id);
       } else {
         setAuthError(data.error || 'Giriş yapılamadı.');
-      }
-    } catch (err) {
-      setAuthError('Sunucu bağlantı hatası.');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  // Demo Login handler
-  const handleDemoLogin = async () => {
-    setAuthLoading(true);
-    setAuthError('');
-    try {
-      const res = await fetch('/api/architect/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'demo' })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setArchitectInfo(data.architect);
-        setIsLoggedIn(true);
-        localStorage.setItem('seramikbak_architect', JSON.stringify(data.architect));
-        fetchProjects(data.architect.id);
-        fetchSamples(data.architect.id);
-      } else {
-        setAuthError(data.error || 'Örnek giriş açılamadı.');
       }
     } catch (err) {
       setAuthError('Sunucu bağlantı hatası.');
@@ -742,35 +714,6 @@ export default function ArchitectPortalPage() {
             <p style={{ fontSize: isMobile ? '0.8rem' : '0.86rem', color: '#94a3b8', margin: 0, lineHeight: 1.45 }}>
               Mimarlık ofisleri ve tasarımcılar için B2B şartname, numune ve 3D BIM stüdyosu.
             </p>
-          </div>
-
-          {/* Quick Architect Preview Button */}
-          <div style={{ marginBottom: '20px' }}>
-            <button
-              onClick={handleDemoLogin}
-              disabled={authLoading}
-              style={{
-                width: '100%',
-                background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                color: '#090d16',
-                border: 'none',
-                borderRadius: '12px',
-                padding: '13px 14px',
-                fontWeight: '800',
-                fontSize: isMobile ? '0.84rem' : '0.9rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                lineHeight: 1.3,
-                boxShadow: '0 4px 14px rgba(212, 175, 55, 0.25)',
-                boxSizing: 'border-box'
-              }}
-            >
-              {authLoading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
-              <span>Örnek Mimar Olarak Giriş Yap</span>
-            </button>
           </div>
 
           {/* Tabs */}
