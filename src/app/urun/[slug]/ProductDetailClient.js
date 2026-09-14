@@ -22,7 +22,6 @@ import {
   ExternalLink,
   Info,
   Building2,
-  Compass,
   Truck,
   Eye
 } from 'lucide-react';
@@ -600,81 +599,6 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 <span>Numune kutuları ve fabrika palet sevkiyatları 81 ile sigortalı olarak gönderilir.</span>
               </div>
             </div>
-
-            {/* Marketplace Comparison Cards (If Available) */}
-            {(product.trendyolPrice || product.hepsiburadaPrice || product.koctasPrice || product.bauhausPrice) && (
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '14px',
-                padding: '18px',
-                marginBottom: '24px'
-              }}>
-                <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Compass size={15} style={{ color: '#d4af37' }} />
-                  <span>Pazaryeri & Yapı Market Referans Fiyatları</span>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
-                  {product.trendyolPrice && (
-                    <a
-                      href={product.trendyolUrl || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        background: 'rgba(242, 122, 26, 0.1)',
-                        border: '1px solid rgba(242, 122, 26, 0.3)',
-                        padding: '10px 12px',
-                        borderRadius: '10px',
-                        textDecoration: 'none',
-                        display: 'block'
-                      }}
-                    >
-                      <div style={{ fontSize: '0.72rem', color: '#f27a1a', fontWeight: '700' }}>Trendyol</div>
-                      <div style={{ fontSize: '1rem', fontWeight: '800', color: '#fff' }}>{product.trendyolPrice} ₺/m²</div>
-                    </a>
-                  )}
-
-                  {product.hepsiburadaPrice && (
-                    <a
-                      href={product.hepsiburadaUrl || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        background: 'rgba(255, 96, 0, 0.1)',
-                        border: '1px solid rgba(255, 96, 0, 0.3)',
-                        padding: '10px 12px',
-                        borderRadius: '10px',
-                        textDecoration: 'none',
-                        display: 'block'
-                      }}
-                    >
-                      <div style={{ fontSize: '0.72rem', color: '#ff6000', fontWeight: '700' }}>Hepsiburada</div>
-                      <div style={{ fontSize: '1rem', fontWeight: '800', color: '#fff' }}>{product.hepsiburadaPrice} ₺/m²</div>
-                    </a>
-                  )}
-
-                  {product.koctasPrice && (
-                    <a
-                      href={product.koctasUrl || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        background: 'rgba(227, 6, 19, 0.1)',
-                        border: '1px solid rgba(227, 6, 19, 0.3)',
-                        padding: '10px 12px',
-                        borderRadius: '10px',
-                        textDecoration: 'none',
-                        display: 'block'
-                      }}
-                    >
-                      <div style={{ fontSize: '0.72rem', color: '#ef4444', fontWeight: '700' }}>Koçtaş</div>
-                      <div style={{ fontSize: '1rem', fontWeight: '800', color: '#fff' }}>{product.koctasPrice} ₺/m²</div>
-                    </a>
-                  )}
-                </div>
-              </div>
-            )}
-
           </div>
 
         </div>
