@@ -90,10 +90,10 @@ export default async function sitemap() {
       supportedLangs.forEach(lang => {
         const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
         productRoutes.push({
-          url: `${baseUrl}/?product=${p.id}&slug=${slug}${langParam ? `&lang=${lang}` : ''}`,
+          url: `${baseUrl}/urun/${slug}${langParam ? `?lang=${lang}` : ''}`,
           lastModified: p.updatedAt || new Date(),
           changeFrequency: 'daily',
-          priority: 0.9
+          priority: 0.95
         });
       });
     });
@@ -104,7 +104,7 @@ export default async function sitemap() {
       supportedLangs.forEach(lang => {
         const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
         productRoutes.push({
-          url: `${baseUrl}/?brand=${brandSlug}${langParam ? `&lang=${lang}` : ''}`,
+          url: `${baseUrl}/marka/${brandSlug}${langParam ? `?lang=${lang}` : ''}`,
           lastModified: new Date(),
           changeFrequency: 'daily',
           priority: 0.9

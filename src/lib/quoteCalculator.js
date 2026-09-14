@@ -1,4 +1,4 @@
-import { slugify } from './slugify';
+import { slugify } from './slugify.js';
 
 /**
  * SeramikBak Smart Ceramic & Tile Quote Calculation Engine

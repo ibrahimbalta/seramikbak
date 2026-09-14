@@ -6600,6 +6600,33 @@ export default function Home() {
                       </div>
                     </button>
                   </div>
+
+                  {/* MÜSTAKİL ÜRÜN SAYFASI & PAYLAŞ BUTONU */}
+                  <div style={{ marginTop: '10px' }}>
+                    <Link
+                      href={`/urun/${slugify(`${detailProduct.brand?.name || 'seramik'} ${detailProduct.name}`)}`}
+                      target="_blank"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        width: '100%',
+                        padding: '10px 14px',
+                        background: 'rgba(212, 175, 55, 0.08)',
+                        border: '1px solid rgba(212, 175, 55, 0.25)',
+                        borderRadius: '10px',
+                        color: '#d4af37',
+                        fontSize: '0.82rem',
+                        fontWeight: '700',
+                        textDecoration: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    >
+                      <ExternalLink size={15} />
+                      <span>Müstakil Ürün Sayfasında Aç & Paylaş</span>
+                    </Link>
+                  </div>
                 </div>
 
                 {/* MİMAR VE TASARIMCILAR İÇİN DOKU PORTALI */}
