@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import { slugify } from '@/lib/slugify';
+import { CATEGORY_DEFINITIONS } from '@/lib/categories';
 
 export default async function sitemap() {
   const baseUrl = 'https://www.seramikbak.com';
@@ -174,6 +175,19 @@ export default async function sitemap() {
     });
   }
 
+  // 6. Programmatic SEO Category Routes
+  let categoryRoutes = [];
+  Object.keys(CATEGORY_DEFINITIONS).forEach(slug => {
+    supportedLangs.forEach(lang => {
+      const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
+      categoryRoutes.push({
+        url: `${baseUrl}/kategori/${slug}${langParam}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.95
+      });
+    });
+  });
 
-  return [...staticRoutes, ...cityBrandRoutes, ...productRoutes, ...dealerRoutes, ...brandRoutes];
+  return [...staticRoutes, ...categoryRoutes, ...cityBrandRoutes, ...productRoutes, ...dealerRoutes, ...brandRoutes];
 }
