@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { sendPushNotification } from '@/lib/pushServer';
 
 export async function POST(request) {
   try {
@@ -71,6 +72,17 @@ export async function POST(request) {
         dealerId: targetDealerId,
         query: `AR_SCAN_${surfaceType}_${netAreaM2}M2`
       }
+    });
+
+    // Send Web Push notification to dealer
+    sendPushNotification({
+      userType: 'DEALER',
+      userId: targetDealerId,
+      title: '📐 Yeni AR LiDAR Ölçüm Talebi!',
+      body: `${clientName} (${netAreaM2} m²) - LiDAR ile taranan alan için teklif bekliyor.`,
+      url: '/bayi'
+    }).catch(err => {
+      console.warn('AR lead push notification error:', err.message);
     });
 
     return NextResponse.json({

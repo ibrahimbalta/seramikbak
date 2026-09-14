@@ -121,3 +121,65 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
+// 4. Web Push Notification Handlers
+self.addEventListener('push', (event) => {
+  let data = {
+    title: 'SeramikBak Bildirimi',
+    body: 'Yeni bir güncelleme veya talep mevcut.',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    url: '/'
+  };
+
+  if (event.data) {
+    try {
+      const parsed = event.data.json();
+      data = { ...data, ...parsed };
+    } catch (e) {
+      data.body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: data.body,
+    icon: data.icon || '/icon-192.png',
+    badge: data.badge || '/icon-192.png',
+    vibrate: [150, 50, 150],
+    data: {
+      url: data.url || '/'
+    },
+    actions: [
+      { action: 'open', title: 'İncele' },
+      { action: 'close', title: 'Kapat' }
+    ],
+    tag: data.tag || 'seramikbak-notification'
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'close') {
+    return;
+  }
+
+  const targetUrl = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url.includes(targetUrl) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
+});

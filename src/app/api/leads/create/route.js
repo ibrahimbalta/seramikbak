@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sendLeadNotification } from '@/lib/email';
+import { sendPushNotification } from '@/lib/pushServer';
 
 export async function POST(request) {
   try {
@@ -80,6 +81,17 @@ export async function POST(request) {
       productName: product.name
     }).catch(err => {
       console.error('Lead email notification trigger error:', err);
+    });
+
+    // Send Web Push notification to dealer
+    sendPushNotification({
+      userType: 'DEALER',
+      userId: dealerId,
+      title: '🎯 Yeni Müşteri Teklif Talebi!',
+      body: `${clientName} (${dealer.city || 'Genel'}) - ${product.name} için fiyat teklifi bekliyor.`,
+      url: '/bayi'
+    }).catch(err => {
+      console.warn('Lead push notification error:', err.message);
     });
 
     return NextResponse.json({

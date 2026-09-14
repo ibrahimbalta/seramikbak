@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { sendPushNotification } from '@/lib/pushServer';
 
 // GET: List sample orders requested by the architect
 export async function GET(request) {
@@ -161,6 +162,17 @@ export async function POST(request) {
               notes: `[Mimari Numune] Ofis: ${architect.officeName}. Proje: ${projectName || 'Mimari Tasarım'}. ${effectiveM2 ? `İhtiyaç: ${effectiveM2} m². ` : ''}Not: ${notes || '-'}`,
               status: 'PENDING'
             }
+          });
+
+          // Send Web Push to the matched dealer
+          sendPushNotification({
+            userType: 'DEALER',
+            userId: matchedDealer.id,
+            title: '📦 Yeni Mimari Numune Talebi!',
+            body: `${architect.officeName} (${city}) bir numune kutusu talep etti. Hemen inceleyin!`,
+            url: '/bayi'
+          }).catch(pushErr => {
+            console.warn('Dealer push notification failed:', pushErr.message);
           });
         } catch (leadErr) {
           console.warn('Could not sync to dealer lead:', leadErr.message);

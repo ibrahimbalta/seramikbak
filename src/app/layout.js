@@ -202,6 +202,7 @@ export const viewport = {
 
 import { LanguageProvider } from "@/lib/languageContext";
 import CookieBanner from "@/components/CookieBanner";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 export default function RootLayout({ children }) {
   return (
@@ -252,6 +253,7 @@ export default function RootLayout({ children }) {
         <LanguageProvider>
           {children}
           <CookieBanner />
+          <PWAInstallPrompt />
         </LanguageProvider>
       </body>
     </html>

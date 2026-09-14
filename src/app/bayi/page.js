@@ -54,6 +54,7 @@ import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
 import QuotePDFTemplate from '@/components/QuotePDFTemplate';
 import { calculateQuote, formatQuoteWhatsAppText, getWhatsAppUrl } from '@/lib/quoteCalculator';
+import NotificationBell from '@/components/NotificationBell';
 
 export default function DealerPortalPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -2552,6 +2553,7 @@ Yetkili Satış & Showroom Departmanı`;
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <NotificationBell userType="DEALER" userId={dealerInfo?.id} />
                   {dealerInfo && (
                     <a
                       href={`/bayi/${dealerInfo.name ? slugify(dealerInfo.name) : dealerInfo.id}`}
@@ -2615,6 +2617,7 @@ Yetkili Satış & Showroom Departmanı`;
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <NotificationBell userType="DEALER" userId={dealerInfo?.id} />
                 {dealerInfo && (
                   <a
                     href={`/bayi/${dealerInfo.name ? slugify(dealerInfo.name) : dealerInfo.id}`}

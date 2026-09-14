@@ -38,6 +38,7 @@ import {
   Sliders
 } from 'lucide-react';
 import Link from 'next/link';
+import NotificationBell from '@/components/NotificationBell';
 import { matchCSBPoz, CSB_POZ_LIST } from '@/lib/csbPozMatcher';
 
 const TURKEY_CITIES = [
@@ -1365,6 +1366,7 @@ export default function ArchitectPortalPage() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <NotificationBell userType="ARCHITECT" userId={architectInfo?.id} />
                 <button
                   onClick={() => setShowNewProjectModal(true)}
                   style={{
@@ -1410,6 +1412,7 @@ export default function ArchitectPortalPage() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <NotificationBell userType="ARCHITECT" userId={architectInfo?.id} />
                 <button
                   onClick={() => setShowNewProjectModal(true)}
                   style={{
