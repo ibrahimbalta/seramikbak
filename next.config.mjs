@@ -4,6 +4,59 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
+  // Image Optimization CDN Domains
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.canakkaleseramik.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.kutahyaseramik.com.tr',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.vitra.com.tr',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.bien.com.tr',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.yurtbayseramik.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.seramiksan.com.tr',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.egeseramik.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.quagranite.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.seramikbak.com',
+      },
+    ],
+  },
+
   // SEO: www redirect ve trailing slash normalizasyonu
   async redirects() {
     return [

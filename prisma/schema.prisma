@@ -10,6 +10,7 @@ generator client {
 model Brand {
   id        String        @id @default(uuid())
   name      String        @unique
+  slug      String?       @unique
   logoUrl   String?
   username  String?       @unique
   password  String
@@ -23,12 +24,15 @@ model Brand {
   specInLeads    SpecInLead[]
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
+
+  @@index([slug])
 }
 
 model Product {
   id         String         @id @default(uuid())
   name       String
   code       String         @unique
+  slug       String?        @unique
   brandId    String
   brand      Brand          @relation(fields: [brandId], references: [id], onDelete: Cascade)
   width      Float          // in cm, e.g., 60
@@ -79,6 +83,7 @@ model Product {
 
   @@index([brandId])
   @@index([code])
+  @@index([slug])
   @@index([isPremium])
 }
 

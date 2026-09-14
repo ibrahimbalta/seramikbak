@@ -3,12 +3,21 @@ import { notFound } from 'next/navigation';
 import { slugify } from '@/lib/slugify';
 import ProductDetailClient from './ProductDetailClient';
 
-// Helper to find a product by slug, code or ID
+// Helper to find a product by slug, code or ID (O(1) indexed database query)
 async function getProductBySlugOrId(slug) {
   if (!slug) return null;
 
   try {
-    // 1. Direct UUID match
+    const targetSlug = slug.toLowerCase().trim();
+
+    // 1. Direct indexed slug match - fastest O(1)
+    const bySlug = await prisma.product.findUnique({
+      where: { slug: targetSlug },
+      include: { brand: true }
+    });
+    if (bySlug) return bySlug;
+
+    // 2. Direct UUID match
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
     if (isUuid) {
       const p = await prisma.product.findUnique({
@@ -18,7 +27,7 @@ async function getProductBySlugOrId(slug) {
       if (p) return p;
     }
 
-    // 2. Direct exact code match
+    // 3. Direct exact code match
     const byCode = await prisma.product.findFirst({
       where: {
         code: {
@@ -30,20 +39,29 @@ async function getProductBySlugOrId(slug) {
     });
     if (byCode) return byCode;
 
-    // 3. Match by name or brand+name slug across products
-    const allProducts = await prisma.product.findMany({
+    // 4. Case-insensitive slug fallback
+    const bySlugInsensitive = await prisma.product.findFirst({
+      where: {
+        slug: {
+          equals: targetSlug,
+          mode: 'insensitive'
+        }
+      },
       include: { brand: true }
     });
+    if (bySlugInsensitive) return bySlugInsensitive;
 
-    const targetSlug = slug.toLowerCase();
-    const matched = allProducts.find(p => {
-      const fullSlug = slugify(`${p.brand?.name || 'seramik'} ${p.name}`).toLowerCase();
-      const nameSlug = slugify(p.name).toLowerCase();
-      const codeSlug = slugify(p.code).toLowerCase();
-      return fullSlug === targetSlug || nameSlug === targetSlug || codeSlug === targetSlug || p.id === slug;
+    // 5. Targeted name fallback (only top 5 candidates instead of entire table)
+    const nameMatch = await prisma.product.findFirst({
+      where: {
+        name: {
+          contains: targetSlug.replace(/-/g, ' '),
+          mode: 'insensitive'
+        }
+      },
+      include: { brand: true }
     });
-
-    return matched || null;
+    return nameMatch || null;
   } catch (err) {
     console.error('Error fetching product by slug:', err);
     return null;

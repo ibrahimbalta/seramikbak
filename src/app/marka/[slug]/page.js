@@ -3,12 +3,20 @@ import { notFound } from 'next/navigation';
 import { slugify } from '@/lib/slugify';
 import BrandShowcaseClient from './BrandShowcaseClient';
 
-// Helper to find a brand by slug or ID
+// Helper to find a brand by slug, username, or ID (O(1) indexed database query)
 async function getBrandBySlugOrId(slug) {
   if (!slug) return null;
 
   try {
-    // 1. Direct UUID match
+    const targetSlug = slug.toLowerCase().trim();
+
+    // 1. Direct indexed slug match - fastest O(1)
+    const bySlug = await prisma.brand.findUnique({
+      where: { slug: targetSlug }
+    });
+    if (bySlug) return bySlug;
+
+    // 2. Direct UUID match
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
     if (isUuid) {
       const b = await prisma.brand.findUnique({
@@ -17,17 +25,27 @@ async function getBrandBySlugOrId(slug) {
       if (b) return b;
     }
 
-    // 2. Exact name or slug match
-    const allBrands = await prisma.brand.findMany();
-    const targetSlug = slug.toLowerCase();
-
-    const matched = allBrands.find(b => {
-      const bSlug = slugify(b.name).toLowerCase();
-      const uSlug = (b.username || '').toLowerCase();
-      return bSlug === targetSlug || uSlug === targetSlug || b.name.toLowerCase() === targetSlug || b.id === slug;
+    // 3. Match by username
+    const byUsername = await prisma.brand.findFirst({
+      where: {
+        username: {
+          equals: targetSlug,
+          mode: 'insensitive'
+        }
+      }
     });
+    if (byUsername) return byUsername;
 
-    return matched || null;
+    // 4. Match by normalized name
+    const byName = await prisma.brand.findFirst({
+      where: {
+        name: {
+          equals: targetSlug.replace(/-/g, ' '),
+          mode: 'insensitive'
+        }
+      }
+    });
+    return byName || null;
   } catch (err) {
     console.error('Error fetching brand by slug:', err);
     return null;

@@ -5,6 +5,7 @@ import path from 'path';
 
 import { uploadImage, getOptimizedTextureUrl } from '@/lib/cloudinary';
 import { verifyAuth } from '@/lib/auth-check';
+import { slugify } from '@/lib/slugify';
 
 // Helper to save base64 image (tries Cloudinary first, falls back to local storage)
 async function saveBase64Image(base64Data, filename) {
@@ -187,11 +188,21 @@ export async function POST(request) {
     }
 
 
+    // Generate SEO friendly unique slug
+    const brand = await prisma.brand.findUnique({ where: { id: brandId }, select: { name: true } });
+    const baseSlug = slugify(`${brand?.name || 'seramik'} ${name.trim()}`);
+    let productSlug = baseSlug || `product-${cleanCode.toLowerCase()}`;
+    const existingSlug = await prisma.product.findUnique({ where: { slug: productSlug } });
+    if (existingSlug) {
+      productSlug = `${baseSlug}-${slugify(cleanCode)}`;
+    }
+
     // Save product
     const product = await prisma.product.create({
       data: {
         name: name.trim(),
         code: cleanCode,
+        slug: productSlug,
         brandId,
         width: parseInt(width, 10),
         height: parseInt(height, 10),

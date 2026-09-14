@@ -83,11 +83,11 @@ export default async function sitemap() {
   let productRoutes = [];
   try {
     const products = await prisma.product.findMany({
-      select: { id: true, name: true, updatedAt: true, brand: { select: { name: true } } }
+      select: { id: true, slug: true, name: true, updatedAt: true, brand: { select: { name: true } } }
     });
     
     products.forEach(p => {
-      const slug = slugify(`${p.brand?.name || 'seramik'} ${p.name}`);
+      const slug = p.slug || slugify(`${p.brand?.name || 'seramik'} ${p.name}`);
       supportedLangs.forEach(lang => {
         const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
         productRoutes.push({
@@ -148,10 +148,10 @@ export default async function sitemap() {
   let brandRoutes = [];
   try {
     const brands = await prisma.brand.findMany({
-      select: { name: true, updatedAt: true }
+      select: { name: true, slug: true, updatedAt: true }
     });
     brands.forEach(brand => {
-      const slug = slugify(brand.name);
+      const slug = brand.slug || slugify(brand.name);
       supportedLangs.forEach(lang => {
         const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
         brandRoutes.push({
