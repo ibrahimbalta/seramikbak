@@ -32,12 +32,20 @@ export default function PWAInstallPrompt() {
       if (days < 5) return; // Hide for 5 days after dismissal
     }
 
+    // Device detection: Mobile & Tablet check
+    const isMobileUA = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    const isSmallScreen = window.innerWidth <= 1024;
+    const isMobileOrTablet = isMobileUA || (isTouch && isSmallScreen);
+
     // Android / Chrome / Edge install prompt listener
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      // Wait 3 seconds after page load before showing prompt to prevent intrusive feel
-      setTimeout(() => setShowPrompt(true), 3000);
+      // Only automatically show prompt on mobile and tablet devices to keep desktop luxury UX clean
+      if (isMobileOrTablet) {
+        setTimeout(() => setShowPrompt(true), 3000);
+      }
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -99,26 +107,29 @@ export default function PWAInstallPrompt() {
     <>
       {/* Bottom Floating Install Banner */}
       {showPrompt && !showIOSGuide && (
-        <div style={{
-          position: 'fixed',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 'calc(100% - 32px)',
-          maxWidth: '520px',
-          background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.98) 0%, rgba(9, 13, 22, 0.98) 100%)',
-          border: '1px solid rgba(212, 175, 55, 0.4)',
-          boxShadow: '0 20px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.2)',
-          borderRadius: '16px',
-          padding: '16px 18px',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '14px',
-          backdropFilter: 'blur(12px)',
-          animation: 'slideUp 0.3s ease-out'
-        }}>
+        <div 
+          className="pwa-mobile-install-banner"
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'calc(100% - 32px)',
+            maxWidth: '520px',
+            background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.98) 0%, rgba(9, 13, 22, 0.98) 100%)',
+            border: '1px solid rgba(212, 175, 55, 0.4)',
+            boxShadow: '0 20px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.2)',
+            borderRadius: '16px',
+            padding: '16px 18px',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '14px',
+            backdropFilter: 'blur(12px)',
+            animation: 'slideUp 0.3s ease-out'
+          }}
+        >
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
             <div style={{
@@ -146,7 +157,7 @@ export default function PWAInstallPrompt() {
                 </span>
               </div>
               <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '2px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                Hızlı 3D giydirme ve anlık numune bildirimleri için telefona ekleyin.
+                Hızlı 3D giydirme ve anlık numune bildirimleri için ana ekrana ekleyin.
               </p>
             </div>
           </div>
@@ -283,6 +294,14 @@ export default function PWAInstallPrompt() {
           </div>
         </div>
       )}
+
+      <style jsx global>{`
+        @media (min-width: 1025px) {
+          .pwa-mobile-install-banner {
+            display: none !important;
+          }
+        }
+      `}</style>
     </>
   );
 }
