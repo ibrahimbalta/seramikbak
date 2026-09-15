@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Sparkles, UploadCloud, RefreshCw, CheckCircle2, MapPin } from 'lucide-react';
+import { Sparkles, UploadCloud, RefreshCw, CheckCircle2, MapPin, Zap } from 'lucide-react';
+import { generateTilePreview, loadImage } from './TilePerspectiveEngine';
 
 const presetTiles = [
   {
@@ -186,6 +187,94 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
   const handleMouseMove = (e) => {
     if (isDraggingSlider) {
       handleSliderMove(e.clientX);
+    }
+  };
+
+  // -----------------------------------------------------------------------
+  // Quick Preview: Segment API + Canvas 2D Perspective Tile Mapping
+  // -----------------------------------------------------------------------
+  const handleQuickPreview = async (targetTile = selectedTile) => {
+    setIsGenerating(true);
+    setErrorMsg('');
+    setAiResultImage(null);
+
+    setLoadingStepText('1. Mekan yüzeyleri yapay zeka ile analiz ediliyor...');
+
+    try {
+      // Ensure we have a data URL for the segment API
+      let imageDataUrl = photoPreview;
+      if (!imageDataUrl.startsWith('data:')) {
+        const resp = await fetch(imageDataUrl);
+        const blob = await resp.blob();
+        imageDataUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      setLoadingStepText('2. Duvar ve zemin yüzeyleri tespit ediliyor...');
+
+      // Detect floor and walls in parallel using existing segment API
+      const [floorRes, wallsRes] = await Promise.allSettled([
+        fetch('/api/ai/segment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: imageDataUrl, target: 'floor' }),
+        }).then((r) => r.json()),
+        fetch('/api/ai/segment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: imageDataUrl, target: 'walls' }),
+        }).then((r) => r.json()),
+      ]);
+
+      const floorData =
+        floorRes.status === 'fulfilled' && floorRes.value?.success
+          ? floorRes.value
+          : null;
+      const wallsData =
+        wallsRes.status === 'fulfilled' && wallsRes.value?.success
+          ? wallsRes.value
+          : null;
+
+      if (!floorData && !wallsData) {
+        throw new Error('Yüzey tespit edilemedi. Lütfen farklı bir fotoğraf deneyin.');
+      }
+
+      setLoadingStepText('3. Seramik karoları perspektife uygun döşeniyor...');
+
+      const surfaces = {
+        floor: floorData
+          ? { polygon: floorData.polygon, exclude: floorData.exclude }
+          : null,
+        walls: wallsData
+          ? { polygon: wallsData.polygon, exclude: wallsData.exclude }
+          : null,
+      };
+
+      // Load room photo and tile texture images
+      const [roomImg, tileImg] = await Promise.all([
+        loadImage(photoPreview),
+        loadImage(targetTile?.imageUrl || '/textures/calacatta_gold.jpg'),
+      ]);
+
+      // Generate preview using Canvas 2D perspective mapping (client-side, $0 cost)
+      const resultDataUrl = generateTilePreview(roomImg, tileImg, surfaces, {
+        groutColor: '#d4d4d4',
+        groutWidth: 2,
+        tileWCm: targetTile?.width || 60,
+        tileHCm: targetTile?.height || 120,
+        opacity: 0.88,
+        subdivisions: 14,
+      });
+
+      setAiResultImage(resultDataUrl);
+    } catch (err) {
+      console.error('Quick Preview error:', err);
+      setErrorMsg(err.message || 'Hızlı önizleme oluşturulurken bir hata oluştu.');
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -386,6 +475,35 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
             )}
 
             {/* Action Button */}
+            <button 
+              onClick={() => handleQuickPreview(selectedTile)}
+              style={{
+                width: '100%',
+                padding: '14px',
+                borderRadius: '16px',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                color: '#ffffff',
+                fontWeight: '900',
+                fontSize: '0.95rem',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 8px 24px rgba(59,130,246,0.35)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                transition: 'all 0.25s ease'
+              }}
+            >
+              <Zap size={20} />
+              <span>⚡ Hızlı Önizleme — Anında Seramiği Döşe (Ücretsiz)</span>
+            </button>
+
+            <div style={{ textAlign: 'center', fontSize: '0.72rem', color: '#64748b', fontWeight: '700', padding: '4px 0' }}>
+              — veya —
+            </div>
+
+            {/* Existing Generative AI Button (kept as-is) */}
             <button 
               onClick={() => handleGenerateAIRemodel(selectedTile)}
               style={{
