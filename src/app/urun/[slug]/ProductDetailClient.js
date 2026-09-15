@@ -620,11 +620,6 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 <Sparkles size={16} style={{ color: '#60a5fa' }} />
                 <span>⚡ AI ile Mekan Yenileme — Fotoğrafına Döşe</span>
               </button>
-
-              <div style={{ marginTop: '14px', fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Truck size={14} style={{ color: '#10b981', flexShrink: 0 }} />
-                <span>Numune kutuları ve fabrika palet sevkiyatları 81 ile sigortalı olarak gönderilir.</span>
-              </div>
             </div>
           </div>
 
