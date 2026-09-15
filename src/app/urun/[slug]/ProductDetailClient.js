@@ -26,6 +26,7 @@ import {
   Eye
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
+import AIRemodelModal from '@/components/AIRemodelModal';
 
 const TURKEY_CITIES = [
   'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Amasya', 'Ankara', 'Antalya', 'Artvin', 'Aydın',
@@ -60,6 +61,9 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
 
   // Quote Modal State
   const [showQuoteModal, setShowQuoteModal] = useState(false);
+
+  // AI Remodel Modal State
+  const [showAIRemodel, setShowAIRemodel] = useState(false);
   const [quoteSubmitting, setQuoteSubmitting] = useState(false);
   const [quoteSuccess, setQuoteSuccess] = useState('');
   const [quoteError, setQuoteError] = useState('');
@@ -592,6 +596,29 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               >
                 <Eye size={16} style={{ color: '#d4af37' }} />
                 <span>3D Mekan Giydirme & Kiosk Studio'da Gör</span>
+              </button>
+
+              {/* AI ile Mekan Yenileme Button */}
+              <button
+                onClick={() => setShowAIRemodel(true)}
+                style={{
+                  width: '100%',
+                  background: 'linear-gradient(135deg, rgba(59,130,246,0.15) 0%, rgba(139,92,246,0.15) 100%)',
+                  color: '#93c5fd',
+                  border: '1px solid rgba(59, 130, 246, 0.4)',
+                  borderRadius: '12px',
+                  padding: '12px 18px',
+                  fontSize: '0.85rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Sparkles size={16} style={{ color: '#60a5fa' }} />
+                <span>⚡ AI ile Mekan Yenileme — Fotoğrafına Döşe</span>
               </button>
 
               <div style={{ marginTop: '14px', fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1161,6 +1188,23 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
             )}
           </div>
         </div>
+      )}
+
+      {/* AI ile Mekan Yenileme Modal */}
+      {showAIRemodel && (
+        <AIRemodelModal
+          isOpen={showAIRemodel}
+          onClose={() => setShowAIRemodel(false)}
+          selectedProduct={product}
+          onGoToDealers={() => {
+            const dealersEl = document.getElementById('authorized-dealers-section');
+            if (dealersEl) {
+              dealersEl.scrollIntoView({ behavior: 'smooth' });
+            } else {
+              setShowQuoteModal(true);
+            }
+          }}
+        />
       )}
 
     </div>
