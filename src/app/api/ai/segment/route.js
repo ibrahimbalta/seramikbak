@@ -15,12 +15,11 @@ function cleanJsonString(str) {
 // Helper to determine the best Gemini model name
 async function getBestGeminiModel(apiKey) {
   const preferredModels = [
+    'gemini-3.6-flash',
+    'gemini-3.5-flash',
+    'gemini-3-flash-preview',
     'gemini-2.5-flash',
-    'gemini-2.5-pro',
-    'gemini-2.0-flash',
-    'gemini-1.5-flash-latest',
-    'gemini-1.5-flash',
-    'gemini-1.5-pro'
+    'gemini-flash-latest'
   ];
 
   try {
@@ -43,7 +42,7 @@ async function getBestGeminiModel(apiKey) {
   } catch (err) {
     console.error('[AI Segment] Gemini list models failed:', err);
   }
-  return 'gemini-2.0-flash';
+  return 'gemini-3.6-flash';
 }
 
 // Helper to determine the best Grok model name

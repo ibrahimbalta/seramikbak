@@ -32,10 +32,12 @@ async function getGeminiKey(request) {
 async function getImageGenModel(apiKey) {
   // Models that support generateContent with image output
   const preferredModels = [
+    'gemini-2.5-flash-image',
+    'gemini-3.1-flash-image',
+    'gemini-3-pro-image',
     'gemini-2.0-flash-exp',
-    'gemini-2.0-flash-preview-image-generation',
     'gemini-2.0-flash',
-    'gemini-2.5-flash',
+    'gemini-2.5-flash'
   ];
 
   try {
@@ -55,7 +57,7 @@ async function getImageGenModel(apiKey) {
   } catch (err) {
     console.error('[AI Re-Tile] Failed to list Gemini models:', err.message);
   }
-  return 'gemini-2.0-flash-exp';
+  return 'gemini-2.5-flash-image';
 }
 
 // ---------------------------------------------------------------------------
