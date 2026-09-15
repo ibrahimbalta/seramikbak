@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
 // Helper to sanitize JSON response
 function cleanJsonString(str) {
@@ -101,9 +102,28 @@ export async function POST(request) {
     // Strip base64 headers if present
     const base64Data = image.includes('base64,') ? image.split('base64,')[1] : image;
 
-    // Get AI Provider and Key from headers
-    const provider = request.headers.get('x-ai-provider') || 'grok'; // Default to grok
-    const apiKey = request.headers.get('x-ai-key') || request.headers.get('x-gemini-key') || process.env.GROK_API_KEY || process.env.GEMINI_API_KEY;
+    // Get AI settings from Database
+    let dbProvider = 'gemini';
+    let dbGeminiKey = '';
+    let dbGrokKey = '';
+    try {
+      const settings = await prisma.systemSetting.findMany();
+      settings.forEach(s => {
+        if (s.key === 'ai_provider') dbProvider = s.value;
+        if (s.key === 'gemini_api_key') dbGeminiKey = s.value;
+        if (s.key === 'grok_api_key') dbGrokKey = s.value;
+      });
+    } catch (dbErr) {
+      console.warn('[AI Segment] DB settings fetch failed:', dbErr.message);
+    }
+
+    // Get AI Provider and Key from headers or database or env
+    const provider = request.headers.get('x-ai-provider') || dbProvider || 'gemini';
+    const apiKey = request.headers.get('x-ai-key') || 
+                   (provider === 'grok' ? dbGrokKey : dbGeminiKey) || 
+                   (provider === 'grok' ? process.env.GROK_API_KEY : process.env.GEMINI_API_KEY) ||
+                   dbGeminiKey ||
+                   process.env.GEMINI_API_KEY;
 
     // If no API Key is provided, use calibrated fallbacks
     if (!apiKey) {

@@ -1,10 +1,24 @@
 import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
 // ---------------------------------------------------------------------------
-// Helper: Retrieve Gemini API Key
+// Helper: Retrieve Gemini API Key (from DB SystemSetting or headers or env)
 // ---------------------------------------------------------------------------
-function getGeminiKey(request) {
+async function getGeminiKey(request) {
+  let dbKey = '';
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: 'gemini_api_key' }
+    });
+    if (setting?.value) {
+      dbKey = setting.value;
+    }
+  } catch (err) {
+    console.warn('[AI Re-Tile] Could not read gemini_api_key from DB:', err.message);
+  }
+
   return (
+    dbKey ||
     request.headers.get('x-ai-key') ||
     request.headers.get('x-gemini-key') ||
     process.env.GEMINI_API_KEY ||
@@ -111,7 +125,7 @@ export async function POST(req) {
     } = body;
 
     const fallbackVisual = getModelMatchedTileVisual({ style, color, name: productName, roomType });
-    const geminiKey = getGeminiKey(req);
+    const geminiKey = await getGeminiKey(req);
 
     // -----------------------------------------------------------------------
     // Strategy 1: Gemini Image Editing (Best Quality — like ChatGPT)
