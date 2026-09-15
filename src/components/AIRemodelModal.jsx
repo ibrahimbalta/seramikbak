@@ -139,6 +139,7 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           image: activePhoto,
+          tileImageUrl: targetTile?.imageUrl || '',
           productName: targetTile?.name || 'Calacatta Gold',
           productCode: targetTile?.code || '',
           style: targetTile?.style || 'Mermer',
