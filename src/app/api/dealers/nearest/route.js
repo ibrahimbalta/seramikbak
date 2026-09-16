@@ -46,7 +46,7 @@ export async function GET(request) {
           where: { id: productId },
           select: { id: true, name: true, brandId: true, brand: { select: { id: true, name: true } } }
         });
-        if (productDetails?.brandId && (!targetBrandId || targetBrandId === 'all')) {
+        if (productDetails?.brandId && (!targetBrandId || targetBrandId === 'all' || targetBrandId === 'undefined')) {
           targetBrandId = productDetails.brandId;
         }
       } catch (pErr) {
@@ -54,13 +54,40 @@ export async function GET(request) {
       }
     }
 
-    // Retrieve approved dealers with their brand and inventories
+    // Resolve brand ID if it was passed as a slug or name instead of a UUID
+    let resolvedBrandId = null;
+    if (targetBrandId && targetBrandId !== 'all' && targetBrandId !== 'undefined' && targetBrandId !== 'null') {
+      try {
+        const brandMatch = await prisma.brand.findFirst({
+          where: {
+            OR: [
+              { id: targetBrandId },
+              { slug: targetBrandId.toLowerCase() },
+              { name: { equals: targetBrandId, mode: 'insensitive' } }
+            ]
+          },
+          select: { id: true }
+        });
+        resolvedBrandId = brandMatch ? brandMatch.id : targetBrandId;
+      } catch (bErr) {
+        resolvedBrandId = targetBrandId;
+      }
+    }
+
+    // Strict where clause: ONLY dealers with APPROVED status, and IF brand is specified, ONLY that brand's dealers!
+    const whereClause = {
+      status: {
+        in: ['APPROVED', 'approved']
+      }
+    };
+
+    if (resolvedBrandId) {
+      whereClause.brandId = resolvedBrandId;
+    }
+
+    // Retrieve approved dealers strictly for the requested brand
     const dealers = await prisma.dealer.findMany({
-      where: {
-        status: {
-          in: ['APPROVED', 'approved']
-        }
-      },
+      where: whereClause,
       include: {
         brand: {
           select: { id: true, name: true }
@@ -81,28 +108,14 @@ export async function GET(request) {
       return NextResponse.json([]);
     }
 
-    // Filter candidate dealers:
-    // If a brand is specified and there are registered dealers for this brand,
-    // only return authorized dealers of this brand (or dealers holding this product in stock).
-    let candidateDealers = dealers;
-    if (targetBrandId && targetBrandId !== 'all') {
-      const brandDealers = dealers.filter(
-        (d) => d.brandId === targetBrandId || (d.inventories && d.inventories.length > 0)
-      );
-      if (brandDealers.length > 0) {
-        candidateDealers = brandDealers;
-      }
-    }
-
-    // Compute distance and product availability for each dealer
-    const dealersWithMetadata = candidateDealers.map((dealer) => {
+    // Compute distance and product availability for each dealer of this brand
+    const dealersWithMetadata = dealers.map((dealer) => {
       const dLat = typeof dealer.lat === 'number' ? dealer.lat : (parseFloat(dealer.lat) || 41.0082);
       const dLng = typeof dealer.lng === 'number' ? dealer.lng : (parseFloat(dealer.lng) || 28.9784);
       const rawDistance = haversineDistance(userLat, userLng, dLat, dLng);
       const distance = isNaN(rawDistance) ? 10 : rawDistance;
 
       const hasProductInInventory = dealer.inventories && dealer.inventories.length > 0;
-      const isSameBrand = targetBrandId ? dealer.brandId === targetBrandId : false;
 
       return {
         id: dealer.id,
@@ -121,22 +134,15 @@ export async function GET(request) {
         bannerUrl: dealer.bannerUrl,
         distanceKm: round(distance, 1),
         hasProductInStock: hasProductInInventory,
-        isAuthorizedBrandDealer: isSameBrand,
+        isAuthorizedBrandDealer: true,
         matchedProduct: productDetails?.name || null
       };
     });
 
-    // Intelligent Sorting:
-    // 1. Dealers holding the product directly in inventory first
-    // 2. Authorized dealers of the same brand second
-    // 3. Closest distance third
+    // Sort strictly by distance (closest first), prioritizing dealers with explicit stock if any
     const sortedDealers = dealersWithMetadata.sort((a, b) => {
       if (a.hasProductInStock && !b.hasProductInStock) return -1;
       if (!a.hasProductInStock && b.hasProductInStock) return 1;
-
-      if (a.isAuthorizedBrandDealer && !b.isAuthorizedBrandDealer) return -1;
-      if (!a.isAuthorizedBrandDealer && b.isAuthorizedBrandDealer) return 1;
-
       return a.distanceKm - b.distanceKm;
     });
 

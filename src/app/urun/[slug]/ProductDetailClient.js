@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -48,6 +48,38 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
   const [activeView, setActiveView] = useState('image'); // 'image' or 'texture'
   const [copied, setCopied] = useState(false);
   const [showImageZoom, setShowImageZoom] = useState(false);
+
+  // Dynamic Nearest Dealers State (strictly for this product's brand)
+  const [liveDealers, setLiveDealers] = useState(authorizedDealers);
+  const [userCoords, setUserCoords] = useState(null);
+
+  // Detect user geolocation to sort nearest dealers for this specific brand
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setUserCoords({ lat, lng });
+
+          const bId = product.brandId || product.brand?.id || '';
+          const pId = product.id || '';
+          fetch(`/api/dealers/nearest?brandId=${encodeURIComponent(bId)}&productId=${encodeURIComponent(pId)}&lat=${lat}&lng=${lng}`)
+            .then(res => res.json())
+            .then(data => {
+              if (Array.isArray(data) && data.length > 0) {
+                setLiveDealers(data);
+              }
+            })
+            .catch(err => console.warn('Could not fetch nearest dealers by location:', err));
+        },
+        (err) => {
+          console.log('Location permission denied or unavailable, using initial dealers:', err.message);
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 }
+      );
+    }
+  }, [product.brandId, product.id]);
 
   // Area Calculator State
   const [showCalculator, setShowCalculator] = useState(false);
@@ -166,12 +198,13 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
     setQuoteSubmitting(true);
     setQuoteError('');
     try {
+      const activeDealers = liveDealers.length > 0 ? liveDealers : authorizedDealers;
       const res = await fetch('/api/leads/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: product.id,
-          dealerId: authorizedDealers[0]?.id || null,
+          dealerId: activeDealers[0]?.id || null,
           clientName: quoteForm.name,
           clientPhone: quoteForm.phone,
           clientEmail: quoteForm.email,
@@ -913,7 +946,12 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               </span>
 
               <a
-                href={authorizedDealers[0]?.phone ? `tel:${authorizedDealers[0]?.phone}` : 'tel:08508880000'}
+                href={
+                  (liveDealers && liveDealers[0]?.phone) ||
+                  (authorizedDealers && authorizedDealers[0]?.phone)
+                    ? `tel:${(liveDealers && liveDealers[0]?.phone) || authorizedDealers[0]?.phone}`
+                    : 'tel:08508880000'
+                }
                 style={{
                   color: '#d4af37',
                   textDecoration: 'none',
@@ -1005,100 +1043,110 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
         </section>
 
         {/* Authorized Dealers Section */}
-        {authorizedDealers.length > 0 && (
-          <section style={{ marginTop: '50px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '4px', height: '24px', background: '#d4af37', borderRadius: '2px' }} />
-                <h2 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#fff', margin: 0 }}>
-                  Bu Karoyu İnceleyebileceğiniz Yetkili Showroomlar
-                </h2>
-              </div>
-              <Link href="/bayiler" style={{ color: '#d4af37', fontSize: '0.85rem', textDecoration: 'none', fontWeight: '700' }}>
-                Tüm Bayileri Gör →
-              </Link>
-            </div>
-
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '16px'
-            }}>
-              {authorizedDealers.slice(0, 3).map((dealer) => (
-                <div
-                  key={dealer.id}
-                  style={{
-                    background: 'rgba(15, 23, 42, 0.8)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    borderRadius: '14px',
-                    padding: '20px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#d4af37', fontSize: '0.75rem', fontWeight: '700', marginBottom: '6px' }}>
-                      <Building2 size={14} />
-                      <span>{dealer.city} / {dealer.district}</span>
-                    </div>
-                    <div style={{ fontSize: '1.05rem', fontWeight: '700', color: '#fff', marginBottom: '8px' }}>
-                      {dealer.name}
-                    </div>
-                    <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.4, marginBottom: '14px' }}>
-                      {dealer.address}
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <a
-                      href={`tel:${dealer.phone}`}
-                      style={{
-                        flex: 1,
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        fontSize: '0.78rem',
-                        fontWeight: '700',
-                        textDecoration: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <Phone size={13} style={{ color: '#10b981' }} />
-                      <span>Ara</span>
-                    </a>
-
-                    <Link
-                      href={`/bayi/${slugify(dealer.name)}`}
-                      style={{
-                        flex: 1.2,
-                        background: 'rgba(212, 175, 55, 0.15)',
-                        color: '#d4af37',
-                        border: '1px solid rgba(212, 175, 55, 0.3)',
-                        padding: '8px 12px',
-                        borderRadius: '8px',
-                        fontSize: '0.78rem',
-                        fontWeight: '700',
-                        textDecoration: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <span>Showroom İncele</span>
-                    </Link>
-                  </div>
+        {((liveDealers && liveDealers.length > 0) || (authorizedDealers && authorizedDealers.length > 0)) && (() => {
+          const displayDealers = liveDealers && liveDealers.length > 0 ? liveDealers : authorizedDealers;
+          return (
+            <section style={{ marginTop: '50px' }} id="authorized-dealers-section">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '4px', height: '24px', background: '#d4af37', borderRadius: '2px' }} />
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#fff', margin: 0 }}>
+                    Bu Karoyu İnceleyebileceğiniz En Yakın Yetkili Showroomlar
+                  </h2>
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+                <Link href="/bayiler" style={{ color: '#d4af37', fontSize: '0.85rem', textDecoration: 'none', fontWeight: '700' }}>
+                  Tüm Bayileri Gör →
+                </Link>
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: '16px'
+              }}>
+                {displayDealers.slice(0, 3).map((dealer) => (
+                  <div
+                    key={dealer.id}
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.8)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '14px',
+                      padding: '20px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between'
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#d4af37', fontSize: '0.75rem', fontWeight: '700' }}>
+                          <Building2 size={14} />
+                          <span>{dealer.city} / {dealer.district}</span>
+                        </div>
+                        {typeof dealer.distanceKm === 'number' && (
+                          <span style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: '700', background: 'rgba(56, 189, 248, 0.1)', padding: '2px 8px', borderRadius: '6px' }}>
+                            {dealer.distanceKm} km
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: '700', color: '#fff', marginBottom: '8px' }}>
+                        {dealer.name}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.4, marginBottom: '14px' }}>
+                        {dealer.address}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <a
+                        href={`tel:${dealer.phone}`}
+                        style={{
+                          flex: 1,
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          color: '#fff',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          fontSize: '0.78rem',
+                          fontWeight: '700',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <Phone size={13} style={{ color: '#10b981' }} />
+                        <span>Ara</span>
+                      </a>
+
+                      <Link
+                        href={`/bayi/${slugify(dealer.name)}`}
+                        style={{
+                          flex: 1.2,
+                          background: 'rgba(212, 175, 55, 0.15)',
+                          color: '#d4af37',
+                          border: '1px solid rgba(212, 175, 55, 0.3)',
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          fontSize: '0.78rem',
+                          fontWeight: '700',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <span>Showroom İncele</span>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        })()}
 
         {/* Related Products Section */}
         {relatedProducts.length > 0 && (

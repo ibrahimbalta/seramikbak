@@ -2519,7 +2519,9 @@ export default function Home() {
     
     // Fetch dealers for the product brand
     try {
-      const res = await fetch(`/api/dealers/nearest?brandId=${product.brandId}&lat=${userCoords.lat}&lng=${userCoords.lng}`);
+      const bId = product.brandId || product.brand?.id || '';
+      const pId = product.id || '';
+      const res = await fetch(`/api/dealers/nearest?brandId=${encodeURIComponent(bId)}&productId=${encodeURIComponent(pId)}&lat=${userCoords.lat}&lng=${userCoords.lng}`);
       if (res.ok) {
         const data = await res.json();
         setDetailDealers(data);
