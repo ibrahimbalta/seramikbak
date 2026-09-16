@@ -126,14 +126,12 @@ export async function POST(request) {
 
     // If no API Key is provided, use calibrated fallbacks
     if (!apiKey) {
-      console.warn(`[AI Segment] No API Key provided for ${provider}. Using local geometric fallback.`);
+      console.warn(`[AI Segment] No API Key provided for ${provider}. Using calibrated geometric fallback.`);
       const fallbackPolygon = target === 'floor' 
-        ? [ [18, 62], [82, 62], [100, 100], [0, 100] ]
-        : [ [5, 5], [95, 5], [95, 62], [5, 62] ];
+        ? [ [0, 54], [100, 54], [100, 100], [0, 100] ]
+        : [ [0, 0], [100, 0], [100, 54], [0, 54] ];
 
-      const fallbackExclude = target === 'floor'
-        ? [ [ [0, 62], [48, 62], [48, 100], [0, 100] ] ]
-        : [ [ [11, 13], [29, 13], [29, 56], [11, 56] ] ];
+      const fallbackExclude = [];
 
       return NextResponse.json({
         success: true,
@@ -144,32 +142,47 @@ export async function POST(request) {
       });
     }
 
-    const prompt = `
-      You are an expert AI system for interior design and computer vision.
-      Analyze this room photo and find the primary ${target === 'floor' ? 'floor surface (zemin)' : 'wall surface (duvar)'}.
-      
-      Identify the 4 corner points of this surface to form a perspective quadrilateral.
-      Order the points clockwise starting from top-left:
-      1. Top-Left corner
-      2. Top-Right corner
-      3. Bottom-Right corner
-      4. Bottom-Left corner
-      
-      Also, detect any foreground objects that lie in front of this surface (such as sinks, mirrors, vanity cabinets, toilets, plants, bath tubs, windows).
-      For each foreground object, outline its shape as a polygon.
-      
-      Return ONLY a JSON object with two keys "polygon" and "exclude":
-      {
-        "polygon": [ [x1, y1], [x2, y2], [x3, y3], [x4, y4] ],
-        "exclude": [
-          [ [e1x, e1y], [e2x, e2y], ... ],
-          ...
-        ]
-      }
-      where each coordinate (x, y) is an integer percentage from 0 to 100 relative to the image width and height.
-      
-      Return ONLY the raw JSON object. Do not wrap in markdown or include backticks.
-    `;
+    const prompt = target === 'floor'
+      ? `You are an expert interior architecture AI system.
+Analyze this room photo and accurately detect the entire FLOOR PLANE (zemin / taban).
+
+1. Find the 4 corner points of the full floor surface in perspective:
+   Order clockwise:
+   - Top-Left: where the back wall or windows meet the floor on the left (e.g. around y=50-60%)
+   - Top-Right: where the back wall or windows meet the floor on the right
+   - Bottom-Right: [100, 100] (bottom right corner of image)
+   - Bottom-Left: [0, 100] (bottom left corner of image)
+   Note: Unless obstructed, bottom corners should be [100, 100] and [0, 100] so the floor covers the entire foreground.
+
+2. Identify any foreground furniture or fixtures standing on the floor that should NOT have tiles painted on top:
+   - Sofas, armchairs, coffee tables, dining tables, chairs
+   - TV console, cabinets, fireplace base, staircase
+   - Bathtubs, sinks, toilets, bathroom vanities
+   Outline each foreground object as a tight polygon of points.
+
+Return ONLY a JSON object:
+{
+  "polygon": [[x1, y1], [x2, y2], [x3, y3], [x4, y4]],
+  "exclude": [
+    [[x, y], [x, y], ...],
+    ...
+  ]
+}
+where each (x, y) is an integer or decimal percentage from 0 to 100. Return raw JSON without markdown.`
+      : `You are an expert interior architecture AI system.
+Analyze this room photo and find the main WALL surfaces (duvar).
+1. Identify the 4 corner points of the wall surface: Top-Left, Top-Right, Bottom-Right, Bottom-Left.
+2. Identify foreground fixtures (mirrors, wall art, lamps, windows, cabinets) to exclude.
+
+Return ONLY a JSON object:
+{
+  "polygon": [[x1, y1], [x2, y2], [x3, y3], [x4, y4]],
+  "exclude": [
+    [[x, y], [x, y], ...],
+    ...
+  ]
+}
+where each (x, y) is an integer or decimal percentage from 0 to 100. Return raw JSON without markdown.`;
 
     let resultText = '';
 
@@ -278,12 +291,10 @@ export async function POST(request) {
     
     // Graceful fallback values
     const fallbackPolygon = target === 'walls'
-      ? [ [5, 5], [95, 5], [95, 62], [5, 62] ]
-      : [ [18, 62], [82, 62], [100, 100], [0, 100] ];
+      ? [ [0, 0], [100, 0], [100, 54], [0, 54] ]
+      : [ [0, 54], [100, 54], [100, 100], [0, 100] ];
 
-    const fallbackExclude = target === 'walls'
-      ? [ [ [11, 13], [29, 13], [29, 56], [11, 56] ] ]
-      : [ [ [0, 62], [48, 62], [48, 100], [0, 100] ] ];
+    const fallbackExclude = [];
 
     return NextResponse.json({
       success: true,

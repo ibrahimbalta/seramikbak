@@ -98,17 +98,46 @@ function drawTexturedTriangle(ctx, img, srcTri, dstTri) {
  * @param {string} groutColor - Grout line CSS color
  * @returns {HTMLCanvasElement} Pattern canvas
  */
-export function createTiledPattern(tileImg, cols, rows, tileWCm, tileHCm, groutPx, groutColor) {
-  // Scale tile cells proportionally to real-world dimensions
-  const basePx = 100;
-  const ratio = tileWCm / tileHCm;
+// ---------------------------------------------------------------------------
+// Pattern Generation
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a tiled pattern canvas with realistic grout lines, proportional tile sizing,
+ * staggered running bond for wood/plank tiles, and natural tile-to-tile shade variation.
+ *
+ * @param {HTMLImageElement} tileImg - The tile texture image
+ * @param {number} cols - Number of tile columns in pattern
+ * @param {number} rows - Number of tile rows in pattern
+ * @param {number} tileWCm - Real-world tile width in cm (e.g., 20, 60)
+ * @param {number} tileHCm - Real-world tile height in cm (e.g., 60, 120)
+ * @param {number} groutPx - Grout line width in pixels
+ * @param {string} groutColor - Grout line CSS color
+ * @returns {HTMLCanvasElement} Pattern canvas
+ */
+export function createTiledPattern(tileImg, cols, rows, tileWCm = 60, tileHCm = 120, groutPx = 2, groutColor = '#3e3832') {
+  const ratio = (tileWCm || 60) / (tileHCm || 120);
+  const isPlank = ratio <= 0.35 || ratio >= 2.8;
+
   let cellW, cellH;
-  if (ratio >= 1) {
-    cellH = basePx;
-    cellW = Math.round(basePx * ratio);
+  if (isPlank) {
+    // Narrow plank e.g. 20x120
+    cellW = 56;
+    cellH = Math.round(56 / Math.min(ratio, 1 / ratio));
+    cols = Math.max(cols, 28);
+    rows = Math.max(rows, 14);
+  } else if (Math.abs(ratio - 1) < 0.1) {
+    // Square tile e.g. 60x60
+    cellW = 120;
+    cellH = 120;
+    cols = Math.max(cols, 14);
+    rows = Math.max(rows, 14);
   } else {
-    cellW = basePx;
-    cellH = Math.round(basePx / ratio);
+    // Rectangular tile e.g. 60x120
+    cellW = 90;
+    cellH = Math.round(90 / ratio);
+    cols = Math.max(cols, 16);
+    rows = Math.max(rows, 12);
   }
 
   const patternW = cols * (cellW + groutPx) + groutPx;
@@ -123,12 +152,25 @@ export function createTiledPattern(tileImg, cols, rows, tileWCm, tileHCm, groutP
   ctx.fillStyle = groutColor;
   ctx.fillRect(0, 0, patternW, patternH);
 
-  // Draw each tile cell
+  // Draw tile grid with staggered running bond for planks
   for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const x = groutPx + c * (cellW + groutPx);
+    // Stagger every row by 1/3 for wood planks (derz şaşırtmalı)
+    const rowOffset = isPlank ? ((r % 3) * (cellW / 3)) : 0;
+
+    for (let c = -1; c <= cols + 1; c++) {
+      const x = groutPx + c * (cellW + groutPx) + rowOffset;
       const y = groutPx + r * (cellH + groutPx);
+
+      // Draw tile image
       ctx.drawImage(tileImg, x, y, cellW, cellH);
+
+      // Natural ceramic/wood tone variation (±3% lightness) to avoid repetitive stamp look
+      const hash = Math.sin(r * 12.9898 + c * 78.233) * 43758.5453;
+      const variance = (hash - Math.floor(hash)) * 0.08 - 0.04;
+      if (Math.abs(variance) > 0.012) {
+        ctx.fillStyle = variance > 0 ? `rgba(255,255,255,${variance})` : `rgba(0,0,0,${Math.abs(variance)})`;
+        ctx.fillRect(x, y, cellW, cellH);
+      }
     }
   }
 
@@ -140,18 +182,10 @@ export function createTiledPattern(tileImg, cols, rows, tileWCm, tileHCm, groutP
 // ---------------------------------------------------------------------------
 
 /**
- * Render a tiled pattern onto a perspective quadrilateral with exclusion zones.
- *
- * Uses mesh subdivision: divides the quad into NxN sub-quads, then renders
- * each as 2 affine-transformed triangles for smooth perspective approximation.
- *
- * @param {CanvasRenderingContext2D} ctx - The rendering context
- * @param {HTMLCanvasElement} pattern - The tiled pattern canvas
- * @param {Array} quad - [[x,y],...] 4 corners in pixel coords (TL, TR, BR, BL)
- * @param {Array} excludes - Array of polygons (pixel coords) to exclude
- * @param {number} subs - Number of subdivisions per axis (higher = smoother)
+ * Render a tiled pattern onto a perspective quadrilateral with exclusion zones
+ * using perspective foreshortening mesh subdivision.
  */
-export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs) {
+export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28) {
   const pw = pattern.width;
   const ph = pattern.height;
 
@@ -165,7 +199,7 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs) {
   }
   ctx.closePath();
 
-  // Cut out exclusion regions (sinks, mirrors, toilets, cabinets, etc.)
+  // Cut out exclusion regions (sofas, tables, cabinets, sinks, toilets, etc.)
   if (excludes && excludes.length > 0) {
     excludes.forEach((poly) => {
       if (poly && poly.length >= 3) {
@@ -179,15 +213,23 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs) {
   }
   ctx.clip('evenodd');
 
+  // Perspective foreshortening exponent
+  // Real world cameras compress depth non-linearly towards the horizon
+  const depthPower = 1.65;
+
   // Render subdivided perspective-mapped tiles
   for (let j = 0; j < subs; j++) {
     for (let i = 0; i < subs; i++) {
       const u0 = i / subs;
       const u1 = (i + 1) / subs;
-      const v0 = j / subs;
-      const v1 = (j + 1) / subs;
 
-      // 4 corners of sub-quad in canvas space (bilinear interpolated)
+      // Apply non-linear perspective depth weighting along v
+      const v0Linear = j / subs;
+      const v1Linear = (j + 1) / subs;
+      const v0 = Math.pow(v0Linear, depthPower);
+      const v1 = Math.pow(v1Linear, depthPower);
+
+      // 4 corners of sub-quad in canvas space
       const p00 = bilinear(quad, u0, v0);
       const p10 = bilinear(quad, u1, v0);
       const p01 = bilinear(quad, u0, v1);
@@ -196,11 +238,10 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs) {
       // Corresponding source region in pattern texture
       const sx0 = u0 * pw;
       const sx1 = u1 * pw;
-      const sy0 = v0 * ph;
-      const sy1 = v1 * ph;
+      const sy0 = v0Linear * ph;
+      const sy1 = v1Linear * ph;
 
       // Draw as 2 triangles for proper perspective approximation
-      // Triangle 1: top-left triangle
       drawTexturedTriangle(
         ctx,
         pattern,
@@ -208,7 +249,6 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs) {
         [p00, p10, p01]
       );
 
-      // Triangle 2: bottom-right triangle
       drawTexturedTriangle(
         ctx,
         pattern,
@@ -226,29 +266,26 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs) {
 // ---------------------------------------------------------------------------
 
 /**
- * Generate a complete tile preview image.
- *
- * @param {HTMLImageElement} roomImg - The room photo
- * @param {HTMLImageElement} tileImg - The tile texture
- * @param {Object} surfaces - { floor: { polygon, exclude }, walls: { polygon, exclude } }
- * @param {Object} options - Rendering options
- * @returns {string} Data URL of the result image (JPEG)
+ * Generate a complete, photorealistic tile preview image with multi-pass compositing:
+ * - High-res perspective mapped ceramic tiles
+ * - Contact shadow preservation (Multiply pass)
+ * - Window light and specular reflection preservation (Screen pass)
+ * - Natural ambient contrast (Soft-light pass)
  */
 export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
   const {
-    groutColor = '#c8c8c8',
-    groutWidth = 2,
+    groutColor,
+    groutWidth = 1.5,
     tileWCm = 60,
     tileHCm = 120,
-    opacity = 0.88,
-    subdivisions = 14,
+    subdivisions = 28,
   } = options;
 
   const imgW = roomImg.naturalWidth || roomImg.width;
   const imgH = roomImg.naturalHeight || roomImg.height;
 
-  // Cap canvas size for performance
-  const maxDim = 1200;
+  // High resolution canvas for sharp grout lines and textures
+  const maxDim = 1400;
   let canvasW = imgW;
   let canvasH = imgH;
   if (Math.max(imgW, imgH) > maxDim) {
@@ -262,19 +299,40 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
   canvas.height = canvasH;
   const ctx = canvas.getContext('2d');
 
-  // Step 1: Draw original room photo as base layer
+  // Step 1: Draw base room photo
   ctx.drawImage(roomImg, 0, 0, canvasW, canvasH);
 
-  // Step 2: Create tile pattern with proportional sizing and grout lines
-  const pattern = createTiledPattern(tileImg, 8, 8, tileWCm, tileHCm, groutWidth, groutColor);
+  // Determine tile characteristics
+  const ratio = (tileWCm || 60) / (tileHCm || 120);
+  const isPlank = ratio <= 0.35 || ratio >= 2.8;
 
-  // Step 3: Render tiles on each detected surface
+  // Automatic realistic grout color
+  let resolvedGrout = groutColor;
+  if (!resolvedGrout) {
+    if (isPlank) resolvedGrout = '#28201a'; // warm deep wood grout
+    else if (tileWCm >= 60 && tileHCm >= 120) resolvedGrout = '#818cf8'; // subtle clean line
+    else resolvedGrout = '#94a3b8';
+  }
+
+  const cols = isPlank ? 30 : 16;
+  const rows = isPlank ? 16 : 14;
+
+  // Step 2: Create tile pattern with proportional sizing and grout lines
+  const pattern = createTiledPattern(tileImg, cols, rows, tileWCm, tileHCm, groutWidth, resolvedGrout);
+
+  // Step 3: Offscreen layer for rendered tiles
+  const tileLayer = document.createElement('canvas');
+  tileLayer.width = canvasW;
+  tileLayer.height = canvasH;
+  const tCtx = tileLayer.getContext('2d');
+
+  let floorQuad = null;
   const surfaceTypes = ['floor', 'walls'];
+
   surfaceTypes.forEach((type) => {
     const surf = surfaces[type];
     if (!surf || !surf.polygon || surf.polygon.length < 4) return;
 
-    // Convert percentage coordinates (0-100) to pixel coordinates
     const quad = surf.polygon.map(([x, y]) => [
       (x / 100) * canvasW,
       (y / 100) * canvasH,
@@ -284,21 +342,63 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
       poly.map(([x, y]) => [(x / 100) * canvasW, (y / 100) * canvasH])
     );
 
-    // Draw tiles with partial opacity for natural blending
-    ctx.save();
-    ctx.globalAlpha = opacity;
-    renderPerspectiveTiles(ctx, pattern, quad, excludePixels, subdivisions);
-    ctx.restore();
+    if (type === 'floor') {
+      floorQuad = quad;
+    }
+
+    renderPerspectiveTiles(tCtx, pattern, quad, excludePixels, subdivisions);
   });
 
-  // Step 4: Subtle multiply blend to preserve original shadows and lighting
+  // Step 4: Draw tiles onto canvas
   ctx.save();
-  ctx.globalCompositeOperation = 'multiply';
-  ctx.globalAlpha = 0.18;
-  ctx.drawImage(roomImg, 0, 0, canvasW, canvasH);
+  ctx.globalAlpha = 0.95;
+  ctx.drawImage(tileLayer, 0, 0);
   ctx.restore();
 
-  return canvas.toDataURL('image/jpeg', 0.92);
+  // Step 5: Contact Shadows Pass (Multiply blend with floor quad clip)
+  // Keeps dark ambient shadows under furniture, sofas, tables, fireplace
+  if (floorQuad) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(floorQuad[0][0], floorQuad[0][1]);
+    for (let i = 1; i < floorQuad.length; i++) ctx.lineTo(floorQuad[i][0], floorQuad[i][1]);
+    ctx.closePath();
+    ctx.clip();
+
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.globalAlpha = 0.65;
+    ctx.drawImage(roomImg, 0, 0, canvasW, canvasH);
+    ctx.restore();
+
+    // Step 6: Window Daylight & Specular Reflection Pass (Screen blend)
+    // Preserves sunlight pouring from windows and natural floor glare
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(floorQuad[0][0], floorQuad[0][1]);
+    for (let i = 1; i < floorQuad.length; i++) ctx.lineTo(floorQuad[i][0], floorQuad[i][1]);
+    ctx.closePath();
+    ctx.clip();
+
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = 0.28;
+    ctx.drawImage(roomImg, 0, 0, canvasW, canvasH);
+    ctx.restore();
+
+    // Step 7: Natural Tone Contrast (Soft-light blend)
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(floorQuad[0][0], floorQuad[0][1]);
+    for (let i = 1; i < floorQuad.length; i++) ctx.lineTo(floorQuad[i][0], floorQuad[i][1]);
+    ctx.closePath();
+    ctx.clip();
+
+    ctx.globalCompositeOperation = 'soft-light';
+    ctx.globalAlpha = 0.35;
+    ctx.drawImage(roomImg, 0, 0, canvasW, canvasH);
+    ctx.restore();
+  }
+
+  return canvas.toDataURL('image/jpeg', 0.93);
 }
 
 // ---------------------------------------------------------------------------
