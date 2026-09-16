@@ -77,6 +77,20 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
   const [photoPreview, setPhotoPreview] = useState('/hero/luxury_bathroom.png');
   const [selectedTile, setSelectedTile] = useState(selectedProduct || presetTiles[0]);
 
+  // Sync selectedTile whenever selectedProduct prop changes
+  React.useEffect(() => {
+    if (selectedProduct) {
+      const formatted = {
+        ...selectedProduct,
+        imageUrl: selectedProduct.textureUrl || selectedProduct.imageUrl || presetTiles[0].imageUrl,
+        width: selectedProduct.width || 60,
+        height: selectedProduct.height || 120,
+        name: selectedProduct.name || 'Seçili Seramik'
+      };
+      setSelectedTile(formatted);
+    }
+  }, [selectedProduct]);
+
   const [roomType, setRoomType] = useState('banyo');
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStepText, setLoadingStepText] = useState('');
@@ -117,56 +131,10 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
     setErrorMsg('');
   };
 
+  // Main Action: AI surface detection + perspective texture mapping onto user's uploaded room
   const handleGenerateAIRemodel = async (targetTile = selectedTile) => {
-    const activePhoto = photoPreview || '/hero/luxury_bathroom.png';
-
-    setIsGenerating(true);
-    setErrorMsg('');
-
-    setLoadingStepText('1. Mekan derinliği ve yüzey mimarisi haritalandırılıyor...');
-    
-    const stepTimer1 = setTimeout(() => {
-      setLoadingStepText('2. Seçilen seramiğin dokusu, derz ve ışık açıları hesaplanıyor...');
-    }, 1200);
-
-    const stepTimer2 = setTimeout(() => {
-      setLoadingStepText('3. Yapay zeka mekandaki duvar ve zeminleri yeniden çiziyor...');
-    }, 2800);
-
-    try {
-      const response = await fetch('/api/ai/re-tile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image: activePhoto,
-          tileImageUrl: targetTile?.imageUrl || '',
-          productName: targetTile?.name || 'Calacatta Gold',
-          productCode: targetTile?.code || '',
-          style: targetTile?.style || 'Mermer',
-          color: targetTile?.color || 'Beyaz',
-          finish: targetTile?.finish || 'Parlak',
-          width: targetTile?.width || 60,
-          height: targetTile?.height || 120,
-          roomType: roomType
-        })
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.imageUrl) {
-        setAiResultImage(data.imageUrl);
-      } else {
-        throw new Error(data.error || 'Yapay zeka görseli oluşturamadı.');
-      }
-    } catch (err) {
-      console.error('AI Remodel client error:', err);
-      const modelVisual = getFallbackTileVisual(targetTile);
-      setAiResultImage(modelVisual);
-    } finally {
-      clearTimeout(stepTimer1);
-      clearTimeout(stepTimer2);
-      setIsGenerating(false);
-    }
+    // Directly run perspective texture mapping onto the user's uploaded room
+    return handleQuickPreview(targetTile);
   };
 
   const handleSliderMove = (clientX) => {
@@ -255,19 +223,20 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
       };
 
       // Load room photo and tile texture images
+      const tileSource = targetTile?.textureUrl || targetTile?.imageUrl || '/textures/calacatta_gold.jpg';
       const [roomImg, tileImg] = await Promise.all([
         loadImage(photoPreview),
-        loadImage(targetTile?.imageUrl || '/textures/calacatta_gold.jpg'),
+        loadImage(tileSource).catch(() => loadImage('/textures/calacatta_gold.jpg')),
       ]);
 
       // Generate preview using Canvas 2D perspective mapping (client-side, $0 cost)
       const resultDataUrl = generateTilePreview(roomImg, tileImg, surfaces, {
-        groutColor: '#d4d4d4',
+        groutColor: targetTile?.color?.toLowerCase().includes('antrasit') || targetTile?.color?.toLowerCase().includes('siyah') ? '#334155' : '#e2e8f0',
         groutWidth: 2,
         tileWCm: targetTile?.width || 60,
         tileHCm: targetTile?.height || 120,
-        opacity: 0.88,
-        subdivisions: 14,
+        opacity: 0.90,
+        subdivisions: 16,
       });
 
       setAiResultImage(resultDataUrl);
@@ -477,44 +446,15 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
 
             {/* Action Button */}
             <button 
-              onClick={() => handleQuickPreview(selectedTile)}
-              style={{
-                width: '100%',
-                padding: '14px',
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                color: '#ffffff',
-                fontWeight: '900',
-                fontSize: '0.95rem',
-                border: 'none',
-                cursor: 'pointer',
-                boxShadow: '0 8px 24px rgba(59,130,246,0.35)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                transition: 'all 0.25s ease'
-              }}
-            >
-              <Zap size={20} />
-              <span>⚡ Hızlı Önizleme — Anında Seramiği Döşe (Ücretsiz)</span>
-            </button>
-
-            <div style={{ textAlign: 'center', fontSize: '0.72rem', color: '#64748b', fontWeight: '700', padding: '4px 0' }}>
-              — veya —
-            </div>
-
-            {/* Existing Generative AI Button (kept as-is) */}
-            <button 
               onClick={() => handleGenerateAIRemodel(selectedTile)}
               style={{
                 width: '100%',
-                padding: '14px',
+                padding: '16px',
                 borderRadius: '16px',
                 background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                color: '#ffffff',
+                color: '#090d16',
                 fontWeight: '900',
-                fontSize: '0.95rem',
+                fontSize: '1rem',
                 border: 'none',
                 cursor: 'pointer',
                 boxShadow: '0 8px 24px rgba(212,175,55,0.35)',
@@ -525,8 +465,8 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                 transition: 'all 0.25s ease'
               }}
             >
-              <Sparkles size={20} />
-              <span>Yapay Zeka İle Seramiği Mekana Döşe (Generative AI)</span>
+              <Sparkles size={22} style={{ color: '#090d16' }} />
+              <span>Yapay Zeka ile Bu Banyonun Üzerine Döşe (Canlı Dönüşüm)</span>
             </button>
           </div>
         )}
