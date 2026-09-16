@@ -12,38 +12,14 @@ function cleanJsonString(str) {
   return cleaned;
 }
 
-// Helper to determine the best Gemini model name
-async function getBestGeminiModel(apiKey) {
-  const preferredModels = [
-    'gemini-3.6-flash',
-    'gemini-3.5-flash',
-    'gemini-3-flash-preview',
-    'gemini-2.5-flash',
-    'gemini-flash-latest'
-  ];
-
-  try {
-    const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
-    const response = await fetch(listUrl);
-    if (response.ok) {
-      const data = await response.json();
-      const availableModels = data.models || [];
-      const genModels = availableModels
-        .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
-        .map(m => m.name.replace('models/', ''));
-
-      for (const pref of preferredModels) {
-        if (genModels.includes(pref)) {
-          return pref;
-        }
-      }
-      if (genModels.length > 0) return genModels[0];
-    }
-  } catch (err) {
-    console.error('[AI Segment] Gemini list models failed:', err);
-  }
-  return 'gemini-3.6-flash';
-}
+// Pool of Gemini models with automatic fallback
+const GEMINI_MODELS = [
+  'gemini-3.5-flash',
+  'gemini-flash-latest',
+  'gemini-3.5-flash-lite',
+  'gemini-3.8-flash',
+  'gemini-3.6-flash'
+];
 
 // Helper to determine the best Grok model name
 async function getBestGrokModel(apiKey) {
@@ -124,65 +100,137 @@ export async function POST(request) {
                    dbGeminiKey ||
                    process.env.GEMINI_API_KEY;
 
-    // If no API Key is provided, use calibrated fallbacks
+    // Architectural fallbacks (preserving ceiling, mirrors, and windows)
+    const fallbackFloor = {
+      polygon: [ [0, 62], [100, 62], [100, 100], [0, 100] ],
+      exclude: [ [ [40, 55], [60, 55], [60, 70], [40, 70] ] ]
+    };
+
+    const fallbackWalls = [
+      {
+        name: 'left_wall',
+        polygon: [ [0, 18], [35, 20], [35, 62], [0, 62] ],
+        exclude: []
+      },
+      {
+        name: 'right_wall',
+        polygon: [ [65, 20], [100, 18], [100, 62], [65, 62] ],
+        exclude: [ [ [68, 18], [96, 18], [96, 52], [68, 52] ] ]
+      },
+      {
+        name: 'back_wall',
+        polygon: [ [35, 20], [65, 20], [65, 62], [35, 62] ],
+        exclude: [ [ [40, 25], [60, 25], [60, 55], [40, 55] ] ]
+      }
+    ];
+
+    // If no API Key is provided, use calibrated architectural fallback
     if (!apiKey) {
-      console.warn(`[AI Segment] No API Key provided for ${provider}. Using calibrated geometric fallback.`);
-      const fallbackPolygon = target === 'floor' 
-        ? [ [0, 54], [100, 54], [100, 100], [0, 100] ]
-        : [ [0, 0], [100, 0], [100, 54], [0, 54] ];
-
-      const fallbackExclude = [];
-
+      console.warn(`[AI Segment] No API Key provided for ${provider}. Using calibrated fallback.`);
+      if (target === 'all' || target === 'both') {
+        return NextResponse.json({
+          success: true,
+          floor: fallbackFloor,
+          walls: fallbackWalls,
+          isFallback: true
+        });
+      }
+      if (target === 'walls') {
+        return NextResponse.json({
+          success: true,
+          walls: fallbackWalls,
+          polygon: fallbackWalls[0].polygon,
+          exclude: fallbackWalls[0].exclude,
+          isFallback: true
+        });
+      }
       return NextResponse.json({
         success: true,
-        polygon: fallbackPolygon,
-        exclude: fallbackExclude,
-        isFallback: true,
-        message: 'API Key missing. Pre-calibrated fallback applied.'
+        polygon: fallbackFloor.polygon,
+        exclude: fallbackFloor.exclude,
+        isFallback: true
       });
     }
 
-    const prompt = target === 'floor'
-      ? `You are an expert interior architecture AI system.
-Analyze this room photo and accurately detect the entire FLOOR PLANE (zemin / taban).
+    let prompt = '';
+    if (target === 'all' || target === 'both') {
+      prompt = `You are an expert interior architecture AI system.
+Analyze this room photo for ceramic tile remodel.
+Identify the floor and vertical wall surfaces.
 
-1. Find the 4 corner points of the full floor surface in perspective:
-   Order clockwise:
-   - Top-Left: where the back wall or windows meet the floor on the left (e.g. around y=50-60%)
-   - Top-Right: where the back wall or windows meet the floor on the right
-   - Bottom-Right: [100, 100] (bottom right corner of image)
-   - Bottom-Left: [0, 100] (bottom left corner of image)
-   Note: Unless obstructed, bottom corners should be [100, 100] and [0, 100] so the floor covers the entire foreground.
+CRITICAL ARCHITECTURAL RULES:
+1. FLOOR (zemin): Ground plane starting at bottom (y=100) extending to base of walls. Exclude furniture/fixtures (bathtub, stool, vanity).
+2. WALLS (duvarlar): Only actual vertical wall surfaces.
+   - The CEILING (top 15-25% of image with lights/plaster) is NEVER a wall. Do NOT include ceiling!
+   - WINDOWS and outdoor views are NEVER walls. Exclude all windows!
+   - MIRRORS (ayna) are NEVER walls. Exclude all mirrors!
+   - Separate walls into distinct quads (left_wall, right_wall, back_wall).
 
-2. Identify any foreground furniture or fixtures standing on the floor that should NOT have tiles painted on top:
-   - Sofas, armchairs, coffee tables, dining tables, chairs
-   - TV console, cabinets, fireplace base, staircase
-   - Bathtubs, sinks, toilets, bathroom vanities
-   Outline each foreground object as a tight polygon of points.
-
-Return ONLY a JSON object:
+Return ONLY valid JSON:
 {
-  "polygon": [[x1, y1], [x2, y2], [x3, y3], [x4, y4]],
-  "exclude": [
-    [[x, y], [x, y], ...],
-    ...
+  "floor": {
+    "polygon": [[x1,y1],[x2,y2],[x3,y3],[x4,y4]],
+    "exclude": [ [[x,y],...], ... ]
+  },
+  "walls": [
+    {
+      "name": "left_wall",
+      "polygon": [[x1,y1],[x2,y2],[x3,y3],[x4,y4]],
+      "exclude": [ [[x,y],...], ... ]
+    },
+    {
+      "name": "right_wall",
+      "polygon": [[x1,y1],[x2,y2],[x3,y3],[x4,y4]],
+      "exclude": [ [[x,y],...], ... ]
+    },
+    {
+      "name": "back_wall",
+      "polygon": [[x1,y1],[x2,y2],[x3,y3],[x4,y4]],
+      "exclude": [ [[x,y],...], ... ]
+    }
   ]
 }
-where each (x, y) is an integer or decimal percentage from 0 to 100. Return raw JSON without markdown.`
-      : `You are an expert interior architecture AI system.
-Analyze this room photo and find the main WALL surfaces (duvar).
-1. Identify the 4 corner points of the wall surface: Top-Left, Top-Right, Bottom-Right, Bottom-Left.
-2. Identify foreground fixtures (mirrors, wall art, lamps, windows, cabinets) to exclude.
+Coordinates are percentage (0-100). Return raw JSON only.`;
+    } else if (target === 'walls') {
+      prompt = `You are an expert interior architecture AI system.
+Analyze this room photo and find ONLY the vertical WALL surfaces (duvarlar) that can have tiles.
 
-Return ONLY a JSON object:
+CRITICAL RULES:
+- The CEILING (top of image) is NEVER a wall. Do NOT include the ceiling!
+- WINDOWS and outdoor views are NEVER walls. Exclude all windows!
+- MIRRORS are NEVER walls. Exclude all mirrors!
+- Return individual wall quads: left_wall, right_wall, and back_wall.
+
+Return ONLY valid JSON:
 {
-  "polygon": [[x1, y1], [x2, y2], [x3, y3], [x4, y4]],
-  "exclude": [
-    [[x, y], [x, y], ...],
-    ...
+  "walls": [
+    {
+      "name": "left_wall",
+      "polygon": [[x1,y1],[x2,y2],[x3,y3],[x4,y4]],
+      "exclude": [ [[x,y],...], ... ]
+    },
+    {
+      "name": "right_wall",
+      "polygon": [[x1,y1],[x2,y2],[x3,y3],[x4,y4]],
+      "exclude": [ [[x,y],...], ... ]
+    }
   ]
 }
-where each (x, y) is an integer or decimal percentage from 0 to 100. Return raw JSON without markdown.`;
+Coordinates are percentage (0-100). Return raw JSON only.`;
+    } else {
+      // floor
+      prompt = `You are an expert interior architecture AI system.
+Analyze this room photo and detect the FLOOR PLANE (zemin / taban).
+1. Order clockwise: Top-Left, Top-Right, Bottom-Right [100,100], Bottom-Left [0,100].
+2. Identify foreground fixtures on the floor to exclude (bathtub, vanity, sofa, table, stool).
+
+Return ONLY valid JSON:
+{
+  "polygon": [[x1,y1],[x2,y2],[x3,y3],[x4,y4]],
+  "exclude": [ [[x,y],...], ... ]
+}
+Coordinates are percentage (0-100). Return raw JSON only.`;
+    }
 
     let resultText = '';
 
@@ -227,58 +275,105 @@ where each (x, y) is an integer or decimal percentage from 0 to 100. Return raw 
       resultText = data.choices?.[0]?.message?.content?.trim();
 
     } else {
-      // Gemini provider
-      const modelName = await getBestGeminiModel(apiKey);
-      console.log(`[AI Segment] Calling Gemini (${modelName}) for target: ${target}...`);
-      
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-      const response = await fetch(geminiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: prompt },
+      // Gemini provider with multi-model fallback loop
+      for (const modelName of GEMINI_MODELS) {
+        try {
+          console.log(`[AI Segment] Calling Gemini (${modelName}) for target: ${target}...`);
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+          
+          const response = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
                 {
-                  inlineData: {
-                    mimeType: 'image/jpeg',
-                    data: base64Data
-                  }
+                  parts: [
+                    { text: prompt },
+                    {
+                      inlineData: {
+                        mimeType: 'image/jpeg',
+                        data: base64Data
+                      }
+                    }
+                  ]
                 }
-              ]
+              ],
+              generationConfig: {
+                responseMimeType: 'application/json'
+              }
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            resultText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+            if (resultText) {
+              console.log(`[AI Segment] ✅ Successful response from ${modelName}`);
+              break;
             }
-          ],
-          generationConfig: {
-            responseMimeType: 'application/json'
+          } else {
+            console.warn(`[AI Segment] Model ${modelName} returned status ${response.status}`);
           }
-        })
-      });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error('[AI Segment - Gemini Error]', errText);
-        throw new Error(`Gemini API returned error: ${response.status}`);
+        } catch (err) {
+          console.warn(`[AI Segment] Gemini call failed on ${modelName}:`, err.message);
+        }
       }
-
-      const data = await response.json();
-      resultText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
     }
 
     if (!resultText) {
-      throw new Error('AI provider did not return any content.');
+      throw new Error('All AI models were unavailable or exhausted quota.');
     }
 
     const cleanedText = cleanJsonString(resultText);
     const parsedData = JSON.parse(cleanedText);
-    
-    if (!parsedData.polygon || !Array.isArray(parsedData.polygon) || parsedData.polygon.length !== 4) {
-      throw new Error('Invalid polygon format returned from AI.');
+
+    // Format output based on target
+    if (target === 'all' || target === 'both') {
+      const floorObj = parsedData.floor || fallbackFloor;
+      let wallsArr = [];
+      if (Array.isArray(parsedData.walls)) {
+        wallsArr = parsedData.walls;
+      } else if (parsedData.walls && parsedData.walls.polygon) {
+        wallsArr = [parsedData.walls];
+      } else {
+        wallsArr = fallbackWalls;
+      }
+
+      console.log(`[AI Segment] Segmented ALL: floor + ${wallsArr.length} walls`);
+      return NextResponse.json({
+        success: true,
+        floor: floorObj,
+        walls: wallsArr,
+        isFallback: false
+      });
     }
 
-    console.log(`[AI Segment] Successfully segmented target: ${target} using ${provider}`);
+    if (target === 'walls') {
+      let wallsArr = [];
+      if (Array.isArray(parsedData.walls)) {
+        wallsArr = parsedData.walls;
+      } else if (parsedData.polygon) {
+        wallsArr = [{ polygon: parsedData.polygon, exclude: parsedData.exclude || [] }];
+      } else {
+        wallsArr = fallbackWalls;
+      }
+
+      console.log(`[AI Segment] Segmented WALLS: ${wallsArr.length} wall surfaces`);
+      return NextResponse.json({
+        success: true,
+        walls: wallsArr,
+        polygon: wallsArr[0]?.polygon || fallbackWalls[0].polygon,
+        exclude: wallsArr[0]?.exclude || [],
+        isFallback: false
+      });
+    }
+
+    // floor target
+    if (!parsedData.polygon || !Array.isArray(parsedData.polygon) || parsedData.polygon.length !== 4) {
+      throw new Error('Invalid floor polygon format returned.');
+    }
+
+    console.log(`[AI Segment] Segmented FLOOR successfully`);
     return NextResponse.json({
       success: true,
       polygon: parsedData.polygon,
@@ -287,19 +382,66 @@ where each (x, y) is an integer or decimal percentage from 0 to 100. Return raw 
     });
 
   } catch (error) {
-    console.error('[AI Segment Route Error]', error);
+    console.error('[AI Segment Route Error]', error.message);
     
-    // Graceful fallback values
-    const fallbackPolygon = target === 'walls'
-      ? [ [0, 0], [100, 0], [100, 54], [0, 54] ]
-      : [ [0, 54], [100, 54], [100, 100], [0, 100] ];
+    // Architectural fallback values (never tile ceiling or center window)
+    if (target === 'all' || target === 'both') {
+      return NextResponse.json({
+        success: true,
+        floor: {
+          polygon: [ [0, 62], [100, 62], [100, 100], [0, 100] ],
+          exclude: [ [ [40, 55], [60, 55], [60, 70], [40, 70] ] ]
+        },
+        walls: [
+          {
+            name: 'left_wall',
+            polygon: [ [0, 18], [35, 20], [35, 62], [0, 62] ],
+            exclude: []
+          },
+          {
+            name: 'right_wall',
+            polygon: [ [65, 20], [100, 18], [100, 62], [65, 62] ],
+            exclude: [ [ [68, 18], [96, 18], [96, 52], [68, 52] ] ]
+          },
+          {
+            name: 'back_wall',
+            polygon: [ [35, 20], [65, 20], [65, 62], [35, 62] ],
+            exclude: [ [ [40, 25], [60, 25], [60, 55], [40, 55] ] ]
+          }
+        ],
+        isFallback: true,
+        error: error.message
+      });
+    }
 
-    const fallbackExclude = [];
+    if (target === 'walls') {
+      const fallbackWalls = [
+        {
+          name: 'left_wall',
+          polygon: [ [0, 18], [35, 20], [35, 62], [0, 62] ],
+          exclude: []
+        },
+        {
+          name: 'right_wall',
+          polygon: [ [65, 20], [100, 18], [100, 62], [65, 62] ],
+          exclude: [ [ [68, 18], [96, 18], [96, 52], [68, 52] ] ]
+        }
+      ];
+
+      return NextResponse.json({
+        success: true,
+        walls: fallbackWalls,
+        polygon: fallbackWalls[0].polygon,
+        exclude: fallbackWalls[0].exclude,
+        isFallback: true,
+        error: error.message
+      });
+    }
 
     return NextResponse.json({
       success: true,
-      polygon: fallbackPolygon,
-      exclude: fallbackExclude,
+      polygon: [ [0, 62], [100, 62], [100, 100], [0, 100] ],
+      exclude: [],
       isFallback: true,
       error: error.message
     });

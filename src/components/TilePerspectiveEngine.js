@@ -326,13 +326,40 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
   tileLayer.height = canvasH;
   const tCtx = tileLayer.getContext('2d');
 
-  let floorQuad = null;
-  const surfaceTypes = ['floor', 'walls'];
+  // Collect all architectural surfaces to render
+  const allSurfaces = [];
 
-  surfaceTypes.forEach((type) => {
-    const surf = surfaces[type];
-    if (!surf || !surf.polygon || surf.polygon.length < 4) return;
+  // Floor surface
+  if (surfaces.floor && surfaces.floor.polygon && surfaces.floor.polygon.length >= 4) {
+    allSurfaces.push({
+      type: 'floor',
+      polygon: surfaces.floor.polygon,
+      exclude: surfaces.floor.exclude || []
+    });
+  }
 
+  // Wall surfaces (supports array of walls or single wall object)
+  if (Array.isArray(surfaces.walls)) {
+    surfaces.walls.forEach((w) => {
+      if (w && w.polygon && w.polygon.length >= 4) {
+        allSurfaces.push({
+          type: 'wall',
+          polygon: w.polygon,
+          exclude: w.exclude || []
+        });
+      }
+    });
+  } else if (surfaces.walls && surfaces.walls.polygon && surfaces.walls.polygon.length >= 4) {
+    allSurfaces.push({
+      type: 'wall',
+      polygon: surfaces.walls.polygon,
+      exclude: surfaces.walls.exclude || []
+    });
+  }
+
+  // Render each perspective surface
+  const renderedQuads = [];
+  allSurfaces.forEach((surf) => {
     const quad = surf.polygon.map(([x, y]) => [
       (x / 100) * canvasW,
       (y / 100) * canvasH,
@@ -342,27 +369,27 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
       poly.map(([x, y]) => [(x / 100) * canvasW, (y / 100) * canvasH])
     );
 
-    if (type === 'floor') {
-      floorQuad = quad;
-    }
-
+    renderedQuads.push(quad);
     renderPerspectiveTiles(tCtx, pattern, quad, excludePixels, subdivisions);
   });
 
-  // Step 4: Draw tiles onto canvas
+  // Step 4: Draw rendered tiles onto main canvas
   ctx.save();
   ctx.globalAlpha = 0.95;
   ctx.drawImage(tileLayer, 0, 0);
   ctx.restore();
 
-  // Step 5: Contact Shadows Pass (Multiply blend with floor quad clip)
-  // Keeps dark ambient shadows under furniture, sofas, tables, fireplace
-  if (floorQuad) {
+  // Multi-pass photorealistic lighting compositing across all tiled surfaces
+  if (renderedQuads.length > 0) {
+    // Step 5: Contact Shadows Pass (Multiply blend)
+    // Preserves dark ambient shadows under furniture, fixtures, corners
     ctx.save();
     ctx.beginPath();
-    ctx.moveTo(floorQuad[0][0], floorQuad[0][1]);
-    for (let i = 1; i < floorQuad.length; i++) ctx.lineTo(floorQuad[i][0], floorQuad[i][1]);
-    ctx.closePath();
+    renderedQuads.forEach((q) => {
+      ctx.moveTo(q[0][0], q[0][1]);
+      for (let i = 1; i < q.length; i++) ctx.lineTo(q[i][0], q[i][1]);
+      ctx.closePath();
+    });
     ctx.clip();
 
     ctx.globalCompositeOperation = 'multiply';
@@ -371,12 +398,14 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     ctx.restore();
 
     // Step 6: Window Daylight & Specular Reflection Pass (Screen blend)
-    // Preserves sunlight pouring from windows and natural floor glare
+    // Preserves sunlight pouring from windows, mirrors glare, spotlight reflections
     ctx.save();
     ctx.beginPath();
-    ctx.moveTo(floorQuad[0][0], floorQuad[0][1]);
-    for (let i = 1; i < floorQuad.length; i++) ctx.lineTo(floorQuad[i][0], floorQuad[i][1]);
-    ctx.closePath();
+    renderedQuads.forEach((q) => {
+      ctx.moveTo(q[0][0], q[0][1]);
+      for (let i = 1; i < q.length; i++) ctx.lineTo(q[i][0], q[i][1]);
+      ctx.closePath();
+    });
     ctx.clip();
 
     ctx.globalCompositeOperation = 'screen';
@@ -384,12 +413,14 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     ctx.drawImage(roomImg, 0, 0, canvasW, canvasH);
     ctx.restore();
 
-    // Step 7: Natural Tone Contrast (Soft-light blend)
+    // Step 7: Natural Ambient Contrast (Soft-light blend)
     ctx.save();
     ctx.beginPath();
-    ctx.moveTo(floorQuad[0][0], floorQuad[0][1]);
-    for (let i = 1; i < floorQuad.length; i++) ctx.lineTo(floorQuad[i][0], floorQuad[i][1]);
-    ctx.closePath();
+    renderedQuads.forEach((q) => {
+      ctx.moveTo(q[0][0], q[0][1]);
+      for (let i = 1; i < q.length; i++) ctx.lineTo(q[i][0], q[i][1]);
+      ctx.closePath();
+    });
     ctx.clip();
 
     ctx.globalCompositeOperation = 'soft-light';

@@ -204,39 +204,61 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
       let floorData = null;
       let wallsData = null;
 
-      // Surface-specific AI segmentation
-      if (surfaceToApply === 'floor' || surfaceToApply === 'both') {
+      let surfaces = { floor: null, walls: null };
+
+      if (surfaceToApply === 'both') {
+        const allRes = await fetch('/api/ai/segment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: imageDataUrl, target: 'all' }),
+        }).then((r) => r.json());
+
+        if (allRes.success) {
+          surfaces = {
+            floor: allRes.floor,
+            walls: allRes.walls || []
+          };
+        } else {
+          throw new Error('Mekan yüzeyleri tespit edilemedi.');
+        }
+      } else if (surfaceToApply === 'floor') {
         const floorRes = await fetch('/api/ai/segment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: imageDataUrl, target: 'floor' }),
         }).then((r) => r.json());
-        if (floorRes.success) floorData = floorRes;
-      }
 
-      if (surfaceToApply === 'walls' || surfaceToApply === 'both') {
+        if (floorRes.success) {
+          surfaces = {
+            floor: { polygon: floorRes.polygon, exclude: floorRes.exclude },
+            walls: null
+          };
+        } else {
+          throw new Error('Zemin yüzeyi tespit edilemedi.');
+        }
+      } else {
+        // walls
         const wallsRes = await fetch('/api/ai/segment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: imageDataUrl, target: 'walls' }),
         }).then((r) => r.json());
-        if (wallsRes.success) wallsData = wallsRes;
+
+        if (wallsRes.success) {
+          surfaces = {
+            floor: null,
+            walls: wallsRes.walls || (wallsRes.polygon ? [{ polygon: wallsRes.polygon, exclude: wallsRes.exclude }] : [])
+          };
+        } else {
+          throw new Error('Duvar yüzeyleri tespit edilemedi.');
+        }
       }
 
-      if (!floorData && !wallsData) {
+      if (!surfaces.floor && (!surfaces.walls || surfaces.walls.length === 0)) {
         throw new Error('Yüzey tespit edilemedi. Lütfen farklı bir fotoğraf deneyin.');
       }
 
       setLoadingStepText('3. Seramik karoları perspektife, ışık ve gölgelere uygun döşeniyor...');
-
-      const surfaces = {
-        floor: floorData
-          ? { polygon: floorData.polygon, exclude: floorData.exclude }
-          : null,
-        walls: wallsData
-          ? { polygon: wallsData.polygon, exclude: wallsData.exclude }
-          : null,
-      };
 
       // Load room photo and tile texture images
       const tileSource = targetTile?.textureUrl || targetTile?.imageUrl || '/textures/calacatta_gold.jpg';
