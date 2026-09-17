@@ -6,58 +6,113 @@ import {
   ArrowLeft, 
   Sparkles, 
   BookOpen, 
-  Compass, 
   ChevronRight, 
   X, 
-  Clock, 
   Calculator, 
-  Layers, 
   Eye, 
-  Palette, 
-  Lightbulb, 
-  CheckCircle2, 
-  TrendingUp, 
   Search, 
-  Building2, 
   Heart, 
   Share2, 
-  ExternalLink, 
   Flame, 
   Newspaper, 
-  Rss, 
-  ArrowRight, 
-  SlidersHorizontal, 
-  Maximize2, 
   Check, 
-  Award,
-  Zap,
   RefreshCw,
-  Copy
+  SlidersHorizontal,
+  Maximize2
 } from 'lucide-react';
 
+// Kiosk'ta odanın ve dokunun doğru eşleşmesi için yardımcı fonksiyonlar
+function getKioskProduct(item) {
+  const style = item.style || 'Mermer';
+  const name = item.tileRecommendation || item.title;
+  let code = `SB-ILH-${item.id}`;
+  let textureUrl = '/textures/calacatta_gold.jpg';
+  let productId = 'kal-1';
+
+  const lower = (name + ' ' + style + ' ' + (item.desc || '')).toLowerCase();
+
+  if (lower.includes('ahşap') || lower.includes('ahsap') || lower.includes('wood') || lower.includes('oak') || lower.includes('meşe')) {
+    textureUrl = '/textures/natural_oak.jpg';
+    productId = 'vit-3';
+    code = 'VIT-OAK-20120';
+  } else if (lower.includes('teak') || lower.includes('ceviz')) {
+    textureUrl = '/textures/teak_ahsap.jpg';
+    productId = 'gra-3';
+    code = 'GRA-TEAK-20120';
+  } else if (lower.includes('travertin') || lower.includes('traver')) {
+    textureUrl = '/textures/travertino_classico.jpg';
+    productId = 'gra-4';
+    code = 'GRA-TRAV-60120';
+  } else if (lower.includes('loft') || (lower.includes('beton') && lower.includes('antrasit'))) {
+    textureUrl = '/textures/loft_beton.jpg';
+    productId = 'kut-3';
+    code = 'KUT-BET-8080';
+  } else if (lower.includes('beton') || lower.includes('cement') || lower.includes('çimento') || lower.includes('grej')) {
+    textureUrl = '/textures/concrete_light_grey.jpg';
+    productId = 'kal-3';
+    code = 'KAL-BET-6060';
+  } else if (lower.includes('nero') || lower.includes('marquina') || lower.includes('siyah') || lower.includes('antrasit') || lower.includes('bazalt')) {
+    textureUrl = '/textures/albatros_antrasit.jpg';
+    productId = 'kal-2';
+    code = 'KAL-NERO-60120';
+  } else if (lower.includes('taş') || lower.includes('tas') || lower.includes('bej') || lower.includes('vista') || lower.includes('kireç')) {
+    textureUrl = '/textures/vista_bej.jpg';
+    productId = 'vit-4';
+    code = 'VIT-VIS-60120';
+  } else if (lower.includes('silver') || lower.includes('white silver')) {
+    textureUrl = '/textures/calacatta_gold.jpg';
+    productId = 'gur-1';
+    code = 'GUR-SILV-60120';
+  } else {
+    textureUrl = '/textures/calacatta_gold.jpg';
+    productId = 'kal-1';
+    code = 'KAL-CAL-60120';
+  }
+
+  const dimParts = (item.dimensions || '60x120 cm').replace(' cm', '').split('x');
+  const w = parseInt(dimParts[0]) || 60;
+  const h = parseInt(dimParts[1]) || 120;
+
+  return {
+    id: productId,
+    name: item.tileRecommendation || item.title,
+    code: code,
+    width: w,
+    height: h,
+    style: item.style || 'Mermer',
+    finish: item.finish || 'Parlak Rektifiye',
+    color: item.colorNames?.[0] || 'Doğal Ton',
+    imageUrl: item.img || textureUrl,
+    textureUrl: textureUrl,
+    unitPrice: 520,
+    brand: { id: 'seramikbak', name: 'Seçkin Mimari Koleksiyon' }
+  };
+}
+
+function getMappedRoom(roomStr) {
+  if (!roomStr) return 'bathroom';
+  const str = roomStr.toLowerCase();
+  if (str.includes('mutfak')) return 'kitchen';
+  if (str.includes('salon') || str.includes('yatak') || str.includes('antre') || str.includes('ofis') || str.includes('ticari')) return 'livingroom';
+  if (str.includes('teras') || str.includes('bahçe') || str.includes('havuz') || str.includes('dış cephe') || str.includes('cephe')) return 'terrace';
+  return 'bathroom';
+}
+
 export default function InspirationGalleryPage() {
-  // Main Navigation Tabs
-  const [activeTab, setActiveTab] = useState('gallery'); // 'gallery', 'news', 'beforeAfter', 'calculator', 'blog'
+  // Navigation Tabs: 'gallery' | 'news' | 'beforeAfter' | 'calculator' | 'blog'
+  const [activeTab, setActiveTab] = useState('gallery');
   
   // Gallery Filters
   const [selectedRoomFilter, setSelectedRoomFilter] = useState('ALL');
   const [selectedStyleFilter, setSelectedStyleFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Selected Article for Reading Modal
-  const [selectedArticle, setSelectedArticle] = useState(null);
-
-  // Selected Image for Full View Modal
+  // Modals
   const [previewItem, setPreviewItem] = useState(null);
-
-  // Moodboard / Saved Inspirations State (saved to localStorage)
-  const [savedIds, setSavedIds] = useState([]);
   const [showMoodboardModal, setShowMoodboardModal] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
 
-  // Before / After State
-  const [activeBeforeAfterId, setActiveBeforeAfterId] = useState(1);
-  const [beforeAfterView, setBeforeAfterView] = useState('after'); // 'before' | 'after'
+  // Moodboard / Saved Items
+  const [savedIds, setSavedIds] = useState([]);
 
   // Calculator State
   const [calcWidth, setCalcWidth] = useState('4');
@@ -66,20 +121,21 @@ export default function InspirationGalleryPage() {
   const [calcWastePercent, setCalcWastePercent] = useState('10');
   const [calcResult, setCalcResult] = useState(null);
 
-  // Load Saved Moodboard from localStorage on mount
+  // Load Saved Moodboard from localStorage
   useEffect(() => {
     try {
       const stored = localStorage.getItem('sb_ilham_moodboard');
       if (stored) {
         setSavedIds(JSON.parse(stored));
       }
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) {}
   }, []);
 
   const toggleSaveMoodboard = (id, e) => {
-    if (e) e.stopPropagation();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setSavedIds(prev => {
       const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
       try {
@@ -89,12 +145,29 @@ export default function InspirationGalleryPage() {
     });
   };
 
-  // Calculation logic for Tile & Grout calculator
+  // 3D Kiosk Sayfasını Açma ve Seramik Modelini Seçili Olarak Aktarma
+  const openInKiosk = (item, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const kioskProd = getKioskProduct(item);
+    const room = getMappedRoom(item.room);
+    try {
+      sessionStorage.setItem('kiosk_selected_product', JSON.stringify(kioskProd));
+      localStorage.setItem('kiosk_selected_product', JSON.stringify(kioskProd));
+    } catch (err) {}
+
+    const searchParam = encodeURIComponent(kioskProd.name);
+    const styleParam = encodeURIComponent(kioskProd.style ? kioskProd.style.toLowerCase() : 'all');
+    window.location.href = `/kiosk?productId=${encodeURIComponent(kioskProd.id)}&code=${encodeURIComponent(kioskProd.code)}&room=${room}&style=${styleParam}&search=${searchParam}`;
+  };
+
+  // Hesaplayıcı Formülü
   const calculateMaterials = () => {
     const w = parseFloat(calcWidth) || 0;
     const l = parseFloat(calcLength) || 0;
     const area = w * l;
-
     if (area <= 0) return;
 
     const wasteFactor = 1 + (parseFloat(calcWastePercent) / 100);
@@ -125,10 +198,9 @@ export default function InspirationGalleryPage() {
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 1. EXPANDED GALLERY ITEMS (28+ Diverse Architectural & Design Models)
+  // 1. GENİŞ MİMARİ SERAMİK İLHAM KOLEKSİYONU
   // ─────────────────────────────────────────────────────────────────────────────
-  const [galleryItems, setGalleryItems] = useState([
-    // BANYO & SPA
+  const galleryItems = [
     {
       id: 1,
       title: 'Lüks Calacatta Camsı Banyo & Spa',
@@ -199,8 +271,6 @@ export default function InspirationGalleryPage() {
       img: 'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=1000&q=80',
       tileRecommendation: 'Microcement Greige R10 80x80 cm'
     },
-
-    // MUTFAK & ADA
     {
       id: 6,
       title: 'Statuario Beyaz Dev Mutfak Adası',
@@ -271,8 +341,6 @@ export default function InspirationGalleryPage() {
       img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80',
       tileRecommendation: 'Sahara Noir Gold 60x120 cm'
     },
-
-    // SALON & ANTRE
     {
       id: 11,
       title: 'Endüstriyel Beton Loft Salon Zemin',
@@ -333,7 +401,7 @@ export default function InspirationGalleryPage() {
       id: 15,
       title: 'Bal Parıltılı Amber Onyx Koridor Duvarı',
       desc: 'Işıklı arkadan aydınlatmaya uygun camsı bal rengi amber onyx lüks seramik serisi.',
-      style: 'Onyx',
+      style: 'Mermer',
       room: 'Salon & Antre',
       tag: 'Translucent Glamour',
       dimensions: '60x120 cm',
@@ -343,8 +411,6 @@ export default function InspirationGalleryPage() {
       img: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80',
       tileRecommendation: 'Onyx Amber High Gloss 60x120 cm'
     },
-
-    // YATAK ODASI & SUİT
     {
       id: 16,
       title: 'Huzurlu Meşe & Akustik Yatak Başı Duvarı',
@@ -373,8 +439,6 @@ export default function InspirationGalleryPage() {
       img: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1000&q=80',
       tileRecommendation: 'Linen Touch Bej 60x120 cm'
     },
-
-    // TERAS, BAHÇE & HAVUZ
     {
       id: 18,
       title: 'Sıcak Traverten Teras & Dış Mekan (R11)',
@@ -431,8 +495,6 @@ export default function InspirationGalleryPage() {
       img: 'https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=1000&q=80',
       tileRecommendation: 'Sandstone Greige R11 60x120 cm'
     },
-
-    // OFİS, KAFE & TİCARİ
     {
       id: 22,
       title: 'Brütist Beton Kafe & Butik Restoran Zemin',
@@ -475,8 +537,6 @@ export default function InspirationGalleryPage() {
       img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1000&q=80',
       tileRecommendation: 'Plaza Cement Silk Grey 60x120 cm'
     },
-
-    // DIŞ CEPHE & MİMARİ
     {
       id: 25,
       title: 'Mekanik Montajlı Havalandırmalı Porselen Cephe',
@@ -533,420 +593,202 @@ export default function InspirationGalleryPage() {
       img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1000&q=80',
       tileRecommendation: 'Terrazzo Milano Rosso 60x60 cm'
     }
-  ]);
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // 2. LIVE CERAMIC INDUSTRY AGENDA & NEWS (Seramiğin Nabzı)
-  // ─────────────────────────────────────────────────────────────────────────────
-  const liveNewsItems = [
-    {
-      id: 'news-1',
-      badge: 'CANLI FUAR GÜNDEMİ',
-      badgeColor: '#ef4444',
-      date: 'Eylül 2026',
-      title: 'Cersaie 2026 Bologna Fuarı: 160x320 cm Dev Plakalar ve Doğal Dokular Damga Vurdu',
-      summary: 'İtalya Bologna’da düzenlenen dünyanın en büyük seramik fuarında, dikişsiz ek yeri bırakmayan dev format porselen plakalar (Slabs) ve dokunma hissi uyandıran 3D rölyefli mat yüzeyler öne çıktı.',
-      source: 'Cersaie Official / Bologna',
-      readTime: '3 dk okuma',
-      trendScore: '+%84 İlgi',
-      stats: 'Dev Plakalar pazarın %32’sine ulaştı'
-    },
-    {
-      id: 'news-2',
-      badge: 'TÜRKİYE ÜRETİCİLERİ',
-      badgeColor: '#b38e47',
-      date: '2026 Sezonu',
-      title: 'UNICERA İstanbul Zirvesi: Türk Üreticilerden Küresel İhracat ve Yeşil Fırınlama Hamlesi',
-      summary: 'Bien, VitrA, NG Kütahya, Ege Seramik ve Qua Granite gibi lider üreticiler, doğalgaz tüketimini %40 azaltan yeni nesil ekolojik fırın teknolojilerini ve 2026-2027 ihracat koleksiyonlarını tanıttı.',
-      source: 'TSF / UNICERA Raporu',
-      readTime: '4 dk okuma',
-      trendScore: '142 Ülkeye İhracat',
-      stats: 'Türkiye Avrupa’nın 2. büyük üreticisi'
-    },
-    {
-      id: 'news-3',
-      badge: 'MİMARİ TREND DEĞİŞİMİ',
-      badgeColor: '#10b981',
-      date: 'Yeni Trend',
-      title: 'Soğuk Beyaz Mermer Yerini Sıcak Traverten ve Kemik Bej Tonlarına Bırakıyor',
-      summary: 'İç mimarlar bu sezon banyolarda steril soğuk gri tonlar yerine, sıcak traverten, kum beji ve ceviz ahşap kombinasyonlarını (Japandi & Wabi-Sabi) birinci sıraya taşıdı.',
-      source: 'Architectural Digest Mimari Raporu',
-      readTime: '2 dk okuma',
-      trendScore: '+%72 Talep Artışı',
-      stats: 'Kemik beji seramik aramaları zirvede'
-    },
-    {
-      id: 'news-4',
-      badge: 'TEKNOLOJİ & İNOVASYON',
-      badgeColor: '#2563eb',
-      date: '2026 İnovasyon',
-      title: '2 cm Ekstra Kalın Dış Mekan Karoları: Çim ve Teraslarda Harçsız Devrim',
-      summary: '20 mm kalınlığındaki dış mekan porselen karolar, harç ve yapıştırıcı gerektirmeden çakıl, çim veya ayarlanabilir ayaklar üzerine doğrudan serilerek teras yenilemelerini 1 güne indirdi.',
-      source: 'SeramikBak Teknik Departman',
-      readTime: '3 dk okuma',
-      trendScore: 'R11 Yüksek Kaymazlık',
-      stats: 'Teras projelerinde %60 montaj hızı'
-    }
   ];
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // 3. BEFORE / AFTER RENOVATION SHOWCASE
-  // ─────────────────────────────────────────────────────────────────────────────
-  const beforeAfterProjects = [
-    {
-      id: 1,
-      title: 'Eski 90’lar Banyonun Lüks Calacatta Mermer Spa Dönüşümü',
-      location: 'Bağdat Caddesi, İstanbul',
-      m2: '14 m²',
-      beforeDesc: 'Küçük sararmış 20x20 fayanslar, kalın sarı derzler ve daraltıcı kabin.',
-      afterDesc: '60x120 Calacatta Gold rektifiyeli parlak porselen karolar, gizli ledler ve fırçalanmış pirinç armatürler ile 5 yıldızlı otel banyosu ferahlığı.',
-      beforeImg: 'https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=1000&q=80',
-      afterImg: '/hero/luxury_bathroom.png',
-      tilesUsed: ['Calacatta Gold 60x120 cm', 'Basalt Gri 60x60 cm Mat'],
-      budgetSavings: 'Doğrudan Bayi Teklifi ile %28 Tasarruf'
-    },
-    {
-      id: 2,
-      title: 'Karanlık Mutfaktan İskandinav Meşe & Statuario Plakalı Aydınlık Yaşama',
-      location: 'Çankaya, Ankara',
-      m2: '22 m²',
-      beforeDesc: 'Çizilmiş laminat zemin, yağ lekesi tutmuş eski tezgah arası fayanslar.',
-      afterDesc: 'Suya dayanıklı 20x120 ham meşe porselen parke ve 120x240 kesintisiz leke tutmaz beyaz mermer ada tezgahı.',
-      beforeImg: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1000&q=80',
-      afterImg: '/hero/scandinavian_kitchen.png',
-      tilesUsed: ['Natural Oak 20x120 cm Mat', 'Statuario Extra Slab 120x240 cm'],
-      budgetSavings: 'Mimar & Bayi Kampanyası ile %32 Tasarruf'
-    }
-  ];
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // 4. EDUCATIONAL & TECHNICAL ARTICLES
-  // ─────────────────────────────────────────────────────────────────────────────
-  const [articles, setArticles] = useState([
-    {
-      id: 1,
-      title: 'Rektifiyeli Seramik Nedir? Derz Aralıkları Neden 1mm Olmalıdır?',
-      summary: 'Seramiklerin kenarlarının lazerle traşlanarak 90 derece dikleştirilmesi işlemine rektifiye denir. Kesintisiz mekan algısı sağlar.',
-      category: 'Teknik Rehber',
-      readTime: '4 dk okuma',
-      content: `
-        <h3>Rektifiyeli Seramik Nedir?</h3>
-        <p>Rektifiyeli seramik veya porselen karolar, pişirilme aşamasından sonra kenarlarının özel elmas bıçaklarla traşlanarak tam 90 derecelik dik açılara getirilmesi işlemidir. Standart seramiklerde kenarlar hafif yuvarlak gelirken, rektifiyeli ürünlerin kenarları keskin ve düzdür.</p>
-        
-        <h3>Rektifiyeli Seramiklerin Avantajları Nelerdir?</h3>
-        <ul>
-          <li><strong>Minimum Derz Boşluğu:</strong> Kenarları dik açılı olduğu için karolar birbirine 1mm - 1.5mm gibi incecik derzlerle döşenebilir.</li>
-          <li><strong>Kesintisiz Yüzey Görünümü:</strong> Derz çizgileri çok az fark edildiği için oda olduğundan çok daha geniş ve modern görünür.</li>
-          <li><strong>Kolay Temizlik:</strong> Kalın derz alanları olmadığı için kir birikimi ve küf oluşumu minimuma iner.</li>
-        </ul>
-
-        <h3>Döşerken Nelere Dikkat Edilmelidir?</h3>
-        <p>Zeminin şapı ve terazisi kusursuz olmalıdır. Montaj sırasında mutlaka profesyonel seramik klipsleri ve tesviye takozları kullanılmalıdır.</p>
-      `
-    },
-    {
-      id: 2,
-      title: 'Mat mı, Parlak (Full Lappato) Seramik mi? Mekana Göre Doğru Tercih',
-      summary: 'Zemin ve duvar karolarında mat ve parlak yüzeylerin kaymazlık, leke tutma, ışık yansıtma ve temizlik karşılaştırması.',
-      category: 'Tasarım İpuçları',
-      readTime: '5 dk okuma',
-      content: `
-        <h3>Mat ve Parlak Karoların Karşılaştırması</h3>
-        <p>Seramik seçiminde doğru karar verebilmek için odanın ışık alma durumu ve kullanım amacı dikkate alınmalıdır.</p>
-
-        <h3>Parlak (Lappato / Full Lappato) Seramikler</h3>
-        <ul>
-          <li><strong>Nerede Kullanılmalı?</strong> Işığı az alan dar banyolar, holler, salon şömine arkaları ve duvar kaplamaları için mükemmeldir. Odayı ayna gibi ferah gösterir.</li>
-          <li><strong>Önemli Uyarı:</strong> Islakken kayganlaşırlar. Bu nedenle banyo duş zeminleri veya dış mekan merdivenleri için önerilmez.</li>
-        </ul>
-
-        <h3>Mat Seramikler</h3>
-        <ul>
-          <li><strong>Nerede Kullanılmalı?</strong> Banyo zeminleri, mutfak zeminleri, balkonlar, teraslar ve yaya trafiğinin yoğun olduğu alanlar.</li>
-          <li><strong>Kaymazlık Değeri (R Derecesi):</strong> Islak zeminler için mutlaka R10 veya R11 sınıfı mat seramikler tercih edilmelidir.</li>
-        </ul>
-      `
-    },
-    {
-      id: 3,
-      title: '2026 Banyo Tasarım Trendleri: Doğallığa Dönüş, Traverten ve Japandi',
-      summary: 'Bu yıl banyolarda mermer soğukluğundan ziyade sıcak traverten tonları, ham meşe ahşap dokuları ve yeşil bitkiler hakim.',
-      category: 'Trendler',
-      readTime: '3 dk okuma',
-      content: `
-        <h3>2026 Banyo Tasarımlarında Öne Çıkanlar</h3>
-        <p>Banyolar artık evlerin kişisel spa merkezleri ve dinlenme köşeleri haline geldi. İşte öne çıkan trendler:</p>
-        <ul>
-          <li><strong>Sıcak Traverten ve Bej Tonları:</strong> Soğuk gri yerini kemik rengi, bej ve sıcak traverten dokularına bırakıyor.</li>
-          <li><strong>Ahşap Görünümlü Porselen:</strong> Suya ve neme %100 dayanıklı ahşap desenli porselen karolar banyoya sıcaklık katar.</li>
-          <li><strong>Mat Bronz ve Pirinç Bataryalar:</strong> Klasik krom yerine fırçalanmış mat bronz batarya kombinasyonları.</li>
-          <li><strong>Gömme Niş Aydınlatmaları:</strong> Duş nişlerinde gizli led profillerle seramik dokusunu vurgulama.</li>
-        </ul>
-      `
-    },
-    {
-      id: 4,
-      title: 'Dev Porselen Plakalar (Slabs): Mutfak Tezgahı ve Banyolarda Kullanım',
-      summary: '120x240 cm ve 160x320 cm dev porselen plakaların montaj teknikleri, dikişsiz mutfak adaları ve banyo zemin avantajları.',
-      category: 'Mimari İnceleme',
-      readTime: '6 dk okuma',
-      content: `
-        <h3>Büyük Ebatlı Porselen Plakaların Yükselişi</h3>
-        <p>Geleneksel mermer ve granitin yerini hızla porselen plakalar (slabs) alıyor. Neden?</p>
-        <ul>
-          <li><strong>Leke ve Asit Geçirimsizliği:</strong> Doğal mermer limon ve yağdan leke tutarken, porselen plaka sıfır emiciliğe sahiptir.</li>
-          <li><strong>Çizilme ve Isı Direnci:</strong> Sıcak tencere doğrudan tezgahın üzerine konulabilir, bıçakla çizilmez.</li>
-          <li><strong>Görsel Kesintisizlik:</strong> 120x240 cm tek plaka bir banyo duvarını baştan başa kaplar, hiçbir derz çizgisi kalmaz.</li>
-        </ul>
-      `
-    }
-  ]);
-
-  // Filtered Gallery logic
+  // Filtrelenmiş Galeri Listesi
   const filteredGallery = useMemo(() => {
     return galleryItems.filter(item => {
-      const matchRoom = selectedRoomFilter === 'ALL' || item.room === selectedRoomFilter;
-      const matchStyle = selectedStyleFilter === 'ALL' || item.style === selectedStyleFilter;
-      const matchQuery = !searchQuery.trim() || (
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.tileRecommendation.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.style.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      return matchRoom && matchStyle && matchQuery;
+      let matchRoom = true;
+      if (selectedRoomFilter !== 'ALL') {
+        matchRoom = item.room.toLowerCase().includes(selectedRoomFilter.toLowerCase()) ||
+                    selectedRoomFilter.toLowerCase().includes(item.room.toLowerCase());
+      }
+
+      let matchStyle = true;
+      if (selectedStyleFilter !== 'ALL') {
+        matchStyle = item.style.toLowerCase() === selectedStyleFilter.toLowerCase();
+      }
+
+      let matchSearch = true;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        matchSearch = item.title.toLowerCase().includes(q) ||
+                      item.desc.toLowerCase().includes(q) ||
+                      item.style.toLowerCase().includes(q) ||
+                      item.room.toLowerCase().includes(q) ||
+                      (item.tileRecommendation && item.tileRecommendation.toLowerCase().includes(q));
+      }
+
+      return matchRoom && matchStyle && matchSearch;
     });
   }, [galleryItems, selectedRoomFilter, selectedStyleFilter, searchQuery]);
 
-  // Saved items for moodboard modal
-  const savedGalleryItems = useMemo(() => {
-    return galleryItems.filter(item => savedIds.includes(item.id));
-  }, [galleryItems, savedIds]);
-
-  // Current active before/after project
-  const currentProject = beforeAfterProjects.find(p => p.id === activeBeforeAfterId) || beforeAfterProjects[0];
-
   return (
-    <main style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(180deg, #090d16 0%, #0f172a 400px, #f8fafc 400px, #f1f5f9 100%)',
-      fontFamily: 'Inter, system-ui, sans-serif',
-      color: '#0f172a',
-      position: 'relative',
-      overflowX: 'hidden'
-    }}>
-
+    <div style={{ background: '#f8fafc', minHeight: '100vh', color: '#0f172a', fontFamily: 'inherit' }}>
+      
       {/* ─────────────────────────────────────────────────────────────────────────────
-          TOP BAR & NAVIGATION
+          1. ZARİF & FERAH ÜST HEADER
       ───────────────────────────────────────────────────────────────────────────── */}
       <header style={{
-        background: 'rgba(15, 23, 42, 0.92)',
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        background: '#ffffff',
+        borderBottom: '1px solid #e2e8f0',
         position: 'sticky',
         top: 0,
         zIndex: 40,
-        boxShadow: '0 4px 30px rgba(0,0,0,0.3)'
+        boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
       }}>
         <div style={{
-          maxWidth: '1200px',
+          maxWidth: '1280px',
           margin: '0 auto',
-          padding: '14px 24px',
+          padding: '12px 24px',
           display: 'flex',
-          justifyContent: 'space-between',
           alignItems: 'center',
-          gap: '16px'
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px'
         }}>
-          <Link href="/" style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            textDecoration: 'none',
-            color: '#cbd5e1',
-            fontSize: '0.84rem',
-            fontWeight: '700',
-            transition: 'color 0.2s'
-          }}>
-            <ArrowLeft size={16} />
-            <span>Ana Sayfaya Dön</span>
-          </Link>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '8px',
-              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-              color: '#090d16',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '900',
-              fontSize: '0.95rem'
-            }}>SB</div>
-            <span style={{ fontSize: '1.05rem', fontWeight: '850', color: '#ffffff', letterSpacing: '-0.01em' }}>
-              SeramikBak <span style={{ color: '#d4af37' }}>İlham & Gündem Hub</span>
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <Link
+              href="/"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                color: '#64748b',
+                textDecoration: 'none',
+                fontSize: '0.86rem',
+                fontWeight: '650',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                background: '#f1f5f9',
+                transition: 'all 0.2s'
+              }}
+            >
+              <ArrowLeft size={16} />
+              <span>Ana Sayfa</span>
+            </Link>
+
+            <div style={{ height: '18px', width: '1px', background: '#cbd5e1' }} />
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '1.05rem', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.02em' }}>
+                SeramikBak <span style={{ color: '#b38e47', fontWeight: '800' }}>İlham</span>
+              </span>
+            </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
-              type="button"
               onClick={() => setShowMoodboardModal(true)}
               style={{
-                background: savedIds.length > 0 ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.08)',
-                border: savedIds.length > 0 ? '1px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.15)',
-                color: savedIds.length > 0 ? '#d4af37' : '#cbd5e1',
-                padding: '6px 14px',
+                background: savedIds.length > 0 ? 'rgba(212, 175, 55, 0.12)' : '#ffffff',
+                border: savedIds.length > 0 ? '1px solid #d4af37' : '1px solid #e2e8f0',
+                color: savedIds.length > 0 ? '#997328' : '#64748b',
+                padding: '7px 14px',
                 borderRadius: '10px',
-                fontSize: '0.78rem',
-                fontWeight: '800',
+                fontSize: '0.82rem',
+                fontWeight: '750',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
+                cursor: 'pointer'
               }}
             >
-              <Heart size={14} fill={savedIds.length > 0 ? '#d4af37' : 'none'} />
+              <Heart size={15} fill={savedIds.length > 0 ? '#d4af37' : 'none'} color={savedIds.length > 0 ? '#d4af37' : 'currentColor'} />
               <span>İlham Panom ({savedIds.length})</span>
             </button>
+
+            <Link
+              href="/kiosk"
+              style={{
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                color: '#d4af37',
+                border: '1px solid rgba(212, 175, 55, 0.4)',
+                padding: '7px 15px',
+                borderRadius: '10px',
+                textDecoration: 'none',
+                fontSize: '0.82rem',
+                fontWeight: '800',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              }}
+            >
+              <Sparkles size={15} />
+              <span>3D Kiosk Stüdyo</span>
+            </Link>
           </div>
         </div>
       </header>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
-          CANLI SERAMİK GÜNDEMİ TICKER (Live News Ticker)
-      ───────────────────────────────────────────────────────────────────────────── */}
-      <div style={{
-        background: 'linear-gradient(90deg, #111827 0%, #1e293b 100%)',
-        borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
-        padding: '8px 16px',
-        overflow: 'hidden'
-      }}>
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'rgba(239, 68, 68, 0.18)',
-            border: '1px solid rgba(239, 68, 68, 0.4)',
-            color: '#f87171',
-            padding: '3px 9px',
-            borderRadius: '6px',
-            fontSize: '0.68rem',
-            fontWeight: '900',
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-            flexShrink: 0
-          }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ef4444', animation: 'pulse 1.5s infinite' }}></span>
-            <span>Canlı Gündem</span>
-          </div>
-
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '24px',
-            overflowX: 'auto',
-            whiteSpace: 'nowrap',
-            fontSize: '0.78rem',
-            color: '#e2e8f0',
-            scrollbarWidth: 'none'
-          }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <strong style={{ color: '#d4af37' }}>Cersaie 2026:</strong> 160x320 cm dev plakalar ve traverten damgası vuruyor.
-            </span>
-            <span style={{ color: '#64748b' }}>&bull;</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <strong style={{ color: '#10b981' }}>Trend Analizi:</strong> Soğuk beyaz mermerden sıcak kemik bejine geçiş (+%72 talep).
-            </span>
-            <span style={{ color: '#64748b' }}>&bull;</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <strong style={{ color: '#38bdf8' }}>Dış Mekan:</strong> 2cm kalınlığındaki harçsız teras porselenleri yükselişte.
-            </span>
-            <span style={{ color: '#64748b' }}>&bull;</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <strong style={{ color: '#fbbf24' }}>UNICERA İstanbul:</strong> Türk seramik devlerinin yeni ihracat koleksiyonları yayında.
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          HERO & INTERACTIVE TAB SELECTOR
+          2. FERAH HERO & MİNİMALİST SEKME MENÜSÜ
       ───────────────────────────────────────────────────────────────────────────── */}
       <section style={{
-        maxWidth: '1200px',
+        maxWidth: '1280px',
         margin: '0 auto',
-        padding: '40px 24px 28px 24px',
-        textAlign: 'center',
-        color: '#ffffff'
+        padding: '36px 24px 20px 24px',
+        textAlign: 'center'
       }}>
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
           gap: '6px',
-          background: 'rgba(212, 175, 55, 0.15)',
-          border: '1px solid rgba(212, 175, 55, 0.35)',
-          color: '#d4af37',
-          padding: '6px 16px',
+          background: 'rgba(212, 175, 55, 0.12)',
+          border: '1px solid rgba(212, 175, 55, 0.3)',
+          color: '#8c6b30',
+          padding: '5px 14px',
           borderRadius: '20px',
-          fontSize: '0.75rem',
+          fontSize: '0.74rem',
           fontWeight: '800',
           textTransform: 'uppercase',
-          letterSpacing: '0.06em',
-          marginBottom: '16px'
+          letterSpacing: '0.04em',
+          marginBottom: '14px'
         }}>
-          <Sparkles size={14} />
-          <span>2026 Mimari Seramik Trendleri & Canlı Sektör Radarı</span>
+          <Sparkles size={13} />
+          <span>Mimari Tasarım Galerisi & 3D Kiosk Deneyimi</span>
         </div>
 
         <h1 style={{
-          fontSize: 'clamp(2.1rem, 4.2vw, 3.2rem)',
-          fontWeight: '950',
+          fontSize: 'clamp(1.9rem, 3.8vw, 2.7rem)',
+          fontWeight: '900',
           letterSpacing: '-0.03em',
-          margin: '0 0 16px 0',
-          color: '#ffffff',
+          margin: '0 0 12px 0',
+          color: '#0f172a',
           lineHeight: '1.2'
         }}>
-          Yaşam Alanınız İçin Kusursuz Seramik İlhamı
+          Yaşam Alanınız İçin Kusursuz Seramik Kombinasyonları
         </h1>
 
         <p style={{
-          fontSize: '1.05rem',
-          color: '#94a3b8',
-          maxWidth: '720px',
-          margin: '0 auto 28px auto',
-          lineHeight: '1.6'
+          fontSize: '0.98rem',
+          color: '#64748b',
+          maxWidth: '680px',
+          margin: '0 auto 24px auto',
+          lineHeight: '1.55'
         }}>
-          Banyo, mutfak, salon veya terasınızı yenilerken 28+ seçkin mimari projeden ilham alın; seramiğin canlı gündemini takip edin ve 3D stüdyoda kendi odanızda canlı deneyin.
+          Banyo, mutfak ve salonlar için 28+ seçkin mimari projeyi inceleyin; beğendiğiniz seramik modellerini 3D Kiosk stüdyoda kendi odanızda canlı deneyin.
         </p>
 
-        {/* 5 Main Section Navigation Tabs */}
+        {/* Minimalist Segmented Tabs */}
         <div style={{
           display: 'inline-flex',
-          background: 'rgba(15, 23, 42, 0.85)',
-          backdropFilter: 'blur(16px)',
-          padding: '6px',
-          borderRadius: '18px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+          background: '#ffffff',
+          padding: '5px',
+          borderRadius: '14px',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
           flexWrap: 'wrap',
           justifyContent: 'center',
-          gap: '6px'
+          gap: '4px'
         }}>
           {[
-            { id: 'gallery', label: 'Tasarım İlham Galerisi', count: '28+ Mekan', icon: Sparkles },
-            { id: 'news', label: 'Seramiğin Gündemi & Trendler', count: 'Canlı Nabız', icon: Newspaper },
-            { id: 'beforeAfter', label: 'Önce / Sonra Dönüşümler', count: 'Gerçek Projeler', icon: Eye },
-            { id: 'calculator', label: 'Metraj & Derz Hesaplayıcı', count: 'Akıllı Araç', icon: Calculator },
-            { id: 'blog', label: 'Teknik Seçim Rehberleri', count: '4 Rehber', icon: BookOpen }
+            { id: 'gallery', label: 'Tasarım İlham Galerisi', icon: Sparkles },
+            { id: 'news', label: 'Sektör & Trend Raporu', icon: Newspaper },
+            { id: 'beforeAfter', label: 'Öncesi / Sonrası', icon: Eye },
+            { id: 'calculator', label: 'Metraj & Derz Hesapla', icon: Calculator },
+            { id: 'blog', label: 'Seçim Rehberleri', icon: BookOpen }
           ].map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -955,30 +797,22 @@ export default function InspirationGalleryPage() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 style={{
-                  padding: '10px 18px',
-                  borderRadius: '12px',
-                  border: isActive ? '1px solid #d4af37' : '1px solid transparent',
-                  background: isActive ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)' : 'transparent',
-                  color: isActive ? '#d4af37' : '#94a3b8',
-                  fontWeight: '800',
-                  fontSize: '0.82rem',
-                  cursor: 'pointer',
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s ease',
-                  boxShadow: isActive ? '0 4px 15px rgba(212,175,55,0.2)' : 'none'
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: isActive ? '#0f172a' : 'transparent',
+                  color: isActive ? '#d4af37' : '#64748b',
+                  fontSize: '0.82rem',
+                  fontWeight: isActive ? '800' : '650',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
                 }}
               >
-                <Icon size={16} style={{ color: isActive ? '#d4af37' : '#64748b' }} />
+                <Icon size={15} />
                 <span>{tab.label}</span>
-                <span style={{
-                  fontSize: '0.68rem',
-                  padding: '1px 6px',
-                  borderRadius: '6px',
-                  background: isActive ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.06)',
-                  color: isActive ? '#d4af37' : '#64748b'
-                }}>{tab.count}</span>
               </button>
             );
           })}
@@ -986,92 +820,72 @@ export default function InspirationGalleryPage() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
-          MAIN CONTENT CONTAINER
+          ANA İÇERİK ALANI
       ───────────────────────────────────────────────────────────────────────────── */}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '30px 24px 120px 24px',
-        position: 'relative',
-        zIndex: 2
-      }}>
-
+      <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px 60px 24px' }}>
+        
         {/* ═════════════════════════════════════════════════════════════════════════
-            TAB 1: ENRICHED INSPIRATION GALLERY
+            SEKME 1: TASARIM İLHAM GALERİSİ
         ═════════════════════════════════════════════════════════════════════════ */}
         {activeTab === 'gallery' && (
-          <section style={{ animation: 'fadeIn 0.3s ease-out' }}>
+          <section>
             
-            {/* Filter & Search Toolbar */}
+            {/* SADELEŞTİRİLMİŞ TEK SATIR FİLTRE VE ARAMA PANELİ */}
             <div style={{
               background: '#ffffff',
-              borderRadius: '20px',
-              padding: '20px',
+              borderRadius: '16px',
+              padding: '16px 20px',
               border: '1px solid #e2e8f0',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.03)',
-              marginBottom: '32px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
+              marginBottom: '28px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '16px'
+              gap: '14px'
             }}>
-              {/* Room Tabs */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    Mekan Kategorileri ({filteredGallery.length} Model Listeleniyor)
-                  </span>
-                  {savedIds.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => setShowMoodboardModal(true)}
-                      style={{ background: 'none', border: 'none', color: '#b38e47', fontSize: '0.75rem', fontWeight: '750', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-                    >
-                      <Heart size={12} fill="#b38e47" />
-                      <span>{savedIds.length} Görsel Panonuzda</span>
-                    </button>
-                  )}
-                </div>
-
-                <div style={{
-                  display: 'flex',
-                  gap: '8px',
-                  overflowX: 'auto',
-                  paddingBottom: '4px',
-                  scrollbarWidth: 'none'
-                }}>
-                  {[
-                    { id: 'ALL', label: 'Tüm Mekanlar' },
-                    { id: 'Banyo & Spa', label: '🛁 Banyo & Spa' },
-                    { id: 'Mutfak & Ada', label: '🍳 Mutfak & Ada' },
-                    { id: 'Salon & Antre', label: '🛋️ Salon & Antre' },
-                    { id: 'Yatak Odası & Suit', label: '🛏️ Yatak Odası' },
-                    { id: 'Teras, Bahçe & Havuz', label: '🌿 Teras & Havuz' },
-                    { id: 'Ofis, Kafe & Ticari', label: '☕ Ticari & Ofis' },
-                    { id: 'Dış Cephe & Mimari', label: '🏢 Dış Cephe' }
-                  ].map(tab => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setSelectedRoomFilter(tab.id)}
-                      style={{
-                        padding: '8px 16px',
-                        borderRadius: '10px',
-                        border: selectedRoomFilter === tab.id ? '1.5px solid #d4af37' : '1px solid #e2e8f0',
-                        background: selectedRoomFilter === tab.id ? '#0f172a' : '#f8fafc',
-                        color: selectedRoomFilter === tab.id ? '#d4af37' : '#475569',
-                        fontSize: '0.8rem',
-                        fontWeight: '750',
-                        whiteSpace: 'nowrap',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
+              {/* Mekan Filtreleri */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                overflowX: 'auto',
+                paddingBottom: '2px',
+                scrollbarWidth: 'none'
+              }}>
+                <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#94a3b8', whiteSpace: 'nowrap', marginRight: '4px' }}>
+                  Mekan:
+                </span>
+                {[
+                  { id: 'ALL', label: 'Tüm Mekanlar' },
+                  { id: 'Banyo & Spa', label: 'Banyo & Spa' },
+                  { id: 'Mutfak & Ada', label: 'Mutfak & Ada' },
+                  { id: 'Salon & Antre', label: 'Salon & Antre' },
+                  { id: 'Yatak Odası & Suit', label: 'Yatak Odası' },
+                  { id: 'Teras, Bahçe & Havuz', label: 'Teras & Bahçe' },
+                  { id: 'Ofis, Kafe & Ticari', label: 'Ticari & Ofis' },
+                  { id: 'Dış Cephe & Mimari', label: 'Dış Cephe' }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setSelectedRoomFilter(tab.id)}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      border: selectedRoomFilter === tab.id ? '1.5px solid #0f172a' : '1px solid #e2e8f0',
+                      background: selectedRoomFilter === tab.id ? '#0f172a' : '#ffffff',
+                      color: selectedRoomFilter === tab.id ? '#ffffff' : '#475569',
+                      fontSize: '0.78rem',
+                      fontWeight: '700',
+                      whiteSpace: 'nowrap',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
 
-              {/* Secondary Style & Search Row */}
+              {/* Alt Satır: Stil Filtreleri ve Hızlı Arama */}
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -1081,9 +895,9 @@ export default function InspirationGalleryPage() {
                 paddingTop: '12px',
                 borderTop: '1px solid #f1f5f9'
               }}>
-                {/* Style Pills */}
+                {/* Stil Butonları */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.72rem', fontWeight: '750', color: '#94a3b8', marginRight: '4px' }}>Stil:</span>
+                  <span style={{ fontSize: '0.76rem', fontWeight: '800', color: '#94a3b8', marginRight: '4px' }}>Stil:</span>
                   {['ALL', 'Mermer', 'Beton', 'Ahşap', 'Doğal Taş', 'Terrazzo', 'Mozaik'].map(st => (
                     <button
                       key={st}
@@ -1092,33 +906,61 @@ export default function InspirationGalleryPage() {
                         padding: '4px 10px',
                         borderRadius: '6px',
                         border: 'none',
-                        fontSize: '0.74rem',
+                        fontSize: '0.75rem',
                         fontWeight: '700',
                         background: selectedStyleFilter === st ? '#b38e47' : '#f1f5f9',
-                        color: selectedStyleFilter === st ? '#ffffff' : '#64748b',
-                        cursor: 'pointer'
+                        color: selectedStyleFilter === st ? '#ffffff' : '#475569',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s'
                       }}
                     >
                       {st === 'ALL' ? 'Tümü' : st}
                     </button>
                   ))}
+
+                  {(selectedRoomFilter !== 'ALL' || selectedStyleFilter !== 'ALL' || searchQuery) && (
+                    <button
+                      onClick={() => {
+                        setSelectedRoomFilter('ALL');
+                        setSelectedStyleFilter('ALL');
+                        setSearchQuery('');
+                      }}
+                      style={{
+                        padding: '4px 8px',
+                        background: 'none',
+                        border: 'none',
+                        color: '#ef4444',
+                        fontSize: '0.72rem',
+                        fontWeight: '750',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '2px',
+                        marginLeft: '4px'
+                      }}
+                    >
+                      <RefreshCw size={11} />
+                      <span>Filtreleri Temizle</span>
+                    </button>
+                  )}
                 </div>
 
-                {/* Search Bar */}
-                <div style={{ position: 'relative', width: '100%', maxWidth: '280px' }}>
-                  <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                {/* Arama Input */}
+                <div style={{ position: 'relative', width: '100%', maxWidth: '270px' }}>
+                  <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Seramik veya stil ara..."
+                    placeholder="Model veya stil ara..."
                     style={{
                       width: '100%',
-                      padding: '8px 12px 8px 34px',
-                      borderRadius: '10px',
+                      padding: '7px 12px 7px 32px',
+                      borderRadius: '8px',
                       border: '1px solid #cbd5e1',
                       fontSize: '0.8rem',
-                      outline: 'none'
+                      outline: 'none',
+                      boxSizing: 'border-box'
                     }}
                   />
                   {searchQuery && (
@@ -1126,27 +968,27 @@ export default function InspirationGalleryPage() {
                       onClick={() => setSearchQuery('')}
                       style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
                     >
-                      <X size={14} />
+                      <X size={13} />
                     </button>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Editor's Choice Spotlight Banner */}
+            {/* RAFİNE & KOMPAKT HAFTANIN EDİTÖR SEÇİMİ (SPOTLIGHT) */}
             {selectedRoomFilter === 'ALL' && !searchQuery && selectedStyleFilter === 'ALL' && (
               <div style={{
-                background: 'linear-gradient(135deg, #111827 0%, #0f172a 100%)',
-                borderRadius: '24px',
-                border: '1.5px solid rgba(212, 175, 55, 0.4)',
+                background: '#0f172a',
+                borderRadius: '20px',
+                border: '1px solid rgba(212, 175, 55, 0.35)',
                 overflow: 'hidden',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
-                marginBottom: '36px',
+                boxShadow: '0 12px 30px rgba(15, 23, 42, 0.12)',
+                marginBottom: '32px',
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
                 alignItems: 'center'
               }}>
-                <div style={{ height: '340px', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ height: '280px', position: 'relative', overflow: 'hidden' }}>
                   <img
                     src="/hero/luxury_bathroom.png"
                     alt="Haftanın İlhamı - Lüks Calacatta Camsı Banyo"
@@ -1154,69 +996,68 @@ export default function InspirationGalleryPage() {
                   />
                   <div style={{
                     position: 'absolute',
-                    top: '20px',
-                    left: '20px',
-                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    top: '16px',
+                    left: '16px',
+                    background: '#d4af37',
                     color: '#090d16',
-                    padding: '6px 14px',
-                    borderRadius: '8px',
+                    padding: '4px 12px',
+                    borderRadius: '6px',
+                    fontSize: '0.7rem',
                     fontWeight: '900',
-                    fontSize: '0.75rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    boxShadow: '0 4px 15px rgba(212,175,55,0.4)'
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase'
                   }}>
-                    <Award size={15} />
-                    <span>Haftanın Editör Seçimi</span>
+                    Haftanın Seçimi
                   </div>
                 </div>
 
-                <div style={{ padding: '36px', color: '#ffffff', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '0.72rem', color: '#d4af37', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      2026 Sezon Zirvesi &bull; İtalyan Calacatta Trendi
-                    </span>
+                <div style={{ padding: '28px', color: '#ffffff', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                    2026 İTALYAN CALACATTA TRENDİ
                   </div>
-
-                  <h3 style={{ fontSize: '1.6rem', fontWeight: '900', margin: 0, lineHeight: '1.25' }}>
-                    Camsı Beyaz Calacatta & Pirinç Armatür Banyo Kombinasyonu
-                  </h3>
-
-                  <p style={{ fontSize: '0.9rem', color: '#94a3b8', margin: 0, lineHeight: '1.6' }}>
-                    Geniş ebatlı 60x120 cm rektifiyeli tam parlak porselen karolar ile dikişsiz ayna ferahlığı. Işık kırılmalarıyla banyonuzu 2 kat daha aydınlık gösterir.
+                  <h2 style={{ fontSize: '1.45rem', fontWeight: '900', margin: 0, lineHeight: '1.25' }}>
+                    Camsı Beyaz Calacatta & Pirinç Armatür Banyo
+                  </h2>
+                  <p style={{ fontSize: '0.84rem', color: '#94a3b8', margin: 0, lineHeight: '1.5' }}>
+                    60x120 cm rektifiyeli tam parlak porselen karolar ile dikişsiz ayna ferahlığı ve fırçalanmış pirinç armatür zarafeti.
                   </p>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                    <div style={{ background: 'rgba(255,255,255,0.06)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.76rem' }}>
-                      <span style={{ color: '#94a3b8' }}>Önerilen Model: </span>
-                      <strong style={{ color: '#d4af37' }}>Calacatta Gold 60x120 cm</strong>
-                    </div>
-                    <div style={{ background: 'rgba(255,255,255,0.06)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.76rem', color: '#10b981', fontWeight: '750' }}>
-                      ✓ Rektifiyeli &bull; 1mm Derz
-                    </div>
+                  <div style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    background: 'rgba(255,255,255,0.06)',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    fontSize: '0.76rem',
+                    width: 'fit-content'
+                  }}>
+                    <span style={{ color: '#94a3b8' }}>Önerilen Model:</span>
+                    <strong style={{ color: '#d4af37' }}>Calacatta Gold 60x120 cm</strong>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '6px' }}>
-                    <Link
-                      href="/?q=Calacatta&tab=studio"
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' }}>
+                    <button
+                      onClick={(e) => openInKiosk(galleryItems[0], e)}
                       style={{
                         background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                         color: '#090d16',
-                        padding: '10px 20px',
-                        borderRadius: '10px',
-                        textDecoration: 'none',
-                        fontSize: '0.84rem',
+                        padding: '9px 18px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        fontSize: '0.82rem',
                         fontWeight: '850',
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px',
-                        boxShadow: '0 4px 15px rgba(212,175,55,0.3)'
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 14px rgba(212,175,55,0.35)'
                       }}
                     >
-                      <Sparkles size={16} />
-                      <span>3D Stüdyoda Canlı Gör</span>
-                    </Link>
+                      <Sparkles size={15} />
+                      <span>3D Kioskta Canlı Gör</span>
+                    </button>
 
                     <Link
                       href="/proje-talep?style=Mermer&product=Calacatta"
@@ -1224,153 +1065,137 @@ export default function InspirationGalleryPage() {
                         background: 'rgba(255,255,255,0.08)',
                         color: '#ffffff',
                         border: '1px solid rgba(255,255,255,0.18)',
-                        padding: '10px 18px',
-                        borderRadius: '10px',
+                        padding: '9px 16px',
+                        borderRadius: '8px',
                         textDecoration: 'none',
-                        fontSize: '0.84rem',
+                        fontSize: '0.82rem',
                         fontWeight: '750',
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px'
                       }}
                     >
-                      <span>En Yakın Bayiden Fiyat İste</span>
+                      <span>Fiyat Teklifi Al</span>
+                      <ChevronRight size={14} />
                     </Link>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Gallery Cards Grid (28 Models) */}
+            {/* MİMARİ İLHAM KARTLARI IZGARASI */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))',
-              gap: '26px'
+              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+              gap: '24px'
             }}>
-              {filteredGallery.map((item) => {
+              {filteredGallery.map(item => {
                 const isSaved = savedIds.includes(item.id);
                 return (
                   <div
                     key={item.id}
                     style={{
                       background: '#ffffff',
-                      border: '1px solid rgba(0, 0, 0, 0.06)',
-                      borderRadius: '24px',
+                      borderRadius: '16px',
+                      border: '1px solid #e2e8f0',
                       overflow: 'hidden',
-                      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.03)',
+                      boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
                       display: 'flex',
                       flexDirection: 'column',
-                      transition: 'transform 0.2s, box-shadow 0.2s',
-                      position: 'relative'
+                      transition: 'transform 0.2s, box-shadow 0.2s'
                     }}
                   >
-                    {/* Image Area */}
-                    <div style={{ height: '240px', position: 'relative', background: '#e2e8f0', overflow: 'hidden' }}>
-                      <img 
-                        src={item.img} 
-                        alt={item.title} 
+                    {/* Görsel Alanı */}
+                    <div 
+                      style={{ position: 'relative', height: '220px', overflow: 'hidden', cursor: 'pointer', background: '#e2e8f0' }}
+                      onClick={() => setPreviewItem(item)}
+                    >
+                      <img
+                        src={item.img}
+                        alt={item.title}
                         loading="lazy"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s' }}
                       />
-                      
-                      {/* Top Badges */}
+
+                      {/* Etiket */}
                       <div style={{
                         position: 'absolute',
-                        top: '14px',
-                        left: '14px',
-                        background: 'rgba(15, 23, 42, 0.88)',
-                        backdropFilter: 'blur(6px)',
+                        top: '12px',
+                        left: '12px',
+                        background: 'rgba(15, 23, 42, 0.75)',
+                        backdropFilter: 'blur(8px)',
                         color: '#ffffff',
-                        padding: '4px 10px',
-                        borderRadius: '8px',
+                        padding: '3px 10px',
+                        borderRadius: '6px',
                         fontSize: '0.7rem',
-                        fontWeight: '800',
-                        border: '1px solid rgba(255,255,255,0.1)'
-                      }}>{item.tag}</div>
+                        fontWeight: '800'
+                      }}>
+                        {item.tag}
+                      </div>
 
-                      {/* Save to Moodboard Heart Button */}
+                      {/* Kalp / Favori Butonu */}
                       <button
                         type="button"
                         onClick={(e) => toggleSaveMoodboard(item.id, e)}
-                        title={isSaved ? "İlham Panomdan Çıkar" : "İlham Panoma Kaydet"}
                         style={{
                           position: 'absolute',
-                          top: '14px',
-                          right: '14px',
-                          background: isSaved ? '#d4af37' : 'rgba(15, 23, 42, 0.75)',
-                          backdropFilter: 'blur(6px)',
-                          border: isSaved ? '1px solid #b38e47' : '1px solid rgba(255,255,255,0.2)',
-                          color: isSaved ? '#090d16' : '#ffffff',
-                          width: '36px',
-                          height: '36px',
+                          top: '12px',
+                          right: '12px',
+                          width: '32px',
+                          height: '32px',
                           borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.9)',
+                          backdropFilter: 'blur(4px)',
+                          border: 'none',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           cursor: 'pointer',
-                          transition: 'all 0.2s'
+                          color: isSaved ? '#e11d48' : '#64748b'
                         }}
                       >
-                        <Heart size={17} fill={isSaved ? '#090d16' : 'none'} />
+                        <Heart size={15} fill={isSaved ? '#e11d48' : 'none'} />
                       </button>
 
-                      {/* Room & Spec Badges */}
+                      {/* Boyut ve Bitiş */}
                       <div style={{
                         position: 'absolute',
-                        bottom: '14px',
-                        left: '14px',
-                        display: 'flex',
-                        gap: '6px'
+                        bottom: '10px',
+                        left: '12px',
+                        background: 'rgba(0,0,0,0.65)',
+                        backdropFilter: 'blur(4px)',
+                        color: '#f8fafc',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '0.68rem',
+                        fontWeight: '750'
                       }}>
-                        <div style={{
-                          background: 'rgba(255, 255, 255, 0.94)',
-                          backdropFilter: 'blur(6px)',
-                          color: '#0f172a',
-                          padding: '3px 9px',
-                          borderRadius: '6px',
-                          fontSize: '0.7rem',
-                          fontWeight: '800'
-                        }}>
-                          📍 {item.room}
-                        </div>
-                        {item.finish && (
-                          <div style={{
-                            background: 'rgba(15, 23, 42, 0.82)',
-                            backdropFilter: 'blur(6px)',
-                            color: '#d4af37',
-                            padding: '3px 9px',
-                            borderRadius: '6px',
-                            fontSize: '0.68rem',
-                            fontWeight: '750'
-                          }}>
-                            {item.finish}
-                          </div>
-                        )}
+                        {item.style} &bull; {item.dimensions}
                       </div>
                     </div>
 
-                    {/* Card Content Area */}
-                    <div style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: '10px', flexGrow: 1 }}>
-                      <h4 style={{ fontSize: '1.1rem', fontWeight: '850', margin: 0, color: '#0f172a', lineHeight: '1.35' }}>
+                    {/* Kart Gövdesi */}
+                    <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: '8px', flexGrow: 1 }}>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: '850', margin: 0, color: '#0f172a', lineHeight: '1.35' }}>
                         {item.title}
-                      </h4>
-                      
-                      <p style={{ fontSize: '0.84rem', color: '#64748b', margin: 0, lineHeight: '1.5' }}>
+                      </h3>
+
+                      <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0, lineHeight: '1.45', flexGrow: 1 }}>
                         {item.desc}
                       </p>
 
-                      {/* Color Palette Indicators */}
-                      {item.colors && item.colors.length > 0 && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-                          <span style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: '700' }}>Renk Paleti:</span>
-                          <div style={{ display: 'flex', gap: '4px' }}>
-                            {item.colors.map((c, cIdx) => (
+                      {/* Renk Paleti */}
+                      {item.colors && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                          <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: '700' }}>Renkler:</span>
+                          <div style={{ display: 'flex', gap: '3px' }}>
+                            {item.colors.map((c, idx) => (
                               <span
-                                key={cIdx}
-                                title={item.colorNames?.[cIdx] || c}
+                                key={idx}
+                                title={item.colorNames?.[idx] || c}
                                 style={{
-                                  width: '18px',
-                                  height: '18px',
+                                  width: '14px',
+                                  height: '14px',
                                   borderRadius: '50%',
                                   background: c,
                                   border: '1px solid rgba(0,0,0,0.15)',
@@ -1382,55 +1207,56 @@ export default function InspirationGalleryPage() {
                         </div>
                       )}
 
-                      {/* Recommended Tile Spec Box */}
+                      {/* Önerilen Model */}
                       {item.tileRecommendation && (
                         <div style={{
                           background: '#f8fafc',
-                          padding: '10px 12px',
-                          borderRadius: '12px',
+                          padding: '6px 10px',
+                          borderRadius: '8px',
                           border: '1px solid #f1f5f9',
-                          fontSize: '0.76rem',
-                          marginTop: '4px'
+                          fontSize: '0.74rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginTop: '2px'
                         }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#64748b', fontWeight: '600' }}>Önerilen Karo:</span>
-                            <span style={{ color: '#b38e47', fontWeight: '800' }}>{item.dimensions}</span>
-                          </div>
-                          <div style={{ fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>
-                            {item.tileRecommendation}
-                          </div>
+                          <span style={{ color: '#64748b' }}>Öneri:</span>
+                          <strong style={{ color: '#0f172a' }}>{item.tileRecommendation}</strong>
                         </div>
                       )}
 
-                      {/* Action Buttons */}
+                      {/* Aksiyon Butonları */}
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         gap: '8px',
-                        marginTop: 'auto',
-                        paddingTop: '16px',
+                        paddingTop: '12px',
+                        marginTop: '4px',
                         borderTop: '1px solid #f1f5f9'
                       }}>
-                        <Link
-                          href={`/?q=${encodeURIComponent(item.style)}&tab=studio`}
+                        {/* 3D Kiosk'ta Aç Butonu */}
+                        <button
+                          type="button"
+                          onClick={(e) => openInKiosk(item, e)}
                           style={{
                             background: '#0f172a',
                             color: '#ffffff',
-                            padding: '8px 14px',
+                            padding: '7px 13px',
                             borderRadius: '8px',
-                            textDecoration: 'none',
+                            border: 'none',
                             fontSize: '0.78rem',
                             fontWeight: '800',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '6px',
+                            gap: '5px',
+                            cursor: 'pointer',
                             transition: 'all 0.2s'
                           }}
                         >
                           <Sparkles size={13} style={{ color: '#d4af37' }} />
-                          <span>3D Canlı Gör</span>
-                        </Link>
+                          <span>3D Kioskta Gör</span>
+                        </button>
 
                         <Link
                           href={`/proje-talep?style=${encodeURIComponent(item.style)}&room=${encodeURIComponent(item.room)}`}
@@ -1438,10 +1264,10 @@ export default function InspirationGalleryPage() {
                             background: 'rgba(212, 175, 55, 0.12)',
                             color: '#8c6b30',
                             border: '1px solid rgba(212, 175, 55, 0.3)',
-                            padding: '8px 12px',
+                            padding: '7px 11px',
                             borderRadius: '8px',
                             textDecoration: 'none',
-                            fontSize: '0.78rem',
+                            fontSize: '0.76rem',
                             fontWeight: '800',
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -1449,7 +1275,7 @@ export default function InspirationGalleryPage() {
                           }}
                         >
                           <span>Fiyat İste</span>
-                          <ChevronRight size={14} />
+                          <ChevronRight size={13} />
                         </Link>
                       </div>
                     </div>
@@ -1457,376 +1283,180 @@ export default function InspirationGalleryPage() {
                 );
               })}
             </div>
+
+            {filteredGallery.length === 0 && (
+              <div style={{
+                textAlign: 'center',
+                padding: '60px 20px',
+                background: '#ffffff',
+                borderRadius: '16px',
+                border: '1px solid #e2e8f0',
+                marginTop: '20px'
+              }}>
+                <Search size={32} style={{ color: '#94a3b8', margin: '0 auto 12px auto' }} />
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a' }}>Aradığınız kriterlere uygun model bulunamadı</h3>
+                <p style={{ color: '#64748b', fontSize: '0.85rem' }}>Filtreleri sıfırlayarak tüm 28+ mimari ilham projesini inceleyebilirsiniz.</p>
+                <button
+                  onClick={() => {
+                    setSelectedRoomFilter('ALL');
+                    setSelectedStyleFilter('ALL');
+                    setSearchQuery('');
+                  }}
+                  style={{
+                    marginTop: '10px',
+                    padding: '8px 16px',
+                    background: '#0f172a',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '0.8rem',
+                    fontWeight: '750',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Tüm Modelleri Göster
+                </button>
+              </div>
+            )}
           </section>
         )}
 
         {/* ═════════════════════════════════════════════════════════════════════════
-            TAB 2: SERAMİĞİN GÜNDEMİ & CANLI TREND RADARI
+            SEKME 2: SEKTÖR & TREND RAPORU
         ═════════════════════════════════════════════════════════════════════════ */}
         {activeTab === 'news' && (
-          <section style={{ animation: 'fadeIn 0.3s ease-out' }}>
-            
-            {/* Agenda Header & Market Pulse */}
+          <section>
             <div style={{
               background: '#ffffff',
-              borderRadius: '24px',
-              padding: '28px',
+              borderRadius: '20px',
+              padding: '24px',
               border: '1px solid #e2e8f0',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.03)',
-              marginBottom: '32px'
+              marginBottom: '28px'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
-                    <Flame size={22} />
-                  </div>
-                  <div>
-                    <h2 style={{ fontSize: '1.35rem', fontWeight: '900', margin: 0, color: '#0f172a' }}>
-                      Seramiğin Gündemi & Canlı Sektör Raporu
-                    </h2>
-                    <p style={{ fontSize: '0.84rem', color: '#64748b', margin: '2px 0 0 0' }}>
-                      Cersaie Bologna, UNICERA ve iç mimarlık dünyasından en son üretim teknolojileri, hammadde ve renk analizleri.
-                    </p>
-                  </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(239, 68, 68, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
+                  <Flame size={20} />
                 </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', padding: '6px 12px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '0.74rem', color: '#64748b' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
-                  <span>Veriler Günlük Canlı Güncellenir</span>
+                <div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: '900', margin: 0, color: '#0f172a' }}>
+                    Seramiğin Gündemi & Trend Raporu
+                  </h2>
+                  <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                    Cersaie Bologna, UNICERA ve iç mimarlık dünyasından en son ebat, hammadde ve renk analizleri.
+                  </p>
                 </div>
               </div>
 
-              {/* Real Market Pulse Metric Cards */}
+              {/* İstatistik Kutuları */}
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                gap: '16px'
+                gap: '14px'
               }}>
-                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>
-                    En Çok Tercih Edilen Ebat
-                  </div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: '950', color: '#0f172a', margin: '4px 0' }}>
-                    60x120 cm (%48 Pay)
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: '#10b981', fontWeight: '750' }}>
-                    ↑ Derzsiz kesintisiz banyo ve salon standardı
-                  </div>
+                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>En Popüler Ebat</div>
+                  <div style={{ fontSize: '1.3rem', fontWeight: '900', color: '#0f172a', margin: '4px 0' }}>60x120 cm (%48 Pay)</div>
+                  <div style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '750' }}>Kesintisiz derzsiz zemin standardı</div>
                 </div>
 
-                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>
-                    Yükselen Doku & Renk
-                  </div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: '950', color: '#b38e47', margin: '4px 0' }}>
-                    Sıcak Traverten & Bej
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: '#b38e47', fontWeight: '750' }}>
-                    ↑ Soğuk griye göre +%72 talep artışı
-                  </div>
+                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>Yükselen Trend</div>
+                  <div style={{ fontSize: '1.3rem', fontWeight: '900', color: '#b38e47', margin: '4px 0' }}>Sıcak Traverten & Bej</div>
+                  <div style={{ fontSize: '0.72rem', color: '#b38e47', fontWeight: '750' }}>Soğuk griye kıyasla +%72 talep</div>
                 </div>
 
-                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>
-                    2026 İnovasyon Lideri
-                  </div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: '950', color: '#2563eb', margin: '4px 0' }}>
-                    2 cm Dış Mekan Karoları
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: '#2563eb', fontWeight: '750' }}>
-                    Harçsız çim & yükseltilmiş döşeme
-                  </div>
-                </div>
-
-                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>
-                    Türkiye Üretim Gücü
-                  </div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: '950', color: '#059669', margin: '4px 0' }}>
-                    Avrupa 2.si &bull; 140+ Ülke
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: '#059669', fontWeight: '750' }}>
-                    Global porselen ihracat rekoru
-                  </div>
+                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>Dış Mekan İnovasyonu</div>
+                  <div style={{ fontSize: '1.3rem', fontWeight: '900', color: '#2563eb', margin: '4px 0' }}>2 cm Kalın Porselen</div>
+                  <div style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: '750' }}>Harçsız çim & yükseltilmiş döşeme</div>
                 </div>
               </div>
             </div>
+          </section>
+        )}
 
-            {/* Live News Grid */}
+        {/* ═════════════════════════════════════════════════════════════════════════
+            SEKME 3: ÖNCESİ / SONRASI
+        ═════════════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'beforeAfter' && (
+          <section>
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-              gap: '24px'
+              background: '#ffffff',
+              borderRadius: '20px',
+              padding: '24px',
+              border: '1px solid #e2e8f0',
+              marginBottom: '28px'
             }}>
-              {liveNewsItems.map(item => (
-                <div
-                  key={item.id}
-                  style={{
-                    background: '#ffffff',
-                    borderRadius: '20px',
-                    padding: '26px',
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 6px 20px rgba(0,0,0,0.02)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{
-                      padding: '3px 10px',
-                      borderRadius: '6px',
-                      fontSize: '0.7rem',
-                      fontWeight: '900',
-                      background: `${item.badgeColor}15`,
-                      color: item.badgeColor,
-                      border: `1px solid ${item.badgeColor}35`
-                    }}>
-                      {item.badge}
-                    </span>
-                    <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '600' }}>{item.date}</span>
-                  </div>
-
-                  <h3 style={{ fontSize: '1.18rem', fontWeight: '850', margin: 0, color: '#0f172a', lineHeight: '1.35' }}>
-                    {item.title}
-                  </h3>
-
-                  <p style={{ fontSize: '0.85rem', color: '#475569', margin: 0, lineHeight: '1.6' }}>
-                    {item.summary}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(56, 189, 248, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0284c7' }}>
+                  <Eye size={20} />
+                </div>
+                <div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: '900', margin: 0, color: '#0f172a' }}>
+                    Gerçek Proje Dönüşümleri (Öncesi / Sonrası)
+                  </h2>
+                  <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                    Eski seramiklerin modern 60x120 ve derzsiz porselen karolarla yenilenme farkı.
                   </p>
+                </div>
+              </div>
 
-                  <div style={{
-                    background: '#f8fafc',
-                    padding: '10px 14px',
-                    borderRadius: '10px',
-                    border: '1px solid #f1f5f9',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    fontSize: '0.74rem',
-                    marginTop: '4px'
-                  }}>
-                    <span style={{ color: '#64748b' }}>Kaynak: <strong>{item.source}</strong></span>
-                    <span style={{ color: '#b38e47', fontWeight: '800' }}>{item.trendScore}</span>
-                  </div>
-
-                  <div style={{
-                    marginTop: 'auto',
-                    paddingTop: '12px',
-                    borderTop: '1px solid #f1f5f9',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}>
-                    <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{item.readTime}</span>
-                    <Link
-                      href={`/?q=${encodeURIComponent(item.badge)}`}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: '20px'
+              }}>
+                <div style={{ borderRadius: '14px', overflow: 'hidden', border: '1px solid #e2e8f0', position: 'relative' }}>
+                  <img src="/hero/luxury_bathroom.png" alt="Banyo Yenileme" style={{ width: '100%', height: '240px', objectFit: 'cover' }} />
+                  <div style={{ padding: '14px', background: '#ffffff' }}>
+                    <div style={{ fontWeight: '850', color: '#0f172a' }}>30 Yıllık Banyonun Calacatta Dönüşümü</div>
+                    <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '4px 0 10px 0' }}>Eski sararmış 20x20 fayanslar yerine kesintisiz 60x120 Calacatta Lappato uygulandı.</p>
+                    <button
+                      onClick={(e) => openInKiosk(galleryItems[0], e)}
                       style={{
-                        fontSize: '0.8rem',
+                        padding: '6px 12px',
+                        borderRadius: '6px',
+                        background: '#0f172a',
+                        color: '#d4af37',
+                        border: 'none',
+                        fontSize: '0.76rem',
                         fontWeight: '800',
-                        color: '#0f172a',
-                        textDecoration: 'none',
-                        display: 'flex',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
                         alignItems: 'center',
                         gap: '4px'
                       }}
                     >
-                      <span>İlgili Karoları İncele</span>
-                      <ChevronRight size={14} />
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ═════════════════════════════════════════════════════════════════════════
-            TAB 3: BEFORE / AFTER RENOVATION SHOWCASE
-        ═════════════════════════════════════════════════════════════════════════ */}
-        {activeTab === 'beforeAfter' && (
-          <section style={{ animation: 'fadeIn 0.3s ease-out' }}>
-            <div style={{
-              background: '#ffffff',
-              borderRadius: '24px',
-              padding: '32px',
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.03)',
-              marginBottom: '24px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
-                <div>
-                  <h2 style={{ fontSize: '1.35rem', fontWeight: '900', margin: 0, color: '#0f172a' }}>
-                    Önce & Sonra: Gerçek Mekan Dönüşüm Vitrini
-                  </h2>
-                  <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '4px 0 0 0' }}>
-                    Eski ve yıpranmış mekanların SeramikBak porselen karoları ile nasıl 5 yıldızlı yaşam alanlarına dönüştüğünü inceleyin.
-                  </p>
-                </div>
-
-                {/* Project Selector Tabs */}
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  {beforeAfterProjects.map(p => (
-                    <button
-                      key={p.id}
-                      onClick={() => setActiveBeforeAfterId(p.id)}
-                      style={{
-                        padding: '8px 16px',
-                        borderRadius: '10px',
-                        border: activeBeforeAfterId === p.id ? '1.5px solid #d4af37' : '1px solid #e2e8f0',
-                        background: activeBeforeAfterId === p.id ? '#0f172a' : '#f8fafc',
-                        color: activeBeforeAfterId === p.id ? '#d4af37' : '#64748b',
-                        fontSize: '0.8rem',
-                        fontWeight: '800',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Proje {p.id}: {p.location.split(',')[0]}
+                      <Sparkles size={12} />
+                      <span>3D Kioskta Canlı Gör</span>
                     </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* View Toggle Bar (Before vs After) */}
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-                <div style={{
-                  display: 'inline-flex',
-                  background: '#f1f5f9',
-                  padding: '4px',
-                  borderRadius: '12px'
-                }}>
-                  <button
-                    onClick={() => setBeforeAfterView('before')}
-                    style={{
-                      padding: '8px 24px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      background: beforeAfterView === 'before' ? '#ef4444' : 'transparent',
-                      color: beforeAfterView === 'before' ? '#ffffff' : '#64748b',
-                      fontSize: '0.82rem',
-                      fontWeight: '800',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    ⏮️ Önceki Hali (Eski Döşeme)
-                  </button>
-                  <button
-                    onClick={() => setBeforeAfterView('after')}
-                    style={{
-                      padding: '8px 24px',
-                      borderRadius: '8px',
-                      border: 'none',
-                      background: beforeAfterView === 'after' ? '#10b981' : 'transparent',
-                      color: beforeAfterView === 'after' ? '#ffffff' : '#64748b',
-                      fontSize: '0.82rem',
-                      fontWeight: '800',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    ✨ SeramikBak ile Yenilenmiş Hali
-                  </button>
-                </div>
-              </div>
-
-              {/* Image & Detail Comparison Area */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                gap: '24px',
-                alignItems: 'center'
-              }}>
-                <div style={{ height: '360px', borderRadius: '18px', overflow: 'hidden', position: 'relative', border: '1px solid #e2e8f0' }}>
-                  <img
-                    src={beforeAfterView === 'after' ? currentProject.afterImg : currentProject.beforeImg}
-                    alt={currentProject.title}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'all 0.3s' }}
-                  />
-                  <div style={{
-                    position: 'absolute',
-                    top: '16px',
-                    left: '16px',
-                    background: beforeAfterView === 'after' ? '#10b981' : '#ef4444',
-                    color: '#ffffff',
-                    padding: '4px 12px',
-                    borderRadius: '6px',
-                    fontSize: '0.74rem',
-                    fontWeight: '900'
-                  }}>
-                    {beforeAfterView === 'after' ? 'DÖNÜŞÜM SONRASI' : 'ÖNCEKİ HALİ'}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <span style={{ fontSize: '0.72rem', color: '#b38e47', fontWeight: '800', textTransform: 'uppercase' }}>
-                    📍 {currentProject.location} &bull; {currentProject.m2}
-                  </span>
-
-                  <h3 style={{ fontSize: '1.4rem', fontWeight: '900', margin: 0, color: '#0f172a' }}>
-                    {currentProject.title}
-                  </h3>
-
-                  <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: '800', color: beforeAfterView === 'after' ? '#10b981' : '#ef4444', marginBottom: '4px' }}>
-                      {beforeAfterView === 'after' ? '✓ Yapılan İyileştirmeler:' : '✕ Yaşanan Problemler:'}
-                    </div>
-                    <p style={{ fontSize: '0.85rem', color: '#334155', margin: 0, lineHeight: '1.5' }}>
-                      {beforeAfterView === 'after' ? currentProject.afterDesc : currentProject.beforeDesc}
-                    </p>
-                  </div>
-
-                  <div>
-                    <span style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '750', display: 'block', marginBottom: '6px' }}>
-                      Kullanılan Karolar & Malzemeler:
-                    </span>
-                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      {currentProject.tilesUsed.map((t, tIdx) => (
-                        <span key={tIdx} style={{ background: '#f1f5f9', color: '#0f172a', padding: '4px 10px', borderRadius: '6px', fontSize: '0.76rem', fontWeight: '750' }}>
-                          ✓ {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '8px' }}>
-                    <Link
-                      href="/proje-talep"
+                <div style={{ borderRadius: '14px', overflow: 'hidden', border: '1px solid #e2e8f0', position: 'relative' }}>
+                  <img src="/hero/scandinavian_kitchen.png" alt="Mutfak Yenileme" style={{ width: '100%', height: '240px', objectFit: 'cover' }} />
+                  <div style={{ padding: '14px', background: '#ffffff' }}>
+                    <div style={{ fontWeight: '850', color: '#0f172a' }}>Karanlık Mutfaktan İskandinav Ferahlığına</div>
+                    <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '4px 0 10px 0' }}>Suya dayanıksız laminat parke yerine 20x120 Meşe Porselen Parke kaplandı.</p>
+                    <button
+                      onClick={(e) => openInKiosk(galleryItems[6], e)}
                       style={{
+                        padding: '6px 12px',
+                        borderRadius: '6px',
                         background: '#0f172a',
-                        color: '#ffffff',
-                        padding: '10px 20px',
-                        borderRadius: '10px',
-                        textDecoration: 'none',
-                        fontSize: '0.82rem',
+                        color: '#d4af37',
+                        border: 'none',
+                        fontSize: '0.76rem',
                         fontWeight: '800',
+                        cursor: 'pointer',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '6px'
+                        gap: '4px'
                       }}
                     >
-                      <Calculator size={15} style={{ color: '#d4af37' }} />
-                      <span>Benim Mekanım İçin Fiyat Al</span>
-                    </Link>
-                    <Link
-                      href="/?tab=studio"
-                      style={{
-                        background: '#f1f5f9',
-                        color: '#0f172a',
-                        border: '1px solid #cbd5e1',
-                        padding: '10px 16px',
-                        borderRadius: '10px',
-                        textDecoration: 'none',
-                        fontSize: '0.82rem',
-                        fontWeight: '750',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <Sparkles size={14} />
-                      <span>3D Simülasyon Yap</span>
-                    </Link>
+                      <Sparkles size={12} />
+                      <span>3D Kioskta Canlı Gör</span>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1835,175 +1465,100 @@ export default function InspirationGalleryPage() {
         )}
 
         {/* ═════════════════════════════════════════════════════════════════════════
-            TAB 4: MATERIAL & GROUT CALCULATOR
+            SEKME 4: METRAJ & DERZ HESAPLAYICI
         ═════════════════════════════════════════════════════════════════════════ */}
         {activeTab === 'calculator' && (
-          <section style={{ animation: 'fadeIn 0.3s ease-out' }}>
+          <section>
             <div style={{
               background: '#ffffff',
+              borderRadius: '20px',
+              padding: '28px',
               border: '1px solid #e2e8f0',
-              borderRadius: '24px',
-              padding: '36px',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.02)'
+              maxWidth: '720px',
+              margin: '0 auto'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-                <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: 'rgba(179, 142, 71, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b38e47' }}>
-                  <Calculator size={24} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(212, 175, 55, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b38e47' }}>
+                  <Calculator size={20} />
                 </div>
                 <div>
-                  <h2 style={{ fontSize: '1.35rem', fontWeight: '900', margin: 0, color: '#0f172a' }}>
-                    Seramik & Derz Metraj Hesaplayıcı
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: '900', margin: 0, color: '#0f172a' }}>
+                    Akıllı Karo Kutu & Derz Hesaplayıcı
                   </h2>
-                  <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '2px 0 0 0' }}>
-                    Zemin veya duvar ölçülerinizi girin; kaç kutu seramik ve kaç kg derz harcı gerektiğini anında öğrenin.
+                  <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
+                    Oda ölçülerinizi girin, gereken paket sayısını ve derz dolgusunu anında hesaplayın.
                   </p>
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '20px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '750', color: '#334155', marginBottom: '6px' }}>En (Metre)</label>
-                  <input 
-                    type="number" 
-                    value={calcWidth} 
-                    onChange={e => setCalcWidth(e.target.value)} 
-                    placeholder="Örn: 4"
-                    style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.9rem', outline: 'none' }}
+                  <label style={{ fontSize: '0.76rem', fontWeight: '750', color: '#64748b', display: 'block', marginBottom: '4px' }}>Genişlik (Metre):</label>
+                  <input
+                    type="number"
+                    value={calcWidth}
+                    onChange={(e) => setCalcWidth(e.target.value)}
+                    style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
                   />
                 </div>
-
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '750', color: '#334155', marginBottom: '6px' }}>Boy (Metre)</label>
-                  <input 
-                    type="number" 
-                    value={calcLength} 
-                    onChange={e => setCalcLength(e.target.value)} 
-                    placeholder="Örn: 5"
-                    style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.9rem', outline: 'none' }}
+                  <label style={{ fontSize: '0.76rem', fontWeight: '750', color: '#64748b', display: 'block', marginBottom: '4px' }}>Uzunluk (Metre):</label>
+                  <input
+                    type="number"
+                    value={calcLength}
+                    onChange={(e) => setCalcLength(e.target.value)}
+                    style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
                   />
                 </div>
-
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '750', color: '#334155', marginBottom: '6px' }}>Seramik Ebat Seçimi</label>
-                  <select 
-                    value={calcTileSize} 
-                    onChange={e => setCalcTileSize(e.target.value)}
-                    style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.9rem', background: '#fff' }}
+                  <label style={{ fontSize: '0.76rem', fontWeight: '750', color: '#64748b', display: 'block', marginBottom: '4px' }}>Karo Ebatı:</label>
+                  <select
+                    value={calcTileSize}
+                    onChange={(e) => setCalcTileSize(e.target.value)}
+                    style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', background: '#ffffff' }}
                   >
-                    <option value="60x120">60x120 cm (Kutu: 1.44 m²)</option>
-                    <option value="60x60">60x60 cm (Kutu: 1.44 m²)</option>
-                    <option value="80x80">80x80 cm (Kutu: 1.28 m²)</option>
-                    <option value="120x240">120x240 cm Dev Plaka (Kutu: 2.88 m²)</option>
-                    <option value="30x60">30x60 cm (Kutu: 1.44 m²)</option>
-                    <option value="20x120">20x120 cm Ahşap Parke (Kutu: 1.20 m²)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '750', color: '#334155', marginBottom: '6px' }}>Kesim & Fire Oranı (%)</label>
-                  <select 
-                    value={calcWastePercent} 
-                    onChange={e => setCalcWastePercent(e.target.value)}
-                    style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '0.9rem', background: '#fff' }}
-                  >
-                    <option value="5">%5 (Düz & Basit Döşeme)</option>
-                    <option value="10">%10 (Standart Önerilen)</option>
-                    <option value="15">%15 (Çapraz / Balıksırtı / Köşeli Döşeme)</option>
+                    <option value="60x120">60x120 cm (1.44 m²/kutu)</option>
+                    <option value="60x60">60x60 cm (1.44 m²/kutu)</option>
+                    <option value="80x80">80x80 cm (1.28 m²/kutu)</option>
+                    <option value="20x120">20x120 cm (1.20 m²/kutu)</option>
                   </select>
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={calculateMaterials}
                 style={{
-                  background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '10px',
+                  background: '#0f172a',
                   color: '#ffffff',
                   border: 'none',
-                  borderRadius: '12px',
-                  padding: '14px 28px',
+                  fontSize: '0.85rem',
                   fontWeight: '800',
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  boxShadow: '0 4px 15px rgba(15, 23, 42, 0.2)'
+                  cursor: 'pointer'
                 }}
               >
-                <Calculator size={18} style={{ color: '#d4af37' }} />
-                <span>Malzeme İhtiyacını Hesapla</span>
+                Hesapla
               </button>
 
-              {/* CALCULATION RESULTS DISPLAY */}
               {calcResult && (
-                <div style={{ marginTop: '30px', padding: '24px', background: '#f8fafc', borderRadius: '16px', border: '1.5px solid #d4af37' }}>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: '850', margin: '0 0 16px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <CheckCircle2 size={20} style={{ color: '#10b981' }} />
-                    <span>Hesaplanan İhtiyaç Özeti</span>
-                  </h3>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
-                    <div style={{ background: '#fff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase' }}>Net Alan</span>
-                      <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#0f172a', marginTop: '4px' }}>
-                        {calcResult.netArea} m²
-                      </div>
-                    </div>
-
-                    <div style={{ background: '#fff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase' }}>Fire Dahil Satın Alınacak</span>
-                      <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#2563eb', marginTop: '4px' }}>
-                        {calcResult.totalAreaWithWaste} m²
-                      </div>
-                    </div>
-
-                    <div style={{ background: '#fff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase' }}>Gereken Kutu</span>
-                      <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#b38e47', marginTop: '4px' }}>
-                        {calcResult.boxesNeeded} Kutu
-                      </div>
-                      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Top. {calcResult.totalPurchasedM2} m²</span>
-                    </div>
-
-                    <div style={{ background: '#fff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                      <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase' }}>Tahmini Derz Dolgusu</span>
-                      <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#10b981', marginTop: '4px' }}>
-                        ~{calcResult.groutKgNeeded} kg
-                      </div>
-                    </div>
+                <div style={{ marginTop: '20px', padding: '16px', borderRadius: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '700' }}>Net Alan</div>
+                    <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#0f172a' }}>{calcResult.netArea} m²</div>
                   </div>
-
-                  <div style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                    <Link href={`/?q=${calcTileSize}`} style={{
-                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                      color: '#090d16',
-                      textDecoration: 'none',
-                      padding: '10px 20px',
-                      borderRadius: '10px',
-                      fontSize: '0.82rem',
-                      fontWeight: '800',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}>
-                      <span>{calcTileSize} cm Seramik Modellerini İncele</span>
-                      <ChevronRight size={16} />
-                    </Link>
-                    <Link href={`/proje-talep?m2=${calcResult.totalAreaWithWaste}&size=${calcTileSize}`} style={{
-                      background: '#ffffff',
-                      color: '#0f172a',
-                      border: '1px solid #cbd5e1',
-                      textDecoration: 'none',
-                      padding: '10px 20px',
-                      borderRadius: '10px',
-                      fontSize: '0.82rem',
-                      fontWeight: '750',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}>
-                      <span>Bayilerden Bu Metraj İçin Fiyat Teklifi İste</span>
-                    </Link>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '750' }}>Fire Dahil (%10)</div>
+                    <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#b38e47' }}>{calcResult.totalAreaWithWaste} m²</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '750' }}>Gereken Kutu</div>
+                    <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#10b981' }}>{calcResult.boxesNeeded} Kutu</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '750' }}>Derz Dolgusu</div>
+                    <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#2563eb' }}>~{calcResult.groutKgNeeded} kg</div>
                   </div>
                 </div>
               )}
@@ -2012,375 +1567,273 @@ export default function InspirationGalleryPage() {
         )}
 
         {/* ═════════════════════════════════════════════════════════════════════════
-            TAB 5: EDUCATIONAL BLOG & TECHNICAL GUIDES
+            SEKME 5: SEÇİM REHBERLERİ
         ═════════════════════════════════════════════════════════════════════════ */}
         {activeTab === 'blog' && (
-          <section style={{ animation: 'fadeIn 0.3s ease-out' }}>
+          <section>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: '24px'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '20px'
             }}>
-              {articles.map(article => (
-                <div 
-                  key={article.id}
-                  onClick={() => setSelectedArticle(article)}
-                  style={{
-                    background: '#ffffff',
-                    border: '1px solid rgba(0, 0, 0, 0.06)',
-                    borderRadius: '24px',
-                    padding: '30px',
-                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.02)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '14px',
-                    transition: 'transform 0.2s'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{
-                      background: 'rgba(179, 142, 71, 0.12)',
-                      color: '#8c6b30',
-                      padding: '4px 12px',
-                      borderRadius: '8px',
-                      fontSize: '0.72rem',
-                      fontWeight: '800'
-                    }}>{article.category}</span>
-                    <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Clock size={12} />
-                      {article.readTime}
-                    </span>
-                  </div>
-                  
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: '850', margin: 0, lineHeight: '1.4', color: '#0f172a' }}>
-                    {article.title}
-                  </h3>
-                  
-                  <p style={{ fontSize: '0.86rem', color: '#64748b', margin: 0, lineHeight: '1.6' }}>
-                    {article.summary}
-                  </p>
-
-                  <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '0.82rem',
-                    fontWeight: '800',
-                    color: '#b38e47',
-                    marginTop: 'auto',
-                    paddingTop: '12px'
-                  }}>
-                    <span>Detaylı Rehberi Oku</span>
-                    <ChevronRight size={14} />
-                  </div>
+              {[
+                { title: '60x120 Seramik Döşeme Rehberi', desc: 'Büyük format porselen karolarda klips ve derz artı kullanımının püf noktaları.', tag: 'Uygulama' },
+                { title: 'R10 ve R11 Kaymazlık Değerleri Ne Anlama Gelir?', desc: 'Banyo ıslak hacimleri ve teraslar için doğru kaymazlık sınıfı seçimi.', tag: 'Teknik Bilgi' },
+                { title: 'Lappato vs Mat: Hangi Bitiş Tercih Edilmeli?', desc: 'Işık yansıması, temizlik kolaylığı ve leke tutmazlık karşılaştırması.', tag: 'Tasarım' }
+              ].map((art, idx) => (
+                <div key={idx} style={{ background: '#ffffff', borderRadius: '14px', padding: '20px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#b38e47', textTransform: 'uppercase' }}>{art.tag}</span>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: '850', color: '#0f172a', margin: 0 }}>{art.title}</h3>
+                  <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0, lineHeight: '1.45' }}>{art.desc}</p>
                 </div>
               ))}
             </div>
           </section>
         )}
 
-      </div>
+      </main>
 
       {/* ─────────────────────────────────────────────────────────────────────────────
-          MOODBOARD MODAL / DRAWER (Benim İlham Panom)
+          HIZLI ÖNİZLEME MODALI (QUICK VIEW)
       ───────────────────────────────────────────────────────────────────────────── */}
-      {showMoodboardModal && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(15, 23, 42, 0.65)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 100,
-          padding: '20px'
-        }}>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '24px',
-            width: '100%',
-            maxWidth: '780px',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)',
-            position: 'relative'
-          }}>
-            <div style={{
-              padding: '24px 30px',
-              borderBottom: '1px solid #f1f5f9',
-              position: 'sticky',
-              top: 0,
+      {previewItem && (
+        <div 
+          onClick={() => setPreviewItem(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{
               background: '#ffffff',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              zIndex: 5
-            }}>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '900', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Heart size={20} fill="#d4af37" color="#d4af37" />
-                  <span>Benim İlham Panom ({savedGalleryItems.length} Görsel)</span>
-                </h3>
-                <p style={{ margin: '3px 0 0 0', fontSize: '0.78rem', color: '#64748b' }}>
-                  Beğendiğiniz tasarım modelleri bu panoda toplanır. Mimarla paylaşabilir veya bayiden teklif alabilirsiniz.
-                </p>
-              </div>
+              borderRadius: '20px',
+              maxWidth: '740px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+              position: 'relative'
+            }}
+          >
+            <button
+              onClick={() => setPreviewItem(null)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: 'rgba(0,0,0,0.6)',
+                color: '#ffffff',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: 10
+              }}
+            >
+              <X size={18} />
+            </button>
 
-              <button 
-                onClick={() => setShowMoodboardModal(false)}
-                style={{
-                  background: '#f1f5f9',
-                  border: 'none',
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  color: '#475569'
-                }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div style={{ padding: '24px 30px' }}>
-              {savedGalleryItems.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b' }}>
-                  <Heart size={48} style={{ color: '#cbd5e1', marginBottom: '12px' }} />
-                  <h4 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', color: '#0f172a', fontWeight: '800' }}>
-                    Henüz İlham Panonuza Model Eklemediniz
-                  </h4>
-                  <p style={{ margin: 0, fontSize: '0.84rem' }}>
-                    Galerideki beğendiğiniz fotoğrafların sağ üstündeki kalp butonuna basarak bu panoya toplayabilirsiniz.
-                  </p>
-                </div>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
-                  {savedGalleryItems.map(item => (
-                    <div key={item.id} style={{ borderRadius: '14px', border: '1px solid #e2e8f0', overflow: 'hidden', background: '#f8fafc' }}>
-                      <div style={{ height: '130px', position: 'relative' }}>
-                        <img src={item.img} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        <button
-                          onClick={() => toggleSaveMoodboard(item.id)}
-                          style={{ position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.6)', border: 'none', color: '#fff', width: '24px', height: '24px', borderRadius: '50%', cursor: 'pointer' }}
-                        >
-                          <X size={13} />
-                        </button>
-                      </div>
-                      <div style={{ padding: '10px' }}>
-                        <div style={{ fontSize: '0.8rem', fontWeight: '800', color: '#0f172a', lineHeight: '1.2' }}>{item.title}</div>
-                        <div style={{ fontSize: '0.7rem', color: '#b38e47', marginTop: '4px', fontWeight: '700' }}>{item.tileRecommendation}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {savedGalleryItems.length > 0 && (
+            <div style={{ height: '360px', width: '100%', overflow: 'hidden', position: 'relative' }}>
+              <img src={previewItem.img} alt={previewItem.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               <div style={{
-                padding: '18px 30px',
+                position: 'absolute',
+                bottom: '16px',
+                left: '16px',
+                background: 'rgba(15, 23, 42, 0.85)',
+                color: '#d4af37',
+                padding: '4px 12px',
+                borderRadius: '6px',
+                fontSize: '0.74rem',
+                fontWeight: '800'
+              }}>
+                {previewItem.style} &bull; {previewItem.dimensions}
+              </div>
+            </div>
+
+            <div style={{ padding: '24px' }}>
+              <h2 style={{ fontSize: '1.35rem', fontWeight: '900', color: '#0f172a', margin: '0 0 8px 0' }}>
+                {previewItem.title}
+              </h2>
+              <p style={{ fontSize: '0.88rem', color: '#64748b', lineHeight: '1.5', margin: '0 0 16px 0' }}>
+                {previewItem.desc}
+              </p>
+
+              <div style={{
                 background: '#f8fafc',
-                borderTop: '1px solid #f1f5f9',
+                padding: '14px',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 flexWrap: 'wrap',
-                gap: '12px'
+                gap: '10px',
+                marginBottom: '20px'
               }}>
+                <div>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700' }}>Önerilen Seramik Modeli:</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: '900', color: '#0f172a' }}>{previewItem.tileRecommendation}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700' }}>Yüzey Bitişi:</div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: '850', color: '#b38e47' }}>{previewItem.finish}</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                {/* 3D Kioskta Aç */}
                 <button
-                  onClick={() => {
-                    setSavedIds([]);
-                    localStorage.removeItem('sb_ilham_moodboard');
+                  type="button"
+                  onClick={(e) => {
+                    setPreviewItem(null);
+                    openInKiosk(previewItem, e);
                   }}
-                  style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '0.78rem', fontWeight: '750', cursor: 'pointer' }}
+                  style={{
+                    flex: 1,
+                    minWidth: '200px',
+                    padding: '12px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                    color: '#d4af37',
+                    border: '1px solid rgba(212, 175, 55, 0.4)',
+                    fontSize: '0.88rem',
+                    fontWeight: '850',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    cursor: 'pointer'
+                  }}
                 >
-                  Panoyu Temizle
+                  <Sparkles size={16} />
+                  <span>Bu Modeli 3D Kioskta Canlı İncele</span>
                 </button>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(window.location.href);
-                      setCopiedLink(true);
-                      setTimeout(() => setCopiedLink(false), 2500);
-                    }}
-                    style={{
-                      background: '#ffffff',
-                      border: '1px solid #cbd5e1',
-                      color: '#0f172a',
-                      padding: '8px 14px',
-                      borderRadius: '8px',
-                      fontSize: '0.78rem',
-                      fontWeight: '750',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}
-                  >
-                    {copiedLink ? <Check size={14} style={{ color: '#10b981' }} /> : <Copy size={14} />}
-                    <span>{copiedLink ? 'Link Kopyalandı!' : 'Panoyu Paylaş'}</span>
-                  </button>
+                <Link
+                  href={`/proje-talep?style=${encodeURIComponent(previewItem.style)}&room=${encodeURIComponent(previewItem.room)}`}
+                  style={{
+                    padding: '12px 20px',
+                    borderRadius: '10px',
+                    background: 'rgba(212, 175, 55, 0.12)',
+                    color: '#8c6b30',
+                    border: '1px solid rgba(212, 175, 55, 0.3)',
+                    fontSize: '0.88rem',
+                    fontWeight: '800',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  Fiyat Teklifi Al
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
-                  <Link
-                    href={`/proje-talep?notes=${encodeURIComponent(`İlham Panomdaki Modeller: ${savedGalleryItems.map(x => x.tileRecommendation).join(', ')}`)}`}
-                    style={{
-                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                      color: '#090d16',
-                      padding: '8px 18px',
-                      borderRadius: '8px',
-                      textDecoration: 'none',
-                      fontSize: '0.8rem',
-                      fontWeight: '850',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    <span>Bu İlhamlarla Teklif İste</span>
-                    <ChevronRight size={14} />
-                  </Link>
-                </div>
+      {/* ─────────────────────────────────────────────────────────────────────────────
+          İLHAM PANOM MODALI (MOODBOARD)
+      ───────────────────────────────────────────────────────────────────────────── */}
+      {showMoodboardModal && (
+        <div 
+          onClick={() => setShowMoodboardModal(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#ffffff',
+              borderRadius: '20px',
+              maxWidth: '680px',
+              width: '100%',
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+              padding: '24px',
+              position: 'relative'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Heart size={20} fill="#e11d48" color="#e11d48" />
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '900', margin: 0, color: '#0f172a' }}>
+                  Kaydettiğiniz İlham Modelleri ({savedIds.length})
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowMoodboardModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {savedIds.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>
+                <Heart size={36} style={{ color: '#cbd5e1', margin: '0 auto 10px auto' }} />
+                <p>Henüz favorilere model eklemediniz. Kartların üzerindeki kalp ikonuna tıklayarak beğendiğiniz seramikleri buraya kaydedebilirsiniz.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '14px' }}>
+                {galleryItems.filter(x => savedIds.includes(x.id)).map(item => (
+                  <div key={item.id} style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                    <img src={item.img} alt={item.title} style={{ width: '100%', height: '110px', objectFit: 'cover' }} />
+                    <div style={{ padding: '8px' }}>
+                      <div style={{ fontSize: '0.78rem', fontWeight: '800', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.title}</div>
+                      <button
+                        onClick={(e) => {
+                          setShowMoodboardModal(false);
+                          openInKiosk(item, e);
+                        }}
+                        style={{
+                          marginTop: '6px',
+                          width: '100%',
+                          padding: '4px',
+                          borderRadius: '6px',
+                          background: '#0f172a',
+                          color: '#d4af37',
+                          border: 'none',
+                          fontSize: '0.7rem',
+                          fontWeight: '800',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        3D Kioskta Aç
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          ARTICLE DETAIL MODAL
-      ───────────────────────────────────────────────────────────────────────────── */}
-      {selectedArticle && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(15, 23, 42, 0.6)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 100,
-          padding: '24px'
-        }}>
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '28px',
-            width: '100%',
-            maxWidth: '680px',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-            position: 'relative'
-          }}>
-            <div style={{
-              padding: '24px 32px 16px 32px',
-              borderBottom: '1px solid #f1f5f9',
-              position: 'sticky',
-              top: 0,
-              background: '#ffffff',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              zIndex: 5
-            }}>
-              <div>
-                <span style={{ fontSize: '0.72rem', color: '#b38e47', fontWeight: '800', textTransform: 'uppercase' }}>{selectedArticle.category}</span>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '900', margin: '4px 0 0 0', color: '#0f172a' }}>{selectedArticle.title}</h2>
-              </div>
-              <button 
-                onClick={() => setSelectedArticle(null)}
-                style={{
-                  background: '#f1f5f9',
-                  border: 'none',
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  color: '#475569'
-                }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div 
-              style={{ padding: '32px' }}
-              className="article-detail-body"
-              dangerouslySetInnerHTML={{ __html: selectedArticle.content }}
-            />
-
-            <div style={{
-              padding: '20px 32px',
-              background: '#f8fafc',
-              borderTop: '1px solid #f1f5f9',
-              display: 'flex',
-              justifyContent: 'flex-end'
-            }}>
-              <button 
-                onClick={() => setSelectedArticle(null)}
-                style={{
-                  background: '#0f172a',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '10px 24px',
-                  fontWeight: '750',
-                  fontSize: '0.85rem',
-                  cursor: 'pointer'
-                }}
-              >
-                Kapat
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────────────────────
-          GLOBAL STYLES & ANIMATIONS
-      ───────────────────────────────────────────────────────────────────────────── */}
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse {
-          0% { transform: scale(0.95); opacity: 0.8; }
-          50% { transform: scale(1.2); opacity: 1; }
-          100% { transform: scale(0.95); opacity: 0.8; }
-        }
-        .article-detail-body h3 {
-          font-size: 1.18rem;
-          font-weight: 850;
-          margin-top: 24px;
-          margin-bottom: 12px;
-          color: #0f172a;
-        }
-        .article-detail-body p {
-          font-size: 0.92rem;
-          line-height: 1.65;
-          color: #475569;
-          margin-bottom: 16px;
-        }
-        .article-detail-body ul {
-          padding-left: 20px;
-          margin-bottom: 16px;
-        }
-        .article-detail-body li {
-          font-size: 0.92rem;
-          line-height: 1.6;
-          color: #475569;
-          margin-bottom: 8px;
-        }
-      `}</style>
-    </main>
+    </div>
   );
 }

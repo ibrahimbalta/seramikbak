@@ -83,7 +83,12 @@ const BRAND_CATALOG = [
   { id: 'ser-1', name: 'Seramiksan Vista Bej Taş Karo', code: 'SER-VIS-60120', width: 60, height: 120, style: 'Taş', finish: 'Rölyef Mat', color: 'Sıcak Bej', brand: { id: 'seramiksan', name: 'Seramiksan' }, imageUrl: '/textures/vista_bej.jpg', textureUrl: '/textures/vista_bej.jpg', unitPrice: 440 },
 
   // Qua Granite
-  { id: 'qua-1', name: 'Qua Travertino Classico Granite', code: 'QUA-TRAV-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Mega Slab', color: 'Krem Traverten', brand: { id: 'qua', name: 'Qua Granite' }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 590 }
+  { id: 'qua-1', name: 'Qua Travertino Classico Granite', code: 'QUA-TRAV-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Mega Slab', color: 'Krem Traverten', brand: { id: 'qua', name: 'Qua Granite' }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 590 },
+
+  // Güral Seramik
+  { id: 'gur-1', name: 'Güral Seramik White Silver 60x120 Full Lappato', code: 'GUR-SILV-60120', width: 60, height: 120, style: 'Mermer', finish: 'Full Lappato', color: 'Beyaz / Gümüş', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 550 },
+  { id: 'gur-2', name: 'Güral Seramik West Wood 20x120 Mat Teak', code: 'GUR-WOOD-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat', color: 'Teak', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/teak_ahsap.jpg', textureUrl: '/textures/teak_ahsap.jpg', unitPrice: 460 },
+  { id: 'gur-3', name: 'Güral Seramik West Wood 20x120 Mat Kayın', code: 'GUR-KAYIN-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat', color: 'Kayın', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg', unitPrice: 460 }
 ];
 
 const getTextureFallback = (prod) => {
@@ -127,80 +132,6 @@ export default function ShowroomKioskPage() {
   const [comparisonProduct, setComparisonProduct] = useState(null);
 
   const [isOffline, setIsOffline] = useState(false);
-
-  // Showroom'dan seçilip gelinen seramiği zemin ve duvara uygula + Online/Offline Dinleyici
-  useEffect(() => {
-    setMounted(true);
-    if (typeof window === 'undefined') return;
-
-    setIsOffline(!navigator.onLine);
-    const handleOnline = () => setIsOffline(false);
-    const handleOffline = () => setIsOffline(true);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    let targetProduct = null;
-
-
-    // 1. Session / Local Storage kontrolü (Showroom ve Mimar portalından tıklanınca anında aktarılan ürün)
-    try {
-      const stored = sessionStorage.getItem('kiosk_selected_product') || localStorage.getItem('kiosk_selected_product');
-      if (stored) {
-        targetProduct = JSON.parse(stored);
-      }
-    } catch (e) {
-      console.error('Kiosk storage read error:', e);
-    }
-
-    // 2. URL searchParams kontrolü (?productId=... &code=...)
-    const urlParams = new URLSearchParams(window.location.search);
-    const paramProductId = urlParams.get('productId') || urlParams.get('product') || urlParams.get('id');
-    const paramCode = urlParams.get('code');
-
-    if (paramProductId && targetProduct && String(targetProduct.id) !== String(paramProductId)) {
-      const match = BRAND_CATALOG.find(p => String(p.id) === String(paramProductId));
-      if (match) targetProduct = match;
-    }
-
-    if (!targetProduct && (paramProductId || paramCode)) {
-      targetProduct = BRAND_CATALOG.find(p =>
-        (paramProductId && String(p.id) === String(paramProductId)) ||
-        (paramCode && (p.code === paramCode || p.name?.toLowerCase().includes(paramCode.toLowerCase())))
-      );
-    }
-
-    if (targetProduct) {
-      let tex = targetProduct.textureUrl || targetProduct.imageUrl;
-      let img = targetProduct.imageUrl || tex;
-      if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
-        tex = getTextureFallback(targetProduct);
-      }
-
-      const finalProd = {
-        ...targetProduct,
-        imageUrl: img || tex,
-        textureUrl: tex || img,
-        unitPrice: targetProduct.unitPrice || 480
-      };
-
-      setSelectedProduct(finalProd);
-      setFloorProduct(finalProd);
-      setWallProduct(finalProd);
-      setApplyFloor(true);
-      setApplyWalls(true);
-      if (finalProd.unitPrice) {
-        setUnitPriceM2(finalProd.unitPrice);
-      }
-
-      setProducts(prev => {
-        const exists = prev.some(p => p.id === finalProd.id || (p.code && p.code === finalProd.code));
-        if (!exists) {
-          return [finalProd, ...prev];
-        }
-        return prev;
-      });
-    }
-  }, []);
 
   // Yüzey Uygulama Açık/Kapalı
   const [applyFloor, setApplyFloor] = useState(true);
@@ -247,6 +178,119 @@ export default function ShowroomKioskPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSurfaceMenuOpen, setIsSurfaceMenuOpen] = useState(false);
+
+  // Showroom'dan seçilip gelinen seramiği zemin ve duvara uygula + Online/Offline Dinleyici
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window === 'undefined') return;
+
+    setIsOffline(!navigator.onLine);
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    let targetProduct = null;
+
+    // 1. Session / Local Storage kontrolü (İlham, Showroom ve Mimar portalından tıklanınca anında aktarılan ürün)
+    try {
+      const stored = sessionStorage.getItem('kiosk_selected_product') || localStorage.getItem('kiosk_selected_product');
+      if (stored) {
+        targetProduct = JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error('Kiosk storage read error:', e);
+    }
+
+    // 2. URL searchParams kontrolü (?productId=... &code=... &room=... &style=... &q=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramProductId = urlParams.get('productId') || urlParams.get('product') || urlParams.get('id');
+    const paramCode = urlParams.get('code');
+    const paramRoom = urlParams.get('room');
+    const paramStyle = urlParams.get('style');
+    const paramSearch = urlParams.get('search') || urlParams.get('q');
+
+    if (paramSearch) {
+      setSearchTerm(paramSearch);
+    }
+    if (paramStyle) {
+      setSelectedStyle(paramStyle.toLowerCase());
+    }
+    if (paramRoom) {
+      const r = paramRoom.toLowerCase();
+      if (r === 'kitchen' || r === 'mutfak') {
+        setRoomType('kitchen');
+        setApplyWalls(false);
+        setApplyShower(false);
+        setApplyShowerFloor(false);
+        setApplyToiletWall(false);
+        setApplyAccent(false);
+        setApplyStripeWall(true);
+        setActiveTargetSurface('stripe');
+      } else if (r === 'livingroom' || r === 'salon') {
+        setRoomType('livingroom');
+        setApplyWalls(false);
+        setApplyShower(false);
+        setApplyShowerFloor(false);
+        setApplyToiletWall(false);
+        setApplyStripeWall(false);
+        setApplyAccent(false);
+      } else if (r === 'terrace' || r === 'teras') {
+        setRoomType('terrace');
+        setApplyWalls(false);
+        setApplyShower(false);
+        setApplyShowerFloor(false);
+        setApplyToiletWall(false);
+        setApplyStripeWall(false);
+        setApplyAccent(false);
+      } else {
+        setRoomType('bathroom');
+        setApplyWalls(true);
+      }
+    }
+
+    if (paramProductId && targetProduct && String(targetProduct.id) !== String(paramProductId)) {
+      const match = BRAND_CATALOG.find(p => String(p.id) === String(paramProductId));
+      if (match) targetProduct = match;
+    }
+
+    if (!targetProduct && (paramProductId || paramCode || paramSearch)) {
+      targetProduct = BRAND_CATALOG.find(p =>
+        (paramProductId && String(p.id) === String(paramProductId)) ||
+        (paramCode && (p.code === paramCode || p.name?.toLowerCase().includes(paramCode.toLowerCase()))) ||
+        (paramSearch && (p.name?.toLowerCase().includes(paramSearch.toLowerCase()) || p.style?.toLowerCase().includes(paramSearch.toLowerCase())))
+      );
+    }
+
+    if (targetProduct) {
+      let tex = targetProduct.textureUrl || targetProduct.imageUrl;
+      let img = targetProduct.imageUrl || tex;
+      if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
+        tex = getTextureFallback(targetProduct);
+      }
+
+      const finalProd = {
+        ...targetProduct,
+        imageUrl: img || tex,
+        textureUrl: tex || img,
+        unitPrice: targetProduct.unitPrice || 480
+      };
+
+      setSelectedProduct(finalProd);
+      setFloorProduct(finalProd);
+      setWallProduct(finalProd);
+      setApplyFloor(true);
+      setApplyWalls(true);
+      if (finalProd.unitPrice) {
+        setUnitPriceM2(finalProd.unitPrice);
+      }
+
+      setProducts(prev => {
+        const withoutTarget = prev.filter(p => p.id !== finalProd.id && p.code !== finalProd.code);
+        return [finalProd, ...withoutTarget];
+      });
+    }
+  }, []);
 
   // Veritabanından Markaları ve Bayileri Yükle
   useEffect(() => {
