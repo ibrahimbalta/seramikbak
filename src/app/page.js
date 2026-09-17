@@ -4431,28 +4431,6 @@ export default function Home() {
                   <span>3D Seriler</span>
                 </Link>
               </div>
-
-              {/* 3D Sanal Stüdyo Promo Banner Card */}
-              <Link href="/kiosk" style={{ textDecoration: 'none', display: 'block' }}>
-                <div className="studio-promo-card-banner" style={{ cursor: 'pointer' }}>
-                  <div className="promo-text-column">
-                    <div className="promo-top-badge">
-                      <Sparkles size={11} className="promo-sparkle-icon" />
-                      <span>AI 3D MEKAN</span>
-                    </div>
-                    <h5>3D Sanal Stüdyo</h5>
-                    <p>Seramiklerinizi mekanınızda canlı görün</p>
-                    <div className="promo-action-btn-gold">
-                      <span>Hemen Deneyin</span>
-                      <ArrowRight size={12} />
-                    </div>
-                  </div>
-                  <div className="promo-image-column">
-                    <img src="/hero/hero_ceramics.jpg" alt="3D Studio Preview" />
-                    <div className="promo-image-badge">3D</div>
-                  </div>
-                </div>
-              </Link>
             </div>
 
             {/* Dynamic Schema.org JSON-LD Structured Data for Google Global & Yandex */}
@@ -11505,19 +11483,20 @@ export default function Home() {
         /* CATEGORIES SHOWCASE CONTAINER */
         .categories-showcase-container {
           display: flex;
-          justify-content: space-between;
+          justify-content: center;
           align-items: center;
-          gap: 20px;
           margin-bottom: 24px;
-          flex-wrap: wrap;
+          width: 100%;
         }
 
         .circular-categories-row {
           display: flex;
-          gap: 14px;
+          justify-content: center;
+          align-items: center;
+          gap: 16px;
           overflow-x: auto;
           padding: 8px 4px;
-          flex-grow: 1;
+          width: 100%;
           scrollbar-width: none;
         }
 
