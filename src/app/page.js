@@ -4238,15 +4238,10 @@ export default function Home() {
               <div className="persona-gateway-grid">
                 
                 {/* 1. Evini Yenileyenler */}
-                <div 
+                <Link 
+                  href="/kiosk"
                   className="persona-card persona-homeowner"
-                  onClick={() => {
-                    setActiveTab('studio');
-                    setStudioSubTab('photo');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  role="button"
-                  tabIndex={0}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
                 >
                   <div className="persona-card-header">
                     <div className="persona-icon-wrapper gold">
@@ -4262,7 +4257,7 @@ export default function Home() {
                     <span>3D Stüdyoyu Aç</span>
                     <ArrowRight size={14} />
                   </div>
-                </div>
+                </Link>
 
                 {/* 2. Mimarlar & Müteahhitler */}
                 <div 
