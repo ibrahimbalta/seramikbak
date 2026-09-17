@@ -3996,7 +3996,87 @@ export default function Home() {
         {/* TAB 1: SMART SEARCH & CATALOG */}
         {activeTab === 'search' && (
           <div className="search-portal animate-fade-in">
-            
+            {/* Dynamic Live Platform Activity & Traffic Statistics Section (Compact & Modern) */}
+            <div className="live-stats-section-banner glass-panel">
+              <div className="live-stats-header">
+                <div className="live-header-title-group">
+                  <div className="live-pulse-badge">
+                    <span className="pulse-dot" />
+                    <span className="live-badge-text">CANLI ANALİTİK</span>
+                  </div>
+                  <h4 className="live-banner-heading">
+                    Türkiye Geneli <span>Platform Hareketleri</span>
+                  </h4>
+                </div>
+
+                {liveActivities && liveActivities.length > 0 && (
+                  <div className="live-ticker-capsule">
+                    <span className="ticker-capsule-badge">⚡ ANLIK AKIŞ</span>
+                    <span className="ticker-capsule-text animate-fade-in">
+                      {liveActivities[activeActivityIdx % liveActivities.length]?.text} 
+                      <span className="ticker-time-ago">• {liveActivities[activeActivityIdx % liveActivities.length]?.time}</span>
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="live-stats-grid">
+                <div className="stat-card-item card-green">
+                  <div className="stat-icon-wrapper green-glow">
+                    <Users size={16} />
+                  </div>
+                  <div className="stat-card-info">
+                    <div className="stat-card-number">
+                      {(liveStats.todayVisitors || liveStats.activeOnlineUsers || 0).toLocaleString('tr-TR')}
+                      <span className="stat-mini-tag tag-green" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <span className="live-pulse-dot" /> Canlı
+                      </span>
+                    </div>
+                    <div className="stat-card-title">Ziyaretçi & İnceleme</div>
+                  </div>
+                </div>
+
+                <div className="stat-card-item card-gold">
+                  <div className="stat-icon-wrapper gold-glow">
+                    <Building2 size={16} />
+                  </div>
+                  <div className="stat-card-info">
+                    <div className="stat-card-number">
+                      {liveStats.approvedDealers ? liveStats.approvedDealers.toLocaleString('tr-TR') : 0}
+                      <span className="stat-mini-tag tag-gold">81 İl</span>
+                    </div>
+                    <div className="stat-card-title">Bayi & Marka Ağı</div>
+                  </div>
+                </div>
+
+                <div className="stat-card-item card-blue">
+                  <div className="stat-icon-wrapper blue-glow">
+                    <FileText size={16} />
+                  </div>
+                  <div className="stat-card-info">
+                    <div className="stat-card-number">
+                      {liveStats.totalRFQs ? liveStats.totalRFQs.toLocaleString('tr-TR') : 0}
+                      <span className="stat-mini-tag tag-blue">Teklif</span>
+                    </div>
+                    <div className="stat-card-title">Teklif & Proje Talebi</div>
+                  </div>
+                </div>
+
+                <div className="stat-card-item card-purple">
+                  <div className="stat-icon-wrapper purple-glow">
+                    <Sparkles size={16} />
+                  </div>
+                  <div className="stat-card-info">
+                    <div className="stat-card-number">
+                      {liveStats.productCount ? liveStats.productCount.toLocaleString('tr-TR') : 0}
+                      <span className="stat-mini-tag tag-purple">3D</span>
+                    </div>
+                    <div className="stat-card-title">Katalog Ürün Modeli</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Wide Centered Hero Section with Showroom Image Background */}
             <div className="showroom-hero-banner glass-panel" style={{ backgroundImage: `url(${heroSlides[heroSlideIndex].bg})`, transition: 'background-image 0.8s ease' }}>
               <div className="hero-dark-overlay" />
@@ -4435,88 +4515,6 @@ export default function Home() {
 
             {/* Dynamic Schema.org JSON-LD Structured Data for Google Global & Yandex */}
             <ProductSchemaJsonLd product={activeProduct || (products && products[0])} />
-
-            {/* Dynamic Live Platform Activity & Traffic Statistics Section (Compact & Modern) */}
-            <div className="live-stats-section-banner glass-panel">
-              <div className="live-stats-header">
-                <div className="live-header-title-group">
-                  <div className="live-pulse-badge">
-                    <span className="pulse-dot" />
-                    <span className="live-badge-text">CANLI ANALİTİK</span>
-                  </div>
-                  <h4 className="live-banner-heading">
-                    Türkiye Geneli <span>Platform Hareketleri</span>
-                  </h4>
-                </div>
-
-                {liveActivities && liveActivities.length > 0 && (
-                  <div className="live-ticker-capsule">
-                    <span className="ticker-capsule-badge">⚡ ANLIK AKIŞ</span>
-                    <span className="ticker-capsule-text animate-fade-in">
-                      {liveActivities[activeActivityIdx % liveActivities.length]?.text} 
-                      <span className="ticker-time-ago">• {liveActivities[activeActivityIdx % liveActivities.length]?.time}</span>
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="live-stats-grid">
-                <div className="stat-card-item card-green">
-                  <div className="stat-icon-wrapper green-glow">
-                    <Users size={16} />
-                  </div>
-                  <div className="stat-card-info">
-                    <div className="stat-card-number">
-                      {(liveStats.todayVisitors || liveStats.activeOnlineUsers || 0).toLocaleString('tr-TR')}
-                      <span className="stat-mini-tag tag-green" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        <span className="live-pulse-dot" /> Canlı
-                      </span>
-                    </div>
-                    <div className="stat-card-title">Ziyaretçi & İnceleme</div>
-                  </div>
-                </div>
-
-                <div className="stat-card-item card-gold">
-                  <div className="stat-icon-wrapper gold-glow">
-                    <Building2 size={16} />
-                  </div>
-                  <div className="stat-card-info">
-                    <div className="stat-card-number">
-                      {liveStats.approvedDealers ? liveStats.approvedDealers.toLocaleString('tr-TR') : 0}
-                      <span className="stat-mini-tag tag-gold">81 İl</span>
-                    </div>
-                    <div className="stat-card-title">Bayi & Marka Ağı</div>
-                  </div>
-                </div>
-
-                <div className="stat-card-item card-blue">
-                  <div className="stat-icon-wrapper blue-glow">
-                    <FileText size={16} />
-                  </div>
-                  <div className="stat-card-info">
-                    <div className="stat-card-number">
-                      {liveStats.totalRFQs ? liveStats.totalRFQs.toLocaleString('tr-TR') : 0}
-                      <span className="stat-mini-tag tag-blue">Teklif</span>
-                    </div>
-                    <div className="stat-card-title">Teklif & Proje Talebi</div>
-                  </div>
-                </div>
-
-                <div className="stat-card-item card-purple">
-                  <div className="stat-icon-wrapper purple-glow">
-                    <Sparkles size={16} />
-                  </div>
-                  <div className="stat-card-info">
-                    <div className="stat-card-number">
-                      {liveStats.productCount ? liveStats.productCount.toLocaleString('tr-TR') : 0}
-                      <span className="stat-mini-tag tag-purple">3D</span>
-                    </div>
-                    <div className="stat-card-title">Katalog Ürün Modeli</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Brand Logos Infinite Marquee */}
             <div className="brand-marquee-section">
               <div className="brand-marquee-container">
