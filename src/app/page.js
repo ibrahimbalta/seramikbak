@@ -9503,13 +9503,13 @@ export default function Home() {
           border-radius: 18px;
           display: flex;
           overflow: hidden;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
-          border: 1px solid rgba(245, 158, 11, 0.4);
+          background: #ffffff;
+          border: 1.5px solid #e2e8f0;
           padding: 12px 14px;
           align-items: center;
           justify-content: space-between;
           gap: 12px;
-          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25), 0 0 20px rgba(245, 158, 11, 0.12);
+          box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
           position: relative;
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -9521,14 +9521,14 @@ export default function Home() {
           left: -50%;
           width: 200%;
           height: 200%;
-          background: radial-gradient(circle, rgba(245, 158, 11, 0.14) 0%, transparent 60%);
+          background: radial-gradient(circle, rgba(245, 158, 11, 0.06) 0%, transparent 60%);
           pointer-events: none;
         }
 
         :global(.persona-banner-card:hover) {
           transform: translateY(-3px);
-          box-shadow: 0 16px 36px rgba(15, 23, 42, 0.35), 0 0 28px rgba(245, 158, 11, 0.3);
-          border-color: rgba(251, 191, 36, 0.75);
+          box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08), 0 0 20px rgba(245, 158, 11, 0.15);
+          border-color: rgba(245, 158, 11, 0.6);
         }
 
         :global(.persona-banner-card .promo-text-column) {
@@ -9546,26 +9546,26 @@ export default function Home() {
           gap: 4px;
           font-size: 0.58rem;
           font-weight: 800;
-          color: #fbbf24;
+          color: #b45309;
           letter-spacing: 0.06em;
           text-transform: uppercase;
           margin-bottom: 3px;
-          background: rgba(245, 158, 11, 0.12);
+          background: #fef3c7;
           padding: 2px 6px;
           border-radius: 4px;
-          border: 1px solid rgba(245, 158, 11, 0.25);
+          border: 1px solid #fde68a;
         }
 
         :global(.persona-banner-card .promo-top-badge.blue) {
-          color: #38bdf8;
-          background: rgba(56, 189, 248, 0.12);
-          border-color: rgba(56, 189, 248, 0.3);
+          color: #0369a1;
+          background: #e0f2fe;
+          border-color: #bae6fd;
         }
 
         :global(.persona-banner-card .promo-top-badge.emerald) {
-          color: #34d399;
-          background: rgba(52, 211, 153, 0.12);
-          border-color: rgba(52, 211, 153, 0.3);
+          color: #047857;
+          background: #d1fae5;
+          border-color: #a7f3d0;
         }
 
         :global(.persona-banner-card .promo-sparkle-icon) {
@@ -9574,7 +9574,7 @@ export default function Home() {
 
         :global(.persona-banner-card .promo-text-column h5) {
           font-size: 0.94rem;
-          color: #ffffff;
+          color: #0f172a;
           font-weight: 800;
           letter-spacing: -0.01em;
           line-height: 1.25;
@@ -9584,7 +9584,7 @@ export default function Home() {
 
         :global(.persona-banner-card .promo-text-column p) {
           font-size: 0.68rem;
-          color: #94a3b8;
+          color: #64748b;
           margin: 2px 0 8px 0;
           line-height: 1.25;
           white-space: nowrap;
@@ -9594,11 +9594,11 @@ export default function Home() {
         }
 
         :global(.persona-banner-card .promo-action-btn-gold) {
-          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-          color: #0f172a;
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          color: #ffffff;
           border: none;
           font-family: var(--font-title);
-          font-weight: 800;
+          font-weight: 700;
           font-size: 0.70rem;
           padding: 5px 13px;
           border-radius: 20px;
@@ -9606,15 +9606,15 @@ export default function Home() {
           display: inline-flex;
           align-items: center;
           gap: 5px;
-          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+          box-shadow: 0 3px 10px rgba(217, 119, 6, 0.25);
           transition: all 0.2s ease;
           white-space: nowrap;
         }
 
         :global(.persona-banner-card:hover .promo-action-btn-gold) {
-          background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+          background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
           transform: translateX(2px);
-          box-shadow: 0 6px 16px rgba(245, 158, 11, 0.45);
+          box-shadow: 0 5px 14px rgba(217, 119, 6, 0.35);
         }
 
         :global(.persona-banner-card .promo-image-column) {
@@ -9624,8 +9624,8 @@ export default function Home() {
           overflow: hidden;
           position: relative;
           flex-shrink: 0;
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+          border: 1.5px solid #e2e8f0;
+          box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
           z-index: 1;
         }
 
@@ -9644,24 +9644,25 @@ export default function Home() {
           position: absolute;
           bottom: 4px;
           right: 4px;
-          background: rgba(15, 23, 42, 0.85);
+          background: rgba(255, 255, 255, 0.92);
           backdrop-filter: blur(4px);
-          border: 1px solid rgba(245, 158, 11, 0.5);
-          color: #fbbf24;
+          border: 1px solid #fde68a;
+          color: #b45309;
           font-size: 0.54rem;
           font-weight: 800;
           padding: 2px 5px;
           border-radius: 4px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
         }
 
         :global(.persona-banner-card .promo-image-badge.blue) {
-          border-color: rgba(56, 189, 248, 0.5);
-          color: #38bdf8;
+          border-color: #bae6fd;
+          color: #0369a1;
         }
 
         :global(.persona-banner-card .promo-image-badge.emerald) {
-          border-color: rgba(52, 211, 153, 0.5);
-          color: #34d399;
+          border-color: #a7f3d0;
+          color: #047857;
         }
 
         /* Calculator wrapper collapsible */

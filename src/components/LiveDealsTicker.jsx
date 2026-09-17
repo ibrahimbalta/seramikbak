@@ -40,9 +40,6 @@ export default function LiveDealsTicker() {
         {
           id: 'real-status-1',
           badge: 'CANLI BİLGİ',
-          color: '#fbbf24',
-          bg: 'rgba(245, 158, 11, 0.1)',
-          border: 'rgba(245, 158, 11, 0.3)',
           time: 'Canlı',
           location: 'Türkiye',
           text: 'SeramikBak Canlı Pazaryeri: Aktif bayi teklifleri ve müşteri aramaları anlık takip edilmektedir',
@@ -50,12 +47,22 @@ export default function LiveDealsTicker() {
         }
       ];
 
-  const getEventIcon = (badge) => {
+  const getEventIcon = (badge = '') => {
     if (badge.includes('NUMUNE')) return <Truck size={12} />;
     if (badge.includes('TEKLİF')) return <ShoppingBag size={12} />;
     if (badge.includes('MİMARİ')) return <FileCode size={12} />;
     if (badge.includes('STOK') || badge.includes('FIRSAT')) return <Tag size={12} />;
     return <Flame size={12} />;
+  };
+
+  const getBadgeStyle = (badge = '') => {
+    if (badge.includes('TEKLİF')) {
+      return { color: '#0284c7', background: '#f0f9ff', borderColor: '#bae6fd' };
+    }
+    if (badge.includes('MİMARİ')) {
+      return { color: '#047857', background: '#ecfdf5', borderColor: '#a7f3d0' };
+    }
+    return { color: '#b45309', background: '#fef3c7', borderColor: '#fde68a' };
   };
 
   return (
@@ -72,36 +79,39 @@ export default function LiveDealsTicker() {
         {/* Endless Moving Track Viewport */}
         <div className="live-ticker-viewport">
           <div className="live-ticker-track">
-            {tickerItems.map((item, idx) => (
-              <Link
-                key={`${item.id}-${idx}`}
-                href={item.link || '/outlet'}
-                className="ticker-event-card"
-                title={`${item.location} - ${item.text}`}
-              >
-                <span 
-                  className="event-badge-tag"
-                  style={{
-                    color: item.color || '#fbbf24',
-                    background: item.bg || 'rgba(245, 158, 11, 0.1)',
-                    borderColor: item.border || 'rgba(245, 158, 11, 0.3)'
-                  }}
+            {tickerItems.map((item, idx) => {
+              const bStyle = getBadgeStyle(item.badge || '');
+              return (
+                <Link
+                  key={`${item.id}-${idx}`}
+                  href={item.link || '/outlet'}
+                  className="ticker-event-card"
+                  title={`${item.location} - ${item.text}`}
                 >
-                  {getEventIcon(item.badge || '')}
-                  {item.badge}
-                </span>
-                <span className="event-location">[{item.location}]</span>
-                <span className="event-text">{item.text}</span>
-                <span className="event-time">• {item.time}</span>
-                <ArrowUpRight size={13} className="event-arrow" />
-              </Link>
-            ))}
+                  <span 
+                    className="event-badge-tag"
+                    style={{
+                      color: bStyle.color,
+                      background: bStyle.background,
+                      borderColor: bStyle.borderColor
+                    }}
+                  >
+                    {getEventIcon(item.badge || '')}
+                    {item.badge}
+                  </span>
+                  <span className="event-location">[{item.location}]</span>
+                  <span className="event-text">{item.text}</span>
+                  <span className="event-time">• {item.time}</span>
+                  <ArrowUpRight size={13} className="event-arrow" />
+                </Link>
+              );
+            })}
           </div>
         </div>
 
         {/* Fixed Right Social Proof Badge */}
         <div className="ticker-social-proof">
-          <Activity size={14} style={{ color: '#fbbf24' }} />
+          <Activity size={14} style={{ color: '#d97706' }} />
           {stats && stats.todayLogsCount > 0 ? (
             <span>Bugün <strong>{stats.todayLogsCount} canlı arama & teklif</strong> gerçekleşti</span>
           ) : stats && stats.outletCount > 0 ? (
@@ -128,15 +138,15 @@ export default function LiveDealsTicker() {
 
         .live-ticker-bar {
           width: 100vw;
-          background: linear-gradient(90deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-          border-top: 1px solid rgba(245, 158, 11, 0.25);
-          border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+          background: #ffffff;
+          border-top: 1px solid #e2e8f0;
+          border-bottom: 1px solid #e2e8f0;
           padding: 8px 24px;
           display: flex;
           align-items: center;
           gap: 16px;
           position: relative;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
           box-sizing: border-box;
           overflow: hidden;
         }
@@ -151,45 +161,46 @@ export default function LiveDealsTicker() {
           display: flex;
           align-items: center;
           gap: 8px;
-          padding: 6px 13px;
+          padding: 6px 14px;
           border-radius: 20px;
-          background: rgba(245, 158, 11, 0.12);
-          border: 1px solid rgba(245, 158, 11, 0.4);
-          color: #fbbf24;
+          background: #fffbeb;
+          border: 1px solid #fde68a;
+          color: #b45309;
           font-size: 0.76rem;
           font-weight: 800;
           white-space: nowrap;
-          box-shadow: 0 2px 10px rgba(245, 158, 11, 0.15);
-          transition: transform 0.2s ease, background 0.2s ease;
+          box-shadow: 0 2px 8px rgba(217, 119, 6, 0.08);
+          transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
         }
 
         .live-badge-content:hover {
           transform: scale(1.03);
-          background: rgba(245, 158, 11, 0.2);
+          background: #fef3c7;
+          border-color: #f59e0b;
         }
 
         .live-pulse-dot {
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background: #fbbf24;
+          background: #d97706;
           display: inline-block;
-          box-shadow: 0 0 8px #fbbf24;
+          box-shadow: 0 0 6px rgba(217, 119, 6, 0.6);
           animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
           0% {
             transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+            box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.5);
           }
           70% {
             transform: scale(1);
-            box-shadow: 0 0 0 6px rgba(251, 191, 36, 0);
+            box-shadow: 0 0 0 6px rgba(217, 119, 6, 0);
           }
           100% {
             transform: scale(0.95);
-            box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+            box-shadow: 0 0 0 0 rgba(217, 119, 6, 0);
           }
         }
 
@@ -227,25 +238,25 @@ export default function LiveDealsTicker() {
           display: flex !important;
           align-items: center !important;
           gap: 8px !important;
-          background: rgba(30, 41, 59, 0.8) !important;
+          background: #f8fafc !important;
           backdrop-filter: blur(8px) !important;
           padding: 6px 14px !important;
           border-radius: 12px !important;
-          border: 1px solid rgba(255, 255, 255, 0.08) !important;
+          border: 1px solid #e2e8f0 !important;
           font-size: 0.80rem !important;
           white-space: nowrap !important;
           text-decoration: none !important;
-          color: #f1f5f9 !important;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+          color: #1e293b !important;
+          box-shadow: 0 1px 4px rgba(15, 23, 42, 0.04) !important;
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
           flex-shrink: 0 !important;
         }
 
         :global(a.ticker-event-card:hover) {
-          background: rgba(30, 41, 59, 0.95) !important;
-          border-color: rgba(245, 158, 11, 0.4) !important;
+          background: #ffffff !important;
+          border-color: #b38e47 !important;
           transform: translateY(-1px) !important;
-          box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2) !important;
+          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.15) !important;
         }
 
         .event-badge-tag {
@@ -262,24 +273,24 @@ export default function LiveDealsTicker() {
         }
 
         .event-location {
-          color: #94a3b8;
+          color: #64748b;
           font-weight: 700;
           font-size: 0.76rem;
         }
 
         .event-text {
-          color: #f8fafc;
+          color: #1e293b;
           font-weight: 600;
         }
 
         .event-time {
-          color: #64748b;
+          color: #94a3b8;
           font-size: 0.72rem;
           font-weight: 500;
         }
 
         :global(.event-arrow) {
-          color: #fbbf24;
+          color: #d97706;
           opacity: 0.7;
           transition: transform 0.2s ease, opacity 0.2s ease;
         }
@@ -294,16 +305,16 @@ export default function LiveDealsTicker() {
           align-items: center;
           gap: 8px;
           font-size: 0.78rem;
-          color: #cbd5e1;
+          color: #475569;
           white-space: nowrap;
-          border-left: 1px solid rgba(255, 255, 255, 0.1);
+          border-left: 1px solid #e2e8f0;
           padding-left: 16px;
           flex-shrink: 0;
           z-index: 5;
         }
 
         .ticker-social-proof strong {
-          color: #fbbf24;
+          color: #b45309;
           font-weight: 800;
         }
 
