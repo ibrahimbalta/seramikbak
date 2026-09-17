@@ -4233,35 +4233,37 @@ export default function Home() {
               </div>
             </div>
 
-            {/* PERSONA GATEWAY CARDS: 3 Clear Paths to Eliminate Cognitive Overload */}
+            {/* PERSONA GATEWAY CARDS: Modern Visual Cards Matching Studio Banner Style */}
             <section className="persona-gateway-section" aria-label="Kullanıcı Odaklı Hızlı Yönlendirme">
               <div className="persona-gateway-grid">
                 
                 {/* 1. Evini Yenileyenler */}
                 <Link 
                   href="/kiosk"
-                  className="persona-card persona-homeowner"
-                  style={{ textDecoration: 'none', color: 'inherit' }}
+                  className="persona-banner-card"
+                  style={{ textDecoration: 'none' }}
                 >
-                  <div className="persona-card-header">
-                    <div className="persona-icon-wrapper gold">
-                      <Sparkles size={20} />
+                  <div className="promo-text-column">
+                    <div className="promo-top-badge gold">
+                      <Sparkles size={11} className="promo-sparkle-icon" />
+                      <span>AI 3D MEKAN</span>
                     </div>
-                    <span className="persona-badge gold">EVİNİ YENİLEYENLER</span>
+                    <h5>3D Sanal Stüdyo</h5>
+                    <p>Seramiklerinizi odanızda canlı görün</p>
+                    <div className="promo-action-btn-gold">
+                      <span>Hemen Deneyin</span>
+                      <ArrowRight size={12} />
+                    </div>
                   </div>
-                  <h3 className="persona-title">3D Stüdyoda Odanı Gör & Fikir Al</h3>
-                  <p className="persona-desc">
-                    Banyo veya mutfağınızın fotoğrafını yükleyin, 3D stüdyoda seramikleri canlı döşeyip renk ve derzleri deneyin.
-                  </p>
-                  <div className="persona-action-row gold">
-                    <span>3D Stüdyoyu Aç</span>
-                    <ArrowRight size={14} />
+                  <div className="promo-image-column">
+                    <img src="/hero/luxury_bathroom.png" alt="3D Sanal Stüdyo" />
+                    <div className="promo-image-badge">3D</div>
                   </div>
                 </Link>
 
                 {/* 2. Mimarlar & Müteahhitler */}
                 <div 
-                  className="persona-card persona-architect"
+                  className="persona-banner-card"
                   onClick={() => {
                     setShowCalculatorWidget(prev => !prev);
                     setTimeout(() => {
@@ -4270,26 +4272,29 @@ export default function Home() {
                   }}
                   role="button"
                   tabIndex={0}
+                  style={{ cursor: 'pointer' }}
                 >
-                  <div className="persona-card-header">
-                    <div className="persona-icon-wrapper blue">
-                      <FileText size={20} />
+                  <div className="promo-text-column">
+                    <div className="promo-top-badge blue">
+                      <FileText size={11} className="promo-sparkle-icon" />
+                      <span>MİMAR & METRAJ</span>
                     </div>
-                    <span className="persona-badge blue">MİMAR & MÜTEAHHİT</span>
+                    <h5>Metraj & Maliyet Robotu</h5>
+                    <p>Kutu ve fire ihtiyacını anında hesaplayın</p>
+                    <div className="promo-action-btn-gold">
+                      <span>{showCalculatorWidget ? 'Robotu Kapat ✕' : 'Metrajı Başlat'}</span>
+                      <ArrowRight size={12} />
+                    </div>
                   </div>
-                  <h3 className="persona-title">BIM, Şartname & Metraj Robotu</h3>
-                  <p className="persona-desc">
-                    Projenizin m² kutu fire ihtiyacını hesaplayın, teknik şartname ve BIM/Revit dosyalarını anında indirin.
-                  </p>
-                  <div className="persona-action-row blue">
-                    <span>{showCalculatorWidget ? 'Robotu Kapat ✕' : 'Metraj Robotunu Aç'}</span>
-                    <ArrowRight size={14} />
+                  <div className="promo-image-column">
+                    <img src="/hero/modern_living.png" alt="BIM ve Metraj" />
+                    <div className="promo-image-badge blue">BIM</div>
                   </div>
                 </div>
 
                 {/* 3. Hemen Satın Almak İsteyenler */}
                 <div 
-                  className="persona-card persona-buyer"
+                  className="persona-banner-card"
                   onClick={() => {
                     setActiveTab('dealers');
                     setTimeout(() => {
@@ -4300,20 +4305,23 @@ export default function Home() {
                   }}
                   role="button"
                   tabIndex={0}
+                  style={{ cursor: 'pointer' }}
                 >
-                  <div className="persona-card-header">
-                    <div className="persona-icon-wrapper emerald">
-                      <Store size={20} />
+                  <div className="promo-text-column">
+                    <div className="promo-top-badge emerald">
+                      <Store size={11} className="promo-sparkle-icon" />
+                      <span>YETKİLİ BAYİ AĞI</span>
                     </div>
-                    <span className="persona-badge emerald">HEMEN SATIN AL</span>
+                    <h5>En Yakın Bayiyi Bul</h5>
+                    <p>81 ildeki 150+ showroom ve stoka ulaşın</p>
+                    <div className="promo-action-btn-gold">
+                      <span>Bayi Haritası</span>
+                      <ArrowRight size={12} />
+                    </div>
                   </div>
-                  <h3 className="persona-title">En Yakın Yetkili Bayiyi Bul</h3>
-                  <p className="persona-desc">
-                    81 ildeki 150+ onaylı üretici bayisinin güncel stok ve showroom konumuna ulaşın, projeniz için teklif isteyin.
-                  </p>
-                  <div className="persona-action-row emerald">
-                    <span>Bayi Haritasına Git</span>
-                    <ArrowRight size={14} />
+                  <div className="promo-image-column">
+                    <img src="/hero/scandinavian_kitchen.png" alt="Yetkili Bayiler" />
+                    <div className="promo-image-badge emerald">81 İL</div>
                   </div>
                 </div>
 
@@ -9513,112 +9521,170 @@ export default function Home() {
           gap: 16px;
         }
 
-        :global(.persona-card) {
-          background: #ffffff;
-          border: 1px solid rgba(226, 232, 240, 0.9);
-          border-radius: 16px;
-          padding: 22px 20px;
-          cursor: pointer;
-          transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        :global(.persona-banner-card) {
+          border-radius: 18px;
           display: flex;
-          flex-direction: column;
-          box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
-          position: relative;
           overflow: hidden;
-        }
-
-        :global(.persona-card:hover) {
-          transform: translateY(-4px);
-          box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
-          border-color: var(--accent-gold, #b38e47);
-        }
-
-        :global(.persona-card-header) {
-          display: flex;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+          border: 1px solid rgba(245, 158, 11, 0.4);
+          padding: 12px 14px;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 14px;
+          gap: 12px;
+          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25), 0 0 20px rgba(245, 158, 11, 0.12);
+          position: relative;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        :global(.persona-icon-wrapper) {
-          width: 42px;
-          height: 42px;
-          border-radius: 12px;
+        :global(.persona-banner-card::before) {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle, rgba(245, 158, 11, 0.14) 0%, transparent 60%);
+          pointer-events: none;
+        }
+
+        :global(.persona-banner-card:hover) {
+          transform: translateY(-3px);
+          box-shadow: 0 16px 36px rgba(15, 23, 42, 0.35), 0 0 28px rgba(245, 158, 11, 0.3);
+          border-color: rgba(251, 191, 36, 0.75);
+        }
+
+        :global(.persona-banner-card .promo-text-column) {
           display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        :global(.persona-icon-wrapper.gold) {
-          background: rgba(179, 142, 71, 0.12);
-          color: #b38e47;
-        }
-        :global(.persona-icon-wrapper.blue) {
-          background: rgba(37, 99, 235, 0.1);
-          color: #2563eb;
-        }
-        :global(.persona-icon-wrapper.emerald) {
-          background: rgba(16, 185, 129, 0.12);
-          color: #10b981;
-        }
-
-        :global(.persona-badge) {
-          font-size: 0.64rem;
-          font-weight: 800;
-          letter-spacing: 0.06em;
-          padding: 4px 8px;
-          border-radius: 6px;
-          text-transform: uppercase;
-        }
-
-        :global(.persona-badge.gold) {
-          background: rgba(179, 142, 71, 0.08);
-          color: #b38e47;
-          border: 1px solid rgba(179, 142, 71, 0.25);
-        }
-        :global(.persona-badge.blue) {
-          background: rgba(37, 99, 235, 0.08);
-          color: #2563eb;
-          border: 1px solid rgba(37, 99, 235, 0.2);
-        }
-        :global(.persona-badge.emerald) {
-          background: rgba(16, 185, 129, 0.08);
-          color: #10b981;
-          border: 1px solid rgba(16, 185, 129, 0.25);
-        }
-
-        :global(.persona-title) {
-          font-size: 1.06rem;
-          font-weight: 800;
-          color: #0f172a;
-          margin: 0 0 6px 0;
-          letter-spacing: -0.01em;
-          line-height: 1.35;
-        }
-
-        :global(.persona-desc) {
-          font-size: 0.78rem;
-          color: #64748b;
-          line-height: 1.5;
-          margin: 0 0 16px 0;
+          flex-direction: column;
+          align-items: flex-start;
           flex-grow: 1;
+          z-index: 1;
+          min-width: 0;
         }
 
-        :global(.persona-action-row) {
+        :global(.persona-banner-card .promo-top-badge) {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          font-size: 0.8rem;
+          gap: 4px;
+          font-size: 0.58rem;
           font-weight: 800;
-          transition: gap 0.2s ease;
-        }
-        :global(.persona-card:hover .persona-action-row) {
-          gap: 10px;
+          color: #fbbf24;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          margin-bottom: 3px;
+          background: rgba(245, 158, 11, 0.12);
+          padding: 2px 6px;
+          border-radius: 4px;
+          border: 1px solid rgba(245, 158, 11, 0.25);
         }
 
-        :global(.persona-action-row.gold) { color: #b38e47; }
-        :global(.persona-action-row.blue) { color: #2563eb; }
-        :global(.persona-action-row.emerald) { color: #10b981; }
+        :global(.persona-banner-card .promo-top-badge.blue) {
+          color: #38bdf8;
+          background: rgba(56, 189, 248, 0.12);
+          border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        :global(.persona-banner-card .promo-top-badge.emerald) {
+          color: #34d399;
+          background: rgba(52, 211, 153, 0.12);
+          border-color: rgba(52, 211, 153, 0.3);
+        }
+
+        :global(.persona-banner-card .promo-sparkle-icon) {
+          color: inherit;
+        }
+
+        :global(.persona-banner-card .promo-text-column h5) {
+          font-size: 0.94rem;
+          color: #ffffff;
+          font-weight: 800;
+          letter-spacing: -0.01em;
+          line-height: 1.25;
+          margin: 0;
+          white-space: nowrap;
+        }
+
+        :global(.persona-banner-card .promo-text-column p) {
+          font-size: 0.68rem;
+          color: #94a3b8;
+          margin: 2px 0 8px 0;
+          line-height: 1.25;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 200px;
+        }
+
+        :global(.persona-banner-card .promo-action-btn-gold) {
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+          color: #0f172a;
+          border: none;
+          font-family: var(--font-title);
+          font-weight: 800;
+          font-size: 0.70rem;
+          padding: 5px 13px;
+          border-radius: 20px;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+
+        :global(.persona-banner-card:hover .promo-action-btn-gold) {
+          background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
+          transform: translateX(2px);
+          box-shadow: 0 6px 16px rgba(245, 158, 11, 0.45);
+        }
+
+        :global(.persona-banner-card .promo-image-column) {
+          width: 80px;
+          height: 68px;
+          border-radius: 12px;
+          overflow: hidden;
+          position: relative;
+          flex-shrink: 0;
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+          z-index: 1;
+        }
+
+        :global(.persona-banner-card .promo-image-column img) {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.4s ease;
+        }
+
+        :global(.persona-banner-card:hover .promo-image-column img) {
+          transform: scale(1.1);
+        }
+
+        :global(.persona-banner-card .promo-image-badge) {
+          position: absolute;
+          bottom: 4px;
+          right: 4px;
+          background: rgba(15, 23, 42, 0.85);
+          backdrop-filter: blur(4px);
+          border: 1px solid rgba(245, 158, 11, 0.5);
+          color: #fbbf24;
+          font-size: 0.54rem;
+          font-weight: 800;
+          padding: 2px 5px;
+          border-radius: 4px;
+        }
+
+        :global(.persona-banner-card .promo-image-badge.blue) {
+          border-color: rgba(56, 189, 248, 0.5);
+          color: #38bdf8;
+        }
+
+        :global(.persona-banner-card .promo-image-badge.emerald) {
+          border-color: rgba(52, 211, 153, 0.5);
+          color: #34d399;
+        }
 
         /* Calculator wrapper collapsible */
         :global(.calculator-collapsible-wrapper) {
