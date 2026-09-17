@@ -2082,6 +2082,20 @@ h1, h2, h3, h4, h5, h6 {
   gap: 12px;
 }
 
+.live-analytics-top-bar {
+  margin: 0 0 10px 0;
+  padding: 8px 18px;
+  background: #ffffff;
+  border: 1px solid rgba(179, 142, 71, 0.22);
+  border-radius: var(--border-radius-lg, 16px);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .live-stats-header {
   display: flex;
   align-items: center;
