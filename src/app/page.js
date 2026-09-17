@@ -763,6 +763,9 @@ export default function Home() {
   const [aiPhotoScanning, setAiPhotoScanning] = useState(false);
   const [selectedPhotoTemplate, setSelectedPhotoTemplate] = useState(null);
   const aiFileInputRef = useRef(null);
+  const catalogSectionRef = useRef(null);
+  const calculatorSectionRef = useRef(null);
+  const [showCalculatorWidget, setShowCalculatorWidget] = useState(false);
   const [uploadedPhotoPreview, setUploadedPhotoPreview] = useState(null);
   const [uploadedPhotoName, setUploadedPhotoName] = useState('');
 
@@ -2117,6 +2120,9 @@ export default function Home() {
     setVisualSearchMatches(null);
     setPage(1);
     fetchProducts('', 1, false);
+    setTimeout(() => {
+      catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
   };
 
   const handleTagClick = (tagQuery, filterType = '', filterVal = '') => {
@@ -2131,6 +2137,9 @@ export default function Home() {
     } else if (filterType === 'size') {
       setSelectedSize(filterVal);
     }
+    setTimeout(() => {
+      catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
   };
 
   const handleClearSearch = () => {
@@ -3344,6 +3353,22 @@ export default function Home() {
     );
   }
 
+  const activeFilterCount = [
+    selectedBrand,
+    selectedColor,
+    selectedFinish,
+    selectedStyle,
+    selectedArea,
+    selectedSize,
+    selectedRectified,
+    selectedFrost,
+    selectedSlipResistance,
+    selectedThickness,
+    selectedPeiRating,
+    selectedIsPremium,
+    searchQuery?.trim()
+  ].filter(Boolean).length;
+
   return (
     <main className="main-layout">
       {/* Premium Collections Banner */}
@@ -4108,22 +4133,6 @@ export default function Home() {
                   )}
                 </form>
 
-                {/* AKILLI MALİYET & METRAJ SİHİRBAZI */}
-                <TileCalculatorWidget 
-                  onGoToDealers={() => {
-                    setActiveTab('dealers');
-                    setTimeout(() => {
-                      const el = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
-                      if (el) {
-                        el.scrollIntoView({ behavior: 'smooth' });
-                      } else {
-                        window.scrollTo({ top: 300, behavior: 'smooth' });
-                      }
-                    }, 100);
-                  }}
-                  onOpenQuoteModal={handleOpenLeadModalWithProduct} 
-                />
-
                 {/* Popular Searches */}
                 <div className="hero-popular-tags">
                   <span className="pop-tags-label">Popüler Aramalar:</span>
@@ -4223,6 +4232,127 @@ export default function Home() {
                 ))}
               </div>
             </div>
+
+            {/* PERSONA GATEWAY CARDS: 3 Clear Paths to Eliminate Cognitive Overload */}
+            <section className="persona-gateway-section" aria-label="Kullanıcı Odaklı Hızlı Yönlendirme">
+              <div className="persona-gateway-grid">
+                
+                {/* 1. Evini Yenileyenler */}
+                <div 
+                  className="persona-card persona-homeowner"
+                  onClick={() => {
+                    setActiveTab('studio');
+                    setStudioSubTab('photo');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="persona-card-header">
+                    <div className="persona-icon-wrapper gold">
+                      <Sparkles size={20} />
+                    </div>
+                    <span className="persona-badge gold">EVİNİ YENİLEYENLER</span>
+                  </div>
+                  <h3 className="persona-title">3D Stüdyoda Odanı Gör & Fikir Al</h3>
+                  <p className="persona-desc">
+                    Banyo veya mutfağınızın fotoğrafını yükleyin, 3D stüdyoda seramikleri canlı döşeyip renk ve derzleri deneyin.
+                  </p>
+                  <div className="persona-action-row gold">
+                    <span>3D Stüdyoyu Aç</span>
+                    <ArrowRight size={14} />
+                  </div>
+                </div>
+
+                {/* 2. Mimarlar & Müteahhitler */}
+                <div 
+                  className="persona-card persona-architect"
+                  onClick={() => {
+                    setShowCalculatorWidget(prev => !prev);
+                    setTimeout(() => {
+                      calculatorSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 80);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="persona-card-header">
+                    <div className="persona-icon-wrapper blue">
+                      <FileText size={20} />
+                    </div>
+                    <span className="persona-badge blue">MİMAR & MÜTEAHHİT</span>
+                  </div>
+                  <h3 className="persona-title">BIM, Şartname & Metraj Robotu</h3>
+                  <p className="persona-desc">
+                    Projenizin m² kutu fire ihtiyacını hesaplayın, teknik şartname ve BIM/Revit dosyalarını anında indirin.
+                  </p>
+                  <div className="persona-action-row blue">
+                    <span>{showCalculatorWidget ? 'Robotu Kapat ✕' : 'Metraj Robotunu Aç'}</span>
+                    <ArrowRight size={14} />
+                  </div>
+                </div>
+
+                {/* 3. Hemen Satın Almak İsteyenler */}
+                <div 
+                  className="persona-card persona-buyer"
+                  onClick={() => {
+                    setActiveTab('dealers');
+                    setTimeout(() => {
+                      const el = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      else window.scrollTo({ top: 300, behavior: 'smooth' });
+                    }, 100);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="persona-card-header">
+                    <div className="persona-icon-wrapper emerald">
+                      <Store size={20} />
+                    </div>
+                    <span className="persona-badge emerald">HEMEN SATIN AL</span>
+                  </div>
+                  <h3 className="persona-title">En Yakın Yetkili Bayiyi Bul</h3>
+                  <p className="persona-desc">
+                    81 ildeki 150+ onaylı üretici bayisinin güncel stok ve showroom konumuna ulaşın, projeniz için teklif isteyin.
+                  </p>
+                  <div className="persona-action-row emerald">
+                    <span>Bayi Haritasına Git</span>
+                    <ArrowRight size={14} />
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Collapsible Metraj & Maliyet Robotu Container */}
+              {showCalculatorWidget && (
+                <div ref={calculatorSectionRef} className="calculator-collapsible-wrapper animate-fade-in">
+                  <div className="calculator-wrapper-header">
+                    <div className="calc-header-left">
+                      <FileText size={18} style={{ color: 'var(--accent-gold)' }} />
+                      <h4>Akıllı Maliyet & Metraj Robotu (Kutu ve Fire Hesabı)</h4>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => setShowCalculatorWidget(false)}
+                      className="calc-close-btn"
+                    >
+                      Kapat ✕
+                    </button>
+                  </div>
+                  <TileCalculatorWidget 
+                    onGoToDealers={() => {
+                      setActiveTab('dealers');
+                      setTimeout(() => {
+                        const el = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }, 100);
+                    }}
+                    onOpenQuoteModal={handleOpenLeadModalWithProduct} 
+                  />
+                </div>
+              )}
+            </section>
 
             {/* Categories & 3D Showcase Section */}
             <div className="categories-showcase-container">
@@ -4705,7 +4835,7 @@ export default function Home() {
             </div>
 
             {/* Main Layout: Left Sidebar + Results Grid */}
-            <div className="main-search-and-results-layout">
+            <div className="main-search-and-results-layout" ref={catalogSectionRef} id="catalog-results-section">
               {/* Left Sidebar Filter Section */}
               <aside className="filters-sidebar-new glass-panel desktop-sidebar" style={{ position: 'relative' }}>
                 <div className="filter-header-row" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: '12px' }}>
@@ -5177,19 +5307,120 @@ export default function Home() {
                         )}
                       </div>
                     ) : (
-                      <h3>Katalog Sonuçları</h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a', margin: 0 }}>
+                          {searchQuery?.trim() ? (
+                            <span>
+                              &ldquo;{searchQuery}&rdquo; <span style={{ fontSize: '0.9rem', fontWeight: '600', color: '#64748b' }}>için arama sonuçları</span>
+                            </span>
+                          ) : (
+                            'Katalog Sonuçları'
+                          )}
+                        </h3>
+                        <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                          {products.length > 0 ? (
+                            <span>Toplam <strong style={{ color: 'var(--accent-gold)' }}>{products.length}</strong> seramik modeli listeleniyor</span>
+                          ) : (
+                            'Kriterlerinize uygun seramik bulunamadı'
+                          )}
+                        </span>
+                      </div>
                     )}
                   </div>
                   <div className="results-header-actions-new" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <button onClick={() => setShowMobileFilters(true)} className="mobile-filter-trigger-btn">
                       <SlidersHorizontal size={14} />
                       <span>Filtrele</span>
+                      {activeFilterCount > 0 && (
+                        <span className="mobile-filter-badge">{activeFilterCount}</span>
+                      )}
                     </button>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: '500' }}>
                       Sonuç: <strong style={{ color: '#0f172a' }}>{products.length}</strong>
                     </div>
                   </div>
                 </div>
+
+                {/* Active Filter Chips / Removable Tags Bar */}
+                {activeFilterCount > 0 && (
+                  <div className="active-filters-chips-bar animate-fade-in">
+                    <span className="active-chips-title">Aktif Filtreler:</span>
+                    {searchQuery?.trim() && (
+                      <span className="filter-chip" onClick={() => { setSearchQuery(''); fetchProducts('clear_search=1'); }}>
+                        Arama: &ldquo;{searchQuery}&rdquo; <X size={12} />
+                      </span>
+                    )}
+                    {selectedBrand && (
+                      <span className="filter-chip" onClick={() => { setSelectedBrand(''); fetchProducts(); }}>
+                        Marka: {selectedBrand} <X size={12} />
+                      </span>
+                    )}
+                    {selectedStyle && (
+                      <span className="filter-chip" onClick={() => { setSelectedStyle(''); fetchProducts(); }}>
+                        Tarz: {selectedStyle} <X size={12} />
+                      </span>
+                    )}
+                    {selectedFinish && (
+                      <span className="filter-chip" onClick={() => { setSelectedFinish(''); fetchProducts(); }}>
+                        Yüzey: {selectedFinish} <X size={12} />
+                      </span>
+                    )}
+                    {selectedSize && (
+                      <span className="filter-chip" onClick={() => { setSelectedSize(''); fetchProducts(); }}>
+                        Ebat: {selectedSize} <X size={12} />
+                      </span>
+                    )}
+                    {selectedColor && (
+                      <span className="filter-chip" onClick={() => { setSelectedColor(''); fetchProducts(); }}>
+                        Renk: {selectedColor} <X size={12} />
+                      </span>
+                    )}
+                    {selectedArea && (
+                      <span className="filter-chip" onClick={() => { setSelectedArea(''); fetchProducts(); }}>
+                        Alan: {selectedArea} <X size={12} />
+                      </span>
+                    )}
+                    {selectedRectified && (
+                      <span className="filter-chip" onClick={() => { setSelectedRectified(''); fetchProducts(); }}>
+                        Rektifiye <X size={12} />
+                      </span>
+                    )}
+                    {selectedFrost && (
+                      <span className="filter-chip" onClick={() => { setSelectedFrost(''); fetchProducts(); }}>
+                        Dona Dayanıklı <X size={12} />
+                      </span>
+                    )}
+                    {selectedSlipResistance && (
+                      <span className="filter-chip" onClick={() => { setSelectedSlipResistance(''); fetchProducts(); }}>
+                        Kaymazlık: {selectedSlipResistance} <X size={12} />
+                      </span>
+                    )}
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setSelectedBrand('');
+                        setSelectedColor('');
+                        setSelectedFinish('');
+                        setSelectedStyle('');
+                        setSelectedArea('');
+                        setSelectedSize('');
+                        setSelectedRectified('');
+                        setSelectedFrost('');
+                        setSelectedSlipResistance('');
+                        setSelectedThickness('');
+                        setSelectedPeiRating('');
+                        setSelectedIsPremium('');
+                        setSearchQuery('');
+                        setUploadedImagePreview(null);
+                        setVisualSearchMatches(null);
+                        fetchProducts('clear=true');
+                      }} 
+                      className="filter-clear-all-chip"
+                    >
+                      Tümünü Sıfırla
+                    </button>
+                  </div>
+                )}
 
                 {/* Main Grid */}
                 <div className="products-grid-new">
@@ -9272,6 +9503,249 @@ export default function Home() {
 
       {/* Embedded CSS specific to this high-fidelity layout */}
       <style jsx>{`
+        /* ==========================================================================
+           PERSONA GATEWAY CARDS & DYNAMIC FILTER STYLES
+           ========================================================================== */
+        :global(.persona-gateway-section) {
+          max-width: 1280px;
+          margin: 28px auto 20px auto;
+          padding: 0 16px;
+        }
+
+        :global(.persona-gateway-grid) {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+        }
+
+        :global(.persona-card) {
+          background: #ffffff;
+          border: 1px solid rgba(226, 232, 240, 0.9);
+          border-radius: 16px;
+          padding: 22px 20px;
+          cursor: pointer;
+          transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+          position: relative;
+          overflow: hidden;
+        }
+
+        :global(.persona-card:hover) {
+          transform: translateY(-4px);
+          box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+          border-color: var(--accent-gold, #b38e47);
+        }
+
+        :global(.persona-card-header) {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 14px;
+        }
+
+        :global(.persona-icon-wrapper) {
+          width: 42px;
+          height: 42px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        :global(.persona-icon-wrapper.gold) {
+          background: rgba(179, 142, 71, 0.12);
+          color: #b38e47;
+        }
+        :global(.persona-icon-wrapper.blue) {
+          background: rgba(37, 99, 235, 0.1);
+          color: #2563eb;
+        }
+        :global(.persona-icon-wrapper.emerald) {
+          background: rgba(16, 185, 129, 0.12);
+          color: #10b981;
+        }
+
+        :global(.persona-badge) {
+          font-size: 0.64rem;
+          font-weight: 800;
+          letter-spacing: 0.06em;
+          padding: 4px 8px;
+          border-radius: 6px;
+          text-transform: uppercase;
+        }
+
+        :global(.persona-badge.gold) {
+          background: rgba(179, 142, 71, 0.08);
+          color: #b38e47;
+          border: 1px solid rgba(179, 142, 71, 0.25);
+        }
+        :global(.persona-badge.blue) {
+          background: rgba(37, 99, 235, 0.08);
+          color: #2563eb;
+          border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+        :global(.persona-badge.emerald) {
+          background: rgba(16, 185, 129, 0.08);
+          color: #10b981;
+          border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        :global(.persona-title) {
+          font-size: 1.06rem;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 0 0 6px 0;
+          letter-spacing: -0.01em;
+          line-height: 1.35;
+        }
+
+        :global(.persona-desc) {
+          font-size: 0.78rem;
+          color: #64748b;
+          line-height: 1.5;
+          margin: 0 0 16px 0;
+          flex-grow: 1;
+        }
+
+        :global(.persona-action-row) {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.8rem;
+          font-weight: 800;
+          transition: gap 0.2s ease;
+        }
+        :global(.persona-card:hover .persona-action-row) {
+          gap: 10px;
+        }
+
+        :global(.persona-action-row.gold) { color: #b38e47; }
+        :global(.persona-action-row.blue) { color: #2563eb; }
+        :global(.persona-action-row.emerald) { color: #10b981; }
+
+        /* Calculator wrapper collapsible */
+        :global(.calculator-collapsible-wrapper) {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+          padding: 20px;
+          margin-top: 16px;
+          box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        :global(.calculator-wrapper-header) {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid #f1f5f9;
+        }
+
+        :global(.calc-header-left) {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        :global(.calc-header-left h4) {
+          font-size: 1.05rem;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 0;
+        }
+        :global(.calc-close-btn) {
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+          padding: 5px 12px;
+          font-size: 0.76rem;
+          font-weight: 700;
+          color: #64748b;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        :global(.calc-close-btn:hover) {
+          background: #e2e8f0;
+          color: #0f172a;
+        }
+
+        /* Active Filter Chips Bar */
+        :global(.active-filters-chips-bar) {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 18px;
+          padding: 10px 14px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+        }
+
+        :global(.active-chips-title) {
+          font-size: 0.76rem;
+          font-weight: 700;
+          color: #475569;
+          margin-right: 4px;
+        }
+
+        :global(.filter-chip) {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 10px;
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #0f172a;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        :global(.filter-chip:hover) {
+          border-color: #ef4444;
+          color: #ef4444;
+          background: #fef2f2;
+        }
+
+        :global(.filter-clear-all-chip) {
+          background: transparent;
+          border: none;
+          font-size: 0.75rem;
+          font-weight: 700;
+          color: #ef4444;
+          cursor: pointer;
+          margin-left: auto;
+          text-decoration: underline;
+          padding: 4px 6px;
+        }
+
+        :global(.mobile-filter-badge) {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 18px;
+          height: 18px;
+          padding: 0 5px;
+          background: var(--accent-gold, #b38e47);
+          color: #0f172a;
+          font-size: 0.68rem;
+          font-weight: 800;
+          border-radius: 999px;
+          margin-left: 4px;
+        }
+
+        @media (max-width: 900px) {
+          :global(.persona-gateway-grid) {
+            grid-template-columns: repeat(1, 1fr);
+            gap: 12px;
+          }
+        }
+
         /* ==========================================================================
            NEW LIGHT LUXURY UTILITY BAR & HEADER STYLE
            ========================================================================== */
