@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import AIRemodelModal from '@/components/AIRemodelModal';
+import { generateTilePreview, loadImage } from '@/components/TilePerspectiveEngine';
 
 const TURKEY_CITIES = [
   'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Amasya', 'Ankara', 'Antalya', 'Artvin', 'Aydın',
@@ -227,28 +228,139 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
     }
   };
 
-  // Ebat Alan Hesabı
-  const singleTileM2 = (product.width * product.height) / 10000;
-  const tileAreaM2 = singleTileM2.toFixed(2);
-  const tilesPerM2 = (1 / (singleTileM2 || 0.72)).toFixed(1);
+  // Dimensions & Accurate Metric Calculations
+  const tileWidth = Number(product.width) || 60;
+  const tileHeight = Number(product.height) || tileWidth;
+  const productDimensions = `${tileWidth}×${tileHeight} cm`;
+  const isSquareTile = Math.abs(tileWidth - tileHeight) < 5;
+
+  // Ebat Alan Hesabı (Gerçek Ölçülere Göre)
+  const singleTileM2 = (tileWidth * tileHeight) / 10000;
+  const tileAreaM2 = singleTileM2 > 0 ? singleTileM2.toFixed(2) : '0.36';
+  const tilesPerM2 = singleTileM2 > 0 ? (1 / singleTileM2).toFixed(1) : '2.8';
+
+  // Tiles per box calculation (Standart üretici paketleme kuralları: ~1.44 m²)
+  const tilesPerBox = tileWidth === 60 && tileHeight === 120 ? 2 :
+                      tileWidth === 60 && tileHeight === 60 ? 4 :
+                      tileWidth === 80 && tileHeight === 80 ? 2 :
+                      tileWidth === 20 && tileHeight === 120 ? 6 :
+                      tileWidth === 30 && tileHeight === 60 ? 8 :
+                      Math.max(1, Math.round(1.44 / (singleTileM2 || 0.72)));
+  const boxM2 = (singleTileM2 * tilesPerBox).toFixed(2);
 
   // Metraj Hesaplayıcı
   const parsedM2 = parseFloat(customM2) || 0;
   const targetArea = includeWastage ? parsedM2 * 1.1 : parsedM2;
   const calculatedTiles = Math.ceil(targetArea / (singleTileM2 || 0.72));
-  const estimatedBoxes = Math.ceil(calculatedTiles / 2);
+  const estimatedBoxes = Math.ceil(calculatedTiles / tilesPerBox);
 
   const openQuoteWithCalculatedArea = () => {
     setQuoteForm(prev => ({ ...prev, areaM2: String(Math.round(targetArea)) }));
     setShowQuoteModal(true);
   };
 
-  const roomRenderFallback = product.renderUrl || '/hero/luxury_bathroom.png';
+  // Dynamic Room Render state (Birebir ürün dokusunun mimari mekanda sergilenmesi)
+  const [roomRenderImage, setRoomRenderImage] = useState(null);
+  const [isRoomRendering, setIsRoomRendering] = useState(false);
+
+  useEffect(() => {
+    if (activeView === 'room' && !roomRenderImage && !isRoomRendering) {
+      let isMounted = true;
+      setIsRoomRendering(true);
+
+      const generateProductRoom = async () => {
+        try {
+          const nameLc = (product.name || '').toLowerCase();
+          const styleLc = (product.style || '').toLowerCase();
+          const colorLc = (product.color || '').toLowerCase();
+
+          // 1. Curated match if exact curated showcase exists
+          if (nameLc.includes('albatros') || (colorLc.includes('siyah') && styleLc.includes('mermer') && !nameLc.includes('storia'))) {
+            if (isMounted) {
+              setRoomRenderImage('/renders/luxury_bathroom_albatros_antrasit.jpg');
+              setIsRoomRendering(false);
+            }
+            return;
+          }
+          if (nameLc.includes('loft') || (styleLc.includes('beton') && colorLc.includes('gri') && !colorLc.includes('green'))) {
+            if (isMounted) {
+              setRoomRenderImage('/renders/luxury_bathroom_loft_beton.jpg');
+              setIsRoomRendering(false);
+            }
+            return;
+          }
+          if (nameLc.includes('oak') || nameLc.includes('ahşap') || styleLc.includes('ahşap')) {
+            if (isMounted) {
+              setRoomRenderImage('/renders/luxury_bathroom_natural_oak.jpg');
+              setIsRoomRendering(false);
+            }
+            return;
+          }
+          if (nameLc.includes('calacatta') || nameLc.includes('altın') || (colorLc.includes('beyaz') && styleLc.includes('mermer') && !colorLc.includes('green') && !nameLc.includes('storia'))) {
+            if (isMounted) {
+              setRoomRenderImage('/renders/luxury_bathroom_calacatta_gold.jpg');
+              setIsRoomRendering(false);
+            }
+            return;
+          }
+
+          // 2. Dynamic 3D Room Render with the product's EXACT tile texture & dimensions
+          const rawTileSource = product.textureUrl || product.imageUrl || '/textures/calacatta_gold.jpg';
+          const isHttp = typeof rawTileSource === 'string' && rawTileSource.startsWith('http');
+          const tileSource = isHttp ? `/api/proxy?url=${encodeURIComponent(rawTileSource)}` : rawTileSource;
+
+          const [roomImg, tileImg] = await Promise.all([
+            loadImage('/hero/luxury_bathroom.png'),
+            loadImage(tileSource).catch(() => loadImage('/hero/hero_ceramics.jpg'))
+          ]);
+
+          const isDark = colorLc.includes('antrasit') || colorLc.includes('siyah') || colorLc.includes('koyu') || colorLc.includes('green') || nameLc.includes('green') || nameLc.includes('storia');
+          const isPlank = (tileWidth / tileHeight) <= 0.35 || (tileHeight / tileWidth) <= 0.35;
+
+          const surfaces = {
+            floor: {
+              polygon: [[0, 68], [100, 68], [100, 100], [0, 100]],
+              exclude: [[[35, 62], [65, 62], [65, 85], [35, 85]]]
+            },
+            walls: []
+          };
+
+          const renderedUrl = generateTilePreview(roomImg, tileImg, surfaces, {
+            groutColor: isPlank ? '#241a14' : isDark ? '#16221a' : '#cbd5e1',
+            groutWidth: 1.4,
+            tileWCm: tileWidth,
+            tileHCm: tileHeight,
+            finish: product.finish || 'Full Lappato',
+            layout: 'straight',
+            subdivisions: 28,
+          });
+
+          if (isMounted) {
+            setRoomRenderImage(renderedUrl);
+            setIsRoomRendering(false);
+          }
+        } catch (err) {
+          console.warn('[ProductDetailClient] Room render error:', err);
+          if (isMounted) {
+            setRoomRenderImage('/hero/luxury_bathroom.png');
+            setIsRoomRendering(false);
+          }
+        }
+      };
+
+      generateProductRoom();
+
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, [activeView, roomRenderImage, isRoomRendering, product, tileWidth, tileHeight]);
+
   const currentDisplayImage = 
     activeView === 'texture' 
       ? (product.textureUrl || product.imageUrl) 
       : activeView === 'room'
-      ? roomRenderFallback
+      ? (roomRenderImage || '/hero/luxury_bathroom.png')
       : product.imageUrl;
 
   return (
@@ -372,8 +484,8 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               background: 'radial-gradient(ellipse at 50% 40%, rgba(30, 48, 40, 0.45) 0%, rgba(13, 20, 32, 0.75) 45%, #070a10 100%)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-              aspectRatio: '4 / 5',
-              maxHeight: '620px',
+              aspectRatio: isSquareTile ? '1 / 1' : '4 / 5',
+              maxHeight: isSquareTile ? '580px' : '620px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
@@ -387,9 +499,33 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   height: '100%',
                   objectFit: activeView === 'texture' || activeView === 'room' ? 'cover' : 'contain',
                   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                  padding: activeView === 'image' ? '28px' : '0'
+                  padding: activeView === 'image' ? (isSquareTile ? '20px' : '28px') : '0'
                 }}
               />
+
+              {/* Room Rendering Shimmering Loading Overlay */}
+              {isRoomRendering && (
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(7, 10, 16, 0.85)',
+                  backdropFilter: 'blur(10px)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '14px',
+                  zIndex: 25
+                }}>
+                  <div style={{ width: '44px', height: '44px', borderRadius: '50%', border: '3px solid rgba(212,175,55,0.2)', borderTopColor: '#d4af37', animation: 'spin 0.8s linear infinite' }} />
+                  <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#d4af37' }}>
+                    {product.name} ({productDimensions}) Mekâna Döşeniyor...
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                    3D perspektif, ebat ve ışık yansımaları hesaplanıyor
+                  </div>
+                </div>
+              )}
 
               {/* Gloss Sheen Reflection for Full Lappato / Polished Karolar */}
               {activeView !== 'room' && (
@@ -474,11 +610,11 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   top: '64px',
                   left: '18px',
                   right: '18px',
-                  background: 'rgba(9, 13, 22, 0.85)',
+                  background: 'rgba(9, 13, 22, 0.9)',
                   backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
                   padding: '8px 14px',
-                  borderRadius: '10px',
+                  borderRadius: '12px',
                   fontSize: '0.74rem',
                   color: '#f1f5f9',
                   display: 'flex',
@@ -489,21 +625,23 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Sparkles size={13} style={{ color: '#d4af37' }} />
-                    <span>Mimari Mekân Simülasyonu</span>
+                    <span><strong>{product.name} ({productDimensions})</strong> Birebir 3D Mekân Simülasyonu</span>
                   </span>
                   <button
                     onClick={() => setShowAIRemodel(true)}
                     style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#d4af37',
+                      background: 'rgba(212, 175, 55, 0.15)',
+                      border: '1px solid rgba(212, 175, 55, 0.4)',
+                      color: '#f3d375',
                       fontWeight: '700',
                       cursor: 'pointer',
-                      fontSize: '0.74rem',
-                      textDecoration: 'underline'
+                      fontSize: '0.72rem',
+                      padding: '4px 10px',
+                      borderRadius: '8px',
+                      transition: 'all 0.15s ease'
                     }}
                   >
-                    Kendi Evinde Dene →
+                    Kendi Evinde Dene (Fotoğraf Yükle) →
                   </button>
                 </div>
               )}
@@ -540,7 +678,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   }}
                 >
                   <Layers size={13} style={{ color: activeView === 'image' ? '#d4af37' : '#94a3b8' }} />
-                  <span>Plaka (60×120)</span>
+                  <span>Plaka ({tileWidth}×{tileHeight})</span>
                 </button>
 
                 {product.textureUrl && (
@@ -610,7 +748,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   {tileAreaM2} m²
                 </div>
                 <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
-                  Tek Karo Ebatı
+                  Tek Karo ({tileWidth}×{tileHeight} cm)
                 </div>
               </div>
 
@@ -641,10 +779,10 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   Kenar Bitişi
                 </div>
                 <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#f3d375' }}>
-                  Lazer Rektifiye
+                  {product.rectified ? 'Lazer Rektifiye' : 'Rektifiyeli Kesim'}
                 </div>
                 <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
-                  1 mm Sıfır Derz
+                  {product.rectified ? '1 mm Sıfır Derz' : 'Hassas Derz'}
                 </div>
               </div>
             </div>
@@ -708,7 +846,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               lineHeight: 1.5,
               fontWeight: '400'
             }}>
-              Doğal mermer dokusu, derin damar zenginliği ve ayna parlaklığında Full Lappato yüzeyi ile tasarlanmış üst segment porselen karo.
+              {productSubtitle}
             </p>
 
             {/* Architectural Spec Matrix (4-Grid Luxury Tiles) */}
@@ -728,7 +866,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   Format
                 </div>
                 <div style={{ fontSize: '0.86rem', fontWeight: '700', color: '#ffffff', marginTop: '3px' }}>
-                  {product.width}×{product.height} cm
+                  {tileWidth}×{tileHeight} cm
                 </div>
               </div>
 
@@ -742,7 +880,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   Yüzey
                 </div>
                 <div style={{ fontSize: '0.86rem', fontWeight: '700', color: '#e5c568', marginTop: '3px' }}>
-                  {product.finish || 'Full Lappato'}
+                  {product.finish || 'Mat / Parlak'}
                 </div>
               </div>
 
@@ -756,7 +894,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   Dokusu
                 </div>
                 <div style={{ fontSize: '0.86rem', fontWeight: '700', color: '#ffffff', marginTop: '3px' }}>
-                  {product.style || 'Mermer'}
+                  {product.style || 'Porselen'}
                 </div>
               </div>
 
@@ -770,7 +908,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   Ton
                 </div>
                 <div style={{ fontSize: '0.86rem', fontWeight: '700', color: '#ffffff', marginTop: '3px' }}>
-                  {product.color || 'Dark Green'}
+                  {product.color || 'Standart'}
                 </div>
               </div>
             </div>
