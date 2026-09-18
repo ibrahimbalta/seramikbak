@@ -1619,12 +1619,17 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
           onClose={() => setShowAIRemodel(false)}
           selectedProduct={product}
           onGoToDealers={() => {
+            setShowAIRemodel(false);
             const dealersEl = document.getElementById('authorized-dealers-section');
             if (dealersEl) {
               dealersEl.scrollIntoView({ behavior: 'smooth' });
             } else {
               setShowQuoteModal(true);
             }
+          }}
+          onRequestSample={() => {
+            setShowAIRemodel(false);
+            setShowSampleModal(true);
           }}
         />
       )}

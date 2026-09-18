@@ -12,14 +12,36 @@ function cleanJsonString(str) {
   return cleaned;
 }
 
-// Pool of Gemini models with automatic fallback
+// Active and fast Gemini models with priority on flash-lite / latest
 const GEMINI_MODELS = [
-  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite-preview',
   'gemini-flash-latest',
-  'gemini-3.5-flash-lite',
-  'gemini-3.8-flash',
-  'gemini-3.6-flash'
+  'gemini-3.6-flash',
+  'gemini-3-flash-preview'
 ];
+
+// Normalize coordinates to [0, 100] percentage range (Gemini vision often uses 0-1000)
+function normalizePolygon(poly) {
+  if (!Array.isArray(poly) || poly.length === 0) return poly;
+  let maxCoord = 0;
+  for (const pt of poly) {
+    if (Array.isArray(pt)) {
+      maxCoord = Math.max(maxCoord, Number(pt[0]) || 0, Number(pt[1]) || 0);
+    }
+  }
+  const scale = maxCoord > 105 ? (maxCoord > 2000 ? 100 : 10) : 1;
+  return poly.map(([x, y]) => [
+    Math.min(100, Math.max(0, Math.round(((Number(x) || 0) / scale) * 10) / 10)),
+    Math.min(100, Math.max(0, Math.round(((Number(y) || 0) / scale) * 10) / 10))
+  ]);
+}
+
+function normalizeExcludeList(excludes) {
+  if (!Array.isArray(excludes)) return [];
+  return excludes
+    .map(poly => normalizePolygon(poly))
+    .filter(p => Array.isArray(p) && p.length >= 3);
+}
 
 // Helper to determine the best Grok model name
 async function getBestGrokModel(apiKey) {
@@ -327,15 +349,30 @@ Coordinates are percentage (0-100). Return raw JSON only.`;
     const cleanedText = cleanJsonString(resultText);
     const parsedData = JSON.parse(cleanedText);
 
-    // Format output based on target
+    // Format output based on target with coordinate normalization
     if (target === 'all' || target === 'both') {
-      const floorObj = parsedData.floor || fallbackFloor;
+      const rawFloor = parsedData.floor || (parsedData.polygon ? { polygon: parsedData.polygon, exclude: parsedData.exclude } : fallbackFloor);
+      const floorObj = {
+        polygon: normalizePolygon(rawFloor.polygon || fallbackFloor.polygon),
+        exclude: normalizeExcludeList(rawFloor.exclude || fallbackFloor.exclude)
+      };
+
       let wallsArr = [];
       if (Array.isArray(parsedData.walls)) {
-        wallsArr = parsedData.walls;
+        wallsArr = parsedData.walls.map(w => ({
+          name: w.name || 'wall',
+          polygon: normalizePolygon(w.polygon),
+          exclude: normalizeExcludeList(w.exclude)
+        })).filter(w => w.polygon && w.polygon.length >= 4);
       } else if (parsedData.walls && parsedData.walls.polygon) {
-        wallsArr = [parsedData.walls];
-      } else {
+        wallsArr = [{
+          name: parsedData.walls.name || 'wall',
+          polygon: normalizePolygon(parsedData.walls.polygon),
+          exclude: normalizeExcludeList(parsedData.walls.exclude)
+        }];
+      }
+
+      if (wallsArr.length === 0) {
         wallsArr = fallbackWalls;
       }
 
@@ -351,10 +388,20 @@ Coordinates are percentage (0-100). Return raw JSON only.`;
     if (target === 'walls') {
       let wallsArr = [];
       if (Array.isArray(parsedData.walls)) {
-        wallsArr = parsedData.walls;
+        wallsArr = parsedData.walls.map(w => ({
+          name: w.name || 'wall',
+          polygon: normalizePolygon(w.polygon),
+          exclude: normalizeExcludeList(w.exclude)
+        })).filter(w => w.polygon && w.polygon.length >= 4);
       } else if (parsedData.polygon) {
-        wallsArr = [{ polygon: parsedData.polygon, exclude: parsedData.exclude || [] }];
-      } else {
+        wallsArr = [{
+          name: 'wall',
+          polygon: normalizePolygon(parsedData.polygon),
+          exclude: normalizeExcludeList(parsedData.exclude)
+        }];
+      }
+
+      if (wallsArr.length === 0) {
         wallsArr = fallbackWalls;
       }
 
@@ -368,16 +415,28 @@ Coordinates are percentage (0-100). Return raw JSON only.`;
       });
     }
 
-    // floor target
-    if (!parsedData.polygon || !Array.isArray(parsedData.polygon) || parsedData.polygon.length !== 4) {
-      throw new Error('Invalid floor polygon format returned.');
+    // floor target: handle both { polygon: ... } and { floor: { polygon: ... } }
+    const rawFloorPolygon = parsedData.polygon || parsedData.floor?.polygon;
+    const rawFloorExclude = parsedData.exclude || parsedData.floor?.exclude || [];
+
+    if (!rawFloorPolygon || !Array.isArray(rawFloorPolygon) || rawFloorPolygon.length < 4) {
+      console.warn('[AI Segment] Fallback floor used due to polygon shape');
+      return NextResponse.json({
+        success: true,
+        polygon: fallbackFloor.polygon,
+        exclude: fallbackFloor.exclude,
+        isFallback: true
+      });
     }
+
+    const normPolygon = normalizePolygon(rawFloorPolygon);
+    const normExclude = normalizeExcludeList(rawFloorExclude);
 
     console.log(`[AI Segment] Segmented FLOOR successfully`);
     return NextResponse.json({
       success: true,
-      polygon: parsedData.polygon,
-      exclude: parsedData.exclude || [],
+      polygon: normPolygon,
+      exclude: normExclude,
       isFallback: false
     });
 
