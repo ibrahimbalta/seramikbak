@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import AIRemodelModal from '@/components/AIRemodelModal';
+import { generateTilePreview, loadImage } from '@/components/TilePerspectiveEngine';
 
 // 3D Kiosk Studio Canvas (Loaded dynamically on client side without SSR)
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
@@ -720,7 +721,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                       }}
                     >
                       <ExternalLink size={11} />
-                      <span>Kiosk'ta Aç</span>
+                      <span>Kiosk&apos;ta Aç</span>
                     </button>
 
                     <button

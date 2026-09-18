@@ -59,7 +59,9 @@ import {
   Store,
   QrCode,
   Maximize2,
-  Compass
+  Compass,
+  Activity,
+  CheckCircle
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import WebARModal from '@/components/WebARModal';
