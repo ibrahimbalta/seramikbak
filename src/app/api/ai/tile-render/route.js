@@ -156,9 +156,10 @@ Analyze this room photo for ceramic tile remodel (${resolvedProduct.name} ${reso
 
 CRITICAL ARCHITECTURAL RULES:
 1. FLOOR (zemin): Ground plane starting at bottom (y=100) extending back to wall baseboards.
-2. OBJECT EXCLUSIONS: Identify all furniture and fixtures to preserve 100% untouched:
+2. CLEAN EDGES: Provide sharp and accurate transition coordinates along baseboards, cabinet toe kicks, and furniture edges without blur.
+3. OBJECT EXCLUSIONS: Identify all furniture and fixtures to preserve 100% untouched:
    - Bathtubs (küvet), toilets (klozet), sinks & vanities (lavabo/tezgah), faucets (musluk), shower glass (duş camı), doors (kapı), windows (pencere), mirrors (ayna), ceiling (tavan), humans (insan).
-3. WALLS (duvarlar): Only true vertical tileable wall surfaces (shower wall, backsplash, feature wall).
+4. WALLS (duvarlar): Only true vertical tileable wall surfaces (shower wall, backsplash, feature wall).
    - NEVER include ceilings, mirrors, windows, or glass partitions as walls!
 
 Return ONLY valid JSON:
@@ -237,6 +238,18 @@ Coordinates are percentages (0-100). Return raw JSON only.`;
 
     const processingTime = Date.now() - startTime;
 
+    const tileTypeAndColor = `${resolvedProduct.name} ${resolvedProduct.color ? `- ${resolvedProduct.color}` : ''} ${resolvedProduct.style ? `(${resolvedProduct.style})` : ''}`.trim();
+    const tileSizeAndFinish = `${resolvedProduct.width}x${resolvedProduct.height} cm ${resolvedProduct.finish || 'Full Lappato'}`.trim();
+
+    const architecturalPrompt = `Photo-realistic interior design render. Replace the existing floor in the masked area with ${tileTypeAndColor} tiles.
+
+Key Requirements:
+- Pattern & Texture: ${tileSizeAndFinish} with subtle natural texture.
+- Alignment & Perspective: Tiles must follow the natural perspective lines and depth of the room.
+- Details: Seamless installation, ultra-thin precise grout lines matching the tile color.
+- Lighting & Reflections: Realistic floor reflections, ambient indoor lighting, natural shadows cast by furniture onto the new ceramic floor.
+- Clean Edges: Sharp and accurate transition along the baseboards and furniture edges. No blur, high resolution 8k.`;
+
     return NextResponse.json({
       success: true,
       product: resolvedProduct,
@@ -244,6 +257,7 @@ Coordinates are percentages (0-100). Return raw JSON only.`;
       layout,
       groutWidth: resolvedProduct.groutWidth,
       maskData,
+      architecturalPrompt,
       processingTime: `${processingTime}ms`
     });
 

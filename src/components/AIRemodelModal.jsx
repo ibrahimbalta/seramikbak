@@ -129,6 +129,19 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
     }
   }, [selectedProduct]);
 
+  // Exact Architectural Prompt formatted with active product specs
+  const tileTypeAndColor = `${selectedTile?.style || 'Porselen'} ${selectedTile?.color ? `- ${selectedTile.color}` : ''} (${selectedTile?.name || 'Seçili Seramik'})`.trim();
+  const tileSizeAndFinish = `${selectedTile?.width || 60}x${selectedTile?.height || 120} cm ${selectedTile?.finish || 'Full Lappato'}`.trim();
+
+  const architecturalPromptText = `Photo-realistic interior design render. Replace the existing floor in the masked area with ${tileTypeAndColor} tiles.
+
+Key Requirements:
+- Pattern & Texture: ${tileSizeAndFinish} with subtle natural texture.
+- Alignment & Perspective: Tiles must follow the natural perspective lines and depth of the room.
+- Details: Seamless installation, ultra-thin precise grout lines matching the tile color.
+- Lighting & Reflections: Realistic floor reflections, ambient indoor lighting, natural shadows cast by furniture onto the new ceramic floor.
+- Clean Edges: Sharp and accurate transition along the baseboards and furniture edges. No blur, high resolution 8k.`;
+
   if (!isOpen) return null;
 
   // Process selected file
@@ -287,25 +300,61 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
     }
 
     try {
-      setLoadingStepText('1/3 Mekan analizi için görsel optimize ediliyor...');
+      setLoadingStepText('1/3 Zemin yüzeyi ve süpürgelik hatları analiz ediliyor...');
 
       // Rapidly downscale image in-browser to max 800px for ultra-fast AI vision processing
       const optimizedAiImage = await downscaleImageForAI(currentPhoto, 800);
 
+      // Load original high-res room photo and 4K tile texture (routed through /api/proxy if external to bypass CORS)
+      const rawTileSource = targetTile?.textureUrl || targetTile?.imageUrl || '/textures/calacatta_gold.jpg';
+      const isHttp = typeof rawTileSource === 'string' && rawTileSource.startsWith('http');
+      const tileSource = isHttp ? `/api/proxy?url=${encodeURIComponent(rawTileSource)}` : rawTileSource;
+
+      setLoadingStepText('2/3 Photo-realistic interior design render işleniyor...');
+
+      // Priority 1: Call Generative AI Re-Tile endpoint with exact architectural prompt
+      try {
+        const reTileRes = await fetch('/api/ai/re-tile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: optimizedAiImage || currentPhoto,
+            tileImageUrl: tileSource,
+            productName: targetTile?.name,
+            style: targetTile?.style,
+            color: targetTile?.color,
+            finish: targetTile?.finish,
+            width: targetTile?.width,
+            height: targetTile?.height,
+            roomType: surfaceToApply,
+            promptOverride: architecturalPromptText
+          }),
+        }).then((r) => r.json());
+
+        if (reTileRes?.success && reTileRes?.imageUrl && reTileRes.method !== 'static-fallback' && reTileRes.method !== 'error-fallback') {
+          setLoadingStepText('3/3 8K Photo-realistic render tamamlandı!');
+          setAiResultImage(reTileRes.imageUrl);
+          setIsGenerating(false);
+          return;
+        }
+      } catch (aiErr) {
+        console.warn('[AI Remodel] Re-Tile API bypassed, proceeding to PBR perspective engine:', aiErr);
+      }
+
       setLoadingStepText(
-        '2/3 ' + (surfaceToApply === 'floor' ? 'Zemin yüzeyi' : surfaceToApply === 'walls' ? 'Duvar yüzeyleri' : 'Zemin ve duvarlar') + ' analiz ediliyor (Sıfır Kota)...'
+        '2/3 ' + (surfaceToApply === 'floor' ? 'Zemin yüzeyi' : surfaceToApply === 'walls' ? 'Duvar yüzeyleri' : 'Zemin ve duvarlar') + ' 3D perspektife oturtuluyor...'
       );
 
       let surfaces = { floor: null, walls: null };
 
-      // Priority 1: If user already painted with MaskBrushEditor, use it directly (0 API quota)
+      // If user already painted with MaskBrushEditor, use it directly (0 API quota)
       if (customMaskCanvas) {
         surfaces = {
           floor: { polygon: [[0, 0], [100, 0], [100, 100], [0, 100]], exclude: [] },
           walls: []
         };
       } else {
-        // Priority 2: Try AI Tile-Render API
+        // Try AI Tile-Render API for semantic surface and clean edge mask detection
         try {
           const renderRes = await fetch('/api/ai/tile-render', {
             method: 'POST',
@@ -340,10 +389,10 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
             }
           }
         } catch (apiErr) {
-          console.warn('[AI Remodel] API bypassed, falling back to 100% free client detector:', apiErr);
+          console.warn('[AI Remodel] API bypassed, falling back to client detector:', apiErr);
         }
 
-        // Priority 3: Zero-Quota Client-Side Computer Vision Engine ($0 cost, 100% reliable)
+        // Client-Side Computer Vision Engine Fallback
         if (!surfaces.floor && (!surfaces.walls || surfaces.walls.length === 0)) {
           const baseImg = await loadImage(currentPhoto);
           const clientSurfaces = detectTileSurfacesClientSide(
@@ -362,12 +411,7 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
         }
       }
 
-      setLoadingStepText('3/3 ' + (targetTile?.name || 'Seramik') + ' eski derzler temizlenerek 3D mimari render kalitesinde giydiriliyor...');
-
-      // Load original high-res room photo and 4K tile texture (routed through /api/proxy if external to bypass CORS)
-      const rawTileSource = targetTile?.textureUrl || targetTile?.imageUrl || '/textures/calacatta_gold.jpg';
-      const isHttp = typeof rawTileSource === 'string' && rawTileSource.startsWith('http');
-      const tileSource = isHttp ? `/api/proxy?url=${encodeURIComponent(rawTileSource)}` : rawTileSource;
+      setLoadingStepText('3/3 ' + (targetTile?.name || 'Seramik') + ' mimari render kalitesinde giydiriliyor...');
 
       const fallbackTexture = (targetTile?.color || '').toLowerCase().includes('siyah') || (targetTile?.color || '').toLowerCase().includes('antrasit')
         ? '/textures/albatros_antrasit.jpg'
@@ -538,6 +582,47 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
           <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '5px 14px', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)', whiteSpace: 'nowrap' }}>
             ✨ Seçili Ürün
           </span>
+        </div>
+
+        {/* Architectural AI Prompt Directive Card */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(9, 13, 22, 0.9) 100%)',
+          border: '1px solid rgba(212, 175, 55, 0.35)',
+          borderRadius: '16px',
+          padding: '14px 18px',
+          marginBottom: '18px',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.4)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Sparkles size={16} style={{ color: '#d4af37' }} />
+              <span style={{ fontSize: '0.84rem', fontWeight: '900', color: '#d4af37', letterSpacing: '0.02em' }}>
+                Mimari Render Direktifi (Prompt):
+              </span>
+            </div>
+            <span style={{ fontSize: '0.68rem', fontWeight: '800', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '3px 10px', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+              8K Photo-Realistic
+            </span>
+          </div>
+
+          <p style={{ margin: '0 0 10px 0', fontSize: '0.82rem', color: '#f8fafc', lineHeight: 1.5, fontWeight: '600' }}>
+            Photo-realistic interior design render. Replace the existing floor in the masked area with <span style={{ color: '#d4af37', fontWeight: '800' }}>{tileTypeAndColor}</span> tiles.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '8px', background: 'rgba(0,0,0,0.4)', padding: '10px 14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: '0.74rem', color: '#cbd5e1' }}>
+              <strong style={{ color: '#94a3b8' }}>• Pattern & Texture:</strong> {tileSizeAndFinish}
+            </div>
+            <div style={{ fontSize: '0.74rem', color: '#cbd5e1' }}>
+              <strong style={{ color: '#94a3b8' }}>• Alignment & Perspective:</strong> Doğal derinlik ve kaçış çizgileri
+            </div>
+            <div style={{ fontSize: '0.74rem', color: '#cbd5e1' }}>
+              <strong style={{ color: '#94a3b8' }}>• Details:</strong> Kusursuz derz çizgisi & renk uyumu
+            </div>
+            <div style={{ fontSize: '0.74rem', color: '#cbd5e1' }}>
+              <strong style={{ color: '#94a3b8' }}>• Clean Edges:</strong> Süpürgelik & mobilya temasında sıfır blur
+            </div>
+          </div>
         </div>
 
         {/* WORKSPACE: Upload Area OR Loading OR Result State */}
@@ -731,7 +816,7 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                   }}
                 >
                   <Sparkles size={22} style={{ color: '#090d16' }} />
-                  <span>Seçili Seramiği Bu Mekana Döşe (%100 Ücretsiz & Sıfır Kota)</span>
+                  <span>Seçili Seramiği Bu Mekana Döşe (Photo-Realistic AI Render)</span>
                 </button>
 
                 {isUserUploaded && (

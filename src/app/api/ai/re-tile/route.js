@@ -152,26 +152,31 @@ export async function POST(req) {
         // Prepare room photo as base64
         const roomImage = await urlToBase64(image);
 
+        // Dynamic tile attributes for architectural prompt
+        const tileTypeAndColor = `${productName || 'Seçili Seramik'} ${color ? `- ${color}` : ''} ${style ? `(${style})` : ''}`.trim();
+        const tileSizeAndFinish = `${width || 60}x${height || 120} cm ${finish || 'Full Lappato'}`.trim();
+
+        // Exact architectural interior design render prompt requested by user
+        const architecturalPrompt = body.promptOverride || `Photo-realistic interior design render. Replace the existing floor in the masked area with ${tileTypeAndColor} tiles.
+
+Key Requirements:
+- Pattern & Texture: ${tileSizeAndFinish} with subtle natural texture.
+- Alignment & Perspective: Tiles must follow the natural perspective lines and depth of the room.
+- Details: Seamless installation, ultra-thin precise grout lines matching the tile color.
+- Lighting & Reflections: Realistic floor reflections, ambient indoor lighting, natural shadows cast by furniture onto the new ceramic floor.
+- Clean Edges: Sharp and accurate transition along the baseboards and furniture edges. No blur, high resolution 8k.`;
+
         // Build the prompt parts
         const parts = [
           {
-            text: `You are an expert interior designer AI. I am giving you two images:
-1. First image: A room photo (bathroom/kitchen/living room)
-2. Second image: A ceramic tile texture
+            text: `${architecturalPrompt}
 
-YOUR TASK: Realistically re-tile the walls and floor of the room in the first photo using the ceramic tile texture from the second image.
-
-IMPORTANT RULES:
-- Keep the EXACT SAME room layout, furniture, fixtures (sink, toilet, mirror, bathtub, cabinets) — do NOT change them
-- Apply the tile texture ONLY to wall and floor surfaces
-- Maintain proper perspective and vanishing points for tile grout lines
-- Add realistic 2mm grout lines between tiles
-- Tile size is ${width || 60}x${height || 120} cm
-- Tile finish: ${finish || 'mat'}
-- Preserve the original lighting, shadows, and reflections of the room
-- The result must look like a professional architectural visualization
-- Do NOT add or remove any objects from the room
-- Output a single photorealistic image of the re-tiled room`,
+CRITICAL RULES FOR AI RENDERING:
+- Maintain 100% of the original room structure, walls, ceiling, windows, doors, mirrors, lighting fixtures, and decor.
+- Keep all furniture, bathtub, toilet, vanity sink, faucets, and cabinetry completely intact and untouched.
+- Re-tile ONLY the floor surfaces within the perspective boundaries.
+- Ensure natural contact shadows under furniture and ultra-clean transitions along baseboards.
+- Output a single photorealistic high-resolution 8k rendered image.`,
           },
           {
             inlineData: {
@@ -193,7 +198,7 @@ IMPORTANT RULES:
             });
           } catch (tileErr) {
             console.warn('[AI Re-Tile] Could not load tile texture, using text description:', tileErr.message);
-            parts[0].text += `\n\nNote: The tile texture could not be loaded. Use a ${color || 'white'} ${style || 'marble'} ceramic tile texture based on this description: ${productName || 'Calacatta Gold'}.`;
+            parts[0].text += `\n\nTile texture reference: ${tileTypeAndColor}, size ${tileSizeAndFinish}.`;
           }
         }
 
@@ -206,7 +211,7 @@ IMPORTANT RULES:
             contents: [{ parts }],
             generationConfig: {
               responseModalities: ['TEXT', 'IMAGE'],
-              temperature: 0.4,
+              temperature: 0.3,
             },
           }),
         });
@@ -229,6 +234,7 @@ IMPORTANT RULES:
                   imageUrl: resultDataUrl,
                   method: 'gemini-image-edit',
                   model: modelName,
+                  prompt: architecturalPrompt
                 });
               }
             }
@@ -247,18 +253,21 @@ IMPORTANT RULES:
     }
 
     // -----------------------------------------------------------------------
-    // Strategy 2: Pollinations Fallback (text-to-image, lower quality)
+    // Strategy 2: Pollinations Fallback (text-to-image with exact architectural prompt)
     // -----------------------------------------------------------------------
-    console.log('[AI Re-Tile] Falling back to Pollinations text-to-image');
+    console.log('[AI Re-Tile] Falling back to Pollinations text-to-image with architectural prompt');
 
     const targetRoom = roomType === 'salon' ? 'luxury living room' : roomType === 'mutfak' ? 'modern kitchen' : 'luxury bathroom';
-    const prompt = `Photorealistic architectural interior design photo of a ${targetRoom}, all wall surfaces and floor retiled with high-end ${color || 'white'} ${style || 'Calacatta Marble'} ceramic porcelain tiles (${productName || 'Calacatta Gold'}, ${width || 60}x${height || 120} cm, ${finish || 'polished Lappato'} finish, realistic tile grout lines, natural ambient reflections), 8k resolution, architectural digest interior design photo`;
+    const tileTypeAndColorFallback = `${productName || 'Seçili Seramik'} ${color ? `- ${color}` : ''} ${style ? `(${style})` : ''}`.trim();
+    const tileSizeAndFinishFallback = `${width || 60}x${height || 120} cm ${finish || 'Full Lappato'}`.trim();
+
+    const prompt = body.promptOverride || `Photo-realistic interior design render of a ${targetRoom}. Replace the existing floor in the masked area with ${tileTypeAndColorFallback} tiles. Key Requirements: Pattern & Texture: ${tileSizeAndFinishFallback} with subtle natural texture. Alignment & Perspective: Tiles must follow the natural perspective lines and depth of the room. Details: Seamless installation, ultra-thin precise grout lines matching the tile color. Lighting & Reflections: Realistic floor reflections, ambient indoor lighting, natural shadows cast by furniture onto the new ceramic floor. Clean Edges: Sharp and accurate transition along the baseboards and furniture edges. No blur, high resolution 8k.`;
     const encodedPrompt = encodeURIComponent(prompt);
     const randomSeed = Math.floor(Math.random() * 1000000);
     const aiImageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=768&seed=${randomSeed}&model=flux&nologo=true`;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     try {
       const aiResponse = await fetch(aiImageUrl, { signal: controller.signal });
