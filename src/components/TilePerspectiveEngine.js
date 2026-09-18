@@ -200,27 +200,14 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28) 
 
   ctx.save();
 
-  // Build clip path: main quad minus exclusion zones
+  // Step A: Clip strictly to the surface quad boundary
   ctx.beginPath();
   ctx.moveTo(quad[0][0], quad[0][1]);
   for (let i = 1; i < quad.length; i++) {
     ctx.lineTo(quad[i][0], quad[i][1]);
   }
   ctx.closePath();
-
-  // Cut out exclusion regions (sofas, tables, cabinets, sinks, toilets, etc.)
-  if (excludes && excludes.length > 0) {
-    excludes.forEach((poly) => {
-      if (poly && poly.length >= 3) {
-        ctx.moveTo(poly[0][0], poly[0][1]);
-        for (let i = 1; i < poly.length; i++) {
-          ctx.lineTo(poly[i][0], poly[i][1]);
-        }
-        ctx.closePath();
-      }
-    });
-  }
-  ctx.clip('evenodd');
+  ctx.clip();
 
   // Perspective foreshortening exponent
   // Real world cameras compress depth non-linearly towards the horizon
@@ -265,6 +252,25 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28) 
         [p10, p11, p01]
       );
     }
+  }
+
+  // Step B: Erase exclusion zones (bathtub, toilet, vanity, furniture) with destination-out
+  // This guarantees furniture from original photo stays 100% pristine without evenodd leaks
+  if (excludes && excludes.length > 0) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    excludes.forEach((poly) => {
+      if (poly && poly.length >= 3) {
+        ctx.moveTo(poly[0][0], poly[0][1]);
+        for (let i = 1; i < poly.length; i++) {
+          ctx.lineTo(poly[i][0], poly[i][1]);
+        }
+        ctx.closePath();
+      }
+    });
+    ctx.fill();
+    ctx.restore();
   }
 
   ctx.restore();
