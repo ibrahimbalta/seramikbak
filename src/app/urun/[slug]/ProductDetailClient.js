@@ -243,7 +243,13 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
     setShowQuoteModal(true);
   };
 
-  const currentDisplayImage = activeView === 'texture' ? (product.textureUrl || product.imageUrl) : product.imageUrl;
+  const roomRenderFallback = product.renderUrl || '/hero/luxury_bathroom.png';
+  const currentDisplayImage = 
+    activeView === 'texture' 
+      ? (product.textureUrl || product.imageUrl) 
+      : activeView === 'room'
+      ? roomRenderFallback
+      : product.imageUrl;
 
   return (
     <div style={{ minHeight: '100vh', background: '#080b11', color: '#f8fafc', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
@@ -282,7 +288,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               href={`/marka/${brandSlug}`} 
               style={{ 
                 color: '#cbd5e1', 
-                textDecoration: 'none',
+                textDecoration: 'none', 
                 fontWeight: '500'
               }}
             >
@@ -357,68 +363,82 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
           alignItems: 'start'
         }}>
           
-          {/* Left Column: Image & Texture View */}
+          {/* Left Column: Architectural Presentation Stage */}
           <div>
             <div style={{
               position: 'relative',
               borderRadius: '24px',
               overflow: 'hidden',
-              background: 'linear-gradient(180deg, #111728 0%, #090d16 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.09)',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-              aspectRatio: '1 / 1',
+              background: 'radial-gradient(ellipse at 50% 40%, rgba(30, 48, 40, 0.45) 0%, rgba(13, 20, 32, 0.75) 45%, #070a10 100%)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+              aspectRatio: '4 / 5',
+              maxHeight: '620px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              {/* Main Product Image */}
+              {/* Main Product Image with subtle zoom on hover */}
               <img
                 src={currentDisplayImage}
                 alt={`${brandName} ${product.name}`}
                 style={{
                   width: '100%',
                   height: '100%',
-                  objectFit: activeView === 'texture' ? 'cover' : 'contain',
-                  transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                  background: '#090d16'
+                  objectFit: activeView === 'texture' || activeView === 'room' ? 'cover' : 'contain',
+                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                  padding: activeView === 'image' ? '28px' : '0'
                 }}
               />
 
+              {/* Gloss Sheen Reflection for Full Lappato / Polished Karolar */}
+              {activeView !== 'room' && (
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  pointerEvents: 'none',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, 0.03) 70%, rgba(255, 255, 255, 0) 100%)',
+                  mixBlendMode: 'overlay'
+                }} />
+              )}
+
               {/* Minimal Badges Overlay (Top Left) */}
-              <div style={{ position: 'absolute', top: '16px', left: '16px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 10 }}>
+              <div style={{ position: 'absolute', top: '18px', left: '18px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 10 }}>
                 <span style={{
-                  background: 'rgba(9, 13, 22, 0.75)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  background: 'rgba(7, 10, 16, 0.85)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
                   color: '#e2e8f0',
                   fontSize: '0.72rem',
                   fontWeight: '700',
-                  padding: '4px 10px',
+                  padding: '5px 12px',
                   borderRadius: '9999px',
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase'
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
                 }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d4af37', display: 'inline-block' }} />
                   {brandName}
                 </span>
 
-                {product.isPremium && (
-                  <span style={{
-                    background: 'rgba(212, 175, 55, 0.12)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(212, 175, 55, 0.35)',
-                    color: '#f3d375',
-                    fontSize: '0.7rem',
-                    fontWeight: '600',
-                    padding: '4px 10px',
-                    borderRadius: '9999px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}>
-                    <Sparkles size={11} style={{ color: '#d4af37' }} />
-                    <span>Lüks Seri</span>
-                  </span>
-                )}
+                <span style={{
+                  background: 'rgba(212, 175, 55, 0.12)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
+                  color: '#f3d375',
+                  fontSize: '0.7rem',
+                  fontWeight: '600',
+                  padding: '5px 12px',
+                  borderRadius: '9999px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}>
+                  <Sparkles size={11} style={{ color: '#d4af37' }} />
+                  <span>{product.finish || 'Full Lappato'}</span>
+                </span>
               </div>
 
               {/* Fullscreen Zoom Trigger (Top Right) */}
@@ -427,14 +447,14 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 title="Büyük boyutta incele"
                 style={{
                   position: 'absolute',
-                  top: '16px',
-                  right: '16px',
-                  background: 'rgba(9, 13, 22, 0.75)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  color: '#94a3b8',
-                  width: '36px',
-                  height: '36px',
+                  top: '18px',
+                  right: '18px',
+                  background: 'rgba(7, 10, 16, 0.85)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  color: '#e2e8f0',
+                  width: '38px',
+                  height: '38px',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
@@ -447,116 +467,194 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 <Maximize2 size={15} />
               </button>
 
-              {/* View Switcher: Segmented Pill (Bottom Floating) */}
-              {product.textureUrl && (
+              {/* View Mode Notice when in 'room' mode */}
+              {activeView === 'room' && (
                 <div style={{
                   position: 'absolute',
-                  bottom: '16px',
+                  top: '64px',
+                  left: '18px',
+                  right: '18px',
+                  background: 'rgba(9, 13, 22, 0.85)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  padding: '8px 14px',
+                  borderRadius: '10px',
+                  fontSize: '0.74rem',
+                  color: '#f1f5f9',
                   display: 'flex',
-                  background: 'rgba(8, 12, 20, 0.8)',
-                  backdropFilter: 'blur(14px)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: '9999px',
-                  padding: '3px',
-                  gap: '2px',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '8px',
                   zIndex: 10
                 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Sparkles size={13} style={{ color: '#d4af37' }} />
+                    <span>Mimari Mekân Simülasyonu</span>
+                  </span>
                   <button
-                    onClick={() => setActiveView('image')}
+                    onClick={() => setShowAIRemodel(true)}
                     style={{
-                      background: activeView === 'image' ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
-                      color: activeView === 'image' ? '#ffffff' : '#94a3b8',
-                      border: activeView === 'image' ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid transparent',
-                      padding: '5px 14px',
-                      borderRadius: '9999px',
-                      fontSize: '0.74rem',
-                      fontWeight: '600',
+                      background: 'none',
+                      border: 'none',
+                      color: '#d4af37',
+                      fontWeight: '700',
                       cursor: 'pointer',
-                      transition: 'all 0.2s ease'
+                      fontSize: '0.74rem',
+                      textDecoration: 'underline'
                     }}
                   >
-                    Karo Görünümü
-                  </button>
-                  <button
-                    onClick={() => setActiveView('texture')}
-                    style={{
-                      background: activeView === 'texture' ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
-                      color: activeView === 'texture' ? '#ffffff' : '#94a3b8',
-                      border: activeView === 'texture' ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid transparent',
-                      padding: '5px 14px',
-                      borderRadius: '9999px',
-                      fontSize: '0.74rem',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    4K Doku (Texture)
+                    Kendi Evinde Dene →
                   </button>
                 </div>
               )}
+
+              {/* View Switcher: Segmented Pill (Bottom Floating) */}
+              <div style={{
+                position: 'absolute',
+                bottom: '18px',
+                display: 'flex',
+                background: 'rgba(7, 10, 16, 0.9)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
+                borderRadius: '9999px',
+                padding: '4px',
+                gap: '4px',
+                zIndex: 10,
+                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)'
+              }}>
+                <button
+                  onClick={() => setActiveView('image')}
+                  style={{
+                    background: activeView === 'image' ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.1) 100%)' : 'transparent',
+                    color: activeView === 'image' ? '#ffffff' : '#94a3b8',
+                    border: activeView === 'image' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid transparent',
+                    padding: '6px 14px',
+                    borderRadius: '9999px',
+                    fontSize: '0.74rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}
+                >
+                  <Layers size={13} style={{ color: activeView === 'image' ? '#d4af37' : '#94a3b8' }} />
+                  <span>Plaka (60×120)</span>
+                </button>
+
+                {product.textureUrl && (
+                  <button
+                    onClick={() => setActiveView('texture')}
+                    style={{
+                      background: activeView === 'texture' ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.1) 100%)' : 'transparent',
+                      color: activeView === 'texture' ? '#ffffff' : '#94a3b8',
+                      border: activeView === 'texture' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid transparent',
+                      padding: '6px 14px',
+                      borderRadius: '9999px',
+                      fontSize: '0.74rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}
+                  >
+                    <Eye size={13} style={{ color: activeView === 'texture' ? '#d4af37' : '#94a3b8' }} />
+                    <span>4K Doku</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => setActiveView('room')}
+                  style={{
+                    background: activeView === 'room' ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.1) 100%)' : 'transparent',
+                    color: activeView === 'room' ? '#ffffff' : '#94a3b8',
+                    border: activeView === 'room' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid transparent',
+                    padding: '6px 14px',
+                    borderRadius: '9999px',
+                    fontSize: '0.74rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}
+                >
+                  <Sparkles size={13} style={{ color: activeView === 'room' ? '#d4af37' : '#94a3b8' }} />
+                  <span>Mimari Mekân</span>
+                </button>
+              </div>
             </div>
 
-            {/* Quick Architectural Info Bar Under Image */}
+            {/* Architectural Under-Stage Specifications Ribbon */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '8px',
-              marginTop: '14px',
+              gap: '10px',
+              marginTop: '16px',
               textAlign: 'center'
             }}>
               <div style={{
-                background: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
-                borderRadius: '12px',
-                padding: '10px 8px'
+                background: 'rgba(15, 23, 42, 0.55)',
+                border: '1px solid rgba(255, 255, 255, 0.07)',
+                borderRadius: '14px',
+                padding: '12px 10px'
               }}>
-                <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', marginBottom: '2px' }}>
-                  <Layers size={12} style={{ color: '#d4af37' }} />
-                  <span>Karo Alanı</span>
+                <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
+                  Plaka Alanı
                 </div>
-                <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#fff' }}>
+                <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#ffffff' }}>
                   {tileAreaM2} m²
                 </div>
-              </div>
-
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
-                borderRadius: '12px',
-                padding: '10px 8px'
-              }}>
-                <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', marginBottom: '2px' }}>
-                  <ShieldCheck size={12} style={{ color: '#34d399' }} />
-                  <span>Kalite Standardı</span>
-                </div>
-                <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#fff' }}>
-                  1. Sınıf TSE & CE
+                <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
+                  Tek Karo Ebatı
                 </div>
               </div>
 
               <div style={{
-                background: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
-                borderRadius: '12px',
-                padding: '10px 8px'
+                background: 'rgba(15, 23, 42, 0.55)',
+                border: '1px solid rgba(255, 255, 255, 0.07)',
+                borderRadius: '14px',
+                padding: '12px 10px'
               }}>
-                <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', marginBottom: '2px' }}>
-                  <Truck size={12} style={{ color: '#60a5fa' }} />
-                  <span>Tedarik & Sevk</span>
+                <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
+                  Kalite Sınıfı
                 </div>
-                <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#fff' }}>
-                  Fabrika / Yetkili Bayi
+                <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#34d399' }}>
+                  1. Sınıf Porselen
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
+                  TSE EN 14411
+                </div>
+              </div>
+
+              <div style={{
+                background: 'rgba(15, 23, 42, 0.55)',
+                border: '1px solid rgba(255, 255, 255, 0.07)',
+                borderRadius: '14px',
+                padding: '12px 10px'
+              }}>
+                <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
+                  Kenar Bitişi
+                </div>
+                <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#f3d375' }}>
+                  Lazer Rektifiye
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
+                  1 mm Sıfır Derz
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Product Info & Conversion Actions */}
+          {/* Right Column: Architectural Storytelling & Haute-Couture Conversion Suite */}
           <div>
             
-            {/* Brand Link & SKU Meta */}
-            <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+            {/* Editorial Eyebrow & Model Identifier */}
+            <div style={{ marginBottom: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
               <Link
                 href={`/marka/${brandSlug}`}
                 style={{
@@ -565,200 +663,260 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   fontWeight: '700',
                   textDecoration: 'none',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.14em',
+                  letterSpacing: '0.18em',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '4px'
+                  gap: '6px'
                 }}
               >
                 <span>{brandName}</span>
-                <ChevronRight size={13} />
+                <span style={{ color: '#64748b' }}>•</span>
+                <span style={{ color: '#94a3b8', fontWeight: '500' }}>ARCHITECTURAL COLLECTION</span>
+                <ChevronRight size={13} style={{ color: '#d4af37' }} />
               </Link>
 
               <span style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                color: '#94a3b8',
+                background: 'rgba(212, 175, 55, 0.06)',
+                border: '1px solid rgba(212, 175, 55, 0.2)',
+                color: '#e5c568',
                 fontSize: '0.72rem',
                 fontFamily: 'monospace',
-                padding: '3px 10px',
-                borderRadius: '6px'
+                padding: '4px 10px',
+                borderRadius: '6px',
+                letterSpacing: '0.06em'
               }}>
-                KOD: {product.code}
+                REF: {product.code}
               </span>
             </div>
 
-            {/* Main Product Title */}
+            {/* Main Product Title & Architectural Subtitle */}
             <h1 style={{
-              fontSize: '2.2rem',
+              fontSize: '2.5rem',
               fontWeight: '800',
               color: '#ffffff',
-              margin: '0 0 16px 0',
-              lineHeight: 1.2,
-              letterSpacing: '-0.02em'
+              margin: '0 0 8px 0',
+              lineHeight: 1.15,
+              letterSpacing: '-0.025em'
             }}>
               {product.name}
             </h1>
 
-            {/* Refined Architectural Spec Chips */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
+            <p style={{
+              fontSize: '0.92rem',
+              color: '#94a3b8',
+              margin: '0 0 22px 0',
+              lineHeight: 1.5,
+              fontWeight: '400'
+            }}>
+              Doğal mermer dokusu, derin damar zenginliği ve ayna parlaklığında Full Lappato yüzeyi ile tasarlanmış üst segment porselen karo.
+            </p>
+
+            {/* Architectural Spec Matrix (4-Grid Luxury Tiles) */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '8px',
+              marginBottom: '26px'
+            }}>
               <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(212, 175, 55, 0.08)',
-                color: '#e5c568',
-                border: '1px solid rgba(212, 175, 55, 0.25)',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                fontSize: '0.8rem',
-                fontWeight: '600'
+                background: 'rgba(15, 23, 42, 0.6)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '12px',
+                padding: '10px 12px'
               }}>
-                <Ruler size={13} style={{ color: '#d4af37' }} />
-                <span>{product.width}×{product.height} cm</span>
+                <div style={{ fontSize: '0.66rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: '600' }}>
+                  Format
+                </div>
+                <div style={{ fontSize: '0.86rem', fontWeight: '700', color: '#ffffff', marginTop: '3px' }}>
+                  {product.width}×{product.height} cm
+                </div>
               </div>
 
               <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                color: '#e2e8f0',
+                background: 'rgba(15, 23, 42, 0.6)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                fontSize: '0.8rem',
-                fontWeight: '500'
+                borderRadius: '12px',
+                padding: '10px 12px'
               }}>
-                <Sparkles size={13} style={{ color: '#94a3b8' }} />
-                <span>{product.finish || 'Mat'} Yüzey</span>
+                <div style={{ fontSize: '0.66rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: '600' }}>
+                  Yüzey
+                </div>
+                <div style={{ fontSize: '0.86rem', fontWeight: '700', color: '#e5c568', marginTop: '3px' }}>
+                  {product.finish || 'Full Lappato'}
+                </div>
               </div>
 
               <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                color: '#e2e8f0',
+                background: 'rgba(15, 23, 42, 0.6)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                fontSize: '0.8rem',
-                fontWeight: '500'
+                borderRadius: '12px',
+                padding: '10px 12px'
               }}>
-                <Layers size={13} style={{ color: '#94a3b8' }} />
-                <span>{product.style || 'Mermer'} Dokusu</span>
+                <div style={{ fontSize: '0.66rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: '600' }}>
+                  Dokusu
+                </div>
+                <div style={{ fontSize: '0.86rem', fontWeight: '700', color: '#ffffff', marginTop: '3px' }}>
+                  {product.style || 'Mermer'}
+                </div>
               </div>
 
               <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                color: '#e2e8f0',
+                background: 'rgba(15, 23, 42, 0.6)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                fontSize: '0.8rem',
-                fontWeight: '500'
+                borderRadius: '12px',
+                padding: '10px 12px'
               }}>
-                <Palette size={13} style={{ color: '#94a3b8' }} />
-                <span>{product.color || 'Antrasit'}</span>
+                <div style={{ fontSize: '0.66rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: '600' }}>
+                  Ton
+                </div>
+                <div style={{ fontSize: '0.86rem', fontWeight: '700', color: '#ffffff', marginTop: '3px' }}>
+                  {product.color || 'Dark Green'}
+                </div>
               </div>
             </div>
 
-            {/* AI & 3D Interactive Feature Card */}
+            {/* AI Mekânsal Dönüşüm Stüdyosu — The Magnet & Hero Feature */}
             <div style={{
-              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(15, 23, 42, 0.65) 60%, rgba(59, 130, 246, 0.06) 100%)',
-              border: '1px solid rgba(212, 175, 55, 0.22)',
-              borderRadius: '16px',
-              padding: '18px 20px',
-              marginBottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '14px'
+              background: 'linear-gradient(135deg, rgba(20, 30, 48, 0.9) 0%, rgba(10, 15, 26, 0.95) 100%)',
+              border: '1px solid rgba(212, 175, 55, 0.35)',
+              borderRadius: '20px',
+              padding: '24px',
+              marginBottom: '22px',
+              position: 'relative',
+              overflow: 'hidden',
+              boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 35px rgba(212, 175, 55, 0.08)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  background: 'rgba(212, 175, 55, 0.12)',
-                  border: '1px solid rgba(212, 175, 55, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#d4af37',
-                  flexShrink: 0
+              {/* Subtle Ambient Decorative Glow */}
+              <div style={{
+                position: 'absolute',
+                top: '-40px',
+                right: '-40px',
+                width: '180px',
+                height: '180px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0) 70%)',
+                pointerEvents: 'none'
+              }} />
+
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', marginBottom: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.05) 100%)',
+                    border: '1px solid rgba(212, 175, 55, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#f3d375',
+                    flexShrink: 0
+                  }}>
+                    <Sparkles size={18} />
+                  </div>
+                  <div>
+                    <span style={{
+                      fontSize: '0.7rem',
+                      fontWeight: '700',
+                      color: '#d4af37',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.12em',
+                      display: 'block'
+                    }}>
+                      MİMARİ YAPAY ZEKA SİMÜLASYONU
+                    </span>
+                    <h3 style={{
+                      fontSize: '1.08rem',
+                      fontWeight: '700',
+                      color: '#ffffff',
+                      margin: '2px 0 0',
+                      letterSpacing: '-0.01em'
+                    }}>
+                      Bu Seramiği Kendi Odanızda Görün
+                    </h3>
+                  </div>
+                </div>
+
+                <span style={{
+                  fontSize: '0.7rem',
+                  fontWeight: '700',
+                  color: '#34d399',
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  border: '1px solid rgba(16, 185, 129, 0.25)',
+                  padding: '3px 9px',
+                  borderRadius: '9999px',
+                  whiteSpace: 'nowrap'
                 }}>
-                  <Sparkles size={20} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#ffffff', letterSpacing: '-0.01em' }}>
-                    Kendi Mekânında Canlı Gör
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '2px' }}>
-                    Fotoğrafını yükle, seçtiğin seramiği yapay zeka ile odana döşe.
-                  </div>
-                </div>
+                  ● Canlı Render
+                </span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <p style={{
+                fontSize: '0.84rem',
+                color: '#94a3b8',
+                lineHeight: 1.5,
+                margin: '0 0 18px 0'
+              }}>
+                Banyonuzun veya salonunuzun bir fotoğrafını yükleyin. Yapay zeka motorumuz küvet, lavabo ve mobilyalarınıza dokunmadan bu seramiği mimari 3D render kalitesinde odanıza döşesin.
+              </p>
+
+              {/* Dual Action Buttons */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 0.9fr', gap: '10px' }}>
                 <button
                   onClick={() => setShowAIRemodel(true)}
                   style={{
-                    background: 'linear-gradient(135deg, #d4af37 0%, #c49a2c 100%)',
-                    color: '#090d16',
+                    background: 'linear-gradient(135deg, #f5d77f 0%, #d4af37 50%, #aa7c11 100%)',
+                    color: '#070a10',
                     border: 'none',
-                    borderRadius: '10px',
-                    padding: '9px 16px',
-                    fontSize: '0.82rem',
-                    fontWeight: '700',
+                    borderRadius: '12px',
+                    padding: '12px 18px',
+                    fontSize: '0.86rem',
+                    fontWeight: '800',
                     cursor: 'pointer',
-                    display: 'inline-flex',
+                    display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    boxShadow: '0 4px 14px rgba(212, 175, 55, 0.25)',
-                    transition: 'all 0.2s ease'
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: '0 6px 20px -2px rgba(212, 175, 55, 0.4)',
+                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                   }}
                 >
-                  <Sparkles size={14} />
-                  <span>AI Mekân Yenileme</span>
+                  <Sparkles size={16} />
+                  <span>Fotoğraf Yükle & Gör</span>
                 </button>
 
                 <button
                   onClick={handleLaunch3DKiosk}
-                  title="3D Kiosk Stüdyosunda İncele"
                   style={{
                     background: 'rgba(255, 255, 255, 0.04)',
-                    color: '#cbd5e1',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    borderRadius: '10px',
-                    padding: '9px 14px',
-                    fontSize: '0.82rem',
+                    color: '#f1f5f9',
+                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    fontSize: '0.84rem',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    display: 'inline-flex',
+                    display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
+                    justifyContent: 'center',
+                    gap: '7px',
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  <Eye size={14} style={{ color: '#d4af37' }} />
-                  <span>3D Kiosk</span>
+                  <Eye size={15} style={{ color: '#d4af37' }} />
+                  <span>3D Kiosk Modeli</span>
                 </button>
               </div>
             </div>
 
-            {/* Refined Conversion Card (Teklif & Numune) */}
+            {/* Haute-Couture Conversion Suite (Teklif & Numune) */}
             <div style={{
-              background: 'rgba(15, 23, 42, 0.65)',
+              background: 'rgba(13, 18, 30, 0.75)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '18px',
-              padding: '22px',
-              marginBottom: '24px'
+              borderRadius: '20px',
+              padding: '24px',
+              marginBottom: '24px',
+              boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.6)'
             }}>
               {/* Status Header */}
               <div style={{
@@ -771,14 +929,14 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{
-                    width: '7px',
-                    height: '7px',
+                    width: '8px',
+                    height: '8px',
                     borderRadius: '50%',
                     background: '#10b981',
                     display: 'inline-block',
-                    boxShadow: '0 0 8px #10b981'
+                    boxShadow: '0 0 10px #10b981'
                   }} />
-                  <span style={{ fontSize: '0.82rem', fontWeight: '600', color: '#f1f5f9' }}>
+                  <span style={{ fontSize: '0.84rem', fontWeight: '700', color: '#f8fafc' }}>
                     Yetkili Bayi & Fabrika Tedariki
                   </span>
                 </div>
@@ -787,60 +945,72 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   fontSize: '0.74rem',
                   color: '#94a3b8',
                   background: 'rgba(255, 255, 255, 0.03)',
-                  padding: '3px 8px',
-                  borderRadius: '6px',
-                  border: '1px solid rgba(255, 255, 255, 0.06)'
+                  padding: '3px 10px',
+                  borderRadius: '9999px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)'
                 }}>
-                  1. Kalite TSE / CE
+                  Stokta Hazır • 1. Kalite
                 </span>
               </div>
 
-              {/* Primary Buttons: Teklif Al & Numune İste */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
-                <button
-                  onClick={() => setShowQuoteModal(true)}
-                  style={{
-                    background: 'linear-gradient(135deg, #d4af37 0%, #c49a2c 100%)',
-                    color: '#090d16',
-                    border: 'none',
-                    borderRadius: '12px',
-                    padding: '13px 18px',
-                    fontSize: '0.88rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    boxShadow: '0 4px 18px rgba(212, 175, 55, 0.25)',
-                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
-                  }}
-                >
-                  <Send size={15} />
-                  <span>Teklif Talebi Al</span>
-                </button>
+              {/* Primary Dual Actions (Teklif Al & Numune İste) */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+                <div>
+                  <button
+                    onClick={() => setShowQuoteModal(true)}
+                    style={{
+                      width: '100%',
+                      background: 'linear-gradient(135deg, #d4af37 0%, #b8860b 100%)',
+                      color: '#070a10',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '14px 18px',
+                      fontSize: '0.9rem',
+                      fontWeight: '800',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      boxShadow: '0 6px 20px -2px rgba(212, 175, 55, 0.35)',
+                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+                    }}
+                  >
+                    <Send size={16} />
+                    <span>Teklif Talebi Al</span>
+                  </button>
+                  <div style={{ fontSize: '0.7rem', color: '#64748b', textAlign: 'center', marginTop: '6px' }}>
+                    Metrajınıza özel bayi fiyatı
+                  </div>
+                </div>
 
-                <button
-                  onClick={() => setShowSampleModal(true)}
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    color: '#f1f5f9',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    borderRadius: '12px',
-                    padding: '13px 18px',
-                    fontSize: '0.88rem',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <Box size={15} style={{ color: '#d4af37' }} />
-                  <span>15×15 Numune İste</span>
-                </button>
+                <div>
+                  <button
+                    onClick={() => setShowSampleModal(true)}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(255, 255, 255, 0.04)',
+                      color: '#f8fafc',
+                      border: '1px solid rgba(255, 255, 255, 0.14)',
+                      borderRadius: '12px',
+                      padding: '14px 18px',
+                      fontSize: '0.9rem',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <Box size={16} style={{ color: '#d4af37' }} />
+                    <span>15×15 Numune İste</span>
+                  </button>
+                  <div style={{ fontSize: '0.7rem', color: '#64748b', textAlign: 'center', marginTop: '6px' }}>
+                    Özel kargo kutusuyla adrese teslim
+                  </div>
+                </div>
               </div>
 
               {/* Area Calculator Accordion Trigger */}
@@ -851,9 +1021,9 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   background: showCalculator ? 'rgba(212, 175, 55, 0.06)' : 'rgba(255, 255, 255, 0.02)',
                   border: showCalculator ? '1px solid rgba(212, 175, 55, 0.25)' : '1px solid rgba(255, 255, 255, 0.06)',
                   borderRadius: '10px',
-                  padding: '10px 14px',
+                  padding: '11px 16px',
                   color: showCalculator ? '#d4af37' : '#94a3b8',
-                  fontSize: '0.8rem',
+                  fontSize: '0.82rem',
                   fontWeight: '600',
                   display: 'flex',
                   alignItems: 'center',
@@ -862,40 +1032,40 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   transition: 'all 0.2s ease'
                 }}
               >
-                <span style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-                  <Calculator size={14} style={{ color: '#d4af37' }} />
-                  <span>Metraj ve Kutu Adedi Hesapla</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Calculator size={15} style={{ color: '#d4af37' }} />
+                  <span>Metraj ve Kutu Adedi Hesaplayıcı</span>
                 </span>
                 <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                  {showCalculator ? 'Gizle ▲' : 'Hesapla ▼'}
+                  {showCalculator ? 'Hesaplayıcıyı Kapat ▲' : 'Metrajı Hesapla ▼'}
                 </span>
               </button>
 
               {/* Area Calculator Drawer */}
               {showCalculator && (
                 <div style={{
-                  marginTop: '12px',
-                  padding: '16px',
-                  background: 'rgba(0, 0, 0, 0.3)',
-                  border: '1px solid rgba(255, 255, 255, 0.07)',
-                  borderRadius: '12px'
+                  marginTop: '14px',
+                  padding: '18px',
+                  background: 'rgba(0, 0, 0, 0.35)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '14px'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#fff' }}>
-                      Gereken Metrajı Girin
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: '700', color: '#fff' }}>
+                      Kaplanacak Net Alanı Girin
                     </span>
-                    <label style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                    <label style={{ fontSize: '0.74rem', color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
                       <input 
                         type="checkbox" 
                         checked={includeWastage} 
                         onChange={(e) => setIncludeWastage(e.target.checked)}
                         style={{ accentColor: '#d4af37' }}
                       />
-                      <span>+%10 Kesim Firesi</span>
+                      <span>+%10 Mimari Kesim & Fire Payı</span>
                     </label>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
                     <div style={{ position: 'relative', flex: 1 }}>
                       <input
                         type="number"
@@ -906,16 +1076,16 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                         style={{
                           width: '100%',
                           background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          border: '1px solid rgba(255, 255, 255, 0.12)',
                           color: '#fff',
-                          borderRadius: '8px',
-                          padding: '8px 12px',
-                          fontSize: '0.85rem',
+                          borderRadius: '10px',
+                          padding: '10px 14px',
+                          fontSize: '0.9rem',
                           outline: 'none',
                           boxSizing: 'border-box'
                         }}
                       />
-                      <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.75rem', color: '#64748b' }}>
+                      <span style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.8rem', color: '#64748b' }}>
                         m²
                       </span>
                     </div>
@@ -923,13 +1093,13 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                     <button
                       onClick={openQuoteWithCalculatedArea}
                       style={{
-                        background: 'rgba(212, 175, 55, 0.15)',
-                        border: '1px solid rgba(212, 175, 55, 0.35)',
-                        color: '#d4af37',
-                        borderRadius: '8px',
-                        padding: '8px 14px',
-                        fontSize: '0.8rem',
-                        fontWeight: '600',
+                        background: 'rgba(212, 175, 55, 0.18)',
+                        border: '1px solid rgba(212, 175, 55, 0.4)',
+                        color: '#f3d375',
+                        borderRadius: '10px',
+                        padding: '10px 18px',
+                        fontSize: '0.84rem',
+                        fontWeight: '700',
                         cursor: 'pointer',
                         whiteSpace: 'nowrap'
                       }}
@@ -938,18 +1108,40 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                     </button>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', textAlign: 'center', fontSize: '0.75rem' }}>
-                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '6px', borderRadius: '6px' }}>
+                  {/* Quick Preset Buttons */}
+                  <div style={{ display: 'flex', gap: '6px', marginBottom: '14px', flexWrap: 'wrap' }}>
+                    {['15', '30', '50', '100', '200'].map((val) => (
+                      <button
+                        key={val}
+                        onClick={() => setCustomM2(val)}
+                        style={{
+                          background: customM2 === val ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.03)',
+                          border: customM2 === val ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid rgba(255, 255, 255, 0.07)',
+                          color: customM2 === val ? '#d4af37' : '#94a3b8',
+                          borderRadius: '6px',
+                          padding: '4px 10px',
+                          fontSize: '0.72rem',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {val} m²
+                      </button>
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', textAlign: 'center', fontSize: '0.78rem' }}>
+                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
                       <div style={{ color: '#64748b' }}>Gereken Alan</div>
-                      <div style={{ color: '#fff', fontWeight: '700', marginTop: '2px' }}>{targetArea.toFixed(1)} m²</div>
+                      <div style={{ color: '#fff', fontWeight: '800', marginTop: '3px', fontSize: '0.92rem' }}>{targetArea.toFixed(1)} m²</div>
                     </div>
-                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '6px', borderRadius: '6px' }}>
+                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
                       <div style={{ color: '#64748b' }}>Karo Adedi</div>
-                      <div style={{ color: '#fff', fontWeight: '700', marginTop: '2px' }}>{calculatedTiles} adet</div>
+                      <div style={{ color: '#fff', fontWeight: '800', marginTop: '3px', fontSize: '0.92rem' }}>{calculatedTiles} adet</div>
                     </div>
-                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '6px', borderRadius: '6px' }}>
+                    <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
                       <div style={{ color: '#64748b' }}>Tahmini Kutu</div>
-                      <div style={{ color: '#fff', fontWeight: '700', marginTop: '2px' }}>~{estimatedBoxes} kutu</div>
+                      <div style={{ color: '#fff', fontWeight: '800', marginTop: '3px', fontSize: '0.92rem' }}>~{estimatedBoxes} kutu</div>
                     </div>
                   </div>
                 </div>
