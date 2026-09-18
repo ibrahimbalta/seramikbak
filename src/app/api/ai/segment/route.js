@@ -12,11 +12,11 @@ function cleanJsonString(str) {
   return cleaned;
 }
 
-// Active and fast Gemini models with priority on flash-lite / latest
+// Active and fast Gemini models with priority on verified vision models
 const GEMINI_MODELS = [
+  'gemini-3.6-flash',
   'gemini-3.1-flash-lite-preview',
   'gemini-flash-latest',
-  'gemini-3.6-flash',
   'gemini-3-flash-preview'
 ];
 

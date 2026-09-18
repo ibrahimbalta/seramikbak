@@ -215,24 +215,58 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
       return;
     }
 
-    // Instant match for pre-rendered reference showcase (Lüks Banyo + Albatros Antrasit / Volcano / Siyah Mermer)
+    // Instant match for pre-rendered 3D architectural showcase (Lüks Banyo - 3D Mimari Render)
     const isLuxuryBathroom = typeof currentPhoto === 'string' && currentPhoto.includes('luxury_bathroom.png');
-    const isDarkTile = (targetTile?.name?.toLowerCase().includes('albatros') || 
-                        targetTile?.name?.toLowerCase().includes('volcano') || 
-                        targetTile?.name?.toLowerCase().includes('antrasit') || 
-                        targetTile?.name?.toLowerCase().includes('siyah') || 
-                        targetTile?.color?.toLowerCase().includes('siyah') ||
-                        targetTile?.color?.toLowerCase().includes('antrasit') ||
-                        targetTile?.style?.toLowerCase().includes('siyah'));
+    if (isLuxuryBathroom) {
+      setLoadingStepText('1/3 Banyo yüzeyleri ve 3D mimari perspektif analiz ediliyor...');
+      await new Promise(r => setTimeout(r, 400));
+      setLoadingStepText('2/3 ' + (targetTile?.name || 'Seçili seramik') + ' 3D mimari render kalitesinde zemin ve duvarlara döşeniyor...');
+      await new Promise(r => setTimeout(r, 450));
+      setLoadingStepText('3/3 Doğal pencere yansımaları ve PBR derinlik harmanlanıyor...');
+      await new Promise(r => setTimeout(r, 350));
 
-    if (isLuxuryBathroom && isDarkTile) {
-      setLoadingStepText('1/3 Banyo yüzeyleri ve mimari perspektif analiz ediliyor...');
-      await new Promise(r => setTimeout(r, 400));
-      setLoadingStepText('2/3 ' + (targetTile?.name || 'Albatros Antrasit') + ' seramik zemin ve duvarlara döşeniyor...');
-      await new Promise(r => setTimeout(r, 400));
-      setLoadingStepText('3/3 Doğal pencere yansımaları ve derinlik harmanlanıyor...');
-      await new Promise(r => setTimeout(r, 300));
-      setAiResultImage('/renders/luxury_bathroom_albatros_antrasit.jpg');
+      const nameLc = (targetTile?.name || '').toLowerCase();
+      const colorLc = (targetTile?.color || '').toLowerCase();
+      const styleLc = (targetTile?.style || '').toLowerCase();
+
+      // 1. Dark / Black marble (Albatros Antrasit, Volcano, Siyah)
+      if (
+        nameLc.includes('albatros') || 
+        nameLc.includes('volcano') || 
+        nameLc.includes('antrasit') || 
+        nameLc.includes('siyah') || 
+        colorLc.includes('siyah') || 
+        colorLc.includes('antrasit') ||
+        styleLc.includes('siyah')
+      ) {
+        setAiResultImage('/renders/luxury_bathroom_albatros_antrasit.jpg');
+      }
+      // 2. Concrete / Grey (Loft Beton, Concrete, Gri)
+      else if (
+        nameLc.includes('loft') || 
+        nameLc.includes('beton') || 
+        nameLc.includes('concrete') || 
+        styleLc.includes('beton') || 
+        colorLc.includes('gri')
+      ) {
+        setAiResultImage('/renders/luxury_bathroom_loft_beton.jpg');
+      }
+      // 3. Wood / Oak (Natural Oak, Teak, Ahşap)
+      else if (
+        nameLc.includes('oak') || 
+        nameLc.includes('ahşap') || 
+        nameLc.includes('teak') || 
+        styleLc.includes('ahşap') || 
+        colorLc.includes('ahşap') ||
+        targetTile?.width === 20
+      ) {
+        setAiResultImage('/renders/luxury_bathroom_natural_oak.jpg');
+      }
+      // 4. White / Gold marble (Calacatta Gold, White Silver, Carrara)
+      else {
+        setAiResultImage('/renders/luxury_bathroom_calacatta_gold.jpg');
+      }
+
       setIsGenerating(false);
       return;
     }
@@ -865,7 +899,7 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
                     Bu Mekan İçin Tahmini Miktar:
                   </span>
                   <span style={{ fontSize: '0.84rem', fontWeight: '900', color: '#38bdf8' }}>
-                    ~${requiredBoxes} Kutu (${totalCoveredM2} m²)
+                    ~{requiredBoxes} Kutu ({totalCoveredM2} m²)
                   </span>
                 </div>
 
