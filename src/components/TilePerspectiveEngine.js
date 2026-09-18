@@ -287,6 +287,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     groutWidth = 1.5,
     tileWCm = 60,
     tileHCm = 120,
+    subdivisions = 28,
     finish = 'parlak',
     screenAlphaOverride = null,
   } = options;
