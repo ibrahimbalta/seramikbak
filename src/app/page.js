@@ -3372,7 +3372,7 @@ export default function Home() {
   return (
     <main className="main-layout">
       {/* Live Platform Activity & Ticker Bar */}
-      <div className="live-analytics-top-bar glass-panel">
+      <div className="live-analytics-top-bar">
         {liveActivities && liveActivities.length > 0 && (
           <div className="live-ticker-capsule">
             <span className="ticker-capsule-badge">⚡ ANLIK AKIŞ</span>
