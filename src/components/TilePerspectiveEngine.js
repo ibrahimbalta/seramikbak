@@ -7,13 +7,15 @@
  *
  * Takes a user-uploaded room photo, tile texture, and AI-detected surface polygons,
  * then renders real-world scaled ceramic/porcelain slabs onto surfaces with:
- * - True architectural slab proportions (e.g. 60x120 cm slabs, 2.5 - 3 slabs across room)
+ * - True architectural slab proportions (60x120, 60x60, 20x120, 30x60, 120x120, 120x240)
+ * - Multiple layout patterns: Straight Grid, 1/2 Staggered, 1/3 Staggered, Diagonal
  * - Multi-face veining variation (alternating rotation/flips for continuous organic marble look)
  * - Pure, unpolluted tile color (zero brown/muddy bleed from old beige/yellow floors)
  * - PBR High-Pass Specular Light Map (crisp, pure white window and spotlight reflections)
  * - Neutral Contact Shadows (under bathtubs, furniture, and baseboards without color tinting)
- * - PBR Fresnel Clearcoat Sheen for Glossy/Lappato finishes
+ * - PBR Fresnel Clearcoat Sheen for Glossy/Full Lappato finishes
  * - Strict exclusion clipping (bathtubs, faucets, toilets, and windows remain 100% pristine)
+ * - Support for Custom Mask Canvas from MaskBrushEditor
  *
  * Cost: $0 (Runs entirely client-side on user GPU/device)
  * Speed: ~150-250ms total
@@ -85,24 +87,16 @@ function drawTexturedTriangle(ctx, img, srcTri, dstTri) {
 }
 
 // ---------------------------------------------------------------------------
-// Pattern Generation (Architectural Grand Slabs + Multi-Face Marble)
+// Pattern Generation (Architectural Slabs + Layouts + Multi-Face Marble)
 // ---------------------------------------------------------------------------
 
 /**
  * Create a tiled pattern canvas with:
- * - Real-world proportional slab sizing (60x120 dev plakalar)
+ * - Real-world proportional slab sizing (60x120, 60x60, 20x120 vb.)
+ * - Multiple layouts: 'straight', 'staggered_50', 'staggered_33', 'diagonal'
  * - Multi-face random rotation/flipping so veins don't repeat like stamps
- * - Razor-sharp rectified micro-grout lines (1.2px)
+ * - Razor-sharp rectified micro-grout lines (1.2px - 2px)
  * - 3D physical slab bevel catchlights & micro-shadows
- *
- * @param {HTMLImageElement} tileImg - The tile texture image
- * @param {number} cols - Number of tile columns in pattern
- * @param {number} rows - Number of tile rows in pattern
- * @param {number} tileWCm - Real-world tile width in cm (e.g., 60)
- * @param {number} tileHCm - Real-world tile height in cm (e.g., 120)
- * @param {number} groutPx - Grout line width in pixels
- * @param {string} groutColor - Grout line CSS color
- * @returns {HTMLCanvasElement} Pattern canvas
  */
 export function createTiledPattern(
   tileImg,
@@ -111,7 +105,8 @@ export function createTiledPattern(
   tileWCm = 60,
   tileHCm = 120,
   groutPx = 1.4,
-  groutColor = '#222222'
+  groutColor = '#222222',
+  layout = 'straight'
 ) {
   const ratio = (tileWCm || 60) / (tileHCm || 120);
   const isPlank = ratio <= 0.35 || ratio >= 2.8;
@@ -124,16 +119,15 @@ export function createTiledPattern(
     cols = Math.max(cols || 8, 8);
     rows = Math.max(rows || 4, 4);
   } else if (Math.abs(ratio - 1) < 0.15) {
-    // Square tile e.g. 60x60 or 80x80
+    // Square tile e.g. 60x60 or 80x80 or 120x120
     cellW = 380;
     cellH = 380;
     cols = Math.max(cols || 4, 4);
     rows = Math.max(rows || 4, 4);
   } else {
     // Large rectangular slab e.g. 60x120 cm (Architectural Grand Format)
-    // Real bathrooms/living rooms only fit 2.5 - 3.5 slabs across the width!
     cellW = 420;
-    cellH = Math.round(420 / ratio); // e.g. 840px
+    cellH = Math.round(420 / ratio);
     cols = Math.max(cols || 3, 3);
     rows = Math.max(rows || 3, 3);
   }
@@ -150,10 +144,20 @@ export function createTiledPattern(
   ctx.fillStyle = groutColor;
   ctx.fillRect(0, 0, patternW, patternH);
 
+  // Layout offset calculation
+  const getRowOffset = (r) => {
+    if (layout === 'staggered_50') {
+      return (r % 2) * (cellW * 0.5);
+    }
+    if (layout === 'staggered_33' || isPlank) {
+      return (r % 3) * (cellW * 0.33);
+    }
+    return 0; // straight grid
+  };
+
   // Draw tile grid with multi-face rotation & plank running bond
   for (let r = 0; r < rows; r++) {
-    // Stagger every row by 1/3 for wood planks (derz şaşırtmalı)
-    const rowOffset = isPlank ? ((r % 3) * (cellW / 3)) : 0;
+    const rowOffset = getRowOffset(r);
 
     for (let c = -1; c <= cols + 1; c++) {
       const x = groutPx + c * (cellW + groutPx) + rowOffset;
@@ -179,7 +183,6 @@ export function createTiledPattern(
       ctx.restore();
 
       // 3D Physical Slab Micro-Bevel & Edge Shadows:
-      // Micro catchlight on top/left edge and ambient shadow on bottom/right edge
       ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
       ctx.fillRect(x, y, cellW, 1.0); // top edge catchlight
       ctx.fillRect(x, y, 1.0, cellH); // left edge catchlight
@@ -187,7 +190,7 @@ export function createTiledPattern(
       ctx.fillRect(x, y + cellH - 1.2, cellW, 1.2); // bottom grout shadow
       ctx.fillRect(x + cellW - 1.2, y, 1.2, cellH); // right grout shadow
 
-      // Very subtle ceramic glaze variance (±1.5% lightness) for natural authentic kiln look
+      // Subtle ceramic glaze variance (±1.5% lightness) for natural authentic kiln look
       const hash = Math.sin(r * 13.1 + c * 71.9) * 43758.5453;
       const variance = (hash - Math.floor(hash)) * 0.04 - 0.02;
       if (Math.abs(variance) > 0.008) {
@@ -195,6 +198,20 @@ export function createTiledPattern(
         ctx.fillRect(x, y, cellW, cellH);
       }
     }
+  }
+
+  // Handle Diagonal 45-degree rotation if requested
+  if (layout === 'diagonal') {
+    const diagCanvas = document.createElement('canvas');
+    diagCanvas.width = patternW;
+    diagCanvas.height = patternH;
+    const dCtx = diagCanvas.getContext('2d');
+    dCtx.save();
+    dCtx.translate(patternW / 2, patternH / 2);
+    dCtx.rotate(Math.PI / 4);
+    dCtx.drawImage(canvas, -patternW / 2, -patternH / 2);
+    dCtx.restore();
+    return diagCanvas;
   }
 
   return canvas;
@@ -206,13 +223,6 @@ export function createTiledPattern(
 
 /**
  * Render a tiled pattern onto a perspective quadrilateral with exclusion zones.
- *
- * @param {CanvasRenderingContext2D} ctx - Target canvas context
- * @param {HTMLCanvasElement} pattern - Prepared tiled pattern canvas
- * @param {Array<Array<number>>} quad - 4 corners [TL, TR, BR, BL] in canvas pixel coords
- * @param {Array<Array<Array<number>>>} excludes - Furniture/fixture exclusion polygons
- * @param {number} subs - Mesh subdivision density (default 28)
- * @param {boolean} isFloor - Whether surface is a floor (perspective foreshortened along v) or wall
  */
 export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28, isFloor = true) {
   const pw = pattern.width;
@@ -230,7 +240,6 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28, 
   ctx.clip();
 
   // Non-linear camera perspective foreshortening for ground floor planes
-  // Vertical walls are viewed straight-on, so they retain linear vertical spacing
   const depthPower = isFloor ? 1.48 : 1.0;
 
   // Render subdivided perspective-mapped mesh
@@ -274,7 +283,6 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28, 
   }
 
   // Step B: Erase exclusion zones (bathtub, toilet, vanity, fixtures) with destination-out
-  // This guarantees original bathroom fixtures stay 100% untouched and clean
   if (excludes && excludes.length > 0) {
     ctx.save();
     ctx.globalCompositeOperation = 'destination-out';
@@ -302,17 +310,6 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28, 
 /**
  * Extracts pure neutral white specular window/lamp reflections and neutral ambient
  * contact shadows from the original room image.
- *
- * CRITICAL ARCHITECTURAL BENEFIT:
- * - Does NOT multiply old beige/brown floor colors over new tiles (zero muddy color contamination!)
- * - Pure black marble retains its deep pitch-black depth and vivid white veins
- * - Window light pours across the floor as a brilliant, realistic mirror reflection (Image 3 quality)
- *
- * @param {HTMLImageElement} roomImg - Original room photo
- * @param {number} width - Canvas width
- * @param {number} height - Canvas height
- * @param {boolean} isGlossy - Whether tile has a glossy/lappato finish
- * @returns {{ specCanvas: HTMLCanvasElement, shadowCanvas: HTMLCanvasElement }}
  */
 function extractPBRSpecularAndShadows(roomImg, width, height, isGlossy) {
   const tempCanvas = document.createElement('canvas');
@@ -324,7 +321,6 @@ function extractPBRSpecularAndShadows(roomImg, width, height, isGlossy) {
   const imgData = tempCtx.getImageData(0, 0, width, height);
   const data = imgData.data;
 
-  // Specular map canvas (pure daylight white window glares & highlights)
   const specCanvas = document.createElement('canvas');
   specCanvas.width = width;
   specCanvas.height = height;
@@ -332,7 +328,6 @@ function extractPBRSpecularAndShadows(roomImg, width, height, isGlossy) {
   const specImgData = specCtx.createImageData(width, height);
   const specData = specImgData.data;
 
-  // Shadow map canvas (pure neutral ambient shadows, zero yellow/beige bleed)
   const shadowCanvas = document.createElement('canvas');
   shadowCanvas.width = width;
   shadowCanvas.height = height;
@@ -340,7 +335,6 @@ function extractPBRSpecularAndShadows(roomImg, width, height, isGlossy) {
   const shadowImgData = shadowCtx.createImageData(width, height);
   const shadowData = shadowImgData.data;
 
-  // Adaptive luminance analysis
   let totalLum = 0;
   const sampleStep = 8;
   let sampleCount = 0;
@@ -348,9 +342,8 @@ function extractPBRSpecularAndShadows(roomImg, width, height, isGlossy) {
     totalLum += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
     sampleCount++;
   }
-  const avgLum = sampleCount > 0 ? (totalLum / sampleCount) : 128;
+  const avgLum = sampleCount > 0 ? totalLum / sampleCount : 128;
 
-  // Calibrate thresholds based on room brightness
   const specThreshold = Math.min(215, Math.max(135, avgLum + 20));
   const shadowThreshold = Math.max(45, Math.min(115, avgLum - 15));
 
@@ -360,26 +353,24 @@ function extractPBRSpecularAndShadows(roomImg, width, height, isGlossy) {
     const b = data[i + 2];
     const lum = 0.299 * r + 0.587 * g + 0.114 * b;
 
-    // 1. High-Pass Specular Catchlight (Window daylight & spotlight glare)
+    // High-Pass Specular Catchlight (Window daylight & spotlight glare)
     if (lum > specThreshold) {
       const specNorm = (lum - specThreshold) / (255 - specThreshold);
       const specCurve = Math.pow(specNorm, isGlossy ? 1.25 : 1.9);
       const specAlpha = Math.min(255, Math.round(specCurve * (isGlossy ? 215 : 95)));
 
-      // PURE WHITE DAYLIGHT SPECULAR (Never beige or brown!)
       specData[i] = 255;
       specData[i + 1] = 255;
       specData[i + 2] = 255;
       specData[i + 3] = specAlpha;
     }
 
-    // 2. Pure Neutral Ambient Contact Shadow (Bathtub base, corners, baseboards)
+    // Pure Neutral Ambient Contact Shadow
     if (lum < shadowThreshold) {
       const shadowNorm = (shadowThreshold - lum) / shadowThreshold;
       const shadowCurve = Math.pow(shadowNorm, 1.2);
       const shadowAlpha = Math.min(255, Math.round(shadowCurve * 170));
 
-      // PURE NEUTRAL BLACK SHADOW (Never yellow or brown!)
       shadowData[i] = 0;
       shadowData[i + 1] = 0;
       shadowData[i + 2] = 0;
@@ -398,28 +389,18 @@ function extractPBRSpecularAndShadows(roomImg, width, height, isGlossy) {
 // ---------------------------------------------------------------------------
 
 /**
- * Generate a complete, photorealistic tile preview with WebGL / PBR 3D surface mapping:
- * - Real 60x120 architectural slab dimensions
- * - Crisp multi-face continuous marble veins
- * - Zero beige color contamination on dark marble
- * - High-pass white window & spotlight reflections
- * - PBR Fresnel Clearcoat sheen for glossy/lappato tiles
- * - Seamless bathtub, faucet, and vanity preservation
- *
- * @param {HTMLImageElement} roomImg - Original room photo
- * @param {HTMLImageElement} tileImg - Selected tile texture
- * @param {Object} surfaces - Detected surfaces { floor, walls }
- * @param {Object} options - Customization parameters
- * @returns {string} High-resolution JPEG data URL
+ * Generate a complete, photorealistic tile preview with WebGL / PBR 3D surface mapping.
  */
 export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
   const {
     groutColor,
-    groutWidth = 1.3,
+    groutWidth = 2,
     tileWCm = 60,
     tileHCm = 120,
     subdivisions = 28,
-    finish = 'parlak',
+    finish = 'Full Lappato',
+    layout = 'straight',
+    customMaskCanvas = null,
   } = options;
 
   const isGlossy =
@@ -431,7 +412,6 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
   const imgW = roomImg.naturalWidth || roomImg.width;
   const imgH = roomImg.naturalHeight || roomImg.height;
 
-  // Render at high resolution for crisp rectified grout lines and veining details
   const maxDim = 1500;
   let canvasW = imgW;
   let canvasH = imgH;
@@ -449,11 +429,10 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
   // Step 1: Draw base room photo
   ctx.drawImage(roomImg, 0, 0, canvasW, canvasH);
 
-  // Determine tile proportions
+  // Proportions & Grout
   const ratio = (tileWCm || 60) / (tileHCm || 120);
   const isPlank = ratio <= 0.35 || ratio >= 2.8;
 
-  // Automatic realistic rectified grout line color
   let resolvedGrout = groutColor;
   if (!resolvedGrout) {
     if (isPlank) resolvedGrout = '#241a14';
@@ -461,31 +440,32 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     else resolvedGrout = '#94a3b8';
   }
 
-  // Large format architectural proportions:
-  // In real bathrooms only 2.5 - 3 slabs span the room width!
+  const groutPx = Math.max(1.0, Math.min(3.5, (groutWidth || 2) * 0.7));
+
   const floorCols = isPlank ? 8 : Math.abs(ratio - 1) < 0.15 ? 4 : 3;
   const floorRows = isPlank ? 4 : Math.abs(ratio - 1) < 0.15 ? 4 : 3;
 
-  // Step 2: Create floor pattern with realistic scale and multi-face veining
+  // Step 2: Create floor pattern with realistic scale, layout and multi-face veining
   const floorPattern = createTiledPattern(
     tileImg,
     floorCols,
     floorRows,
     tileWCm,
     tileHCm,
-    groutWidth,
-    resolvedGrout
+    groutPx,
+    resolvedGrout,
+    layout
   );
 
-  // Wall pattern (walls often have tiles arranged for vertical height)
   const wallPattern = createTiledPattern(
     tileImg,
     3,
     3,
     tileWCm,
     tileHCm,
-    groutWidth,
-    resolvedGrout
+    groutPx,
+    resolvedGrout,
+    layout
   );
 
   // Step 3: Offscreen layer for rendered tiles
@@ -494,11 +474,9 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
   tileLayer.height = canvasH;
   const tCtx = tileLayer.getContext('2d');
 
-  // Collect all architectural surfaces to render
   const floorSurfaces = [];
   const wallSurfaces = [];
 
-  // Floor surface
   if (surfaces.floor && surfaces.floor.polygon && surfaces.floor.polygon.length >= 4) {
     floorSurfaces.push({
       type: 'floor',
@@ -507,7 +485,6 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     });
   }
 
-  // Wall surfaces
   if (Array.isArray(surfaces.walls)) {
     surfaces.walls.forEach((w) => {
       if (w && w.polygon && w.polygon.length >= 4) {
@@ -554,7 +531,15 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     renderPerspectiveTiles(tCtx, wallPattern, quad, excludePixels, subdivisions, false);
   });
 
-  // Step 4: Extract PBR Specular (Window/Light glare) & Neutral Shadows (Zero Color Bleed)
+  // If client provided a customMaskCanvas (from MaskBrushEditor), apply it as alpha clip
+  if (customMaskCanvas) {
+    tCtx.save();
+    tCtx.globalCompositeOperation = 'destination-in';
+    tCtx.drawImage(customMaskCanvas, 0, 0, canvasW, canvasH);
+    tCtx.restore();
+  }
+
+  // Step 4: Extract PBR Specular (Window/Light glare) & Neutral Shadows
   const { specCanvas, shadowCanvas } = extractPBRSpecularAndShadows(
     roomImg,
     canvasW,
@@ -568,7 +553,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
   ctx.drawImage(tileLayer, 0, 0);
   ctx.restore();
 
-  // Step 6: PBR Lighting Compositing (Strictly clipped to tiled surfaces)
+  // Step 6: PBR Lighting Compositing
   if (renderedQuads.length > 0) {
     ctx.save();
     ctx.beginPath();
@@ -579,23 +564,21 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     });
     ctx.clip();
 
-    // 6A. Ambient Contact Shadows (under bathtub, fixtures, baseboards)
-    // Pure neutral grayscale shadow, 0% color contamination
+    // 6A. Ambient Contact Shadows
     ctx.save();
     ctx.globalCompositeOperation = 'multiply';
     ctx.globalAlpha = isGlossy ? 0.65 : 0.85;
     ctx.drawImage(shadowCanvas, 0, 0);
     ctx.restore();
 
-    // 6B. High-Pass Specular Daylight & Window Reflections (The Image 3 Mirror Effect!)
-    // Adds brilliant white daylight reflections over the dark marble
+    // 6B. High-Pass Specular Daylight & Window Reflections
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
     ctx.globalAlpha = isGlossy ? 0.92 : 0.40;
     ctx.drawImage(specCanvas, 0, 0);
     ctx.restore();
 
-    // 6C. PBR Fresnel Clearcoat Sheen for Polished Lappato finishes
+    // 6C. PBR Fresnel Clearcoat Sheen for Polished Full Lappato finishes
     if (isGlossy) {
       renderedQuads.forEach(({ quad, type }) => {
         if (type === 'floor') {
@@ -630,11 +613,6 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
 // Image Loading & Downscaling Utilities
 // ---------------------------------------------------------------------------
 
-/**
- * Load an image from a URL or data URL.
- * @param {string} src - Image source (URL or data URL)
- * @returns {Promise<HTMLImageElement>}
- */
 export function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -645,15 +623,6 @@ export function loadImage(src) {
   });
 }
 
-/**
- * Rapidly downscale any user image in-memory for AI Vision API segmentation.
- * Shrinks heavy mobile photos (4000x3000) to max 800px in ~30ms, reducing
- * network payload from ~8MB to ~45KB, allowing the AI to respond in < 1.5 seconds.
- *
- * @param {string} sourceUrlOrData - The image URL or data URL
- * @param {number} maxDim - Maximum width or height (default 800)
- * @returns {Promise<string>} Lightweight base64 JPEG data URL
- */
 export async function downscaleImageForAI(sourceUrlOrData, maxDim = 800) {
   const img = await loadImage(sourceUrlOrData);
   const origW = img.naturalWidth || img.width;

@@ -19,9 +19,12 @@ import {
   ChevronRight,
   Eye,
   SlidersHorizontal,
-  Home
+  Home,
+  Paintbrush,
+  Grid
 } from 'lucide-react';
 import { generateTilePreview, loadImage, downscaleImageForAI } from './TilePerspectiveEngine';
+import MaskBrushEditor from './MaskBrushEditor';
 
 const presetTiles = [
   {
@@ -86,6 +89,11 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
   
   const [selectedTile, setSelectedTile] = useState(selectedProduct || presetTiles[0]);
   const [applySurface, setApplySurface] = useState('floor'); // 'floor' | 'walls' | 'both'
+  const [layout, setLayout] = useState('straight'); // 'straight' | 'staggered_50' | 'staggered_33' | 'diagonal'
+  const [groutMm, setGroutMm] = useState(2);
+  const [showMaskEditor, setShowMaskEditor] = useState(false);
+  const [customMaskCanvas, setCustomMaskCanvas] = useState(null);
+  const [detectedMaskData, setDetectedMaskData] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStepText, setLoadingStepText] = useState('');
   const [aiResultImage, setAiResultImage] = useState(null);
@@ -281,55 +289,65 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
         '2/3 ' + (surfaceToApply === 'floor' ? 'Zemin yüzeyi' : surfaceToApply === 'walls' ? 'Duvar yüzeyleri' : 'Zemin ve duvarlar') + ' yapay zeka ile tespit ediliyor...'
       );
 
-      const targetEndpoint = surfaceToApply === 'both' ? 'all' : surfaceToApply;
-      const segRes = await fetch('/api/ai/segment', {
+      // Call production AI Tile-Render API
+      const renderRes = await fetch('/api/ai/tile-render', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: optimizedAiImage, target: targetEndpoint }),
+        body: JSON.stringify({
+          roomImage: optimizedAiImage,
+          productId: selectedProduct?.id,
+          productData: targetTile,
+          surfaceType: surfaceToApply,
+          layout,
+          groutWidth: groutMm,
+        }),
       }).then((r) => r.json());
 
       let surfaces = { floor: null, walls: null };
 
-      if (segRes.success) {
+      if (renderRes.success && renderRes.maskData) {
+        setDetectedMaskData(renderRes.maskData);
         if (surfaceToApply === 'both') {
           surfaces = {
-            floor: segRes.floor,
-            walls: segRes.walls || []
+            floor: renderRes.maskData.floor,
+            walls: renderRes.maskData.walls || []
           };
         } else if (surfaceToApply === 'floor') {
           surfaces = {
-            floor: { polygon: segRes.polygon, exclude: segRes.exclude },
+            floor: renderRes.maskData.floor,
             walls: null
           };
         } else {
           surfaces = {
             floor: null,
-            walls: segRes.walls || (segRes.polygon ? [{ polygon: segRes.polygon, exclude: segRes.exclude }] : [])
+            walls: renderRes.maskData.walls || []
           };
         }
       } else {
-        throw new Error('Yüzeyler tespit edilemedi. Lütfen net bir oda fotoğrafı deneyiniz.');
+        throw new Error(renderRes.error || 'Yüzeyler tespit edilemedi. Lütfen net bir oda fotoğrafı deneyiniz.');
       }
 
-      setLoadingStepText('3/3 Seramik karoları perspektif, derz ve ışık yansımalarıyla döşeniyor...');
+      setLoadingStepText('3/3 ' + (targetTile?.name || 'Seramik') + ' 3D mimari render kalitesinde döşeniyor...');
 
-      // Load original high-res room photo and tile texture
+      // Load original high-res room photo and 4K tile texture
       const tileSource = targetTile?.textureUrl || targetTile?.imageUrl || '/textures/calacatta_gold.jpg';
       const [roomImg, tileImg] = await Promise.all([
         loadImage(currentPhoto),
         loadImage(tileSource).catch(() => loadImage('/textures/calacatta_gold.jpg')),
       ]);
 
-      const isDark = targetTile?.color?.toLowerCase().includes('antrasit') || targetTile?.color?.toLowerCase().includes('siyah');
+      const isDark = (targetTile?.color || '').toLowerCase().includes('antrasit') || (targetTile?.color || '').toLowerCase().includes('siyah') || (targetTile?.name || '').toLowerCase().includes('antrasit') || (targetTile?.name || '').toLowerCase().includes('siyah');
       const isPlank = ((targetTile?.width || 60) / (targetTile?.height || 120)) <= 0.35;
 
-      // Generate preview using high-fidelity PBR 3D engine with specular reflections
+      // Generate preview using high-fidelity PBR 3D engine with specular reflections & custom masks
       const resultDataUrl = generateTilePreview(roomImg, tileImg, surfaces, {
         groutColor: isPlank ? '#241a14' : isDark ? '#1a1a1a' : '#cbd5e1',
-        groutWidth: 1.3,
+        groutWidth: groutMm,
         tileWCm: targetTile?.width || 60,
         tileHCm: targetTile?.height || 120,
-        finish: targetTile?.finish || 'Parlak Lappato',
+        finish: targetTile?.finish || 'Full Lappato',
+        layout,
+        customMaskCanvas,
         subdivisions: 28,
       });
 
@@ -576,10 +594,110 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
               </button>
             </div>
           </div>
+
+          {/* Architectural Layout & Grout Toolbar */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)', flexWrap: 'wrap' }}>
+            {/* Layout Mode */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#94a3b8' }}>Döşeme Düzeni:</span>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                {[
+                  { id: 'straight', label: 'Düz Grid' },
+                  { id: 'staggered_50', label: '1/2 Şaşırtmalı' },
+                  { id: 'staggered_33', label: '1/3 Şaşırtmalı' },
+                  { id: 'diagonal', label: 'Çapraz (45°)' }
+                ].map((l) => (
+                  <button
+                    key={l.id}
+                    type="button"
+                    onClick={() => {
+                      setLayout(l.id);
+                      if (aiResultImage) handleGenerateAIRemodel(selectedTile, applySurface);
+                    }}
+                    style={{
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.7rem',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      background: layout === l.id ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255,255,255,0.04)',
+                      color: layout === l.id ? '#38bdf8' : '#94a3b8',
+                      border: layout === l.id ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.08)'
+                    }}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Grout Width & Mask Brush Trigger */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Derz:</span>
+                {[1.5, 2, 3].map((g) => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => {
+                      setGroutMm(g);
+                      if (aiResultImage) handleGenerateAIRemodel(selectedTile, applySurface);
+                    }}
+                    style={{
+                      padding: '3px 7px',
+                      borderRadius: '6px',
+                      fontSize: '0.7rem',
+                      fontWeight: '800',
+                      cursor: 'pointer',
+                      background: groutMm === g ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.04)',
+                      color: groutMm === g ? '#d4af37' : '#94a3b8',
+                      border: groutMm === g ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.08)'
+                    }}
+                  >
+                    {g}mm
+                  </button>
+                ))}
+              </div>
+
+              {photoPreview && (
+                <button
+                  type="button"
+                  onClick={() => setShowMaskEditor(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '4px 10px',
+                    borderRadius: '8px',
+                    fontSize: '0.72rem',
+                    fontWeight: '800',
+                    background: 'rgba(56, 189, 248, 0.12)',
+                    color: '#38bdf8',
+                    border: '1px solid rgba(56, 189, 248, 0.3)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Paintbrush size={12} />
+                  <span>Maskeyi Düzenle</span>
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* WORKSPACE: Initial Upload & Selection State */}
-        {!aiResultImage && !isGenerating && (
+        {/* WORKSPACE: Mask Editor View OR Standard Upload / Result State */}
+        {showMaskEditor ? (
+          <MaskBrushEditor
+            backgroundImage={photoPreview}
+            initialMask={detectedMaskData}
+            onSaveMask={({ maskCanvas }) => {
+              setCustomMaskCanvas(maskCanvas);
+              setShowMaskEditor(false);
+              handleGenerateAIRemodel(selectedTile, applySurface);
+            }}
+            onCancel={() => setShowMaskEditor(false)}
+          />
+        ) : !aiResultImage && !isGenerating && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             
             {/* PHOTO SECTION */}
