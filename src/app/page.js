@@ -3373,16 +3373,6 @@ export default function Home() {
     <main className="main-layout">
       {/* Live Platform Activity & Ticker Bar */}
       <div className="live-analytics-top-bar glass-panel">
-        <div className="live-header-title-group">
-          <div className="live-pulse-badge">
-            <span className="pulse-dot" />
-            <span className="live-badge-text">CANLI ANALİTİK</span>
-          </div>
-          <h4 className="live-banner-heading">
-            Türkiye Geneli <span>Platform Hareketleri</span>
-          </h4>
-        </div>
-
         {liveActivities && liveActivities.length > 0 && (
           <div className="live-ticker-capsule">
             <span className="ticker-capsule-badge">⚡ ANLIK AKIŞ</span>

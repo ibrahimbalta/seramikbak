@@ -2091,7 +2091,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
   flex-wrap: wrap;
 }
