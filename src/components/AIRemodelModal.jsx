@@ -142,10 +142,14 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
     setErrorMsg('');
     const reader = new FileReader();
     reader.onload = (event) => {
+      const dataUrl = event.target.result;
       setUserPhoto(file);
-      setPhotoPreview(event.target.result);
+      setPhotoPreview(dataUrl);
       setIsUserUploaded(true);
       setAiResultImage(null);
+      setTimeout(() => {
+        handleGenerateAIRemodel(selectedTile, dataUrl);
+      }, 50);
     };
     reader.readAsDataURL(file);
   };
@@ -168,6 +172,9 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
     setUserPhoto(null);
     setAiResultImage(null);
     setErrorMsg('');
+    setTimeout(() => {
+      handleGenerateAIRemodel(selectedTile, sampleUrl);
+    }, 50);
   };
 
   const handleSliderMove = (clientX) => {
@@ -195,14 +202,14 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
   // -----------------------------------------------------------------------
   // Fast & Photorealistic AI Remodel Execution (< 3 seconds)
   // -----------------------------------------------------------------------
-  const handleGenerateAIRemodel = async (targetTile = selectedTile, surfaceOverride = null) => {
-    const currentPhoto = photoPreview;
+  const handleGenerateAIRemodel = async (targetTile = selectedTile, photoOverride = null) => {
+    const currentPhoto = photoOverride || photoPreview;
     if (!currentPhoto) {
       setErrorMsg('Lütfen önce kendi mekan fotoğrafınızı yükleyin veya örnek bir oda seçin.');
       return;
     }
 
-    const surfaceToApply = surfaceOverride || applySurface;
+    const surfaceToApply = applySurface || 'both';
     setIsGenerating(true);
     setErrorMsg('');
     setAiResultImage(null);
@@ -502,230 +509,30 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
           </button>
         </div>
 
-        {/* Selected Ceramic Model Pill & Quick Switcher */}
-        <div style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '16px', padding: '12px 16px', marginBottom: '18px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <img src={selectedTile?.imageUrl || '/textures/calacatta_gold.jpg'} alt="Tile" style={{ width: '42px', height: '42px', objectFit: 'cover', borderRadius: '10px', border: '1.5px solid #d4af37' }} />
-              <div>
-                <div style={{ fontSize: '0.9rem', fontWeight: '900', color: '#ffffff' }}>{selectedTile?.name || 'Calacatta Gold Porselen'}</div>
-                <div style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
-                  {selectedTile?.width || 60}×{selectedTile?.height || 120} cm • {selectedTile?.style || 'Mermer Doku'} • {selectedTile?.finish || 'Parlak Lappato'}
-                </div>
+        {/* Sleek Selected Ceramic Card */}
+        <div style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.25)', borderRadius: '16px', padding: '12px 18px', marginBottom: '18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <img 
+              src={selectedTile?.imageUrl || '/textures/calacatta_gold.jpg'} 
+              alt="Tile" 
+              style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '12px', border: '1.5px solid #d4af37', boxShadow: '0 4px 12px rgba(0,0,0,0.4)' }} 
+            />
+            <div>
+              <div style={{ fontSize: '0.98rem', fontWeight: '900', color: '#ffffff' }}>
+                {selectedTile?.name || 'Seçili Seramik Modeli'}
+              </div>
+              <div style={{ fontSize: '0.78rem', color: '#cbd5e1', marginTop: '2px' }}>
+                {selectedTile?.width || 60}×{selectedTile?.height || 120} cm • {selectedTile?.finish || 'Full Lappato Parlak'} • {selectedTile?.style || 'Porselen Seramik'}
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '4px 12px', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)' }}>
-                Seçili Seramik Modeli
-              </span>
-            </div>
           </div>
-
-          {/* Quick Model Selector Pills */}
-          <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingTop: '2px', paddingBottom: '2px', scrollbarWidth: 'none' }}>
-            {presetTiles.map((tile, idx) => {
-              const isSelected = selectedTile?.name === tile.name;
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => {
-                    setSelectedTile(tile);
-                    if (aiResultImage) handleGenerateAIRemodel(tile);
-                  }}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '6px 12px',
-                    borderRadius: '10px',
-                    background: isSelected ? 'rgba(212,175,55,0.25)' : 'rgba(255,255,255,0.05)',
-                    border: isSelected ? '1.5px solid #d4af37' : '1px solid rgba(255,255,255,0.1)',
-                    color: isSelected ? '#ffffff' : '#94a3b8',
-                    fontSize: '0.74rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <img src={tile.imageUrl} alt={tile.name} style={{ width: '20px', height: '20px', borderRadius: '4px', objectFit: 'cover' }} />
-                  <span>{tile.name}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Target Surface Selector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#cbd5e1' }}>Uygulanacak Alan:</span>
-            <div style={{ display: 'flex', gap: '6px' }}>
-              <button
-                type="button"
-                onClick={() => {
-                  setApplySurface('floor');
-                  if (aiResultImage) handleGenerateAIRemodel(selectedTile, 'floor');
-                }}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: '8px',
-                  fontSize: '0.74rem',
-                  fontWeight: '800',
-                  cursor: 'pointer',
-                  background: applySurface === 'floor' ? '#d4af37' : 'rgba(255,255,255,0.06)',
-                  color: applySurface === 'floor' ? '#0f172a' : '#cbd5e1',
-                  border: applySurface === 'floor' ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.12)',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                🏠 Zemin (Taban) [Önerilen]
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setApplySurface('walls');
-                  if (aiResultImage) handleGenerateAIRemodel(selectedTile, 'walls');
-                }}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: '8px',
-                  fontSize: '0.74rem',
-                  fontWeight: '800',
-                  cursor: 'pointer',
-                  background: applySurface === 'walls' ? '#d4af37' : 'rgba(255,255,255,0.06)',
-                  color: applySurface === 'walls' ? '#0f172a' : '#cbd5e1',
-                  border: applySurface === 'walls' ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.12)',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                🧱 Duvarlar
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setApplySurface('both');
-                  if (aiResultImage) handleGenerateAIRemodel(selectedTile, 'both');
-                }}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: '8px',
-                  fontSize: '0.74rem',
-                  fontWeight: '800',
-                  cursor: 'pointer',
-                  background: applySurface === 'both' ? '#d4af37' : 'rgba(255,255,255,0.06)',
-                  color: applySurface === 'both' ? '#0f172a' : '#cbd5e1',
-                  border: applySurface === 'both' ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.12)',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                🌟 Tüm Mekan
-              </button>
-            </div>
-          </div>
-
-          {/* Architectural Layout & Grout Toolbar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)', flexWrap: 'wrap' }}>
-            {/* Layout Mode */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#94a3b8' }}>Döşeme Düzeni:</span>
-              <div style={{ display: 'flex', gap: '4px' }}>
-                {[
-                  { id: 'straight', label: 'Düz Grid' },
-                  { id: 'staggered_50', label: '1/2 Şaşırtmalı' },
-                  { id: 'staggered_33', label: '1/3 Şaşırtmalı' },
-                  { id: 'diagonal', label: 'Çapraz (45°)' }
-                ].map((l) => (
-                  <button
-                    key={l.id}
-                    type="button"
-                    onClick={() => {
-                      setLayout(l.id);
-                      if (aiResultImage) handleGenerateAIRemodel(selectedTile, applySurface);
-                    }}
-                    style={{
-                      padding: '4px 8px',
-                      borderRadius: '6px',
-                      fontSize: '0.7rem',
-                      fontWeight: '700',
-                      cursor: 'pointer',
-                      background: layout === l.id ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255,255,255,0.04)',
-                      color: layout === l.id ? '#38bdf8' : '#94a3b8',
-                      border: layout === l.id ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.08)'
-                    }}
-                  >
-                    {l.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Grout Width & Mask Brush Trigger */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Derz:</span>
-                {[1.5, 2, 3].map((g) => (
-                  <button
-                    key={g}
-                    type="button"
-                    onClick={() => {
-                      setGroutMm(g);
-                      if (aiResultImage) handleGenerateAIRemodel(selectedTile, applySurface);
-                    }}
-                    style={{
-                      padding: '3px 7px',
-                      borderRadius: '6px',
-                      fontSize: '0.7rem',
-                      fontWeight: '800',
-                      cursor: 'pointer',
-                      background: groutMm === g ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.04)',
-                      color: groutMm === g ? '#d4af37' : '#94a3b8',
-                      border: groutMm === g ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.08)'
-                    }}
-                  >
-                    {g}mm
-                  </button>
-                ))}
-              </div>
-
-              {photoPreview && (
-                <button
-                  type="button"
-                  onClick={() => setShowMaskEditor(true)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    padding: '4px 10px',
-                    borderRadius: '8px',
-                    fontSize: '0.72rem',
-                    fontWeight: '800',
-                    background: 'rgba(56, 189, 248, 0.12)',
-                    color: '#38bdf8',
-                    border: '1px solid rgba(56, 189, 248, 0.3)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <Paintbrush size={12} />
-                  <span>Maskeyi Düzenle</span>
-                </button>
-              )}
-            </div>
-          </div>
+          <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#d4af37', background: 'rgba(212,175,55,0.15)', padding: '5px 14px', borderRadius: '20px', border: '1px solid rgba(212,175,55,0.3)', whiteSpace: 'nowrap' }}>
+            ✨ Seçili Ürün
+          </span>
         </div>
 
-        {/* WORKSPACE: Mask Editor View OR Standard Upload / Result State */}
-        {showMaskEditor ? (
-          <MaskBrushEditor
-            backgroundImage={photoPreview}
-            initialMask={detectedMaskData}
-            onSaveMask={({ maskCanvas }) => {
-              setCustomMaskCanvas(maskCanvas);
-              setShowMaskEditor(false);
-              handleGenerateAIRemodel(selectedTile, applySurface);
-            }}
-            onCancel={() => setShowMaskEditor(false)}
-          />
-        ) : !aiResultImage && !isGenerating && (
+        {/* WORKSPACE: Upload Area OR Loading OR Result State */}
+        {!aiResultImage && !isGenerating && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             
             {/* PHOTO SECTION */}
@@ -1232,7 +1039,7 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
               {/* Change Photo */}
               <button 
                 type="button"
-                onClick={() => { setAiResultImage(null); }}
+                onClick={() => { setAiResultImage(null); setPhotoPreview(null); setUserPhoto(null); }}
                 style={{
                   padding: '12px',
                   borderRadius: '14px',
