@@ -304,22 +304,162 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28, 
 }
 
 // ---------------------------------------------------------------------------
-// PBR Specular Reflection & Neutral Contact Shadow Extraction
+// Client-Side Zero-Quota Surface Detection & De-Texturing Lighting
 // ---------------------------------------------------------------------------
 
 /**
- * Extracts pure neutral white specular window/lamp reflections and neutral ambient
- * contact shadows from the original room image.
+ * Detect tileable ground plane and fixture exclusions entirely in-browser
+ * using computer vision edge & contrast analysis.
+ * Cost: $0 (Zero AI quota / 100% client-side)
  */
-function extractPBRSpecularAndShadows(roomImg, width, height, isGlossy) {
+export function detectTileSurfacesClientSide(roomImg, canvasW, canvasH) {
+  const tempCanvas = document.createElement('canvas');
+  // Use lower resolution for fast edge & color analysis
+  const dw = Math.min(400, canvasW);
+  const dh = Math.round(canvasH * (dw / canvasW));
+  tempCanvas.width = dw;
+  tempCanvas.height = dh;
+  const tCtx = tempCanvas.getContext('2d');
+  tCtx.drawImage(roomImg, 0, 0, dw, dh);
+
+  const imgData = tCtx.getImageData(0, 0, dw, dh);
+  const data = imgData.data;
+
+  // 1. Find floor horizon / baseboard line (typically in lower 45% - 75% of room photo)
+  const startRow = Math.round(dh * 0.52);
+  const endRow = Math.round(dh * 0.85);
+
+  let bestHorizonRow = Math.round(dh * 0.65);
+  let maxHorizontalDiff = -1;
+
+  for (let y = startRow; y < endRow; y++) {
+    let rowDiff = 0;
+    for (let x = 10; x < dw - 10; x += 3) {
+      const idxCurr = (y * dw + x) * 4;
+      const idxAbove = ((y - 2) * dw + x) * 4;
+      const lumCurr = 0.299 * data[idxCurr] + 0.587 * data[idxCurr + 1] + 0.114 * data[idxCurr + 2];
+      const lumAbove = 0.299 * data[idxAbove] + 0.587 * data[idxAbove + 1] + 0.114 * data[idxAbove + 2];
+      rowDiff += Math.abs(lumCurr - lumAbove);
+    }
+    if (rowDiff > maxHorizontalDiff) {
+      maxHorizontalDiff = rowDiff;
+      bestHorizonRow = y;
+    }
+  }
+
+  const horizonPct = Math.round((bestHorizonRow / dh) * 100);
+
+  // 2. Scan for white fixtures (bathtubs, toilets, sinks) resting on the ground
+  // High luminance (> 180) in lower-middle regions
+  const excludes = [];
+  const fixtureBoxes = [];
+
+  const checkYStart = Math.round(bestHorizonRow);
+  const checkYEnd = Math.round(dh * 0.95);
+  const xStep = 10;
+  const yStep = 8;
+
+  let currentFixture = null;
+  for (let x = Math.round(dw * 0.2); x < Math.round(dw * 0.85); x += xStep) {
+    for (let y = checkYStart; y < checkYEnd; y += yStep) {
+      const idx = (y * dw + x) * 4;
+      const r = data[idx];
+      const g = data[idx + 1];
+      const b = data[idx + 2];
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      const isWhiteFixture = lum > 195 && Math.abs(r - g) < 20 && Math.abs(g - b) < 20;
+
+      if (isWhiteFixture) {
+        if (!currentFixture) {
+          currentFixture = { minX: x, maxX: x, minY: y, maxY: y, count: 1 };
+        } else {
+          currentFixture.minX = Math.min(currentFixture.minX, x);
+          currentFixture.maxX = Math.max(currentFixture.maxX, x);
+          currentFixture.minY = Math.min(currentFixture.minY, y);
+          currentFixture.maxY = Math.max(currentFixture.maxY, y);
+          currentFixture.count++;
+        }
+      }
+    }
+  }
+
+  if (currentFixture && currentFixture.count > 12) {
+    // Convert to percentage box
+    const pad = 2;
+    const fx1 = Math.max(0, Math.round((currentFixture.minX / dw) * 100) - pad);
+    const fx2 = Math.min(100, Math.round((currentFixture.maxX / dw) * 100) + pad);
+    const fy1 = Math.max(0, Math.round((currentFixture.minY / dh) * 100) - pad);
+    const fy2 = Math.min(100, Math.round((currentFixture.maxY / dh) * 100) + pad);
+
+    excludes.push([
+      [fx1, fy1],
+      [fx2, fy1],
+      [fx2, fy2],
+      [fx1, fy2]
+    ]);
+  }
+
+  return {
+    floor: {
+      polygon: [
+        [0, horizonPct],
+        [100, horizonPct],
+        [100, 100],
+        [0, 100]
+      ],
+      exclude: excludes
+    },
+    walls: [
+      {
+        name: 'shower_feature_wall',
+        polygon: [
+          [15, 15],
+          [85, 15],
+          [85, horizonPct],
+          [15, horizonPct]
+        ],
+        exclude: excludes
+      }
+    ]
+  };
+}
+
+/**
+ * De-Texturing & PBR Ambient Illumination Engine:
+ * - Wipes out old tile grout lines, dirt seams, and old discoloration using spatial smoothing.
+ * - Extracts clean macro ambient illumination and contact shadows.
+ * - Extracts high-pass specular glare (window daylight & ceiling lights).
+ */
+function extractDeTexturedLighting(roomImg, width, height, isGlossy) {
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = width;
   tempCanvas.height = height;
   const tempCtx = tempCanvas.getContext('2d');
   tempCtx.drawImage(roomImg, 0, 0, width, height);
 
-  const imgData = tempCtx.getImageData(0, 0, width, height);
-  const data = imgData.data;
+  // 1. Create smoothed luminance canvas (De-Texturing filter)
+  // Downsampling by factor of 12 completely dissolves fine grout lines and texture noise
+  const blurFactor = 14;
+  const lowW = Math.max(16, Math.round(width / blurFactor));
+  const lowH = Math.max(16, Math.round(height / blurFactor));
+
+  const lowCanvas = document.createElement('canvas');
+  lowCanvas.width = lowW;
+  lowCanvas.height = lowH;
+  const lowCtx = lowCanvas.getContext('2d');
+  lowCtx.drawImage(tempCanvas, 0, 0, lowW, lowH);
+
+  // Upscale smooth ambient illumination with bilinear interpolation
+  const smoothLumCanvas = document.createElement('canvas');
+  smoothLumCanvas.width = width;
+  smoothLumCanvas.height = height;
+  const sCtx = smoothLumCanvas.getContext('2d');
+  sCtx.imageSmoothingEnabled = true;
+  sCtx.imageSmoothingQuality = 'high';
+  sCtx.drawImage(lowCanvas, 0, 0, width, height);
+
+  // 2. High-pass specular highlights & deep contact shadows from original
+  const origData = tempCtx.getImageData(0, 0, width, height).data;
 
   const specCanvas = document.createElement('canvas');
   specCanvas.width = width;
@@ -335,29 +475,30 @@ function extractPBRSpecularAndShadows(roomImg, width, height, isGlossy) {
   const shadowImgData = shadowCtx.createImageData(width, height);
   const shadowData = shadowImgData.data;
 
+  // Measure average luminance
   let totalLum = 0;
   const sampleStep = 8;
   let sampleCount = 0;
-  for (let i = 0; i < data.length; i += 4 * sampleStep) {
-    totalLum += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+  for (let i = 0; i < origData.length; i += 4 * sampleStep) {
+    totalLum += 0.299 * origData[i] + 0.587 * origData[i + 1] + 0.114 * origData[i + 2];
     sampleCount++;
   }
   const avgLum = sampleCount > 0 ? totalLum / sampleCount : 128;
 
-  const specThreshold = Math.min(215, Math.max(135, avgLum + 20));
-  const shadowThreshold = Math.max(45, Math.min(115, avgLum - 15));
+  const specThreshold = Math.min(215, Math.max(140, avgLum + 22));
+  const shadowThreshold = Math.max(45, Math.min(110, avgLum - 15));
 
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
+  for (let i = 0; i < origData.length; i += 4) {
+    const r = origData[i];
+    const g = origData[i + 1];
+    const b = origData[i + 2];
     const lum = 0.299 * r + 0.587 * g + 0.114 * b;
 
-    // High-Pass Specular Catchlight (Window daylight & spotlight glare)
+    // Specular Reflection (Window daylight, spotlight glare)
     if (lum > specThreshold) {
       const specNorm = (lum - specThreshold) / (255 - specThreshold);
-      const specCurve = Math.pow(specNorm, isGlossy ? 1.25 : 1.9);
-      const specAlpha = Math.min(255, Math.round(specCurve * (isGlossy ? 215 : 95)));
+      const specCurve = Math.pow(specNorm, isGlossy ? 1.2 : 1.8);
+      const specAlpha = Math.min(255, Math.round(specCurve * (isGlossy ? 220 : 90)));
 
       specData[i] = 255;
       specData[i + 1] = 255;
@@ -365,11 +506,11 @@ function extractPBRSpecularAndShadows(roomImg, width, height, isGlossy) {
       specData[i + 3] = specAlpha;
     }
 
-    // Pure Neutral Ambient Contact Shadow
+    // Neutral Ambient Contact Shadow (under bathtub, vanity)
     if (lum < shadowThreshold) {
       const shadowNorm = (shadowThreshold - lum) / shadowThreshold;
       const shadowCurve = Math.pow(shadowNorm, 1.2);
-      const shadowAlpha = Math.min(255, Math.round(shadowCurve * 170));
+      const shadowAlpha = Math.min(255, Math.round(shadowCurve * 165));
 
       shadowData[i] = 0;
       shadowData[i + 1] = 0;
@@ -381,7 +522,7 @@ function extractPBRSpecularAndShadows(roomImg, width, height, isGlossy) {
   specCtx.putImageData(specImgData, 0, 0);
   shadowCtx.putImageData(shadowImgData, 0, 0);
 
-  return { specCanvas, shadowCanvas };
+  return { smoothLumCanvas, specCanvas, shadowCanvas };
 }
 
 // ---------------------------------------------------------------------------
@@ -531,6 +672,22 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     renderPerspectiveTiles(tCtx, wallPattern, quad, excludePixels, subdivisions, false);
   });
 
+  // Step 4: Extract De-Textured Ambient Illumination, Specular Glare & Contact Shadows
+  const { smoothLumCanvas, specCanvas, shadowCanvas } = extractDeTexturedLighting(
+    roomImg,
+    canvasW,
+    canvasH,
+    isGlossy
+  );
+
+  // Apply smooth ambient illumination to tile layer (De-texturing integration)
+  // This blends room light gradient without any of the old dirty grout lines or color bleed
+  tCtx.save();
+  tCtx.globalCompositeOperation = 'multiply';
+  tCtx.globalAlpha = 0.88;
+  tCtx.drawImage(smoothLumCanvas, 0, 0);
+  tCtx.restore();
+
   // If client provided a customMaskCanvas (from MaskBrushEditor), apply it as alpha clip
   if (customMaskCanvas) {
     tCtx.save();
@@ -539,15 +696,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     tCtx.restore();
   }
 
-  // Step 4: Extract PBR Specular (Window/Light glare) & Neutral Shadows
-  const { specCanvas, shadowCanvas } = extractPBRSpecularAndShadows(
-    roomImg,
-    canvasW,
-    canvasH,
-    isGlossy
-  );
-
-  // Step 5: Draw pristine tiles onto main canvas
+  // Step 5: Draw pristine, naturally-lit tiles onto main canvas
   ctx.save();
   ctx.globalAlpha = 0.98;
   ctx.drawImage(tileLayer, 0, 0);
@@ -564,10 +713,10 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     });
     ctx.clip();
 
-    // 6A. Ambient Contact Shadows
+    // 6A. Ambient Contact Shadows under furniture / fixtures
     ctx.save();
     ctx.globalCompositeOperation = 'multiply';
-    ctx.globalAlpha = isGlossy ? 0.65 : 0.85;
+    ctx.globalAlpha = isGlossy ? 0.60 : 0.75;
     ctx.drawImage(shadowCanvas, 0, 0);
     ctx.restore();
 

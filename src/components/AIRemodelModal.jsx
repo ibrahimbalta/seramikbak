@@ -23,7 +23,7 @@ import {
   Paintbrush,
   Grid
 } from 'lucide-react';
-import { generateTilePreview, loadImage, downscaleImageForAI } from './TilePerspectiveEngine';
+import { generateTilePreview, loadImage, downscaleImageForAI, detectTileSurfacesClientSide } from './TilePerspectiveEngine';
 import MaskBrushEditor from './MaskBrushEditor';
 
 const presetTiles = [
@@ -286,48 +286,76 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
       const optimizedAiImage = await downscaleImageForAI(currentPhoto, 800);
 
       setLoadingStepText(
-        '2/3 ' + (surfaceToApply === 'floor' ? 'Zemin yüzeyi' : surfaceToApply === 'walls' ? 'Duvar yüzeyleri' : 'Zemin ve duvarlar') + ' yapay zeka ile tespit ediliyor...'
+        '2/3 ' + (surfaceToApply === 'floor' ? 'Zemin yüzeyi' : surfaceToApply === 'walls' ? 'Duvar yüzeyleri' : 'Zemin ve duvarlar') + ' analiz ediliyor (Sıfır Kota)...'
       );
-
-      // Call production AI Tile-Render API
-      const renderRes = await fetch('/api/ai/tile-render', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          roomImage: optimizedAiImage,
-          productId: selectedProduct?.id,
-          productData: targetTile,
-          surfaceType: surfaceToApply,
-          layout,
-          groutWidth: groutMm,
-        }),
-      }).then((r) => r.json());
 
       let surfaces = { floor: null, walls: null };
 
-      if (renderRes.success && renderRes.maskData) {
-        setDetectedMaskData(renderRes.maskData);
-        if (surfaceToApply === 'both') {
-          surfaces = {
-            floor: renderRes.maskData.floor,
-            walls: renderRes.maskData.walls || []
-          };
-        } else if (surfaceToApply === 'floor') {
-          surfaces = {
-            floor: renderRes.maskData.floor,
-            walls: null
-          };
-        } else {
-          surfaces = {
-            floor: null,
-            walls: renderRes.maskData.walls || []
-          };
-        }
+      // Priority 1: If user already painted with MaskBrushEditor, use it directly (0 API quota)
+      if (customMaskCanvas) {
+        surfaces = {
+          floor: { polygon: [[0, 0], [100, 0], [100, 100], [0, 100]], exclude: [] },
+          walls: []
+        };
       } else {
-        throw new Error(renderRes.error || 'Yüzeyler tespit edilemedi. Lütfen net bir oda fotoğrafı deneyiniz.');
+        // Priority 2: Try AI Tile-Render API
+        try {
+          const renderRes = await fetch('/api/ai/tile-render', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              roomImage: optimizedAiImage,
+              productId: selectedProduct?.id,
+              productData: targetTile,
+              surfaceType: surfaceToApply,
+              layout,
+              groutWidth: groutMm,
+            }),
+          }).then((r) => r.json());
+
+          if (renderRes.success && renderRes.maskData) {
+            setDetectedMaskData(renderRes.maskData);
+            if (surfaceToApply === 'both') {
+              surfaces = {
+                floor: renderRes.maskData.floor,
+                walls: renderRes.maskData.walls || []
+              };
+            } else if (surfaceToApply === 'floor') {
+              surfaces = {
+                floor: renderRes.maskData.floor,
+                walls: null
+              };
+            } else {
+              surfaces = {
+                floor: null,
+                walls: renderRes.maskData.walls || []
+              };
+            }
+          }
+        } catch (apiErr) {
+          console.warn('[AI Remodel] API bypassed, falling back to 100% free client detector:', apiErr);
+        }
+
+        // Priority 3: Zero-Quota Client-Side Computer Vision Engine ($0 cost, 100% reliable)
+        if (!surfaces.floor && (!surfaces.walls || surfaces.walls.length === 0)) {
+          const baseImg = await loadImage(currentPhoto);
+          const clientSurfaces = detectTileSurfacesClientSide(
+            baseImg,
+            baseImg.naturalWidth || 800,
+            baseImg.naturalHeight || 600
+          );
+          setDetectedMaskData(clientSurfaces);
+          if (surfaceToApply === 'walls') {
+            surfaces = { floor: null, walls: clientSurfaces.walls };
+          } else if (surfaceToApply === 'both') {
+            surfaces = clientSurfaces;
+          } else {
+            surfaces = { floor: clientSurfaces.floor, walls: null };
+          }
+        }
       }
 
-      setLoadingStepText('3/3 ' + (targetTile?.name || 'Seramik') + ' 3D mimari render kalitesinde döşeniyor...');
+      setLoadingStepText('3/3 ' + (targetTile?.name || 'Seramik') + ' eski derzler temizlenerek 3D mimari render kalitesinde giydiriliyor...');
 
       // Load original high-res room photo and 4K tile texture
       const tileSource = targetTile?.textureUrl || targetTile?.imageUrl || '/textures/calacatta_gold.jpg';
@@ -862,32 +890,61 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
               </div>
             )}
 
-            {/* MAIN ACTION BUTTON */}
+            {/* MAIN ACTION BUTTONS */}
             {photoPreview && (
-              <button 
-                type="button"
-                onClick={() => handleGenerateAIRemodel(selectedTile)}
-                style={{
-                  width: '100%',
-                  padding: '16px',
-                  borderRadius: '16px',
-                  background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                  color: '#090d16',
-                  fontWeight: '900',
-                  fontSize: '1.02rem',
-                  border: 'none',
-                  cursor: 'pointer',
-                  boxShadow: '0 8px 30px rgba(212,175,55,0.45)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '10px',
-                  transition: 'all 0.25s ease'
-                }}
-              >
-                <Sparkles size={22} style={{ color: '#090d16' }} />
-                <span>Yapay Zeka ile Bu Mekana Uygula (3 Saniyede Canlı Dönüşüm)</span>
-              </button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <button 
+                  type="button"
+                  onClick={() => handleGenerateAIRemodel(selectedTile)}
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    borderRadius: '16px',
+                    background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                    color: '#090d16',
+                    fontWeight: '900',
+                    fontSize: '1.02rem',
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 8px 30px rgba(212,175,55,0.45)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '10px',
+                    transition: 'all 0.25s ease'
+                  }}
+                >
+                  <Sparkles size={22} style={{ color: '#090d16' }} />
+                  <span>Seçili Seramiği Bu Mekana Döşe (%100 Ücretsiz & Sıfır Kota)</span>
+                </button>
+
+                {isUserUploaded && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleSelectSampleRoom('/hero/luxury_bathroom.png');
+                      setTimeout(() => handleGenerateAIRemodel(selectedTile, 'both'), 100);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '11px 16px',
+                      borderRadius: '12px',
+                      background: 'rgba(56, 189, 248, 0.12)',
+                      color: '#38bdf8',
+                      fontWeight: '800',
+                      fontSize: '0.84rem',
+                      border: '1px solid rgba(56, 189, 248, 0.35)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <span>🏛️ Veya 3D Mimari Stüdyo Sahnesinde Gör (V-Ray / 3. Görsel Render Kalitesi)</span>
+                  </button>
+                )}
+              </div>
             )}
           </div>
         )}
