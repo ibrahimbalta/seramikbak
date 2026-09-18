@@ -24,10 +24,8 @@ import {
   Phone, 
   Map, 
   Settings, 
-  Activity,
   Layers2,
   FileText,
-  CheckCircle,
   HelpCircle,
   ArrowRight,
   UploadCloud,
@@ -6690,31 +6688,6 @@ export default function Home() {
                   <small className="architect-desc">
                     İçerik: High-res dikişsiz doku (Diffuse, Normal, Roughness), AutoCAD dwg bloğu, Revit BIM nesnesi (.rfa).
                   </small>
-                </div>
-
-                {/* GÜVENİLİRLİK VE SOSYAL KANIT ROZETLERİ */}
-                <div className="detail-trust-badges-box">
-                  <div className="trust-badge-item">
-                    <CheckCircle size={14} className="trust-icon" />
-                    <div>
-                      <strong>En İyi Fiyat Garantisi</strong>
-                      <span>Bayi ve pazaryerleri arasında en avantajlı fiyatlar</span>
-                    </div>
-                  </div>
-                  <div className="trust-badge-item">
-                    <Activity size={14} className="trust-icon" />
-                    <div>
-                      <strong>Sigortalı Nakliye Sevk</strong>
-                      <span>Kırılma garantili lojistik ve hızlı teslimat</span>
-                    </div>
-                  </div>
-                  <div className="trust-badge-item">
-                    <MapPin size={14} className="trust-icon" />
-                    <div>
-                      <strong>100% Orijinal Yetkili Bayi</strong>
-                      <span>Doğrudan üretici garantili faturalı ürünler</span>
-                    </div>
-                  </div>
                 </div>
 
                 {/* BANYO ORTAMINDA DÖŞENMİŞ GÖRSEL MOCKUP */}
