@@ -259,6 +259,12 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
     setShowQuoteModal(true);
   };
 
+  // Dynamic Product Subtitle based on real fields
+  const productStyle = product.style || 'Porselen Seramik';
+  const productFinish = product.finish || 'Lappato';
+  const productSubtitle = 
+    `Doğal ${productStyle.toLowerCase()} dokusu, zengin detayları ve ${productFinish} yüzey işçiliği ile üretilmiş ${productDimensions} mimari porselen karo.`;
+
   // Dynamic Room Render state (Birebir ürün dokusunun mimari mekanda sergilenmesi)
   const [roomRenderImage, setRoomRenderImage] = useState(null);
   const [isRoomRendering, setIsRoomRendering] = useState(false);
