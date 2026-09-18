@@ -122,22 +122,22 @@ export function createTiledPattern(tileImg, cols, rows, tileWCm = 60, tileHCm = 
   let cellW, cellH;
   if (isPlank) {
     // Narrow plank e.g. 20x120
-    cellW = 56;
-    cellH = Math.round(56 / Math.min(ratio, 1 / ratio));
-    cols = Math.max(cols, 28);
-    rows = Math.max(rows, 14);
+    cellW = 110;
+    cellH = Math.round(110 / Math.min(ratio, 1 / ratio));
+    cols = Math.max(cols || 8, 8);
+    rows = Math.max(rows || 6, 6);
   } else if (Math.abs(ratio - 1) < 0.1) {
     // Square tile e.g. 60x60
-    cellW = 120;
-    cellH = 120;
-    cols = Math.max(cols, 14);
-    rows = Math.max(rows, 14);
+    cellW = 220;
+    cellH = 220;
+    cols = Math.max(cols || 5, 5);
+    rows = Math.max(rows || 5, 5);
   } else {
-    // Rectangular tile e.g. 60x120
-    cellW = 90;
-    cellH = Math.round(90 / ratio);
-    cols = Math.max(cols, 16);
-    rows = Math.max(rows, 12);
+    // Large rectangular slab e.g. 60x120
+    cellW = 250;
+    cellH = Math.round(250 / ratio);
+    cols = Math.max(cols || 4, 4);
+    rows = Math.max(rows || 5, 5);
   }
 
   const patternW = cols * (cellW + groutPx) + groutPx;
@@ -334,8 +334,8 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     else resolvedGrout = '#94a3b8';
   }
 
-  const cols = isPlank ? 30 : 16;
-  const rows = isPlank ? 16 : 14;
+  const cols = isPlank ? 8 : (Math.abs(ratio - 1) < 0.1 ? 5 : 4);
+  const rows = isPlank ? 6 : (Math.abs(ratio - 1) < 0.1 ? 5 : 5);
 
   // Step 2: Create tile pattern with proportional sizing and grout lines
   const pattern = createTiledPattern(tileImg, cols, rows, tileWCm, tileHCm, groutWidth, resolvedGrout);
@@ -395,7 +395,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
 
   // Step 4: Draw rendered tiles onto main canvas
   ctx.save();
-  ctx.globalAlpha = 0.95;
+  ctx.globalAlpha = 0.96;
   ctx.drawImage(tileLayer, 0, 0);
   ctx.restore();
 
@@ -413,7 +413,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     ctx.clip();
 
     ctx.globalCompositeOperation = 'multiply';
-    ctx.globalAlpha = 0.65;
+    ctx.globalAlpha = isGlossy ? 0.35 : 0.55;
     ctx.drawImage(roomImg, 0, 0, canvasW, canvasH);
     ctx.restore();
 
@@ -429,7 +429,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     ctx.clip();
 
     ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = screenAlpha;
+    ctx.globalAlpha = isGlossy ? 0.48 : 0.22;
     ctx.drawImage(roomImg, 0, 0, canvasW, canvasH);
     ctx.restore();
 
