@@ -16,7 +16,6 @@ import {
   Phone, 
   Send, 
   Box, 
-  CheckCircle2, 
   AlertCircle, 
   ChevronRight,
   ExternalLink,
@@ -557,16 +556,16 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
           <div>
             
             {/* Brand Link & SKU Meta */}
-            <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
               <Link
                 href={`/marka/${brandSlug}`}
                 style={{
                   color: '#d4af37',
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   fontWeight: '700',
                   textDecoration: 'none',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.12em',
+                  letterSpacing: '0.14em',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '4px'
@@ -577,12 +576,12 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               </Link>
 
               <span style={{
-                background: 'rgba(255, 255, 255, 0.04)',
+                background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 color: '#94a3b8',
-                fontSize: '0.75rem',
+                fontSize: '0.72rem',
                 fontFamily: 'monospace',
-                padding: '3px 8px',
+                padding: '3px 10px',
                 borderRadius: '6px'
               }}>
                 KOD: {product.code}
@@ -591,18 +590,18 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
 
             {/* Main Product Title */}
             <h1 style={{
-              fontSize: '2.4rem',
+              fontSize: '2.2rem',
               fontWeight: '800',
               color: '#ffffff',
               margin: '0 0 16px 0',
-              lineHeight: 1.15,
+              lineHeight: 1.2,
               letterSpacing: '-0.02em'
             }}>
               {product.name}
             </h1>
 
-            {/* Refined Architectural Spec Badges (Lucide Icons, No Emojis) */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '28px' }}>
+            {/* Refined Architectural Spec Chips */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
               <div style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -668,49 +667,136 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               </div>
             </div>
 
-            {/* Redesigned Minimal & Aesthetic Action Box */}
+            {/* AI & 3D Interactive Feature Card */}
             <div style={{
-              background: 'linear-gradient(180deg, rgba(16, 23, 38, 0.75) 0%, rgba(10, 15, 26, 0.95) 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '20px',
-              padding: '24px',
-              marginBottom: '28px',
-              boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.6)',
-              position: 'relative'
+              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(15, 23, 42, 0.65) 60%, rgba(59, 130, 246, 0.06) 100%)',
+              border: '1px solid rgba(212, 175, 55, 0.22)',
+              borderRadius: '16px',
+              padding: '18px 20px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '14px'
             }}>
-              
-              {/* Header: Inquiry Status & Availability */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px', gap: '12px' }}>
-                <div>
-                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: '600', marginBottom: '4px' }}>
-                    Yetkili Bayi & Proje Tedariki
-                  </div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: '700', color: '#ffffff', letterSpacing: '-0.01em' }}>
-                    Metrajınıza Özel İskontolu Teklif
-                  </div>
-                </div>
-
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{
-                  display: 'inline-flex',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  background: 'rgba(212, 175, 55, 0.12)',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  background: 'rgba(16, 185, 129, 0.08)',
-                  border: '1px solid rgba(16, 185, 129, 0.25)',
-                  padding: '5px 10px',
-                  borderRadius: '9999px',
-                  fontSize: '0.74rem',
-                  fontWeight: '600',
-                  color: '#34d399',
-                  whiteSpace: 'nowrap'
+                  justifyContent: 'center',
+                  color: '#d4af37',
+                  flexShrink: 0
                 }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 8px #10b981' }} />
-                  <span>Stokta Hazır</span>
+                  <Sparkles size={20} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#ffffff', letterSpacing: '-0.01em' }}>
+                    Kendi Mekânında Canlı Gör
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '2px' }}>
+                    Fotoğrafını yükle, seçtiğin seramiği yapay zeka ile odana döşe.
+                  </div>
                 </div>
               </div>
 
-              {/* Primary Dual Actions (Teklif Al & Numune İste) */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
-                {/* Primary Gold Satin Button */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button
+                  onClick={() => setShowAIRemodel(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #d4af37 0%, #c49a2c 100%)',
+                    color: '#090d16',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '9px 16px',
+                    fontSize: '0.82rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    boxShadow: '0 4px 14px rgba(212, 175, 55, 0.25)',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <Sparkles size={14} />
+                  <span>AI Mekân Yenileme</span>
+                </button>
+
+                <button
+                  onClick={handleLaunch3DKiosk}
+                  title="3D Kiosk Stüdyosunda İncele"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    color: '#cbd5e1',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '10px',
+                    padding: '9px 14px',
+                    fontSize: '0.82rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <Eye size={14} style={{ color: '#d4af37' }} />
+                  <span>3D Kiosk</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Refined Conversion Card (Teklif & Numune) */}
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.65)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '18px',
+              padding: '22px',
+              marginBottom: '24px'
+            }}>
+              {/* Status Header */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '18px',
+                paddingBottom: '14px',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    background: '#10b981',
+                    display: 'inline-block',
+                    boxShadow: '0 0 8px #10b981'
+                  }} />
+                  <span style={{ fontSize: '0.82rem', fontWeight: '600', color: '#f1f5f9' }}>
+                    Yetkili Bayi & Fabrika Tedariki
+                  </span>
+                </div>
+
+                <span style={{
+                  fontSize: '0.74rem',
+                  color: '#94a3b8',
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  padding: '3px 8px',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(255, 255, 255, 0.06)'
+                }}>
+                  1. Kalite TSE / CE
+                </span>
+              </div>
+
+              {/* Primary Buttons: Teklif Al & Numune İste */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
                 <button
                   onClick={() => setShowQuoteModal(true)}
                   style={{
@@ -734,13 +820,12 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   <span>Teklif Talebi Al</span>
                 </button>
 
-                {/* Secondary Frosted Glass Button */}
                 <button
                   onClick={() => setShowSampleModal(true)}
                   style={{
                     background: 'rgba(255, 255, 255, 0.04)',
                     color: '#f1f5f9',
-                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
                     borderRadius: '12px',
                     padding: '13px 18px',
                     fontSize: '0.88rem',
@@ -758,102 +843,46 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 </button>
               </div>
 
-              {/* Interactive Visualizer Studio Suite (Segmented Twin Bar) */}
-              <div style={{
-                marginTop: '12px',
-                paddingTop: '14px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.06)'
-              }}>
-                <div style={{
+              {/* Area Calculator Accordion Trigger */}
+              <button
+                onClick={() => setShowCalculator(!showCalculator)}
+                style={{
+                  width: '100%',
+                  background: showCalculator ? 'rgba(212, 175, 55, 0.06)' : 'rgba(255, 255, 255, 0.02)',
+                  border: showCalculator ? '1px solid rgba(212, 175, 55, 0.25)' : '1px solid rgba(255, 255, 255, 0.06)',
+                  borderRadius: '10px',
+                  padding: '10px 14px',
+                  color: showCalculator ? '#d4af37' : '#94a3b8',
+                  fontSize: '0.8rem',
+                  fontWeight: '600',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginBottom: '10px'
-                }}>
-                  <span style={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: '600' }}>
-                    Dijital Görselleştirme Stüdyosu
-                  </span>
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                  <Calculator size={14} style={{ color: '#d4af37' }} />
+                  <span>Metraj ve Kutu Adedi Hesapla</span>
+                </span>
+                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                  {showCalculator ? 'Gizle ▲' : 'Hesapla ▼'}
+                </span>
+              </button>
 
-                  <button
-                    onClick={() => setShowCalculator(!showCalculator)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: showCalculator ? '#d4af37' : '#94a3b8',
-                      fontSize: '0.73rem',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <Calculator size={12} />
-                    <span>{showCalculator ? 'Hesaplayıcıyı Gizle' : 'Metraj Hesapla'}</span>
-                  </button>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  {/* 3D Kiosk Studio */}
-                  <button
-                    onClick={handleLaunch3DKiosk}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      color: '#e2e8f0',
-                      border: '1px solid rgba(255, 255, 255, 0.09)',
-                      borderRadius: '12px',
-                      padding: '11px 14px',
-                      fontSize: '0.8rem',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <Eye size={15} style={{ color: '#d4af37' }} />
-                    <span>3D Kiosk Studio</span>
-                  </button>
-
-                  {/* AI ile Mekan Yenileme */}
-                  <button
-                    onClick={() => setShowAIRemodel(true)}
-                    style={{
-                      background: 'rgba(59, 130, 246, 0.06)',
-                      color: '#93c5fd',
-                      border: '1px solid rgba(59, 130, 246, 0.22)',
-                      borderRadius: '12px',
-                      padding: '11px 14px',
-                      fontSize: '0.8rem',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <Sparkles size={15} style={{ color: '#60a5fa' }} />
-                    <span>AI Mekan Yenileme</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Optional Minimal Area Calculator Box */}
+              {/* Area Calculator Drawer */}
               {showCalculator && (
                 <div style={{
-                  marginTop: '16px',
+                  marginTop: '12px',
                   padding: '16px',
                   background: 'rgba(0, 0, 0, 0.3)',
                   border: '1px solid rgba(255, 255, 255, 0.07)',
-                  borderRadius: '14px'
+                  borderRadius: '12px'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Calculator size={14} style={{ color: '#d4af37' }} />
-                      <span>Hızlı Metraj & Kutu Hesaplayıcı</span>
+                    <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#fff' }}>
+                      Gereken Metrajı Girin
                     </span>
                     <label style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
                       <input 
@@ -925,45 +954,6 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   </div>
                 </div>
               )}
-
-            </div>
-
-            {/* Quick Guarantees & Direct Line */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '12px 18px',
-              background: 'rgba(255, 255, 255, 0.02)',
-              border: '1px solid rgba(255, 255, 255, 0.06)',
-              borderRadius: '14px',
-              fontSize: '0.8rem',
-              color: '#94a3b8'
-            }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <CheckCircle2 size={15} style={{ color: '#34d399' }} />
-                <span>Mimari ve Kurumsal Proje İskontosu</span>
-              </span>
-
-              <a
-                href={
-                  (liveDealers && liveDealers[0]?.phone) ||
-                  (authorizedDealers && authorizedDealers[0]?.phone)
-                    ? `tel:${(liveDealers && liveDealers[0]?.phone) || authorizedDealers[0]?.phone}`
-                    : 'tel:08508880000'
-                }
-                style={{
-                  color: '#d4af37',
-                  textDecoration: 'none',
-                  fontWeight: '600',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
-              >
-                <Phone size={13} />
-                <span>Bayi Hattı</span>
-              </a>
             </div>
 
           </div>
