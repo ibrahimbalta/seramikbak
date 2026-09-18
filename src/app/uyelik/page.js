@@ -695,7 +695,7 @@ export default function UyelikPage() {
           {/* Header */}
           <div className="dashboard-header">
             <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ background: '#b38e47', color: '#fff', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '1rem' }}>SB</div>
+              <div style={{ background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)', border: '1.5px solid #d4af37', color: '#fff', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '1rem', boxShadow: '0 2px 8px rgba(15, 23, 42, 0.25)' }}>SB</div>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '800' }}>SeramikBak</h3>
                 <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Müşteri Cockpit Paneli</span>

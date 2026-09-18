@@ -10041,7 +10041,8 @@ export default function Home() {
         .logo-icon {
           width: 54px; /* enlarged logo icon */
           height: 54px;
-          background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
+          background: linear-gradient(135deg, #182030 0%, #0b0f19 100%);
+          border: 1.5px solid #d4af37;
           border-radius: var(--border-radius-sm);
           display: flex;
           align-items: center;
@@ -10050,10 +10051,15 @@ export default function Home() {
           font-weight: 850;
           color: #ffffff;
           font-size: 1.55rem;
-          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.3);
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25), 0 0 12px rgba(212, 175, 55, 0.15);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           overflow: hidden;
+        }
+
+        .logo-icon:hover {
+          border-color: #f1d279;
+          box-shadow: 0 6px 18px rgba(15, 23, 42, 0.35), 0 0 16px rgba(212, 175, 55, 0.3);
         }
 
         .logo-text {
@@ -10545,7 +10551,8 @@ export default function Home() {
         .mobile-menu-logo {
           width: 34px;
           height: 34px;
-          background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
+          background: linear-gradient(135deg, #182030 0%, #0b0f19 100%);
+          border: 1.5px solid #d4af37;
           border-radius: 8px;
           display: flex;
           align-items: center;
@@ -10554,7 +10561,7 @@ export default function Home() {
           font-weight: 850;
           color: #ffffff;
           font-size: 1rem;
-          box-shadow: 0 4px 10px rgba(179, 142, 71, 0.25);
+          box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25), 0 0 8px rgba(212, 175, 55, 0.15);
         }
 
         .mobile-menu-brand-info {
@@ -14602,7 +14609,8 @@ export default function Home() {
         .footer-logo .logo-icon {
           width: 40px;
           height: 40px;
-          background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
+          background: linear-gradient(135deg, #182030 0%, #0b0f19 100%);
+          border: 1.5px solid #d4af37;
           border-radius: 10px;
           display: flex;
           align-items: center;
@@ -14611,7 +14619,7 @@ export default function Home() {
           font-weight: 850;
           color: #ffffff;
           font-size: 1.20rem;
-          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.35);
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25), 0 0 10px rgba(212, 175, 55, 0.15);
         }
 
         .footer-logo .logo-text {

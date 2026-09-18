@@ -1169,16 +1169,16 @@ export default function BrandPortalPage() {
               width: '48px',
               height: '48px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, #111 0%, #1e293b 100%)',
-              color: '#d4af37',
-              border: '1px solid #d4af37',
+              background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+              color: '#ffffff',
+              border: '1.5px solid #d4af37',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '900',
               fontSize: '1.4rem',
               margin: '0 auto 12px auto',
-              boxShadow: '0 0 15px rgba(212,175,55,0.25)'
+              boxShadow: '0 4px 15px rgba(15,23,42,0.4), 0 0 10px rgba(212,175,55,0.2)'
             }}>SB</div>
             <h3 style={{ 
               fontSize: '1.45rem', 
@@ -1655,18 +1655,19 @@ export default function BrandPortalPage() {
             flexShrink: 0
           }}>
             <div style={{
-              width: '34px',
-              height: '34px',
+              width: '32px',
+              height: '32px',
               borderRadius: '8px',
-              background: '#fff',
-              color: '#090d16',
+              background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+              color: '#ffffff',
+              border: '1.5px solid #d4af37',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '900',
               fontSize: '1.1rem',
               flexShrink: 0,
-              boxShadow: '0 0 10px rgba(255,255,255,0.1)'
+              boxShadow: '0 0 10px rgba(212,175,55,0.2)'
             }}>SB</div>
             {!isSidebarCollapsed && (
               <div style={{ minWidth: 0 }}>
@@ -1822,9 +1823,9 @@ export default function BrandPortalPage() {
                   width: '28px',
                   height: '28px',
                   borderRadius: '6px',
-                  background: 'linear-gradient(135deg, #111 0%, #1e293b 100%)',
-                  color: '#d4af37',
-                  border: '1px solid #d4af37',
+                  background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+                  color: '#ffffff',
+                  border: '1.5px solid #d4af37',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',

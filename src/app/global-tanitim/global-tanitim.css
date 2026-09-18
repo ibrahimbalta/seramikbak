@@ -99,16 +99,16 @@
 .gt-logo-badge {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: #d4af37;
-  border: 1px solid rgba(212, 175, 55, 0.4);
+  background: linear-gradient(135deg, #182030 0%, #0b0f19 100%);
+  color: #ffffff;
+  border: 1.5px solid #d4af37;
   border-radius: 10px;
   font-weight: 900;
   font-size: 0.95rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25), 0 0 8px rgba(212, 175, 55, 0.15);
   flex-shrink: 0;
 }
 

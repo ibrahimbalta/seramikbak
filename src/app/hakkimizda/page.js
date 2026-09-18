@@ -101,13 +101,15 @@ export default function AboutUsPage() {
               width: '32px',
               height: '32px',
               borderRadius: '8px',
-              background: '#0f172a',
-              color: '#b38e47',
+              background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+              color: '#ffffff',
+              border: '1.5px solid #d4af37',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '900',
-              fontSize: '1rem'
+              fontSize: '1rem',
+              boxShadow: '0 2px 8px rgba(15, 23, 42, 0.25)'
             }}>SB</div>
             <span style={{ fontSize: '1.1rem', fontWeight: '800', tracking: '-0.02em' }}>SeramikBak</span>
           </div>

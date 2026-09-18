@@ -2112,15 +2112,16 @@ export default function AdminPage() {
               width: '56px',
               height: '56px',
               borderRadius: '16px',
-              background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
-              color: '#0f172a',
+              background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+              border: '1.5px solid #d4af37',
+              color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '900',
               fontSize: '1.6rem',
               margin: '0 auto 16px auto',
-              boxShadow: '0 8px 20px rgba(212, 175, 55, 0.3)'
+              boxShadow: '0 8px 20px rgba(15, 23, 42, 0.4), 0 0 15px rgba(212, 175, 55, 0.2)'
             }}>SB</div>
             
             <h3 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.6rem)', fontWeight: '800', color: '#ffffff', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
@@ -6863,16 +6864,17 @@ export default function AdminPage() {
         .logo-icon {
           width: 38px;
           height: 38px;
-          background: linear-gradient(135deg, var(--accent-gold) 0%, #d4af37 100%);
+          background: linear-gradient(135deg, #182030 0%, #0b0f19 100%);
+          border: 1.5px solid #d4af37;
           color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
           font-family: var(--font-title);
-          font-weight: 700;
+          font-weight: 850;
           font-size: 1rem;
           border-radius: 10px;
-          box-shadow: 0 2px 8px rgba(179, 142, 71, 0.25);
+          box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25), 0 0 8px rgba(212, 175, 55, 0.15);
         }
 
         .logo-text {

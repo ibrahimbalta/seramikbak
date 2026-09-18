@@ -257,13 +257,15 @@ export default function InstallersDirectoryPage() {
               width: '38px',
               height: '38px',
               borderRadius: '10px',
-              background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+              background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+              border: '1.5px solid #d4af37',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '900',
-              color: '#000',
-              fontSize: '1.1rem'
+              color: '#ffffff',
+              fontSize: '1.1rem',
+              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.25)'
             }}>SB</div>
             <span style={{ fontSize: '1.1rem', fontWeight: '900', color: '#ffffff' }}>
               SeramikBak <span style={{ color: '#d4af37', fontSize: '0.8rem' }}>USTA REHBERİ</span>
