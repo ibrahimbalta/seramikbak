@@ -6519,7 +6519,9 @@ export default function Home() {
                 <h3 style={{ marginTop: '4px' }}>{detailProduct.name}</h3>
                 <small className="code-text">Ürün Kodu: {detailProduct.code}</small>
               </div>
-              <button onClick={() => setShowDetailModal(false)} className="close-modal-btn">✕</button>
+              <button onClick={() => setShowDetailModal(false)} className="close-modal-btn" title="Kapat">
+                <X size={18} />
+              </button>
             </div>
 
             <div className="detail-modal-body">
@@ -6580,6 +6582,7 @@ export default function Home() {
                 </div>
 
                 <div className="detail-primary-actions">
+                  {/* Primary 3D Kiosk & Studio Action Button */}
                   <button 
                     onClick={() => {
                       setShowDetailModal(false);
@@ -6592,11 +6595,12 @@ export default function Home() {
                     </div>
                     <div className="btn-text-group">
                       <span className="btn-title">3D Sanal Stüdyoda Dene</span>
-                      <span className="btn-subtext">Canlı Mekan Simülasyonu</span>
+                      <span className="btn-subtext">360° Mekân Simülasyonu & Kiosk</span>
                     </div>
-                    <span className="btn-hero-tag">AI STÜDYO</span>
+                    <span className="btn-hero-tag">3D KİOSK</span>
                   </button>
 
+                  {/* Secondary 2-Column Action Grid */}
                   <div className="detail-secondary-actions-grid">
                     <button 
                       onClick={() => {
@@ -6605,10 +6609,12 @@ export default function Home() {
                       }}
                       className="detail-action-btn btn-action-dealer"
                     >
-                      <MapPin size={17} className="icon-dealer" />
+                      <div className="btn-action-icon-circle dealer-icon-circle">
+                        <MapPin size={16} />
+                      </div>
                       <div className="btn-text-group">
                         <span className="btn-title">Bayiler & Teklif Al</span>
-                        <span className="btn-subtext">Haritada Gör</span>
+                        <span className="btn-subtext">Haritada En Yakın Bayi</span>
                       </div>
                     </button>
 
@@ -6629,45 +6635,33 @@ export default function Home() {
                       }}
                       className="detail-action-btn btn-action-sample"
                     >
-                      <Truck size={17} className="icon-sample" />
+                      <div className="btn-action-icon-circle sample-icon-circle">
+                        <Truck size={16} />
+                      </div>
                       <div className="btn-text-group">
                         <span className="btn-title">Ücretsiz Numune İste</span>
-                        <span className="btn-subtext">1-Tıkla Adrese</span>
+                        <span className="btn-subtext">1-Tıkla Kapına Gelsin</span>
                       </div>
                     </button>
                   </div>
 
-                  {/* MÜSTAKİL ÜRÜN SAYFASI & PAYLAŞ BUTONU */}
-                  <div style={{ marginTop: '10px' }}>
-                    <Link
-                      href={`/urun/${slugify(`${detailProduct.brand?.name || 'seramik'} ${detailProduct.name}`)}`}
-                      target="_blank"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        width: '100%',
-                        padding: '10px 14px',
-                        background: 'rgba(212, 175, 55, 0.08)',
-                        border: '1px solid rgba(212, 175, 55, 0.25)',
-                        borderRadius: '10px',
-                        color: '#d4af37',
-                        fontSize: '0.82rem',
-                        fontWeight: '700',
-                        textDecoration: 'none',
-                        boxSizing: 'border-box'
-                      }}
-                    >
-                      <ExternalLink size={15} />
-                      <span>Müstakil Ürün Sayfasında Aç & Paylaş</span>
-                    </Link>
-                  </div>
+                  {/* Müstakil Ürün Sayfası Link Butonu */}
+                  <Link
+                    href={`/urun/${slugify(`${detailProduct.brand?.name || 'seramik'} ${detailProduct.name}`)}`}
+                    target="_blank"
+                    className="btn-action-standalone"
+                  >
+                    <ExternalLink size={14} className="icon-gold" />
+                    <span>Müstakil Ürün Sayfasında Aç & Paylaş</span>
+                  </Link>
                 </div>
 
                 {/* MİMAR VE TASARIMCILAR İÇİN DOKU PORTALI */}
                 <div className="architect-download-box">
-                  <span className="architect-lbl">MİMARLAR & TASARIMCILAR İÇİN</span>
+                  <div className="architect-lbl-row">
+                    <span className="architect-lbl">MİMARLAR & TASARIMCILAR İÇİN</span>
+                    <span className="architect-badge-mini">BIM / CAD</span>
+                  </div>
                   <button 
                     onClick={() => handleDownloadCAD(detailProduct)}
                     className="btn-architect-download w-full-btn flex-center-btn"
@@ -6675,18 +6669,18 @@ export default function Home() {
                   >
                     {isDownloadingCAD ? (
                       <>
-                        <Loader2 size={16} className="animate-spin" />
+                        <Loader2 size={15} className="animate-spin" />
                         <span>CAD ZIP Derleniyor...</span>
                       </>
                     ) : (
                       <>
-                        <UploadCloud size={16} style={{ transform: 'rotate(180deg)' }} />
+                        <UploadCloud size={15} style={{ transform: 'rotate(180deg)' }} />
                         <span>3D Doku & CAD Nesnelerini İndir (.ZIP)</span>
                       </>
                     )}
                   </button>
                   <small className="architect-desc">
-                    İçerik: High-res dikişsiz doku (Diffuse, Normal, Roughness), AutoCAD dwg bloğu, Revit BIM nesnesi (.rfa).
+                    İçerik: High-res dikişsiz doku (4K Diffuse, Normal, Roughness), AutoCAD DWG bloğu, Revit BIM nesnesi (.rfa).
                   </small>
                 </div>
 
@@ -13455,34 +13449,34 @@ export default function Home() {
         }
 
         .spec-item-box {
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          background: rgba(15, 23, 42, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.07);
           padding: 8px 10px;
-          border-radius: 8px;
+          border-radius: 10px;
           display: flex;
           flex-direction: column;
           gap: 2px;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .spec-item-box:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(197, 160, 89, 0.3);
+          background: rgba(25, 35, 60, 0.7);
+          border-color: rgba(212, 175, 55, 0.35);
           transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
         }
 
         .spec-lbl {
-          font-size: 0.58rem;
-          color: rgba(255, 255, 255, 0.4);
+          font-size: 0.60rem;
+          color: #94a3b8;
           text-transform: uppercase;
           font-weight: 700;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.06em;
         }
 
         .spec-val {
           font-size: 0.78rem;
-          font-weight: 600;
+          font-weight: 700;
           color: #ffffff;
         }
 
@@ -13490,23 +13484,24 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 10px;
-          margin-top: 14px;
+          margin-top: 16px;
           width: 100%;
         }
 
+        /* 1. Primary 3D Kiosk & Studio Action Button */
         .btn-action-studio {
           width: 100%;
-          padding: 12px 18px;
-          border-radius: 12px;
-          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-          border: 1px solid rgba(254, 240, 138, 0.4);
-          color: #0f172a;
+          padding: 13px 18px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, #e5b93b 0%, #d4af37 50%, #b8860b 100%);
+          border: 1px solid rgba(255, 255, 255, 0.35);
+          color: #0b0f17;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 12px;
-          box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+          box-shadow: 0 6px 20px -2px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.5);
           position: relative;
           overflow: hidden;
           transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
@@ -13522,7 +13517,7 @@ export default function Home() {
           background: linear-gradient(
             45deg,
             transparent 45%,
-            rgba(255, 255, 255, 0.28) 50%,
+            rgba(255, 255, 255, 0.35) 50%,
             transparent 55%
           );
           transform: rotate(30deg);
@@ -13536,8 +13531,8 @@ export default function Home() {
 
         .btn-action-studio:hover {
           transform: translateY(-2px);
-          box-shadow: 0 8px 26px rgba(245, 158, 11, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-          background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 50%, #ea580c 100%);
+          box-shadow: 0 10px 28px -2px rgba(212, 175, 55, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+          background: linear-gradient(135deg, #f3cb52 0%, #e0bd42 50%, #c49216 100%);
         }
 
         .btn-action-studio:active {
@@ -13548,12 +13543,14 @@ export default function Home() {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          background: rgba(15, 23, 42, 0.15);
-          color: #0f172a;
+          width: 34px;
+          height: 34px;
+          border-radius: 9px;
+          background: rgba(11, 15, 23, 0.15);
+          border: 1px solid rgba(11, 15, 23, 0.12);
+          color: #0b0f17;
           flex-shrink: 0;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
         }
 
         .btn-text-group {
@@ -13566,35 +13563,36 @@ export default function Home() {
         }
 
         .btn-action-studio .btn-title {
-          font-size: 0.92rem;
+          font-size: 0.90rem;
           font-weight: 800;
           letter-spacing: 0.01em;
-          color: #0f172a;
+          color: #0b0f17;
           line-height: 1.2;
           white-space: nowrap;
         }
 
         .btn-action-studio .btn-subtext {
-          font-size: 0.70rem;
+          font-size: 0.69rem;
           font-weight: 600;
-          color: rgba(15, 23, 42, 0.8);
+          color: rgba(11, 15, 23, 0.75);
           margin-top: 1px;
           white-space: nowrap;
         }
 
         .btn-hero-tag {
-          font-size: 0.60rem;
+          font-size: 0.62rem;
           font-weight: 800;
-          letter-spacing: 0.08em;
-          padding: 3px 8px;
-          border-radius: 6px;
-          background: #0f172a;
-          color: #fbbf24;
+          letter-spacing: 0.06em;
+          padding: 4px 10px;
+          border-radius: 9999px;
+          background: #0b0f17;
+          color: #f5d77f;
           text-transform: uppercase;
           flex-shrink: 0;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
         }
 
+        /* 2. Secondary 2-Column Action Grid */
         .detail-secondary-actions-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -13605,161 +13603,161 @@ export default function Home() {
         .btn-action-dealer, .btn-action-sample {
           padding: 10px 12px;
           border-radius: 12px;
-          background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
-          backdrop-filter: blur(10px);
+          background: rgba(15, 23, 42, 0.65);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.09);
           cursor: pointer;
           display: flex;
           align-items: center;
           gap: 10px;
-          transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
           position: relative;
           overflow: hidden;
           text-align: left;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
         }
 
-        .btn-action-dealer {
-          border: 1px solid rgba(96, 165, 250, 0.35);
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-action-dealer .icon-dealer {
-          color: #60a5fa;
+        .btn-action-icon-circle {
+          width: 32px;
+          height: 32px;
+          border-radius: 9px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           flex-shrink: 0;
-          filter: drop-shadow(0 0 6px rgba(96, 165, 250, 0.4));
+          transition: transform 0.2s ease;
         }
 
-        .btn-action-dealer .btn-title {
-          font-size: 0.82rem;
+        .dealer-icon-circle {
+          background: rgba(59, 130, 246, 0.12);
+          border: 1px solid rgba(59, 130, 246, 0.25);
+          color: #60a5fa;
+        }
+
+        .sample-icon-circle {
+          background: rgba(16, 185, 129, 0.12);
+          border: 1px solid rgba(16, 185, 129, 0.25);
+          color: #34d399;
+        }
+
+        .btn-action-dealer .btn-title, .btn-action-sample .btn-title {
+          font-size: 0.80rem;
           font-weight: 700;
           color: #f1f5f9;
           line-height: 1.2;
           white-space: nowrap;
         }
 
-        .btn-action-dealer .btn-subtext {
-          font-size: 0.68rem;
+        .btn-action-dealer .btn-subtext, .btn-action-sample .btn-subtext {
+          font-size: 0.67rem;
           font-weight: 500;
           color: #94a3b8;
+          margin-top: 1px;
           white-space: nowrap;
         }
 
         .btn-action-dealer:hover {
-          background: linear-gradient(135deg, rgba(30, 58, 138, 0.35) 0%, rgba(15, 23, 42, 0.9) 100%);
-          border-color: rgba(96, 165, 250, 0.7);
+          background: rgba(26, 42, 74, 0.75);
+          border-color: rgba(96, 165, 250, 0.55);
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25);
+          box-shadow: 0 6px 20px -2px rgba(59, 130, 246, 0.25);
         }
 
-        .btn-action-sample {
-          border: 1px solid rgba(52, 211, 153, 0.35);
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-action-sample .icon-sample {
-          color: #34d399;
-          flex-shrink: 0;
-          filter: drop-shadow(0 0 6px rgba(52, 211, 153, 0.4));
-        }
-
-        .btn-action-sample .btn-title {
-          font-size: 0.82rem;
-          font-weight: 700;
-          color: #f1f5f9;
-          line-height: 1.2;
-          white-space: nowrap;
-        }
-
-        .btn-action-sample .btn-subtext {
-          font-size: 0.68rem;
-          font-weight: 500;
-          color: #94a3b8;
-          white-space: nowrap;
+        .btn-action-dealer:hover .dealer-icon-circle {
+          transform: scale(1.08);
+          background: rgba(59, 130, 246, 0.2);
         }
 
         .btn-action-sample:hover {
-          background: linear-gradient(135deg, rgba(6, 78, 59, 0.35) 0%, rgba(15, 23, 42, 0.9) 100%);
-          border-color: rgba(52, 211, 153, 0.7);
+          background: rgba(16, 48, 38, 0.75);
+          border-color: rgba(52, 211, 153, 0.55);
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
+          box-shadow: 0 6px 20px -2px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-action-sample:hover .sample-icon-circle {
+          transform: scale(1.08);
+          background: rgba(16, 185, 129, 0.2);
         }
 
         .btn-action-dealer:active, .btn-action-sample:active {
           transform: translateY(0) scale(0.98);
         }
 
-        .detail-modal-content-premium .btn-primary {
-          background: linear-gradient(135deg, var(--accent-gold) 0%, #a27e3c 100%);
-          color: #ffffff;
-          border: none;
-          box-shadow: 0 4px 15px rgba(179, 142, 71, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-          font-family: var(--font-title);
-          font-weight: 600;
-          padding: 12px 20px;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .detail-modal-content-premium .btn-primary:hover {
-          background: linear-gradient(135deg, var(--accent-gold-hover) 0%, var(--accent-gold) 100%);
-          transform: translateY(-2px);
-          box-shadow: 0 8px 22px rgba(179, 142, 71, 0.45);
-        }
-
-        .detail-modal-content-premium .btn-secondary {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          color: #ffffff;
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
-          font-family: var(--font-title);
-          font-weight: 500;
-          padding: 12px 20px;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-        .detail-modal-content-premium .btn-secondary:hover {
-          background: rgba(255, 255, 255, 0.07);
-          border-color: rgba(197, 160, 89, 0.4);
-          color: var(--accent-gold);
-          transform: translateY(-2px);
-        }
-
-        .detail-action-btn {
-          font-size: 0.85rem;
+        /* 3. Standalone Link Button */
+        .btn-action-standalone {
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
+          width: 100%;
+          padding: 10px 14px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(212, 175, 55, 0.28);
+          border-radius: 11px;
+          color: #e2e8f0;
+          font-size: 0.79rem;
+          font-weight: 600;
+          text-decoration: none;
+          box-sizing: border-box;
+          transition: all 0.22s ease;
         }
 
+        .btn-action-standalone:hover {
+          background: rgba(212, 175, 55, 0.09);
+          border-color: rgba(212, 175, 55, 0.55);
+          color: #ffffff;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 16px rgba(212, 175, 55, 0.12);
+        }
+
+        /* 4. Architect CAD Download Portal */
         .architect-download-box {
           margin-top: 14px;
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
-          padding-top: 16px;
+          border-top: 1px solid rgba(255, 255, 255, 0.07);
+          padding-top: 14px;
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 8px;
+        }
+
+        .architect-lbl-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
 
         .architect-lbl {
-          display: block;
+          display: flex;
+          align-items: center;
+          gap: 6px;
           font-size: 0.65rem;
-          font-weight: 700;
-          color: var(--accent-gold);
-          letter-spacing: 0.05em;
+          font-weight: 800;
+          color: #d4af37;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
         }
 
+        .architect-badge-mini {
+          font-size: 0.58rem;
+          font-weight: 700;
+          color: #94a3b8;
+          background: rgba(255, 255, 255, 0.06);
+          padding: 2px 6px;
+          border-radius: 4px;
+          letter-spacing: 0.04em;
+        }
+
         .btn-architect-download {
-          background: rgba(197, 160, 89, 0.06);
-          border: 1px solid rgba(197, 160, 89, 0.35);
-          color: var(--accent-gold);
-          font-family: var(--font-title);
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: #e2e8f0;
+          font-size: 0.78rem;
           font-weight: 600;
-          padding: 12px;
-          border-radius: 8px;
+          padding: 10px 14px;
+          border-radius: 10px;
           cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.25s ease;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -13767,10 +13765,11 @@ export default function Home() {
         }
 
         .btn-architect-download:hover:not(:disabled) {
-          background: rgba(197, 160, 89, 0.15);
-          border-color: var(--accent-gold);
+          background: rgba(212, 175, 55, 0.08);
+          border-color: rgba(212, 175, 55, 0.4);
+          color: #ffffff;
           transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(179, 142, 71, 0.1);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         }
 
         .btn-architect-download:disabled {
@@ -13779,31 +13778,30 @@ export default function Home() {
         }
 
         .architect-desc {
-          font-size: 0.62rem;
-          color: var(--text-muted);
+          font-size: 0.63rem;
+          color: #64748b;
           text-align: center;
-          line-height: 1.3;
+          line-height: 1.35;
         }
 
         .detail-modal-content-premium .close-modal-btn {
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(255, 255, 255, 0.06);
           border: 1px solid rgba(255, 255, 255, 0.1);
-          color: rgba(255, 255, 255, 0.6);
-          width: 32px;
-          height: 32px;
+          color: #94a3b8;
+          width: 34px;
+          height: 34px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          font-size: 0.9rem;
+          transition: all 0.22s ease;
         }
         .detail-modal-content-premium .close-modal-btn:hover {
-          background: rgba(197, 160, 89, 0.15);
-          border-color: rgba(197, 160, 89, 0.5);
-          color: var(--accent-gold);
-          transform: rotate(90deg) scale(1.05);
+          background: rgba(239, 68, 68, 0.18);
+          border-color: rgba(239, 68, 68, 0.45);
+          color: #fca5a5;
+          transform: rotate(90deg);
         }
 
         .detail-right-column {
