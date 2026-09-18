@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -30,7 +31,38 @@ import {
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import AIRemodelModal from '@/components/AIRemodelModal';
-import { generateTilePreview, loadImage } from '@/components/TilePerspectiveEngine';
+
+// 3D Kiosk Studio Canvas (Loaded dynamically on client side without SSR)
+const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
+  ssr: false,
+  loading: () => (
+    <div style={{
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '12px',
+      background: '#070a10'
+    }}>
+      <div style={{
+        width: '38px',
+        height: '38px',
+        borderRadius: '50%',
+        border: '3px solid rgba(212, 175, 55, 0.2)',
+        borderTopColor: '#d4af37',
+        animation: 'spin 0.8s linear infinite'
+      }} />
+      <span style={{ fontSize: '0.84rem', fontWeight: '700', color: '#d4af37' }}>
+        3D Kiosk Tasarımı Yükleniyor...
+      </span>
+      <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+        3D mimari mekan ve seramik dokusu hazırlanıyor
+      </span>
+    </div>
+  )
+});
 
 const TURKEY_CITIES = [
   'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Amasya', 'Ankara', 'Antalya', 'Artvin', 'Aydın',
@@ -45,9 +77,15 @@ const TURKEY_CITIES = [
 ];
 
 export default function ProductDetailClient({ product, relatedProducts = [], authorizedDealers = [] }) {
-  const [activeView, setActiveView] = useState('image'); // 'image' or 'texture'
+  const [activeView, setActiveView] = useState('image'); // 'image' | 'texture' | 'room'
   const [copied, setCopied] = useState(false);
   const [showImageZoom, setShowImageZoom] = useState(false);
+
+  // 3D Kiosk State for 'room' mode
+  const [kioskRoomType, setKioskRoomType] = useState('bathroom'); // 'bathroom' | 'livingroom' | 'kitchen' | 'terrace'
+  const [kioskTimeOfDay, setKioskTimeOfDay] = useState('day'); // 'day' | 'night'
+  const [kioskApplyFloor, setKioskApplyFloor] = useState(true);
+  const [kioskApplyWalls, setKioskApplyWalls] = useState(true);
 
   // Dynamic Nearest Dealers State (strictly for this product's brand)
   const [liveDealers, setLiveDealers] = useState(authorizedDealers);
@@ -145,13 +183,17 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
         ...product,
         textureUrl: product.textureUrl || product.imageUrl || '/textures/calacatta_gold.jpg',
         imageUrl: product.imageUrl || product.textureUrl || '/textures/calacatta_gold.jpg',
+        width: tileWidth,
+        height: tileHeight,
+        style: product.style || 'Porselen',
+        finish: product.finish || 'Lappato',
         unitPrice: 480
       };
       sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
       localStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
-      window.location.href = `/kiosk?product=${product.id}`;
+      window.open(`/kiosk?product=${product.id}&room=${kioskRoomType || 'bathroom'}`, '_blank');
     } catch (e) {
-      window.location.href = `/kiosk?product=${product.id}`;
+      window.open(`/kiosk?product=${product.id}&room=${kioskRoomType || 'bathroom'}`, '_blank');
     }
   };
 
@@ -264,6 +306,26 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
   const productFinish = product.finish || 'Lappato';
   const productSubtitle = 
     `Doğal ${productStyle.toLowerCase()} dokusu, zengin detayları ve ${productFinish} yüzey işçiliği ile üretilmiş ${productDimensions} mimari porselen karo.`;
+
+  // Kiosk Product configuration for 3D StudioCanvas
+  const kioskProduct = {
+    ...product,
+    imageUrl: product.imageUrl || product.textureUrl || '/textures/calacatta_gold.jpg',
+    textureUrl: product.textureUrl || product.imageUrl || '/textures/calacatta_gold.jpg',
+    width: tileWidth,
+    height: tileHeight,
+    style: productStyle,
+    finish: productFinish,
+    unitPrice: 480
+  };
+
+  const handleSelectRoomView = () => {
+    setActiveView('room');
+    try {
+      sessionStorage.setItem('kiosk_selected_product', JSON.stringify(kioskProduct));
+      localStorage.setItem('kiosk_selected_product', JSON.stringify(kioskProduct));
+    } catch (e) {}
+  };
 
   // Dynamic Room Render state (Birebir ürün dokusunun mimari mekanda sergilenmesi)
   const [roomRenderImage, setRoomRenderImage] = useState(null);
@@ -496,41 +558,31 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              {/* Main Product Image with subtle zoom on hover */}
-              <img
-                src={currentDisplayImage}
-                alt={`${brandName} ${product.name}`}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: activeView === 'texture' || activeView === 'room' ? 'cover' : 'contain',
-                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                  padding: activeView === 'image' ? (isSquareTile ? '20px' : '28px') : '0'
-                }}
-              />
-
-              {/* Room Rendering Shimmering Loading Overlay */}
-              {isRoomRendering && (
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'rgba(7, 10, 16, 0.85)',
-                  backdropFilter: 'blur(10px)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '14px',
-                  zIndex: 25
-                }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '50%', border: '3px solid rgba(212,175,55,0.2)', borderTopColor: '#d4af37', animation: 'spin 0.8s linear infinite' }} />
-                  <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#d4af37' }}>
-                    {product.name} ({productDimensions}) Mekâna Döşeniyor...
-                  </div>
-                  <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-                    3D perspektif, ebat ve ışık yansımaları hesaplanıyor
-                  </div>
+              {/* 3D Kiosk Studio Canvas or Standard Image */}
+              {activeView === 'room' ? (
+                <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0, zIndex: 1 }}>
+                  <StudioCanvas
+                    activeProduct={kioskProduct}
+                    floorProduct={kioskProduct}
+                    wallProduct={kioskProduct}
+                    applyFloor={kioskApplyFloor}
+                    applyWalls={kioskApplyWalls}
+                    roomType={kioskRoomType}
+                    timeOfDay={kioskTimeOfDay}
+                  />
                 </div>
+              ) : (
+                <img
+                  src={currentDisplayImage}
+                  alt={`${brandName} ${product.name}`}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: activeView === 'texture' ? 'cover' : 'contain',
+                    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                    padding: activeView === 'image' ? (isSquareTile ? '20px' : '28px') : '0'
+                  }}
+                />
               )}
 
               {/* Gloss Sheen Reflection for Full Lappato / Polished Karolar */}
@@ -545,7 +597,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               )}
 
               {/* Minimal Badges Overlay (Top Left) */}
-              <div style={{ position: 'absolute', top: '18px', left: '18px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 10 }}>
+              <div style={{ position: 'absolute', top: '18px', left: '18px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 15 }}>
                 <span style={{
                   background: 'rgba(7, 10, 16, 0.85)',
                   backdropFilter: 'blur(12px)',
@@ -584,42 +636,44 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               </div>
 
               {/* Fullscreen Zoom Trigger (Top Right) */}
-              <button
-                onClick={() => setShowImageZoom(true)}
-                title="Büyük boyutta incele"
-                style={{
-                  position: 'absolute',
-                  top: '18px',
-                  right: '18px',
-                  background: 'rgba(7, 10, 16, 0.85)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  color: '#e2e8f0',
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  zIndex: 10
-                }}
-              >
-                <Maximize2 size={15} />
-              </button>
+              {activeView !== 'room' && (
+                <button
+                  onClick={() => setShowImageZoom(true)}
+                  title="Büyük boyutta incele"
+                  style={{
+                    position: 'absolute',
+                    top: '18px',
+                    right: '18px',
+                    background: 'rgba(7, 10, 16, 0.85)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    color: '#e2e8f0',
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    zIndex: 15
+                  }}
+                >
+                  <Maximize2 size={15} />
+                </button>
+              )}
 
-              {/* View Mode Notice when in 'room' mode */}
+              {/* 3D Kiosk View Overlay Controls when in 'room' mode */}
               {activeView === 'room' && (
                 <div style={{
                   position: 'absolute',
                   top: '64px',
-                  left: '18px',
-                  right: '18px',
-                  background: 'rgba(9, 13, 22, 0.9)',
+                  left: '14px',
+                  right: '14px',
+                  background: 'rgba(9, 13, 22, 0.92)',
                   backdropFilter: 'blur(12px)',
                   border: '1px solid rgba(212, 175, 55, 0.35)',
-                  padding: '8px 14px',
+                  padding: '8px 12px',
                   borderRadius: '12px',
                   fontSize: '0.74rem',
                   color: '#f1f5f9',
@@ -627,27 +681,135 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: '8px',
-                  zIndex: 10
+                  zIndex: 20
                 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Sparkles size={13} style={{ color: '#d4af37' }} />
-                    <span><strong>{product.name} ({productDimensions})</strong> Birebir 3D Mekân Simülasyonu</span>
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ 
+                      background: 'rgba(212, 175, 55, 0.2)', 
+                      color: '#d4af37', 
+                      fontSize: '0.66rem', 
+                      fontWeight: '800', 
+                      padding: '2px 7px', 
+                      borderRadius: '6px',
+                      letterSpacing: '0.05em'
+                    }}>
+                      3D KIOSK
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>
+                      👆 360° Çevirerek İncele
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <button
+                      onClick={handleLaunch3DKiosk}
+                      title="3D Kiosk Stüdyosu'nda Tam Ekran Aç"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(212, 175, 55, 0.15) 100%)',
+                        border: '1px solid rgba(212, 175, 55, 0.5)',
+                        color: '#ffffff',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        fontSize: '0.7rem',
+                        padding: '4px 10px',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <ExternalLink size={11} />
+                      <span>Kiosk'ta Aç</span>
+                    </button>
+
+                    <button
+                      onClick={() => setShowAIRemodel(true)}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        color: '#f3d375',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        fontSize: '0.7rem',
+                        padding: '4px 10px',
+                        borderRadius: '8px',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      Evinde Dene →
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Room Selector Pills for 3D Kiosk mode */}
+              {activeView === 'room' && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: '60px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: 'rgba(7, 10, 16, 0.92)',
+                  backdropFilter: 'blur(16px)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '9999px',
+                  padding: '3px 4px',
+                  gap: '3px',
+                  zIndex: 20,
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)'
+                }}>
+                  {[
+                    { id: 'bathroom', label: 'Banyo' },
+                    { id: 'livingroom', label: 'Salon' },
+                    { id: 'kitchen', label: 'Mutfak' },
+                    { id: 'terrace', label: 'Teras' }
+                  ].map(r => (
+                    <button
+                      key={r.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setKioskRoomType(r.id);
+                      }}
+                      style={{
+                        background: kioskRoomType === r.id ? 'rgba(212, 175, 55, 0.25)' : 'transparent',
+                        color: kioskRoomType === r.id ? '#ffffff' : '#94a3b8',
+                        border: kioskRoomType === r.id ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid transparent',
+                        padding: '4px 9px',
+                        borderRadius: '9999px',
+                        fontSize: '0.68rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+
+                  <div style={{ width: '1px', height: '14px', background: 'rgba(255, 255, 255, 0.15)', margin: '0 2px' }} />
+
                   <button
-                    onClick={() => setShowAIRemodel(true)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setKioskTimeOfDay(prev => prev === 'day' ? 'night' : 'day');
+                    }}
+                    title={kioskTimeOfDay === 'day' ? 'Gece Atmosferine Geç' : 'Gündüz Atmosferine Geç'}
                     style={{
-                      background: 'rgba(212, 175, 55, 0.15)',
-                      border: '1px solid rgba(212, 175, 55, 0.4)',
-                      color: '#f3d375',
-                      fontWeight: '700',
+                      background: 'transparent',
+                      color: kioskTimeOfDay === 'day' ? '#fbbf24' : '#60a5fa',
+                      border: 'none',
+                      padding: '4px 7px',
+                      borderRadius: '9999px',
+                      fontSize: '0.68rem',
+                      fontWeight: '600',
                       cursor: 'pointer',
-                      fontSize: '0.72rem',
-                      padding: '4px 10px',
-                      borderRadius: '8px',
-                      transition: 'all 0.15s ease'
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '3px'
                     }}
                   >
-                    Kendi Evinde Dene (Fotoğraf Yükle) →
+                    {kioskTimeOfDay === 'day' ? '☀️ Gündüz' : '🌙 Gece'}
                   </button>
                 </div>
               )}
@@ -663,7 +825,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 borderRadius: '9999px',
                 padding: '4px',
                 gap: '4px',
-                zIndex: 10,
+                zIndex: 20,
                 boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)'
               }}>
                 <button
@@ -711,7 +873,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 )}
 
                 <button
-                  onClick={() => setActiveView('room')}
+                  onClick={handleSelectRoomView}
                   style={{
                     background: activeView === 'room' ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.1) 100%)' : 'transparent',
                     color: activeView === 'room' ? '#ffffff' : '#94a3b8',
