@@ -289,10 +289,10 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
       const isDark = targetTile?.color?.toLowerCase().includes('antrasit') || targetTile?.color?.toLowerCase().includes('siyah');
       const isPlank = ((targetTile?.width || 60) / (targetTile?.height || 120)) <= 0.35;
 
-      // Generate preview using high-fidelity Canvas 2D engine with 3D bevels & reflections
+      // Generate preview using high-fidelity PBR 3D engine with specular reflections
       const resultDataUrl = generateTilePreview(roomImg, tileImg, surfaces, {
-        groutColor: isPlank ? '#28201a' : isDark ? '#262626' : '#cbd5e1',
-        groutWidth: 1.8,
+        groutColor: isPlank ? '#241a14' : isDark ? '#1a1a1a' : '#cbd5e1',
+        groutWidth: 1.3,
         tileWCm: targetTile?.width || 60,
         tileHCm: targetTile?.height || 120,
         finish: targetTile?.finish || 'Parlak Lappato',
