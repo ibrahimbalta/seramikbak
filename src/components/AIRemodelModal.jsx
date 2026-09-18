@@ -364,11 +364,20 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
 
       setLoadingStepText('3/3 ' + (targetTile?.name || 'Seramik') + ' eski derzler temizlenerek 3D mimari render kalitesinde giydiriliyor...');
 
-      // Load original high-res room photo and 4K tile texture
-      const tileSource = targetTile?.textureUrl || targetTile?.imageUrl || '/textures/calacatta_gold.jpg';
+      // Load original high-res room photo and 4K tile texture (routed through /api/proxy if external to bypass CORS)
+      const rawTileSource = targetTile?.textureUrl || targetTile?.imageUrl || '/textures/calacatta_gold.jpg';
+      const isHttp = typeof rawTileSource === 'string' && rawTileSource.startsWith('http');
+      const tileSource = isHttp ? `/api/proxy?url=${encodeURIComponent(rawTileSource)}` : rawTileSource;
+
+      const fallbackTexture = (targetTile?.color || '').toLowerCase().includes('siyah') || (targetTile?.color || '').toLowerCase().includes('antrasit')
+        ? '/textures/albatros_antrasit.jpg'
+        : (targetTile?.width === 20 || (targetTile?.name || '').toLowerCase().includes('ahşap'))
+        ? '/textures/natural_oak.jpg'
+        : '/textures/calacatta_gold.jpg';
+
       const [roomImg, tileImg] = await Promise.all([
         loadImage(currentPhoto),
-        loadImage(tileSource).catch(() => loadImage('/textures/calacatta_gold.jpg')),
+        loadImage(tileSource).catch(() => loadImage(fallbackTexture)),
       ]);
 
       const isDark = (targetTile?.color || '').toLowerCase().includes('antrasit') || (targetTile?.color || '').toLowerCase().includes('siyah') || (targetTile?.name || '').toLowerCase().includes('antrasit') || (targetTile?.name || '').toLowerCase().includes('siyah');
@@ -938,6 +947,34 @@ export default function AIRemodelModal({ isOpen, onClose, selectedProduct, onGoT
 
             {/* HIGH-CONVERSION ACTIONS GRID */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+              {/* Switch to 3D Architectural Studio Render if viewing user uploaded photo */}
+              {isUserUploaded && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSelectSampleRoom('/hero/luxury_bathroom.png');
+                  }}
+                  style={{
+                    gridColumn: 'span 2',
+                    padding: '13px',
+                    borderRadius: '14px',
+                    background: 'rgba(56, 189, 248, 0.14)',
+                    color: '#38bdf8',
+                    border: '1px solid rgba(56, 189, 248, 0.35)',
+                    fontWeight: '800',
+                    fontSize: '0.88rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <Sparkles size={17} />
+                  <span>🏛️ Bu Seramiği 3D Mimari Stüdyo Banyosunda Gör (3. Görsel Render Kalitesi)</span>
+                </button>
+              )}
+
               {/* Primary: Get Dealer Price */}
               <button 
                 type="button"

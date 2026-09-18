@@ -409,18 +409,7 @@ export function detectTileSurfacesClientSide(roomImg, canvasW, canvasH) {
       ],
       exclude: excludes
     },
-    walls: [
-      {
-        name: 'shower_feature_wall',
-        polygon: [
-          [15, 15],
-          [85, 15],
-          [85, horizonPct],
-          [15, horizonPct]
-        ],
-        exclude: excludes
-      }
-    ]
+    walls: [] // Keep empty on auto-detect so original walls, bathtub, mirror and shower glass remain 100% crystal sharp
   };
 }
 
@@ -672,21 +661,13 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     renderPerspectiveTiles(tCtx, wallPattern, quad, excludePixels, subdivisions, false);
   });
 
-  // Step 4: Extract De-Textured Ambient Illumination, Specular Glare & Contact Shadows
-  const { smoothLumCanvas, specCanvas, shadowCanvas } = extractDeTexturedLighting(
+  // Step 4: Extract Subtle Neutral Contact Shadows & Specular Catchlights
+  const { specCanvas, shadowCanvas } = extractDeTexturedLighting(
     roomImg,
     canvasW,
     canvasH,
     isGlossy
   );
-
-  // Apply smooth ambient illumination to tile layer (De-texturing integration)
-  // This blends room light gradient without any of the old dirty grout lines or color bleed
-  tCtx.save();
-  tCtx.globalCompositeOperation = 'multiply';
-  tCtx.globalAlpha = 0.88;
-  tCtx.drawImage(smoothLumCanvas, 0, 0);
-  tCtx.restore();
 
   // If client provided a customMaskCanvas (from MaskBrushEditor), apply it as alpha clip
   if (customMaskCanvas) {
@@ -696,13 +677,13 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     tCtx.restore();
   }
 
-  // Step 5: Draw pristine, naturally-lit tiles onto main canvas
+  // Step 5: Draw pristine, razor-sharp tiles onto main canvas
   ctx.save();
-  ctx.globalAlpha = 0.98;
+  ctx.globalAlpha = 1.0;
   ctx.drawImage(tileLayer, 0, 0);
   ctx.restore();
 
-  // Step 6: PBR Lighting Compositing
+  // Step 6: PBR Lighting Compositing (Only within rendered floor area)
   if (renderedQuads.length > 0) {
     ctx.save();
     ctx.beginPath();
@@ -716,14 +697,14 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     // 6A. Ambient Contact Shadows under furniture / fixtures
     ctx.save();
     ctx.globalCompositeOperation = 'multiply';
-    ctx.globalAlpha = isGlossy ? 0.60 : 0.75;
+    ctx.globalAlpha = 0.35;
     ctx.drawImage(shadowCanvas, 0, 0);
     ctx.restore();
 
-    // 6B. High-Pass Specular Daylight & Window Reflections
+    // 6B. Natural Specular Window Glare
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = isGlossy ? 0.92 : 0.40;
+    ctx.globalAlpha = isGlossy ? 0.35 : 0.15;
     ctx.drawImage(specCanvas, 0, 0);
     ctx.restore();
 
