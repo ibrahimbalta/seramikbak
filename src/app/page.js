@@ -1120,6 +1120,17 @@ export default function Home() {
   const [studioTimeOfDay, setStudioTimeOfDay] = useState('day'); // sunrise, day, sunset, night
   const [studioCabinetColor, setStudioCabinetColor] = useState('#5c4033'); // oak, white, anthracite, walnut
   const [studioFaucetColor, setStudioFaucetColor] = useState('chrome'); // chrome, black, gold, rosegold
+  const [studioToast, setStudioToast] = useState(null);
+
+  const showStudioToast = (msg) => {
+    setStudioToast(msg);
+    if (typeof window !== 'undefined') {
+      if (window._studioToastTimer) clearTimeout(window._studioToastTimer);
+      window._studioToastTimer = setTimeout(() => {
+        setStudioToast(null);
+      }, 3500);
+    }
+  };
 
   // AR Camera State & Controls
   const [showArCameraModal, setShowArCameraModal] = useState(false);
@@ -3259,16 +3270,132 @@ export default function Home() {
     }
   };
 
-  const navigateTo3DStudio = (product) => {
+  const getTargetLabel = (target) => {
+    switch (target) {
+      case 'floor': return 'Zemin';
+      case 'walls': return 'Ana Duvarlar';
+      case 'accent': return 'Lavabo Arkası';
+      case 'toilet': return 'Klozet Arkası';
+      case 'shower': return 'Duş İçi';
+      case 'showerFloor': return 'Duş Tabanı';
+      case 'leftWallAccent': return 'Sol Duvar Ara';
+      case 'stripe': return 'Yatay Bordür';
+      default: return 'Zemin';
+    }
+  };
+
+  const handleApplyProductToTarget = (product, targetSurface = null) => {
+    if (!product) return;
+    const target = targetSurface || studioTarget || 'floor';
     setActiveProduct(product);
-    setStudioFloorProduct(product);
-    setStudioWallProduct(product);
+    logInteraction('STUDIO_TRY', product.id, product.brandId);
+
+    if (target === 'floor') {
+      setStudioFloorProduct(product);
+      setStudioApplyFloor(true);
+    } else if (target === 'walls') {
+      setStudioWallProduct(product);
+      setStudioApplyWalls(true);
+    } else if (target === 'accent') {
+      setStudioAccentProduct(product);
+      setStudioApplyAccent(true);
+    } else if (target === 'toilet') {
+      setStudioToiletWallProduct(product);
+      setStudioApplyToiletWall(true);
+    } else if (target === 'shower') {
+      setStudioShowerProduct(product);
+      setStudioApplyShower(true);
+    } else if (target === 'showerFloor') {
+      setStudioShowerFloorProduct(product);
+      setStudioApplyShowerFloor(true);
+    } else if (target === 'leftWallAccent') {
+      setStudioLeftWallAccentProduct(product);
+      setStudioApplyLeftWallAccent(true);
+    } else if (target === 'stripe') {
+      setStudioStripeWallProduct(product);
+      setStudioApplyStripeWall(true);
+    }
+
+    showStudioToast(`✓ ${getTargetLabel(target)}: ${product.name} uygulandı`);
+  };
+
+  const handleClearSurface = (target) => {
+    if (target === 'floor') setStudioApplyFloor(false);
+    if (target === 'walls') setStudioApplyWalls(false);
+    if (target === 'accent') setStudioApplyAccent(false);
+    if (target === 'toilet') setStudioApplyToiletWall(false);
+    if (target === 'shower') setStudioApplyShower(false);
+    if (target === 'showerFloor') setStudioApplyShowerFloor(false);
+    if (target === 'leftWallAccent') setStudioApplyLeftWallAccent(false);
+    if (target === 'stripe') setStudioApplyStripeWall(false);
+    showStudioToast(`Sıfırlandı: ${getTargetLabel(target)}`);
+  };
+
+  const handleResetAllSurfaces = () => {
     setStudioApplyFloor(true);
     setStudioApplyWalls(true);
+    setStudioApplyAccent(false);
+    setStudioApplyToiletWall(false);
+    setStudioApplyShower(false);
+    setStudioApplyShowerFloor(false);
+    setStudioApplyLeftWallAccent(false);
+    setStudioApplyStripeWall(false);
+    if (activeProduct) {
+      setStudioFloorProduct(activeProduct);
+      setStudioWallProduct(activeProduct);
+    }
+    showStudioToast(`Tüm yüzeyler varsayılana sıfırlandı`);
+  };
+
+  const navigateTo3DStudio = (product, targetSurface = null) => {
+    setActiveProduct(product);
+    
+    // Yüzeye uygula: Eğer belirli bir yüzey seçilmişse oraya uygula, aksi halde zemin & duvar
+    const target = targetSurface || studioTarget || 'floor';
+    if (target === 'walls') {
+      setStudioWallProduct(product);
+      setStudioApplyWalls(true);
+    } else if (target === 'accent') {
+      setStudioAccentProduct(product);
+      setStudioApplyAccent(true);
+    } else if (target === 'toilet') {
+      setStudioToiletWallProduct(product);
+      setStudioApplyToiletWall(true);
+    } else if (target === 'shower') {
+      setStudioShowerProduct(product);
+      setStudioApplyShower(true);
+    } else if (target === 'showerFloor') {
+      setStudioShowerFloorProduct(product);
+      setStudioApplyShowerFloor(true);
+    } else if (target === 'leftWallAccent') {
+      setStudioLeftWallAccentProduct(product);
+      setStudioApplyLeftWallAccent(true);
+    } else if (target === 'stripe') {
+      setStudioStripeWallProduct(product);
+      setStudioApplyStripeWall(true);
+    } else {
+      setStudioFloorProduct(product);
+      setStudioWallProduct(product);
+      setStudioApplyFloor(true);
+      setStudioApplyWalls(true);
+    }
+
     logInteraction('STUDIO_TRY', product.id, product.brandId);
     setActiveTab('studio');
+    showStudioToast(`✨ ${product.name} 3D mekana giydirildi`);
+
+    // Kullanıcı seramik üzerindeki 3D butonuna tıkladığında doğrudan 3D tasarım alanına odakla
     if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        const studioEl = document.getElementById('studio-canvas-container') || document.getElementById('studio-interactive-section');
+        if (studioEl) {
+          const yOffset = -70; // Header payı
+          const y = studioEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 100);
     }
   };
 
@@ -5300,7 +5427,7 @@ export default function Home() {
 
         {/* TAB 2: 3D VIRTUAL STUDIO */}
         {activeTab === 'studio' && (
-          <div className="studio-portal animate-fade-in">
+          <div className="studio-portal animate-fade-in" id="studio-interactive-section">
 
             <div className="studio-layout">
               {/* Left Side Controls Panel */}
@@ -5754,143 +5881,258 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Right Side 3D Interactive Canvas */}
-              <div className="studio-canvas-panel glass-panel" style={{ position: 'relative' }}>
-                {activeProduct ? (
-                  <StudioCanvas 
-                    activeProduct={activeProduct} 
-                    floorProduct={studioFloorProduct}
-                    wallProduct={studioWallProduct}
-                    accentProduct={studioAccentProduct}
-                    showerProduct={studioShowerProduct}
-                    showerFloorProduct={studioShowerFloorProduct}
-                    toiletWallProduct={studioToiletWallProduct}
-                    leftWallAccentProduct={studioLeftWallAccentProduct}
-                    stripeWallProduct={studioStripeWallProduct}
-                    comparisonProduct={studioComparisonProduct}
-                    applyFloor={studioApplyFloor} 
-                    applyWalls={studioApplyWalls} 
-                    applyAccent={studioApplyAccent}
-                    applyShower={studioApplyShower}
-                    applyShowerFloor={studioApplyShowerFloor}
-                    applyToiletWall={studioApplyToiletWall}
-                    applyLeftWallAccent={studioApplyLeftWallAccent}
-                    applyStripeWall={studioApplyStripeWall}
-                    comparisonMode={studioComparisonMode}
-                    comparisonSplit={studioComparisonSplit}
-                    walkthroughMode={studioWalkthroughMode}
-                    onToggleTarget={(target) => {
-                      if (target === 'floor') {
-                        if (studioApplyFloor && studioFloorProduct?.id === activeProduct?.id) {
-                          setStudioApplyFloor(false);
-                        } else {
-                          setStudioFloorProduct(activeProduct);
-                          setStudioApplyFloor(true);
-                        }
-                      }
-                      if (target === 'walls') {
-                        if (studioApplyWalls && studioWallProduct?.id === activeProduct?.id) {
-                          setStudioApplyWalls(false);
-                        } else {
-                          setStudioWallProduct(activeProduct);
-                          setStudioApplyWalls(true);
-                        }
-                      }
-                      if (target === 'shower') {
-                        if (studioApplyShower && studioShowerProduct?.id === activeProduct?.id) {
-                          setStudioApplyShower(false);
-                        } else {
-                          setStudioShowerProduct(activeProduct);
-                          setStudioApplyShower(true);
-                        }
-                      }
-                      if (target === 'showerFloor') {
-                        if (studioApplyShowerFloor && studioShowerFloorProduct?.id === activeProduct?.id) {
-                          setStudioApplyShowerFloor(false);
-                        } else {
-                          setStudioShowerFloorProduct(activeProduct);
-                          setStudioApplyShowerFloor(true);
-                        }
-                      }
-                      if (target === 'toilet') {
-                        if (studioApplyToiletWall && studioToiletWallProduct?.id === activeProduct?.id) {
-                          setStudioApplyToiletWall(false);
-                        } else {
-                          setStudioToiletWallProduct(activeProduct);
-                          setStudioApplyToiletWall(true);
-                        }
-                      }
-                      if (target === 'accent') {
-                        if (studioApplyAccent && studioAccentProduct?.id === activeProduct?.id) {
-                          setStudioApplyAccent(false);
-                        } else {
-                          setStudioAccentProduct(activeProduct);
-                          setStudioApplyAccent(true);
-                        }
-                      }
-                      if (target === 'leftWallAccent') {
-                        if (studioApplyLeftWallAccent && studioLeftWallAccentProduct?.id === activeProduct?.id) {
-                          setStudioApplyLeftWallAccent(false);
-                        } else {
-                          setStudioLeftWallAccentProduct(activeProduct);
-                          setStudioApplyLeftWallAccent(true);
-                        }
-                      }
-                      if (target === 'stripe') {
-                        if (studioApplyStripeWall && studioStripeWallProduct?.id === activeProduct?.id) {
-                          setStudioApplyStripeWall(false);
-                        } else {
-                          setStudioStripeWallProduct(activeProduct);
-                          setStudioApplyStripeWall(true);
-                        }
-                      }
-                    }}
-                    roomType={studioRoomType}
-                    groutWidth={studioGroutWidth}
-                    groutColor={studioGroutColor}
-                    lightTemp={studioLightTemp}
-                    lightIntensity={studioLightIntensity}
-                    tileRotation={studioTileRotation}
-                    layPattern={studioLayPattern}
-                    timeOfDay={studioTimeOfDay}
-                    cabinetColor={studioCabinetColor}
-                    faucetColor={studioFaucetColor}
-                  />
-                ) : (
-                  <div className="canvas-placeholder">
-                    <Layers size={48} />
-                    <p>3D model yüklemek için bir karo seçin.</p>
+              {/* Right Side 3D Interactive Canvas & Direct Controls Area */}
+              <div className="studio-canvas-panel glass-panel" id="studio-canvas-container" style={{ position: 'relative' }}>
+                {/* 1. TOP TOOLBAR: Room Switcher & Quick Mode Chips */}
+                <div className="studio-top-canvas-bar">
+                  <div className="room-chips-scroll">
+                    <span className="room-chips-title">🏛️ Mekan:</span>
+                    {[
+                      { id: 'bathroom', label: 'Banyo', icon: '🛁' },
+                      { id: 'livingroom', label: 'Salon', icon: '🛋️' },
+                      { id: 'kitchen', label: 'Mutfak', icon: '🍳' },
+                      { id: 'hallway', label: 'Antre', icon: '🚪' },
+                      { id: 'terrace', label: 'Teras', icon: '☀️' },
+                      { id: 'bedroom', label: 'Yatak Odası', icon: '🛏️' }
+                    ].map(r => (
+                      <button
+                        key={r.id}
+                        type="button"
+                        className={`room-chip-btn ${studioRoomType === r.id ? 'active' : ''}`}
+                        onClick={() => handleStudioRoomTypeChange(r.id)}
+                      >
+                        <span>{r.icon}</span>
+                        <span>{r.label}</span>
+                      </button>
+                    ))}
                   </div>
-                )}
-              </div>
-            </div>
 
-            {/* Bottom Quick Product Swapper Carousel */}
-            <div className="quick-swapper-drawer glass-panel" style={{ marginTop: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '800' }}>⚡ Hızlı Seramik Seçimi (Dene & Giydir)</h4>
-                <button 
-                  onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
-                  style={{ background: 'none', border: 'none', color: 'var(--accent-gold)', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
-                >
-                  Tüm Kataloğu İncele →
-                </button>
-              </div>
-              <div className="swapper-grid">
-                {products.slice(0, 8).map((prod) => (
-                  <div 
-                    key={prod.id} 
-                    onClick={() => navigateTo3DStudio(prod)}
-                    className={`swapper-card ${activeProduct?.id === prod.id ? 'active' : ''}`}
-                    style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
-                  >
-                    <TileVisualPreview style={prod.style} color={prod.color} finish={prod.finish} width={prod.width} height={prod.height} imageUrl={prod.imageUrl} />
-                    <div className="swapper-label">
-                      <span>{prod.name}</span>
-                      <small>{prod.brand?.name} • {prod.width}x{prod.height}</small>
+                  <div className="canvas-header-actions">
+                    <button 
+                      type="button"
+                      onClick={() => setStudioWalkthroughMode(!studioWalkthroughMode)}
+                      className={`canvas-mode-btn ${studioWalkthroughMode ? 'active-walk' : ''}`}
+                      title="360° Oda İçi Gezinti"
+                    >
+                      <Sparkles size={13} />
+                      <span>{studioWalkthroughMode ? 'Dış Kamera' : '360° Gezinti'}</span>
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const next = !studioComparisonMode;
+                        setStudioComparisonMode(next);
+                        if (next && !studioComparisonProduct && products.length > 1) {
+                          setStudioComparisonProduct(products[1]);
+                        }
+                      }}
+                      className={`canvas-mode-btn ${studioComparisonMode ? 'active-compare' : ''}`}
+                      title="İki Farklı Seramiği Yan Yana Kıyaslayın"
+                    >
+                      <span>{studioComparisonMode ? '✓ Kıyaslama Açık' : '⚖️ 3D Kıyasla'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. 3D CANVAS VIEWPORT */}
+                <div className="studio-canvas-viewport-box" style={{ position: 'relative' }}>
+                  {activeProduct ? (
+                    <StudioCanvas 
+                      activeProduct={activeProduct} 
+                      floorProduct={studioFloorProduct}
+                      wallProduct={studioWallProduct}
+                      accentProduct={studioAccentProduct}
+                      showerProduct={studioShowerProduct}
+                      showerFloorProduct={studioShowerFloorProduct}
+                      toiletWallProduct={studioToiletWallProduct}
+                      leftWallAccentProduct={studioLeftWallAccentProduct}
+                      stripeWallProduct={studioStripeWallProduct}
+                      comparisonProduct={studioComparisonProduct}
+                      applyFloor={studioApplyFloor} 
+                      applyWalls={studioApplyWalls} 
+                      applyAccent={studioApplyAccent}
+                      applyShower={studioApplyShower}
+                      applyShowerFloor={studioApplyShowerFloor}
+                      applyToiletWall={studioApplyToiletWall}
+                      applyLeftWallAccent={studioApplyLeftWallAccent}
+                      applyStripeWall={studioApplyStripeWall}
+                      comparisonMode={studioComparisonMode}
+                      comparisonSplit={studioComparisonSplit}
+                      walkthroughMode={studioWalkthroughMode}
+                      onToggleTarget={(target) => {
+                        setStudioTarget(target);
+                        if (target === 'floor') setStudioApplyFloor(!studioApplyFloor);
+                        if (target === 'walls') setStudioApplyWalls(!studioApplyWalls);
+                        if (target === 'shower') setStudioApplyShower(!studioApplyShower);
+                        if (target === 'showerFloor') setStudioApplyShowerFloor(!studioApplyShowerFloor);
+                        if (target === 'toilet') setStudioApplyToiletWall(!studioApplyToiletWall);
+                        if (target === 'accent') setStudioApplyAccent(!studioApplyAccent);
+                        if (target === 'leftWallAccent') setStudioApplyLeftWallAccent(!studioApplyLeftWallAccent);
+                        if (target === 'stripe') setStudioApplyStripeWall(!studioApplyStripeWall);
+                      }}
+                      roomType={studioRoomType}
+                      groutWidth={studioGroutWidth}
+                      groutColor={studioGroutColor}
+                      lightTemp={studioLightTemp}
+                      lightIntensity={studioLightIntensity}
+                      tileRotation={studioTileRotation}
+                      layPattern={studioLayPattern}
+                      timeOfDay={studioTimeOfDay}
+                      cabinetColor={studioCabinetColor}
+                      faucetColor={studioFaucetColor}
+                    />
+                  ) : (
+                    <div className="canvas-placeholder">
+                      <Layers size={48} />
+                      <p>3D model yüklemek için bir karo seçin.</p>
+                    </div>
+                  )}
+
+                  {/* Floating Feedback Toast */}
+                  {studioToast && (
+                    <div className="studio-toast-banner animate-fade-in">
+                      <Sparkles size={14} className="gold-text" />
+                      <span>{studioToast}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. 🧱 SERAMİK GİYDİRME YÜZEYLERİ (DIRECTLY UNDER 3D CANVAS) */}
+                <div className="studio-attached-surfaces-section">
+                  <div className="surface-section-header">
+                    <div className="surface-header-left">
+                      <Layers size={16} className="gold-text" />
+                      <div>
+                        <strong className="surface-header-title">🧱 Seramik Giydirme Yüzeyleri:</strong>
+                        <span className="surface-header-sub">Kaplamak istediğiniz yüzeye dokunun, ardından alttaki seramiklerden dilediğinizi giydirin.</span>
+                      </div>
+                    </div>
+                    <div className="surface-active-target-badge">
+                      <span>Aktif Hedef:</span>
+                      <strong className="gold-text">{getTargetLabel(studioTarget)}</strong>
                     </div>
                   </div>
-                ))}
+
+                  {/* Surface Chips Grid */}
+                  <div className="surface-pills-wrap">
+                    {[
+                      { id: 'floor', label: 'Zemin', icon: '🏠', applied: studioApplyFloor && studioFloorProduct, product: studioFloorProduct },
+                      { id: 'walls', label: 'Ana Duvarlar', icon: '🧱', applied: studioApplyWalls && studioWallProduct, product: studioWallProduct },
+                      { id: 'accent', label: 'Lavabo Arkası', icon: '🪞', applied: studioApplyAccent && studioAccentProduct, product: studioAccentProduct },
+                      { id: 'toilet', label: 'Klozet Arkası', icon: '🚾', applied: studioApplyToiletWall && studioToiletWallProduct, product: studioToiletWallProduct },
+                      { id: 'shower', label: 'Duş İçi', icon: '🚿', applied: studioApplyShower && studioShowerProduct, product: studioShowerProduct },
+                      { id: 'showerFloor', label: 'Duş Tabanı', icon: '🚿', applied: studioApplyShowerFloor && studioShowerFloorProduct, product: studioShowerFloorProduct },
+                      { id: 'stripe', label: 'Yatay Bordür', icon: '➖', applied: studioApplyStripeWall && studioStripeWallProduct, product: studioStripeWallProduct },
+                      { id: 'leftWallAccent', label: 'Sol Duvar Ara', icon: '📐', applied: studioApplyLeftWallAccent && studioLeftWallAccentProduct, product: studioLeftWallAccentProduct }
+                    ].map((surf) => {
+                      const isTarget = studioTarget === surf.id;
+                      const hasTile = surf.applied;
+                      return (
+                        <div 
+                          key={surf.id}
+                          onClick={() => setStudioTarget(surf.id)}
+                          className={`surface-pill-card ${isTarget ? 'is-target' : ''} ${hasTile ? 'is-dressed' : ''}`}
+                        >
+                          <div className="pill-top">
+                            <span className="pill-icon">{surf.icon}</span>
+                            <span className="pill-label">{surf.label}</span>
+                            {hasTile && <span className="pill-check">✓</span>}
+                          </div>
+                          
+                          <div className="pill-bottom">
+                            {hasTile && surf.product ? (
+                              <span className="pill-prod-name">{surf.product.name?.split(' ')[0]} {surf.product.code || ''}</span>
+                            ) : (
+                              <span className="pill-empty-state">{isTarget ? '👉 Seçili' : 'Standart'}</span>
+                            )}
+
+                            {hasTile && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleClearSurface(surf.id);
+                                }}
+                                className="pill-clear-btn"
+                                title="Kaplamayı Kaldır"
+                              >
+                                ✕
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Quick Inline Adjustment Bar (Döşeme Deseni & Işık) */}
+                  <div className="surface-quick-adjustments-bar">
+                    <div className="quick-adj-col">
+                      <span className="quick-adj-label">📐 Desen:</span>
+                      <div className="quick-adj-pills">
+                        <button type="button" className={studioLayPattern === 'flat' ? 'active' : ''} onClick={() => setStudioLayPattern('flat')}>Düz</button>
+                        <button type="button" className={studioLayPattern === 'diagonal' ? 'active' : ''} onClick={() => setStudioLayPattern('diagonal')}>Çapraz</button>
+                        <button type="button" className={studioLayPattern === 'herringbone' ? 'active' : ''} onClick={() => setStudioLayPattern('herringbone')}>Balıksırtı</button>
+                        <button type="button" className={studioLayPattern === 'staggered_50' ? 'active' : ''} onClick={() => setStudioLayPattern('staggered_50')}>Tuğla</button>
+                      </div>
+                    </div>
+
+                    <div className="quick-adj-col">
+                      <span className="quick-adj-label">☀️ Işık:</span>
+                      <div className="quick-adj-pills">
+                        <button type="button" className={studioTimeOfDay === 'day' ? 'active' : ''} onClick={() => setStudioTimeOfDay('day')}>Gündüz</button>
+                        <button type="button" className={studioTimeOfDay === 'sunset' ? 'active' : ''} onClick={() => setStudioTimeOfDay('sunset')}>Günbatımı</button>
+                        <button type="button" className={studioTimeOfDay === 'night' ? 'active' : ''} onClick={() => setStudioTimeOfDay('night')}>Gece</button>
+                      </div>
+                    </div>
+
+                    <button 
+                      type="button" 
+                      onClick={handleResetAllSurfaces} 
+                      className="quick-adj-reset-btn"
+                      title="Tüm kaplamaları sıfırla"
+                    >
+                      🔄 Sıfırla
+                    </button>
+                  </div>
+                </div>
+
+                {/* 4. ⚡ HIZLI SERAMİK SEÇİMİ (DENE & GİYDİR) - POSITIONED DIRECTLY UNDER THE SURFACE SELECTOR */}
+                <div className="quick-swapper-drawer glass-panel" style={{ marginTop: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: '800' }}>⚡ Hızlı Seramik Seçimi (Dene & Giydir)</h4>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--accent-gold)', background: 'rgba(212,175,55,0.12)', padding: '2px 8px', borderRadius: '12px', fontWeight: '700' }}>
+                        Hedef: {getTargetLabel(studioTarget)}
+                      </span>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => { setActiveTab('search'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+                      style={{ background: 'none', border: 'none', color: 'var(--accent-gold)', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer' }}
+                    >
+                      Tüm Kataloğu İncele →
+                    </button>
+                  </div>
+                  <div className="swapper-grid">
+                    {products.slice(0, 10).map((prod) => (
+                      <div 
+                        key={prod.id} 
+                        onClick={() => handleApplyProductToTarget(prod, studioTarget)}
+                        className={`swapper-card ${(studioTarget === 'floor' && studioFloorProduct?.id === prod.id) || (studioTarget === 'walls' && studioWallProduct?.id === prod.id) || (activeProduct?.id === prod.id) ? 'active' : ''}`}
+                        style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }}
+                        title={`${prod.name} modelini ${getTargetLabel(studioTarget)} yüzeyine uygula`}
+                      >
+                        <TileVisualPreview style={prod.style} color={prod.color} finish={prod.finish} width={prod.width} height={prod.height} imageUrl={prod.imageUrl} />
+                        <div className="swapper-label">
+                          <span>{prod.name}</span>
+                          <small>{prod.brand?.name} • {prod.width}x{prod.height}</small>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -11757,16 +11999,22 @@ export default function Home() {
           display: grid;
           grid-template-columns: 320px 1fr;
           gap: 20px;
-          height: 600px;
+          min-height: 600px;
         }
 
         @media (max-width: 900px) {
           .studio-layout {
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
             height: auto;
           }
           .studio-canvas-panel {
-            height: 400px;
+            order: -1;
+            width: 100%;
+          }
+          .studio-control-panel {
+            order: 2;
           }
         }
 
@@ -11906,6 +12154,391 @@ export default function Home() {
 
         .studio-canvas-panel {
           overflow: hidden;
+          background: #ffffff;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .studio-top-canvas-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 10px 16px;
+          background: #ffffff;
+          border-bottom: 1px solid var(--border-color, #e5e7eb);
+          flex-wrap: wrap;
+        }
+
+        .room-chips-scroll {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .room-chips-scroll::-webkit-scrollbar {
+          display: none;
+        }
+
+        .room-chips-title {
+          font-size: 0.75rem;
+          font-weight: 800;
+          color: var(--text-secondary, #6b7280);
+          white-space: nowrap;
+          margin-right: 2px;
+        }
+
+        .room-chip-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 5px 11px;
+          font-size: 0.74rem;
+          font-weight: 700;
+          color: var(--text-primary, #1f2937);
+          background: #f3f4f6;
+          border: 1px solid #e5e7eb;
+          border-radius: 20px;
+          cursor: pointer;
+          white-space: nowrap;
+          transition: all 0.2s ease;
+        }
+
+        .room-chip-btn:hover {
+          background: #e5e7eb;
+          border-color: #d1d5db;
+        }
+
+        .room-chip-btn.active {
+          background: var(--accent-gold, #d4af37);
+          color: #ffffff;
+          border-color: var(--accent-gold, #d4af37);
+          box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+        }
+
+        .canvas-header-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .canvas-mode-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 5px 12px;
+          font-size: 0.74rem;
+          font-weight: 700;
+          border-radius: 20px;
+          cursor: pointer;
+          border: 1px solid #e5e7eb;
+          background: #f8fafc;
+          color: var(--text-primary, #1f2937);
+          transition: all 0.2s ease;
+        }
+
+        .canvas-mode-btn:hover {
+          background: #f1f5f9;
+        }
+
+        .canvas-mode-btn.active-walk {
+          background: #2563eb;
+          color: #ffffff;
+          border-color: #1d4ed8;
+          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .canvas-mode-btn.active-compare {
+          background: #059669;
+          color: #ffffff;
+          border-color: #047857;
+          box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+        }
+
+        .studio-canvas-viewport-box {
+          position: relative;
+          width: 100%;
+          height: 520px;
+          background: #0f172a;
+        }
+
+        @media (max-width: 900px) {
+          .studio-canvas-viewport-box {
+            height: 380px;
+          }
+        }
+
+        .studio-toast-banner {
+          position: absolute;
+          top: 14px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(17, 24, 39, 0.92);
+          backdrop-filter: blur(8px);
+          color: #ffffff;
+          padding: 8px 18px;
+          border-radius: 30px;
+          border: 1px solid rgba(212, 175, 55, 0.45);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.8rem;
+          font-weight: 700;
+          z-index: 50;
+          pointer-events: none;
+        }
+
+        .studio-attached-surfaces-section {
+          background: #ffffff;
+          border-top: 1px solid var(--border-color, #e5e7eb);
+          padding: 14px 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .surface-section-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .surface-header-left {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .surface-header-title {
+          font-size: 0.92rem;
+          font-weight: 800;
+          color: var(--text-primary, #111827);
+          display: block;
+        }
+
+        .surface-header-sub {
+          font-size: 0.72rem;
+          color: var(--text-secondary, #6b7280);
+          display: block;
+        }
+
+        .surface-active-target-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 12px;
+          background: rgba(212, 175, 55, 0.12);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          border-radius: 16px;
+          font-size: 0.74rem;
+          color: var(--text-primary, #111827);
+        }
+
+        .surface-pills-wrap {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+          gap: 8px;
+        }
+
+        @media (max-width: 600px) {
+          .surface-pills-wrap {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        .surface-pill-card {
+          background: #f8fafc;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 8px;
+          padding: 8px 10px;
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          user-select: none;
+        }
+
+        .surface-pill-card:hover {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+          transform: translateY(-1px);
+        }
+
+        .surface-pill-card.is-target {
+          background: #fffdf5;
+          border-color: var(--accent-gold, #d4af37);
+          box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.25), 0 4px 12px rgba(212, 175, 55, 0.15);
+        }
+
+        .surface-pill-card.is-dressed {
+          background: #f0fdf4;
+          border-color: #86efac;
+        }
+
+        .surface-pill-card.is-target.is-dressed {
+          background: #fffdf5;
+          border-color: var(--accent-gold, #d4af37);
+          box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.3);
+        }
+
+        .pill-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 4px;
+        }
+
+        .pill-icon {
+          font-size: 0.85rem;
+        }
+
+        .pill-label {
+          font-size: 0.74rem;
+          font-weight: 700;
+          color: var(--text-primary, #1e293b);
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .pill-check {
+          font-size: 0.7rem;
+          font-weight: 900;
+          color: #16a34a;
+          background: rgba(22, 163, 74, 0.12);
+          border-radius: 50%;
+          width: 16px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .pill-bottom {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 4px;
+          min-height: 18px;
+        }
+
+        .pill-prod-name {
+          font-size: 0.68rem;
+          font-weight: 600;
+          color: var(--text-secondary, #475569);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          flex: 1;
+        }
+
+        .pill-empty-state {
+          font-size: 0.66rem;
+          color: var(--text-muted, #94a3b8);
+          font-style: italic;
+        }
+
+        .is-target .pill-empty-state {
+          color: var(--accent-gold, #b38e47);
+          font-weight: 700;
+          font-style: normal;
+        }
+
+        .pill-clear-btn {
+          background: rgba(239, 68, 68, 0.1);
+          color: #dc2626;
+          border: none;
+          width: 18px;
+          height: 18px;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.65rem;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          flex-shrink: 0;
+        }
+
+        .pill-clear-btn:hover {
+          background: #dc2626;
+          color: #ffffff;
+        }
+
+        .surface-quick-adjustments-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding-top: 8px;
+          border-top: 1px solid #f1f5f9;
+          flex-wrap: wrap;
+        }
+
+        .quick-adj-col {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .quick-adj-label {
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: var(--text-secondary, #64748b);
+          white-space: nowrap;
+        }
+
+        .quick-adj-pills {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          background: #f1f5f9;
+          padding: 2px;
+          border-radius: 6px;
+        }
+
+        .quick-adj-pills button {
+          border: none;
+          background: transparent;
+          padding: 4px 8px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          color: var(--text-secondary, #64748b);
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+
+        .quick-adj-pills button.active {
+          background: #ffffff;
+          color: var(--text-primary, #0f172a);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .quick-adj-reset-btn {
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          color: var(--text-secondary, #64748b);
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+
+        .quick-adj-reset-btn:hover {
+          background: #fee2e2;
+          color: #b91c1c;
+          border-color: #fca5a5;
         }
 
         .quick-swapper-drawer {
