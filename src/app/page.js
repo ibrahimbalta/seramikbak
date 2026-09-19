@@ -6447,47 +6447,6 @@ export default function Home() {
                     brandName={detailProduct.brand?.name}
                   />
                 </div>
-                
-                <div className="detail-specs-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-                  <div className="spec-item-box">
-                    <span className="spec-lbl">Boyut</span>
-                    <span className="spec-val">{detailProduct.width}x{detailProduct.height} cm</span>
-                  </div>
-                  <div className="spec-item-box">
-                    <span className="spec-lbl">Yüzey Tipi</span>
-                    <span className="spec-val">{detailProduct.finish}</span>
-                  </div>
-                  <div className="spec-item-box">
-                    <span className="spec-lbl">Malzeme</span>
-                    <span className="spec-val">{detailProduct.style}</span>
-                  </div>
-                  <div className="spec-item-box">
-                    <span className="spec-lbl">Kullanım Alanı</span>
-                    <span className="spec-val" title={String(detailProduct.area || '')}>
-                      {detailProduct.area ? (typeof detailProduct.area === 'string' ? detailProduct.area.split(',').slice(0, 2).join(', ') : Array.isArray(detailProduct.area) ? detailProduct.area.slice(0, 2).join(', ') : String(detailProduct.area)) : 'Zemin/Duvar'}
-                    </span>
-                  </div>
-                  <div className="spec-item-box">
-                    <span className="spec-lbl">Aşınma (PEI)</span>
-                    <span className="spec-val">{detailProduct.peiRating ? `PEI ${detailProduct.peiRating}` : 'N/A'}</span>
-                  </div>
-                  <div className="spec-item-box">
-                    <span className="spec-lbl">Kaymazlık</span>
-                    <span className="spec-val">{detailProduct.slipResistance || 'N/A'}</span>
-                  </div>
-                  <div className="spec-item-box">
-                    <span className="spec-lbl">Kalınlık</span>
-                    <span className="spec-val">{detailProduct.thickness ? `${detailProduct.thickness} mm` : 'N/A'}</span>
-                  </div>
-                  <div className="spec-item-box">
-                    <span className="spec-lbl">Kenar Kesim</span>
-                    <span className="spec-val">{detailProduct.rectified !== null ? (detailProduct.rectified ? 'Rektifiyeli' : 'Rektifiyesiz') : 'N/A'}</span>
-                  </div>
-                  <div className="spec-item-box">
-                    <span className="spec-lbl">Dona Dayanım</span>
-                    <span className="spec-val">{detailProduct.frostResistance !== null ? (detailProduct.frostResistance ? 'Evet' : 'Hayır') : 'N/A'}</span>
-                  </div>
-                </div>
 
                 <div className="detail-primary-actions">
                   {/* 1. Primary 3D Studio & Tasarım Action */}
@@ -6582,6 +6541,47 @@ export default function Home() {
                       <ChevronRight size={13} />
                     </div>
                   </Link>
+                </div>
+
+                <div className="detail-specs-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+                  <div className="spec-item-box">
+                    <span className="spec-lbl">Boyut</span>
+                    <span className="spec-val">{detailProduct.width}x{detailProduct.height} cm</span>
+                  </div>
+                  <div className="spec-item-box">
+                    <span className="spec-lbl">Yüzey Tipi</span>
+                    <span className="spec-val">{detailProduct.finish}</span>
+                  </div>
+                  <div className="spec-item-box">
+                    <span className="spec-lbl">Malzeme</span>
+                    <span className="spec-val">{detailProduct.style}</span>
+                  </div>
+                  <div className="spec-item-box">
+                    <span className="spec-lbl">Kullanım Alanı</span>
+                    <span className="spec-val" title={String(detailProduct.area || '')}>
+                      {detailProduct.area ? (typeof detailProduct.area === 'string' ? detailProduct.area.split(',').slice(0, 2).join(', ') : Array.isArray(detailProduct.area) ? detailProduct.area.slice(0, 2).join(', ') : String(detailProduct.area)) : 'Zemin/Duvar'}
+                    </span>
+                  </div>
+                  <div className="spec-item-box">
+                    <span className="spec-lbl">Aşınma (PEI)</span>
+                    <span className="spec-val">{detailProduct.peiRating ? `PEI ${detailProduct.peiRating}` : 'N/A'}</span>
+                  </div>
+                  <div className="spec-item-box">
+                    <span className="spec-lbl">Kaymazlık</span>
+                    <span className="spec-val">{detailProduct.slipResistance || 'N/A'}</span>
+                  </div>
+                  <div className="spec-item-box">
+                    <span className="spec-lbl">Kalınlık</span>
+                    <span className="spec-val">{detailProduct.thickness ? `${detailProduct.thickness} mm` : 'N/A'}</span>
+                  </div>
+                  <div className="spec-item-box">
+                    <span className="spec-lbl">Kenar Kesim</span>
+                    <span className="spec-val">{detailProduct.rectified !== null ? (detailProduct.rectified ? 'Rektifiyeli' : 'Rektifiyesiz') : 'N/A'}</span>
+                  </div>
+                  <div className="spec-item-box">
+                    <span className="spec-lbl">Dona Dayanım</span>
+                    <span className="spec-val">{detailProduct.frostResistance !== null ? (detailProduct.frostResistance ? 'Evet' : 'Hayır') : 'N/A'}</span>
+                  </div>
                 </div>
 
                 {/* MİMAR VE TASARIMCILAR İÇİN DOKU PORTALI */}
