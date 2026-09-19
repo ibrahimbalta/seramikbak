@@ -135,7 +135,7 @@ export function formatQuoteWhatsAppText(quote, dealerInfo = {}) {
     shippingCostTotal: quote.shippingCostTotal !== undefined ? quote.shippingCostTotal : quote.shippingCost
   });
 
-  const dealerName = dealerInfo?.name || quote.dealerName || 'Yetkili Seramik Bayisi';
+  const dealerName = dealerInfo?.name || quote.dealerName || 'Yetkili Satış Mağazası';
   const district = dealerInfo?.district || quote.dealerDistrict || '';
   const city = dealerInfo?.city || quote.dealerCity || '';
   const locationParts = [district, city].filter(Boolean);
@@ -145,13 +145,15 @@ export function formatQuoteWhatsAppText(quote, dealerInfo = {}) {
   const prodName = quote.productName || 'Seramik Porselen Karo';
   const prodCode = quote.productCode || '';
   const projectName = quote.projectName || '';
-  const dealerSlug = dealerInfo?.slug || quote.dealerSlug || (dealerName ? slugify(dealerName) : '');
+  const isWhiteLabel = quote.isWhiteLabel || quote.hidePlatformBranding || Boolean(dealerInfo?.name || quote.dealerName);
 
   let studioUrl = '';
-  if (prodCode) {
+  // Sadece platform üzerinden doğrudan tüketici tekliflerinde link eklenir; bayinin müşterisine verdiği teklifte üçüncü taraf link eklenmez
+  if (!isWhiteLabel && prodCode) {
     const params = new URLSearchParams();
     params.set('code', prodCode);
     params.set('tab', 'studio');
+    const dealerSlug = dealerInfo?.slug || quote.dealerSlug || (dealerName ? slugify(dealerName) : '');
     if (dealerSlug) params.set('dealer', dealerSlug);
     studioUrl = `https://www.seramikbak.com/?${params.toString()}`;
   }

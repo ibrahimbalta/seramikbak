@@ -9,18 +9,18 @@ export default function QuotePDFTemplate({ quote, onClose }) {
 
   const {
     id = '',
-    dealerName = 'Yetkili Bayi',
+    dealerName = 'Yetkili Satış Mağazası',
     dealerPhone = '',
     dealerAddress = '',
     dealerCity = '',
     dealerLogoUrl = null,
-    brandName = 'SeramikBak',
+    brandName = '',
     customerName = 'Müşteri',
     customerPhone = '',
     customerEmail = '',
     projectName = 'Seramik Projesi',
     productName = 'Seramik Karo',
-    productCode = 'SB-PRODUCT',
+    productCode = 'PRD-CUSTOM',
     productImageUrl = '/hero/hero_ceramics.jpg',
     calculations = {},
     notes = '',
@@ -99,8 +99,8 @@ export default function QuotePDFTemplate({ quote, onClose }) {
             )}
             <div className="dealer-info">
               <h3>{dealerName}</h3>
-              <p><MapPin size={12} /> {dealerAddress} {dealerCity}</p>
-              <p><Phone size={12} /> {dealerPhone} | Yetkili Seramik Bayisi</p>
+              {dealerAddress && <p><MapPin size={12} /> {dealerAddress} {dealerCity}</p>}
+              <p><Phone size={12} /> {dealerPhone ? `${dealerPhone} | Yetkili Satış Mağazası` : 'Yetkili Satış Mağazası'}</p>
             </div>
           </div>
 
@@ -124,7 +124,11 @@ export default function QuotePDFTemplate({ quote, onClose }) {
           <div className="info-box">
             <h4>PROJE / MEKAN BİLGİLERİ</h4>
             <div className="info-line"><strong>Proje Adı:</strong> {projectName}</div>
-            <div className="info-line"><strong>Tedarikçi Marka:</strong> {brandName}</div>
+            {brandName ? (
+              <div className="info-line"><strong>Tedarikçi Marka:</strong> {brandName}</div>
+            ) : (
+              <div className="info-line"><strong>Ürün Sınıfı:</strong> 1. Sınıf Orijinal Fabrika Ürünü</div>
+            )}
             <div className="info-line"><strong>Garanti Statüsü:</strong> %100 Orijinal Fabrika Garantili</div>
           </div>
         </div>
@@ -133,7 +137,7 @@ export default function QuotePDFTemplate({ quote, onClose }) {
         {productImageUrl && (
           <div className="3d-snapshot-box" style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#0f172a', textAlign: 'center', padding: '8px' }}>
             <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#d4af37', marginBottom: '4px', textTransform: 'uppercase' }}>
-              3D MEKAN TASARIM ÖNİZLEMESİ (SHOWROOM STÜDYO)
+              3D MEKAN TASARIM ÖNİZLEMESİ
             </div>
             <img src={productImageUrl} alt="3D Tasarım" style={{ maxHeight: '200px', width: 'auto', margin: '0 auto', borderRadius: '6px', objectFit: 'contain' }} />
           </div>

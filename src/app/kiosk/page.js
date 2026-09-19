@@ -192,6 +192,22 @@ export default function ShowroomKioskPage() {
 
     let targetProduct = null;
 
+    // 0. Bayi Oturumu Kontrolü (Giriş yapan bayinin bilgilerini yükle)
+    try {
+      const savedDealer = localStorage.getItem('sb_dealer_session');
+      if (savedDealer) {
+        const parsedDealer = JSON.parse(savedDealer);
+        if (parsedDealer && (parsedDealer.id || parsedDealer.name)) {
+          setSelectedDealer(parsedDealer);
+          if (parsedDealer.brandId) {
+            setSelectedBrandId(parsedDealer.brandId);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Kiosk dealer session read error:', e);
+    }
+
     // 1. Session / Local Storage kontrolü (İlham, Showroom ve Mimar portalından tıklanınca anında aktarılan ürün)
     try {
       const stored = sessionStorage.getItem('kiosk_selected_product') || localStorage.getItem('kiosk_selected_product');
@@ -305,7 +321,31 @@ export default function ShowroomKioskPage() {
           setBrands(brandRes);
         }
 
-        if (dealerRes && dealerRes.dealers && dealerRes.dealers.length > 0) {
+        // Eğer localStorage'da giriş yapmış bir bayi varsa onu koru; yoksa ilk bayiyi ata
+        let hasActiveSession = false;
+        if (typeof window !== 'undefined') {
+          try {
+            const saved = localStorage.getItem('sb_dealer_session');
+            if (saved) {
+              const parsed = JSON.parse(saved);
+              if (parsed && (parsed.id || parsed.name)) {
+                hasActiveSession = true;
+                if (dealerRes && dealerRes.dealers) {
+                  const dbMatch = dealerRes.dealers.find(d => d.id === parsed.id || d.email === parsed.email);
+                  if (dbMatch) {
+                    setSelectedDealer({ ...parsed, ...dbMatch });
+                  } else {
+                    setSelectedDealer(parsed);
+                  }
+                } else {
+                  setSelectedDealer(parsed);
+                }
+              }
+            }
+          } catch (e) {}
+        }
+
+        if (!hasActiveSession && dealerRes && dealerRes.dealers && dealerRes.dealers.length > 0) {
           setSelectedDealer(dealerRes.dealers[0]);
         }
       } catch (err) {
@@ -795,8 +835,8 @@ export default function ShowroomKioskPage() {
           </Link>
           <div>
             <div className="brand-title-row">
-              <h1 className="brand-title">Seramik<span className="gold-accent">Bak</span></h1>
-              <span className="kiosk-pill">Yetkili Bayi Kiosk</span>
+              <h1 className="brand-title">{selectedDealer?.name ? selectedDealer.name : <>Seramik<span className="gold-accent">Bak</span></>}</h1>
+              <span className="kiosk-pill">{selectedDealer?.name ? 'Yetkili Showroom' : 'Yetkili Bayi Kiosk'}</span>
             </div>
             <p className="dealer-sub-text">
               {selectedDealer ? `${selectedDealer.name} Showroom Teşhir Portalı` : 'Showroom Satış Asistanı'}

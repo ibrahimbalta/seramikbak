@@ -6,6 +6,34 @@ import QuotePDFTemplate from './QuotePDFTemplate';
 import { formatQuoteWhatsAppText } from '@/lib/quoteCalculator';
 
 export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedDealer, calculationData, snapshotUrl }) {
+  // Bayi / Firma Bilgileri (Login olan bayinin bilgileri veya formdan düzenlenebilir)
+  const [dealerName, setDealerName] = useState(selectedDealer?.name || '');
+  const [dealerPhone, setDealerPhone] = useState(selectedDealer?.phone || '');
+  const [dealerAddress, setDealerAddress] = useState(selectedDealer?.address || '');
+  const [dealerCity, setDealerCity] = useState(selectedDealer?.city || '');
+  const [dealerLogoUrl, setDealerLogoUrl] = useState(selectedDealer?.logoUrl || null);
+  const [isDealerSessionActive, setIsDealerSessionActive] = useState(false);
+
+  useEffect(() => {
+    let d = selectedDealer;
+    if (!d && typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('sb_dealer_session');
+        if (saved) {
+          d = JSON.parse(saved);
+        }
+      } catch (e) {}
+    }
+    if (d) {
+      if (d.name) setDealerName(d.name);
+      if (d.phone) setDealerPhone(d.phone);
+      if (d.address) setDealerAddress(d.address);
+      if (d.city) setDealerCity(d.city);
+      if (d.logoUrl) setDealerLogoUrl(d.logoUrl);
+      setIsDealerSessionActive(true);
+    }
+  }, [selectedDealer]);
+
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
@@ -91,23 +119,33 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
       return;
     }
 
-    const quoteId = `SB-${Math.floor(100000 + Math.random() * 900000)}`;
+    const effectiveDealerName = (dealerName || '').trim() || 'Yetkili Satış Mağazası';
+    const effectiveDealerPhone = (dealerPhone || '').trim();
+    const effectiveDealerAddress = (dealerAddress || '').trim();
+    const effectiveDealerCity = (dealerCity || '').trim();
+
+    // Teklif No: Kesinlikle SB- içermez; bayi baş harfleri veya TKF- ile başlar
+    const cleanPrefix = effectiveDealerName.replace(/[^a-zA-Z0-9]/g, '').slice(0, 3).toUpperCase();
+    const prefix = cleanPrefix && cleanPrefix.length >= 2 ? cleanPrefix : 'TKF';
+    const quoteId = `${prefix}-${Math.floor(100000 + Math.random() * 900000)}`;
 
     const quotePayload = {
       id: quoteId,
-      dealerName: selectedDealer?.name || 'SeramikBak Yetkili Showroom',
-      dealerPhone: selectedDealer?.phone || '0850 300 00 00',
-      dealerAddress: selectedDealer?.address || 'Showroom Merkez',
-      dealerCity: selectedDealer?.city || 'İstanbul',
-      dealerLogoUrl: selectedDealer?.logoUrl || null,
-      brandName: selectedProduct?.brand?.name || 'SeramikBak Premium',
-      customerName: customerName,
-      customerPhone: customerPhone,
-      customerEmail: customerEmail,
-      projectName: projectName,
-      productName: selectedProduct?.name || 'Calacatta Porselen Seramik',
-      productCode: selectedProduct?.code || 'SB-60120',
+      dealerName: effectiveDealerName,
+      dealerPhone: effectiveDealerPhone,
+      dealerAddress: effectiveDealerAddress,
+      dealerCity: effectiveDealerCity,
+      dealerLogoUrl: dealerLogoUrl || null,
+      brandName: selectedProduct?.brand?.name || selectedProduct?.brandName || '',
+      customerName: customerName.trim(),
+      customerPhone: customerPhone.trim(),
+      customerEmail: customerEmail.trim(),
+      projectName: projectName.trim(),
+      productName: selectedProduct?.name || 'Porselen Seramik Karo',
+      productCode: selectedProduct?.code || (selectedProduct?.id ? `PRD-${selectedProduct.id}` : 'SRM-KOD'),
       productImageUrl: snapshotUrl || selectedProduct?.imageUrl || selectedProduct?.textureUrl || '/hero/hero_ceramics.jpg',
+      isWhiteLabel: true,
+      hidePlatformBranding: true,
       calculations: {
         unitPriceM2: unitPriceM2Num,
         totalTileM2: totalM2WithWaste,
@@ -138,10 +176,10 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
     };
 
     const rawWa = formatQuoteWhatsAppText(quotePayload, {
-      name: selectedDealer?.name,
-      district: selectedDealer?.district,
-      city: selectedDealer?.city,
-      slug: selectedDealer?.slug
+      name: effectiveDealerName,
+      phone: effectiveDealerPhone,
+      district: '',
+      city: effectiveDealerCity
     });
 
     quotePayload.whatsappMessageRaw = rawWa;
@@ -183,6 +221,63 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
         </div>
 
         <form onSubmit={handleGenerateQuote} className="modal-form-grid">
+          {/* Teklif Veren Bayi / Firma Bilgileri */}
+          <div className="section-title-row">
+            <Building2 size={14} className="gold-text" />
+            <span>Teklif Veren Bayi / Firma Bilgileri</span>
+            {isDealerSessionActive && (
+              <span className="dealer-session-badge">✓ Aktif Bayi Oturumu</span>
+            )}
+          </div>
+
+          <div className="inputs-2col dealer-box">
+            <div className="input-group">
+              <label className="input-label">Bayi / Firma Ünvanı *</label>
+              <input
+                type="text"
+                required
+                value={dealerName}
+                onChange={(e) => setDealerName(e.target.value)}
+                placeholder="ör. Balta Seramik Showroom"
+                className="modal-input"
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Bayi İletişim Telefonu *</label>
+              <input
+                type="tel"
+                required
+                value={dealerPhone}
+                onChange={(e) => setDealerPhone(e.target.value)}
+                placeholder="0212 xxx xx xx / 05xx xxx xx xx"
+                className="modal-input"
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Showroom Adresi</label>
+              <input
+                type="text"
+                value={dealerAddress}
+                onChange={(e) => setDealerAddress(e.target.value)}
+                placeholder="ör. Sanayi Mah. Atatürk Cad. No:14"
+                className="modal-input"
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Şehir / Bölge</label>
+              <input
+                type="text"
+                value={dealerCity}
+                onChange={(e) => setDealerCity(e.target.value)}
+                placeholder="ör. Kadıköy, İstanbul"
+                className="modal-input"
+              />
+            </div>
+          </div>
+
           {/* Müşteri Bilgileri */}
           <div className="section-title-row">
             <User size={14} className="gold-text" />
@@ -583,6 +678,24 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           border-bottom: 1px solid #1e293b;
           padding-bottom: 4px;
           margin-top: 6px;
+        }
+
+        .dealer-session-badge {
+          margin-left: auto;
+          background: rgba(16, 185, 129, 0.15);
+          color: #34d399;
+          border: 1px solid rgba(16, 185, 129, 0.3);
+          font-size: 0.68rem;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: 9999px;
+        }
+
+        .dealer-box {
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(245, 158, 11, 0.2);
+          padding: 12px;
+          border-radius: 14px;
         }
 
         .inputs-2col {
