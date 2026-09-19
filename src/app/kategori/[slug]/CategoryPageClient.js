@@ -16,6 +16,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
+import TileVisualPreview from '@/components/TileVisualPreview';
 
 export default function CategoryPageClient({ category, products = [], otherCategories = [] }) {
   const [selectedBrand, setSelectedBrand] = useState('ALL');
@@ -284,23 +285,16 @@ export default function CategoryPageClient({ category, products = [], otherCateg
                 >
                   <Link href={`/urun/${productSlug}`} style={{ textDecoration: 'none', display: 'block' }}>
                     <div style={{ width: '100%', aspectRatio: '1 / 1', background: '#0a0e1a', position: 'relative', overflow: 'hidden' }}>
-                      <img
-                        src={p.imageUrl}
-                        alt={`${brandName} ${p.name}`}
-                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                      <TileVisualPreview
+                        style={p.style}
+                        color={p.color}
+                        finish={p.finish}
+                        width={p.width}
+                        height={p.height}
+                        imageUrl={p.imageUrl}
+                        productName={p.name}
+                        brandName={brandName}
                       />
-                      <div style={{ position: 'absolute', top: '10px', left: '10px' }}>
-                        <span style={{
-                          background: 'rgba(0, 0, 0, 0.75)',
-                          color: '#d4af37',
-                          fontSize: '0.7rem',
-                          fontWeight: '700',
-                          padding: '3px 8px',
-                          borderRadius: '6px'
-                        }}>
-                          {p.width}x{p.height} cm
-                        </span>
-                      </div>
                     </div>
 
                     <div style={{ padding: '14px 14px 8px' }}>

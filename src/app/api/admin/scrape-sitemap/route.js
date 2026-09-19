@@ -306,20 +306,22 @@ export async function POST(request) {
             parsed.rectified = true;
           }
 
-          // Resolve high-res face texture / image
-          let img = '/textures/calacatta_gold.jpg';
-          if (rawProd.image_url && typeof rawProd.image_url === 'string' && rawProd.image_url.trim().length > 0) {
-            img = rawProd.image_url.trim();
-          } else if (rawProd.image && typeof rawProd.image === 'string' && !rawProd.image.startsWith('data:')) {
-            img = rawProd.image.trim();
+          // Resolve realistic high-res architectural tile texture
+          const str = `${parsed.style || ''} ${parsed.color || ''} ${parsed.name || ''}`.toLowerCase();
+          let textureFallback = '/textures/calacatta_gold.jpg';
+          if (str.includes('teak') || str.includes('ceviz') || str.includes('walnut')) textureFallback = '/textures/teak_ahsap.jpg';
+          else if (str.includes('ahşap') || str.includes('wood') || str.includes('oak') || str.includes('meşe') || str.includes('kayın')) textureFallback = '/textures/natural_oak.jpg';
+          else if (str.includes('beton') || str.includes('concrete') || str.includes('cement') || str.includes('loft') || str.includes('urban') || str.includes('infinity')) {
+            textureFallback = (str.includes('antrasit') || str.includes('koyu') || str.includes('black') || str.includes('siyah')) ? '/textures/loft_beton.jpg' : '/textures/concrete_light_grey.jpg';
+          }
+          else if (str.includes('vista') || str.includes('bej') || str.includes('beige')) textureFallback = '/textures/vista_bej.jpg';
+          else if (str.includes('taş') || str.includes('stone') || str.includes('traverten') || str.includes('travertino') || str.includes('latte') || str.includes('krem')) textureFallback = '/textures/travertino_classico.jpg';
+          else if (str.includes('antrasit') || str.includes('siyah') || str.includes('nero') || str.includes('koyu') || str.includes('marquina') || str.includes('füme') || str.includes('dark') || str.includes('integra') || str.includes('leonardo antrasit')) {
+            textureFallback = '/textures/albatros_antrasit.jpg';
           }
 
-          if (img.startsWith('/')) {
-            img = `https://ngkutahyaseramik.com.tr${img}`;
-          }
-
-          parsed.imageUrl = img;
-          parsed.textureUrl = img; // This is the key fix: use the real high-res texture face image!
+          parsed.imageUrl = textureFallback;
+          parsed.textureUrl = textureFallback;
           parsed.sourceUrl = rawProd.url || `https://ngkutahyaseramik.com.tr/urun/${rawProd.slug}`;
 
           parsedProducts.push(parsed);

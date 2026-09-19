@@ -308,11 +308,26 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
   const productSubtitle = 
     `Doğal ${productStyle.toLowerCase()} dokusu, zengin detayları ve ${productFinish} yüzey işçiliği ile üretilmiş ${productDimensions} mimari porselen karo.`;
 
+  // Smart texture fallback helper for broken or external 404 images
+  const getTextureFallback = (prod) => {
+    if (!prod) return '/textures/calacatta_gold.jpg';
+    const str = `${prod.style || ''} ${prod.color || ''} ${prod.name || ''}`.toLowerCase();
+    if (str.includes('teak') || str.includes('ceviz') || str.includes('walnut')) return '/textures/teak_ahsap.jpg';
+    if (str.includes('ahşap') || str.includes('wood') || str.includes('oak') || str.includes('meşe') || str.includes('kayın')) return '/textures/natural_oak.jpg';
+    if (str.includes('beton') || str.includes('concrete') || str.includes('cement') || str.includes('loft') || str.includes('urban') || str.includes('infinity')) {
+      return (str.includes('antrasit') || str.includes('koyu') || str.includes('black') || str.includes('siyah')) ? '/textures/loft_beton.jpg' : '/textures/concrete_light_grey.jpg';
+    }
+    if (str.includes('vista') || str.includes('bej') || str.includes('beige')) return '/textures/vista_bej.jpg';
+    if (str.includes('taş') || str.includes('stone') || str.includes('traverten') || str.includes('travertino') || str.includes('latte') || str.includes('krem')) return '/textures/travertino_classico.jpg';
+    if (str.includes('antrasit') || str.includes('siyah') || str.includes('nero') || str.includes('koyu') || str.includes('marquina') || str.includes('füme') || str.includes('dark')) return '/textures/albatros_antrasit.jpg';
+    return '/textures/calacatta_gold.jpg';
+  };
+
   // Kiosk Product configuration for 3D StudioCanvas
   const kioskProduct = {
     ...product,
-    imageUrl: product.imageUrl || product.textureUrl || '/textures/calacatta_gold.jpg',
-    textureUrl: product.textureUrl || product.imageUrl || '/textures/calacatta_gold.jpg',
+    imageUrl: product.imageUrl || product.textureUrl || getTextureFallback(product),
+    textureUrl: product.textureUrl || product.imageUrl || getTextureFallback(product),
     width: tileWidth,
     height: tileHeight,
     style: productStyle,
@@ -427,10 +442,10 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
 
   const currentDisplayImage = 
     activeView === 'texture' 
-      ? (product.textureUrl || product.imageUrl) 
+      ? (product.textureUrl || product.imageUrl || getTextureFallback(product)) 
       : activeView === 'room'
       ? (roomRenderImage || '/hero/luxury_bathroom.png')
-      : product.imageUrl;
+      : (product.imageUrl || product.textureUrl || getTextureFallback(product));
 
   return (
     <div style={{ minHeight: '100vh', background: '#080b11', color: '#f8fafc', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
@@ -576,6 +591,13 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 <img
                   src={currentDisplayImage}
                   alt={`${brandName} ${product.name}`}
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const fallback = getTextureFallback(product);
+                    if (e.currentTarget.src !== fallback) {
+                      e.currentTarget.src = fallback;
+                    }
+                  }}
                   style={{
                     width: '100%',
                     height: '100%',
