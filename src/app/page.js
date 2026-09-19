@@ -6485,7 +6485,7 @@ export default function Home() {
                 </div>
 
                 <div className="detail-primary-actions">
-                  {/* Primary 3D Kiosk & Studio Action Button */}
+                  {/* 1. Primary 3D Studio & Tasarım Action */}
                   <button 
                     onClick={() => {
                       setShowDetailModal(false);
@@ -6500,10 +6500,13 @@ export default function Home() {
                       <span className="btn-title">3D Sanal Stüdyoda Dene</span>
                       <span className="btn-subtext">360° Mimari Mekân Simülasyonu</span>
                     </div>
-                    <span className="btn-hero-tag">3D TASARIM</span>
+                    <div className="btn-hero-tag">
+                      <span>3D TASARIM</span>
+                      <ChevronRight size={13} />
+                    </div>
                   </button>
 
-                  {/* Secondary 2-Column Action Grid */}
+                  {/* 2. Secondary 2-Column Action Grid */}
                   <div className="detail-secondary-actions-grid">
                     <button 
                       onClick={() => {
@@ -6542,28 +6545,48 @@ export default function Home() {
                         <Truck size={16} />
                       </div>
                       <div className="btn-text-group">
-                        <span className="btn-title">Ücretsiz Numune İste</span>
-                        <span className="btn-subtext">1-Tıkla Kapına Gelsin</span>
+                        <span className="btn-title">Ücretsiz Numune</span>
+                        <span className="btn-subtext">Kapınıza Gelsin</span>
                       </div>
                     </button>
                   </div>
 
-                  {/* Müstakil Ürün Sayfası Link Butonu */}
+                  {/* 3. Müstakil Ürün Sayfası Kartı */}
                   <Link
                     href={`/urun/${slugify(`${detailProduct.brand?.name || 'seramik'} ${detailProduct.name}`)}`}
                     target="_blank"
                     className="btn-action-standalone"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      textDecoration: 'none'
+                    }}
                   >
-                    <ExternalLink size={14} className="icon-gold" />
-                    <span>Müstakil Ürün Sayfasında Aç & Paylaş</span>
+                    <div className="standalone-left">
+                      <div className="standalone-icon-circle">
+                        <ExternalLink size={13} />
+                      </div>
+                      <div className="standalone-text-wrap">
+                        <span className="standalone-title">Müstakil Ürün Sayfası</span>
+                        <span className="standalone-desc">Tüm teknik özellikler, 4K doku & paylaşım</span>
+                      </div>
+                    </div>
+                    <div className="standalone-arrow-pill">
+                      <span>İncele</span>
+                      <ChevronRight size={13} />
+                    </div>
                   </Link>
                 </div>
 
                 {/* MİMAR VE TASARIMCILAR İÇİN DOKU PORTALI */}
                 <div className="architect-download-box">
                   <div className="architect-lbl-row">
-                    <span className="architect-lbl">MİMARLAR & TASARIMCILAR İÇİN</span>
-                    <span className="architect-badge-mini">BIM / CAD</span>
+                    <span className="architect-lbl">
+                      <Layers size={13} style={{ color: '#d4af37' }} />
+                      <span>MİMARLAR & TASARIMCILAR İÇİN</span>
+                    </span>
+                    <span className="architect-badge-mini">BIM / CAD / 3D</span>
                   </div>
                   <button 
                     onClick={() => handleDownloadCAD(detailProduct)}
@@ -6578,12 +6601,12 @@ export default function Home() {
                     ) : (
                       <>
                         <UploadCloud size={15} style={{ transform: 'rotate(180deg)' }} />
-                        <span>3D Doku & CAD Nesnelerini İndir (.ZIP)</span>
+                        <span>3D Doku & CAD Paketini İndir (.ZIP)</span>
                       </>
                     )}
                   </button>
                   <small className="architect-desc">
-                    İçerik: High-res dikişsiz doku (4K Diffuse, Normal, Roughness), AutoCAD DWG bloğu, Revit BIM nesnesi (.rfa).
+                    4K Diffuse & Normal doku haritaları, AutoCAD DWG bloğu ve Revit BIM nesnesi (.rfa).
                   </small>
                 </div>
 
@@ -13391,23 +13414,23 @@ export default function Home() {
           width: 100%;
         }
 
-        /* 1. Primary 3D Kiosk & Studio Action Button */
+        /* 1. Primary 3D Studio Action Button */
         .btn-action-studio {
           width: 100%;
           padding: 13px 18px;
           border-radius: 14px;
-          background: linear-gradient(135deg, #e5b93b 0%, #d4af37 50%, #b8860b 100%);
-          border: 1px solid rgba(255, 255, 255, 0.35);
-          color: #0b0f17;
+          background: linear-gradient(135deg, #d4af37 0%, #c49926 50%, #ad8217 100%);
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          color: #090d16;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 12px;
-          box-shadow: 0 6px 20px -2px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+          box-shadow: 0 6px 22px -2px rgba(212, 175, 55, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.6);
           position: relative;
           overflow: hidden;
-          transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .btn-action-studio::before {
@@ -13434,8 +13457,8 @@ export default function Home() {
 
         .btn-action-studio:hover {
           transform: translateY(-2px);
-          box-shadow: 0 10px 28px -2px rgba(212, 175, 55, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.7);
-          background: linear-gradient(135deg, #f3cb52 0%, #e0bd42 50%, #c49216 100%);
+          box-shadow: 0 10px 28px -2px rgba(212, 175, 55, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+          background: linear-gradient(135deg, #e4be42 0%, #d4a72e 50%, #b88a1b 100%);
         }
 
         .btn-action-studio:active {
@@ -13446,14 +13469,13 @@ export default function Home() {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 34px;
-          height: 34px;
-          border-radius: 9px;
-          background: rgba(11, 15, 23, 0.15);
-          border: 1px solid rgba(11, 15, 23, 0.12);
-          color: #0b0f17;
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          background: rgba(9, 13, 22, 0.14);
+          border: 1px solid rgba(9, 13, 22, 0.15);
+          color: #090d16;
           flex-shrink: 0;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
         }
 
         .btn-text-group {
@@ -13466,33 +13488,43 @@ export default function Home() {
         }
 
         .btn-action-studio .btn-title {
-          font-size: 0.90rem;
+          font-size: 0.92rem;
           font-weight: 800;
-          letter-spacing: 0.01em;
-          color: #0b0f17;
+          letter-spacing: -0.01em;
+          color: #090d16;
           line-height: 1.2;
           white-space: nowrap;
         }
 
         .btn-action-studio .btn-subtext {
-          font-size: 0.69rem;
+          font-size: 0.70rem;
           font-weight: 600;
-          color: rgba(11, 15, 23, 0.75);
-          margin-top: 1px;
+          color: rgba(9, 13, 22, 0.8);
+          margin-top: 2px;
           white-space: nowrap;
         }
 
         .btn-hero-tag {
-          font-size: 0.62rem;
+          font-size: 0.66rem;
           font-weight: 800;
-          letter-spacing: 0.06em;
-          padding: 4px 10px;
+          letter-spacing: 0.04em;
+          padding: 6px 12px;
           border-radius: 9999px;
-          background: #0b0f17;
+          background: #090d16;
           color: #f5d77f;
-          text-transform: uppercase;
+          display: flex;
+          align-items: center;
+          gap: 4px;
           flex-shrink: 0;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          transition: all 0.2s ease;
+        }
+
+        .btn-action-studio:hover .btn-hero-tag {
+          background: #000000;
+          color: #ffffff;
+          transform: translateX(2px);
         }
 
         /* 2. Secondary 2-Column Action Grid */
@@ -13503,12 +13535,28 @@ export default function Home() {
           width: 100%;
         }
 
+        @media (max-width: 520px) {
+          .detail-secondary-actions-grid {
+            grid-template-columns: 1fr;
+          }
+          .btn-action-studio {
+            padding: 11px 14px;
+          }
+          .btn-action-studio .btn-title {
+            font-size: 0.86rem;
+          }
+          .btn-hero-tag {
+            font-size: 0.60rem;
+            padding: 4px 8px;
+          }
+        }
+
         .btn-action-dealer, .btn-action-sample {
-          padding: 10px 12px;
-          border-radius: 12px;
+          padding: 11px 13px;
+          border-radius: 13px;
           background: rgba(15, 23, 42, 0.65);
           backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.09);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -13518,12 +13566,14 @@ export default function Home() {
           overflow: hidden;
           text-align: left;
           box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+          box-sizing: border-box;
+          min-width: 0;
         }
 
         .btn-action-icon-circle {
-          width: 32px;
-          height: 32px;
-          border-radius: 9px;
+          width: 34px;
+          height: 34px;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -13533,85 +13583,146 @@ export default function Home() {
 
         .dealer-icon-circle {
           background: rgba(59, 130, 246, 0.12);
-          border: 1px solid rgba(59, 130, 246, 0.25);
+          border: 1px solid rgba(59, 130, 246, 0.28);
           color: #60a5fa;
         }
 
         .sample-icon-circle {
           background: rgba(16, 185, 129, 0.12);
-          border: 1px solid rgba(16, 185, 129, 0.25);
+          border: 1px solid rgba(16, 185, 129, 0.28);
           color: #34d399;
         }
 
         .btn-action-dealer .btn-title, .btn-action-sample .btn-title {
-          font-size: 0.80rem;
+          font-size: 0.82rem;
           font-weight: 700;
-          color: #f1f5f9;
+          color: #f8fafc;
           line-height: 1.2;
           white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          width: 100%;
         }
 
         .btn-action-dealer .btn-subtext, .btn-action-sample .btn-subtext {
-          font-size: 0.67rem;
+          font-size: 0.68rem;
           font-weight: 500;
           color: #94a3b8;
-          margin-top: 1px;
+          margin-top: 2px;
           white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          width: 100%;
         }
 
         .btn-action-dealer:hover {
-          background: rgba(26, 42, 74, 0.75);
+          background: rgba(22, 38, 70, 0.85);
           border-color: rgba(96, 165, 250, 0.55);
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px -2px rgba(59, 130, 246, 0.25);
+          box-shadow: 0 8px 22px -2px rgba(59, 130, 246, 0.3);
         }
 
         .btn-action-dealer:hover .dealer-icon-circle {
           transform: scale(1.08);
-          background: rgba(59, 130, 246, 0.2);
+          background: rgba(59, 130, 246, 0.22);
+          color: #93c5fd;
         }
 
         .btn-action-sample:hover {
-          background: rgba(16, 48, 38, 0.75);
+          background: rgba(14, 45, 36, 0.85);
           border-color: rgba(52, 211, 153, 0.55);
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px -2px rgba(16, 185, 129, 0.25);
+          box-shadow: 0 8px 22px -2px rgba(16, 185, 129, 0.3);
         }
 
         .btn-action-sample:hover .sample-icon-circle {
           transform: scale(1.08);
-          background: rgba(16, 185, 129, 0.2);
+          background: rgba(16, 185, 129, 0.22);
+          color: #6ee7b7;
         }
 
         .btn-action-dealer:active, .btn-action-sample:active {
           transform: translateY(0) scale(0.98);
         }
 
-        /* 3. Standalone Link Button */
-        .btn-action-standalone {
+        /* 3. Standalone Link Card */
+        :global(.btn-action-standalone) {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+          gap: 12px !important;
+          width: 100% !important;
+          padding: 10px 14px !important;
+          background: rgba(255, 255, 255, 0.03) !important;
+          border: 1px solid rgba(255, 255, 255, 0.09) !important;
+          border-radius: 12px !important;
+          color: #e2e8f0 !important;
+          text-decoration: none !important;
+          box-sizing: border-box !important;
+          transition: all 0.22s ease !important;
+        }
+
+        :global(.btn-action-standalone:hover) {
+          background: rgba(212, 175, 55, 0.08) !important;
+          border-color: rgba(212, 175, 55, 0.4) !important;
+          color: #ffffff !important;
+          transform: translateY(-1px) !important;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        .standalone-left {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          min-width: 0;
+        }
+
+        .standalone-icon-circle {
+          width: 28px;
+          height: 28px;
+          border-radius: 8px;
+          background: rgba(212, 175, 55, 0.12);
+          border: 1px solid rgba(212, 175, 55, 0.25);
+          color: #d4af37;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
-          width: 100%;
-          padding: 10px 14px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(212, 175, 55, 0.28);
-          border-radius: 11px;
-          color: #e2e8f0;
-          font-size: 0.79rem;
-          font-weight: 600;
-          text-decoration: none;
-          box-sizing: border-box;
-          transition: all 0.22s ease;
+          flex-shrink: 0;
         }
 
-        .btn-action-standalone:hover {
-          background: rgba(212, 175, 55, 0.09);
-          border-color: rgba(212, 175, 55, 0.55);
-          color: #ffffff;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 16px rgba(212, 175, 55, 0.12);
+        .standalone-text-wrap {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          text-align: left;
+          min-width: 0;
+        }
+
+        .standalone-title {
+          font-size: 0.80rem;
+          font-weight: 700;
+          color: #f1f5f9;
+          white-space: nowrap;
+        }
+
+        .standalone-desc {
+          font-size: 0.67rem;
+          color: #94a3b8;
+          white-space: nowrap;
+        }
+
+        .standalone-arrow-pill {
+          display: flex;
+          align-items: center;
+          gap: 3px;
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: #d4af37;
+          flex-shrink: 0;
+          padding: 4px 8px;
+          border-radius: 6px;
+          background: rgba(212, 175, 55, 0.08);
+          border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
         /* 4. Architect CAD Download Portal */
@@ -13634,20 +13745,21 @@ export default function Home() {
           display: flex;
           align-items: center;
           gap: 6px;
-          font-size: 0.65rem;
+          font-size: 0.66rem;
           font-weight: 800;
           color: #d4af37;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.06em;
           text-transform: uppercase;
         }
 
         .architect-badge-mini {
-          font-size: 0.58rem;
+          font-size: 0.60rem;
           font-weight: 700;
-          color: #94a3b8;
+          color: #cbd5e1;
           background: rgba(255, 255, 255, 0.06);
-          padding: 2px 6px;
-          border-radius: 4px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          padding: 2px 7px;
+          border-radius: 5px;
           letter-spacing: 0.04em;
         }
 
@@ -13655,10 +13767,10 @@ export default function Home() {
           background: rgba(255, 255, 255, 0.03);
           border: 1px solid rgba(255, 255, 255, 0.1);
           color: #e2e8f0;
-          font-size: 0.78rem;
+          font-size: 0.79rem;
           font-weight: 600;
           padding: 10px 14px;
-          border-radius: 10px;
+          border-radius: 11px;
           cursor: pointer;
           transition: all 0.25s ease;
           display: flex;
@@ -13681,7 +13793,7 @@ export default function Home() {
         }
 
         .architect-desc {
-          font-size: 0.63rem;
+          font-size: 0.66rem;
           color: #64748b;
           text-align: center;
           line-height: 1.35;
