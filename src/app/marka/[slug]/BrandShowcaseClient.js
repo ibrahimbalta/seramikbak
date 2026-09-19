@@ -407,7 +407,7 @@ export default function BrandShowcaseClient({ brand, products = [], dealers = []
                     </Link>
 
                     <Link
-                      href={`/kiosk?product=${p.id}`}
+                      href={`/urun/${productSlug}?view=3d`}
                       style={{
                         background: 'rgba(255, 255, 255, 0.05)',
                         color: '#cbd5e1',
@@ -420,7 +420,7 @@ export default function BrandShowcaseClient({ brand, products = [], dealers = []
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}
-                      title="3D Mekanda Gör"
+                      title="3D Tasarımda Gör"
                     >
                       3D
                     </Link>

@@ -82,7 +82,7 @@ export default function CategoryPageClient({ category, products = [], otherCateg
           </div>
 
           <Link
-            href="/kiosk"
+            href="/#studio"
             style={{
               fontSize: '0.8rem',
               color: '#090d16',
@@ -97,7 +97,7 @@ export default function CategoryPageClient({ category, products = [], otherCateg
             }}
           >
             <Eye size={14} />
-            <span>3D Mekan Giydirme</span>
+            <span>3D Stüdyo</span>
           </Link>
         </div>
       </header>
@@ -335,7 +335,7 @@ export default function CategoryPageClient({ category, products = [], otherCateg
                     </Link>
 
                     <Link
-                      href={`/kiosk?product=${p.id}`}
+                      href={`/urun/${productSlug}?view=3d`}
                       style={{
                         background: 'rgba(255, 255, 255, 0.05)',
                         color: '#cbd5e1',
@@ -348,7 +348,7 @@ export default function CategoryPageClient({ category, products = [], otherCateg
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}
-                      title="3D Mekanda Gör"
+                      title="3D Tasarımda Gör"
                     >
                       3D
                     </Link>

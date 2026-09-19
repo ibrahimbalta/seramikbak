@@ -3261,12 +3261,9 @@ export default function Home() {
     setStudioApplyFloor(true);
     setStudioApplyWalls(true);
     logInteraction('STUDIO_TRY', product.id, product.brandId);
-    
+    setActiveTab('studio');
     if (typeof window !== 'undefined') {
-      try {
-        sessionStorage.setItem('kiosk_selected_product', JSON.stringify(product));
-      } catch (e) {}
-      window.location.href = `/kiosk?productId=${encodeURIComponent(product.id)}&code=${encodeURIComponent(product.code || '')}`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -3708,10 +3705,13 @@ export default function Home() {
                 <SearchIcon size={14} />
                 <span>{t('products')}</span>
               </button>
-              <Link href="/kiosk" className="nav-link">
+              <button 
+                className={`nav-link ${activeTab === 'studio' ? 'active' : ''}`} 
+                onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              >
                 <Palette size={14} />
                 <span>{t('studio3d')}</span>
-              </Link>
+              </button>
               <button className={`nav-link ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <MapPin size={14} />
                 <span>{t('dealers')}</span>
@@ -4250,10 +4250,12 @@ export default function Home() {
               <div className="persona-gateway-grid">
                 
                 {/* 1. Evini Yenileyenler */}
-                <Link 
-                  href="/kiosk"
+                <div 
+                  onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className="persona-banner-card"
-                  style={{ textDecoration: 'none' }}
+                  style={{ textDecoration: 'none', cursor: 'pointer' }}
+                  role="button"
+                  tabIndex={0}
                 >
                   <div className="promo-text-column">
                     <div className="promo-top-badge gold">
@@ -4271,7 +4273,7 @@ export default function Home() {
                     <img src="/hero/luxury_bathroom.png" alt="3D Sanal Stüdyo" />
                     <div className="promo-image-badge">3D</div>
                   </div>
-                </Link>
+                </div>
 
                 {/* 2. Mimarlar & Müteahhitler */}
                 <div 
@@ -4438,10 +4440,13 @@ export default function Home() {
                   <span>Düz Renk</span>
                 </button>
 
-                <Link href="/kiosk" className="category-circle-btn" style={{ textDecoration: 'none' }}>
+                <button 
+                  className="category-circle-btn" 
+                  onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                >
                   <div className="category-circle-icon-wrapper wireframe-bg" />
-                  <span>3D Seriler</span>
-                </Link>
+                  <span>3D Tasarım</span>
+                </button>
               </div>
             </div>
 
@@ -6597,9 +6602,9 @@ export default function Home() {
                     </div>
                     <div className="btn-text-group">
                       <span className="btn-title">3D Sanal Stüdyoda Dene</span>
-                      <span className="btn-subtext">360° Mekân Simülasyonu & Kiosk</span>
+                      <span className="btn-subtext">360° Mimari Mekân Simülasyonu</span>
                     </div>
-                    <span className="btn-hero-tag">3D KİOSK</span>
+                    <span className="btn-hero-tag">3D TASARIM</span>
                   </button>
 
                   {/* Secondary 2-Column Action Grid */}
@@ -8032,7 +8037,7 @@ export default function Home() {
             <h4>Kurumsal & Portallar</h4>
             <ul>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('search'); }}>Arama Motoru</a></li>
-              <li><Link href="/kiosk">3D Sanal Stüdyo</Link></li>
+              <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>3D Sanal Stüdyo</a></li>
               <li><a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('dealers'); }}>Bayi Bulucu</a></li>
               <li><Link href="/bayiler">Yetkili Bayi Rehberi</Link></li>
               <li><Link href="/bayi?tab=register">Bayimiz Olun (B2B Başvuru)</Link></li>
@@ -8730,14 +8735,14 @@ export default function Home() {
           <span style={{ whiteSpace: 'nowrap', fontSize: '0.60rem', display: 'block', width: '100%', textAlign: 'center' }}>Arama</span>
         </button>
 
-        <Link 
-          href="/kiosk" 
-          className="mobile-nav-item studio-highlight" 
-          style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
+        <button 
+          className={`mobile-nav-item studio-highlight ${activeTab === 'studio' ? 'active' : ''}`} 
+          onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}
         >
           <Layers size={19} style={{ color: '#b88a38' }} />
           <span style={{ whiteSpace: 'nowrap', fontSize: '0.56rem', fontWeight: 700, letterSpacing: '-0.2px', display: 'block', width: '100%', textAlign: 'center', color: '#b88a38' }}>3D Stüdyo</span>
-        </Link>
+        </button>
 
         <button 
           className="mobile-nav-item" 

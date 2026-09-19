@@ -766,6 +766,25 @@ export default function ShowroomKioskPage() {
       <header className="kiosk-header">
         <div className="header-left">
           <Link 
+            href="/bayi" 
+            className="btn-exit-kiosk" 
+            title="Bayi Paneline Dön"
+            style={{ 
+              display: 'inline-flex', 
+              flexDirection: 'row', 
+              alignItems: 'center', 
+              gap: '6px', 
+              whiteSpace: 'nowrap', 
+              flexShrink: 0,
+              background: 'rgba(212, 175, 55, 0.15)',
+              borderColor: 'rgba(212, 175, 55, 0.4)',
+              color: '#f3d375'
+            }}
+          >
+            <Building2 size={16} style={{ flexShrink: 0 }} />
+            <span style={{ whiteSpace: 'nowrap', display: 'inline-block' }}>Bayi Paneli</span>
+          </Link>
+          <Link 
             href="/" 
             className="btn-exit-kiosk" 
             title="Ana Sayfaya Dön (Çıkış)"
@@ -777,10 +796,10 @@ export default function ShowroomKioskPage() {
           <div>
             <div className="brand-title-row">
               <h1 className="brand-title">Seramik<span className="gold-accent">Bak</span></h1>
-              <span className="kiosk-pill">3D Sanal Stüdyo Kiosk</span>
+              <span className="kiosk-pill">Yetkili Bayi Kiosk</span>
             </div>
             <p className="dealer-sub-text">
-              {selectedDealer ? `${selectedDealer.name} Dokunmatik Satış Portalı` : 'Showroom Satış Asistanı'}
+              {selectedDealer ? `${selectedDealer.name} Showroom Teşhir Portalı` : 'Showroom Satış Asistanı'}
             </p>
           </div>
         </div>
