@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, User, Phone, Mail, FileCheck, X, Sparkles, Building2, CheckCircle2, Percent, Edit3, Plus, Trash2 } from 'lucide-react';
 import QuotePDFTemplate from './QuotePDFTemplate';
 import { formatQuoteWhatsAppText } from '@/lib/quoteCalculator';
