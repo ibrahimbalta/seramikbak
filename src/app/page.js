@@ -5622,11 +5622,11 @@ export default function Home() {
                     <div className="step-num-badge">1</div>
                     <div>
                       <h3 className="studio-step-title">Giydirilecek Yüzeyi Seçin</h3>
-                      <p className="studio-step-desc">Aşağıdan kaplamak istediğiniz mimari yüzeye dokunun, ardından 2. Adımdaki seramiklerden dilediğinizi giydirin.</p>
+                      <p className="studio-step-desc">Kaplamak istediğiniz mimari yüzeye dokunun, ardından aşağıdaki seramiklerden birini seçin.</p>
                     </div>
                   </div>
                   <div className="surface-active-target-badge">
-                    <span>Aktif Hedef:</span>
+                    <span>Aktif:</span>
                     <strong className="gold-text">{getTargetLabel(studioTarget)}</strong>
                   </div>
                 </div>
@@ -5644,6 +5644,10 @@ export default function Home() {
                   ].map((surf) => {
                     const isTarget = studioTarget === surf.id;
                     const hasTile = surf.applied;
+                    const shortName = surf.product?.name
+                      ? surf.product.name.split(' ').slice(0, 2).join(' ')
+                      : 'Kaplandı';
+
                     return (
                       <div 
                         key={surf.id}
@@ -5658,7 +5662,7 @@ export default function Home() {
                         
                         <div className="pill-bottom">
                           {hasTile && surf.product ? (
-                            <span className="pill-prod-name">{surf.product.name?.split(' ')[0]} {surf.product.code || ''}</span>
+                            <span className="pill-prod-name" title={surf.product.name}>{shortName}</span>
                           ) : (
                             <span className="pill-empty-state">{isTarget ? '👉 Seçili' : 'Standart'}</span>
                           )}
@@ -5685,7 +5689,7 @@ export default function Home() {
 
               {/* 4. ADIM 2: SERAMİK SEÇİN & GİYDİRİN (FİLTRELİ HIZLI GALERİ) */}
               <div className="studio-step-section glass-panel" style={{ marginTop: '16px' }}>
-                <div className="studio-step-header" style={{ flexWrap: 'wrap', gap: '10px' }}>
+                <div className="studio-step-header">
                   <div className="studio-step-title-wrap">
                     <div className="step-num-badge">2</div>
                     <div>
@@ -5696,7 +5700,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <div className="studio-step-tools-row">
                     {/* Kategori Filtre Butonları */}
                     <div className="tile-category-pills">
                       {[
@@ -5788,7 +5792,7 @@ export default function Home() {
                     <div className="step-num-badge">3</div>
                     <div>
                       <h3 className="studio-step-title">Tasarım & Mekan Detayları</h3>
-                      <p className="studio-step-desc">Döşeme deseni, derz kalınlığı ve rengi, aydınlatma atmosferi ve mobilya renklerini özelleştirin.</p>
+                      <p className="studio-step-desc">Döşeme deseni, derz dolgusu, ışıklandırma ve mobilyayı özelleştirin.</p>
                     </div>
                   </div>
 
@@ -5806,14 +5810,14 @@ export default function Home() {
                       className={`settings-tab-btn ${studioSettingsTab === 'light' ? 'active' : ''}`}
                       onClick={() => setStudioSettingsTab('light')}
                     >
-                      <span>☀️ Aydınlatma & Işık</span>
+                      <span>☀️ Aydınlatma</span>
                     </button>
                     <button
                       type="button"
                       className={`settings-tab-btn ${studioSettingsTab === 'fixtures' ? 'active' : ''}`}
                       onClick={() => setStudioSettingsTab('fixtures')}
                     >
-                      <span>🚰 Mobilya & Armatür</span>
+                      <span>🚰 Mobilya</span>
                     </button>
                   </div>
                 </div>
@@ -12206,6 +12210,14 @@ export default function Home() {
           justify-content: space-between;
           gap: 12px;
           margin-bottom: 14px;
+          flex-wrap: wrap;
+        }
+
+        .studio-step-tools-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
         }
 
         .studio-step-title-wrap {
@@ -12746,6 +12758,326 @@ export default function Home() {
         .studio-whatsapp-btn:hover {
           background: #20ba5a;
           box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+        }
+
+        /* ==========================================================================
+           3D STUDIO MOBİL UYGULAMA DÜZENİ (APP-LIKE MINIMAL MOBILE UX)
+           ========================================================================== */
+        @media (max-width: 768px) {
+          .studio-portal {
+            padding-bottom: 120px !important; /* SB Asistan ve Alt Menü çubuğu payı */
+            gap: 12px;
+          }
+
+          .studio-unified-workspace {
+            gap: 12px;
+          }
+
+          /* 1. Üst Bar: Mekan & Araçlar */
+          .studio-top-canvas-bar {
+            padding: 8px 10px;
+            gap: 8px;
+            flex-direction: column;
+            align-items: stretch;
+            border-radius: 10px;
+          }
+
+          .room-chips-scroll {
+            width: 100%;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            gap: 6px;
+            padding-bottom: 2px;
+          }
+
+          .room-chip-btn {
+            padding: 5px 10px;
+            font-size: 0.72rem;
+            flex-shrink: 0;
+          }
+
+          .canvas-header-actions {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+          }
+
+          .canvas-mode-btn {
+            flex: 1;
+            justify-content: center;
+            padding: 6px 4px;
+            font-size: 0.68rem;
+            white-space: nowrap;
+            border-radius: 16px;
+          }
+
+          .canvas-mode-btn span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          /* 2. 3D Canvas Viewport */
+          .studio-canvas-panel {
+            border-radius: 10px;
+          }
+
+          .studio-canvas-viewport-box {
+            height: 350px !important;
+          }
+
+          .studio-viewport-hints {
+            font-size: 0.65rem;
+            padding: 3px 10px;
+            bottom: 8px;
+          }
+
+          .studio-toast-banner {
+            font-size: 0.74rem;
+            padding: 6px 14px;
+            top: 10px;
+            width: 90%;
+            justify-content: center;
+          }
+
+          /* 3. Adım Kartları (Minimal & Düzenli) */
+          .studio-step-section {
+            padding: 12px 12px !important;
+            border-radius: 10px;
+            margin-top: 10px !important;
+          }
+
+          .studio-step-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 10px;
+          }
+
+          .studio-step-title-wrap {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+
+          .step-num-badge {
+            width: 24px;
+            height: 24px;
+            font-size: 0.78rem;
+          }
+
+          .studio-step-title {
+            font-size: 0.88rem;
+          }
+
+          .studio-step-desc {
+            display: none !important; /* Mobilde uzun açıklamaları gizle, sade tut */
+          }
+
+          .surface-active-target-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            align-self: flex-start;
+          }
+
+          /* Step 1: Yüzey Kartları 2 Sütun */
+          .surface-pills-wrap {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 6px;
+          }
+
+          .surface-pill-card {
+            padding: 7px 8px;
+            border-radius: 6px;
+            min-width: 0;
+            overflow: hidden;
+          }
+
+          .pill-label {
+            font-size: 0.72rem;
+          }
+
+          .pill-bottom {
+            min-height: 16px;
+          }
+
+          .pill-prod-name {
+            font-size: 0.64rem;
+            max-width: 85px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .pill-empty-state {
+            font-size: 0.62rem;
+          }
+
+          .pill-clear-btn {
+            width: 16px;
+            height: 16px;
+            font-size: 0.6rem;
+          }
+
+          /* Step 2: Seramik Galerisi & Filtreler */
+          .studio-step-tools-row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            flex-wrap: nowrap;
+          }
+
+          .tile-category-pills {
+            flex: 1;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            gap: 4px;
+            padding: 2px;
+          }
+
+          .cat-pill-btn {
+            padding: 4px 8px;
+            font-size: 0.68rem;
+            flex-shrink: 0;
+          }
+
+          .studio-catalog-link-btn {
+            padding: 4px 8px;
+            font-size: 0.68rem;
+            flex-shrink: 0;
+          }
+
+          .swapper-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px;
+            margin-top: 10px !important;
+          }
+
+          .swapper-card {
+            height: 110px;
+            min-width: 0;
+            border-radius: 6px;
+          }
+
+          .swapper-name {
+            font-size: 0.65rem;
+          }
+
+          .swapper-meta {
+            font-size: 0.58rem;
+          }
+
+          .swapper-price {
+            font-size: 0.62rem;
+          }
+
+          /* Step 3: Ayarlar Sekmeleri (Taşmayı Önle) */
+          .studio-settings-tabs-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            gap: 4px;
+            padding: 3px;
+            border-radius: 16px;
+          }
+
+          .settings-tab-btn {
+            flex: 1;
+            padding: 6px 4px;
+            font-size: 0.68rem;
+            text-align: center;
+            justify-content: center;
+            border-radius: 12px;
+            white-space: nowrap;
+          }
+
+          .settings-tab-btn span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .settings-grid-cols {
+            grid-template-columns: 1fr !important;
+            gap: 8px;
+          }
+
+          .setting-box {
+            padding: 8px 10px;
+            border-radius: 6px;
+            gap: 6px;
+          }
+
+          .setting-box-label {
+            font-size: 0.7rem;
+          }
+
+          .setting-pills-row {
+            gap: 4px;
+          }
+
+          .pill-option-btn {
+            padding: 4px 7px;
+            font-size: 0.66rem;
+            border-radius: 4px;
+          }
+
+          .grout-color-pill {
+            padding: 4px 7px;
+            font-size: 0.66rem;
+            border-radius: 4px;
+          }
+
+          .grout-dot {
+            width: 10px;
+            height: 10px;
+          }
+
+          /* Step 4: Teklif ve Butonlar */
+          .studio-summary-cards-wrap {
+            grid-template-columns: 1fr !important;
+            gap: 6px;
+            margin: 8px 0 12px 0;
+          }
+
+          .summary-surface-item {
+            padding: 8px 10px;
+            border-radius: 6px;
+          }
+
+          .summary-target-label {
+            font-size: 0.64rem;
+          }
+
+          .summary-prod-name {
+            font-size: 0.74rem;
+          }
+
+          .summary-prod-price {
+            font-size: 0.74rem;
+          }
+
+          .studio-quote-action-row {
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+          }
+
+          .studio-quote-btn, .studio-whatsapp-btn {
+            width: 100%;
+            min-width: 0;
+            padding: 10px 14px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+          }
         }
 
         /* Dealers Panel styles */
