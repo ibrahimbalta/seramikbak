@@ -30,6 +30,7 @@ import {
   ArrowRight,
   UploadCloud,
   ChevronDown,
+  ChevronRight,
   Info,
   Home as HomeIcon,
   Heart as HeartIcon,
@@ -2491,6 +2492,7 @@ export default function Home() {
 
   const logInteraction = async (action, productId, brandId) => {
     try {
+      const city = (userLocationName && typeof userLocationName === 'string') ? userLocationName.split(' ')[0] : 'İstanbul';
       await fetch('/api/analytics/log', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2498,7 +2500,7 @@ export default function Home() {
           action,
           productId,
           brandId,
-          city: userLocationName.split(' ')[0]
+          city
         })
       });
     } catch (err) {
@@ -2507,6 +2509,7 @@ export default function Home() {
   };
 
   const handleProductCardClick = async (product) => {
+    if (!product) return;
     setActiveProduct(product);
     setDetailProduct(product);
     setShowDetailModal(true);
@@ -2516,7 +2519,7 @@ export default function Home() {
 
     // Fetch full product details asynchronously to keep the main grid query fast
     if (product && product.code) {
-      fetch(`/api/search?q=${product.code}&fullDetail=true`)
+      fetch(`/api/search?q=${encodeURIComponent(product.code)}&fullDetail=true`)
         .then(res => res.json())
         .then(data => {
           if (data && data.length > 0) {
@@ -2530,7 +2533,9 @@ export default function Home() {
     try {
       const bId = product.brandId || product.brand?.id || '';
       const pId = product.id || '';
-      const res = await fetch(`/api/dealers/nearest?brandId=${encodeURIComponent(bId)}&productId=${encodeURIComponent(pId)}&lat=${userCoords.lat}&lng=${userCoords.lng}`);
+      const lat = userCoords?.lat || 40.9901;
+      const lng = userCoords?.lng || 29.0278;
+      const res = await fetch(`/api/dealers/nearest?brandId=${encodeURIComponent(bId)}&productId=${encodeURIComponent(pId)}&lat=${lat}&lng=${lng}`);
       if (res.ok) {
         const data = await res.json();
         setDetailDealers(data);
@@ -6458,8 +6463,8 @@ export default function Home() {
                   </div>
                   <div className="spec-item-box">
                     <span className="spec-lbl">Kullanım Alanı</span>
-                    <span className="spec-val" title={detailProduct.area}>
-                      {detailProduct.area ? detailProduct.area.split(',').slice(0, 2).join(', ') : 'Zemin/Duvar'}
+                    <span className="spec-val" title={String(detailProduct.area || '')}>
+                      {detailProduct.area ? (typeof detailProduct.area === 'string' ? detailProduct.area.split(',').slice(0, 2).join(', ') : Array.isArray(detailProduct.area) ? detailProduct.area.slice(0, 2).join(', ') : String(detailProduct.area)) : 'Zemin/Duvar'}
                     </span>
                   </div>
                   <div className="spec-item-box">
@@ -6739,7 +6744,7 @@ export default function Home() {
                         }}>
                           <span>Toplam Tahmini İşçilik Bedeli:</span>
                           <strong className="logistics-price" style={{ fontSize: '0.9rem' }}>
-                            {calcResults.laborCostTotal.toLocaleString('tr-TR')} TL
+                            {(calcResults.laborCostTotal || 0).toLocaleString('tr-TR')} TL
                           </strong>
                         </div>
                         <p style={{ fontSize: '0.6rem', color: '#94a3b8', margin: 0, fontStyle: 'italic', lineHeight: '1.3' }}>
