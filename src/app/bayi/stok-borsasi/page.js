@@ -621,7 +621,7 @@ export default function DealerStockExchangePage() {
 
         {/* Offers Grid */}
         {!loading && offers.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(330px, 1fr))', gap: '20px' }}>
+          <div className="stok-borsasi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 330px), 1fr))', gap: '20px' }}>
             {offers.map(offer => {
               const isNeed = offer.type === 'NEED_STOCK';
               const mine = isMyOffer(offer);
@@ -1277,6 +1277,15 @@ export default function DealerStockExchangePage() {
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          :global(.stok-borsasi-grid) {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

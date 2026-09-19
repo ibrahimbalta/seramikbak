@@ -488,12 +488,12 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
       </header>
 
       {/* Main Container */}
-      <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 20px 80px' }}>
+      <main className="product-detail-main" style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px 20px 80px' }}>
         
         {/* Top Product Hero Grid */}
-        <div style={{
+        <div className="product-hero-grid" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))',
           gap: '48px',
           alignItems: 'start'
         }}>
@@ -837,7 +837,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
             </div>
 
             {/* Main Product Title & Architectural Subtitle */}
-            <h1 style={{
+            <h1 className="product-title" style={{
               fontSize: '2.5rem',
               fontWeight: '800',
               color: '#ffffff',
@@ -859,7 +859,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
             </p>
 
             {/* Architectural Spec Matrix (4-Grid Luxury Tiles) */}
-            <div style={{
+            <div className="product-specs-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(4, 1fr)',
               gap: '8px',
@@ -1008,7 +1008,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               </p>
 
               {/* Dual Action Buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 0.9fr', gap: '10px' }}>
+              <div className="ai-remodel-btn-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 0.9fr', gap: '10px' }}>
                 <button
                   onClick={() => setShowAIRemodel(true)}
                   style={{
@@ -1104,7 +1104,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               </div>
 
               {/* Primary Dual Actions (Teklif Al & Numune İste) */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+              <div className="product-conversion-btn-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
                 <div>
                   <button
                     onClick={() => setShowQuoteModal(true)}
@@ -1215,7 +1215,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                     </label>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                  <div className="calc-input-row" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
                     <div style={{ position: 'relative', flex: 1 }}>
                       <input
                         type="number"
@@ -1965,6 +1965,43 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
           }}
         />
       )}
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          :global(.product-detail-main) {
+            padding: 16px 12px 90px !important;
+          }
+          :global(.product-hero-grid) {
+            grid-template-columns: 1fr !important;
+            gap: 24px !important;
+          }
+          :global(.product-title) {
+            font-size: 1.55rem !important;
+            line-height: 1.2 !important;
+          }
+          :global(.product-specs-grid) {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 6px !important;
+          }
+          :global(.ai-remodel-btn-grid) {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+          }
+          :global(.product-conversion-btn-grid) {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+          }
+          :global(.calc-input-row) {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 8px !important;
+          }
+          :global(.calc-input-row > div),
+          :global(.calc-input-row > button) {
+            width: 100% !important;
+          }
+        }
+      `}</style>
 
     </div>
   );

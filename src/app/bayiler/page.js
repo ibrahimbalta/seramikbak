@@ -514,11 +514,43 @@ export default function BayilerPage() {
         }
 
         @media (max-width: 768px) {
-          .filter-grid {
-            grid-template-columns: 1fr;
+          .bayiler-header {
+            padding: 24px 14px 18px;
           }
           .bayiler-header h1 {
-            font-size: 1.4rem;
+            font-size: 1.35rem;
+            line-height: 1.25;
+          }
+          .bayiler-header p {
+            font-size: 0.82rem;
+            line-height: 1.45;
+          }
+          .filter-section {
+            padding: 10px 12px 16px;
+          }
+          .filter-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+          }
+          .dealers-container {
+            padding: 0 12px 100px;
+          }
+          .dealers-cards-grid {
+            grid-template-columns: 1fr;
+            gap: 14px;
+          }
+          .dealer-card {
+            padding: 16px 14px;
+            border-radius: 14px;
+          }
+          .card-footer-actions {
+            grid-template-columns: 1fr;
+            gap: 8px;
+          }
+          :global(.btn-card-action) {
+            padding: 10px 14px;
+            font-size: 0.82rem;
+            border-radius: 10px;
           }
         }
       `}</style>

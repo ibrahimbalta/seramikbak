@@ -565,7 +565,7 @@ export default function ProjectDemandPage() {
                   </p>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                <div className="form-step-nav-buttons" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
                   <button 
                     onClick={nextStep}
                     style={{
@@ -790,7 +790,7 @@ export default function ProjectDemandPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+                <div className="form-step-nav-buttons" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
                   <button 
                     onClick={prevStep}
                     style={{
@@ -1027,7 +1027,7 @@ export default function ProjectDemandPage() {
                   </label>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+                <div className="form-step-nav-buttons" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
                   <button 
                     type="button"
                     onClick={prevStep}
@@ -1099,6 +1099,16 @@ export default function ProjectDemandPage() {
           }
           .form-grid-2col {
             grid-template-columns: 1fr !important;
+          }
+          .form-step-nav-buttons {
+            flex-direction: column-reverse !important;
+            gap: 10px !important;
+          }
+          .form-step-nav-buttons button {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 11px 18px !important;
+            font-size: 0.85rem !important;
           }
         }
 

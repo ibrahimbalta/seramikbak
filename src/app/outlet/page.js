@@ -300,6 +300,7 @@ export default function OutletMarketplacePage() {
 
           <div style={{ marginBottom: '24px' }}>
             <button
+              className="outlet-alert-btn"
               type="button"
               onClick={() => { setShowAlertModal(true); setAlertCity(selectedCity || 'ALL'); }}
               style={{
@@ -504,9 +505,9 @@ export default function OutletMarketplacePage() {
             </p>
           </div>
         ) : (
-          <div style={{
+          <div className="outlet-items-grid" style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
             gap: '20px'
           }}>
             {items.map((item) => {
@@ -1079,6 +1080,21 @@ export default function OutletMarketplacePage() {
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          :global(.outlet-alert-btn) {
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 10px 14px !important;
+            font-size: 0.8rem !important;
+          }
+          :global(.outlet-items-grid) {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

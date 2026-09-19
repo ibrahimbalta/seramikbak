@@ -478,9 +478,9 @@ export default function InstallersDirectoryPage() {
             </button>
           </div>
         ) : (
-          <div style={{
+          <div className="installers-grid" style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
             gap: '16px'
           }}>
             {installers.map(inst => {
@@ -1302,6 +1302,15 @@ export default function InstallersDirectoryPage() {
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          :global(.installers-grid) {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

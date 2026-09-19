@@ -3714,5 +3714,131 @@ select option:hover {
   }
 }
 
+/* ==========================================================================
+   GLOBAL MOBILE-FIRST & ANTI-OVERFLOW SYSTEM
+   Enforces clean button sizes, zero horizontal overflow, and mobile app feel
+   ========================================================================== */
 
+/* Universal anti-overflow guarantee */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+  position: relative;
+}
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Media elements should never exceed parent width */
+img, video, canvas, svg {
+  max-width: 100%;
+}
+
+/* Prevent text overflow in labels, badges and headings */
+h1, h2, h3, h4, h5, h6, p, span, a, label {
+  overflow-wrap: break-word;
+}
+
+/* ==========================================================================
+   TABLET & MOBILE RESPONSIVE TWEAKS (<= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Prevent iOS zoom on input focus */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Global Button Sizing: Compact, touch-friendly, no overflow */
+  button,
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  a.btn {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    word-break: normal !important;
+    white-space: normal !important;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 10px 16px !important;
+    font-size: 0.84rem !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  /* Auto-contain any high minmax grids on mobile screens */
+  [style*="minmax(320px"],
+  [style*="minmax(330px"],
+  [style*="minmax(340px"],
+  [style*="minmax(360px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Tables horizontal scroll container */
+  table {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Modal Dialog Anti-Overflow */
+  [role="dialog"],
+  .modal-card,
+  .podium-card,
+  div[style*="maxWidth: '500px'"],
+  div[style*="maxWidth: '600px'"],
+  div[style*="maxWidth: '700px'"],
+  div[style*="maxWidth: '720px'"] {
+    max-width: calc(100vw - 20px) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Floating SB Asistan Chatbot Mobile Optimization */
+  .ai-chatbot-toggle-btn {
+    bottom: 80px !important;
+    right: 14px !important;
+    padding: 8px 16px !important;
+    font-size: 0.76rem !important;
+  }
+
+  .ai-chatbot-window {
+    position: fixed !important;
+    bottom: 80px !important;
+    right: 12px !important;
+    left: 12px !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+    height: min(72vh, 480px) !important;
+    border-radius: 16px !important;
+  }
+
+  /* Responsive helper utilities */
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  .full-width-on-mobile {
+    width: 100% !important;
+  }
+
+  .stack-on-mobile {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+}

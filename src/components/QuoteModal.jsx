@@ -927,12 +927,30 @@ export default function QuoteModal({ isOpen, onClose, selectedProduct, selectedD
           box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+          .quote-modal-backdrop {
+            padding: 10px;
+          }
+          .quote-modal-card {
+            padding: 18px 12px;
+            border-radius: 16px;
+            max-width: 100%;
+          }
+          .modal-title {
+            font-size: 0.98rem;
+            line-height: 1.25;
+          }
           .inputs-2col {
             grid-template-columns: 1fr;
+            gap: 8px;
           }
           .edit-inputs {
             grid-template-columns: 1fr;
+            gap: 8px;
+          }
+          .btn-submit-pdf {
+            padding: 11px 14px;
+            font-size: 0.82rem;
           }
         }
       `}</style>

@@ -1872,3 +1872,144 @@
   border-color: var(--accent-gold);
   color: #ffffff;
 }
+
+/* ==========================================================================
+   DEALER PROFILE MOBILE RESPONSIVE OPTIMIZATION (<= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .profile-header-bar {
+    padding: 10px 14px;
+  }
+
+  .back-link {
+    padding: 8px 14px;
+    font-size: 0.78rem;
+  }
+
+  .profile-main-container {
+    padding: 0 12px;
+    margin-top: 14px;
+  }
+
+  .profile-banner-card {
+    padding: 20px 16px;
+    margin-bottom: 20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    border-radius: 18px;
+  }
+
+  .profile-banner-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .profile-logo-box {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    padding: 6px;
+  }
+
+  .profile-badges-row {
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .profile-badge,
+  .verified-badge {
+    padding: 4px 10px;
+    font-size: 0.68rem;
+  }
+
+  .profile-name {
+    font-size: 1.55rem !important;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .profile-location {
+    justify-content: center;
+    font-size: 0.85rem;
+  }
+
+  .hero-stats {
+    padding: 10px 12px;
+    border-radius: 14px;
+    width: 100%;
+    justify-content: space-around;
+    gap: 8px;
+  }
+
+  .hero-stat-item {
+    gap: 6px;
+  }
+
+  .stat-number {
+    font-size: 0.9rem;
+  }
+
+  .stat-label {
+    font-size: 0.62rem;
+  }
+
+  .hero-stat-divider {
+    height: 22px;
+  }
+
+  .profile-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .profile-actions a,
+  .profile-actions button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 14px !important;
+    font-size: 0.84rem !important;
+    border-radius: 12px !important;
+  }
+
+  .section-glass-card {
+    padding: 18px 14px !important;
+    border-radius: 16px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .section-main-heading {
+    font-size: 1.25rem !important;
+    gap: 10px !important;
+  }
+
+  .campaigns-grid,
+  .products-grid,
+  .services-grid,
+  .dealers-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .campaign-card {
+    padding: 18px 14px !important;
+    border-radius: 14px !important;
+  }
+
+  .quick-actions-store-bar {
+    padding: 12px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .quick-action-chip {
+    padding: 7px 12px;
+    font-size: 0.76rem;
+    justify-content: center;
+  }
+}
+

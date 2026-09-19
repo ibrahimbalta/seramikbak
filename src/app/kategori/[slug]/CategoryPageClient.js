@@ -165,7 +165,7 @@ export default function CategoryPageClient({ category, products = [], otherCateg
       <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '40px 20px 80px' }}>
         
         {/* Filters Bar */}
-        <div style={{
+        <div className="category-filters-bar" style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -225,7 +225,7 @@ export default function CategoryPageClient({ category, products = [], otherCateg
           </div>
 
           {/* Search Box */}
-          <div style={{ position: 'relative', width: '260px' }}>
+          <div className="category-search-box" style={{ position: 'relative', width: '260px' }}>
             <Search size={15} style={{ position: 'absolute', left: '12px', top: '11px', color: '#64748b' }} />
             <input
               type="text"
@@ -260,7 +260,7 @@ export default function CategoryPageClient({ category, products = [], otherCateg
             Bu filtreye uygun seramik modeli bulunamadı. Lütfen filtreleri sıfırlayın.
           </div>
         ) : (
-          <div style={{
+          <div className="category-products-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
             gap: '22px',
@@ -431,6 +431,25 @@ export default function CategoryPageClient({ category, products = [], otherCateg
         )}
 
       </main>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          :global(.category-filters-bar) {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            padding: 12px !important;
+          }
+          :global(.category-search-box) {
+            width: 100% !important;
+          }
+          :global(.category-products-grid) {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+            margin-bottom: 40px !important;
+          }
+        }
+      `}</style>
 
     </div>
   );

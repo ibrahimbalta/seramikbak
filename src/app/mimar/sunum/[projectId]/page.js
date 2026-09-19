@@ -359,9 +359,9 @@ export default function ClientPresentationPage({ params }) {
           </span>
         </div>
 
-        <div style={{
+        <div className="sunum-items-grid" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
           gap: '24px'
         }}>
           {items.map((item, idx) => {
@@ -753,6 +753,15 @@ export default function ClientPresentationPage({ params }) {
           />
         </div>
       )}
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          :global(.sunum-items-grid) {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

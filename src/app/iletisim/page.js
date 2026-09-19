@@ -271,14 +271,14 @@ export default function ContactAndFaqPage() {
         </section>
 
         {/* Contact Form + Map Representation */}
-        <section style={{
+        <section className="contact-main-grid" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))',
           gap: '30px',
           marginBottom: '80px'
         }}>
           {/* Form */}
-          <div style={{
+          <div className="contact-form-card" style={{
             background: '#ffffff',
             border: '1px solid rgba(0, 0, 0, 0.04)',
             borderRadius: '24px',
@@ -304,7 +304,7 @@ export default function ContactAndFaqPage() {
               </div>
             ) : (
               <form onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div className="contact-form-row-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <label style={{ fontSize: '0.78rem', fontWeight: '700', color: '#475569' }}>Adınız Soyadınız</label>
                     <input 
@@ -628,6 +628,21 @@ export default function ContactAndFaqPage() {
           to {
             opacity: 1;
             transform: translateY(0);
+          }
+        }
+        @media (max-width: 768px) {
+          .contact-main-grid {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+            margin-bottom: 40px !important;
+          }
+          .contact-form-card {
+            padding: 20px 16px !important;
+            border-radius: 18px !important;
+          }
+          .contact-form-row-2col {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
           }
         }
       `}</style>
