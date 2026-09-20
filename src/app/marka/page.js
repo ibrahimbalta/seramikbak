@@ -4165,64 +4165,71 @@ export default function BrandPortalPage() {
 
               {/* -------------------- TAB: KÜRESEL ÜLKE ANALİTİĞİ -------------------- */}
               {activePortalTab === 'country-analytics' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '14px' : '24px', width: '100%', boxSizing: 'border-box' }}>
                   
                   {/* HEADER & TIME RANGE SELECTOR */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                        <div style={{ background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', padding: '8px', borderRadius: '10px', display: 'flex' }}>
-                          <Globe size={22} />
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    justifyContent: 'space-between',
+                    alignItems: isMobile ? 'stretch' : 'center',
+                    gap: isMobile ? '14px' : '16px',
+                    background: '#fff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '16px',
+                    padding: isMobile ? '16px' : '24px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+                    width: '100%',
+                    boxSizing: 'border-box'
+                  }}>
+                    <div style={{ width: '100%' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div style={{ background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', padding: '8px', borderRadius: '10px', display: 'flex', flexShrink: 0 }}>
+                            <Globe size={20} />
+                          </div>
+                          <div>
+                            <h2 style={{ fontSize: isMobile ? '1.05rem' : '1.25rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>
+                              Küresel Ülke Analitiği
+                            </h2>
+                            <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>İhracat & Global B2B Trafiği</span>
+                          </div>
                         </div>
-                        <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>
-                          Küresel Ülke Analitiği & İhracat Trafiği
-                        </h2>
-                        <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#10b981', background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '3px 10px', borderRadius: '20px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                        <span style={{ fontSize: '0.68rem', fontWeight: '700', color: '#10b981', background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '3px 8px', borderRadius: '20px', display: 'inline-flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
                           <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
-                          Canlı İhracat & B2B Verisi
+                          Canlı
                         </span>
                       </div>
-                      <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
-                        {brandInfo?.name || 'Marka'} seramik koleksiyonlarınızın Google Global, Yandex ve B2B mimarlık platformlarındaki ülke bazlı gösterimlerini, 3D BIM/CAD indirmelerini ve proje şartname taleplerini takip edin.
+                      <p style={{ fontSize: isMobile ? '0.78rem' : '0.85rem', color: '#64748b', margin: 0, lineHeight: '1.45' }}>
+                        {brandInfo?.name || 'Marka'} seramik koleksiyonlarınızın Google Global, Yandex ve B2B platformlarındaki ülke bazlı gösterimlerini ve şartname taleplerini takip edin.
                       </p>
                     </div>
 
                     {/* Period Buttons & Refresh */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <button
-                          disabled={countryLoading}
-                          onClick={() => {
-                            if (brandInfo) fetchCountryAnalytics(brandInfo.id, countryPeriod);
-                          }}
-                          title="Verileri Yenile"
-                          style={{
-                            padding: '8px 14px',
-                            borderRadius: '10px',
-                            border: countryRefreshMsg ? '1px solid #10b981' : '1px solid #cbd5e1',
-                            background: countryRefreshMsg ? '#ecfdf5' : '#ffffff',
-                            color: countryRefreshMsg ? '#047857' : '#475569',
-                            cursor: countryLoading ? 'not-allowed' : 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            fontSize: '0.78rem',
-                            fontWeight: '700',
-                            transition: 'all 0.2s ease',
-                            opacity: countryLoading ? 0.7 : 1
-                          }}
-                        >
-                          <RefreshCw size={14} className={countryLoading ? "animate-spin" : ""} style={{ color: countryRefreshMsg ? '#10b981' : '#64748b' }} />
-                          <span>{countryRefreshMsg || 'Tazele'}</span>
-                        </button>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '4px', background: '#f8fafc', padding: '4px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: isMobile ? 'column' : 'row',
+                      alignItems: isMobile ? 'stretch' : 'center',
+                      gap: '10px',
+                      width: isMobile ? '100%' : 'auto',
+                      marginTop: isMobile ? '4px' : '0'
+                    }}>
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                        gap: '4px',
+                        background: '#f8fafc',
+                        padding: '4px',
+                        borderRadius: '12px',
+                        border: '1px solid #e2e8f0',
+                        width: isMobile ? '100%' : 'auto',
+                        boxSizing: 'border-box'
+                      }}>
                         {[
-                          { id: '30d', label: 'Son 30 Gün' },
-                          { id: '90d', label: 'Son 90 Gün' },
+                          { id: '30d', label: isMobile ? '30 Gün' : 'Son 30 Gün' },
+                          { id: '90d', label: isMobile ? '90 Gün' : 'Son 90 Gün' },
                           { id: '1y', label: '1 Yıl' },
-                          { id: 'all', label: 'Tüm Zamanlar' }
+                          { id: 'all', label: isMobile ? 'Tümü' : 'Tüm Zamanlar' }
                         ].map(p => (
                           <button
                             key={p.id}
@@ -4231,57 +4238,96 @@ export default function BrandPortalPage() {
                               if (brandInfo) fetchCountryAnalytics(brandInfo.id, p.id);
                             }}
                             style={{
-                              padding: '6px 14px',
-                              fontSize: '0.78rem',
+                              padding: isMobile ? '8px 2px' : '6px 14px',
+                              fontSize: isMobile ? '0.72rem' : '0.78rem',
                               fontWeight: '700',
                               borderRadius: '8px',
                               border: 'none',
                               cursor: 'pointer',
                               background: countryPeriod === p.id ? '#0f172a' : 'transparent',
                               color: countryPeriod === p.id ? '#ffffff' : '#64748b',
-                              transition: 'all 0.2s ease'
+                              transition: 'all 0.2s ease',
+                              textAlign: 'center',
+                              whiteSpace: 'nowrap',
+                              minWidth: 0,
+                              boxSizing: 'border-box'
                             }}
                           >
                             {p.label}
                           </button>
                         ))}
                       </div>
+
+                      <button
+                        disabled={countryLoading}
+                        onClick={() => {
+                          if (brandInfo) fetchCountryAnalytics(brandInfo.id, countryPeriod);
+                        }}
+                        title="Verileri Yenile"
+                        style={{
+                          padding: isMobile ? '10px 14px' : '8px 14px',
+                          borderRadius: '10px',
+                          border: countryRefreshMsg ? '1px solid #10b981' : '1px solid #cbd5e1',
+                          background: countryRefreshMsg ? '#ecfdf5' : '#ffffff',
+                          color: countryRefreshMsg ? '#047857' : '#475569',
+                          cursor: countryLoading ? 'not-allowed' : 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          fontSize: '0.78rem',
+                          fontWeight: '700',
+                          transition: 'all 0.2s ease',
+                          opacity: countryLoading ? 0.7 : 1,
+                          width: isMobile ? '100%' : 'auto',
+                          boxSizing: 'border-box'
+                        }}
+                      >
+                        <RefreshCw size={14} className={countryLoading ? "animate-spin" : ""} style={{ color: countryRefreshMsg ? '#10b981' : '#64748b' }} />
+                        <span>{countryRefreshMsg || 'Verileri Tazele'}</span>
+                      </button>
                     </div>
                   </div>
 
                   {/* TOP KPI CARDS GRID */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(auto-fit, minmax(220px, 1fr))',
+                    gap: isMobile ? '10px' : '16px',
+                    width: '100%',
+                    boxSizing: 'border-box'
+                  }}>
                     
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>Toplam Küresel Gösterim</span>
-                      <div style={{ fontSize: '1.7rem', fontWeight: '900', color: '#0f172a', margin: '6px 0 2px 0' }}>
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: isMobile ? '14px 12px' : '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', minWidth: 0 }}>
+                      <span style={{ fontSize: isMobile ? '0.65rem' : '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Toplam Gösterim</span>
+                      <div style={{ fontSize: isMobile ? '1.35rem' : '1.7rem', fontWeight: '900', color: '#0f172a', margin: '4px 0 2px 0' }}>
                         {(countryAnalytics?.summary?.totalGlobalViews ?? 0).toLocaleString('tr-TR')}
                       </div>
-                      <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>🌍 {countryAnalytics?.summary?.activeCountriesCount ?? 0} Hedef İhracat Pazarı</span>
+                      <span style={{ fontSize: isMobile ? '0.64rem' : '0.72rem', color: '#10b981', fontWeight: '700', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>🌍 {countryAnalytics?.summary?.activeCountriesCount ?? 0} Hedef Pazar</span>
                     </div>
 
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>En Aktif İhracat Pazarı</span>
-                      <div style={{ fontSize: '1.35rem', fontWeight: '900', color: '#b38e47', margin: '6px 0 2px 0' }}>
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: isMobile ? '14px 12px' : '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', minWidth: 0 }}>
+                      <span style={{ fontSize: isMobile ? '0.65rem' : '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>En Aktif Pazar</span>
+                      <div style={{ fontSize: isMobile ? '1.15rem' : '1.35rem', fontWeight: '900', color: '#b38e47', margin: '4px 0 2px 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {countryAnalytics?.summary?.topExportMarket || 'Henüz Veri Yok'}
                       </div>
-                      <span style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: '700' }}>⚡ En Yüksek B2B Şartname Trafiği</span>
+                      <span style={{ fontSize: isMobile ? '0.64rem' : '0.72rem', color: '#2563eb', fontWeight: '700', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>⚡ B2B Şartname</span>
                     </div>
 
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>3D BIM / CAD İndirmeleri</span>
-                      <div style={{ fontSize: '1.7rem', fontWeight: '900', color: '#2563eb', margin: '6px 0 2px 0' }}>
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: isMobile ? '14px 12px' : '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', minWidth: 0 }}>
+                      <span style={{ fontSize: isMobile ? '0.65rem' : '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>3D BIM / CAD</span>
+                      <div style={{ fontSize: isMobile ? '1.35rem' : '1.7rem', fontWeight: '900', color: '#2563eb', margin: '4px 0 2px 0' }}>
                         {(countryAnalytics?.summary?.totalBimDownloads ?? 0).toLocaleString('tr-TR')}
                       </div>
-                      <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>📐 4K PBR Dokuları & Revit (.rfa)</span>
+                      <span style={{ fontSize: isMobile ? '0.64rem' : '0.72rem', color: '#64748b', fontWeight: '600', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>📐 4K PBR & Revit</span>
                     </div>
 
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>B2B İhracat Talepleri</span>
-                      <div style={{ fontSize: '1.7rem', fontWeight: '900', color: '#10b981', margin: '6px 0 2px 0' }}>
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: isMobile ? '14px 12px' : '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', minWidth: 0 }}>
+                      <span style={{ fontSize: isMobile ? '0.65rem' : '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>B2B Talepleri</span>
+                      <div style={{ fontSize: isMobile ? '1.35rem' : '1.7rem', fontWeight: '900', color: '#10b981', margin: '4px 0 2px 0' }}>
                         {(countryAnalytics?.summary?.totalB2bLeads ?? 0).toLocaleString('tr-TR')}
                       </div>
-                      <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: '700' }}>📋 Doğrulanmış Proje Şartnameleri</span>
+                      <span style={{ fontSize: isMobile ? '0.64rem' : '0.72rem', color: '#10b981', fontWeight: '700', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>📋 Şartnameler</span>
                     </div>
 
                   </div>
@@ -4290,81 +4336,83 @@ export default function BrandPortalPage() {
                   <div style={{ 
                     background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', 
                     borderRadius: '16px', 
-                    padding: '22px 24px', 
+                    padding: isMobile ? '16px' : '22px 24px', 
                     color: '#ffffff',
-                    boxShadow: '0 4px 20px rgba(15, 23, 42, 0.12)'
+                    boxShadow: '0 4px 20px rgba(15, 23, 42, 0.12)',
+                    width: '100%',
+                    boxSizing: 'border-box'
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: '12px', marginBottom: '14px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Search size={22} style={{ color: '#38bdf8' }} />
+                        <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <Search size={20} style={{ color: '#38bdf8' }} />
                         </div>
                         <div>
-                          <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: '#ffffff' }}>
-                            SeramikBak Otomatik SEO & Küresel Google İndeksleme Paneli
+                          <h3 style={{ fontSize: isMobile ? '0.95rem' : '1.05rem', fontWeight: '800', margin: 0, color: '#ffffff' }}>
+                            SeramikBak Küresel SEO & İndeksleme
                           </h3>
-                          <p style={{ fontSize: '0.78rem', color: '#94a3b8', margin: '2px 0 0 0' }}>
-                            Yüklediğiniz seramik koleksiyonları Google Global, Yandex RU ve Bing'de 5 farklı dilde otomatik indekslenir.
+                          <p style={{ fontSize: isMobile ? '0.72rem' : '0.78rem', color: '#94a3b8', margin: '2px 0 0 0' }}>
+                            Koleksiyonlarınız 5 dilde Google Global ve Yandex'te otomatik indekslenir.
                           </p>
                         </div>
                       </div>
-                      <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '6px 14px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Sparkles size={16} style={{ color: '#34d399' }} />
-                        <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#34d399' }}>
-                          SEO Uyum Skoru: %{countryAnalytics?.seoStatus?.score || 98}
+                      <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '5px 12px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '6px', alignSelf: isMobile ? 'flex-start' : 'auto' }}>
+                        <Sparkles size={14} style={{ color: '#34d399' }} />
+                        <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#34d399' }}>
+                          SEO Skoru: %{countryAnalytics?.seoStatus?.score || 98}
                         </span>
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginTop: '14px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px' }}>
-                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px 14px', borderRadius: '12px' }}>
-                        <span style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase' }}>SEO İndeksli Sayfa Varyasyonu</span>
-                        <div style={{ fontSize: '1.3rem', fontWeight: '900', color: '#38bdf8', marginTop: '4px' }}>
-                          {countryAnalytics?.seoStatus?.indexedVariants || 0} Sayfa Varyasyonu
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginTop: '12px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '14px' }}>
+                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '12px' }}>
+                        <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase' }}>SEO İndeksli Sayfa</span>
+                        <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#38bdf8', marginTop: '2px' }}>
+                          {countryAnalytics?.seoStatus?.indexedVariants || 0} Varyasyon
                         </div>
-                        <span style={{ fontSize: '0.68rem', color: '#cbd5e1' }}>🌐 5 Dilde (TR, EN, DE, AR, RU) sitemap.xml</span>
+                        <span style={{ fontSize: '0.65rem', color: '#cbd5e1' }}>🌐 5 Dilde sitemap.xml</span>
                       </div>
 
-                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px 14px', borderRadius: '12px' }}>
-                        <span style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase' }}>Schema.org Yapılandırılmış Veri</span>
-                        <div style={{ fontSize: '1.3rem', fontWeight: '900', color: '#34d399', marginTop: '4px' }}>
+                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '12px' }}>
+                        <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase' }}>Yapılandırılmış Veri</span>
+                        <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#34d399', marginTop: '2px' }}>
                           Product & 3D BIM
                         </div>
-                        <span style={{ fontSize: '0.68rem', color: '#cbd5e1' }}>📐 Google Zengin Sonuç (Rich Snippet) Uyumlu</span>
+                        <span style={{ fontSize: '0.65rem', color: '#cbd5e1' }}>📐 Google Zengin Sonuç Uyumlu</span>
                       </div>
 
-                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px 14px', borderRadius: '12px' }}>
-                        <span style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase' }}>Dövizli İhracat İndeksi</span>
-                        <div style={{ fontSize: '1.3rem', fontWeight: '900', color: '#fbbf24', marginTop: '4px' }}>
+                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '12px' }}>
+                        <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase' }}>Dövizli İhracat İndeksi</span>
+                        <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#fbbf24', marginTop: '2px' }}>
                           EUR, USD, GBP, SAR
                         </div>
-                        <span style={{ fontSize: '0.68rem', color: '#cbd5e1' }}>⚡ Hedef Ülke Para Birimi ile Fiyatlandırma</span>
+                        <span style={{ fontSize: '0.65rem', color: '#cbd5e1' }}>⚡ Hedef Ülke Para Birimi</span>
                       </div>
                     </div>
                   </div>
 
                   {/* REGIONAL MARKET OVERVIEW SUMMARY */}
                   {countryAnalytics?.regions && countryAnalytics.regions.length > 0 && (
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-                      <h3 style={{ fontSize: '0.95rem', fontWeight: '800', margin: '0 0 14px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Globe size={18} style={{ color: '#2563eb' }} />
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: isMobile ? '16px' : '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)', width: '100%', boxSizing: 'border-box' }}>
+                      <h3 style={{ fontSize: isMobile ? '0.9rem' : '0.95rem', fontWeight: '800', margin: '0 0 12px 0', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Globe size={16} style={{ color: '#2563eb' }} />
                         <span>Bölgesel İhracat Dağılımı Özeti</span>
                       </h3>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
                         {countryAnalytics.regions.map(r => (
-                          <div key={r.region} style={{ background: '#f8fafc', padding: '14px', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
-                            <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#334155', marginBottom: '6px' }}>{r.region}</div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
+                          <div key={r.region} style={{ background: '#f8fafc', padding: isMobile ? '10px 12px' : '14px', borderRadius: '12px', border: '1px solid #f1f5f9', minWidth: 0 }}>
+                            <div style={{ fontSize: '0.74rem', fontWeight: '800', color: '#334155', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.region}</div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
                               <span style={{ color: '#64748b' }}>Gösterim:</span>
                               <strong style={{ color: '#0f172a' }}>{r.views.toLocaleString('tr-TR')}</strong>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', marginTop: '4px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', marginTop: '2px' }}>
                               <span style={{ color: '#64748b' }}>CAD/BIM:</span>
                               <strong style={{ color: '#2563eb' }}>{r.downloads.toLocaleString('tr-TR')}</strong>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', marginTop: '2px' }}>
-                              <span style={{ color: '#64748b' }}>B2B Talep:</span>
-                              <strong style={{ color: '#10b981' }}>{r.leads} Şartname</strong>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', marginTop: '2px' }}>
+                              <span style={{ color: '#64748b' }}>Talep:</span>
+                              <strong style={{ color: '#10b981' }}>{r.leads}</strong>
                             </div>
                           </div>
                         ))}
@@ -4373,16 +4421,16 @@ export default function BrandPortalPage() {
                   )}
 
                   {/* DYNAMIC COUNTRY DISTRIBUTION CHART & TABLE GRID */}
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr', gap: '24px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr', gap: isMobile ? '14px' : '24px', width: '100%', boxSizing: 'border-box' }}>
                     
                     {/* LEFT: COUNTRY PROGRESS BARS & STATS */}
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                        <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: isMobile ? '16px' : '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', width: '100%', boxSizing: 'border-box' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                        <h3 style={{ fontSize: isMobile ? '0.95rem' : '1.05rem', fontWeight: '800', margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <BarChart3 size={18} style={{ color: '#b38e47' }} />
-                          <span>Ülkelere Göre Görüntülenme & Şartname Trafiği</span>
+                          <span>Ülkelere Göre Şartname Trafiği</span>
                         </h3>
-                        <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '600' }}>Canlı İndeks Analizi</span>
+                        <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '600' }}>Canlı İndeks</span>
                       </div>
 
                       {countryLoading ? (
@@ -4390,28 +4438,51 @@ export default function BrandPortalPage() {
                           <Loader2 size={24} className="animate-spin" style={{ color: '#b38e47' }} />
                         </div>
                       ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                           {countryAnalytics?.countries?.map((c, index) => (
-                            <div key={c.code || index} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', color: '#1e293b' }}>
-                                  <span style={{ fontSize: '1.3rem' }}>{c.flag}</span>
-                                  <div>
-                                    <span style={{ fontWeight: '800' }}>{c.country}</span>
-                                    <span style={{ fontSize: '0.68rem', color: '#64748b', marginLeft: '6px', background: '#f1f5f9', padding: '1px 6px', borderRadius: '4px' }}>{c.region}</span>
+                            <div key={c.code || index} style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
+                              {isMobile ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, overflow: 'hidden' }}>
+                                      <span style={{ fontSize: '1.15rem', flexShrink: 0 }}>{c.flag}</span>
+                                      <span style={{ fontWeight: '800', fontSize: '0.84rem', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.country}</span>
+                                      <span style={{ fontSize: '0.62rem', color: '#64748b', background: '#f1f5f9', padding: '1px 5px', borderRadius: '4px', flexShrink: 0 }}>{c.region}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                                      <span style={{ fontSize: '0.66rem', fontWeight: '700', color: '#10b981', background: '#ecfdf5', padding: '1px 6px', borderRadius: '4px' }}>
+                                        {c.growth}
+                                      </span>
+                                      <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>%{c.sharePercent}</span>
+                                    </div>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.7rem', color: '#64748b', flexWrap: 'wrap' }}>
+                                    <span style={{ fontWeight: '700', color: '#334155' }}>👁️ {c.views.toLocaleString('tr-TR')} Görünüm</span>
+                                    <span style={{ color: '#2563eb', fontWeight: '700' }}>📐 {c.specDownloads} BIM</span>
+                                    <span style={{ color: '#10b981', fontWeight: '700' }}>📋 {c.b2bLeads} Talep</span>
                                   </div>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                  <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#10b981', background: '#ecfdf5', padding: '2px 8px', borderRadius: '6px' }}>
-                                    {c.growth}
-                                  </span>
-                                  <span style={{ fontWeight: '800', color: '#0f172a' }}>{c.views.toLocaleString('tr-TR')} Görüntülenme</span>
-                                  <span style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: '600' }}>{c.specDownloads} BIM</span>
-                                  <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700' }}>{c.b2bLeads} Talep</span>
-                                  <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '750', minWidth: '35px', textAlign: 'right' }}>%{c.sharePercent}</span>
+                              ) : (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', color: '#1e293b' }}>
+                                    <span style={{ fontSize: '1.3rem' }}>{c.flag}</span>
+                                    <div>
+                                      <span style={{ fontWeight: '800' }}>{c.country}</span>
+                                      <span style={{ fontSize: '0.68rem', color: '#64748b', marginLeft: '6px', background: '#f1f5f9', padding: '1px 6px', borderRadius: '4px' }}>{c.region}</span>
+                                    </div>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#10b981', background: '#ecfdf5', padding: '2px 8px', borderRadius: '6px' }}>
+                                      {c.growth}
+                                    </span>
+                                    <span style={{ fontWeight: '800', color: '#0f172a' }}>{c.views.toLocaleString('tr-TR')} Görüntülenme</span>
+                                    <span style={{ fontSize: '0.75rem', color: '#2563eb', fontWeight: '600' }}>{c.specDownloads} BIM</span>
+                                    <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: '700' }}>{c.b2bLeads} Talep</span>
+                                    <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '750', minWidth: '35px', textAlign: 'right' }}>%{c.sharePercent}</span>
+                                  </div>
                                 </div>
-                              </div>
-                              <div style={{ width: '100%', height: '10px', background: '#f1f5f9', borderRadius: '6px', overflow: 'hidden' }}>
+                              )}
+                              <div style={{ width: '100%', height: '8px', background: '#f1f5f9', borderRadius: '6px', overflow: 'hidden' }}>
                                 <div 
                                   style={{
                                     height: '100%',
@@ -4433,22 +4504,22 @@ export default function BrandPortalPage() {
                     </div>
 
                     {/* RIGHT: TOP PRODUCTS BY COUNTRY MATRIX & AI INSIGHTS */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '14px' : '20px' }}>
                       
                       {/* Top Product per Country */}
-                      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                        <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: isMobile ? '16px' : '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', width: '100%', boxSizing: 'border-box' }}>
+                        <h4 style={{ fontSize: isMobile ? '0.9rem' : '0.95rem', fontWeight: '800', color: '#0f172a', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <Tag size={16} style={{ color: '#b38e47' }} />
                           <span>Ülke Bazlı En Popüler Koleksiyonlar</span>
                         </h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           {countryAnalytics?.countries?.slice(0, 7).map((c, i) => (
-                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ fontSize: '1.1rem' }}>{c.flag}</span>
-                                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155' }}>{c.country}</span>
+                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9', minWidth: 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                                <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{c.flag}</span>
+                                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.country}</span>
                               </div>
-                              <span style={{ fontSize: '0.74rem', fontWeight: '700', color: '#2563eb', textAlign: 'right', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <span style={{ fontSize: '0.74rem', fontWeight: '700', color: '#2563eb', textAlign: 'right', maxWidth: isMobile ? '140px' : '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0 }}>
                                 {c.topProduct}
                               </span>
                             </div>
@@ -4457,10 +4528,10 @@ export default function BrandPortalPage() {
                       </div>
 
                       {/* AI Export Insights */}
-                      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', borderRadius: '16px', padding: '20px', color: '#fff', boxShadow: '0 4px 16px rgba(15,23,42,0.15)' }}>
+                      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', borderRadius: '16px', padding: isMobile ? '16px' : '20px', color: '#fff', boxShadow: '0 4px 16px rgba(15,23,42,0.15)', width: '100%', boxSizing: 'border-box' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                           <Sparkles size={18} style={{ color: '#d4af37' }} />
-                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', margin: 0, color: '#f8fafc' }}>İhracat Akıllı Fırsat Önerileri</h4>
+                          <h4 style={{ fontSize: isMobile ? '0.88rem' : '0.92rem', fontWeight: '800', margin: 0, color: '#f8fafc' }}>İhracat Akıllı Fırsat Önerileri</h4>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                           {countryAnalytics?.insights?.map((insight) => (
