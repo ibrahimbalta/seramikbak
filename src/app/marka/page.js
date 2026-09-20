@@ -5496,142 +5496,270 @@ export default function BrandPortalPage() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.6)',
-          backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div className="glass-panel" style={{
+          padding: '16px 12px',
+          boxSizing: 'border-box'
+        }} onClick={() => setShowAddDealerModal(false)}>
+          <div className="glass-panel modal-responsive-card" style={{
             background: '#ffffff',
             borderRadius: '20px',
             border: '1px solid #e2e8f0',
             width: '100%',
-            maxWidth: '520px',
-            padding: '30px',
-            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
-            position: 'relative'
-          }}>
+            maxWidth: '500px',
+            padding: '24px 20px',
+            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.25)',
+            position: 'relative',
+            maxHeight: 'calc(100dvh - 32px)',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            boxSizing: 'border-box'
+          }} onClick={(e) => e.stopPropagation()}>
             <button 
               onClick={() => setShowAddDealerModal(false)}
-              style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#64748b' }}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: '#f1f5f9',
+                border: 'none',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.25rem',
+                lineHeight: 1,
+                cursor: 'pointer',
+                color: '#64748b'
+              }}
+              aria-label="Kapat"
             >
               ×
             </button>
 
-            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px', color: '#0f172a' }}>
-              Yeni Yetkili Bayi Tanımla
-            </h3>
-            <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '20px' }}>
-              Ürünlerinizi fiziki showroom'unda satan yetkili satıcınızı veri tabanına kaydedin.
-            </p>
+            <div style={{ paddingRight: '36px', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '6px', color: '#0f172a' }}>
+                Yeni Yetkili Bayi Tanımla
+              </h3>
+              <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: 1.45 }}>
+                Ürünlerinizi fiziki showroom'unda satan yetkili satıcınızı veri tabanına kaydedin.
+              </p>
+            </div>
 
             {addDealerError && (
-              <div style={{ background: '#fef2f2', border: '1px solid #ef4444', color: '#991b1b', padding: '10px', borderRadius: '8px', fontSize: '0.78rem', marginBottom: '14px' }}>
+              <div style={{ background: '#fef2f2', border: '1px solid #ef4444', color: '#991b1b', padding: '10px 12px', borderRadius: '10px', fontSize: '0.78rem', marginBottom: '14px' }}>
                 {addDealerError}
               </div>
             )}
 
-            <form onSubmit={handleAddDealer} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Bayi / Mağaza Adı</label>
+            <form onSubmit={handleAddDealer} style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', boxSizing: 'border-box' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Bayi / Mağaza Adı *</label>
                 <input 
                   type="text" 
                   value={newDealerData.name} 
                   onChange={(e) => setNewDealerData({ ...newDealerData, name: e.target.value })}
                   placeholder="Örn: İstanbul Seramik Dünyası" 
                   required
-                  style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.85rem',
+                    boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Telefon Numarası</label>
-                  <input 
-                    type="tel" 
-                    value={newDealerData.phone} 
-                    onChange={(e) => setNewDealerData({ ...newDealerData, phone: e.target.value })}
-                    placeholder="Örn: 0216 123 45 67" 
-                    required
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
-                  />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Şehir</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Telefon Numarası *</label>
+                <input 
+                  type="tel" 
+                  value={newDealerData.phone} 
+                  onChange={(e) => setNewDealerData({ ...newDealerData, phone: e.target.value })}
+                  placeholder="Örn: 0216 123 45 67" 
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.85rem',
+                    boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                gap: '10px',
+                width: '100%',
+                boxSizing: 'border-box'
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Şehir *</label>
                   <input 
                     type="text" 
                     value={newDealerData.city} 
                     onChange={(e) => setNewDealerData({ ...newDealerData, city: e.target.value })}
                     placeholder="Örn: İstanbul" 
                     required
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '10px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.85rem',
+                      boxSizing: 'border-box',
+                      minWidth: 0,
+                      outline: 'none'
+                    }}
                   />
                 </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>İlçe</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>İlçe *</label>
                   <input 
                     type="text" 
                     value={newDealerData.district} 
                     onChange={(e) => setNewDealerData({ ...newDealerData, district: e.target.value })}
                     placeholder="Örn: Kadıköy" 
                     required
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
-                  />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Adres</label>
-                  <input 
-                    type="text" 
-                    value={newDealerData.address} 
-                    onChange={(e) => setNewDealerData({ ...newDealerData, address: e.target.value })}
-                    placeholder="Örn: Bağdat Cad. No:12" 
-                    required
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '10px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.85rem',
+                      boxSizing: 'border-box',
+                      minWidth: 0,
+                      outline: 'none'
+                    }}
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Harita Enlem (Latitude)</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Açık Adres *</label>
+                <input 
+                  type="text" 
+                  value={newDealerData.address} 
+                  onChange={(e) => setNewDealerData({ ...newDealerData, address: e.target.value })}
+                  placeholder="Örn: Bağdat Cad. No:12 D:4" 
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.85rem',
+                    boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                gap: '10px',
+                width: '100%',
+                boxSizing: 'border-box'
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Enlem (Latitude) *</label>
                   <input 
                     type="text" 
                     value={newDealerData.lat} 
                     onChange={(e) => setNewDealerData({ ...newDealerData, lat: e.target.value })}
+                    placeholder="40.9901"
                     required
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', fontFamily: 'monospace' }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '10px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.85rem',
+                      fontFamily: 'monospace',
+                      boxSizing: 'border-box',
+                      minWidth: 0,
+                      outline: 'none'
+                    }}
                   />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700' }}>Harita Boylam (Longitude)</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Boylam (Longitude) *</label>
                   <input 
                     type="text" 
                     value={newDealerData.lng} 
                     onChange={(e) => setNewDealerData({ ...newDealerData, lng: e.target.value })}
+                    placeholder="29.0278"
                     required
-                    style={{ padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem', fontFamily: 'monospace' }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '10px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.85rem',
+                      fontFamily: 'monospace',
+                      boxSizing: 'border-box',
+                      minWidth: 0,
+                      outline: 'none'
+                    }}
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+              <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '-2px' }}>
+                <span>📍</span>
+                <span>Koordinatlar yetkili bayiler haritasında ve en yakın bayi aramasında kullanılır.</span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
                 <button 
                   type="button"
                   onClick={() => setShowAddDealerModal(false)}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '700', cursor: 'pointer' }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: '1px solid #e2e8f0',
+                    background: '#f8fafc',
+                    color: '#475569',
+                    fontSize: '0.84rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxSizing: 'border-box'
+                  }}
                 >
                   İptal
                 </button>
                 <button 
                   type="submit"
                   disabled={addDealerLoading}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#059669', color: '#fff', fontWeight: '700', cursor: 'pointer', opacity: addDealerLoading ? 0.7 : 1 }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: '#059669',
+                    color: '#fff',
+                    fontSize: '0.84rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    opacity: addDealerLoading ? 0.7 : 1,
+                    boxSizing: 'border-box'
+                  }}
                 >
                   {addDealerLoading ? 'Ekleniyor...' : 'Bayiyi Ekle'}
                 </button>
@@ -5649,60 +5777,86 @@ export default function BrandPortalPage() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.6)',
-          backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div className="glass-panel" style={{
+          padding: '16px 12px',
+          boxSizing: 'border-box'
+        }} onClick={() => setShowPaymentModal(false)}>
+          <div className="glass-panel modal-responsive-card" style={{
             background: '#ffffff',
             borderRadius: '20px',
             border: '1px solid #e2e8f0',
             width: '100%',
             maxWidth: '500px',
-            padding: '30px',
-            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
-            position: 'relative'
-          }}>
+            padding: '24px 20px',
+            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.25)',
+            position: 'relative',
+            maxHeight: 'calc(100dvh - 32px)',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            boxSizing: 'border-box'
+          }} onClick={(e) => e.stopPropagation()}>
             <button 
               onClick={() => setShowPaymentModal(false)}
-              style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#64748b' }}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: '#f1f5f9',
+                border: 'none',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.25rem',
+                lineHeight: 1,
+                cursor: 'pointer',
+                color: '#64748b'
+              }}
+              aria-label="Kapat"
             >
               ×
             </button>
 
-            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px', color: '#0f172a' }}>
-              Banka Havalesi Ödeme Bildirimi
-            </h3>
-            <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '20px' }}>
-              Seçtiğiniz <strong>{selectedPaymentPlan}</strong> paketini aktifleştirmek için lütfen aşağıdaki IBAN adresine transfer yapıp bildirim formunu doldurun.
-            </p>
+            <div style={{ paddingRight: '36px', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '6px', color: '#0f172a' }}>
+                Banka Havalesi Ödeme Bildirimi
+              </h3>
+              <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: 1.45 }}>
+                Seçtiğiniz <strong>{selectedPaymentPlan}</strong> paketini aktifleştirmek için lütfen aşağıdaki IBAN adresine transfer yapıp bildirim formunu doldurun.
+              </p>
+            </div>
 
             <div style={{
               background: '#f8fafc',
               border: '1px solid #e2e8f0',
               borderRadius: '12px',
-              padding: '16px',
-              marginBottom: '20px',
-              fontSize: '0.82rem',
+              padding: '14px',
+              marginBottom: '16px',
+              fontSize: '0.8rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '6px'
+              gap: '6px',
+              boxSizing: 'border-box'
             }}>
               <div><strong>Banka:</strong> {bankDetails.bank_name}</div>
               <div><strong>Alıcı:</strong> {bankDetails.bank_recipient}</div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban}</span></div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+                <div style={{ wordBreak: 'break-all' }}><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban}</span></div>
                 <button 
                   type="button"
                   onClick={() => {
                     navigator.clipboard.writeText(bankDetails.bank_iban);
                     alert('IBAN panoya kopyalandı!');
                   }}
-                  style={{ background: '#e2e8f0', border: 'none', borderRadius: '4px', padding: '2px 8px', fontSize: '0.7rem', cursor: 'pointer', fontWeight: '600' }}
+                  style={{ background: '#e2e8f0', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: '600' }}
                 >
                   Kopyala
                 </button>
@@ -5712,57 +5866,104 @@ export default function BrandPortalPage() {
               </div>
             </div>
 
-            <form onSubmit={handleSendPaymentNotification} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <form onSubmit={handleSendPaymentNotification} style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', boxSizing: 'border-box' }}>
               
-              {paymentSuccess && <div style={{ background: '#ecfdf5', color: '#065f46', padding: '8px 12px', borderRadius: '6px', fontSize: '0.78rem' }}>{paymentSuccess}</div>}
-              {paymentError && <div style={{ background: '#fef2f2', color: '#991b1b', padding: '8px 12px', borderRadius: '6px', fontSize: '0.78rem' }}>{paymentError}</div>}
+              {paymentSuccess && <div style={{ background: '#ecfdf5', color: '#065f46', padding: '8px 12px', borderRadius: '8px', fontSize: '0.78rem' }}>{paymentSuccess}</div>}
+              {paymentError && <div style={{ background: '#fef2f2', color: '#991b1b', padding: '8px 12px', borderRadius: '8px', fontSize: '0.78rem' }}>{paymentError}</div>}
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: '600' }}>Ödeme Yapan Ad Soyad</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Ödeme Yapan Ad Soyad *</label>
                 <input 
                   type="text" 
                   value={paymentSenderName} 
                   onChange={(e) => setPaymentSenderName(e.target.value)} 
                   placeholder="Hesap Sahibi Adı Soyadı" 
                   required
-                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    fontSize: '0.85rem',
+                    borderRadius: '10px',
+                    border: '1px solid #cbd5e1',
+                    boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
                 />
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: '600' }}>Ödeme Tarihi</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Ödeme Tarihi *</label>
                 <input 
                   type="date" 
                   value={paymentDate} 
                   onChange={(e) => setPaymentDate(e.target.value)} 
                   required
-                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    fontSize: '0.85rem',
+                    borderRadius: '10px',
+                    border: '1px solid #cbd5e1',
+                    boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
                 />
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: '600' }}>Dekont No / Ek Notlar</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Dekont No / Ek Notlar</label>
                 <input 
                   type="text" 
                   value={paymentNote} 
                   onChange={(e) => setPaymentNote(e.target.value)} 
                   placeholder="Referans No veya Not" 
-                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    fontSize: '0.85rem',
+                    borderRadius: '10px',
+                    border: '1px solid #cbd5e1',
+                    boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
                 <button 
                   type="button"
                   onClick={() => setShowPaymentModal(false)}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '700', cursor: 'pointer' }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: '1px solid #e2e8f0',
+                    background: '#f8fafc',
+                    color: '#475569',
+                    fontSize: '0.84rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxSizing: 'border-box'
+                  }}
                 >
                   İptal
                 </button>
                 <button 
                   type="submit"
                   disabled={paymentLoading}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#000', fontWeight: '800', cursor: 'pointer', opacity: paymentLoading ? 0.7 : 1 }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    color: '#000',
+                    fontSize: '0.84rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    opacity: paymentLoading ? 0.7 : 1,
+                    boxSizing: 'border-box'
+                  }}
                 >
                   {paymentLoading ? 'İletiliyor...' : 'Bildirimi Gönder'}
                 </button>
@@ -5781,60 +5982,86 @@ export default function BrandPortalPage() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.6)',
-          backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div className="glass-panel" style={{
+          padding: '16px 12px',
+          boxSizing: 'border-box'
+        }} onClick={() => setShowCampaignPaymentModal(false)}>
+          <div className="glass-panel modal-responsive-card" style={{
             background: '#ffffff',
             borderRadius: '20px',
             border: '1px solid #e2e8f0',
             width: '100%',
             maxWidth: '500px',
-            padding: '30px',
-            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
-            position: 'relative'
-          }}>
+            padding: '24px 20px',
+            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.25)',
+            position: 'relative',
+            maxHeight: 'calc(100dvh - 32px)',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            boxSizing: 'border-box'
+          }} onClick={(e) => e.stopPropagation()}>
             <button 
               onClick={() => setShowCampaignPaymentModal(false)}
-              style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#64748b' }}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: '#f1f5f9',
+                border: 'none',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.25rem',
+                lineHeight: 1,
+                cursor: 'pointer',
+                color: '#64748b'
+              }}
+              aria-label="Kapat"
             >
               ×
             </button>
 
-            <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px', color: '#0f172a' }}>
-              Vitrin Reklamı Ödeme Bilgileri
-            </h3>
-            <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '20px' }}>
-              Reklam yayın süresi: <strong>{campaignDuration === '7' ? '1 Hafta' : campaignDuration === '30' ? '1 Ay' : campaignDuration === '90' ? '3 Ay' : '6 Ay'}</strong>. Havalenizi tamamlayıp dekont işlem numarasını girin.
-            </p>
+            <div style={{ paddingRight: '36px', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '6px', color: '#0f172a' }}>
+                Vitrin Reklamı Ödeme Bilgileri
+              </h3>
+              <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, lineHeight: 1.45 }}>
+                Reklam yayın süresi: <strong>{campaignDuration === '7' ? '1 Hafta' : campaignDuration === '30' ? '1 Ay' : campaignDuration === '90' ? '3 Ay' : '6 Ay'}</strong>. Havalenizi tamamlayıp dekont işlem numarasını girin.
+              </p>
+            </div>
 
             <div style={{
               background: '#f8fafc',
               border: '1px solid #e2e8f0',
               borderRadius: '12px',
-              padding: '16px',
-              marginBottom: '20px',
-              fontSize: '0.82rem',
+              padding: '14px',
+              marginBottom: '16px',
+              fontSize: '0.8rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '6px'
+              gap: '6px',
+              boxSizing: 'border-box'
             }}>
               <div><strong>Banka:</strong> {bankDetails.bank_name}</div>
               <div><strong>Alıcı:</strong> {bankDetails.bank_recipient}</div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban}</span></div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
+                <div style={{ wordBreak: 'break-all' }}><strong>IBAN:</strong> <span style={{ fontFamily: 'monospace', fontWeight: '700' }}>{bankDetails.bank_iban}</span></div>
                 <button 
                   type="button"
                   onClick={() => {
                     navigator.clipboard.writeText(bankDetails.bank_iban);
                     alert('IBAN panoya kopyalandı!');
                   }}
-                  style={{ background: '#e2e8f0', border: 'none', borderRadius: '4px', padding: '2px 8px', fontSize: '0.7rem', cursor: 'pointer', fontWeight: '600' }}
+                  style={{ background: '#e2e8f0', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: '600' }}
                 >
                   Kopyala
                 </button>
@@ -5846,32 +6073,63 @@ export default function BrandPortalPage() {
               </div>
             </div>
 
-            <form onSubmit={handleCampaignPaymentConfirm} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <form onSubmit={handleCampaignPaymentConfirm} style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', boxSizing: 'border-box' }}>
               
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.75rem', fontWeight: '600' }}>Havale Dekont No / İşlem Kodu</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Havale Dekont No / İşlem Kodu *</label>
                 <input 
                   type="text" 
                   value={campaignPaymentRef} 
                   onChange={(e) => setCampaignPaymentRef(e.target.value)} 
                   placeholder="İşlem veya Referans No" 
                   required
-                  style={{ padding: '10px', fontSize: '0.82rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    fontSize: '0.85rem',
+                    borderRadius: '10px',
+                    border: '1px solid #cbd5e1',
+                    boxSizing: 'border-box',
+                    outline: 'none'
+                  }}
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
                 <button 
                   type="button"
                   onClick={() => setShowCampaignPaymentModal(false)}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: '#f1f5f9', color: '#475569', fontWeight: '700', cursor: 'pointer' }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: '1px solid #e2e8f0',
+                    background: '#f8fafc',
+                    color: '#475569',
+                    fontSize: '0.84rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxSizing: 'border-box'
+                  }}
                 >
                   İptal
                 </button>
                 <button 
                   type="submit"
                   disabled={isStartingCampaign}
-                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)', color: '#000', fontWeight: '800', cursor: 'pointer', opacity: isStartingCampaign ? 0.7 : 1 }}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    color: '#000',
+                    fontSize: '0.84rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    opacity: isStartingCampaign ? 0.7 : 1,
+                    boxSizing: 'border-box'
+                  }}
                 >
                   {isStartingCampaign ? 'Gönderiliyor...' : 'Ödemeyi Bildir'}
                 </button>

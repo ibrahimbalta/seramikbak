@@ -3798,15 +3798,22 @@ h1, h2, h3, h4, h5, h6, p, span, a, label {
   [role="dialog"],
   .modal-card,
   .podium-card,
+  .modal-responsive-card,
+  div[style*="maxWidth: '480px'"],
   div[style*="maxWidth: '500px'"],
+  div[style*="maxWidth: '520px'"],
+  div[style*="maxWidth: '540px'"],
   div[style*="maxWidth: '600px'"],
   div[style*="maxWidth: '700px'"],
   div[style*="maxWidth: '720px'"] {
-    max-width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 24px) !important;
     width: 100% !important;
     box-sizing: border-box !important;
     margin-left: auto !important;
     margin-right: auto !important;
+    max-height: calc(100dvh - 28px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   /* Floating SB Asistan Chatbot Mobile Optimization */
