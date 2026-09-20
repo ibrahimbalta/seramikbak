@@ -1903,7 +1903,7 @@ export default function BrandPortalPage() {
         </header>
 
         {/* PORTAL MAIN TAB CONTAINER */}
-        <main style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
+        <main style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto', overflowX: 'hidden' }}>
           
           {statsLoading && !b2bStats ? (
             <div style={{ textAlign: 'center', padding: '120px 0', color: '#64748b' }}>
@@ -4421,16 +4421,35 @@ export default function BrandPortalPage() {
                   )}
 
                   {/* DYNAMIC COUNTRY DISTRIBUTION CHART & TABLE GRID */}
-                  <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr', gap: isMobile ? '14px' : '24px', width: '100%', boxSizing: 'border-box' }}>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    gap: isMobile ? '14px' : '24px',
+                    width: '100%',
+                    maxWidth: '100%',
+                    boxSizing: 'border-box'
+                  }}>
                     
                     {/* LEFT: COUNTRY PROGRESS BARS & STATS */}
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: isMobile ? '16px' : '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', width: '100%', boxSizing: 'border-box' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                        <h3 style={{ fontSize: isMobile ? '0.95rem' : '1.05rem', fontWeight: '800', margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <BarChart3 size={18} style={{ color: '#b38e47' }} />
-                          <span>Ülkelere Göre Şartname Trafiği</span>
+                    <div style={{
+                      background: '#fff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '16px',
+                      padding: isMobile ? '14px 12px' : '24px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+                      width: '100%',
+                      maxWidth: '100%',
+                      boxSizing: 'border-box',
+                      overflow: 'hidden',
+                      flex: isMobile ? 'none' : '1.5',
+                      minWidth: 0
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', width: '100%', gap: '8px', boxSizing: 'border-box' }}>
+                        <h3 style={{ fontSize: isMobile ? '0.88rem' : '1.05rem', fontWeight: '800', margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, overflow: 'hidden' }}>
+                          <BarChart3 size={16} style={{ color: '#b38e47', flexShrink: 0 }} />
+                          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Ülkelere Göre Şartname Trafiği</span>
                         </h3>
-                        <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '600' }}>Canlı İndeks</span>
+                        <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: '600', flexShrink: 0 }}>Canlı İndeks</span>
                       </div>
 
                       {countryLoading ? (
@@ -4438,25 +4457,25 @@ export default function BrandPortalPage() {
                           <Loader2 size={24} className="animate-spin" style={{ color: '#b38e47' }} />
                         </div>
                       ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%', boxSizing: 'border-box' }}>
                           {countryAnalytics?.countries?.map((c, index) => (
-                            <div key={c.code || index} style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
+                            <div key={c.code || index} style={{ display: 'flex', flexDirection: 'column', gap: '5px', width: '100%', minWidth: 0, boxSizing: 'border-box' }}>
                               {isMobile ? (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, overflow: 'hidden' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%', minWidth: 0, boxSizing: 'border-box' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: '6px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flex: 1, overflow: 'hidden' }}>
                                       <span style={{ fontSize: '1.15rem', flexShrink: 0 }}>{c.flag}</span>
-                                      <span style={{ fontWeight: '800', fontSize: '0.84rem', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.country}</span>
-                                      <span style={{ fontSize: '0.62rem', color: '#64748b', background: '#f1f5f9', padding: '1px 5px', borderRadius: '4px', flexShrink: 0 }}>{c.region}</span>
+                                      <span style={{ fontWeight: '800', fontSize: '0.82rem', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.country}</span>
+                                      <span style={{ fontSize: '0.6rem', color: '#64748b', background: '#f1f5f9', padding: '1px 5px', borderRadius: '4px', flexShrink: 0 }}>{c.region}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                                      <span style={{ fontSize: '0.66rem', fontWeight: '700', color: '#10b981', background: '#ecfdf5', padding: '1px 6px', borderRadius: '4px' }}>
+                                      <span style={{ fontSize: '0.65rem', fontWeight: '700', color: '#10b981', background: '#ecfdf5', padding: '1px 5px', borderRadius: '4px' }}>
                                         {c.growth}
                                       </span>
-                                      <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>%{c.sharePercent}</span>
+                                      <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a', minWidth: '36px', textAlign: 'right' }}>%{c.sharePercent}</span>
                                     </div>
                                   </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.7rem', color: '#64748b', flexWrap: 'wrap' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.68rem', color: '#64748b', flexWrap: 'wrap', width: '100%' }}>
                                     <span style={{ fontWeight: '700', color: '#334155' }}>👁️ {c.views.toLocaleString('tr-TR')} Görünüm</span>
                                     <span style={{ color: '#2563eb', fontWeight: '700' }}>📐 {c.specDownloads} BIM</span>
                                     <span style={{ color: '#10b981', fontWeight: '700' }}>📋 {c.b2bLeads} Talep</span>
@@ -4482,7 +4501,7 @@ export default function BrandPortalPage() {
                                   </div>
                                 </div>
                               )}
-                              <div style={{ width: '100%', height: '8px', background: '#f1f5f9', borderRadius: '6px', overflow: 'hidden' }}>
+                              <div style={{ width: '100%', height: '7px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
                                 <div 
                                   style={{
                                     height: '100%',
@@ -4492,7 +4511,7 @@ export default function BrandPortalPage() {
                                       : index < 3 
                                         ? 'linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)' 
                                         : 'linear-gradient(90deg, #64748b 0%, #94a3b8 100%)',
-                                    borderRadius: '6px',
+                                    borderRadius: '4px',
                                     transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
                                   }}
                                 />
@@ -4504,22 +4523,41 @@ export default function BrandPortalPage() {
                     </div>
 
                     {/* RIGHT: TOP PRODUCTS BY COUNTRY MATRIX & AI INSIGHTS */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '14px' : '20px' }}>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: isMobile ? '14px' : '20px',
+                      flex: isMobile ? 'none' : '1',
+                      width: '100%',
+                      maxWidth: '100%',
+                      minWidth: 0,
+                      boxSizing: 'border-box'
+                    }}>
                       
                       {/* Top Product per Country */}
-                      <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: isMobile ? '16px' : '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', width: '100%', boxSizing: 'border-box' }}>
-                        <h4 style={{ fontSize: isMobile ? '0.9rem' : '0.95rem', fontWeight: '800', color: '#0f172a', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div style={{
+                        background: '#fff',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '16px',
+                        padding: isMobile ? '14px 12px' : '20px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+                        width: '100%',
+                        maxWidth: '100%',
+                        boxSizing: 'border-box',
+                        overflow: 'hidden'
+                      }}>
+                        <h4 style={{ fontSize: isMobile ? '0.88rem' : '0.95rem', fontWeight: '800', color: '#0f172a', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <Tag size={16} style={{ color: '#b38e47' }} />
                           <span>Ülke Bazlı En Popüler Koleksiyonlar</span>
                         </h4>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                           {countryAnalytics?.countries?.slice(0, 7).map((c, i) => (
-                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9', minWidth: 0 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 10px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9', minWidth: 0, gap: '8px', boxSizing: 'border-box' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flex: 1, overflow: 'hidden' }}>
                                 <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{c.flag}</span>
-                                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.country}</span>
+                                <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#334155', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.country}</span>
                               </div>
-                              <span style={{ fontSize: '0.74rem', fontWeight: '700', color: '#2563eb', textAlign: 'right', maxWidth: isMobile ? '140px' : '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                              <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#2563eb', textAlign: 'right', maxWidth: isMobile ? '120px' : '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0 }}>
                                 {c.topProduct}
                               </span>
                             </div>
@@ -4528,7 +4566,16 @@ export default function BrandPortalPage() {
                       </div>
 
                       {/* AI Export Insights */}
-                      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', borderRadius: '16px', padding: isMobile ? '16px' : '20px', color: '#fff', boxShadow: '0 4px 16px rgba(15,23,42,0.15)', width: '100%', boxSizing: 'border-box' }}>
+                      <div style={{
+                        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                        borderRadius: '16px',
+                        padding: isMobile ? '14px 12px' : '20px',
+                        color: '#fff',
+                        boxShadow: '0 4px 16px rgba(15,23,42,0.15)',
+                        width: '100%',
+                        maxWidth: '100%',
+                        boxSizing: 'border-box'
+                      }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                           <Sparkles size={18} style={{ color: '#d4af37' }} />
                           <h4 style={{ fontSize: isMobile ? '0.88rem' : '0.92rem', fontWeight: '800', margin: 0, color: '#f8fafc' }}>İhracat Akıllı Fırsat Önerileri</h4>
