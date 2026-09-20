@@ -3558,35 +3558,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Dynamic Ad Campaign Showcase */}
-        {activeAdCampaigns.length > 0 && activeAdCampaigns[currentAdIndex]?.product && (
-          <div className="banner-ad-showcase" onClick={() => {
-            const camp = activeAdCampaigns[currentAdIndex];
-            const prod = camp.product;
-            // Record analytics click for sponsored ad
-            fetch('/api/analytics/log', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ 
-                action: 'CLICK', 
-                campaignId: camp.id,
-                productId: prod.id,
-                brandId: prod.brandId
-              })
-            }).catch(console.error);
-            
-            // Enrich and open details
-            const enriched = enrichProductData(prod);
-            handleProductCardClick(enriched);
-          }}>
-            <span className="ad-badge">SPONSORLU</span>
-            <img src={activeAdCampaigns[currentAdIndex].product?.imageUrl || '/ceramic_placeholder.png'} alt="Ad" className="ad-thumb" />
-            <div className="ad-info">
-              <span className="ad-brand">{activeAdCampaigns[currentAdIndex].product?.brand?.name || 'Marka'}</span>
-              <span className="ad-name">{activeAdCampaigns[currentAdIndex].product?.name || 'Ürün'}</span>
-            </div>
-          </div>
-        )}
 
         <div className="banner-marquee-wrapper">
           <div className="banner-marquee-track">
