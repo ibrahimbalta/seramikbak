@@ -4495,14 +4495,12 @@ export default function Home() {
                     </button>
                   </div>
                   <TileCalculatorWidget 
-                    onGoToDealers={() => {
-                      setActiveTab('dealers');
-                      setTimeout(() => {
-                        const el = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      }, 100);
+                    onGoToDealers={(summary) => {
+                      try {
+                        localStorage.setItem('seramikbak_metraj_quote', JSON.stringify(summary));
+                      } catch (e) {}
+                      window.location.href = '/bayiler?nearby=true&from=metraj';
                     }}
-                    onOpenQuoteModal={handleOpenLeadModalWithProduct} 
                   />
                 </div>
               )}

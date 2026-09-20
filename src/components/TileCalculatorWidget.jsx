@@ -122,7 +122,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
   const totalMinCost = tileCostMin + adhesiveCost + groutCost + extraMaterialCost + laborCost;
   const totalMaxCost = tileCostMax + adhesiveCost + groutCost + extraMaterialCost + laborCost;
 
-  // Teklif Al / Bayiye Git
+  // Teklif Al / Bayiye Git -> En Yakın Yetkili Bayilere Yönlendir
   const handleRequestQuote = () => {
     const calcSummary = {
       areaM2,
@@ -140,15 +140,14 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
       estimatedMaxCost: totalMaxCost
     };
 
-    if (onOpenQuoteModal) {
-      onOpenQuoteModal(calcSummary);
-    } else if (onGoToDealers) {
+    try {
+      localStorage.setItem('seramikbak_metraj_quote', JSON.stringify(calcSummary));
+    } catch (e) {}
+
+    if (onGoToDealers) {
       onGoToDealers(calcSummary);
     } else {
-      const dealerSec = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
-      if (dealerSec) {
-        dealerSec.scrollIntoView({ behavior: 'smooth' });
-      }
+      window.location.href = '/bayiler?nearby=true&from=metraj';
     }
   };
 
