@@ -11141,23 +11141,6 @@ export default function Home() {
             flex-direction: column;
             align-items: stretch;
           }
-          .banner-left-area {
-            background: #07090f;
-            justify-content: center;
-            padding: 12px;
-          }
-          .banner-ad-showcase {
-            border-left: none;
-            border-right: none;
-            border-top: 1px solid rgba(212, 175, 55, 0.18);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.18);
-            padding: 12px;
-            justify-content: center;
-          }
-          .banner-marquee-wrapper {
-            mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
-          }
         }
 
         .content-container {
@@ -16476,66 +16459,78 @@ export default function Home() {
           .project-top-banner {
             display: flex !important;
             flex-direction: column !important;
-            padding: 8px 10px !important;
+            padding: 8px !important;
             margin: 4px 0 8px 0 !important;
             border-radius: 14px !important;
             background: linear-gradient(135deg, #fdfbf7 0%, #f5efe1 100%) !important;
             border: 1px solid rgba(179, 142, 71, 0.25) !important;
-            box-shadow: 0 4px 16px rgba(179, 142, 71, 0.08) !important;
+            box-shadow: 0 4px 16px rgba(179, 142, 71, 0.06) !important;
             gap: 8px !important;
+            box-sizing: border-box !important;
+            width: 100% !important;
           }
           .banner-left-area {
             display: flex !important;
             align-items: center !important;
             justify-content: flex-start !important;
-            padding: 0 2px !important;
+            padding: 2px 4px 0 4px !important;
             background: transparent !important;
           }
           .banner-badge {
-            font-size: 0.66rem !important;
+            font-size: 0.68rem !important;
             padding: 4px 12px !important;
             border-radius: 14px !important;
             font-weight: 800 !important;
             letter-spacing: 0.04em !important;
+            background: #ffffff !important;
+            border: 1px solid rgba(179, 142, 71, 0.35) !important;
+            box-shadow: 0 2px 6px rgba(179, 142, 71, 0.08) !important;
           }
           .banner-ad-showcase {
             display: flex !important;
             align-items: center !important;
             gap: 10px !important;
-            padding: 6px 10px !important;
-            border-radius: 10px !important;
-            background: rgba(255, 255, 255, 0.9) !important;
-            border: 1px solid rgba(179, 142, 71, 0.2) !important;
+            padding: 5px 12px 5px 5px !important;
+            height: 74px !important;
+            border-radius: 12px !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(179, 142, 71, 0.22) !important;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03) !important;
             min-width: unset !important;
-            width: 100% !important;
+            width: auto !important;
+            max-width: 250px !important;
             box-sizing: border-box !important;
           }
           .ad-thumb {
-            width: 44px !important;
-            height: 44px !important;
-            border-radius: 8px !important;
+            width: 64px !important;
+            height: 64px !important;
+            border-radius: 9px !important;
+            object-fit: cover !important;
             flex-shrink: 0 !important;
+            border: 1px solid rgba(179, 142, 71, 0.15) !important;
           }
           .ad-info {
             display: flex !important;
             flex-direction: column !important;
             gap: 2px !important;
             min-width: 0 !important;
+            flex: 1 !important;
             overflow: hidden !important;
           }
           .ad-brand {
             font-size: 0.60rem !important;
-            font-weight: 700 !important;
-            color: #b38e47 !important;
+            font-weight: 800 !important;
+            color: #8c6b30 !important;
             text-transform: uppercase !important;
           }
           .ad-name {
-            font-size: 0.72rem !important;
+            font-size: 0.74rem !important;
             font-weight: 700 !important;
             color: #0f172a !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
+            max-width: 140px !important;
           }
           .banner-marquee-wrapper {
             overflow-x: auto !important;
@@ -16555,45 +16550,59 @@ export default function Home() {
             gap: 8px !important;
             width: max-content !important;
             padding-right: 8px !important;
+            align-items: center !important;
           }
           .banner-item {
             display: flex !important;
             align-items: center !important;
-            gap: 6px !important;
-            background: rgba(255, 255, 255, 0.95) !important;
+            gap: 10px !important;
+            background: rgba(255, 255, 255, 0.98) !important;
             border: 1px solid rgba(179, 142, 71, 0.2) !important;
-            border-radius: 8px !important;
-            padding: 4px 8px !important;
-            min-width: 130px !important;
+            border-radius: 12px !important;
+            padding: 5px 14px 5px 5px !important;
+            width: auto !important;
+            min-width: 175px !important;
+            max-width: 220px !important;
+            height: 74px !important;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
             flex-shrink: 0 !important;
             cursor: pointer !important;
+            box-sizing: border-box !important;
           }
           .banner-img {
-            width: 32px !important;
-            height: 32px !important;
-            border-radius: 6px !important;
+            width: 64px !important;
+            height: 64px !important;
+            border-radius: 9px !important;
             object-fit: cover !important;
             flex-shrink: 0 !important;
+            border: 1px solid rgba(179, 142, 71, 0.15) !important;
           }
           .banner-item-info {
             display: flex !important;
             flex-direction: column !important;
+            justify-content: center !important;
+            gap: 2px !important;
             min-width: 0 !important;
+            flex: 1 !important;
           }
           .banner-brand-name {
-            font-size: 0.56rem !important;
-            font-weight: 700 !important;
-            color: #b38e47 !important;
+            font-size: 0.62rem !important;
+            font-weight: 800 !important;
+            color: #8c6b30 !important;
             text-transform: uppercase !important;
+            letter-spacing: 0.04em !important;
           }
           .banner-product-name {
-            font-size: 0.65rem !important;
-            font-weight: 600 !important;
-            color: #1e293b !important;
-            white-space: nowrap !important;
+            font-size: 0.74rem !important;
+            font-weight: 700 !important;
+            color: #0f172a !important;
+            line-height: 1.25 !important;
+            white-space: normal !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
             overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            max-width: 85px !important;
+            max-width: 125px !important;
           }
 
           /* Top Utility Bar (Anasayfa, Kurumsal, B2B, Portallar, Outlet vb.) Mobile Strip */
