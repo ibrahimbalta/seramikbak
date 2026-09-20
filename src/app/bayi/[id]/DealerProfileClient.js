@@ -388,7 +388,9 @@ export default function DealerProfileClient({ dealer, products }) {
           {/* Quick Actions */}
           <div className="profile-actions" style={{ zIndex: 1 }}>
             <Link 
-              href={featuredProductsList.length > 0 ? `/kiosk?productId=${encodeURIComponent(featuredProductsList[0].id)}&code=${encodeURIComponent(featuredProductsList[0].code || '')}` : "/kiosk"} 
+              href={featuredProductsList.length > 0 && featuredProductsList[0].code 
+                ? `/?code=${encodeURIComponent(featuredProductsList[0].code)}&tab=studio#studio` 
+                : "/?tab=studio#studio"} 
               onClick={() => {
                 if (featuredProductsList.length > 0) {
                   try {
@@ -398,6 +400,7 @@ export default function DealerProfileClient({ dealer, products }) {
                       textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
                       imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
                     };
+                    localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
                     sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
                   } catch(e) {}
                 }
@@ -477,7 +480,9 @@ export default function DealerProfileClient({ dealer, products }) {
           <span className="quick-actions-bar-title">⚡ Hızlı Mağaza Araçları:</span>
           <div className="quick-actions-bar-scroll">
             <Link 
-              href={featuredProductsList.length > 0 ? `/kiosk?productId=${encodeURIComponent(featuredProductsList[0].id)}&code=${encodeURIComponent(featuredProductsList[0].code || '')}` : "/kiosk"}
+              href={featuredProductsList.length > 0 && featuredProductsList[0].code 
+                ? `/?code=${encodeURIComponent(featuredProductsList[0].code)}&tab=studio#studio` 
+                : "/?tab=studio#studio"}
               className="quick-action-chip primary-chip"
               onClick={() => {
                 if (featuredProductsList.length > 0) {
@@ -488,6 +493,7 @@ export default function DealerProfileClient({ dealer, products }) {
                       textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
                       imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
                     };
+                    localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
                     sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
                   } catch(e) {}
                 }
@@ -1463,7 +1469,7 @@ export default function DealerProfileClient({ dealer, products }) {
                         </div>
                         <div className="product-card-actions-group" style={{ display: 'flex', gap: '8px' }}>
                           <Link 
-                            href={`/kiosk?productId=${encodeURIComponent(prod.id)}&code=${encodeURIComponent(prod.code || '')}`}
+                            href={prod.code ? `/?code=${encodeURIComponent(prod.code)}&tab=studio#studio` : `/?tab=studio#studio`}
                             onClick={() => {
                               try {
                                 const selectedObj = {
@@ -1472,6 +1478,7 @@ export default function DealerProfileClient({ dealer, products }) {
                                   textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
                                   imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
                                 };
+                                localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
                                 sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
                               } catch(e) {}
                             }}
@@ -1533,7 +1540,7 @@ export default function DealerProfileClient({ dealer, products }) {
                   </div>
                   <div className="product-card-actions-group">
                     <Link 
-                      href={`/kiosk?productId=${encodeURIComponent(prod.id)}&code=${encodeURIComponent(prod.code || '')}`}
+                      href={prod.code ? `/?code=${encodeURIComponent(prod.code)}&tab=studio#studio` : `/?tab=studio#studio`}
                       onClick={() => {
                         try {
                           const selectedObj = {
@@ -1541,6 +1548,7 @@ export default function DealerProfileClient({ dealer, products }) {
                             textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
                             imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
                           };
+                          localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
                           sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
                         } catch(e) {}
                       }}

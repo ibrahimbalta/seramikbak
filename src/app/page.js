@@ -1773,11 +1773,29 @@ export default function Home() {
       const codeParam = params.get('code');
       const tabParam = params.get('tab');
       if (codeParam) {
-        openProductByCode(codeParam).then(() => {
-          if (tabParam === 'studio') {
-            setActiveTab('studio');
-          }
-        });
+        if (tabParam === 'studio') {
+          setActiveTab('studio');
+          fetch(`/api/search?q=${encodeURIComponent(codeParam)}&fullDetail=true`)
+            .then(res => res.json())
+            .then(data => {
+              if (data && data.length > 0) {
+                const enriched = enrichProductData(data[0]);
+                setActiveProduct(enriched);
+                setStudioFloorProduct(enriched);
+                setStudioWallProduct(enriched);
+                setStudioApplyFloor(true);
+                setStudioApplyWalls(true);
+                showStudioToast(`✨ ${enriched.name} 3D mekana giydirildi`);
+              }
+            })
+            .catch(err => console.error('Studio product fetch error:', err));
+        } else {
+          openProductByCode(codeParam).then(() => {
+            if (tabParam) {
+              setActiveTab(tabParam);
+            }
+          });
+        }
       } else if (tabParam) {
         setActiveTab(tabParam);
       }
@@ -1790,11 +1808,27 @@ export default function Home() {
           setActiveProduct(prod);
           setStudioFloorProduct(prod);
           setStudioWallProduct(prod);
+          setStudioApplyFloor(true);
+          setStudioApplyWalls(true);
           setActiveTab('studio');
+          showStudioToast(`✨ ${prod.name || 'Seçilen ürün'} 3D mekana giydirildi`);
         } catch (e) {
           console.error('Failed to load preselected product:', e);
         }
         localStorage.removeItem('seramikbak_preselected_product');
+      }
+
+      // Auto-scroll to 3D studio if requested via tab or hash
+      if (tabParam === 'studio' || window.location.hash === '#studio') {
+        setActiveTab('studio');
+        setTimeout(() => {
+          const studioEl = document.getElementById('studio-canvas-container') || document.getElementById('studio-interactive-section');
+          if (studioEl) {
+            const yOffset = -70;
+            const y = studioEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+          }
+        }, 300);
       }
     }
   }, []);
