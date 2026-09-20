@@ -4723,20 +4723,21 @@ export default function Home() {
                   borderBottom: '1px solid var(--border-color)', 
                   paddingBottom: '16px' 
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ 
+                  <div className="weekly-header-title-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div className="weekly-header-icon" style={{ 
                       background: 'rgba(179, 142, 71, 0.1)', 
                       color: 'var(--accent-gold)', 
                       padding: '8px', 
                       borderRadius: '50%', 
                       display: 'flex', 
                       alignItems: 'center', 
-                      justifyContent: 'center' 
+                      justifyContent: 'center',
+                      flexShrink: 0
                     }}>
                       <Flame size={20} fill="var(--accent-gold)" />
                     </div>
-                    <div>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ minWidth: 0 }}>
+                      <h3 className="weekly-heading-title" style={{ fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         Haftanın En Popüler Ürünleri
                       </h3>
                       <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
@@ -4783,7 +4784,7 @@ export default function Home() {
                         }} 
                         onClick={() => handleProductCardClick(p)}
                       >
-                        {/* Top Row: Brand name & Badge (NO PRICE) */}
+                        {/* Top Row: Brand name (NO PRICE) */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ 
                             fontSize: '0.68rem', 
@@ -4793,13 +4794,6 @@ export default function Home() {
                             letterSpacing: '0.05em'
                           }}>
                             {brandShort}
-                          </span>
-                          <span style={{ 
-                            fontSize: '0.78rem', 
-                            fontWeight: '800', 
-                            color: 'var(--accent-gold)'
-                          }}>
-                            ₺{price.toLocaleString('tr-TR')},00
                           </span>
                         </div>
 
@@ -16859,18 +16853,49 @@ export default function Home() {
 
           /* Weekly Products Carousel Mobile */
           .weekly-products-section {
-            padding: 14px 12px !important;
+            padding: 14px 10px !important;
             margin-bottom: 16px !important;
             border-radius: 16px !important;
           }
           .weekly-products-header {
             padding-bottom: 10px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 6px !important;
           }
-          .weekly-products-header h3 {
-            font-size: 0.95rem !important;
+          .weekly-header-title-wrapper {
+            gap: 6px !important;
+            min-width: 0 !important;
+            flex: 1 !important;
+          }
+          .weekly-header-icon {
+            padding: 5px !important;
+            flex-shrink: 0 !important;
+          }
+          .weekly-header-icon svg {
+            width: 16px !important;
+            height: 16px !important;
+          }
+          .weekly-products-header h3,
+          .weekly-heading-title {
+            font-size: 0.80rem !important;
+            font-weight: 800 !important;
+            white-space: nowrap !important;
+            letter-spacing: -0.02em !important;
+            line-height: 1.2 !important;
+            margin: 0 !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
           }
           .weekly-products-header p {
             display: none !important;
+          }
+          .weekly-badge {
+            font-size: 0.58rem !important;
+            padding: 3px 8px !important;
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
           }
           .weekly-products-scroll-container {
             gap: 10px !important;
