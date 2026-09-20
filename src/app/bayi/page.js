@@ -8890,49 +8890,62 @@ Yetkili Satış & Showroom Departmanı`;
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(9, 13, 22, 0.7)',
-          backdropFilter: 'blur(6px)',
-          zIndex: 999,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(9, 13, 22, 0.75)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 2000,
           display: 'flex',
           justifyContent: 'flex-end',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          boxSizing: 'border-box'
         }} onClick={() => setShowMobileMoreMenu(false)}>
           <div style={{
             background: '#111827',
             borderTopLeftRadius: '24px',
             borderTopRightRadius: '24px',
-            borderTop: '1px solid rgba(212, 175, 55, 0.25)',
-            padding: '20px 16px 40px 16px',
+            borderTop: '1.5px solid rgba(212, 175, 55, 0.3)',
+            padding: '20px 14px calc(env(safe-area-inset-bottom, 0px) + 28px) 14px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px',
-            boxShadow: '0 -10px 30px rgba(0,0,0,0.6)',
+            gap: '12px',
+            boxShadow: '0 -10px 40px rgba(0,0,0,0.8)',
             maxHeight: '85vh',
             overflowY: 'auto',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: 'touch',
+            width: '100%',
+            maxWidth: '100vw',
+            boxSizing: 'border-box'
           }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#fff', margin: 0 }}>Tüm İşlemler</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#fff', margin: 0 }}>Tüm İşlemler</h3>
               <button 
                 onClick={() => setShowMobileMoreMenu(false)}
-                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
+                aria-label="Kapat"
               >
                 <X size={20} />
               </button>
             </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+              gap: '8px',
+              width: '100%',
+              boxSizing: 'border-box'
+            }}>
               {[
-                { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
-                { id: 'stock-exchange', label: '🤝 Bayi Stok Borsası', icon: <RefreshCw size={18} /> },
-                { id: 'quick-quote', label: '💬 WhatsApp Teklif', icon: <Calculator size={18} />, isPremiumFeature: true },
-                { id: 'showroom-qr', label: '📱 Showroom QR', icon: <QrCode size={18} />, isPremiumFeature: true },
-                { id: 'b2b-projects', label: 'Proje Talepleri (B2B)', icon: <Building2 size={18} /> },
-                { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={18} /> },
-                { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={18} /> },
-                { id: 'outlet-exchange', label: 'Outlet & Proje Fazlası', icon: <Sparkles size={18} /> },
-                { id: 'subscription', label: 'Abonelik & SaaS', icon: <CreditCard size={18} /> },
-                { id: 'settings', label: 'Şube Ayarları', icon: <Settings size={18} /> }
+                { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={16} /> },
+                { id: 'stock-exchange', label: 'Stok Borsası', icon: <RefreshCw size={16} /> },
+                { id: 'quick-quote', label: 'WhatsApp Teklif', icon: <Calculator size={16} />, isPremiumFeature: true },
+                { id: 'showroom-qr', label: 'Showroom QR', icon: <QrCode size={16} />, isPremiumFeature: true },
+                { id: 'b2b-projects', label: 'Proje Talepleri', icon: <Building2 size={16} /> },
+                { id: 'analytics', label: 'Bölge Analitiği', icon: <TrendingUp size={16} /> },
+                { id: 'inventory', label: 'Envanter & Stok', icon: <Package size={16} /> },
+                { id: 'outlet-exchange', label: 'Outlet Borsası', icon: <Sparkles size={16} /> },
+                { id: 'subscription', label: 'Abonelik & Plan', icon: <CreditCard size={16} /> },
+                { id: 'settings', label: 'Şube Ayarları', icon: <Settings size={16} /> }
               ].map(item => {
                 const isActive = activePortalTab === item.id;
                 const isLocked = item.isPremiumFeature && saasInfo?.plan !== 'PREMIUM';
@@ -8944,26 +8957,29 @@ Yetkili Satış & Showroom Departmanı`;
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      gap: '8px',
-                      padding: '12px 14px',
+                      gap: '6px',
+                      padding: '10px 10px',
                       background: isActive ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'rgba(255, 255, 255, 0.03)',
-                      border: isActive ? 'none' : '1px solid rgba(255, 255, 255, 0.05)',
+                      border: isActive ? 'none' : '1px solid rgba(255, 255, 255, 0.06)',
                       borderRadius: '12px',
                       color: isActive ? '#090d16' : '#cbd5e1',
-                      fontSize: '0.8rem',
+                      fontSize: '0.74rem',
                       fontWeight: '700',
                       cursor: 'pointer',
-                      textAlign: 'left'
+                      textAlign: 'left',
+                      minWidth: 0,
+                      width: '100%',
+                      boxSizing: 'border-box'
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
-                      {item.icon}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, overflow: 'hidden' }}>
+                      <span style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>{item.icon}</span>
                       <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</span>
                     </div>
                     {item.isPremiumFeature && (
                       <span style={{
-                        fontSize: '0.58rem',
-                        padding: '1px 5px',
+                        fontSize: '0.55rem',
+                        padding: '1px 4px',
                         borderRadius: '4px',
                         background: isLocked ? 'rgba(212,175,55,0.2)' : 'linear-gradient(135deg, #111 0%, #333 100%)',
                         color: '#d4af37',
@@ -8978,7 +8994,7 @@ Yetkili Satış & Showroom Departmanı`;
               })}
             </div>
             
-            <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '16px', marginTop: '8px' }}>
+            <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '12px', marginTop: '4px' }}>
               <button
                 onClick={() => {
                   setShowMobileMoreMenu(false);
@@ -8988,19 +9004,20 @@ Yetkili Satış & Showroom Departmanı`;
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '10px',
+                  gap: '8px',
                   width: '100%',
-                  padding: '12px',
-                  background: 'rgba(239, 68, 68, 0.1)',
-                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                  padding: '11px',
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
                   borderRadius: '12px',
                   color: '#ef4444',
-                  fontSize: '0.85rem',
+                  fontSize: '0.82rem',
                   fontWeight: '700',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  boxSizing: 'border-box'
                 }}
               >
-                <LogOut size={16} />
+                <LogOut size={15} />
                 <span>Güvenli Çıkış Yap</span>
               </button>
             </div>
