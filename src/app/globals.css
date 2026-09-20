@@ -1133,20 +1133,24 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 1px;
 }
 
-/* Hover actions row */
+/* Hover / Mobile Actions Row (3D, AR, Bayi - Guaranteed to fit) */
 .card-quick-actions-row {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(15, 23, 42, 0.88);
   backdrop-filter: blur(8px);
-  padding: 8px;
-  display: flex;
-  gap: 6px;
+  -webkit-backdrop-filter: blur(8px);
+  padding: 4px 5px;
+  display: grid !important;
+  grid-template-columns: 1fr 1.15fr 1fr !important;
+  gap: 3px !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
   transform: translateY(100%);
   opacity: 0;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
   z-index: 10;
 }
 
@@ -1156,12 +1160,43 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card-action-btn-new {
-  flex: 1;
-  padding: 6px;
-  font-size: 0.68rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
+  padding: 6px 2px !important;
+  font-size: 0.67rem !important;
+  font-weight: 700 !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+}
+
+.card-action-btn-new.btn-action-3d {
+  background: rgba(212, 175, 55, 0.22) !important;
+  border-color: rgba(212, 175, 55, 0.5) !important;
+  color: #fef08a !important;
+}
+
+.card-action-btn-new.btn-action-ar {
+  background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%) !important;
+  color: #0f172a !important;
+  border: none !important;
+  font-weight: 800 !important;
+}
+
+.card-action-btn-new.btn-action-dealer {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
 }
 
 /* Compare Button on Card Overlay */

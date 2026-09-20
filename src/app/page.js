@@ -4485,104 +4485,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* MOBILE NATIVE APP STORIES: YENİ KOLEKSİYONLAR (Instagram / Trendyol App Style) */}
-            <div className="mobile-app-stories-container">
-              <div className="stories-header-mobile">
-                <div className="stories-title-group">
-                  <span className="stories-title-mobile">✨ Yeni Koleksiyonlar</span>
-                  <span className="stories-subtitle-mobile">Canlı ürünleri incelemek için dokunun</span>
-                </div>
-                <button 
-                  type="button" 
-                  onClick={() => { setSelectedStyle(''); setSelectedColor(''); fetchProducts(); }}
-                  className="stories-see-all-btn"
-                >
-                  Tümünü Gör →
-                </button>
-              </div>
-
-              <div className="mobile-app-stories-track">
-                {/* 1. All Trends Story */}
-                <div 
-                  className="mobile-story-pill highlight-story" 
-                  onClick={() => { setSelectedStyle(''); setSelectedColor(''); setSelectedSize(''); fetchProducts(); }}
-                >
-                  <div className="story-circle-ring">
-                    <div className="story-circle-inner story-icon-gold">
-                      <Sparkles size={20} />
-                    </div>
-                  </div>
-                  <span className="story-caption">Trendler</span>
-                </div>
-
-                {/* 2. Calacatta Gold */}
-                <div 
-                  className="mobile-story-pill" 
-                  onClick={() => openProductByCode('KUT-CAL-GLD')}
-                >
-                  <div className="story-circle-ring">
-                    <img src="/textures/calacatta_gold.jpg" alt="Calacatta" className="story-circle-img" />
-                  </div>
-                  <span className="story-caption">Calacatta</span>
-                </div>
-
-                {/* 3. Meşe Ahşap */}
-                <div 
-                  className="mobile-story-pill" 
-                  onClick={() => openProductByCode('BIEN-NAT-OAK')}
-                >
-                  <div className="story-circle-ring">
-                    <img src="/textures/natural_oak.jpg" alt="Meşe" className="story-circle-img" />
-                  </div>
-                  <span className="story-caption">Meşe Ahşap</span>
-                </div>
-
-                {/* 4. Beton Gri */}
-                <div 
-                  className="mobile-story-pill" 
-                  onClick={() => openProductByCode('VIT-CON-GRY')}
-                >
-                  <div className="story-circle-ring">
-                    <img src="/textures/concrete_light_grey.jpg" alt="Beton" className="story-circle-img" />
-                  </div>
-                  <span className="story-caption">Beton Gri</span>
-                </div>
-
-                {/* 5. Traverten */}
-                <div 
-                  className="mobile-story-pill" 
-                  onClick={() => openProductByCode('EGE-TRA-CLA')}
-                >
-                  <div className="story-circle-ring">
-                    <img src="/textures/travertino_classico.jpg" alt="Traverten" className="story-circle-img" />
-                  </div>
-                  <span className="story-caption">Traverten</span>
-                </div>
-
-                {/* 6. Nexos Antrasit */}
-                <div 
-                  className="mobile-story-pill" 
-                  onClick={() => openProductByCode('HITIT-NEXOS-ANTRASIT-LAPPATO-60X120')}
-                >
-                  <div className="story-circle-ring">
-                    <img src="/textures/albatros_antrasit.jpg" alt="Nexos" className="story-circle-img" />
-                  </div>
-                  <span className="story-caption">Antrasit</span>
-                </div>
-
-                {/* 7. Borneo */}
-                <div 
-                  className="mobile-story-pill" 
-                  onClick={() => openProductByCode('BIEN-BOR-ANT')}
-                >
-                  <div className="story-circle-ring">
-                    <img src="/textures/borneo_antrasit.jpg" alt="Borneo" className="story-circle-img" />
-                  </div>
-                  <span className="story-caption">Borneo</span>
-                </div>
-              </div>
-            </div>
-
             {/* PERSONA GATEWAY CARDS: Modern Visual Cards Matching Studio Banner Style */}
             <section className="persona-gateway-section" aria-label="Kullanıcı Odaklı Hızlı Yönlendirme">
               <div className="persona-gateway-grid">
@@ -4882,10 +4784,10 @@ export default function Home() {
                         }} 
                         onClick={() => handleProductCardClick(p)}
                       >
-                        {/* Top Row: Brand name & Price */}
+                        {/* Top Row: Brand name & Badge (NO PRICE) */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ 
-                            fontSize: '0.65rem', 
+                            fontSize: '0.68rem', 
                             fontWeight: '700', 
                             color: 'var(--text-secondary)',
                             textTransform: 'uppercase',
@@ -4894,11 +4796,15 @@ export default function Home() {
                             {brandShort}
                           </span>
                           <span style={{ 
-                            fontSize: '0.78rem', 
+                            fontSize: '0.60rem', 
                             fontWeight: '800', 
-                            color: 'var(--accent-gold)'
+                            color: 'var(--accent-gold)',
+                            background: 'rgba(179,142,71,0.1)',
+                            border: '1px solid rgba(179,142,71,0.25)',
+                            padding: '2px 8px',
+                            borderRadius: '10px'
                           }}>
-                            ₺{price.toLocaleString('tr-TR')},00
+                            YENİ SEZON
                           </span>
                         </div>
 
@@ -11220,7 +11126,15 @@ export default function Home() {
 
         @media (max-width: 768px) {
           .top-utility-bar {
-            display: none !important;
+            display: flex !important;
+            overflow-x: auto !important;
+            scrollbar-width: none !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding: 6px 8px !important;
+            margin-bottom: 8px !important;
+            border-radius: 12px !important;
+            gap: 6px !important;
+            justify-content: flex-start !important;
           }
           .project-top-banner {
             border-radius: var(--border-radius-md);
@@ -16525,124 +16439,197 @@ export default function Home() {
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 8px !important;
           }
-          /* Top Website Banners Cleanup: Hide desktop ticker and website marquee on mobile */
-          .live-analytics-top-bar,
-          :global(.live-deals-ticker),
-          .project-top-banner {
-            display: none !important;
-          }
-
-          /* Native Mobile App Stories Container ("Yeni Koleksiyonlar" - Instagram/Trendyol Style) */
-          .mobile-app-stories-container {
+          /* Top Website Banners: Mobile Adaptive Luxury Header Strip */
+          .live-analytics-top-bar {
             display: flex !important;
-            flex-direction: column !important;
-            gap: 8px !important;
-            margin: 6px 0 12px 0 !important;
-            padding: 10px 12px !important;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%) !important;
-            border-radius: 18px !important;
-            border: 1px solid rgba(212, 175, 55, 0.28) !important;
-            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05) !important;
+            justify-content: center !important;
+            align-items: center !important;
             width: 100% !important;
-            box-sizing: border-box !important;
+            margin: 2px 0 6px 0 !important;
+            padding: 0 4px !important;
           }
-          .stories-header-mobile {
+          .live-ticker-capsule {
             display: flex !important;
             align-items: center !important;
-            justify-content: space-between !important;
-          }
-          .stories-title-group {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 1px !important;
-          }
-          .stories-title-mobile {
-            font-size: 0.84rem !important;
-            font-weight: 800 !important;
-            color: #0f172a !important;
-            letter-spacing: -0.01em !important;
-          }
-          .stories-subtitle-mobile {
-            font-size: 0.63rem !important;
-            color: #64748b !important;
-            font-weight: 500 !important;
-          }
-          .stories-see-all-btn {
-            background: none !important;
-            border: none !important;
-            color: var(--accent-gold, #b38e47) !important;
+            gap: 6px !important;
+            padding: 4px 10px !important;
+            border-radius: 20px !important;
+            max-width: 100% !important;
             font-size: 0.68rem !important;
-            font-weight: 700 !important;
-            cursor: pointer !important;
-            padding: 0 !important;
+            box-sizing: border-box !important;
           }
-          .mobile-app-stories-track {
-            display: flex !important;
-            align-items: flex-start !important;
-            gap: 12px !important;
-            overflow-x: auto !important;
-            padding: 6px 2px 4px 2px !important;
-            scrollbar-width: none !important;
-            -webkit-overflow-scrolling: touch !important;
-            scroll-snap-type: x mandatory !important;
-          }
-          .mobile-app-stories-track::-webkit-scrollbar {
-            display: none !important;
-          }
-          .mobile-story-pill {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            gap: 5px !important;
-            cursor: pointer !important;
+          .ticker-capsule-badge {
+            font-size: 0.60rem !important;
             flex-shrink: 0 !important;
-            scroll-snap-align: start !important;
-            width: 56px !important;
-            transition: transform 0.15s ease !important;
           }
-          .mobile-story-pill:active {
-            transform: scale(0.92) !important;
-          }
-          .story-circle-ring {
-            width: 52px !important;
-            height: 52px !important;
-            border-radius: 50% !important;
-            padding: 2.5px !important;
-            background: linear-gradient(135deg, #d4af37 0%, #f59e0b 50%, #b38e47 100%) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            box-shadow: 0 4px 10px rgba(179, 142, 71, 0.25) !important;
-            box-sizing: border-box !important;
-          }
-          .mobile-story-pill.highlight-story .story-circle-ring {
-            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%) !important;
-          }
-          .story-circle-inner,
-          .story-circle-img {
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 50% !important;
-            object-fit: cover !important;
-            border: 2px solid #ffffff !important;
-            box-sizing: border-box !important;
-          }
-          .story-icon-gold {
-            background: #ffffff !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            color: #d4af37 !important;
-          }
-          .story-caption {
-            font-size: 0.63rem !important;
-            font-weight: 700 !important;
-            color: #1e293b !important;
-            text-align: center !important;
+          .ticker-capsule-text {
+            font-size: 0.66rem !important;
             white-space: nowrap !important;
-            max-width: 56px !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
+          }
+          .ticker-time-ago {
+            font-size: 0.62rem !important;
+          }
+
+          /* Project Top Banner (Yeni Koleksiyonlar & Sponsorlu) Mobile Adaption */
+          .project-top-banner {
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 8px 10px !important;
+            margin: 4px 0 8px 0 !important;
+            border-radius: 14px !important;
+            background: linear-gradient(135deg, #fdfbf7 0%, #f5efe1 100%) !important;
+            border: 1px solid rgba(179, 142, 71, 0.25) !important;
+            box-shadow: 0 4px 16px rgba(179, 142, 71, 0.08) !important;
+            gap: 8px !important;
+          }
+          .banner-left-area {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            padding: 0 2px !important;
+            background: transparent !important;
+          }
+          .banner-badge {
+            font-size: 0.66rem !important;
+            padding: 4px 12px !important;
+            border-radius: 14px !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.04em !important;
+          }
+          .banner-ad-showcase {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            padding: 6px 10px !important;
+            border-radius: 10px !important;
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 1px solid rgba(179, 142, 71, 0.2) !important;
+            min-width: unset !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .ad-thumb {
+            width: 44px !important;
+            height: 44px !important;
+            border-radius: 8px !important;
+            flex-shrink: 0 !important;
+          }
+          .ad-info {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 2px !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
+          }
+          .ad-brand {
+            font-size: 0.60rem !important;
+            font-weight: 700 !important;
+            color: #b38e47 !important;
+            text-transform: uppercase !important;
+          }
+          .ad-name {
+            font-size: 0.72rem !important;
+            font-weight: 700 !important;
+            color: #0f172a !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+          }
+          .banner-marquee-wrapper {
+            overflow-x: auto !important;
+            scrollbar-width: none !important;
+            -webkit-overflow-scrolling: touch !important;
+            mask-image: none !important;
+            -webkit-mask-image: none !important;
+            padding: 2px 0 !important;
+            width: 100% !important;
+          }
+          .banner-marquee-wrapper::-webkit-scrollbar {
+            display: none !important;
+          }
+          .banner-marquee-track {
+            animation: none !important;
+            display: flex !important;
+            gap: 8px !important;
+            width: max-content !important;
+            padding-right: 8px !important;
+          }
+          .banner-item {
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(179, 142, 71, 0.2) !important;
+            border-radius: 8px !important;
+            padding: 4px 8px !important;
+            min-width: 130px !important;
+            flex-shrink: 0 !important;
+            cursor: pointer !important;
+          }
+          .banner-img {
+            width: 32px !important;
+            height: 32px !important;
+            border-radius: 6px !important;
+            object-fit: cover !important;
+            flex-shrink: 0 !important;
+          }
+          .banner-item-info {
+            display: flex !important;
+            flex-direction: column !important;
+            min-width: 0 !important;
+          }
+          .banner-brand-name {
+            font-size: 0.56rem !important;
+            font-weight: 700 !important;
+            color: #b38e47 !important;
+            text-transform: uppercase !important;
+          }
+          .banner-product-name {
+            font-size: 0.65rem !important;
+            font-weight: 600 !important;
+            color: #1e293b !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            max-width: 85px !important;
+          }
+
+          /* Top Utility Bar (Anasayfa, Kurumsal, B2B, Portallar, Outlet vb.) Mobile Strip */
+          .top-utility-bar {
+            display: flex !important;
+            overflow-x: auto !important;
+            scrollbar-width: none !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding: 6px 8px !important;
+            margin-bottom: 8px !important;
+            border-radius: 12px !important;
+            gap: 6px !important;
+            justify-content: flex-start !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(226, 232, 240, 0.9) !important;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .top-utility-bar::-webkit-scrollbar {
+            display: none !important;
+          }
+          .utility-left,
+          .utility-right {
+            display: flex !important;
+            flex-shrink: 0 !important;
+            gap: 6px !important;
+            align-items: center !important;
+          }
+          .utility-item {
+            padding: 5px 9px !important;
+            font-size: 0.67rem !important;
+            border-radius: 10px !important;
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+            line-height: 1 !important;
           }
 
           /* Mobile Header Actions (Heart + Menu) */
@@ -17102,7 +17089,39 @@ export default function Home() {
             border-radius: 12px 12px 0 0 !important;
           }
           .card-quick-actions-row {
-            display: none !important;
+            display: grid !important;
+            grid-template-columns: 1fr 1.15fr 1fr !important;
+            gap: 3px !important;
+            padding: 4px 4px !important;
+            box-sizing: border-box !important;
+            width: 100% !important;
+            transform: translateY(0) !important;
+            opacity: 1 !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 10 !important;
+            background: rgba(15, 23, 42, 0.84) !important;
+            backdrop-filter: blur(6px) !important;
+            -webkit-backdrop-filter: blur(6px) !important;
+          }
+          .card-action-btn-new {
+            padding: 5px 1px !important;
+            font-size: 0.65rem !important;
+            font-weight: 700 !important;
+            border-radius: 6px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: clip !important;
+            line-height: 1.1 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-width: 0 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            text-align: center !important;
           }
           .card-text-details-new {
             padding: 8px 8px 10px 8px !important;

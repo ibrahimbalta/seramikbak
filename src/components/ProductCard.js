@@ -60,49 +60,31 @@ export default function ProductCard({
           <HeartIcon size={16} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
         </button>
 
-        {/* Hover action layout (Desktop only on hover) */}
-        <div className="card-quick-actions-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px' }}>
+        {/* Quick Action 3-Button Strip (3D, AR, Bayi - Guaranteed to Fit) */}
+        <div className="card-quick-actions-row">
           <button 
+            type="button"
             onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
-            className="btn-primary card-action-btn-new"
-            style={{ fontSize: '0.65rem', padding: '6px 4px' }}
+            className="card-action-btn-new btn-action-3d"
+            title="3D Mekan"
           >
             3D
           </button>
           <button 
+            type="button"
             onClick={(e) => { e.stopPropagation(); onOpenAR ? onOpenAR(product) : navigateTo3DStudio(product); }}
-            className="btn-primary card-action-btn-new"
-            style={{ fontSize: '0.65rem', padding: '6px 4px', backgroundColor: 'var(--accent-gold)', borderColor: 'var(--accent-gold)' }}
-            title="AR"
+            className="card-action-btn-new btn-action-ar"
+            title="AR ile Gör"
           >
             📷 AR
           </button>
           <button 
+            type="button"
             onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}
-            className="btn-secondary card-action-btn-new"
-            style={{ fontSize: '0.65rem', padding: '6px 4px' }}
+            className="card-action-btn-new btn-action-dealer"
+            title="Yetkili Bayi"
           >
-            {t('dealers')}
-          </button>
-        </div>
-
-        {/* Mobile-App Floating Micro-Chips (Zero vertical space overhead, 1-tap 3D & AR) */}
-        <div className="card-mobile-floating-chips">
-          <button 
-            type="button"
-            onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
-            className="mobile-floating-chip"
-            title="3D Gör"
-          >
-            3D
-          </button>
-          <button 
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onOpenAR ? onOpenAR(product) : navigateTo3DStudio(product); }}
-            className="mobile-floating-chip chip-gold"
-            title="AR ile Gör"
-          >
-            AR
+            Bayi
           </button>
         </div>
       </div>
