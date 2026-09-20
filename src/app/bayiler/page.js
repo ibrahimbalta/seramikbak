@@ -348,7 +348,9 @@ export default function BayilerPage() {
                   </span>
                 </div>
 
-                <h4 className="dealer-name">{dealer.name}</h4>
+                <Link href={`/bayi/${dealer.id}`} style={{ textDecoration: 'none' }}>
+                  <h4 className="dealer-name hover:text-amber-400 transition-colors">{dealer.name}</h4>
+                </Link>
 
                 <div className="dealer-info-rows">
                   <div className="info-row">
@@ -817,58 +819,82 @@ export default function BayilerPage() {
 
         @media (max-width: 768px) {
           .bayiler-header {
-            padding: 24px 14px 18px;
+            padding: 20px 12px 14px;
           }
           .bayiler-header h1 {
-            font-size: 1.35rem;
+            font-size: 1.25rem;
             line-height: 1.25;
           }
           .bayiler-header p {
-            font-size: 0.82rem;
-            line-height: 1.45;
+            font-size: 0.78rem;
+            line-height: 1.4;
           }
           .filter-section {
-            padding: 10px 12px 16px;
+            padding: 10px 12px 14px;
           }
           .filter-grid {
             grid-template-columns: 1fr;
-            gap: 10px;
+            gap: 8px;
+          }
+          .filter-input, .filter-select {
+            height: 38px;
+            font-size: 16px;
+            border-radius: 8px;
+            padding: 8px 10px;
           }
           .metraj-banner-container {
-            margin: 12px auto 0;
-            padding: 0 12px;
+            margin: 10px auto 0;
+            padding: 0 10px;
           }
           .metraj-info-banner {
-            padding: 12px 14px;
-            border-radius: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
           }
           .metraj-desc-text {
-            font-size: 0.76rem;
-            line-height: 1.4;
+            font-size: 0.72rem;
+            line-height: 1.35;
           }
           .btn-locate-nearest {
-            height: 40px;
-            font-size: 0.78rem;
+            height: 38px;
+            font-size: 0.76rem;
+            border-radius: 8px;
           }
-          .dealers-container {
-            padding: 0 12px 100px;
+          .dealers-main {
+            padding: 16px 10px 100px;
           }
           .dealers-cards-grid {
             grid-template-columns: 1fr;
-            gap: 14px;
+            gap: 10px;
           }
           .dealer-card {
-            padding: 16px 14px;
-            border-radius: 14px;
-          }
-          .card-footer-actions {
-            grid-template-columns: 1fr;
+            padding: 12px 12px;
+            border-radius: 12px;
             gap: 8px;
           }
+          .dealer-name {
+            font-size: 0.95rem;
+            line-height: 1.25;
+          }
+          .info-row {
+            font-size: 0.76rem;
+            gap: 6px;
+          }
+          .card-footer-actions {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 6px;
+            margin-top: 4px;
+          }
           :global(.btn-card-action) {
-            padding: 10px 14px;
-            font-size: 0.82rem;
-            border-radius: 10px;
+            padding: 0 8px;
+            height: 36px;
+            font-size: 0.74rem;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            box-sizing: border-box;
           }
         }
       `}</style>
