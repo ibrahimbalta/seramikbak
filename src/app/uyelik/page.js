@@ -704,6 +704,13 @@ export default function UyelikPage() {
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Link
+                href="/?tab=studio#studio"
+                style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(179,142,71,0.1) 100%)', color: '#d4af37', border: '1px solid rgba(212, 175, 55, 0.4)', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '800', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <Layers size={13} />
+                <span>3D Stüdyo</span>
+              </Link>
+              <Link
                 href="/"
                 style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#e2e8f0', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
               >
@@ -738,6 +745,10 @@ export default function UyelikPage() {
               <Settings size={14} />
               <span>Hesap Ayarları</span>
             </button>
+            <Link href="/?tab=studio#studio" className="dashboard-nav-btn" style={{ textDecoration: 'none', color: '#b38e47', fontWeight: '800' }}>
+              <Layers size={14} />
+              <span>3D Sanal Stüdyo</span>
+            </Link>
           </div>
 
           {/* Main Content Area */}
@@ -808,8 +819,8 @@ export default function UyelikPage() {
                       </h4>
                       <p style={{ fontSize: '0.75rem', color: '#64748b', margin: 0 }}>Beğendiğiniz seramik modellerini 3D banyo, mutfak veya salon sahnelerinde canlı olarak uygulayın.</p>
                     </div>
-                    <button onClick={() => window.location.href = '/'} style={{ background: '#f1f5f9', color: '#0f172a', border: 'none', borderRadius: '8px', padding: '10px', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                      <Layers size={13} />
+                    <button onClick={() => window.location.href = '/?tab=studio#studio'} style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: '#ffffff', border: '1px solid rgba(212, 175, 55, 0.4)', borderRadius: '8px', padding: '10px', fontSize: '0.78rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+                      <Layers size={13} style={{ color: '#d4af37' }} />
                       <span>3D Stüdyoya Git</span>
                     </button>
                   </div>
@@ -867,7 +878,7 @@ export default function UyelikPage() {
                           </small>
                           <div style={{ display: 'flex', gap: '6px' }}>
                             <button 
-                              onClick={() => { localStorage.setItem('seramikbak_preselected_product', JSON.stringify(fav.product)); window.location.href = '/'; }}
+                              onClick={() => { localStorage.setItem('seramikbak_preselected_product', JSON.stringify(fav.product)); window.location.href = '/?tab=studio#studio'; }}
                               style={{ flex: 1, background: '#0f172a', color: '#fff', border: 'none', borderRadius: '6px', padding: '6px', fontSize: '0.7rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
                             >
                               <Layers size={11} />

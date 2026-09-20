@@ -1819,17 +1819,30 @@ export default function Home() {
       }
 
       // Auto-scroll to 3D studio if requested via tab or hash
-      if (tabParam === 'studio' || window.location.hash === '#studio') {
-        setActiveTab('studio');
-        setTimeout(() => {
-          const studioEl = document.getElementById('studio-canvas-container') || document.getElementById('studio-interactive-section');
-          if (studioEl) {
-            const yOffset = -70;
-            const y = studioEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-          }
-        }, 300);
-      }
+      const checkAndActivateStudio = () => {
+        const curParams = new URLSearchParams(window.location.search);
+        if (curParams.get('tab') === 'studio' || window.location.hash === '#studio') {
+          setActiveTab('studio');
+          setTimeout(() => {
+            const studioEl = document.getElementById('studio-canvas-container') || document.getElementById('studio-interactive-section');
+            if (studioEl) {
+              const yOffset = -70;
+              const y = studioEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+              window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+            }
+          }, 300);
+        }
+      };
+
+      checkAndActivateStudio();
+
+      window.addEventListener('hashchange', checkAndActivateStudio);
+      window.addEventListener('popstate', checkAndActivateStudio);
+
+      return () => {
+        window.removeEventListener('hashchange', checkAndActivateStudio);
+        window.removeEventListener('popstate', checkAndActivateStudio);
+      };
     }
   }, []);
 
@@ -3923,6 +3936,9 @@ export default function Home() {
                         </div>
                         <button className="user-dropdown-item" onClick={() => { window.location.href = '/uyelik?tab=overview'; setShowUserMenu(false); }}>
                           <Activity size={14} /> Panelim
+                        </button>
+                        <button className="user-dropdown-item" onClick={() => { setActiveTab('studio'); setShowUserMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                          <Palette size={14} /> 3D Sanal Stüdyo
                         </button>
                         <button className="user-dropdown-item" onClick={() => { setShowFavoritesPanel(true); setShowUserMenu(false); }}>
                           <HeartIcon size={14} /> Favorilerim ({userFavorites.length})
