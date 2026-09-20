@@ -13,5 +13,5 @@ export const metadata = {
 };
 
 export default function BayilerLayout({ children }) {
-  return <>{children}</>;
+  return <div style={{ backgroundColor: '#0f172a', minHeight: '100vh', color: '#f8fafc' }}>{children}</div>;
 }

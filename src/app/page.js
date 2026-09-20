@@ -4499,7 +4499,6 @@ export default function Home() {
                       try {
                         localStorage.setItem('seramikbak_metraj_quote', JSON.stringify(summary));
                       } catch (e) {}
-                      window.location.href = '/bayiler?nearby=true&from=metraj';
                     }}
                   />
                 </div>

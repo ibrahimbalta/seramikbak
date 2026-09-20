@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Calculator, ArrowRight, ShieldCheck, Bath, Utensils, Sofa, Home, ChevronDown, Check } from 'lucide-react';
 import { useLanguage } from '@/lib/languageContext';
 
@@ -146,8 +147,6 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
 
     if (onGoToDealers) {
       onGoToDealers(calcSummary);
-    } else {
-      window.location.href = '/bayiler?nearby=true&from=metraj';
     }
   };
 
@@ -331,10 +330,14 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
             </div>
           </div>
 
-          <button type="button" onClick={handleRequestQuote} className="calc-cta-button">
+          <Link 
+            href="/bayiler?nearby=true&from=metraj" 
+            onClick={handleRequestQuote} 
+            className="calc-cta-button"
+          >
             <span>Bayilerden Fiyat Teklifi Al</span>
             <ArrowRight size={15} />
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -817,6 +820,8 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
           box-shadow: 0 4px 14px rgba(179, 142, 71, 0.3);
           transition: all 0.2s ease;
           white-space: nowrap;
+          text-decoration: none;
+          box-sizing: border-box;
         }
 
         .calc-cta-button:hover {
