@@ -12,6 +12,19 @@ export default function BayilerPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Parse URL search parameters on mount (e.g. /bayiler?brand=Güral)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const brandParam = params.get('brand');
+      const cityParam = params.get('city');
+      const qParam = params.get('q') || params.get('search');
+      if (brandParam) setSelectedBrand(brandParam);
+      if (cityParam) setSelectedCity(cityParam);
+      if (qParam) setSearchQuery(qParam);
+    }
+  }, []);
+
   // Fetch real approved dealers from API
   useEffect(() => {
     setIsLoading(true);
@@ -52,8 +65,11 @@ export default function BayilerPage() {
     const dDistrict = (d.district || '').toLowerCase();
     const dAddress = (d.address || '').toLowerCase();
 
-    const matchCity = !selectedCity || dCity === selectedCity.toLowerCase();
-    const matchBrand = !selectedBrand || dBrand === selectedBrand.toLowerCase();
+    const sCity = (selectedCity || '').toLowerCase().trim();
+    const sBrand = (selectedBrand || '').toLowerCase().trim();
+
+    const matchCity = !sCity || dCity === sCity;
+    const matchBrand = !sBrand || dBrand === sBrand || dBrand.includes(sBrand) || sBrand.includes(dBrand);
     const q = (searchQuery || '').toLowerCase().trim();
     const matchQuery =
       !q ||
@@ -135,6 +151,9 @@ export default function BayilerPage() {
                 className="filter-select"
               >
                 <option value="">Tüm Markalar ({brandsList.length})</option>
+                {selectedBrand && !brandsList.some(b => b.toLowerCase() === selectedBrand.toLowerCase()) && (
+                  <option value={selectedBrand}>{selectedBrand}</option>
+                )}
                 {brandsList.map((brand) => (
                   <option key={brand} value={brand}>
                     {brand}

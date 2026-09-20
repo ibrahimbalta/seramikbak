@@ -6055,51 +6055,19 @@ export default function Home() {
                   )}
                 </div>
 
-                {/* Eylem Butonları */}
+                {/* Eylem Butonu - Yetkili Bayilerden Teklif Al */}
                 <div className="studio-quote-action-row">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (activeProduct) setLeadProduct(activeProduct);
-                      setShowLeadModal(true);
-                    }}
+                  <Link
+                    href={(() => {
+                      const brand = studioFloorProduct?.brand?.name || studioWallProduct?.brand?.name || studioAccentProduct?.brand?.name || studioShowerProduct?.brand?.name || activeProduct?.brand?.name;
+                      return brand ? `/bayiler?brand=${encodeURIComponent(brand)}` : '/bayiler';
+                    })()}
                     className="btn-primary studio-quote-btn"
+                    style={{ textDecoration: 'none', color: '#0f172a' }}
                   >
-                    <FileText size={16} />
-                    <span>Bu Tasarım İçin Ücretsiz Teklif İste</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const roomName = {
-                        bathroom: 'Banyo',
-                        livingroom: 'Salon',
-                        kitchen: 'Mutfak',
-                        hallway: 'Antre',
-                        terrace: 'Teras',
-                        bedroom: 'Yatak Odası'
-                      }[studioRoomType] || 'Mekan';
-                      
-                      const surfaces = [
-                        { label: 'Zemin', p: studioApplyFloor ? studioFloorProduct : null },
-                        { label: 'Duvar', p: studioApplyWalls ? studioWallProduct : null },
-                        { label: 'Lavabo Arkası', p: studioApplyAccent ? studioAccentProduct : null },
-                        { label: 'Duş İçi', p: studioApplyShower ? studioShowerProduct : null }
-                      ].filter(x => x.p);
-
-                      const detailText = surfaces.length > 0
-                        ? surfaces.map(x => `• ${x.label}: ${x.p.name} (${x.p.width}x${x.p.height} cm)`).join('\n')
-                        : `• ${activeProduct?.name || 'Seçili Seramik'}`;
-
-                      const msg = `Merhaba, SeramikBak 3D Stüdyo'da bir ${roomName} tasarımı hazırladım.\n\nKullanılan Seramikler:\n${detailText}\n\nBu tasarım için fiyat teklifi ve stok durumu rica ediyorum.`;
-                      window.open(`https://wa.me/905324637651?text=${encodeURIComponent(msg)}`, '_blank');
-                    }}
-                    className="studio-whatsapp-btn"
-                  >
-                    <Phone size={15} />
-                    <span>WhatsApp ile Danış & Paylaş</span>
-                  </button>
+                    <Store size={18} />
+                    <span>Yetkili Bayilerden Fiyat Teklifi Al</span>
+                  </Link>
                 </div>
               </div>
             </div>
