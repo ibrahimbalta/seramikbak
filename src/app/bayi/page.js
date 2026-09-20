@@ -2492,34 +2492,36 @@ Yetkili Satış & Showroom Departmanı`;
         }}>
           {/* Top Bar Header */}
           <header className="no-print dealer-header" style={{
-            height: isMobile ? 'auto' : '64px',
+            height: isMobile ? '56px' : '64px',
             minHeight: isMobile ? '56px' : '64px',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-            background: 'rgba(9, 13, 22, 0.7)',
+            borderBottom: '1px solid rgba(212, 175, 55, 0.15)',
+            background: 'rgba(9, 13, 22, 0.95)',
             backdropFilter: 'blur(20px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: isMobile ? '10px 14px' : '0 28px',
+            padding: isMobile ? '0 10px' : '0 28px',
             position: 'sticky',
             top: 0,
             zIndex: 90
           }}>
             {isMobile ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: '1 1 auto' }}>
                   <button
                     onClick={() => setShowMobileMoreMenu(true)}
                     style={{
-                      background: 'rgba(212, 175, 55, 0.15)',
+                      background: 'rgba(212, 175, 55, 0.12)',
                       border: '1px solid rgba(212, 175, 55, 0.3)',
                       color: '#d4af37',
-                      padding: '8px',
+                      width: '34px',
+                      height: '34px',
                       borderRadius: '8px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      flexShrink: 0
                     }}
                     aria-label="Menü"
                   >
@@ -2536,25 +2538,29 @@ Yetkili Satış & Showroom Departmanı`;
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: '900',
-                    fontSize: '0.85rem'
+                    fontSize: '0.8rem',
+                    flexShrink: 0
                   }}>SB</div>
-                  <div>
-                    <h4 style={{ fontSize: '0.85rem', fontWeight: '800', color: '#fff', margin: 0 }}>{dealerInfo ? dealerInfo.name : 'SeramikBak'}</h4>
-                    <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700' }}>
+                  <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                    <h4 style={{ fontSize: '0.82rem', fontWeight: '800', color: '#fff', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {dealerInfo ? dealerInfo.name : 'SeramikBak'}
+                    </h4>
+                    <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700', whiteSpace: 'nowrap', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
-                      {activePortalTab === 'quick-quote' && 'WhatsApp & PDF Teklif'}
-                      {activePortalTab === 'showroom-qr' && 'Showroom QR Etiketleri'}
+                      {activePortalTab === 'quick-quote' && 'WhatsApp Teklif'}
+                      {activePortalTab === 'showroom-qr' && 'Showroom QR'}
                       {activePortalTab === 'b2b-projects' && 'Proje Talepleri'}
                       {activePortalTab === 'analytics' && 'Arama Analitiği'}
                       {activePortalTab === 'inventory' && 'Envanter & Stok'}
-                      {activePortalTab === 'outlet-exchange' && 'Outlet & Proje Fazlası'}
+                      {activePortalTab === 'outlet-exchange' && 'Outlet Borsası'}
                       {activePortalTab === 'subscription' && 'Abonelik & SaaS'}
                       {activePortalTab === 'settings' && 'Şube Ayarları'}
                     </span>
                   </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <NotificationBell userType="DEALER" userId={dealerInfo?.id} />
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                  <NotificationBell userType="DEALER" userId={dealerInfo?.id} compact={true} />
                   {dealerInfo && (
                     <a
                       href={`/bayi/${dealerInfo.name ? slugify(dealerInfo.name) : dealerInfo.id}`}
@@ -2564,31 +2570,40 @@ Yetkili Satış & Showroom Departmanı`;
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '4px',
-                        background: 'rgba(212, 175, 55, 0.15)',
+                        background: 'rgba(212, 175, 55, 0.12)',
                         border: '1px solid rgba(212, 175, 55, 0.35)',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        fontSize: '0.62rem',
+                        padding: '0 8px',
+                        height: '34px',
+                        borderRadius: '8px',
+                        fontSize: '0.68rem',
                         color: '#d4af37',
                         fontWeight: '700',
-                        textDecoration: 'none'
+                        textDecoration: 'none',
+                        boxSizing: 'border-box'
                       }}
-                      title="Showroom Sayfası"
+                      title="Showroom Sayfasını Aç"
                     >
-                      <ExternalLink size={10} />
+                      <ExternalLink size={11} />
                       <span>Showroom</span>
                     </a>
                   )}
                   {saasInfo && (
                     <span style={{
-                      fontSize: '0.6rem',
-                      padding: '3px 8px',
-                      borderRadius: '10px',
-                      background: saasInfo.plan === 'PREMIUM' ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.05)',
+                      fontSize: '0.58rem',
+                      padding: '0 6px',
+                      height: '34px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '8px',
+                      background: saasInfo.plan === 'PREMIUM' ? 'linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.1) 100%)' : 'rgba(255,255,255,0.05)',
+                      border: saasInfo.plan === 'PREMIUM' ? '1px solid rgba(212,175,55,0.35)' : '1px solid rgba(255,255,255,0.1)',
                       color: saasInfo.plan === 'PREMIUM' ? '#d4af37' : '#cbd5e1',
-                      fontWeight: '700'
+                      fontWeight: '800',
+                      letterSpacing: '0.04em',
+                      boxSizing: 'border-box'
                     }}>
-                      {saasInfo.plan}
+                      {saasInfo.plan === 'PREMIUM' ? 'PRO' : saasInfo.plan}
                     </span>
                   )}
                 </div>
@@ -2668,7 +2683,7 @@ Yetkili Satış & Showroom Departmanı`;
         </header>
 
         {/* PORTAL MAIN CONTENT */}
-        <div className="dealer-main-content" style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
+        <div className="dealer-main-content" style={{ padding: isMobile ? '12px 10px 84px 10px' : '32px', maxWidth: '1400px', width: '100%', boxSizing: 'border-box', margin: '0 auto' }}>
           {activePortalTab === 'quick-quote' ? (
             /* QUICK QUOTE BUILDER TAB - PREMIUM FEATURE */
             saasInfo?.plan !== 'PREMIUM' ? (
@@ -6990,87 +7005,112 @@ Yetkili Satış & Showroom Departmanı`;
             {/* STATS COUNT GRID */}
             <div className="dealer-stats-grid" style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '20px'
+              gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: isMobile ? '8px' : '20px',
+              marginBottom: isMobile ? '14px' : '24px'
             }}>
               <div className="glass-panel" style={{
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                padding: '24px',
+                borderRadius: isMobile ? '12px' : '16px',
+                padding: isMobile ? '12px 6px' : '24px',
                 display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
                 alignItems: 'center',
-                gap: '20px'
+                textAlign: isMobile ? 'center' : 'left',
+                gap: isMobile ? '6px' : '20px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
               }}>
                 <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
+                  width: isMobile ? '34px' : '48px',
+                  height: isMobile ? '34px' : '48px',
+                  borderRadius: isMobile ? '10px' : '12px',
                   background: 'rgba(255, 255, 255, 0.06)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#cbd5e1'
+                  color: '#cbd5e1',
+                  flexShrink: 0
                 }}>
-                  <FileText size={22} />
+                  <FileText size={isMobile ? 17 : 22} />
                 </div>
-                <div>
-                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#94a3b8', margin: '0 0 4px 0' }}>Toplam Teklif Talebi</h4>
-                  <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#ffffff' }}>{stats.totalLeads} Adet</span>
+                <div style={{ minWidth: 0 }}>
+                  <h4 style={{ fontSize: isMobile ? '0.64rem' : '0.8rem', fontWeight: '600', color: '#94a3b8', margin: '0 0 2px 0', whiteSpace: isMobile ? 'nowrap' : 'normal' }}>
+                    {isMobile ? 'Toplam' : 'Toplam Teklif Talebi'}
+                  </h4>
+                  <span style={{ fontSize: isMobile ? '1.15rem' : '1.6rem', fontWeight: '900', color: '#ffffff', display: 'block', lineHeight: 1.1 }}>
+                    {stats.totalLeads} <span style={{ fontSize: isMobile ? '0.6rem' : '0.8rem', fontWeight: '500', color: '#94a3b8' }}>Adet</span>
+                  </span>
                 </div>
               </div>
 
               <div className="glass-panel" style={{
                 background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                padding: '24px',
+                border: '1px solid rgba(217, 119, 6, 0.25)',
+                borderRadius: isMobile ? '12px' : '16px',
+                padding: isMobile ? '12px 6px' : '24px',
                 display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
                 alignItems: 'center',
-                gap: '20px'
+                textAlign: isMobile ? 'center' : 'left',
+                gap: isMobile ? '6px' : '20px',
+                boxShadow: '0 4px 12px rgba(217, 119, 6, 0.05)'
               }}>
                 <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
+                  width: isMobile ? '34px' : '48px',
+                  height: isMobile ? '34px' : '48px',
+                  borderRadius: isMobile ? '10px' : '12px',
                   background: 'rgba(217, 119, 6, 0.15)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#d97706'
+                  color: '#d97706',
+                  flexShrink: 0
                 }}>
-                  <Activity size={22} className="animate-pulse" />
+                  <Activity size={isMobile ? 17 : 22} className="animate-pulse" />
                 </div>
-                <div>
-                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#94a3b8', margin: '0 0 4px 0' }}>Bekleyen Talepler</h4>
-                  <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#d97706' }}>{stats.pendingLeads} Adet</span>
+                <div style={{ minWidth: 0 }}>
+                  <h4 style={{ fontSize: isMobile ? '0.64rem' : '0.8rem', fontWeight: '600', color: '#94a3b8', margin: '0 0 2px 0', whiteSpace: isMobile ? 'nowrap' : 'normal' }}>
+                    {isMobile ? 'Bekleyen' : 'Bekleyen Talepler'}
+                  </h4>
+                  <span style={{ fontSize: isMobile ? '1.15rem' : '1.6rem', fontWeight: '900', color: '#d97706', display: 'block', lineHeight: 1.1 }}>
+                    {stats.pendingLeads} <span style={{ fontSize: isMobile ? '0.6rem' : '0.8rem', fontWeight: '500', color: '#d97706' }}>Adet</span>
+                  </span>
                 </div>
               </div>
 
               <div className="glass-panel" style={{
                 background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                padding: '24px',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
+                borderRadius: isMobile ? '12px' : '16px',
+                padding: isMobile ? '12px 6px' : '24px',
                 display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
                 alignItems: 'center',
-                gap: '20px'
+                textAlign: isMobile ? 'center' : 'left',
+                gap: isMobile ? '6px' : '20px',
+                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.05)'
               }}>
                 <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '12px',
+                  width: isMobile ? '34px' : '48px',
+                  height: isMobile ? '34px' : '48px',
+                  borderRadius: isMobile ? '10px' : '12px',
                   background: 'rgba(16, 185, 129, 0.15)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#10b981'
+                  color: '#10b981',
+                  flexShrink: 0
                 }}>
-                  <CheckCircle size={22} />
+                  <CheckCircle size={isMobile ? 17 : 22} />
                 </div>
-                <div>
-                  <h4 style={{ fontSize: '0.8rem', fontWeight: '600', color: '#94a3b8', margin: '0 0 4px 0' }}>Cevaplanan Talepler</h4>
-                  <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#10b981' }}>{stats.respondedLeads} Adet</span>
+                <div style={{ minWidth: 0 }}>
+                  <h4 style={{ fontSize: isMobile ? '0.64rem' : '0.8rem', fontWeight: '600', color: '#94a3b8', margin: '0 0 2px 0', whiteSpace: isMobile ? 'nowrap' : 'normal' }}>
+                    {isMobile ? 'Cevaplanan' : 'Cevaplanan Talepler'}
+                  </h4>
+                  <span style={{ fontSize: isMobile ? '1.15rem' : '1.6rem', fontWeight: '900', color: '#10b981', display: 'block', lineHeight: 1.1 }}>
+                    {stats.respondedLeads} <span style={{ fontSize: isMobile ? '0.6rem' : '0.8rem', fontWeight: '500', color: '#10b981' }}>Adet</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -7078,29 +7118,29 @@ Yetkili Satış & Showroom Departmanı`;
             {/* QUICK B2B TOOLS GRID */}
             <div className="dealer-tools-grid" style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '20px',
-              marginBottom: '28px'
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: isMobile ? '12px' : '20px',
+              marginBottom: isMobile ? '20px' : '28px'
             }}>
               {/* Kiosk Mode tool */}
               <div className="glass-panel" style={{
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                padding: '24px',
+                borderRadius: isMobile ? '14px' : '16px',
+                padding: isMobile ? '16px' : '24px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                gap: '16px',
+                gap: isMobile ? '12px' : '16px',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
               }}>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(212,175,55,0.1)', color: '#d4af37', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(212,175,55,0.1)', color: '#d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <Activity size={18} />
                   </div>
                   <div>
                     <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: '0 0 2px 0', color: '#ffffff' }}>Kiosk Teşhir Modu</h4>
-                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>Bu cihazı veya mağazadaki bir tableti dijital kiosk ekranına dönüştürün.</p>
+                    <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>Bu cihazı veya mağazadaki bir tableti dijital kiosk ekranına dönüştürün.</p>
                   </div>
                 </div>
                 <button
@@ -7111,15 +7151,16 @@ Yetkili Satış & Showroom Departmanı`;
                     background: 'rgba(255, 255, 255, 0.06)',
                     color: '#ffffff',
                     border: '1px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '8px',
-                    padding: '10px',
+                    borderRadius: '10px',
+                    padding: '10px 14px',
                     fontSize: '0.8rem',
                     fontWeight: '700',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '6px'
+                    gap: '6px',
+                    boxSizing: 'border-box'
                   }}
                 >
                   <ExternalLink size={13} />
@@ -7131,21 +7172,21 @@ Yetkili Satış & Showroom Departmanı`;
               <div className="glass-panel" style={{
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                padding: '24px',
+                borderRadius: isMobile ? '14px' : '16px',
+                padding: isMobile ? '16px' : '24px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                gap: '16px',
+                gap: isMobile ? '12px' : '16px',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
               }}>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(2,132,199,0.1)', color: '#0284c7', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(2,132,199,0.1)', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <TrendingUp size={18} />
                   </div>
                   <div>
                     <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: '0 0 2px 0', color: '#ffffff' }}>Bölgesel Arama Analizleri</h4>
-                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: 0 }}>{dealerInfo?.city} şehrindeki tüketicilerin en çok aradığı modelleri analiz edin.</p>
+                    <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>{dealerInfo?.city} şehrindeki tüketicilerin en çok aradığı modelleri analiz edin.</p>
                   </div>
                 </div>
                 <button
@@ -7156,15 +7197,16 @@ Yetkili Satış & Showroom Departmanı`;
                     background: 'rgba(255, 255, 255, 0.06)',
                     color: '#ffffff',
                     border: '1px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '8px',
-                    padding: '10px',
+                    borderRadius: '10px',
+                    padding: '10px 14px',
                     fontSize: '0.8rem',
                     fontWeight: '700',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '6px'
+                    gap: '6px',
+                    boxSizing: 'border-box'
                   }}
                 >
                   <TrendingUp size={13} />
@@ -7959,7 +8001,6 @@ Yetkili Satış & Showroom Departmanı`;
           }
           .dealer-project-details-split,
           .dealer-pricing-grid,
-          .dealer-stats-grid,
           .campaign-inputs-grid,
           .inventory-dashboard-grid,
           .quote-form-card .form-group-row,
@@ -7968,6 +8009,11 @@ Yetkili Satış & Showroom Departmanı`;
           .settings-grid-address {
             grid-template-columns: 1fr !important;
             gap: 12px !important;
+          }
+          .dealer-stats-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 8px !important;
+            margin-bottom: 14px !important;
           }
           .settings-card {
             padding: 16px !important;
@@ -8764,14 +8810,14 @@ Yetkili Satış & Showroom Departmanı`;
 
       {/* Mobile Bottom Navigation Bar */}
       {isMobile && (
-        <div className="no-print" style={{
+        <div className="no-print mobile-bottom-bar" style={{
           position: 'fixed',
           bottom: 0,
           left: 0,
           right: 0,
-          height: '60px',
-          background: 'rgba(9, 13, 22, 0.95)',
-          backdropFilter: 'blur(10px)',
+          height: '58px',
+          background: 'rgba(9, 13, 22, 0.96)',
+          backdropFilter: 'blur(16px)',
           borderTop: '1px solid rgba(212, 175, 55, 0.2)',
           display: 'flex',
           justifyContent: 'space-around',
@@ -8781,11 +8827,11 @@ Yetkili Satış & Showroom Departmanı`;
           boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.5)'
         }}>
           {[
-            { id: 'dashboard', label: 'Panel', icon: <Activity size={20} /> },
-            { id: 'stock-exchange', label: 'Takas Borsa', icon: <RefreshCw size={20} /> },
-            { id: 'b2b-projects', label: 'Talepler', icon: <Building2 size={20} /> },
-            { id: 'inventory', label: 'Stok', icon: <Package size={20} /> },
-            { id: 'more', label: 'Menü', icon: <Menu size={20} /> }
+            { id: 'dashboard', label: 'Panel', icon: <Activity size={18} /> },
+            { id: 'stock-exchange', label: 'Takas Borsa', icon: <RefreshCw size={18} /> },
+            { id: 'b2b-projects', label: 'Talepler', icon: <Building2 size={18} /> },
+            { id: 'inventory', label: 'Stok', icon: <Package size={18} /> },
+            { id: 'more', label: 'Menü', icon: <Menu size={18} /> }
           ].map(tab => {
             const isActive = tab.id === 'more' ? showMobileMoreMenu : (activePortalTab === tab.id);
             return (
@@ -8803,18 +8849,33 @@ Yetkili Satış & Showroom Departmanı`;
                   border: 'none',
                   color: isActive ? '#d4af37' : '#94a3b8',
                   display: 'flex',
+                  flex: 1,
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '4px',
+                  justifyContent: 'center',
+                  gap: '3px',
                   cursor: 'pointer',
-                  fontSize: '0.65rem',
-                  fontWeight: isActive ? '700' : '500',
-                  padding: '6px 12px',
-                  transition: 'color 0.2s'
+                  fontSize: '0.62rem',
+                  fontWeight: isActive ? '800' : '500',
+                  padding: '6px 0',
+                  height: '100%',
+                  position: 'relative',
+                  transition: 'all 0.2s'
                 }}
               >
+                {isActive && (
+                  <span style={{
+                    position: 'absolute',
+                    top: 0,
+                    width: '24px',
+                    height: '2.5px',
+                    background: '#d4af37',
+                    borderRadius: '2px',
+                    boxShadow: '0 0 8px #d4af37'
+                  }} />
+                )}
                 {tab.icon}
-                <span>{tab.label}</span>
+                <span style={{ letterSpacing: '0.01em' }}>{tab.label}</span>
               </button>
             );
           })}
@@ -8829,8 +8890,8 @@ Yetkili Satış & Showroom Departmanı`;
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(9, 13, 22, 0.6)',
-          backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(9, 13, 22, 0.7)',
+          backdropFilter: 'blur(6px)',
           zIndex: 999,
           display: 'flex',
           justifyContent: 'flex-end',
@@ -8840,12 +8901,15 @@ Yetkili Satış & Showroom Departmanı`;
             background: '#111827',
             borderTopLeftRadius: '24px',
             borderTopRightRadius: '24px',
-            borderTop: '1px solid rgba(212, 175, 55, 0.2)',
-            padding: '24px 20px 40px 20px',
+            borderTop: '1px solid rgba(212, 175, 55, 0.25)',
+            padding: '20px 16px 40px 16px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '16px',
-            boxShadow: '0 -10px 25px rgba(0,0,0,0.5)'
+            gap: '14px',
+            boxShadow: '0 -10px 30px rgba(0,0,0,0.6)',
+            maxHeight: '85vh',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch'
           }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#fff', margin: 0 }}>Tüm İşlemler</h3>

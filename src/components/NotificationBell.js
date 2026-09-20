@@ -14,7 +14,7 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
-export default function NotificationBell({ userType = 'DEALER', userId = null, title = 'Bildirimler' }) {
+export default function NotificationBell({ userType = 'DEALER', userId = null, title = 'Bildirimler', compact = false }) {
   const [permission, setPermission] = useState('default');
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
@@ -140,7 +140,7 @@ export default function NotificationBell({ userType = 'DEALER', userId = null, t
   const isGranted = permission === 'granted';
 
   return (
-    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: compact ? '4px' : '8px' }}>
       <button
         onClick={handleToggleNotifications}
         disabled={loading}
@@ -148,30 +148,38 @@ export default function NotificationBell({ userType = 'DEALER', userId = null, t
         style={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: '6px',
+          justifyContent: 'center',
+          gap: compact ? '0px' : '6px',
           background: isGranted ? 'rgba(16, 185, 129, 0.15)' : 'rgba(212, 175, 55, 0.12)',
           color: isGranted ? '#10b981' : '#d4af37',
           border: `1px solid ${isGranted ? 'rgba(16, 185, 129, 0.3)' : 'rgba(212, 175, 55, 0.3)'}`,
-          padding: '6px 12px',
+          padding: compact ? '0' : '6px 12px',
+          width: compact ? '34px' : 'auto',
+          height: compact ? '34px' : 'auto',
           borderRadius: '8px',
           fontSize: '0.78rem',
           fontWeight: '700',
           cursor: 'pointer',
-          transition: 'all 0.2s'
+          position: 'relative',
+          transition: 'all 0.2s',
+          boxSizing: 'border-box'
         }}
       >
         {loading ? (
-          <Loader2 size={14} className="animate-spin" />
+          <Loader2 size={compact ? 16 : 14} className="animate-spin" />
         ) : isGranted ? (
-          <BellRing size={14} style={{ color: '#10b981' }} />
+          <BellRing size={compact ? 16 : 14} style={{ color: '#10b981' }} />
         ) : (
-          <Bell size={14} style={{ color: '#d4af37' }} />
+          <Bell size={compact ? 16 : 14} style={{ color: '#d4af37' }} />
         )}
 
-        <span>{isGranted ? 'Bildirimler Açık' : 'Bildirimleri Aç'}</span>
+        {!compact && <span>{isGranted ? 'Bildirimler Açık' : 'Bildirimleri Aç'}</span>}
 
         {isGranted && (
           <span style={{
+            position: compact ? 'absolute' : 'relative',
+            top: compact ? '6px' : 'auto',
+            right: compact ? '6px' : 'auto',
             width: '6px',
             height: '6px',
             background: '#10b981',
@@ -181,8 +189,8 @@ export default function NotificationBell({ userType = 'DEALER', userId = null, t
         )}
       </button>
 
-      {/* Quick Test Push button if already granted */}
-      {isGranted && (
+      {/* Quick Test Push button if already granted and not compact */}
+      {isGranted && !compact && (
         <button
           onClick={handleSendTestPush}
           disabled={loading}
