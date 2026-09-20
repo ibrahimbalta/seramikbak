@@ -3830,6 +3830,23 @@ h1, h2, h3, h4, h5, h6, p, span, a, label {
     border-radius: 16px !important;
   }
 
+  /* Native Mobile App / PWA & APK Optimization */
+  * {
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  button, a, input, select, textarea {
+    touch-action: manipulation !important;
+  }
+  .card-mobile-floating-chips {
+    position: absolute !important;
+    bottom: 6px !important;
+    right: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    z-index: 3 !important;
+  }
+
   /* Responsive helper utilities */
   .hide-on-mobile {
     display: none !important;
@@ -3844,3 +3861,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, label {
     align-items: stretch !important;
   }
 }
+
+.card-mobile-floating-chips {
+  display: none;
+}
+

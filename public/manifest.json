@@ -5,14 +5,31 @@
   "start_url": "/",
   "id": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "background_color": "#0b0f19",
+  "theme_color": "#0b0f19",
   "orientation": "portrait",
   "lang": "tr",
   "dir": "ltr",
   "categories": ["shopping", "business", "lifestyle"],
   "permissions": ["camera", "geolocation"],
   "features": ["camera"],
+  "shortcuts": [
+    {
+      "name": "3D Sanal Stüdyo",
+      "short_name": "3D Stüdyo",
+      "description": "Seramikleri odanızda 3D giydirin",
+      "url": "/?tab=studio",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Yetkili Bayiler",
+      "short_name": "Bayiler",
+      "description": "En yakın yetkili seramik showroomları",
+      "url": "/?tab=dealers",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
   "icons": [
     {
       "src": "/icon-192.png",

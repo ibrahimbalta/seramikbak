@@ -3948,9 +3948,20 @@ export default function Home() {
             )}
             <LanguageSelector />
           </div>
-          <button className="hamburger-menu-btn" onClick={() => setShowMobileMenu(!showMobileMenu)} aria-label="Menü">
-            <MenuIcon size={20} />
-          </button>
+          <div className="mobile-header-actions">
+            <button 
+              type="button"
+              className="mobile-header-action-btn" 
+              onClick={() => { if(currentUser) { setShowFavoritesPanel(!showFavoritesPanel); } else { window.location.href = '/uyelik'; } }}
+              aria-label="Favorilerim"
+            >
+              <HeartIcon size={17} fill={userFavorites.length > 0 ? 'var(--accent-gold)' : 'none'} stroke={userFavorites.length > 0 ? 'var(--accent-gold)' : 'currentColor'} />
+              {userFavorites.length > 0 && <span className="mobile-header-badge">{userFavorites.length}</span>}
+            </button>
+            <button className="hamburger-menu-btn" onClick={() => setShowMobileMenu(!showMobileMenu)} aria-label="Menü">
+              <MenuIcon size={20} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -4019,6 +4030,64 @@ export default function Home() {
                   </Link>
                 </div>
               )}
+
+              {/* PWA / APK Mobile App Install Card */}
+              <div className="mobile-app-install-banner-card" style={{
+                padding: '12px 14px',
+                background: 'linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(15,23,42,0.85) 100%)',
+                borderRadius: '14px',
+                border: '1px solid rgba(212, 175, 55, 0.35)',
+                marginBottom: '12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '900',
+                    fontSize: '1rem',
+                    flexShrink: 0
+                  }}>
+                    📱
+                  </div>
+                  <div style={{ flex: 1, overflow: 'hidden' }}>
+                    <div style={{ fontWeight: '800', fontSize: '0.86rem', color: '#ffffff' }}>Mobil Uygulama (PWA / APK)</div>
+                    <div style={{ fontSize: '0.70rem', color: '#cbd5e1' }}>Tek dokunuşla ana ekrana ekleyin</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMobileMenu(false);
+                    window.dispatchEvent(new CustomEvent('seramikbak:install-pwa'));
+                  }}
+                  style={{
+                    padding: '8px 12px',
+                    background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#0f172a',
+                    fontWeight: '800',
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Smartphone size={14} />
+                  <span>Uygulamayı Cihaza Yükle</span>
+                </button>
+              </div>
 
               <Link href="/" className="mobile-nav-link" style={{ textDecoration: 'none' }} onClick={() => { setActiveTab('search'); setShowMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
                 <HomeIcon size={16} />
@@ -4413,6 +4482,104 @@ export default function Home() {
                     }}
                   />
                 ))}
+              </div>
+            </div>
+
+            {/* MOBILE NATIVE APP STORIES: YENİ KOLEKSİYONLAR (Instagram / Trendyol App Style) */}
+            <div className="mobile-app-stories-container">
+              <div className="stories-header-mobile">
+                <div className="stories-title-group">
+                  <span className="stories-title-mobile">✨ Yeni Koleksiyonlar</span>
+                  <span className="stories-subtitle-mobile">Canlı ürünleri incelemek için dokunun</span>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => { setSelectedStyle(''); setSelectedColor(''); fetchProducts(); }}
+                  className="stories-see-all-btn"
+                >
+                  Tümünü Gör →
+                </button>
+              </div>
+
+              <div className="mobile-app-stories-track">
+                {/* 1. All Trends Story */}
+                <div 
+                  className="mobile-story-pill highlight-story" 
+                  onClick={() => { setSelectedStyle(''); setSelectedColor(''); setSelectedSize(''); fetchProducts(); }}
+                >
+                  <div className="story-circle-ring">
+                    <div className="story-circle-inner story-icon-gold">
+                      <Sparkles size={20} />
+                    </div>
+                  </div>
+                  <span className="story-caption">Trendler</span>
+                </div>
+
+                {/* 2. Calacatta Gold */}
+                <div 
+                  className="mobile-story-pill" 
+                  onClick={() => openProductByCode('KUT-CAL-GLD')}
+                >
+                  <div className="story-circle-ring">
+                    <img src="/textures/calacatta_gold.jpg" alt="Calacatta" className="story-circle-img" />
+                  </div>
+                  <span className="story-caption">Calacatta</span>
+                </div>
+
+                {/* 3. Meşe Ahşap */}
+                <div 
+                  className="mobile-story-pill" 
+                  onClick={() => openProductByCode('BIEN-NAT-OAK')}
+                >
+                  <div className="story-circle-ring">
+                    <img src="/textures/natural_oak.jpg" alt="Meşe" className="story-circle-img" />
+                  </div>
+                  <span className="story-caption">Meşe Ahşap</span>
+                </div>
+
+                {/* 4. Beton Gri */}
+                <div 
+                  className="mobile-story-pill" 
+                  onClick={() => openProductByCode('VIT-CON-GRY')}
+                >
+                  <div className="story-circle-ring">
+                    <img src="/textures/concrete_light_grey.jpg" alt="Beton" className="story-circle-img" />
+                  </div>
+                  <span className="story-caption">Beton Gri</span>
+                </div>
+
+                {/* 5. Traverten */}
+                <div 
+                  className="mobile-story-pill" 
+                  onClick={() => openProductByCode('EGE-TRA-CLA')}
+                >
+                  <div className="story-circle-ring">
+                    <img src="/textures/travertino_classico.jpg" alt="Traverten" className="story-circle-img" />
+                  </div>
+                  <span className="story-caption">Traverten</span>
+                </div>
+
+                {/* 6. Nexos Antrasit */}
+                <div 
+                  className="mobile-story-pill" 
+                  onClick={() => openProductByCode('HITIT-NEXOS-ANTRASIT-LAPPATO-60X120')}
+                >
+                  <div className="story-circle-ring">
+                    <img src="/textures/albatros_antrasit.jpg" alt="Nexos" className="story-circle-img" />
+                  </div>
+                  <span className="story-caption">Antrasit</span>
+                </div>
+
+                {/* 7. Borneo */}
+                <div 
+                  className="mobile-story-pill" 
+                  onClick={() => openProductByCode('BIEN-BOR-ANT')}
+                >
+                  <div className="story-circle-ring">
+                    <img src="/textures/borneo_antrasit.jpg" alt="Borneo" className="story-circle-img" />
+                  </div>
+                  <span className="story-caption">Borneo</span>
+                </div>
               </div>
             </div>
 
@@ -16337,7 +16504,18 @@ export default function Home() {
           font-size: 0.6rem;
         }
 
-        /* MOBILE RESPONSIVENESS OVERRIDES */
+        /* Desktop defaults: Hide mobile app components on desktop */
+        .mobile-app-stories-container {
+          display: none !important;
+        }
+        .mobile-header-actions {
+          display: none !important;
+        }
+        :global(.card-mobile-floating-chips) {
+          display: none !important;
+        }
+
+        /* MOBILE NATIVE APP (PWA / APK) RESPONSIVE ENGINE */
         @media (max-width: 768px) {
           .ai-actions-grid {
             grid-template-columns: 1fr !important;
@@ -16347,91 +16525,191 @@ export default function Home() {
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 8px !important;
           }
-          /* Top Ticker Cleanup */
+          /* Top Website Banners Cleanup: Hide desktop ticker and website marquee on mobile */
           .live-analytics-top-bar,
-          :global(.live-deals-ticker) {
+          :global(.live-deals-ticker),
+          .project-top-banner {
             display: none !important;
           }
 
-          /* New Collections Banner on Mobile - Elegant & Responsive */
-          .project-top-banner {
+          /* Native Mobile App Stories Container ("Yeni Koleksiyonlar" - Instagram/Trendyol Style) */
+          .mobile-app-stories-container {
             display: flex !important;
             flex-direction: column !important;
-            align-items: stretch !important;
-            margin: 6px 0 10px 0 !important;
-            border-radius: 16px !important;
-            border: 1px solid rgba(179, 142, 71, 0.22) !important;
-            background: linear-gradient(135deg, #fdfbf7 0%, #f5efe1 100%) !important;
-            overflow: hidden !important;
+            gap: 8px !important;
+            margin: 6px 0 12px 0 !important;
+            padding: 10px 12px !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%) !important;
+            border-radius: 18px !important;
+            border: 1px solid rgba(212, 175, 55, 0.28) !important;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05) !important;
             width: 100% !important;
-            max-width: 100% !important;
             box-sizing: border-box !important;
           }
-          .banner-left-area {
-            padding: 8px 12px !important;
+          .stories-header-mobile {
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            background: transparent !important;
-            border-bottom: 1px solid rgba(179, 142, 71, 0.12) !important;
           }
-          .banner-badge {
-            padding: 4px 10px !important;
-            font-size: 0.65rem !important;
+          .stories-title-group {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 1px !important;
+          }
+          .stories-title-mobile {
+            font-size: 0.84rem !important;
             font-weight: 800 !important;
-            border-radius: 20px !important;
-            background: #ffffff !important;
-            border: 1px solid rgba(179, 142, 71, 0.35) !important;
-            color: #8c6b30 !important;
+            color: #0f172a !important;
+            letter-spacing: -0.01em !important;
+          }
+          .stories-subtitle-mobile {
+            font-size: 0.63rem !important;
+            color: #64748b !important;
+            font-weight: 500 !important;
+          }
+          .stories-see-all-btn {
+            background: none !important;
+            border: none !important;
+            color: var(--accent-gold, #b38e47) !important;
+            font-size: 0.68rem !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+          }
+          .mobile-app-stories-track {
+            display: flex !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+            overflow-x: auto !important;
+            padding: 6px 2px 4px 2px !important;
+            scrollbar-width: none !important;
+            -webkit-overflow-scrolling: touch !important;
+            scroll-snap-type: x mandatory !important;
+          }
+          .mobile-app-stories-track::-webkit-scrollbar {
+            display: none !important;
+          }
+          .mobile-story-pill {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 5px !important;
+            cursor: pointer !important;
+            flex-shrink: 0 !important;
+            scroll-snap-align: start !important;
+            width: 56px !important;
+            transition: transform 0.15s ease !important;
+          }
+          .mobile-story-pill:active {
+            transform: scale(0.92) !important;
+          }
+          .story-circle-ring {
+            width: 52px !important;
+            height: 52px !important;
+            border-radius: 50% !important;
+            padding: 2.5px !important;
+            background: linear-gradient(135deg, #d4af37 0%, #f59e0b 50%, #b38e47 100%) !important;
             display: flex !important;
             align-items: center !important;
-            gap: 6px !important;
-          }
-          .banner-ad-showcase {
-            padding: 6px 12px !important;
-            min-width: unset !important;
-            width: 100% !important;
+            justify-content: center !important;
+            box-shadow: 0 4px 10px rgba(179, 142, 71, 0.25) !important;
             box-sizing: border-box !important;
-            border-top: none !important;
-            border-bottom: 1px solid rgba(179, 142, 71, 0.12) !important;
-            border-left: none !important;
-            border-right: none !important;
-            gap: 10px !important;
           }
-          .banner-ad-showcase .ad-thumb {
-            width: 44px !important;
-            height: 44px !important;
-            border-radius: 6px !important;
+          .mobile-story-pill.highlight-story .story-circle-ring {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%) !important;
           }
-          .banner-marquee-wrapper {
-            padding: 6px 0 !important;
-            overflow: hidden !important;
+          .story-circle-inner,
+          .story-circle-img {
             width: 100% !important;
-            max-width: 100% !important;
-            mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%) !important;
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%) !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            border: 2px solid #ffffff !important;
+            box-sizing: border-box !important;
           }
-          .banner-marquee-track {
-            gap: 12px !important;
+          .story-icon-gold {
+            background: #ffffff !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #d4af37 !important;
           }
-          .banner-item {
-            gap: 4px !important;
-            cursor: pointer !important;
-          }
-          .banner-img {
-            width: 72px !important;
-            height: 80px !important;
-            border-radius: 8px !important;
-          }
-          .banner-brand-name {
-            font-size: 0.58rem !important;
-          }
-          .banner-product-name {
-            font-size: 0.65rem !important;
-            max-width: 72px !important;
+          .story-caption {
+            font-size: 0.63rem !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            text-align: center !important;
+            white-space: nowrap !important;
+            max-width: 56px !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
-            white-space: nowrap !important;
+          }
+
+          /* Mobile Header Actions (Heart + Menu) */
+          .mobile-header-actions {
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+          }
+          .mobile-header-action-btn {
+            position: relative !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 10px !important;
+            background: #f1f5f9 !important;
+            border: 1px solid rgba(15, 23, 42, 0.08) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #1e293b !important;
+            cursor: pointer !important;
+          }
+          .mobile-header-badge {
+            position: absolute !important;
+            top: -3px !important;
+            right: -3px !important;
+            background: #ef4444 !important;
+            color: #ffffff !important;
+            font-size: 0.55rem !important;
+            font-weight: 800 !important;
+            padding: 1px 5px !important;
+            border-radius: 10px !important;
+            border: 1.5px solid #ffffff !important;
+            line-height: 1 !important;
+          }
+
+          /* Mobile App Product Card Floating Micro-Chips */
+          :global(.card-mobile-floating-chips) {
+            position: absolute !important;
+            bottom: 6px !important;
+            right: 6px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            z-index: 3 !important;
+            pointer-events: auto !important;
+          }
+          :global(.mobile-floating-chip) {
+            padding: 3px 7px !important;
+            font-size: 0.62rem !important;
+            font-weight: 800 !important;
+            border-radius: 6px !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            background: rgba(15, 23, 42, 0.8) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            color: #ffffff !important;
+            cursor: pointer !important;
+            line-height: 1 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+          }
+          :global(.mobile-floating-chip.chip-gold) {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.95), rgba(179, 142, 71, 0.95)) !important;
+            color: #0f172a !important;
+            border-color: rgba(255, 255, 255, 0.4) !important;
+          }
+          :global(.mobile-floating-chip:active) {
+            transform: scale(0.92) !important;
           }
 
           /* Main Mobile App Container */

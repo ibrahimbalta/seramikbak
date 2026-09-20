@@ -85,6 +85,26 @@ export default function ProductCard({
             {t('dealers')}
           </button>
         </div>
+
+        {/* Mobile-App Floating Micro-Chips (Zero vertical space overhead, 1-tap 3D & AR) */}
+        <div className="card-mobile-floating-chips">
+          <button 
+            type="button"
+            onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
+            className="mobile-floating-chip"
+            title="3D Gör"
+          >
+            3D
+          </button>
+          <button 
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onOpenAR ? onOpenAR(product) : navigateTo3DStudio(product); }}
+            className="mobile-floating-chip chip-gold"
+            title="AR ile Gör"
+          >
+            AR
+          </button>
+        </div>
       </div>
 
       {/* Card Meta Content */}
