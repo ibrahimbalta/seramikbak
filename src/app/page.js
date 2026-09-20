@@ -16577,14 +16577,15 @@ export default function Home() {
             gap: 8px !important;
           }
           .logo-icon {
-            width: 32px !important;
-            height: 32px !important;
-            font-size: 0.85rem !important;
-            font-weight: 900 !important;
+            width: 34px !important;
+            height: 34px !important;
+            font-size: 0.90rem !important;
+            font-weight: 850 !important;
             border-radius: 9px !important;
-            background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%) !important;
+            background: linear-gradient(135deg, #182030 0%, #0b0f19 100%) !important;
+            border: 1.5px solid #d4af37 !important;
             color: #ffffff !important;
-            box-shadow: 0 2px 8px rgba(179, 142, 71, 0.35) !important;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25), 0 0 8px rgba(212, 175, 55, 0.15) !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
