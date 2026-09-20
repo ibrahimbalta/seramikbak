@@ -3551,54 +3551,64 @@ export default function Home() {
 
       {/* Premium Collections Banner */}
       <div className="project-top-banner">
-        <div className="banner-left-area">
-          <div className="banner-badge">
-            <Sparkles size={13} className="spin-icon-slow" />
-            <span>YENİ KOLEKSİYONLAR</span>
-          </div>
-        </div>
-
-
         <div className="banner-marquee-wrapper">
           <div className="banner-marquee-track">
             {/* First set */}
             <div className="banner-item" onClick={() => openProductByCode('VIT-CON-GRY')}>
-              <img src="/hero/luxury_bathroom.png" alt="VitrA Concrete" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/luxury_bathroom.png" alt="VitrA Concrete" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">VitrA</span>
                 <span className="banner-product-name">Concrete Light Grey</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('BIEN-NAT-OAK')}>
-              <img src="/hero/modern_living.png" alt="Bien Natural Oak" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/modern_living.png" alt="Bien Natural Oak" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Bien</span>
                 <span className="banner-product-name">Natural Oak</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('KUT-CAL-GLD')}>
-              <img src="/hero/scandinavian_kitchen.png" alt="Kütahya Calacatta" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/scandinavian_kitchen.png" alt="Kütahya Calacatta" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Kütahya</span>
                 <span className="banner-product-name">Calacatta Gold</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('EGE-TRA-CLA')}>
-              <img src="/hero/hero_ceramics.jpg" alt="Ege Travertino" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/hero_ceramics.jpg" alt="Ege Travertino" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Ege Seramik</span>
                 <span className="banner-product-name">Travertino Classico</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('HITIT-NEXOS-ANTRASIT-LAPPATO-60X120')}>
-              <img src="/hero/luxury_bathroom.png" alt="Hitit Nexos" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/luxury_bathroom.png" alt="Hitit Nexos" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Hitit Seramik</span>
                 <span className="banner-product-name">Nexos Antrasit Lappato</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('BIEN-BOR-ANT')}>
-              <img src="/hero/modern_living.png" alt="Bien Borneo" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/modern_living.png" alt="Bien Borneo" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Bien</span>
                 <span className="banner-product-name">Borneo Antrasit</span>
@@ -3606,42 +3616,60 @@ export default function Home() {
             </div>
             {/* Duplicate set for seamless loop */}
             <div className="banner-item" onClick={() => openProductByCode('VIT-CON-GRY')}>
-              <img src="/hero/luxury_bathroom.png" alt="VitrA Concrete" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/luxury_bathroom.png" alt="VitrA Concrete" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">VitrA</span>
                 <span className="banner-product-name">Concrete Light Grey</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('BIEN-NAT-OAK')}>
-              <img src="/hero/modern_living.png" alt="Bien Natural Oak" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/modern_living.png" alt="Bien Natural Oak" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Bien</span>
                 <span className="banner-product-name">Natural Oak</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('KUT-CAL-GLD')}>
-              <img src="/hero/scandinavian_kitchen.png" alt="Kütahya Calacatta" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/scandinavian_kitchen.png" alt="Kütahya Calacatta" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Kütahya</span>
                 <span className="banner-product-name">Calacatta Gold</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('EGE-TRA-CLA')}>
-              <img src="/hero/hero_ceramics.jpg" alt="Ege Travertino" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/hero_ceramics.jpg" alt="Ege Travertino" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Ege Seramik</span>
                 <span className="banner-product-name">Travertino Classico</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('HITIT-NEXOS-ANTRASIT-LAPPATO-60X120')}>
-              <img src="/hero/luxury_bathroom.png" alt="Hitit Nexos" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/luxury_bathroom.png" alt="Hitit Nexos" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Hitit Seramik</span>
                 <span className="banner-product-name">Nexos Antrasit Lappato</span>
               </div>
             </div>
             <div className="banner-item" onClick={() => openProductByCode('BIEN-BOR-ANT')}>
-              <img src="/hero/modern_living.png" alt="Bien Borneo" className="banner-img" />
+              <div className="banner-img-wrapper">
+                <img src="/hero/modern_living.png" alt="Bien Borneo" className="banner-img" />
+                <span className="banner-img-badge">YENİ</span>
+              </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Bien</span>
                 <span className="banner-product-name">Borneo Antrasit</span>
@@ -10504,7 +10532,7 @@ export default function Home() {
           background: linear-gradient(135deg, #fdfbf7 0%, #f5efe1 100%); /* warm champagne cream */
           border: 1px solid rgba(179, 142, 71, 0.22);
           border-radius: var(--border-radius-lg);
-          padding: 0;
+          padding: 6px 12px;
           gap: 0;
           box-shadow: 0 10px 30px rgba(179, 142, 71, 0.05), 
                       inset 0 1px 0 #ffffff;
@@ -10512,125 +10540,21 @@ export default function Home() {
           position: relative;
         }
 
-        .banner-left-area {
-          flex-shrink: 0;
-          padding: 20px 24px;
-          display: flex;
-          align-items: center;
-          z-index: 2;
-          background: linear-gradient(90deg, #fdfbf7 85%, transparent 100%);
-        }
-
-        .banner-badge {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: #ffffff;
-          border: 1px solid rgba(179, 142, 71, 0.35);
-          color: #8c6b30;
-          padding: 8px 18px;
-          border-radius: 20px;
-          font-size: 0.74rem;
-          font-weight: 800;
-          letter-spacing: 0.08em;
-          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.06);
-          white-space: nowrap;
-        }
-
-        .banner-badge svg {
-          color: #8c6b30;
-          filter: drop-shadow(0 0 2px rgba(179, 142, 71, 0.2));
-        }
-
-        .banner-ad-showcase {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          background: linear-gradient(135deg, rgba(179, 142, 71, 0.05) 0%, rgba(255, 255, 255, 0.2) 100%);
-          border-left: 1px solid rgba(179, 142, 71, 0.12);
-          border-right: 1px solid rgba(179, 142, 71, 0.12);
-          padding: 10px 22px;
-          height: 100%;
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-          position: relative;
-          z-index: 3;
-          flex-shrink: 0;
-          min-width: 270px;
-          border-radius: 0;
-        }
-
-        .banner-ad-showcase:hover {
-          background: linear-gradient(135deg, rgba(179, 142, 71, 0.1) 0%, rgba(255, 255, 255, 0.4) 100%);
-          box-shadow: inset 0 0 10px rgba(179, 142, 71, 0.08);
-          transform: scale(1.01);
-        }
-
-        .ad-badge {
-          font-size: 0.58rem;
-          font-weight: 900;
-          color: #ffffff;
-          background: #0f172a;
-          padding: 3px 8px;
-          border-radius: 4px;
-          letter-spacing: 0.06em;
-        }
-
-        .ad-thumb {
-          width: 70px;
-          height: 70px;
-          border-radius: 10px;
-          object-fit: cover;
-          border: 1.5px solid rgba(179, 142, 71, 0.2);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-          transition: all 0.3s ease;
-        }
-
-        .banner-ad-showcase:hover .ad-thumb {
-          border-color: #8c6b30;
-          box-shadow: 0 4px 10px rgba(179, 142, 71, 0.15);
-        }
-
-        .ad-info {
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-          line-height: 1.25;
-        }
-
-        .ad-brand {
-          font-size: 0.65rem;
-          color: #8c6b30;
-          font-weight: 800;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-        }
-
-        .ad-name {
-          font-size: 0.76rem;
-          color: #1e293b;
-          font-weight: 700;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 140px;
-        }
-
         .banner-marquee-wrapper {
           flex-grow: 1;
           overflow: hidden;
           position: relative;
-          mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+          mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+          -webkit-mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
         }
 
         .banner-marquee-track {
           display: flex;
           align-items: center;
-          gap: 28px;
+          gap: 20px;
           animation: marqueeScroll 40s linear infinite;
           width: max-content;
-          padding: 12px 0;
+          padding: 6px 0;
         }
 
         .banner-marquee-track:hover {
@@ -10646,17 +10570,17 @@ export default function Home() {
         .banner-item {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 14px;
           cursor: pointer;
           transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
           padding: 8px 16px 8px 8px;
-          border-radius: 18px;
+          border-radius: 16px;
           flex-shrink: 0;
-          background: rgba(255, 255, 255, 0.8); /* white glass tiles */
+          background: rgba(255, 255, 255, 0.85); /* white glass tiles */
           backdrop-filter: blur(8px);
-          border: 1px solid rgba(179, 142, 71, 0.15);
-          width: 300px;
-          height: 130px;
+          border: 1px solid rgba(179, 142, 71, 0.18);
+          width: 270px;
+          height: 110px;
           box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
 
@@ -10667,9 +10591,35 @@ export default function Home() {
           box-shadow: 0 10px 25px rgba(179, 142, 71, 0.12);
         }
 
+        .banner-img-wrapper {
+          position: relative;
+          display: inline-flex;
+          flex-shrink: 0;
+          border-radius: 12px;
+          overflow: hidden;
+        }
+
+        .banner-img-badge {
+          position: absolute;
+          top: 6px;
+          left: 6px;
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          color: #ffffff;
+          font-size: 0.58rem;
+          font-weight: 850;
+          padding: 2.5px 6.5px;
+          border-radius: 4px;
+          letter-spacing: 0.06em;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          line-height: 1;
+          text-transform: uppercase;
+          z-index: 2;
+          pointer-events: none;
+        }
+
         .banner-img {
-          width: 100px;
-          height: 112px;
+          width: 90px;
+          height: 94px;
           object-fit: cover;
           border-radius: 12px;
           flex-shrink: 0;
@@ -16418,82 +16368,20 @@ export default function Home() {
             font-size: 0.62rem !important;
           }
 
-          /* Project Top Banner (Yeni Koleksiyonlar & Sponsorlu) Mobile Adaption */
+          /* Project Top Banner (Sadece Yeni Rozetli Koleksiyonlar Şeridi) Mobile Adaption */
           .project-top-banner {
             display: flex !important;
-            flex-direction: column !important;
-            padding: 8px !important;
-            margin: 4px 0 8px 0 !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            padding: 4px 6px !important;
+            margin: 2px 0 6px 0 !important;
             border-radius: 14px !important;
             background: linear-gradient(135deg, #fdfbf7 0%, #f5efe1 100%) !important;
             border: 1px solid rgba(179, 142, 71, 0.25) !important;
             box-shadow: 0 4px 16px rgba(179, 142, 71, 0.06) !important;
-            gap: 8px !important;
             box-sizing: border-box !important;
             width: 100% !important;
-          }
-          .banner-left-area {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
-            padding: 2px 4px 0 4px !important;
-            background: transparent !important;
-          }
-          .banner-badge {
-            font-size: 0.68rem !important;
-            padding: 4px 12px !important;
-            border-radius: 14px !important;
-            font-weight: 800 !important;
-            letter-spacing: 0.04em !important;
-            background: #ffffff !important;
-            border: 1px solid rgba(179, 142, 71, 0.35) !important;
-            box-shadow: 0 2px 6px rgba(179, 142, 71, 0.08) !important;
-          }
-          .banner-ad-showcase {
-            display: flex !important;
-            align-items: center !important;
-            gap: 10px !important;
-            padding: 5px 12px 5px 5px !important;
-            height: 74px !important;
-            border-radius: 12px !important;
-            background: rgba(255, 255, 255, 0.95) !important;
-            border: 1px solid rgba(179, 142, 71, 0.22) !important;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03) !important;
-            min-width: unset !important;
-            width: auto !important;
-            max-width: 250px !important;
-            box-sizing: border-box !important;
-          }
-          .ad-thumb {
-            width: 64px !important;
-            height: 64px !important;
-            border-radius: 9px !important;
-            object-fit: cover !important;
-            flex-shrink: 0 !important;
-            border: 1px solid rgba(179, 142, 71, 0.15) !important;
-          }
-          .ad-info {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 2px !important;
-            min-width: 0 !important;
-            flex: 1 !important;
             overflow: hidden !important;
-          }
-          .ad-brand {
-            font-size: 0.60rem !important;
-            font-weight: 800 !important;
-            color: #8c6b30 !important;
-            text-transform: uppercase !important;
-          }
-          .ad-name {
-            font-size: 0.74rem !important;
-            font-weight: 700 !important;
-            color: #0f172a !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            max-width: 140px !important;
           }
           .banner-marquee-wrapper {
             overflow-x: auto !important;
@@ -16531,6 +16419,29 @@ export default function Home() {
             flex-shrink: 0 !important;
             cursor: pointer !important;
             box-sizing: border-box !important;
+          }
+          .banner-img-wrapper {
+            position: relative !important;
+            display: inline-flex !important;
+            flex-shrink: 0 !important;
+            border-radius: 9px !important;
+            overflow: hidden !important;
+          }
+          .banner-img-badge {
+            position: absolute !important;
+            top: 4px !important;
+            left: 4px !important;
+            font-size: 0.52rem !important;
+            font-weight: 850 !important;
+            padding: 1.5px 5px !important;
+            border-radius: 3px !important;
+            letter-spacing: 0.04em !important;
+            background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+            z-index: 2 !important;
+            line-height: 1 !important;
+            text-transform: uppercase !important;
           }
           .banner-img {
             width: 64px !important;
