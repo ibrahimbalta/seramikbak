@@ -3997,15 +3997,18 @@ export default function Home() {
                 <SearchIcon size={16} />
                 <span>{t('products')}</span>
               </button>
-              <Link 
-                href="/kiosk" 
-                className="mobile-nav-link"
-                onClick={() => setShowMobileMenu(false)}
-                style={{ textDecoration: 'none' }}
+              <button 
+                type="button"
+                className={`mobile-nav-link ${activeTab === 'studio' ? 'active' : ''}`}
+                onClick={() => { 
+                  setActiveTab('studio'); 
+                  setShowMobileMenu(false); 
+                  window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                }}
               >
                 <Palette size={16} />
                 <span>{t('studio3d')}</span>
-              </Link>
+              </button>
               <button 
                 className={`mobile-nav-link ${activeTab === 'dealers' ? 'active' : ''}`} 
                 onClick={() => { setActiveTab('dealers'); if(activeProduct) logInteraction('CLICK', activeProduct.id, activeProduct.brandId); setShowMobileMenu(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
