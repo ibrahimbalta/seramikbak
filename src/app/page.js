@@ -3557,7 +3557,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('VIT-CON-GRY')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/luxury_bathroom.png" alt="VitrA Concrete" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">VitrA</span>
@@ -3567,7 +3567,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('BIEN-NAT-OAK')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/modern_living.png" alt="Bien Natural Oak" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Bien</span>
@@ -3577,7 +3577,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('KUT-CAL-GLD')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/scandinavian_kitchen.png" alt="Kütahya Calacatta" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Kütahya</span>
@@ -3587,7 +3587,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('EGE-TRA-CLA')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/hero_ceramics.jpg" alt="Ege Travertino" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Ege Seramik</span>
@@ -3597,7 +3597,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('HITIT-NEXOS-ANTRASIT-LAPPATO-60X120')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/luxury_bathroom.png" alt="Hitit Nexos" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Hitit Seramik</span>
@@ -3607,7 +3607,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('BIEN-BOR-ANT')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/modern_living.png" alt="Bien Borneo" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Bien</span>
@@ -3618,7 +3618,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('VIT-CON-GRY')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/luxury_bathroom.png" alt="VitrA Concrete" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">VitrA</span>
@@ -3628,7 +3628,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('BIEN-NAT-OAK')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/modern_living.png" alt="Bien Natural Oak" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Bien</span>
@@ -3638,7 +3638,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('KUT-CAL-GLD')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/scandinavian_kitchen.png" alt="Kütahya Calacatta" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Kütahya</span>
@@ -3648,7 +3648,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('EGE-TRA-CLA')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/hero_ceramics.jpg" alt="Ege Travertino" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Ege Seramik</span>
@@ -3658,7 +3658,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('HITIT-NEXOS-ANTRASIT-LAPPATO-60X120')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/luxury_bathroom.png" alt="Hitit Nexos" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Hitit Seramik</span>
@@ -3668,7 +3668,7 @@ export default function Home() {
             <div className="banner-item" onClick={() => openProductByCode('BIEN-BOR-ANT')}>
               <div className="banner-img-wrapper">
                 <img src="/hero/modern_living.png" alt="Bien Borneo" className="banner-img" />
-                <span className="banner-img-badge">YENİ</span>
+                <span className="banner-img-badge">YENİ SEZON</span>
               </div>
               <div className="banner-item-info">
                 <span className="banner-brand-name">Bien</span>
@@ -4795,15 +4795,11 @@ export default function Home() {
                             {brandShort}
                           </span>
                           <span style={{ 
-                            fontSize: '0.60rem', 
+                            fontSize: '0.78rem', 
                             fontWeight: '800', 
-                            color: 'var(--accent-gold)',
-                            background: 'rgba(179,142,71,0.1)',
-                            border: '1px solid rgba(179,142,71,0.25)',
-                            padding: '2px 8px',
-                            borderRadius: '10px'
+                            color: 'var(--accent-gold)'
                           }}>
-                            YENİ SEZON
+                            ₺{price.toLocaleString('tr-TR')},00
                           </span>
                         </div>
 
