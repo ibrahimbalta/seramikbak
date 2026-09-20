@@ -4484,7 +4484,7 @@ export default function Home() {
                   <div className="calculator-wrapper-header">
                     <div className="calc-header-left">
                       <FileText size={18} style={{ color: 'var(--accent-gold)' }} />
-                      <h4>Akıllı Maliyet & Metraj Robotu (Kutu ve Fire Hesabı)</h4>
+                      <h4>Akıllı Maliyet & Metraj Robotu</h4>
                     </div>
                     <button 
                       type="button" 
@@ -9612,6 +9612,25 @@ export default function Home() {
         :global(.calc-close-btn:hover) {
           background: #e2e8f0;
           color: #0f172a;
+        }
+
+        @media (max-width: 640px) {
+          :global(.calculator-collapsible-wrapper) {
+            padding: 10px 10px 18px 10px;
+            margin-top: 10px;
+            border-radius: 14px;
+          }
+          :global(.calculator-wrapper-header) {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+          }
+          :global(.calc-header-left h4) {
+            font-size: 0.88rem;
+          }
+          :global(.calc-close-btn) {
+            padding: 3px 8px;
+            font-size: 0.72rem;
+          }
         }
 
         /* Active Filter Chips Bar */
