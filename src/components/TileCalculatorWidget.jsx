@@ -1,12 +1,19 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Calculator, ArrowRight, ShieldCheck, Bath, Utensils, Sofa, Home, ChevronDown, Check } from 'lucide-react';
 import { useLanguage } from '@/lib/languageContext';
 
 export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }) {
+  const router = useRouter();
   const { t } = useLanguage();
+
+  useEffect(() => {
+    try {
+      router.prefetch('/bayiler?nearby=true&from=metraj');
+    } catch (e) {}
+  }, [router]);
   
   // Selection States
   const [roomType, setRoomType] = useState('banyo');
@@ -123,7 +130,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
   const totalMinCost = tileCostMin + adhesiveCost + groutCost + extraMaterialCost + laborCost;
   const totalMaxCost = tileCostMax + adhesiveCost + groutCost + extraMaterialCost + laborCost;
 
-  // Teklif Al / Bayiye Git -> En Yakın Yetkili Bayilere Yönlendir
+  // Teklif Al / Bayiye Git -> En Yakın Yetkili Bayilere Yönlendir (SPA İstemci Geçişi)
   const handleRequestQuote = () => {
     const calcSummary = {
       areaM2,
@@ -148,6 +155,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
     if (onGoToDealers) {
       onGoToDealers(calcSummary);
     }
+    router.push('/bayiler?nearby=true&from=metraj');
   };
 
   const roomItems = [
@@ -330,14 +338,31 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
             </div>
           </div>
 
-          <Link 
-            href="/bayiler?nearby=true&from=metraj" 
+          <button 
+            type="button" 
             onClick={handleRequestQuote} 
             className="calc-cta-button"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              background: 'linear-gradient(135deg, #b38e47 0%, #987532 100%)',
+              color: '#ffffff',
+              fontWeight: 800,
+              fontSize: '0.84rem',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(179, 142, 71, 0.3)',
+              boxSizing: 'border-box',
+              padding: '10px 16px',
+              gap: '6px'
+            }}
           >
             <span>Bayilerden Fiyat Teklifi Al</span>
-            <ArrowRight size={15} />
-          </Link>
+            <ArrowRight size={15} style={{ flexShrink: 0 }} />
+          </button>
         </div>
       </div>
 
@@ -1048,10 +1073,16 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
 
           .calc-cta-button {
             padding: 8px 12px;
-            font-size: 0.78rem;
-            border-radius: 7px;
+            font-size: 0.80rem;
+            border-radius: 8px;
             width: 100%;
-            height: 36px;
+            height: 38px;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px;
+            font-weight: 800;
+            color: #ffffff !important;
           }
         }
       `}</style>
