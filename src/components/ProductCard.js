@@ -60,8 +60,8 @@ export default function ProductCard({
           <HeartIcon size={16} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
         </button>
 
-        {/* Hover action layout */}
-        <div className="card-quick-actions-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px' }}>
+        {/* Desktop Hover action layout */}
+        <div className="card-quick-actions-row desktop-only-actions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '4px' }}>
           <button 
             onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
             className="btn-primary card-action-btn-new"
@@ -109,6 +109,31 @@ export default function ProductCard({
         <h4 className="card-title-new">{product.name}</h4>
         <p className="card-specs-new">{product.width}x{product.height} cm • {translateStyle(product.style) || product.style}</p>
         <p className="card-brand-new">{product.brand?.name}</p>
+      </div>
+
+      {/* Mobile-Only Symmetrical 3-Button Bottom Strip */}
+      <div className="card-mobile-actions-row">
+        <button 
+          onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
+          className="mobile-card-btn"
+          title="3D Mekan"
+        >
+          3D
+        </button>
+        <button 
+          onClick={(e) => { e.stopPropagation(); onOpenAR ? onOpenAR(product) : navigateTo3DStudio(product); }}
+          className="mobile-card-btn mobile-card-btn-ar"
+          title="AR ile Gör"
+        >
+          📷 AR
+        </button>
+        <button 
+          onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}
+          className="mobile-card-btn"
+          title="Bayi Haritası"
+        >
+          Bayi
+        </button>
       </div>
     </div>
   );

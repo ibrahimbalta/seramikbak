@@ -1163,10 +1163,9 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   cursor: pointer;
 }
-
-/* Sponsored ads border highlight */
-.sponsored-card-new {
-  border: 1px solid var(--border-gold);
+/* Desktop/Mobile Card Action Separation */
+.card-mobile-actions-row {
+  display: none;
 }
 
 /* Compare Button on Card Overlay */
@@ -3847,5 +3846,43 @@ h1, h2, h3, h4, h5, h6, p, span, a, label {
   .stack-on-mobile {
     flex-direction: column !important;
     align-items: stretch !important;
+  }
+
+  /* Product Card Mobile-App Action Strip */
+  .desktop-only-actions {
+    display: none !important;
+  }
+  .card-mobile-actions-row {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 4px !important;
+    padding: 6px 8px 8px 8px !important;
+    border-top: 1px solid rgba(15, 23, 42, 0.06) !important;
+    background: #f8fafc !important;
+    margin-top: auto !important;
+  }
+  .mobile-card-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 28px !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    white-space: nowrap !important;
+  }
+  .mobile-card-btn:active {
+    transform: scale(0.95) !important;
+    background: #f1f5f9 !important;
+  }
+  .mobile-card-btn.mobile-card-btn-ar {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%) !important;
+    border-color: rgba(212, 175, 55, 0.4) !important;
+    color: #b38e47 !important;
   }
 }
