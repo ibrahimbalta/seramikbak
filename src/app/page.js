@@ -11126,15 +11126,7 @@ export default function Home() {
 
         @media (max-width: 768px) {
           .top-utility-bar {
-            display: flex !important;
-            overflow-x: auto !important;
-            scrollbar-width: none !important;
-            -webkit-overflow-scrolling: touch !important;
-            padding: 6px 8px !important;
-            margin-bottom: 8px !important;
-            border-radius: 12px !important;
-            gap: 6px !important;
-            justify-content: flex-start !important;
+            display: none !important;
           }
           .project-top-banner {
             border-radius: var(--border-radius-md);
@@ -16605,40 +16597,9 @@ export default function Home() {
             max-width: 125px !important;
           }
 
-          /* Top Utility Bar (Anasayfa, Kurumsal, B2B, Portallar, Outlet vb.) Mobile Strip */
+          /* Top Utility Bar: Hidden on mobile as links are accessible via Hamburger Menu */
           .top-utility-bar {
-            display: flex !important;
-            overflow-x: auto !important;
-            scrollbar-width: none !important;
-            -webkit-overflow-scrolling: touch !important;
-            padding: 6px 8px !important;
-            margin-bottom: 8px !important;
-            border-radius: 12px !important;
-            gap: 6px !important;
-            justify-content: flex-start !important;
-            background: rgba(255, 255, 255, 0.95) !important;
-            border: 1px solid rgba(226, 232, 240, 0.9) !important;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-          }
-          .top-utility-bar::-webkit-scrollbar {
             display: none !important;
-          }
-          .utility-left,
-          .utility-right {
-            display: flex !important;
-            flex-shrink: 0 !important;
-            gap: 6px !important;
-            align-items: center !important;
-          }
-          .utility-item {
-            padding: 5px 9px !important;
-            font-size: 0.67rem !important;
-            border-radius: 10px !important;
-            flex-shrink: 0 !important;
-            white-space: nowrap !important;
-            line-height: 1 !important;
           }
 
           /* Mobile Header Actions (Heart + Menu) */
