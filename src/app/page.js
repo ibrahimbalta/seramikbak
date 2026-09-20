@@ -5697,11 +5697,7 @@ export default function Home() {
                     </div>
                   )}
 
-                  {/* Etkileşim İpucu & Toast Bildirimi */}
-                  <div className="studio-viewport-hints">
-                    <span className="viewport-gesture-hint">👆 360° döndürmek için sürükleyin • İki parmakla yakınlaştırın</span>
-                  </div>
-
+                  {/* Toast Bildirimi */}
                   {studioToast && (
                     <div className="studio-toast-banner animate-fade-in">
                       <Sparkles size={14} className="gold-text" />
@@ -12189,40 +12185,29 @@ export default function Home() {
         }
 
         .studio-viewport-hints {
-          position: absolute;
-          bottom: 12px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: rgba(15, 23, 42, 0.75);
-          backdrop-filter: blur(6px);
-          color: rgba(255, 255, 255, 0.85);
-          font-size: 0.7rem;
-          font-weight: 600;
-          padding: 4px 12px;
-          border-radius: 14px;
-          pointer-events: none;
-          z-index: 10;
+          display: none !important;
         }
 
         .studio-toast-banner {
           position: absolute;
-          top: 14px;
+          top: 48px;
           left: 50%;
           transform: translateX(-50%);
-          background: rgba(17, 24, 39, 0.92);
+          background: rgba(17, 24, 39, 0.95);
           backdrop-filter: blur(8px);
           color: #ffffff;
-          padding: 8px 18px;
+          padding: 6px 16px;
           border-radius: 30px;
           border: 1px solid rgba(212, 175, 55, 0.45);
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
           display: flex;
           align-items: center;
           gap: 8px;
-          font-size: 0.8rem;
+          font-size: 0.78rem;
           font-weight: 700;
           z-index: 50;
           pointer-events: none;
+          white-space: nowrap;
         }
 
         /* 3. Adım Bölümleri (Step Sections) */
@@ -12860,16 +12845,15 @@ export default function Home() {
           }
 
           .studio-viewport-hints {
-            font-size: 0.65rem;
-            padding: 3px 10px;
-            bottom: 8px;
+            display: none !important;
           }
 
           .studio-toast-banner {
-            font-size: 0.74rem;
-            padding: 6px 14px;
-            top: 10px;
-            width: 90%;
+            font-size: 0.70rem;
+            padding: 5px 12px;
+            top: 42px;
+            width: auto;
+            max-width: 85%;
             justify-content: center;
           }
 

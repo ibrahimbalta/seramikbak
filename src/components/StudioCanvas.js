@@ -1874,15 +1874,9 @@ export default function StudioCanvas({
         </div>
       )}
 
-      {/* Information Overlay */}
-      <div className="canvas-overlay">
-        <div className="overlay-left-badges">
-          <div className="overlay-badge">
-            <span>Doku: </span>
-            <strong style={{ color: textureStatus.includes('Real') ? 'var(--accent-green)' : 'var(--accent-gold)' }}>
-              {textureStatus}
-            </strong>
-          </div>
+      {/* 3D Viewport Overlays (Top & Bottom Symmetrical Edges) */}
+      <div className="canvas-overlay-top">
+        <div className="overlay-top-left-badges">
           <div className="overlay-badge">
             <span>Oda Türü: </span>
             <strong style={{ textTransform: 'capitalize', color: 'var(--accent-gold)' }}>
@@ -1899,6 +1893,12 @@ export default function StudioCanvas({
               {applyAccent ? 'Zemin, Duvar & Vurgu' : applyFloor && applyWalls ? 'Zemin & Duvar' : applyFloor ? 'Sadece Zemin' : 'Döşenmemiş'}
             </strong>
           </div>
+          <div className="overlay-badge">
+            <span>Doku: </span>
+            <strong style={{ color: textureStatus.includes('Real') ? 'var(--accent-green)' : 'var(--accent-gold)' }}>
+              {textureStatus}
+            </strong>
+          </div>
           {layPattern !== 'flat' && (
             <div className="overlay-badge" style={{ borderColor: 'var(--accent-gold)' }}>
               <span>Desen: </span>
@@ -1909,50 +1909,72 @@ export default function StudioCanvas({
           )}
         </div>
         
-        <div className="overlay-right-actions">
-          <button onClick={downloadSnapshot} className="overlay-action-btn">
+        <div className="overlay-top-right-actions">
+          <button onClick={downloadSnapshot} className="overlay-action-btn" title="Yüksek Çözünürlüklü Görüntüyü İndir">
             📷 HD Fotoğraf İndir
           </button>
+        </div>
+      </div>
+
+      <div className="canvas-overlay-bottom">
+        <div className="overlay-bottom-left">
           <div className="overlay-instructions">
-            {walkthroughMode ? '360° Oda İçinde Gezintidesiniz' : 'Zemine/Duvara Tıklayarak Kapla'}
+            <span className="instruction-desktop">{walkthroughMode ? '🚶 360° Oda İçinde Gezintidesiniz' : '👆 Zemine/Duvara Tıklayarak Kapla'}</span>
+            <span className="instruction-mobile">{walkthroughMode ? '🚶 360° Gezinti' : '👆 Tıklayarak Kapla'}</span>
+          </div>
+        </div>
+        <div className="overlay-bottom-right">
+          <div className="overlay-gesture-hint">
+            <span className="gesture-hint-desktop">🔄 360° döndürmek için sürükleyin</span>
+            <span className="gesture-hint-mobile">👆 Sürükle • Yakınlaştır</span>
           </div>
         </div>
       </div>
+
       <style jsx>{`
-        .canvas-overlay {
+        /* Top Overlay (Badges at Left, Download Button at Right) */
+        .canvas-overlay-top {
           position: absolute;
-          bottom: 16px;
-          left: 16px;
-          right: 16px;
+          top: 14px;
+          left: 14px;
+          right: 14px;
           display: flex;
           justify-content: space-between;
-          align-items: flex-end;
+          align-items: flex-start;
           pointer-events: none;
           gap: 12px;
+          z-index: 25;
         }
-        .overlay-left-badges {
+        .overlay-top-left-badges {
           display: flex;
           flex-wrap: wrap;
-          gap: 6px;
-          pointer-events: none;
-        }
-        .overlay-right-actions {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
+          align-items: center;
           gap: 8px;
           pointer-events: auto;
+          max-width: 75%;
+        }
+        .overlay-top-right-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          pointer-events: auto;
+          flex-shrink: 0;
         }
         .overlay-badge {
-          background: rgba(15, 23, 42, 0.85);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(15, 23, 42, 0.88);
+          border: 1px solid rgba(255, 255, 255, 0.12);
           color: #fff;
           padding: 6px 12px;
           border-radius: 8px;
           font-size: 0.72rem;
           font-family: var(--font-body);
           backdrop-filter: blur(8px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          -webkit-backdrop-filter: blur(8px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+          white-space: nowrap;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
         }
         .overlay-action-btn {
           background: linear-gradient(135deg, var(--accent-gold) 0%, #d4af37 100%);
@@ -1965,94 +1987,168 @@ export default function StudioCanvas({
           font-weight: 700;
           cursor: pointer;
           pointer-events: auto;
-          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.3);
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.35);
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          white-space: nowrap;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
         }
         .overlay-action-btn:hover {
           transform: translateY(-2px);
           box-shadow: 0 8px 20px rgba(179, 142, 71, 0.45);
         }
+
+        /* Bottom Overlay (Click Guide at Left, Gesture Hint at Right) */
+        .canvas-overlay-bottom {
+          position: absolute;
+          bottom: 14px;
+          left: 14px;
+          right: 14px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          pointer-events: none;
+          gap: 12px;
+          z-index: 25;
+        }
+        .overlay-bottom-left,
+        .overlay-bottom-right {
+          pointer-events: auto;
+          display: flex;
+          align-items: center;
+        }
         .overlay-instructions {
           background: rgba(15, 23, 42, 0.9);
-          border: 1px solid rgba(179, 142, 71, 0.3);
+          border: 1px solid rgba(179, 142, 71, 0.35);
           color: var(--accent-gold);
           padding: 6px 12px;
           border-radius: 8px;
-          font-size: 0.7rem;
+          font-size: 0.70rem;
           font-weight: 600;
           font-family: var(--font-title);
           backdrop-filter: blur(8px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-          text-align: right;
+          -webkit-backdrop-filter: blur(8px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+          white-space: nowrap;
+        }
+        .overlay-gesture-hint {
+          background: rgba(15, 23, 42, 0.88);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: rgba(255, 255, 255, 0.85);
+          padding: 6px 12px;
+          border-radius: 8px;
+          font-size: 0.70rem;
+          font-weight: 600;
+          font-family: var(--font-body);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+          white-space: nowrap;
+        }
+        .instruction-mobile,
+        .gesture-hint-mobile {
+          display: none;
+        }
+        .instruction-desktop,
+        .gesture-hint-desktop {
+          display: inline;
         }
 
         @media (max-width: 768px) {
-          .canvas-overlay {
-            position: absolute;
-            bottom: 46px;
-            left: 6px;
-            right: 6px;
-            top: auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            pointer-events: none;
+          /* Top Overlay Mobile */
+          .canvas-overlay-top {
+            top: 8px;
+            left: 8px;
+            right: 8px;
             gap: 6px;
-            z-index: 30;
+            align-items: flex-start;
           }
-          .overlay-left-badges {
+          .overlay-top-left-badges {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 4px;
-            max-width: 58%;
+            gap: 3px;
+            max-width: 60%;
             pointer-events: none;
           }
           .overlay-badge {
-            font-size: 0.62rem;
-            padding: 4px 8px;
-            border-radius: 6px;
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(245, 158, 11, 0.35);
+            font-size: 0.58rem;
+            padding: 3px 6px;
+            border-radius: 5px;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(245, 158, 11, 0.3);
             color: #ffffff;
             white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
           }
-          .overlay-right-actions {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 4px;
-            max-width: 42%;
+          .overlay-top-right-actions {
+            max-width: 40%;
             pointer-events: auto;
           }
           .overlay-action-btn {
-            padding: 6px 12px;
-            font-size: 0.66rem;
+            padding: 5px 8px;
+            font-size: 0.60rem;
             font-weight: 800;
-            border-radius: 8px;
+            border-radius: 6px;
             white-space: nowrap;
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: #0f172a;
-            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.5);
+            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.4);
             cursor: pointer;
             pointer-events: auto;
           }
+
+          /* Bottom Overlay Mobile */
+          .canvas-overlay-bottom {
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            gap: 6px;
+            justify-content: space-between;
+            align-items: flex-end;
+          }
+          .overlay-bottom-left {
+            max-width: 48%;
+          }
+          .overlay-bottom-right {
+            max-width: 48%;
+          }
           .overlay-instructions {
             font-size: 0.58rem;
-            padding: 4px 6px;
-            border-radius: 6px;
-            background: rgba(15, 23, 42, 0.95);
+            padding: 3px 6px;
+            border-radius: 5px;
+            background: rgba(15, 23, 42, 0.92);
             border: 1px solid rgba(245, 158, 11, 0.35);
             color: #fbbf24;
             font-weight: 700;
-            text-align: right;
             white-space: nowrap;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          }
+          .overlay-gesture-hint {
+            font-size: 0.58rem;
+            padding: 3px 6px;
+            border-radius: 5px;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          }
+          .instruction-desktop,
+          .gesture-hint-desktop {
+            display: none !important;
+          }
+          .instruction-mobile,
+          .gesture-hint-mobile {
+            display: inline !important;
           }
         }
       `}</style>
