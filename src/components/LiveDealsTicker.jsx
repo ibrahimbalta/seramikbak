@@ -42,7 +42,7 @@ export default function LiveDealsTicker() {
           badge: 'CANLI BİLGİ',
           time: 'Canlı',
           location: 'Türkiye',
-          text: 'SeramikBak Canlı Pazaryeri: Aktif bayi teklifleri ve müşteri aramaları anlık takip edilmektedir',
+          text: 'SeramikBak Fırsatlar: Aktif bayi teklifleri ve müşteri aramaları anlık takip edilmektedir',
           link: '/proje-talep'
         }
       ];
@@ -69,10 +69,10 @@ export default function LiveDealsTicker() {
     <div className="live-ticker-fullwidth-wrapper">
       <div className="live-ticker-bar">
         {/* Fixed Left Live Radar Badge */}
-        <Link href="/outlet" className="live-badge-link" title="Canlı Pazaryeri Hareketleri">
+        <Link href="/outlet" className="live-badge-link" title="Fırsatlar">
           <div className="live-badge-content">
             <span className="live-pulse-dot" />
-            <span>CANLI PAZARYERİ</span>
+            <span>Fırsatlar</span>
           </div>
         </Link>
 
