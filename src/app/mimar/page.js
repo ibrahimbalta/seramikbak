@@ -1336,12 +1336,12 @@ export default function ArchitectPortalPage() {
           boxSizing: 'border-box'
         }}>
           {isMobile ? (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
                 <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '10px',
                   background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                   color: '#090d16',
                   display: 'flex',
@@ -1351,11 +1351,11 @@ export default function ArchitectPortalPage() {
                 }}>
                   <Compass size={18} />
                 </div>
-                <div>
-                  <h4 style={{ fontSize: '0.88rem', fontWeight: '800', margin: 0, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <h4 style={{ fontSize: '0.88rem', fontWeight: '800', margin: 0, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {architectInfo?.officeName}
                   </h4>
-                  <span style={{ fontSize: '0.65rem', color: '#d4af37', fontWeight: '700' }}>
+                  <span style={{ fontSize: '0.68rem', color: '#d4af37', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
                     {activeTab === 'projects' && 'Projeler & Moodboard'}
                     {activeTab === 'calculator' && 'Akıllı Metraj & Sarf'}
                     {activeTab === 'vault' && '3D & BIM Varlıklar'}
@@ -1365,7 +1365,7 @@ export default function ArchitectPortalPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
                 <NotificationBell userType="ARCHITECT" userId={architectInfo?.id} />
                 <button
                   onClick={() => setShowNewProjectModal(true)}
@@ -1374,8 +1374,8 @@ export default function ArchitectPortalPage() {
                     color: '#090d16',
                     border: 'none',
                     borderRadius: '8px',
-                    padding: '6px 10px',
-                    fontSize: '0.75rem',
+                    padding: '7px 11px',
+                    fontSize: '0.74rem',
                     fontWeight: '800',
                     cursor: 'pointer',
                     display: 'flex',
@@ -1385,6 +1385,25 @@ export default function ArchitectPortalPage() {
                 >
                   <Plus size={14} />
                   <span>Proje</span>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  title="Çıkış Yap"
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.12)',
+                    border: '1px solid rgba(239, 68, 68, 0.25)',
+                    borderRadius: '8px',
+                    color: '#f87171',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    flexShrink: 0
+                  }}
+                >
+                  <LogOut size={15} />
                 </button>
               </div>
             </div>
@@ -1455,7 +1474,7 @@ export default function ArchitectPortalPage() {
         )}
 
         {/* Main Content Body */}
-        <main className="mimar-main" style={{ padding: isMobile ? '16px 12px 80px 12px' : '32px', flex: 1, boxSizing: 'border-box' }}>
+        <main className="mimar-main" style={{ padding: isMobile ? '16px 12px 88px 12px' : '32px', flex: 1, boxSizing: 'border-box', overflowX: 'hidden', width: '100%', maxWidth: '100%' }}>
 
           {/* ======================================================== */}
           {/* TAB 1: PROJECTS & MOODBOARDS */}
@@ -1467,16 +1486,16 @@ export default function ArchitectPortalPage() {
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '16px',
-                padding: '18px 20px',
+                padding: isMobile ? '14px' : '18px 20px',
                 display: 'flex',
-                flexWrap: 'wrap',
+                flexDirection: isMobile ? 'column' : 'row',
                 justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: '16px'
+                alignItems: isMobile ? 'stretch' : 'center',
+                gap: '14px'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: '600' }}>Aktif Proje:</span>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', width: isMobile ? '100%' : 'auto' }}>
                     {projects.map(p => {
                       const isSel = activeProject?.id === p.id;
                       return (
@@ -1502,7 +1521,12 @@ export default function ArchitectPortalPage() {
                 </div>
 
                 {activeProject && (
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, auto)',
+                    gap: isMobile ? '8px' : '10px',
+                    width: isMobile ? '100%' : 'auto'
+                  }}>
                     <button
                       onClick={() => setShowShareModal(true)}
                       style={{
@@ -1510,18 +1534,19 @@ export default function ArchitectPortalPage() {
                         color: '#d4af37',
                         border: '1px solid rgba(212, 175, 55, 0.35)',
                         borderRadius: '8px',
-                        padding: '8px 14px',
+                        padding: '10px 12px',
                         fontSize: '0.8rem',
                         fontWeight: '700',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         gap: '6px'
                       }}
                       title="İşverene onaylatmak için logosuz, beyaz etiketli sunum linki üretir"
                     >
                       <Share2 size={14} />
-                      <span>Müşteri Sunum Linki</span>
+                      <span>Sunum Linki</span>
                     </button>
 
                     <button
@@ -1534,17 +1559,18 @@ export default function ArchitectPortalPage() {
                         color: '#38bdf8',
                         border: '1px solid rgba(56, 189, 248, 0.35)',
                         borderRadius: '8px',
-                        padding: '8px 14px',
+                        padding: '10px 12px',
                         fontSize: '0.8rem',
                         fontWeight: '700',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         gap: '6px'
                       }}
                     >
                       <Calculator size={14} />
-                      <span>Metraj & Sarfiyat</span>
+                      <span>Metraj & Sarf</span>
                     </button>
 
                     <button
@@ -1555,17 +1581,18 @@ export default function ArchitectPortalPage() {
                         color: '#fff',
                         border: '1px solid rgba(255, 255, 255, 0.15)',
                         borderRadius: '8px',
-                        padding: '8px 14px',
+                        padding: '10px 12px',
                         fontSize: '0.8rem',
                         fontWeight: '600',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         gap: '6px'
                       }}
                     >
                       {specLoading ? <Loader2 size={14} className="animate-spin" /> : <FileText size={14} />}
-                      <span>Şartname Metni</span>
+                      <span>Şartname</span>
                     </button>
 
                     <button
@@ -1578,17 +1605,18 @@ export default function ArchitectPortalPage() {
                         color: '#090d16',
                         border: 'none',
                         borderRadius: '8px',
-                        padding: '8px 14px',
+                        padding: '10px 12px',
                         fontSize: '0.8rem',
                         fontWeight: '700',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         gap: '6px'
                       }}
                     >
                       <Plus size={14} />
-                      <span>Seramik Ekle</span>
+                      <span>Karo Ekle</span>
                     </button>
                   </div>
                 )}
@@ -1599,23 +1627,25 @@ export default function ArchitectPortalPage() {
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.02)',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '20px',
-                  padding: '24px'
+                  borderRadius: isMobile ? '16px' : '20px',
+                  padding: isMobile ? '16px 14px' : '24px'
                 }}>
                   {/* Project Info Header */}
                   <div style={{
                     display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
                     justifyContent: 'space-between',
-                    alignItems: 'flex-start',
+                    alignItems: isMobile ? 'flex-start' : 'flex-start',
                     borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-                    paddingBottom: '18px',
-                    marginBottom: '20px'
+                    paddingBottom: '16px',
+                    marginBottom: '18px',
+                    gap: '10px'
                   }}>
                     <div>
-                      <h2 style={{ fontSize: '1.3rem', fontWeight: '800', margin: '0 0 6px 0', color: '#fff' }}>
+                      <h2 style={{ fontSize: isMobile ? '1.15rem' : '1.3rem', fontWeight: '800', margin: '0 0 6px 0', color: '#fff' }}>
                         {activeProject.title}
                       </h2>
-                      <div style={{ display: 'flex', gap: '14px', fontSize: '0.82rem', color: '#94a3b8' }}>
+                      <div style={{ display: 'flex', gap: '8px 12px', fontSize: '0.8rem', color: '#94a3b8', flexWrap: 'wrap' }}>
                         <span>📍 {activeProject.city}</span>
                         <span>🏢 {activeProject.projectType}</span>
                         <span>📐 {activeProject.totalAreaM2} m² Proje Alanı</span>
@@ -1630,8 +1660,8 @@ export default function ArchitectPortalPage() {
                   {activeProject.items && activeProject.items.length > 0 ? (
                     <div style={{
                       display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                      gap: '20px'
+                      gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
+                      gap: isMobile ? '14px' : '20px'
                     }}>
                       {activeProject.items.map(item => {
                         const p = item.product;
@@ -1775,7 +1805,8 @@ export default function ArchitectPortalPage() {
                                 marginTop: 'auto',
                                 paddingTop: '12px',
                                 borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-                                display: 'flex',
+                                display: 'grid',
+                                gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
                                 gap: '6px'
                               }}>
                                 <button
@@ -2019,19 +2050,19 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                   background: 'rgba(255, 255, 255, 0.03)',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
                   borderRadius: '16px',
-                  padding: '24px',
+                  padding: isMobile ? '16px 14px' : '24px',
                   display: 'flex',
+                  flexDirection: isMobile ? 'column' : 'row',
                   justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '16px'
+                  alignItems: isMobile ? 'stretch' : 'center',
+                  gap: '14px'
                 }}>
                   <div>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '4px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '800', marginBottom: '8px' }}>
                       <Calculator size={13} />
                       MİMARİ METRAJ & BOQ MOTORU
                     </div>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#fff' }}>
+                    <h3 style={{ fontSize: isMobile ? '1.1rem' : '1.25rem', fontWeight: '800', margin: 0, color: '#fff' }}>
                       Akıllı Metraj, Kesim Firesi & Sarf Malzeme Hesaplayıcı
                     </h3>
                     <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '4px 0 0 0' }}>
@@ -2039,10 +2070,11 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                     </p>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '10px' }}>
+                  <div style={{ display: 'flex', width: isMobile ? '100%' : 'auto' }}>
                     <button
                       onClick={handleCopyBOQ}
                       style={{
+                        width: isMobile ? '100%' : 'auto',
                         background: calcCopiedBreakdown ? '#22c55e' : 'rgba(212, 175, 55, 0.15)',
                         color: calcCopiedBreakdown ? '#fff' : '#d4af37',
                         border: '1px solid rgba(212, 175, 55, 0.3)',
@@ -2053,6 +2085,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
+                        justifyContent: 'center',
                         gap: '6px'
                       }}
                     >
@@ -2210,7 +2243,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                       <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '8px' }}>
                         DERZ ARTI DERİNLİĞİ / GENİŞLİĞİ
                       </label>
-                      <div style={{ display: 'flex', gap: '10px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '8px' }}>
                         {[
                           { val: '1.5', label: '1.5 mm (Lazer Rektifiye)' },
                           { val: '2', label: '2.0 mm (Standart)' },
@@ -2221,15 +2254,15 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                             type="button"
                             onClick={() => setCalcJointMm(j.val)}
                             style={{
-                              flex: 1,
                               background: calcJointMm === j.val ? 'rgba(212, 175, 55, 0.15)' : 'rgba(255, 255, 255, 0.04)',
                               border: calcJointMm === j.val ? '1.5px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.1)',
                               color: calcJointMm === j.val ? '#d4af37' : '#cbd5e1',
                               borderRadius: '8px',
-                              padding: '8px',
+                              padding: '10px 8px',
                               fontSize: '0.75rem',
                               fontWeight: '700',
-                              cursor: 'pointer'
+                              cursor: 'pointer',
+                              textAlign: 'center'
                             }}
                           >
                             {j.label}
@@ -2378,11 +2411,10 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                       )}
                     </div>
 
-                    <div style={{ marginTop: 'auto', display: 'flex', gap: '10px', paddingTop: '10px' }}>
+                    <div style={{ marginTop: 'auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr auto', gap: '10px', paddingTop: '10px' }}>
                       <button
                         onClick={handleCopyBOQ}
                         style={{
-                          flex: 1,
                           background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                           color: '#090d16',
                           border: 'none',
@@ -2414,6 +2446,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
+                          justifyContent: 'center',
                           gap: '6px'
                         }}
                       >
@@ -2685,15 +2718,15 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '16px',
-                padding: '20px',
+                padding: isMobile ? '16px 14px' : '20px',
                 display: 'flex',
                 flexDirection: isMobile ? 'column' : 'row',
                 justifyContent: 'space-between',
-                alignItems: isMobile ? 'flex-start' : 'center',
-                gap: '16px'
+                alignItems: isMobile ? 'stretch' : 'center',
+                gap: '14px'
               }}>
                 <div>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: '0 0 4px 0', color: '#fff' }}>
+                  <h3 style={{ fontSize: isMobile ? '1.1rem' : '1.2rem', fontWeight: '800', margin: '0 0 4px 0', color: '#fff' }}>
                     TS EN 14411 Teknik Şartname Sihirbazı
                   </h3>
                   <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: 0 }}>
@@ -2701,26 +2734,35 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                   </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{
+                  display: isMobile ? 'grid' : 'flex',
+                  gridTemplateColumns: isMobile ? '1fr' : undefined,
+                  gap: '10px',
+                  alignItems: 'center',
+                  width: isMobile ? '100%' : 'auto'
+                }}>
                   {specResult && (
                     <div style={{
                       display: 'flex',
                       background: 'rgba(255, 255, 255, 0.06)',
                       borderRadius: '8px',
                       padding: '3px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      width: isMobile ? '100%' : 'auto'
                     }}>
                       <button
                         onClick={() => setSpecViewMode('document')}
                         style={{
+                          flex: 1,
                           background: specViewMode === 'document' ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'transparent',
                           color: specViewMode === 'document' ? '#090d16' : '#cbd5e1',
                           border: 'none',
                           borderRadius: '6px',
-                          padding: '6px 12px',
+                          padding: '8px 12px',
                           fontSize: '0.78rem',
                           fontWeight: '700',
                           cursor: 'pointer',
+                          textAlign: 'center',
                           transition: 'all 0.15s ease'
                         }}
                       >
@@ -2729,14 +2771,16 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                       <button
                         onClick={() => setSpecViewMode('raw')}
                         style={{
+                          flex: 1,
                           background: specViewMode === 'raw' ? 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)' : 'transparent',
                           color: specViewMode === 'raw' ? '#090d16' : '#cbd5e1',
                           border: 'none',
                           borderRadius: '6px',
-                          padding: '6px 12px',
+                          padding: '8px 12px',
                           fontSize: '0.78rem',
                           fontWeight: '700',
                           cursor: 'pointer',
+                          textAlign: 'center',
                           transition: 'all 0.15s ease'
                         }}
                       >
@@ -2749,16 +2793,18 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                     onClick={handleCopySpec}
                     disabled={!specResult}
                     style={{
+                      width: isMobile ? '100%' : 'auto',
                       background: copiedSpec ? '#22c55e' : 'rgba(212, 175, 55, 0.15)',
                       color: copiedSpec ? '#fff' : '#d4af37',
                       border: '1px solid rgba(212, 175, 55, 0.3)',
                       borderRadius: '8px',
-                      padding: '8px 16px',
+                      padding: '10px 16px',
                       fontSize: '0.82rem',
                       fontWeight: '700',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       gap: '6px'
                     }}
                   >
@@ -2770,16 +2816,18 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                     onClick={() => window.print()}
                     disabled={!specResult}
                     style={{
+                      width: isMobile ? '100%' : 'auto',
                       background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                       color: '#090d16',
                       border: 'none',
                       borderRadius: '8px',
-                      padding: '8px 18px',
+                      padding: '10px 18px',
                       fontSize: '0.82rem',
                       fontWeight: '800',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       gap: '8px',
                       boxShadow: '0 4px 15px rgba(212, 175, 55, 0.25)'
                     }}
@@ -2799,7 +2847,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                       background: '#ffffff',
                       color: '#0f172a',
                       borderRadius: '16px',
-                      padding: isMobile ? '24px 16px' : '48px 56px',
+                      padding: isMobile ? '20px 14px' : '48px 56px',
                       boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5)',
                       maxWidth: '960px',
                       margin: '0 auto',
@@ -2808,20 +2856,29 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                       fontFamily: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif'
                     }}>
                       {/* Document Header */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2.5px solid #0f172a', paddingBottom: '14px', marginBottom: '16px', gap: '20px' }}>
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        justifyContent: 'space-between',
+                        alignItems: isMobile ? 'flex-start' : 'flex-start',
+                        borderBottom: '2.5px solid #0f172a',
+                        paddingBottom: '14px',
+                        marginBottom: '16px',
+                        gap: '14px'
+                      }}>
                         <div>
-                          <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748b', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                          <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#64748b', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
                             T.C. ÇEVRE, ŞEHİRCİLİK VE İKLİM DEĞİŞİKLİĞİ BAKANLIĞI STANDARTLARINA UYGUN
                           </div>
-                          <h2 style={{ fontSize: '1.45rem', fontWeight: '900', color: '#0f172a', margin: '4px 0 2px 0', letterSpacing: '-0.3px' }}>
+                          <h2 style={{ fontSize: isMobile ? '1.2rem' : '1.45rem', fontWeight: '900', color: '#0f172a', margin: '4px 0 2px 0', letterSpacing: '-0.3px' }}>
                             MİMARİ TEKNİK ŞARTNAME & MAHAL LİSTESİ
                           </h2>
-                          <div style={{ fontSize: '0.88rem', fontWeight: '800', color: '#b45309' }}>
+                          <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#b45309' }}>
                             TS EN 14411 (GRUP BIA PORSELEN & SERAMİK KARO STANDARDI)
                           </div>
                         </div>
-                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                          <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#0f172a', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                        <div style={{ textAlign: isMobile ? 'left' : 'right', flexShrink: 0 }}>
+                          <div style={{ fontSize: '1.1rem', fontWeight: '900', color: '#0f172a', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
                             {architectInfo?.officeName || 'MİMARİ PROJE OFİSİ'}
                           </div>
                           <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>
@@ -2886,7 +2943,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                                 padding: '14px 16px',
                                 background: '#fbfcfd'
                               }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px dashed #cbd5e1', paddingBottom: '6px', marginBottom: '10px' }}>
+                                <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', borderBottom: '1px dashed #cbd5e1', paddingBottom: '6px', marginBottom: '10px', gap: isMobile ? '6px' : '0' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <span style={{ background: '#0f172a', color: '#fff', fontSize: '0.72rem', fontWeight: '800', padding: '2px 8px', borderRadius: '4px' }}>
                                       Madde {clause.clauseNo}
@@ -3152,13 +3209,15 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: '16px',
-                padding: '20px',
+                padding: isMobile ? '16px 14px' : '20px',
                 display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
                 justifyContent: 'space-between',
-                alignItems: 'center'
+                alignItems: isMobile ? 'stretch' : 'center',
+                gap: '14px'
               }}>
                 <div>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: '0 0 4px 0', color: '#fff' }}>
+                  <h3 style={{ fontSize: isMobile ? '1.1rem' : '1.15rem', fontWeight: '800', margin: '0 0 4px 0', color: '#fff' }}>
                     Mimari Numune Kutularım
                   </h3>
                   <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
@@ -3172,16 +3231,18 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                     setShowSampleModal(true);
                   }}
                   style={{
+                    width: isMobile ? '100%' : 'auto',
                     background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                     color: '#090d16',
                     border: 'none',
                     borderRadius: '10px',
-                    padding: '8px 16px',
+                    padding: '10px 16px',
                     fontSize: '0.82rem',
                     fontWeight: '700',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     gap: '6px'
                   }}
                 >
@@ -3200,23 +3261,23 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                         background: '#0d1322',
                         border: '1px solid rgba(255, 255, 255, 0.08)',
                         borderRadius: '14px',
-                        padding: '16px 20px',
+                        padding: isMobile ? '14px' : '16px 20px',
                         display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
                         justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
+                        alignItems: isMobile ? 'flex-start' : 'center',
                         gap: '12px'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                        <div style={{ width: '48px', height: '48px', borderRadius: '10px', overflow: 'hidden', background: '#1e293b' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', width: isMobile ? '100%' : 'auto' }}>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '10px', overflow: 'hidden', background: '#1e293b', flexShrink: 0 }}>
                           <img
                             src={s.product?.imageUrl || '/textures/calacatta_gold.jpg'}
                             alt=""
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />
                         </div>
-                        <div>
+                        <div style={{ minWidth: 0, flex: 1 }}>
                           <span style={{ fontSize: '0.7rem', color: '#d4af37', fontWeight: '700' }}>
                             {s.product?.brand?.name}
                           </span>
@@ -3237,8 +3298,10 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: isMobile ? '100%' : 'auto' }}>
                         <span style={{
+                          width: isMobile ? '100%' : 'auto',
+                          justifyContent: 'center',
                           fontSize: '0.75rem',
                           fontWeight: '700',
                           padding: '6px 12px',
@@ -3294,8 +3357,11 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
             borderRadius: '20px',
             width: '100%',
             maxWidth: '500px',
-            padding: '28px',
-            position: 'relative'
+            padding: isMobile ? '20px 16px' : '28px',
+            maxHeight: 'calc(100dvh - 32px)',
+            overflowY: 'auto',
+            position: 'relative',
+            boxSizing: 'border-box'
           }}>
             <button
               onClick={() => setShowNewProjectModal(false)}
@@ -3340,7 +3406,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
                     Proje Tipi
@@ -3523,13 +3589,13 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
 
             {/* Project Context Bar: Usage Area & M2 */}
             <div style={{
-              padding: isMobile ? '12px 16px' : '14px 24px',
+              padding: isMobile ? '12px 14px' : '14px 24px',
               background: 'rgba(212, 175, 55, 0.05)',
               borderBottom: '1px solid rgba(212, 175, 55, 0.18)',
-              display: 'flex',
-              flexWrap: 'wrap',
+              display: isMobile ? 'grid' : 'flex',
+              gridTemplateColumns: isMobile ? '1fr 1fr' : undefined,
               alignItems: 'center',
-              gap: '14px',
+              gap: isMobile ? '10px' : '14px',
               flexShrink: 0
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -3548,7 +3614,8 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                     fontSize: '0.82rem',
                     fontWeight: '600',
                     outline: 'none',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    width: isMobile ? '100%' : 'auto'
                   }}
                 >
                   <option value="Zemin Kaplama">Zemin Kaplama</option>
@@ -3565,14 +3632,14 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                 <span style={{ fontSize: '0.72rem', fontWeight: '800', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   TAHMİNİ METRAJ:
                 </span>
-                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center', width: isMobile ? '100%' : 'auto' }}>
                   <input
                     type="number"
                     min="1"
                     value={addTileAreaM2}
                     onChange={(e) => setAddTileAreaM2(e.target.value)}
                     style={{
-                      width: '100px',
+                      width: isMobile ? '100%' : '100px',
                       padding: '8px 30px 8px 12px',
                       borderRadius: '8px',
                       background: '#131c2f',
@@ -3580,21 +3647,22 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                       border: '1px solid rgba(212, 175, 55, 0.3)',
                       fontSize: '0.82rem',
                       fontWeight: '700',
-                      outline: 'none'
+                      outline: 'none',
+                      boxSizing: 'border-box'
                     }}
                   />
                   <span style={{ position: 'absolute', right: '10px', fontSize: '0.72rem', color: '#94a3b8', pointerEvents: 'none' }}>m²</span>
                 </div>
               </div>
 
-              <div style={{ marginLeft: 'auto', fontSize: '0.75rem', color: '#94a3b8' }}>
+              <div style={{ marginLeft: isMobile ? '0' : 'auto', fontSize: '0.75rem', color: '#94a3b8', gridColumn: isMobile ? '1 / -1' : undefined }}>
                 Seçtiğiniz karo otomatik olarak projenin şartname ve numune sepetine eklenecektir.
               </div>
             </div>
 
             {/* Filter Toolbar: Brands pills & Search */}
             <div style={{
-              padding: isMobile ? '12px 16px' : '14px 24px',
+              padding: isMobile ? '12px 14px' : '14px 24px',
               background: 'rgba(0, 0, 0, 0.25)',
               borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
               display: 'flex',
@@ -3603,8 +3671,8 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
               flexShrink: 0
             }}>
               {/* Search input + Style dropdown */}
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-                <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px', alignItems: isMobile ? 'stretch' : 'center' }}>
+                <div style={{ flex: 1, minWidth: isMobile ? '100%' : '220px', position: 'relative' }}>
                   <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                   <input
                     type="text"
@@ -3664,7 +3732,8 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                     border: '1px solid rgba(255, 255, 255, 0.12)',
                     fontSize: '0.85rem',
                     outline: 'none',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    width: isMobile ? '100%' : 'auto'
                   }}
                 >
                   <option value="">Tüm Dokular & Stiller</option>
@@ -4072,8 +4141,11 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
             borderRadius: '20px',
             width: '100%',
             maxWidth: '520px',
-            padding: '28px',
-            position: 'relative'
+            padding: isMobile ? '20px 16px' : '28px',
+            maxHeight: 'calc(100dvh - 32px)',
+            overflowY: 'auto',
+            position: 'relative',
+            boxSizing: 'border-box'
           }}>
             <button
               onClick={() => setShowSampleModal(false)}
@@ -4327,7 +4399,10 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
             borderRadius: '20px',
             maxWidth: '520px',
             width: '100%',
-            padding: '28px',
+            padding: isMobile ? '20px 16px' : '28px',
+            maxHeight: 'calc(100dvh - 32px)',
+            overflowY: 'auto',
+            boxSizing: 'border-box',
             boxShadow: '0 25px 50px rgba(0,0,0,0.8)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -4376,7 +4451,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1', marginBottom: '6px' }}>
                 PAYLAŞILABİLİR ÖZEL ONAY BAĞLANTISI
               </label>
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '8px' }}>
                 <input
                   type="text"
                   readOnly
@@ -4388,7 +4463,8 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                     borderRadius: '8px',
                     padding: '10px 12px',
                     color: '#cbd5e1',
-                    fontSize: '0.8rem'
+                    fontSize: '0.8rem',
+                    boxSizing: 'border-box'
                   }}
                 />
                 <button
@@ -4399,6 +4475,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                     setTimeout(() => setShareCopied(false), 2500);
                   }}
                   style={{
+                    width: isMobile ? '100%' : 'auto',
                     background: shareCopied ? '#22c55e' : 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                     color: '#090d16',
                     border: 'none',
@@ -4407,7 +4484,10 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                     fontWeight: '800',
                     fontSize: '0.8rem',
                     cursor: 'pointer',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                 >
                   {shareCopied ? 'Kopyalandı ✓' : 'Linki Kopyala'}
@@ -4415,7 +4495,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px' }}>
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`${activeProject.title} projemiz için hazırladığımız mimari malzeme ve seramik seçimleri dosyasını inceleyip onaylayabilirsiniz: ${typeof window !== 'undefined' ? window.location.origin : ''}/mimar/sunum/${activeProject.id}`)}`}
                 target="_blank"
@@ -4489,7 +4569,10 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
             borderRadius: '20px',
             maxWidth: '640px',
             width: '100%',
-            padding: '28px',
+            padding: isMobile ? '20px 16px' : '28px',
+            maxHeight: 'calc(100dvh - 32px)',
+            overflowY: 'auto',
+            boxSizing: 'border-box',
             boxShadow: '0 25px 50px rgba(0,0,0,0.8)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -4510,7 +4593,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
             </div>
 
             {/* 4-Map Grid Showcase */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '10px', marginBottom: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '10px', marginBottom: '20px' }}>
               <div style={{ background: '#090d18', borderRadius: '10px', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
                 <div style={{ height: '90px', borderRadius: '6px', overflow: 'hidden', marginBottom: '6px' }}>
                   <img src={pbrProductModal.imageUrl} alt="Albedo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -4564,7 +4647,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px' }}>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(`// V-Ray / Corona PBR Settings for ${pbrProductModal.name}\nIOR: 1.54\nGlossiness: ${pbrProductModal.finish === 'Parlak' ? '0.94' : '0.72'}\nReflection: 0.95\nBump: Normal_Map_15%\nScale: ${pbrProductModal.width}x${pbrProductModal.height}cm`);
@@ -4579,7 +4662,8 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                   padding: '12px',
                   fontWeight: '700',
                   fontSize: '0.82rem',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  textAlign: 'center'
                 }}
               >
                 Parametreleri Kopyala
@@ -4621,23 +4705,23 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
           bottom: 0,
           left: 0,
           right: 0,
-          height: '62px',
-          background: 'rgba(7, 11, 20, 0.95)',
-          backdropFilter: 'blur(12px)',
+          height: '64px',
+          background: 'rgba(7, 11, 20, 0.96)',
+          backdropFilter: 'blur(16px)',
           borderTop: '1px solid rgba(212, 175, 55, 0.25)',
           display: 'flex',
-          justifyContent: 'space-around',
+          justifyContent: 'space-between',
           alignItems: 'center',
-          zIndex: 900,
+          zIndex: 1000,
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.6)'
+          boxShadow: '0 -4px 25px rgba(0, 0, 0, 0.7)'
         }}>
           {[
-            { id: 'projects', label: 'Projeler', icon: <Layers size={18} /> },
-            { id: 'calculator', label: 'Metraj', icon: <Calculator size={18} /> },
-            { id: 'vault', label: '3D PBR', icon: <Box size={18} /> },
-            { id: 'spec-writer', label: 'Şartname', icon: <FileText size={18} /> },
-            { id: 'samples', label: 'Numune', icon: <Package size={18} /> }
+            { id: 'projects', label: 'Projeler', icon: <Layers size={19} /> },
+            { id: 'calculator', label: 'Metraj', icon: <Calculator size={19} /> },
+            { id: 'vault', label: '3D PBR', icon: <Box size={19} /> },
+            { id: 'spec-writer', label: 'Şartname', icon: <FileText size={19} /> },
+            { id: 'samples', label: 'Numune', icon: <Package size={19} /> }
           ].map(tab => {
             const isActive = activeTab === tab.id;
             return (
@@ -4645,21 +4729,41 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 style={{
+                  flex: 1,
+                  height: '100%',
+                  position: 'relative',
                   background: 'transparent',
                   border: 'none',
                   color: isActive ? '#d4af37' : '#94a3b8',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: '4px',
                   cursor: 'pointer',
-                  fontSize: '0.65rem',
-                  fontWeight: isActive ? '700' : '500',
-                  padding: '6px 10px',
-                  transition: 'color 0.2s'
+                  fontSize: '0.68rem',
+                  fontWeight: isActive ? '800' : '500',
+                  padding: '6px 2px',
+                  transition: 'color 0.2s',
+                  boxSizing: 'border-box'
                 }}
               >
-                {tab.icon}
+                {isActive && (
+                  <span style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '28px',
+                    height: '2.5px',
+                    background: '#d4af37',
+                    borderRadius: '2px',
+                    boxShadow: '0 0 8px #d4af37'
+                  }} />
+                )}
+                <span style={{ transform: isActive ? 'scale(1.08)' : 'scale(1)', transition: 'transform 0.15s ease', display: 'flex' }}>
+                  {tab.icon}
+                </span>
                 <span>{tab.label}</span>
               </button>
             );
