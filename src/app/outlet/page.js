@@ -179,244 +179,175 @@ export default function OutletMarketplacePage() {
   };
 
   return (
-    <div style={{ background: '#090d16', color: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>
-      {/* Header Navigation */}
-      <header style={{
-        background: 'rgba(15, 23, 42, 0.85)',
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(239, 68, 68, 0.25)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 90,
-        padding: '12px 16px'
-      }}>
-        <div style={{
-          maxWidth: '1280px',
-          margin: '0 auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px'
-        }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-              color: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '900',
-              fontSize: '1rem',
-              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
-            }}>SB</div>
-            <span style={{ fontSize: '1.1rem', fontWeight: '900', color: '#ffffff' }}>
-              SeramikBak <span style={{ color: '#ef4444', fontSize: '0.8rem' }}>OUTLET</span>
-            </span>
-          </Link>
+    <div style={{ background: '#090d16', color: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      {/* Header Navigation - Mobile App Bar */}
+      <header className="outlet-app-header">
+        <div className="outlet-header-inner">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Link href="/" className="outlet-back-btn" title="Ana Sayfaya Dön">
+              <ChevronLeft size={18} />
+            </Link>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => { setShowAlertModal(true); setAlertCity(selectedCity || 'ALL'); }}
-              style={{
-                fontSize: '0.78rem',
-                fontWeight: '800',
-                color: '#ffffff',
-                background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
-                border: 'none',
-                padding: '8px 14px',
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+              <div style={{
+                width: '34px',
+                height: '34px',
                 borderRadius: '10px',
-                cursor: 'pointer',
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                color: '#fff',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 4px 14px rgba(37, 211, 102, 0.35)',
-                transition: 'transform 0.2s ease'
-              }}
+                justifyContent: 'center',
+                fontWeight: '900',
+                fontSize: '0.95rem',
+                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.35)',
+                flexShrink: 0
+              }}>SB</div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '1rem', fontWeight: '900', color: '#ffffff', lineHeight: '1.1' }}>
+                  SeramikBak
+                </span>
+                <span style={{ color: '#ef4444', fontSize: '0.68rem', fontWeight: '800', letterSpacing: '0.05em' }}>
+                  OUTLET BORSASI
+                </span>
+              </div>
+            </Link>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={() => { setShowAlertModal(true); setAlertCity(selectedCity || 'ALL'); }}
+              className="header-alert-btn"
+              title="WhatsApp Fırsat Alarmı"
             >
               <MessageSquare size={14} />
-              <span>WhatsApp Fırsat Alarmı</span>
+              <span className="btn-text-desktop">Fırsat Alarmı Kur</span>
+              <span className="btn-text-mobile">Alarm</span>
             </button>
 
-            <Link href="/bayi" style={{
-              fontSize: '0.78rem',
-              fontWeight: '700',
-              color: '#d4af37',
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: 'rgba(212, 175, 55, 0.1)',
-              border: '1px solid rgba(212, 175, 55, 0.3)',
-              padding: '8px 12px',
-              borderRadius: '10px'
-            }}>
+            <Link href="/bayi" className="header-dealer-btn">
               <Building2 size={14} />
-              <span>Bayi Girişi & İlan Ver</span>
+              <span className="btn-text-desktop">Bayi Girişi</span>
+              <span className="btn-text-mobile">İlan Ver</span>
             </Link>
           </div>
         </div>
       </header>
 
-      {/* HERO BANNER */}
-      <section style={{
-        background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(9, 13, 22, 1) 100%), url("/hero/hero_ceramics.jpg")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-        padding: '40px 16px 30px 16px',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        textAlign: 'center'
-      }}>
+      {/* HERO BANNER - COMPACT ON MOBILE */}
+      <section className="outlet-hero-section">
         <div style={{ maxWidth: '840px', margin: '0 auto' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(239, 68, 68, 0.2)',
-            border: '1px solid rgba(239, 68, 68, 0.4)',
-            color: '#f87171',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            fontSize: '0.75rem',
-            fontWeight: '800',
-            marginBottom: '14px',
-            maxWidth: '100%'
-          }}>
-            <Sparkles size={14} style={{ flexShrink: 0 }} />
-            <span>BAYİLERDEN CANLI OUTLET & ŞANTİYE FAZLASI BORSASI</span>
+          <div className="outlet-badge-pill">
+            <Sparkles size={13} style={{ flexShrink: 0 }} />
+            <span>CANLI OUTLET & ŞANTİYE FAZLASI BORSASI</span>
           </div>
 
-          <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 2.4rem)', fontWeight: '900', color: '#ffffff', margin: '0 0 14px 0', lineHeight: '1.25' }}>
+          <h1 className="outlet-hero-title">
             Depo Seri Sonları & Proje Fazlası Paletlerde %60'a Varan İndirimler
           </h1>
 
-          <p style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 20px 0' }}>
-            Bayilerin elinde kalan son 30 m², 50 m² şantiye artığı ve 2. kalite stoklar uygun fiyata satışta!
-            Kiralık evinizi, balkonunuzu veya ufak alan tadilatınızı bütçe dostu paletlerle tamamlayın.
+          <p className="outlet-hero-desc">
+            Bayilerin elinde kalan son 30-50 m² şantiye artığı ve 2. kalite stoklar kelepir fiyata!
+            Balkon, kiralık daire ve tadilatlarınızı bütçe dostu paletlerle tamamlayın.
           </p>
 
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: '16px' }}>
             <button
-              className="outlet-alert-btn"
+              className="outlet-main-alert-btn"
               type="button"
               onClick={() => { setShowAlertModal(true); setAlertCity(selectedCity || 'ALL'); }}
-              style={{
-                background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
-                color: '#ffffff',
-                fontWeight: '800',
-                fontSize: '0.85rem',
-                padding: '12px 20px',
-                borderRadius: '12px',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 6px 20px rgba(37, 211, 102, 0.35)',
-                transition: 'transform 0.2s ease',
-                maxWidth: '100%'
-              }}
             >
               <MessageSquare size={16} />
-              <span>{selectedCity !== 'ALL' ? `${selectedCity} İçin WhatsApp Fırsat Alarmı Kur 🔔` : 'WhatsApp Fırsat Alarmı Kur (Tüm İller) 🔔'}</span>
+              <span>{selectedCity !== 'ALL' ? `${selectedCity} İçin WhatsApp Fırsat Alarmı Kur 🔔` : 'WhatsApp Fırsat Alarmı Kur 🔔'}</span>
             </button>
           </div>
 
-          {/* Search & Filter Bar */}
-          <form onSubmit={handleSearchSubmit} style={{
-            background: 'rgba(15, 23, 42, 0.9)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '20px',
-            padding: '12px',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-            gap: '10px',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
-          }}>
-            <div style={{ position: 'relative' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+          {/* MOBILE QUICK CATEGORY CHIPS */}
+          <div className="mobile-category-chips">
+            <button
+              type="button"
+              className={`chip-btn ${selectedCategory === 'ALL' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('ALL')}
+            >
+              🔥 Tüm Fırsatlar
+            </button>
+            <button
+              type="button"
+              className={`chip-btn ${selectedCategory === 'PROJE_FAZLASI' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('PROJE_FAZLASI')}
+            >
+              🏗️ Proje Fazlası
+            </button>
+            <button
+              type="button"
+              className={`chip-btn ${selectedCategory === 'SERI_SONU' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('SERI_SONU')}
+            >
+              📦 Seri Sonu
+            </button>
+            <button
+              type="button"
+              className={`chip-btn ${selectedCategory === 'IKINCI_KALITE' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('IKINCI_KALITE')}
+            >
+              🏷️ 2. Kalite
+            </button>
+            <button
+              type="button"
+              className={`chip-btn ${selectedCategory === 'OUTLET' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('OUTLET')}
+            >
+              ✨ Depo Outlet
+            </button>
+          </div>
+
+          {/* Search & Filter Bar - Fully Symmetrical on Mobile */}
+          <form onSubmit={handleSearchSubmit} className="outlet-filter-form">
+            <div className="filter-input-wrapper">
+              <Search size={16} className="filter-search-icon" />
               <input
                 type="text"
-                placeholder="Desen, ebat veya ürün adı ara..."
+                placeholder="Desen, ebat veya marka ara..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px 10px 36px',
-                  borderRadius: '12px',
-                  background: 'rgba(30, 41, 59, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#ffffff',
-                  fontSize: '0.85rem',
-                  boxSizing: 'border-box'
-                }}
+                className="filter-text-input"
               />
             </div>
 
-            <div>
-              <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '12px',
-                  background: 'rgba(30, 41, 59, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#ffffff',
-                  fontSize: '0.85rem',
-                  boxSizing: 'border-box'
-                }}
-              >
-                <option value="ALL">Tüm Şehirler</option>
-                {TURKEY_CITIES.map(city => (
-                  <option key={city} value={city}>{city}</option>
-                ))}
-              </select>
+            <div className="filter-select-grid">
+              <div style={{ position: 'relative' }}>
+                <MapPin size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
+                <select
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.target.value)}
+                  className="filter-select-input"
+                  style={{ paddingLeft: '28px' }}
+                >
+                  <option value="ALL">Tüm Şehirler</option>
+                  {TURKEY_CITIES.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ position: 'relative' }}>
+                <Tag size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="filter-select-input"
+                  style={{ paddingLeft: '28px' }}
+                >
+                  <option value="ALL">Kategori (Tümü)</option>
+                  <option value="PROJE_FAZLASI">Proje Fazlası</option>
+                  <option value="SERI_SONU">Seri Sonu</option>
+                  <option value="IKINCI_KALITE">2. Kalite</option>
+                  <option value="OUTLET">Depo Outlet</option>
+                </select>
+              </div>
             </div>
 
-            <div>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  borderRadius: '12px',
-                  background: 'rgba(30, 41, 59, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#ffffff',
-                  fontSize: '0.85rem',
-                  boxSizing: 'border-box'
-                }}
-              >
-                <option value="ALL">Tüm Kategoriler</option>
-                <option value="PROJE_FAZLASI">Proje Fazlası (Şantiye Artığı)</option>
-                <option value="SERI_SONU">Seri Sonu (Kapatıyoruz)</option>
-                <option value="IKINCI_KALITE">2. Kalite Paletler</option>
-                <option value="OUTLET">Depo Outlet</option>
-              </select>
-            </div>
-
-            <button
-              type="submit"
-              style={{
-                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                color: '#ffffff',
-                border: 'none',
-                padding: '10px 20px',
-                borderRadius: '12px',
-                fontWeight: '800',
-                fontSize: '0.85rem',
-                cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(239, 68, 68, 0.4)',
-                width: '100%'
-              }}
-            >
+            <button type="submit" className="filter-submit-btn">
               Fırsatları Filtrele
             </button>
           </form>
@@ -683,51 +614,64 @@ export default function OutletMarketplacePage() {
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '8px', marginTop: '4px' }}>
+                    {/* Symmetrical Action Buttons */}
+                    <div className="outlet-card-actions" style={{
+                      display: 'grid',
+                      gridTemplateColumns: d?.phone ? '1fr 1fr' : '1fr',
+                      gap: '8px',
+                      marginTop: '6px'
+                    }}>
                       {d?.phone ? (
                         <a
                           href={`https://wa.me/${d.phone.replace(/[\s\-\(\)\+]/g, '')}?text=${encodeURIComponent(`Merhaba, SeramikBak Outlet Borsası'nda yer alan "${item.title}" (${item.quantityM2} m², ₺${item.unitPrice}/m²) ilanınız için bilgi almak / satın almak istiyorum.`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
+                          className="btn-whatsapp-action"
                           style={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             gap: '6px',
-                            padding: '9px',
-                            borderRadius: '10px',
-                            background: '#22c55e',
+                            padding: '11px 8px',
+                            minHeight: '44px',
+                            borderRadius: '12px',
+                            background: 'linear-gradient(135deg, #25d366 0%, #16a34a 100%)',
                             color: '#ffffff',
                             fontWeight: '800',
-                            fontSize: '0.76rem',
+                            fontSize: '0.8rem',
                             textDecoration: 'none',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            boxShadow: '0 4px 12px rgba(37, 211, 102, 0.25)',
+                            boxSizing: 'border-box'
                           }}
                         >
-                          <MessageSquare size={14} />
+                          <MessageSquare size={15} />
                           <span>WhatsApp Sor</span>
                         </a>
                       ) : null}
 
                       <button
                         onClick={() => setSelectedItemForContact(item)}
+                        className="btn-quote-action"
                         style={{
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           gap: '6px',
-                          padding: '9px',
-                          borderRadius: '10px',
+                          padding: '11px 8px',
+                          minHeight: '44px',
+                          borderRadius: '12px',
                           background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                           color: '#000000',
-                          fontWeight: '800',
-                          fontSize: '0.76rem',
+                          fontWeight: '850',
+                          fontSize: '0.8rem',
                           border: 'none',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 12px rgba(212, 175, 55, 0.25)',
+                          boxSizing: 'border-box'
                         }}
                       >
-                        <Send size={14} />
+                        <Send size={15} />
                         <span>Teklif Al</span>
                       </button>
                     </div>
@@ -736,20 +680,25 @@ export default function OutletMarketplacePage() {
                       <Link
                         href={`/bayi/${slugify(d.name)}`}
                         style={{
-                          fontSize: '0.7rem',
+                          fontSize: '0.72rem',
                           color: '#94a3b8',
                           textDecoration: 'none',
                           textAlign: 'center',
                           marginTop: '4px',
+                          padding: '6px',
+                          borderRadius: '8px',
+                          background: 'rgba(255,255,255,0.03)',
+                          border: '1px solid rgba(255,255,255,0.06)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: '4px'
+                          gap: '4px',
+                          transition: 'color 0.2s ease'
                         }}
                         className="hover:text-white"
                       >
-                        <span>Bayi Showroom Profilini İncele</span>
-                        <ChevronLeft size={12} style={{ transform: 'rotate(180deg)' }} />
+                        <span>🏬 Bayi Profilini ve Diğer Stoklarını Gör</span>
+                        <ArrowRight size={12} />
                       </Link>
                     )}
                   </div>
@@ -1082,16 +1031,343 @@ export default function OutletMarketplacePage() {
       )}
 
       <style jsx>{`
+        .outlet-app-header {
+          background: rgba(15, 23, 42, 0.92);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(239, 68, 68, 0.25);
+          position: sticky;
+          top: 0;
+          z-index: 90;
+          padding: 10px 14px;
+        }
+
+        .outlet-header-inner {
+          max-width: 1280px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+        }
+
+        .outlet-back-btn {
+          width: 34px;
+          height: 34px;
+          border-radius: 10px;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
+          flex-shrink: 0;
+          transition: all 0.2s ease;
+        }
+        .outlet-back-btn:active {
+          transform: scale(0.92);
+          background: rgba(255, 255, 255, 0.15);
+        }
+
+        .header-alert-btn {
+          font-size: 0.78rem;
+          font-weight: 800;
+          color: #ffffff;
+          background: linear-gradient(135deg, #25d366 0%, #059669 100%);
+          border: none;
+          padding: 8px 12px;
+          border-radius: 10px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+          transition: transform 0.15s ease;
+          flex-shrink: 0;
+        }
+        .header-alert-btn:active {
+          transform: scale(0.95);
+        }
+
+        .header-dealer-btn {
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: #d4af37;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          background: rgba(212, 175, 55, 0.12);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          padding: 8px 12px;
+          border-radius: 10px;
+          flex-shrink: 0;
+          transition: transform 0.15s ease;
+        }
+        .header-dealer-btn:active {
+          transform: scale(0.95);
+        }
+
+        .btn-text-mobile {
+          display: none;
+        }
+        .btn-text-desktop {
+          display: inline;
+        }
+
+        /* Hero Section */
+        .outlet-hero-section {
+          background: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(9, 13, 22, 1) 100%), url("/hero/hero_ceramics.jpg");
+          background-size: cover;
+          background-position: center center;
+          padding: 36px 16px 28px 16px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          text-align: center;
+        }
+
+        .outlet-badge-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(239, 68, 68, 0.18);
+          border: 1px solid rgba(239, 68, 68, 0.45);
+          color: #f87171;
+          padding: 5px 12px;
+          borderRadius: 20px;
+          font-size: 0.72rem;
+          font-weight: 850;
+          margin-bottom: 12px;
+          max-width: 100%;
+          letter-spacing: 0.03em;
+        }
+
+        .outlet-hero-title {
+          font-size: clamp(1.35rem, 3.8vw, 2.4rem);
+          font-weight: 900;
+          color: #ffffff;
+          margin: 0 0 10px 0;
+          line-height: 1.25;
+          letter-spacing: -0.015em;
+        }
+
+        .outlet-hero-desc {
+          font-size: 0.88rem;
+          color: #cbd5e1;
+          line-height: 1.55;
+          margin: 0 0 18px 0;
+          max-width: 680px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .outlet-main-alert-btn {
+          background: linear-gradient(135deg, #25d366 0%, #059669 100%);
+          color: #ffffff;
+          font-weight: 850;
+          font-size: 0.85rem;
+          padding: 12px 20px;
+          border-radius: 12px;
+          border: none;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          box-shadow: 0 6px 20px rgba(37, 211, 102, 0.35);
+          transition: transform 0.15s ease;
+          max-width: 100%;
+          width: auto;
+        }
+        .outlet-main-alert-btn:active {
+          transform: scale(0.97);
+        }
+
+        /* Mobile Quick Category Chips */
+        .mobile-category-chips {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          overflow-x: auto;
+          padding: 6px 2px 14px 2px;
+          margin-bottom: 16px;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          justify-content: center;
+        }
+        .mobile-category-chips::-webkit-scrollbar {
+          display: none;
+        }
+
+        .chip-btn {
+          background: rgba(30, 41, 59, 0.7);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #cbd5e1;
+          font-size: 0.76rem;
+          font-weight: 750;
+          padding: 7px 13px;
+          border-radius: 20px;
+          white-space: nowrap;
+          cursor: pointer;
+          flex-shrink: 0;
+          transition: all 0.15s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .chip-btn:active {
+          transform: scale(0.95);
+        }
+        .chip-btn.active {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+          border-color: #ef4444;
+          color: #ffffff;
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Filter Form */
+        .outlet-filter-form {
+          background: rgba(15, 23, 42, 0.92);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          border-radius: 18px;
+          padding: 12px;
+          display: grid;
+          grid-template-columns: 1.5fr 1fr 1fr auto;
+          gap: 10px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+          align-items: center;
+        }
+
+        .filter-input-wrapper {
+          position: relative;
+        }
+
+        .filter-search-icon {
+          position: absolute;
+          left: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #94a3b8;
+        }
+
+        .filter-text-input {
+          width: 100%;
+          padding: 11px 12px 11px 36px;
+          border-radius: 12px;
+          background: rgba(30, 41, 59, 0.85);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #ffffff;
+          font-size: 0.85rem;
+          box-sizing: border-box;
+          outline: none;
+        }
+        .filter-text-input:focus {
+          border-color: #ef4444;
+        }
+
+        .filter-select-grid {
+          display: contents;
+        }
+
+        .filter-select-input {
+          width: 100%;
+          padding: 11px 12px;
+          border-radius: 12px;
+          background: rgba(30, 41, 59, 0.85);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #ffffff;
+          font-size: 0.84rem;
+          box-sizing: border-box;
+          outline: none;
+          cursor: pointer;
+        }
+
+        .filter-submit-btn {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+          color: #ffffff;
+          border: none;
+          padding: 11px 22px;
+          border-radius: 12px;
+          font-weight: 850;
+          font-size: 0.86rem;
+          cursor: pointer;
+          box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+          white-space: nowrap;
+          transition: transform 0.15s ease;
+        }
+        .filter-submit-btn:active {
+          transform: scale(0.97);
+        }
+
+        .btn-whatsapp-action:active,
+        .btn-quote-action:active {
+          transform: scale(0.97);
+        }
+
+        /* Mobile Responsive Overrides */
         @media (max-width: 768px) {
-          :global(.outlet-alert-btn) {
-            width: 100% !important;
-            justify-content: center !important;
-            padding: 10px 14px !important;
-            font-size: 0.8rem !important;
+          .outlet-app-header {
+            padding: 8px 10px;
           }
+
+          .btn-text-desktop {
+            display: none;
+          }
+          .btn-text-mobile {
+            display: inline;
+          }
+
+          .header-alert-btn,
+          .header-dealer-btn {
+            padding: 7px 10px;
+            font-size: 0.74rem;
+            border-radius: 8px;
+          }
+
+          .outlet-hero-section {
+            padding: 24px 12px 20px 12px;
+          }
+
+          .outlet-main-alert-btn {
+            width: 100% !important;
+            padding: 12px 14px !important;
+            font-size: 0.82rem !important;
+          }
+
+          .mobile-category-chips {
+            justify-content: flex-start;
+            padding-left: 2px;
+            padding-right: 2px;
+          }
+
+          .outlet-filter-form {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+            padding: 10px !important;
+            border-radius: 16px !important;
+          }
+
+          .filter-select-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+          }
+
+          .filter-submit-btn {
+            width: 100% !important;
+            padding: 12px !important;
+          }
+
           :global(.outlet-items-grid) {
             grid-template-columns: 1fr !important;
             gap: 14px !important;
+          }
+
+          :global(.outlet-card-actions) {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
           }
         }
       `}</style>

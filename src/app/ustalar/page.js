@@ -22,7 +22,8 @@ import {
   Clock,
   Ruler,
   CheckSquare,
-  Upload
+  Upload,
+  ChevronLeft
 } from 'lucide-react';
 
 const TURKEY_CITIES = [
@@ -233,172 +234,119 @@ export default function InstallersDirectoryPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#090d16', color: '#f8fafc', fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* HEADER BAR */}
-      <header style={{
-        background: 'rgba(15, 23, 42, 0.95)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100
-      }}>
-        <div style={{
-          maxWidth: '1280px',
-          margin: '0 auto',
-          padding: '12px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px'
-        }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-            <div style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
-              border: '1.5px solid #d4af37',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '900',
-              color: '#ffffff',
-              fontSize: '1.1rem',
-              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.25)'
-            }}>SB</div>
-            <span style={{ fontSize: '1.1rem', fontWeight: '900', color: '#ffffff' }}>
-              SeramikBak <span style={{ color: '#d4af37', fontSize: '0.8rem' }}>USTA REHBERİ</span>
-            </span>
-          </Link>
+      {/* Header Navigation - Mobile App Bar */}
+      <header className="ustalar-app-header">
+        <div className="ustalar-header-inner">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Link href="/" className="ustalar-back-btn" title="Ana Sayfaya Dön">
+              <ChevronLeft size={18} />
+            </Link>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <button
-              onClick={() => setShowRegisterModal(true)}
-              style={{
-                fontSize: '0.8rem',
-                fontWeight: '800',
-                color: '#000000',
-                background: 'linear-gradient(135deg, #d4af37 0%, #fef08a 100%)',
-                border: 'none',
-                padding: '9px 16px',
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+              <div style={{
+                width: '34px',
+                height: '34px',
                 borderRadius: '10px',
-                cursor: 'pointer',
+                background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)',
+                border: '1.5px solid #d4af37',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 4px 14px rgba(212, 175, 55, 0.35)',
-                transition: 'transform 0.2s ease'
-              }}
+                justifyContent: 'center',
+                fontWeight: '900',
+                color: '#ffffff',
+                fontSize: '0.95rem',
+                boxShadow: '0 4px 12px rgba(15, 23, 42, 0.25)',
+                flexShrink: 0
+              }}>SB</div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '1rem', fontWeight: '900', color: '#ffffff', lineHeight: '1.1' }}>
+                  SeramikBak
+                </span>
+                <span style={{ color: '#d4af37', fontSize: '0.68rem', fontWeight: '800', letterSpacing: '0.05em' }}>
+                  USTA REHBERİ
+                </span>
+              </div>
+            </Link>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={() => setShowRegisterModal(true)}
+              className="ustalar-header-reg-btn"
             >
-              <Plus size={15} />
-              <span>Usta Olarak Kaydol (Ücretsiz)</span>
+              <Plus size={14} />
+              <span className="btn-text-desktop">Usta Olarak Kaydol (Ücretsiz)</span>
+              <span className="btn-text-mobile">Usta Kaydı</span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* HERO SECTION */}
-      <section style={{
-        background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(9, 13, 22, 1) 100%), url("/hero/hero_ceramics.jpg")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-        padding: '40px 16px 30px 16px',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        textAlign: 'center'
-      }}>
+      {/* HERO SECTION - COMPACT ON MOBILE */}
+      <section className="ustalar-hero-section">
         <div style={{ maxWidth: '840px', margin: '0 auto' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'rgba(212, 175, 55, 0.15)',
-            border: '1px solid rgba(212, 175, 55, 0.4)',
-            color: '#fef08a',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            fontSize: '0.75rem',
-            fontWeight: '800',
-            marginBottom: '14px',
-            maxWidth: '100%'
-          }}>
-            <ShieldCheck size={14} style={{ flexShrink: 0 }} />
-            <span>81 İLDE ONAYLI SERAMİK USTA VE UYGULAMA DİZİNİ</span>
+          <div className="ustalar-badge-pill">
+            <ShieldCheck size={13} style={{ flexShrink: 0 }} />
+            <span>81 İLDE ONAYLI SERAMİK UYGULAMA REHBERİ</span>
           </div>
 
-          <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 2.4rem)', fontWeight: '900', color: '#ffffff', margin: '0 0 14px 0', lineHeight: '1.25' }}>
-            Banyonuz ve Şantiyeniz İçin Bölgenizdeki Yetkili Seramik Ustalarını Bulun
+          <h1 className="ustalar-hero-title">
+            Banyonuz & Şantiyeniz İçin Onaylı Seramik Ustalarını Bulun
           </h1>
 
-          <p style={{ fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 24px 0' }}>
-            Seramiği aldınız ancak kime döşeteceğinizi bilmiyor musunuz? Lazer terazili ve garanti sertifikalı seramik ustalarıyla canlı projelerini görün, hazır sözleşmeyle güvenle çalışın.
+          <p className="ustalar-hero-desc">
+            Seramiği aldınız ancak kime döşeteceğinizi bilmiyor musunuz? Lazer terazili ve garanti sertifikalı ustaların canlı portfolyosunu inceleyin, güvenle çalışın.
           </p>
 
-          {/* Feature Highlights Badges */}
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '24px' }}>
-            <span style={{ fontSize: '0.78rem', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.35)', color: '#34d399', padding: '6px 12px', borderRadius: '12px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <CheckSquare size={14} />
-              Terazi & Derz Uyum İlkeli Uygulama
+          {/* Quick Highlight Badges */}
+          <div className="ustalar-feature-pills">
+            <span className="feat-pill feat-green">
+              <CheckSquare size={13} />
+              Terazi & Derz Uyumlu
             </span>
-            <span style={{ fontSize: '0.78rem', background: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.35)', color: '#60a5fa', padding: '6px 12px', borderRadius: '12px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <Camera size={14} />
-              Öncesi / Sonrası Canlı Şantiye Portfolyosu
+            <span className="feat-pill feat-blue">
+              <Camera size={13} />
+              Canlı Şantiye Portfolyosu
             </span>
-            <span style={{ fontSize: '0.78rem', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.35)', color: '#fef08a', padding: '6px 12px', borderRadius: '12px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <FileText size={14} />
-              Hazır Standart Uygulama Sözleşmesi
+            <span className="feat-pill feat-gold">
+              <FileText size={13} />
+              Hazır Standart Sözleşme
             </span>
           </div>
 
-          {/* Search & Filter Bar */}
-          <form onSubmit={handleSearchSubmit} style={{
-            background: 'rgba(15, 23, 42, 0.9)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            borderRadius: '20px',
-            padding: '12px',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: '10px',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-            maxWidth: '750px',
-            margin: '0 auto'
-          }}>
-            <div style={{ position: 'relative' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+          {/* QUICK CITY FILTER CHIPS */}
+          <div className="mobile-city-chips">
+            {['ALL', 'İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya', 'Adana', 'Kocaeli', 'Gaziantep', 'Konya'].map(city => (
+              <button
+                key={city}
+                type="button"
+                className={`city-chip-btn ${selectedCity === city ? 'active' : ''}`}
+                onClick={() => setSelectedCity(city)}
+              >
+                {city === 'ALL' ? '📍 Tüm İller' : city}
+              </button>
+            ))}
+          </div>
+
+          {/* Search & Filter Bar - Symmetrical on Mobile */}
+          <form onSubmit={handleSearchSubmit} className="ustalar-filter-form">
+            <div className="ustalar-input-wrapper">
+              <Search size={16} className="ustalar-search-icon" />
               <input
                 type="text"
                 placeholder="Usta adı, ilçe veya ebat (60x120)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px 10px 36px',
-                  borderRadius: '12px',
-                  background: 'rgba(30, 41, 59, 0.8)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  color: '#fff',
-                  fontSize: '0.85rem',
-                  boxSizing: 'border-box'
-                }}
+                className="ustalar-text-input"
               />
             </div>
 
-            <div style={{ position: 'relative' }}>
-              <MapPin size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+            <div className="ustalar-select-wrapper">
+              <MapPin size={16} className="ustalar-pin-icon" />
               <select
                 value={selectedCity}
                 onChange={(e) => setSelectedCity(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px 10px 36px',
-                  borderRadius: '12px',
-                  background: 'rgba(30, 41, 59, 0.8)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  color: '#fff',
-                  fontSize: '0.85rem',
-                  boxSizing: 'border-box'
-                }}
+                className="ustalar-select-input"
               >
                 <option value="ALL">Tüm Şehirler (81 İl)</option>
                 {TURKEY_CITIES.map(c => (
@@ -407,21 +355,7 @@ export default function InstallersDirectoryPage() {
               </select>
             </div>
 
-            <button
-              type="submit"
-              style={{
-                background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                color: '#000000',
-                fontWeight: '800',
-                fontSize: '0.88rem',
-                border: 'none',
-                borderRadius: '12px',
-                padding: '10px 20px',
-                cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(212, 175, 55, 0.3)',
-                width: '100%'
-              }}
-            >
+            <button type="submit" className="ustalar-submit-btn">
               Ustaları Ara
             </button>
           </form>
@@ -620,52 +554,63 @@ export default function InstallersDirectoryPage() {
                     </div>
                   </div>
 
-                  {/* Compact Bottom Actions */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '6px', marginTop: '4px' }}>
+                  {/* Symmetrical Dual Action Buttons */}
+                  <div className="installer-card-actions" style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '8px',
+                    marginTop: '8px'
+                  }}>
                     <a
                       href={waLink}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="btn-wa-installer"
                       style={{
-                        background: 'linear-gradient(135deg, #25d366 0%, #059669 100%)',
+                        background: 'linear-gradient(135deg, #25d366 0%, #16a34a 100%)',
                         color: '#ffffff',
                         textDecoration: 'none',
-                        padding: '8px 10px',
-                        borderRadius: '8px',
-                        fontSize: '0.75rem',
-                        fontWeight: '800',
+                        padding: '11px 8px',
+                        minHeight: '44px',
+                        borderRadius: '12px',
+                        fontSize: '0.8rem',
+                        fontWeight: '850',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '5px',
-                        boxShadow: '0 3px 10px rgba(37, 211, 102, 0.2)',
-                        textAlign: 'center'
+                        gap: '6px',
+                        boxShadow: '0 4px 14px rgba(37, 211, 102, 0.25)',
+                        textAlign: 'center',
+                        boxSizing: 'border-box'
                       }}
                     >
-                      <MessageSquare size={13} />
+                      <MessageSquare size={15} />
                       <span>WhatsApp Teklif</span>
                     </a>
 
                     <a
                       href={`tel:${inst.phone.replace(/[^\d+]/g, '')}`}
+                      className="btn-call-installer"
                       style={{
-                        background: 'rgba(255, 255, 255, 0.08)',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        color: '#ffffff',
+                        background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                        color: '#000000',
                         textDecoration: 'none',
-                        padding: '8px',
-                        borderRadius: '8px',
-                        fontSize: '0.75rem',
-                        fontWeight: '800',
+                        padding: '11px 8px',
+                        minHeight: '44px',
+                        borderRadius: '12px',
+                        fontSize: '0.8rem',
+                        fontWeight: '850',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '4px',
-                        textAlign: 'center'
+                        gap: '6px',
+                        boxShadow: '0 4px 14px rgba(212, 175, 55, 0.25)',
+                        textAlign: 'center',
+                        boxSizing: 'border-box'
                       }}
                     >
-                      <Phone size={13} style={{ color: '#d4af37' }} />
-                      <span>Ara</span>
+                      <Phone size={15} />
+                      <span>Hemen Ara</span>
                     </a>
                   </div>
                 </div>
@@ -1304,10 +1249,333 @@ export default function InstallersDirectoryPage() {
       )}
 
       <style jsx>{`
+        .ustalar-app-header {
+          background: rgba(15, 23, 42, 0.92);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          padding: 10px 14px;
+        }
+
+        .ustalar-header-inner {
+          max-width: 1280px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+        }
+
+        .ustalar-back-btn {
+          width: 34px;
+          height: 34px;
+          border-radius: 10px;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
+          flex-shrink: 0;
+          transition: all 0.2s ease;
+        }
+        .ustalar-back-btn:active {
+          transform: scale(0.92);
+          background: rgba(255, 255, 255, 0.15);
+        }
+
+        .ustalar-header-reg-btn {
+          font-size: 0.78rem;
+          font-weight: 850;
+          color: #000000;
+          background: linear-gradient(135deg, #d4af37 0%, #fef08a 100%);
+          border: none;
+          padding: 8px 14px;
+          border-radius: 10px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
+          transition: transform 0.15s ease;
+          flex-shrink: 0;
+        }
+        .ustalar-header-reg-btn:active {
+          transform: scale(0.95);
+        }
+
+        .btn-text-mobile {
+          display: none;
+        }
+        .btn-text-desktop {
+          display: inline;
+        }
+
+        /* Hero Section */
+        .ustalar-hero-section {
+          background: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(9, 13, 22, 1) 100%), url("/hero/hero_ceramics.jpg");
+          background-size: cover;
+          background-position: center center;
+          padding: 36px 16px 26px 16px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          text-align: center;
+        }
+
+        .ustalar-badge-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(212, 175, 55, 0.15);
+          border: 1px solid rgba(212, 175, 55, 0.45);
+          color: #fef08a;
+          padding: 5px 12px;
+          border-radius: 20px;
+          font-size: 0.72rem;
+          font-weight: 850;
+          margin-bottom: 12px;
+          max-width: 100%;
+          letter-spacing: 0.03em;
+        }
+
+        .ustalar-hero-title {
+          font-size: clamp(1.35rem, 3.8vw, 2.4rem);
+          font-weight: 900;
+          color: #ffffff;
+          margin: 0 0 10px 0;
+          line-height: 1.25;
+          letter-spacing: -0.015em;
+        }
+
+        .ustalar-hero-desc {
+          font-size: 0.88rem;
+          color: #cbd5e1;
+          line-height: 1.55;
+          margin: 0 0 18px 0;
+          max-width: 680px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        /* Feature Pills */
+        .ustalar-feature-pills {
+          display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 16px;
+        }
+
+        .feat-pill {
+          font-size: 0.75rem;
+          padding: 5px 11px;
+          border-radius: 12px;
+          font-weight: 750;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          white-space: nowrap;
+        }
+        .feat-green {
+          background: rgba(16, 185, 129, 0.14);
+          border: 1px solid rgba(16, 185, 129, 0.35);
+          color: #34d399;
+        }
+        .feat-blue {
+          background: rgba(59, 130, 246, 0.14);
+          border: 1px solid rgba(59, 130, 246, 0.35);
+          color: #60a5fa;
+        }
+        .feat-gold {
+          background: rgba(212, 175, 55, 0.14);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          color: #fef08a;
+        }
+
+        /* Mobile City Chips */
+        .mobile-city-chips {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          overflow-x: auto;
+          padding: 4px 2px 14px 2px;
+          margin-bottom: 16px;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          justify-content: center;
+        }
+        .mobile-city-chips::-webkit-scrollbar {
+          display: none;
+        }
+
+        .city-chip-btn {
+          background: rgba(30, 41, 59, 0.7);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #cbd5e1;
+          font-size: 0.76rem;
+          font-weight: 750;
+          padding: 7px 13px;
+          border-radius: 20px;
+          white-space: nowrap;
+          cursor: pointer;
+          flex-shrink: 0;
+          transition: all 0.15s ease;
+        }
+        .city-chip-btn:active {
+          transform: scale(0.95);
+        }
+        .city-chip-btn.active {
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          border-color: #d4af37;
+          color: #000000;
+          font-weight: 850;
+          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
+        }
+
+        /* Filter Form */
+        .ustalar-filter-form {
+          background: rgba(15, 23, 42, 0.92);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 18px;
+          padding: 12px;
+          display: grid;
+          grid-template-columns: 2fr 1.3fr auto;
+          gap: 10px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+          max-width: 750px;
+          margin: 0 auto;
+          align-items: center;
+        }
+
+        .ustalar-input-wrapper,
+        .ustalar-select-wrapper {
+          position: relative;
+        }
+
+        .ustalar-search-icon,
+        .ustalar-pin-icon {
+          position: absolute;
+          left: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #94a3b8;
+          pointer-events: none;
+        }
+
+        .ustalar-text-input {
+          width: 100%;
+          padding: 11px 12px 11px 36px;
+          border-radius: 12px;
+          background: rgba(30, 41, 59, 0.85);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #ffffff;
+          font-size: 0.85rem;
+          box-sizing: border-box;
+          outline: none;
+        }
+        .ustalar-text-input:focus {
+          border-color: #d4af37;
+        }
+
+        .ustalar-select-input {
+          width: 100%;
+          padding: 11px 12px 11px 36px;
+          border-radius: 12px;
+          background: rgba(30, 41, 59, 0.85);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #ffffff;
+          font-size: 0.84rem;
+          box-sizing: border-box;
+          outline: none;
+          cursor: pointer;
+        }
+
+        .ustalar-submit-btn {
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          color: #000000;
+          border: none;
+          padding: 11px 22px;
+          border-radius: 12px;
+          font-weight: 850;
+          font-size: 0.86rem;
+          cursor: pointer;
+          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
+          white-space: nowrap;
+          transition: transform 0.15s ease;
+        }
+        .ustalar-submit-btn:active {
+          transform: scale(0.97);
+        }
+
+        .btn-wa-installer:active,
+        .btn-call-installer:active {
+          transform: scale(0.97);
+        }
+
+        /* Mobile Responsive Overrides */
         @media (max-width: 768px) {
+          .ustalar-app-header {
+            padding: 8px 10px;
+          }
+
+          .btn-text-desktop {
+            display: none;
+          }
+          .btn-text-mobile {
+            display: inline;
+          }
+
+          .ustalar-header-reg-btn {
+            padding: 7px 11px;
+            font-size: 0.74rem;
+            border-radius: 8px;
+          }
+
+          .ustalar-hero-section {
+            padding: 24px 12px 20px 12px;
+          }
+
+          .ustalar-feature-pills {
+            justify-content: flex-start;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 4px;
+          }
+          .ustalar-feature-pills::-webkit-scrollbar {
+            display: none;
+          }
+
+          .mobile-city-chips {
+            justify-content: flex-start;
+            padding-left: 2px;
+            padding-right: 2px;
+          }
+
+          .ustalar-filter-form {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+            padding: 10px !important;
+            border-radius: 16px !important;
+          }
+
+          .ustalar-submit-btn {
+            width: 100% !important;
+            padding: 12px !important;
+          }
+
           :global(.installers-grid) {
             grid-template-columns: 1fr !important;
-            gap: 12px !important;
+            gap: 14px !important;
+          }
+
+          :global(.installer-card-actions) {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
           }
         }
       `}</style>
