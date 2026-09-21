@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 function getISOWeekDetails(date = new Date()) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -122,73 +123,77 @@ export async function POST(request) {
     const year = parseInt(targetYear || currentYear, 10);
     const numericBid = parseFloat(bidAmount);
 
-    // KONTROL: Eğer bu hafta için onaylanmış aktif bir reklam varsa ihale KAPALIDIR! Daha yüksek teklif verilemez.
-    const activeWinner = await prisma.podiumBid.findFirst({
-      where: { weekNumber, year, status: 'WINNER_ACTIVE' }
-    });
-
-    if (activeWinner) {
-      return NextResponse.json(
-        { error: 'Bu hafta için yönetici tarafından onaylanmış aktif bir podyum reklamı bulunmaktadır. Bu haftanın reklam alanı kapatılmıştır, yeni teklif verilemez.' },
-        { status: 400 }
-      );
+    // Enforce Brand Session Authentication
+    const session = await verifyAuth(request);
+    if (!session || (session.role !== 'brand' && session.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' }, { status: 401 });
     }
 
-    // Get current highest pending bid for this week
-    const currentHighest = await prisma.podiumBid.findFirst({
-      where: { weekNumber, year, status: 'PENDING_APPROVAL' },
-      orderBy: { bidAmount: 'desc' }
-    });
+    const effectiveBrandId = session.role === 'brand' ? session.id : (brandId || session.id);
 
-    if (currentHighest && numericBid <= currentHighest.bidAmount) {
-      return NextResponse.json(
-        { error: `Teklifiniz mevcut en yüksek teklif olan ₺${currentHighest.bidAmount.toLocaleString('tr-TR')} tutarından daha yüksek olmalıdır.` },
-        { status: 400 }
-      );
-    }
+    // Atomic Transaction to prevent race condition bids
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. KONTROL: Eğer bu hafta için onaylanmış aktif bir reklam varsa ihale KAPALIDIR!
+      const activeWinner = await tx.podiumBid.findFirst({
+        where: { weekNumber, year, status: 'WINNER_ACTIVE' }
+      });
 
-    if (numericBid < 1500) {
-      return NextResponse.json(
-        { error: 'Minimum podyum teklif tutarı ₺1.500 TL olmalıdır.' },
-        { status: 400 }
-      );
-    }
-
-    // Create the new podium bid (Dekont is submitted after approval or confirmation)
-    const newBid = await prisma.podiumBid.create({
-      data: {
-        brandId,
-        productId,
-        bidAmount: numericBid,
-        paymentRef: body.paymentRef || '',
-        title: title || 'Haftalık Podyum Özel Serisi',
-        description: description || '',
-        weekNumber,
-        year,
-        status: 'PENDING_APPROVAL'
-      },
-      include: {
-        product: { select: { name: true, code: true, imageUrl: true } }
+      if (activeWinner) {
+        throw new Error('Bu hafta için yönetici tarafından onaylanmış aktif bir podyum reklamı bulunmaktadır. Bu haftanın reklam alanı kapatılmıştır.');
       }
-    });
 
-    // Mark lower pending bids for outbid status
-    if (currentHighest && currentHighest.brandId !== brandId) {
-      await prisma.podiumBid.updateMany({
-        where: {
+      // 2. Mevcut en yüksek teklif kontrolü
+      const currentHighest = await tx.podiumBid.findFirst({
+        where: { weekNumber, year, status: 'PENDING_APPROVAL' },
+        orderBy: { bidAmount: 'desc' }
+      });
+
+      if (currentHighest && numericBid <= currentHighest.bidAmount) {
+        throw new Error(`Teklifiniz mevcut en yüksek teklif olan ₺${currentHighest.bidAmount.toLocaleString('tr-TR')} tutarından daha yüksek olmalıdır.`);
+      }
+
+      if (numericBid < 1500) {
+        throw new Error('Minimum podyum teklif tutarı ₺1.500 TL olmalıdır.');
+      }
+
+      // 3. Yeni teklifi oluştur
+      const createdBid = await tx.podiumBid.create({
+        data: {
+          brandId: effectiveBrandId,
+          productId,
+          bidAmount: numericBid,
+          paymentRef: body.paymentRef || '',
+          title: title || 'Haftalık Podyum Özel Serisi',
+          description: description || '',
           weekNumber,
           year,
-          id: currentHighest.id,
           status: 'PENDING_APPROVAL'
         },
-        data: { status: 'OUTBID' }
+        include: {
+          product: { select: { name: true, code: true, imageUrl: true } }
+        }
       });
-    }
+
+      // 4. Daha düşük teklifleri OUTBID yap
+      if (currentHighest && currentHighest.brandId !== effectiveBrandId) {
+        await tx.podiumBid.updateMany({
+          where: {
+            weekNumber,
+            year,
+            id: currentHighest.id,
+            status: 'PENDING_APPROVAL'
+          },
+          data: { status: 'OUTBID' }
+        });
+      }
+
+      return createdBid;
+    });
 
     return NextResponse.json({
       success: true,
       message: 'Podyum reklam teklifiniz başarıyla alındı! Yönetici onayından sonra dekont bilgisi girilerek yayın aktif edilecektir.',
-      bid: newBid
+      bid: result
     });
   } catch (error) {
     console.error('B2B Podium Submit Error:', error);

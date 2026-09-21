@@ -3,18 +3,27 @@ import crypto from 'crypto';
 import prisma from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request) {
   try {
+    // Rate limit: Max 5 password reset requests per IP per 15 minutes
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`forgot_pw_${clientIp}`, 5, 15 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: 'Çok fazla şifre sıfırlama talebinde bulundunuz. Lütfen 15 dakika sonra tekrar deneyin.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { action, email, resetToken, newPassword } = body;
 
-    // Helper to extract base URL of current request
+    // Helper to extract base URL of current request (with safe fallback)
     const getBaseUrl = () => {
       if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
-      const host = request.headers.get('host') || 'seramikbak.com';
-      const protocol = host.includes('localhost') ? 'http' : 'https';
-      return `${protocol}://${host}`;
+      return 'https://www.seramikbak.com';
     };
 
     // ---------------------------------------------------------
@@ -34,13 +43,13 @@ export async function POST(request) {
         where: { email: trimmedEmail }
       });
 
+      // Anti-Enumeration: Always respond with success to prevent user scraping
       if (!user) {
-        return NextResponse.json(
-          { 
-            error: `Girmiş olduğunuz (${trimmedEmail}) e-posta adresi sistemimizde kayıtlı değildir. Lütfen e-posta adresinizi kontrol edin veya 'Hesap Oluştur' kısmından kayıt olun.` 
-          },
-          { status: 404 }
-        );
+        return NextResponse.json({
+          success: true,
+          emailSent: true,
+          message: '✓ Eğer bu e-posta adresi sistemimizde kayıtlı ise, şifre sıfırlama bağlantısı gönderilmiştir. Lütfen gelen kutunuzu ve spam klasörünüzü kontrol edin.'
+        });
       }
 
       // Generate secure 32-byte hex token valid for 15 minutes
@@ -127,9 +136,9 @@ export async function POST(request) {
         );
       }
 
-      if (!newPassword || newPassword.length < 4) {
+      if (!newPassword || newPassword.length < 8) {
         return NextResponse.json(
-          { error: 'Lütfen en az 4 karakterden oluşan yeni şifrenizi girin.' },
+          { error: 'Lütfen en az 8 karakterden oluşan yeni şifrenizi girin.' },
           { status: 400 }
         );
       }

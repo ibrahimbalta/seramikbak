@@ -5,6 +5,17 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Shield, FileText, Settings } from 'lucide-react';
 
+function sanitizeHtml(dirty) {
+  if (typeof dirty !== 'string') return '';
+  return dirty
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+    .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '')
+    .replace(/on\w+\s*=\s*(?:'[^']*'|"[^"]*"|[^\s>]+)/gi, '')
+    .replace(/javascript:/gi, '');
+}
+
 function LegalContentReader() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState('kvkk');
@@ -248,6 +259,8 @@ function LegalContentReader() {
             lineHeight: '1.3'
           }}>{currentTab.title}</h2>
           
+
+
           <div 
             style={{
               fontSize: '0.9rem',
@@ -255,7 +268,7 @@ function LegalContentReader() {
               color: '#334155'
             }}
             className="legal-doc-content"
-            dangerouslySetInnerHTML={{ __html: currentTab.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(currentTab.content) }}
           />
         </div>
       </div>

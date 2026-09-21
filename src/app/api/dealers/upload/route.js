@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
 import { uploadImage } from '@/lib/cloudinary';
+import { verifyAuth } from '@/lib/auth-check';
 import fs from 'fs';
 import path from 'path';
 
 export async function POST(request) {
   try {
+    const session = await verifyAuth(request);
+    if (!session || (session.role !== 'dealer' && session.role !== 'admin')) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen giriş yapınız.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { base64Data, filename, folder = 'seramikbak/showroom' } = body;
 
@@ -12,15 +18,29 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Eksik parametreler: base64Data ve filename zorunludur.' }, { status: 400 });
     }
 
+    // 1. Extension Validation (Safe images only - No SVG, HTML, or executables)
+    const fileExt = path.extname(filename).toLowerCase();
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
+    if (!allowedExtensions.includes(fileExt)) {
+      return NextResponse.json({ success: false, error: 'Yalnızca JPEG, PNG ve WebP görsel formatlarına izin verilir.' }, { status: 400 });
+    }
+
+    // 2. Base64 Size Limit (Max 10MB binary ~14MB base64 string)
+    if (base64Data.length > 14 * 1024 * 1024) {
+      return NextResponse.json({ success: false, error: 'Görsel boyutu izin verilen sınırı (10MB) aşmaktadır.' }, { status: 413 });
+    }
+
+    // 3. Filename Sanitization (Prevent Path Traversal)
+    const sanitizedBase = path.basename(filename, fileExt).replace(/[^a-zA-Z0-9_\-]/g, '_');
+    const safeFilename = `${sanitizedBase}${fileExt}`;
+
     let fileUrl = null;
     let cloudinaryError = null;
 
     // 1. Try Cloudinary first
     try {
       if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
-        const fileExt = path.extname(filename);
-        const baseName = path.basename(filename, fileExt);
-        const publicId = `${baseName}_${Date.now()}`;
+        const publicId = `${sanitizedBase}_${Date.now()}`;
         const uploadResult = await uploadImage(base64Data, {
           public_id: publicId,
           folder: folder
@@ -44,9 +64,7 @@ export async function POST(request) {
         const cleanBase64 = base64Data.includes('base64,') ? base64Data.split('base64,')[1] : base64Data;
         const buffer = Buffer.from(cleanBase64, 'base64');
         
-        const fileExt = path.extname(filename) || '.jpg';
-        const baseName = path.basename(filename, fileExt);
-        const uniqueFilename = `${baseName}_${Date.now()}${fileExt}`;
+        const uniqueFilename = `${sanitizedBase}_${Date.now()}${fileExt}`;
         const filePath = path.join(publicDir, uniqueFilename);
         
         fs.writeFileSync(filePath, buffer);

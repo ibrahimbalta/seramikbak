@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // GET: Fetch all installers for Admin
 export async function GET(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const filter = searchParams.get('filter') || 'ALL'; // ALL, PENDING, VERIFIED
     const search = searchParams.get('search') || '';
@@ -54,6 +60,11 @@ export async function GET(request) {
 // PUT: Update installer (approve, toggle verified, update details)
 export async function PUT(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const {
       id,
@@ -107,6 +118,11 @@ export async function PUT(request) {
 // DELETE: Remove an installer
 export async function DELETE(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

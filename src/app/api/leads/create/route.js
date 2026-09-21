@@ -2,9 +2,18 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sendLeadNotification } from '@/lib/email';
 import { sendPushNotification } from '@/lib/pushServer';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request) {
   try {
+    const rateLimit = checkRateLimit(request, 5, 60000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Çok fazla teklif talebi gönderdiniz. Lütfen bir süre sonra tekrar deneyin.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { 
       productId, 
@@ -23,6 +32,13 @@ export async function POST(request) {
     if (!productId || !dealerId || !clientName || !clientPhone || !clientEmail) {
       return NextResponse.json(
         { error: 'Missing required fields (productId, dealerId, clientName, clientPhone, clientEmail)' },
+        { status: 400 }
+      );
+    }
+
+    if (clientName.length > 150 || clientEmail.length > 150 || clientPhone.length > 50 || (notes && notes.length > 3000)) {
+      return NextResponse.json(
+        { error: 'Girdi karakter sınırını aşıyor.' },
         { status: 400 }
       );
     }

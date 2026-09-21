@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { fetchHtml, extractPriceFromHtml, searchProductUrlViaGoogle } from '@/lib/priceScraper';
+import { verifyAuth } from '@/lib/auth-check';
 
 export async function POST(request) {
+  const auth = await verifyAuth(request, 'admin');
+  if (!auth) {
+    return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+  }
+
   const logs = [];
   let updatedCount = 0;
 

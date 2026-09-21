@@ -1,13 +1,20 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 export async function GET(request) {
   try {
+    const session = await verifyAuth(request);
+    if (!session || (session.role !== 'dealer' && session.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen bayi girişi yapınız.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-    const dealerId = searchParams.get('dealerId');
+    // Anti-IDOR: Regular dealers can only access their own data. Admin can inspect by query param.
+    let dealerId = session.role === 'dealer' ? session.id : searchParams.get('dealerId');
 
     if (!dealerId) {
-      return NextResponse.json({ error: 'Missing dealerId query parameter.' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing dealerId parameter.' }, { status: 400 });
     }
 
     // Fetch SaaS subscription details for dealer
@@ -200,11 +207,17 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { leadId, dealerId, status } = body;
+    const session = await verifyAuth(request);
+    if (!session || (session.role !== 'dealer' && session.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen bayi girişi yapınız.' }, { status: 401 });
+    }
 
-    if (!leadId || !dealerId || !status) {
-      return NextResponse.json({ error: 'Missing required parameters.' }, { status: 400 });
+    const body = await request.json();
+    const { leadId, status } = body;
+    const dealerId = session.role === 'dealer' ? session.id : (body.dealerId || session.id);
+
+    if (!leadId || !status) {
+      return NextResponse.json({ error: 'Missing required parameters (leadId, status).' }, { status: 400 });
     }
 
     // Check SaaS subscription
@@ -213,7 +226,7 @@ export async function POST(request) {
       orderBy: { expiresAt: 'desc' }
     });
     const hasActiveSaaS = saas && new Date(saas.expiresAt) > new Date() && saas.status === 'ACTIVE';
-    if (!hasActiveSaaS) {
+    if (!hasActiveSaaS && session.role !== 'admin') {
       return NextResponse.json({ error: 'Teklif durumunu güncelleyebilmek için aktif bir Bayi SaaS aboneliğiniz olmalıdır.' }, { status: 403 });
     }
 
@@ -239,7 +252,7 @@ export async function POST(request) {
           action: 'LEAD_RESOLVED',
           productId: existingLead.productId,
           brandId: (await prisma.product.findUnique({ where: { id: existingLead.productId } }))?.brandId || null,
-          city: existingLead.clientEmail // or whatever
+          city: existingLead.clientEmail
         }
       });
     }
@@ -254,12 +267,17 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
+    const session = await verifyAuth(request);
+    if (!session || (session.role !== 'dealer' && session.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const leadId = searchParams.get('leadId');
-    const dealerId = searchParams.get('dealerId');
+    const dealerId = session.role === 'dealer' ? session.id : (searchParams.get('dealerId') || session.id);
 
-    if (!leadId || !dealerId) {
-      return NextResponse.json({ error: 'Missing parameters.' }, { status: 400 });
+    if (!leadId) {
+      return NextResponse.json({ error: 'Missing leadId parameter.' }, { status: 400 });
     }
 
     // Check SaaS subscription
@@ -268,7 +286,7 @@ export async function DELETE(request) {
       orderBy: { expiresAt: 'desc' }
     });
     const hasActiveSaaS = saas && new Date(saas.expiresAt) > new Date() && saas.status === 'ACTIVE';
-    if (!hasActiveSaaS) {
+    if (!hasActiveSaaS && session.role !== 'admin') {
       return NextResponse.json({ error: 'Teklif talebini silebilmek için aktif bir Bayi SaaS aboneliğiniz olmalıdır.' }, { status: 403 });
     }
 

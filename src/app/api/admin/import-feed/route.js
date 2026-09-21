@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // Helper to find the first array inside a JSON object recursively
 function findJsonArray(obj) {
@@ -174,11 +175,36 @@ export async function POST(request) {
   const logs = [];
   let importedCount = 0;
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { brandId, feedUrl, defaultStyle } = body;
 
     if (!brandId || !feedUrl) {
       return NextResponse.json({ success: false, error: 'Marka seçimi ve Feed URL gereklidir.', logs }, { status: 400 });
+    }
+
+    // SSRF Check for feedUrl
+    try {
+      const parsedUrl = new URL(feedUrl);
+      const hostname = parsedUrl.hostname.toLowerCase();
+      if (
+        hostname === 'localhost' ||
+        hostname.endsWith('.localhost') ||
+        hostname === '127.0.0.1' ||
+        hostname === '::1' ||
+        hostname === '169.254.169.254' ||
+        hostname.startsWith('10.') ||
+        hostname.startsWith('192.168.') ||
+        /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname)
+      ) {
+        return NextResponse.json({ success: false, error: 'Güvenlik hatası: Dahili/özel ağ URL adreslerine izin verilmez.', logs }, { status: 400 });
+      }
+    } catch {
+      return NextResponse.json({ success: false, error: 'Geçersiz URL formatı.', logs }, { status: 400 });
     }
 
     // Fetch brand

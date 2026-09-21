@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // ─── Color Dictionary ───────────────────────────────────────────────────
 const KNOWN_COLORS = new Set([
@@ -208,6 +209,11 @@ function extractProductsFromResponse(data) {
 
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const { brandId } = await request.json();
 
     if (!brandId) {

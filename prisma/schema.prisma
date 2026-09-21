@@ -85,6 +85,9 @@ model Product {
   @@index([code])
   @@index([slug])
   @@index([isPremium])
+  @@index([style])
+  @@index([color])
+  @@index([finish])
 }
 
 model Dealer {
@@ -179,6 +182,9 @@ model Lead {
 
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  @@index([dealerId])
+  @@index([status])
 }
 
 model AdCampaign {

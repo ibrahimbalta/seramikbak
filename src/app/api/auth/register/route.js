@@ -4,8 +4,18 @@ import prisma from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
 import { sendVerificationEmail } from '@/lib/email';
 
+import { checkRateLimit } from '@/lib/rate-limit';
+
 export async function POST(request) {
   try {
+    const rateLimit = checkRateLimit(request, 5, 60000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Çok fazla kayıt denemesi yaptınız. Lütfen bir süre sonra tekrar deneyin.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { name, email, password } = body;
 
@@ -16,9 +26,25 @@ export async function POST(request) {
       );
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      return NextResponse.json(
+        { error: 'Lütfen geçerli bir e-posta adresi girin.' },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: 'Şifreniz en az 8 karakter uzunluğunda olmalıdır.' },
+        { status: 400 }
+      );
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { email: normalizedEmail }
     });
 
     if (existingUser) {
@@ -37,7 +63,7 @@ export async function POST(request) {
     const user = await prisma.user.create({
       data: {
         name,
-        email,
+        email: normalizedEmail,
         password: hashedPassword,
         emailVerified: false,
         verificationToken,
@@ -48,7 +74,7 @@ export async function POST(request) {
     // Send verification email
     const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://seramikbak.com';
     const verificationLink = `${origin}/api/auth/verify-email?token=${verificationToken}`;
-    await sendVerificationEmail({ toEmail: email, userName: name, verificationLink });
+    await sendVerificationEmail({ toEmail: normalizedEmail, userName: name, verificationLink });
 
     return NextResponse.json({
       success: true,

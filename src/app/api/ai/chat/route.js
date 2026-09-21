@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 function extractKeywords(text) {
   if (!text) return [];
@@ -21,6 +22,16 @@ function extractKeywords(text) {
 
 export async function POST(request) {
   try {
+    // Rate limit: Max 20 chat requests per minute per IP to prevent financial depletion
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`ai_chat_${clientIp}`, 20, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Yapay zeka asistanı istek limiti aşıldı. Lütfen 1 dakika sonra tekrar deneyin.' },
+        { status: 429 }
+      );
+    }
+
     const { messages } = await request.json();
 
     if (!messages || !Array.isArray(messages)) {
@@ -53,7 +64,7 @@ export async function POST(request) {
       apiModel = 'gemini-flash-lite-latest';
     } else {
       // Default to deepseek
-      apiKey = settingsMap['deepseek_api_key'] || 'sk-81324cd7ab0749abaee06efafb9013a2';
+      apiKey = process.env.DEEPSEEK_API_KEY || settingsMap['deepseek_api_key'] || '';
       apiUrl = 'https://api.deepseek.com/chat/completions';
       apiModel = 'deepseek-chat';
     }

@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const brandId = searchParams.get('brandId');
+    const requestedBrandId = searchParams.get('brandId');
 
-    if (!brandId) {
-      // Fetch active campaigns (where status is ACTIVE and expiresAt has not passed)
+    // Public view: fetch active campaigns
+    if (!requestedBrandId) {
       const activeCampaigns = await prisma.adCampaign.findMany({
         where: {
           status: 'ACTIVE',
@@ -30,8 +31,14 @@ export async function GET(request) {
       return NextResponse.json(activeCampaigns);
     }
 
+    // Protected view: Brand or Admin viewing campaigns of a specific brand
+    const session = await verifyAuth(request);
+    if (!session || (session.role !== 'admin' && !(session.role === 'brand' && session.id === requestedBrandId))) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Yalnızca kendi markanızın reklamlarını görüntüleyebilirsiniz.' }, { status: 403 });
+    }
+
     const campaigns = await prisma.adCampaign.findMany({
-      where: { brandId },
+      where: { brandId: requestedBrandId },
       include: {
         product: {
           select: { name: true, code: true, imageUrl: true }
@@ -49,8 +56,14 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const session = await verifyAuth(request);
+    if (!session || (session.role !== 'brand' && session.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' }, { status: 401 });
+    }
+
     const body = await request.json();
-    const { brandId, productId, durationDays, paymentRef, price } = body;
+    const brandId = session.role === 'brand' ? session.id : (body.brandId || session.id);
+    const { productId, durationDays, paymentRef, price } = body;
 
     if (!brandId || !productId || !durationDays || !paymentRef || !price) {
       return NextResponse.json(

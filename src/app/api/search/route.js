@@ -48,21 +48,18 @@ export async function GET(request) {
     const slip = searchParams.get('slip');
     const thicknessRange = searchParams.get('thicknessRange');
 
-    // Pagination parameters
+    // Pagination parameters (Clamped to prevent Denial-of-Service)
     const limitParam = searchParams.get('limit');
     const pageParam = searchParams.get('page');
     let skip = undefined;
-    let take = undefined;
+    let take = 60; // Safe default upper bound
 
     if (limitParam !== 'all') {
-      const limit = parseInt(limitParam || '24', 10);
-      const page = parseInt(pageParam || '1', 10);
-      if (!isNaN(limit) && limit > 0) {
-        take = limit;
-        if (!isNaN(page) && page > 0) {
-          skip = (page - 1) * limit;
-        }
-      }
+      const parsedLimit = parseInt(limitParam || '24', 10);
+      const limit = Math.max(1, Math.min(isNaN(parsedLimit) ? 24 : parsedLimit, 60));
+      const page = Math.max(1, parseInt(pageParam || '1', 10) || 1);
+      take = limit;
+      skip = (page - 1) * limit;
     }
 
     // Construct Prisma where filters using AND array to support multiple active criteria

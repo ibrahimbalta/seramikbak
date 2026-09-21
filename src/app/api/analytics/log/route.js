@@ -64,26 +64,40 @@ export async function POST(request) {
       }
     });
 
-    // 2. Click counting & Pay-Per-Click budget subtraction logic
+    // 2. Click counting & Pay-Per-Click budget subtraction logic (ATOMIC CONCURRENCY FIX)
     if (action === 'CLICK' && campaign) {
-      const updateData = {
-        clicks: { increment: 1 }
-      };
+      if (campaign.bidAmount && campaign.bidAmount > 0) {
+        // Atomic update: only decrement if budget is sufficient
+        await prisma.adCampaign.updateMany({
+          where: {
+            id: campaign.id,
+            budget: { gte: campaign.bidAmount }
+          },
+          data: {
+            clicks: { increment: 1 },
+            budget: { decrement: campaign.bidAmount }
+          }
+        });
 
-      if (campaign.bidAmount && campaign.bidAmount > 0 && campaign.budget > 0) {
-        const newBudget = Math.max(0, campaign.budget - campaign.bidAmount);
-        updateData.budget = newBudget;
-        if (newBudget <= 0) {
-          updateData.status = 'COMPLETED';
-        }
+        // Auto-complete exhausted campaigns
+        await prisma.adCampaign.updateMany({
+          where: {
+            id: campaign.id,
+            budget: { lte: 0 },
+            status: 'ACTIVE'
+          },
+          data: {
+            status: 'COMPLETED'
+          }
+        });
+      } else {
+        await prisma.adCampaign.update({
+          where: { id: campaign.id },
+          data: { clicks: { increment: 1 } }
+        });
       }
 
-      await prisma.adCampaign.update({
-        where: { id: campaign.id },
-        data: updateData
-      });
-
-      console.log(`[Campaign Click] Incremented clicks for campaign ${campaign.id}.`);
+      console.log(`[Campaign Click] Atomically incremented clicks for campaign ${campaign.id}.`);
     } 
     
     // 3. Impression counting logic

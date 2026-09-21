@@ -3,9 +3,21 @@ import prisma from '@/lib/prisma';
 import { verifyPassword, hashPassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { encryptSession } from '@/lib/session';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request) {
   try {
+    // Brute-force protection: Max 20 login attempts per IP per 15 minutes
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`login_${clientIp}`, 20, 15 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      const waitMinutes = Math.ceil(rateCheck.resetInMs / 60000);
+      return NextResponse.json(
+        { error: `Çok fazla başarısız giriş denemesi. Lütfen ${waitMinutes} dakika sonra tekrar deneyin.` },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { email, password, username, role } = body;
 

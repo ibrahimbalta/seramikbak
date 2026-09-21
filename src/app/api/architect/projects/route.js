@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // GET: List all projects of an architect with their products
 export async function GET(request) {
   try {
+    const session = await verifyAuth(request);
+    if (!session || (session.role !== 'architect' && session.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen mimar girişi yapınız.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-    const architectId = searchParams.get('architectId');
+    // Anti-IDOR: Architects can only see their own projects. Admin can query by query param.
+    const architectId = session.role === 'architect' ? session.id : (searchParams.get('architectId') || session.id);
 
     if (!architectId) {
       return NextResponse.json({ error: 'architectId gerekli.' }, { status: 400 });
@@ -38,8 +45,14 @@ export async function GET(request) {
 // POST: Create a new project or add/remove an item
 export async function POST(request) {
   try {
+    const session = await verifyAuth(request);
+    if (!session || (session.role !== 'architect' && session.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen mimar girişi yapınız.' }, { status: 401 });
+    }
+
     const body = await request.json();
-    const { action, architectId, title, projectType, city, totalAreaM2, notes, projectId, productId, usageArea, areaM2, itemId, status } = body;
+    const { action, title, projectType, city, totalAreaM2, notes, projectId, productId, usageArea, areaM2, itemId, status } = body;
+    const architectId = session.role === 'architect' ? session.id : (body.architectId || session.id);
 
     // 1. Create New Project
     if (action === 'create_project') {
@@ -80,6 +93,14 @@ export async function POST(request) {
         return NextResponse.json({ error: 'projectId ve productId zorunludur.' }, { status: 400 });
       }
 
+      // Verify project ownership
+      const project = await prisma.architectProject.findFirst({
+        where: session.role === 'admin' ? { id: projectId } : { id: projectId, architectId: session.id }
+      });
+      if (!project) {
+        return NextResponse.json({ error: 'Proje bulunamadı veya yetkiniz yok.' }, { status: 403 });
+      }
+
       const item = await prisma.architectProjectItem.create({
         data: {
           projectId,
@@ -110,6 +131,15 @@ export async function POST(request) {
         return NextResponse.json({ error: 'itemId zorunludur.' }, { status: 400 });
       }
 
+      const item = await prisma.architectProjectItem.findFirst({
+        where: { id: itemId },
+        include: { project: true }
+      });
+
+      if (!item || (session.role !== 'admin' && item.project.architectId !== session.id)) {
+        return NextResponse.json({ error: 'Ürün bulunamadı veya yetkiniz yok.' }, { status: 403 });
+      }
+
       await prisma.architectProjectItem.delete({
         where: { id: itemId }
       });
@@ -121,6 +151,13 @@ export async function POST(request) {
     if (action === 'update_project') {
       if (!projectId) {
         return NextResponse.json({ error: 'projectId zorunludur.' }, { status: 400 });
+      }
+
+      const project = await prisma.architectProject.findFirst({
+        where: session.role === 'admin' ? { id: projectId } : { id: projectId, architectId: session.id }
+      });
+      if (!project) {
+        return NextResponse.json({ error: 'Proje bulunamadı veya yetkiniz yok.' }, { status: 403 });
       }
 
       const updateData = {};
@@ -142,6 +179,13 @@ export async function POST(request) {
     if (action === 'delete_project') {
       if (!projectId) {
         return NextResponse.json({ error: 'projectId zorunludur.' }, { status: 400 });
+      }
+
+      const project = await prisma.architectProject.findFirst({
+        where: session.role === 'admin' ? { id: projectId } : { id: projectId, architectId: session.id }
+      });
+      if (!project) {
+        return NextResponse.json({ error: 'Proje bulunamadı veya yetkiniz yok.' }, { status: 403 });
       }
 
       await prisma.architectProject.delete({

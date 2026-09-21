@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 export async function GET(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const campaigns = await prisma.adCampaign.findMany({
       include: {
         brand: {
@@ -24,6 +30,11 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { campaignId, action } = body;
 

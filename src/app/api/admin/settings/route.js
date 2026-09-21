@@ -1,8 +1,20 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
-export async function GET() {
+function maskKey(key) {
+  if (!key || typeof key !== 'string') return '';
+  if (key.length <= 8) return '********';
+  return `${key.slice(0, 4)}...${key.slice(-4)}`;
+}
+
+export async function GET(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const settings = await prisma.systemSetting.findMany();
     
     // Map array to key-value object
@@ -15,10 +27,14 @@ export async function GET() {
       bank_name: settingsMap['bank_name'] || 'Akbank',
       bank_recipient: settingsMap['bank_recipient'] || 'SeramikBak Yazılım A.Ş.',
       bank_iban: settingsMap['bank_iban'] || 'TR98 0004 6001 5000 1234 5678 90',
-      deepseek_api_key: settingsMap['deepseek_api_key'] || '',
-      grok_api_key: settingsMap['grok_api_key'] || '',
-      gemini_api_key: settingsMap['gemini_api_key'] || '',
-      scraping_api_key: settingsMap['scraping_api_key'] || '',
+      deepseek_api_key: settingsMap['deepseek_api_key'] ? maskKey(settingsMap['deepseek_api_key']) : '',
+      grok_api_key: settingsMap['grok_api_key'] ? maskKey(settingsMap['grok_api_key']) : '',
+      gemini_api_key: settingsMap['gemini_api_key'] ? maskKey(settingsMap['gemini_api_key']) : '',
+      scraping_api_key: settingsMap['scraping_api_key'] ? maskKey(settingsMap['scraping_api_key']) : '',
+      has_deepseek_key: Boolean(settingsMap['deepseek_api_key']),
+      has_grok_key: Boolean(settingsMap['grok_api_key']),
+      has_gemini_key: Boolean(settingsMap['gemini_api_key']),
+      has_scraping_key: Boolean(settingsMap['scraping_api_key']),
       ai_provider: settingsMap['ai_provider'] || 'deepseek',
       
       // Page contents loaded from database or null (so default fallbacks are used)
@@ -37,6 +53,11 @@ export async function GET() {
 
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { 
       bank_name, 
@@ -74,6 +95,12 @@ export async function POST(request) {
 
     for (const item of settingsToUpdate) {
       if (item.value !== undefined && item.value !== null) {
+        // If an API key is sent as a masked string (e.g. sk-a...1234 or ********), do not overwrite existing DB key
+        const isKeyField = item.key.endsWith('_api_key');
+        if (isKeyField && (String(item.value).includes('...') || String(item.value).includes('****') || String(item.value).trim() === '')) {
+          continue; // keep existing value in DB
+        }
+
         await prisma.systemSetting.upsert({
           where: { key: item.key },
           update: { value: String(item.value) },

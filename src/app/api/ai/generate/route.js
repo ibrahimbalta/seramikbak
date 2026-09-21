@@ -1,8 +1,19 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request) {
   try {
+    // Image Generation Rate Limit: Max 8 requests per minute per IP
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`ai_gen_${clientIp}`, 8, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json({
+        success: false,
+        error: 'Görsel üretim istek sınırına ulaştınız. Lütfen 1 dakika sonra tekrar deneyiniz.'
+      }, { status: 429 });
+    }
+
     const body = await request.json();
     const { prompt } = body;
 

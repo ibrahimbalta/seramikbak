@@ -5,16 +5,34 @@ import path from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { uploadImage } from '@/lib/cloudinary';
+import { verifyAuth } from '@/lib/auth-check';
 
 const execAsync = promisify(exec);
 
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file');
 
     if (!file) {
       return NextResponse.json({ success: false, error: 'Lütfen bir ZIP dosyası yükleyin.' }, { status: 400 });
+    }
+
+    // 1. File Extension & MIME validation
+    const fileExt = path.extname(file.name || '').toLowerCase();
+    if (fileExt !== '.zip') {
+      return NextResponse.json({ success: false, error: 'Yalnızca .zip uzantılı arşiv dosyaları yüklenebilir.' }, { status: 400 });
+    }
+
+    // 2. File Size Limit (Max 50MB to prevent ZIP bomb / disk exhaustion)
+    const MAX_ZIP_SIZE = 50 * 1024 * 1024; // 50MB
+    if (file.size > MAX_ZIP_SIZE) {
+      return NextResponse.json({ success: false, error: 'ZIP dosyası boyutu maksimum 50MB olabilir.' }, { status: 413 });
     }
 
     const logs = [];

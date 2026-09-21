@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // Helper to determine the best Gemini model name
 async function getBestGeminiModel(apiKey) {
@@ -46,6 +47,11 @@ export async function POST(request) {
   const logs = [];
   let importedCount = 0;
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { brandId, pdfData, defaultStyle } = body;
 

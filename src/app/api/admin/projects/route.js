@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // GET: Fetch all project requests for admin
-export async function GET() {
+export async function GET(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const projects = await prisma.projectRequest.findMany({
       orderBy: { createdAt: 'desc' }
     });
@@ -23,6 +29,11 @@ export async function GET() {
 // POST: Update project status or edit details
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { id, status } = body;
 
