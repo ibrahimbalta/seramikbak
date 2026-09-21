@@ -387,22 +387,14 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
       : (product.imageUrl || product.textureUrl || getTextureFallback(product));
 
   return (
-    <div style={{ minHeight: '100vh', background: '#080b11', color: '#f8fafc', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#080b11', color: '#f8fafc', fontFamily: 'system-ui, -apple-system, sans-serif', width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
       
-      {/* Top Header / Breadcrumb */}
-      <header style={{
-        borderBottom: '1px solid rgba(255, 255, 255, 0.07)',
-        background: 'rgba(8, 11, 17, 0.85)',
-        backdropFilter: 'blur(16px)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 40,
-        padding: '12px 20px'
-      }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+      {/* Top Header / Breadcrumb & Mobile App Bar */}
+      <header className="product-page-header">
+        <div className="product-header-inner">
           
-          {/* Breadcrumb Path */}
-          <nav aria-label="Breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#94a3b8' }}>
+          {/* Breadcrumb Path - Desktop */}
+          <nav aria-label="Breadcrumb" className="desktop-breadcrumb">
             <Link 
               href="/" 
               style={{ 
@@ -435,27 +427,26 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
             </span>
           </nav>
 
+          {/* Mobile App Bar Title */}
+          <div className="mobile-app-bar-title">
+            <Link href="/" className="mobile-back-icon-btn" title="Geri Dön">
+              <ArrowLeft size={18} />
+            </Link>
+            <div className="mobile-title-text">
+              <span className="mobile-brand-label">{brandName}</span>
+              <span className="mobile-product-label">{product.name}</span>
+            </div>
+          </div>
+
           {/* Quick Actions (Share / Copy) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="product-header-actions">
             <button
               onClick={handleCopyLink}
               title="Ürün bağlantısını kopyala"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(255, 255, 255, 0.04)',
-                color: copied ? '#34d399' : '#cbd5e1',
-                border: copied ? '1px solid rgba(52, 211, 153, 0.3)' : '1px solid rgba(255, 255, 255, 0.08)',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                fontSize: '0.78rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
+              className="btn-header-copy"
             >
-              {copied ? <Check size={13} /> : <Copy size={13} />}
-              <span>{copied ? 'Kopyalandı' : 'Linki Kopyala'}</span>
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+              <span className="action-btn-text">{copied ? 'Kopyalandı' : 'Linki Kopyala'}</span>
             </button>
 
             <a
@@ -463,24 +454,10 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               target="_blank"
               rel="noopener noreferrer"
               title="WhatsApp üzerinden bayiye veya mimara ilet"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(37, 211, 102, 0.1)',
-                color: '#25d366',
-                border: '1px solid rgba(37, 211, 102, 0.25)',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                fontSize: '0.78rem',
-                fontWeight: '600',
-                textDecoration: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
+              className="btn-header-wa"
             >
-              <Share2 size={13} />
-              <span>WhatsApp</span>
+              <Share2 size={14} />
+              <span className="action-btn-text">WhatsApp</span>
             </a>
           </div>
 
@@ -499,19 +476,10 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
         }}>
           
           {/* Left Column: Architectural Presentation Stage */}
-          <div>
-            <div style={{
-              position: 'relative',
-              borderRadius: '24px',
-              overflow: 'hidden',
-              background: 'radial-gradient(ellipse at 50% 40%, rgba(30, 48, 40, 0.45) 0%, rgba(13, 20, 32, 0.75) 45%, #070a10 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+          <div className="product-stage-column">
+            <div className="product-stage-card" style={{
               aspectRatio: isSquareTile ? '1 / 1' : '4 / 5',
-              maxHeight: isSquareTile ? '580px' : '620px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              maxHeight: isSquareTile ? '580px' : '620px'
             }}>
               {/* Product Image or Photorealistic 3D Room Render */}
               <img
@@ -524,12 +492,10 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                     e.currentTarget.src = fallback;
                   }
                 }}
+                className="product-stage-img"
                 style={{
-                  width: '100%',
-                  height: '100%',
                   objectFit: activeView === 'image' ? 'contain' : 'cover',
-                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                  padding: activeView === 'image' ? (isSquareTile ? '20px' : '28px') : '0'
+                  padding: activeView === 'image' ? (isSquareTile ? '16px' : '24px') : '0'
                 }}
               />
 
@@ -545,39 +511,13 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
               )}
 
               {/* Minimal Badges Overlay (Top Left) */}
-              <div style={{ position: 'absolute', top: '18px', left: '18px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 15 }}>
-                <span style={{
-                  background: 'rgba(7, 10, 16, 0.85)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(212, 175, 55, 0.3)',
-                  color: '#e2e8f0',
-                  fontSize: '0.72rem',
-                  fontWeight: '700',
-                  padding: '5px 12px',
-                  borderRadius: '9999px',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d4af37', display: 'inline-block' }} />
+              <div className="product-stage-badges">
+                <span className="badge-stage-brand">
+                  <span className="badge-dot" />
                   {brandName}
                 </span>
 
-                <span style={{
-                  background: 'rgba(212, 175, 55, 0.12)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(212, 175, 55, 0.35)',
-                  color: '#f3d375',
-                  fontSize: '0.7rem',
-                  fontWeight: '600',
-                  padding: '5px 12px',
-                  borderRadius: '9999px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px'
-                }}>
+                <span className="badge-stage-finish">
                   <Sparkles size={11} style={{ color: '#d4af37' }} />
                   <span>{product.finish || 'Full Lappato'}</span>
                 </span>
@@ -588,211 +528,77 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 <button
                   onClick={() => setShowImageZoom(true)}
                   title="Büyük boyutta incele"
-                  style={{
-                    position: 'absolute',
-                    top: '18px',
-                    right: '18px',
-                    background: 'rgba(7, 10, 16, 0.85)',
-                    backdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    color: '#e2e8f0',
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    zIndex: 15
-                  }}
+                  className="btn-stage-zoom"
                 >
-                  <Maximize2 size={15} />
+                  <Maximize2 size={14} />
                 </button>
               )}
 
               {/* Perspective Room Watermark Overlay when in 'room' mode */}
               {activeView === 'room' && (
-                <div style={{
-                  position: 'absolute',
-                  top: '14px',
-                  left: '14px',
-                  right: '14px',
-                  background: 'rgba(9, 13, 22, 0.9)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(212, 175, 55, 0.35)',
-                  padding: '8px 14px',
-                  borderRadius: '12px',
-                  fontSize: '0.74rem',
-                  color: '#f1f5f9',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '8px',
-                  zIndex: 20
-                }}>
+                <div className="perspective-room-watermark">
                   <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Sparkles size={13} style={{ color: '#d4af37' }} />
-                    <span><strong>{product.name} ({productDimensions})</strong> Birebir 3D Tasarım Simülasyonu</span>
+                    <span><strong>{product.name} ({productDimensions})</strong> 3D Simülasyon</span>
                   </span>
 
                   <button
                     onClick={() => setShowAIRemodel(true)}
-                    style={{
-                      background: 'rgba(212, 175, 55, 0.15)',
-                      border: '1px solid rgba(212, 175, 55, 0.4)',
-                      color: '#f3d375',
-                      fontWeight: '700',
-                      cursor: 'pointer',
-                      fontSize: '0.72rem',
-                      padding: '4px 10px',
-                      borderRadius: '8px',
-                      transition: 'all 0.15s ease'
-                    }}
+                    className="btn-room-remodel-inline"
                   >
-                    Kendi Evinde Dene (Fotoğraf Yükle) →
+                    Evinde Dene →
                   </button>
                 </div>
               )}
 
               {/* View Switcher: Segmented Pill (Bottom Floating) */}
-              <div style={{
-                position: 'absolute',
-                bottom: '18px',
-                display: 'flex',
-                background: 'rgba(7, 10, 16, 0.9)',
-                backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255, 255, 255, 0.14)',
-                borderRadius: '9999px',
-                padding: '4px',
-                gap: '4px',
-                zIndex: 20,
-                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)'
-              }}>
+              <div className="product-stage-view-switcher">
                 <button
                   onClick={() => setActiveView('image')}
-                  style={{
-                    background: activeView === 'image' ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.1) 100%)' : 'transparent',
-                    color: activeView === 'image' ? '#ffffff' : '#94a3b8',
-                    border: activeView === 'image' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid transparent',
-                    padding: '6px 14px',
-                    borderRadius: '9999px',
-                    fontSize: '0.74rem',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px'
-                  }}
+                  className={`btn-view-tab ${activeView === 'image' ? 'active' : ''}`}
                 >
-                  <Layers size={13} style={{ color: activeView === 'image' ? '#d4af37' : '#94a3b8' }} />
+                  <Layers size={13} />
                   <span>Plaka ({tileWidth}×{tileHeight})</span>
                 </button>
 
                 {product.textureUrl && (
                   <button
                     onClick={() => setActiveView('texture')}
-                    style={{
-                      background: activeView === 'texture' ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.1) 100%)' : 'transparent',
-                      color: activeView === 'texture' ? '#ffffff' : '#94a3b8',
-                      border: activeView === 'texture' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid transparent',
-                      padding: '6px 14px',
-                      borderRadius: '9999px',
-                      fontSize: '0.74rem',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '5px'
-                    }}
+                    className={`btn-view-tab ${activeView === 'texture' ? 'active' : ''}`}
                   >
-                    <Eye size={13} style={{ color: activeView === 'texture' ? '#d4af37' : '#94a3b8' }} />
+                    <Eye size={13} />
                     <span>4K Doku</span>
                   </button>
                 )}
 
                 <button
                   onClick={handleSelectRoomView}
-                  style={{
-                    background: activeView === 'room' ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.1) 100%)' : 'transparent',
-                    color: activeView === 'room' ? '#ffffff' : '#94a3b8',
-                    border: activeView === 'room' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid transparent',
-                    padding: '6px 14px',
-                    borderRadius: '9999px',
-                    fontSize: '0.74rem',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px'
-                  }}
+                  className={`btn-view-tab ${activeView === 'room' ? 'active' : ''}`}
                 >
-                  <Sparkles size={13} style={{ color: activeView === 'room' ? '#d4af37' : '#94a3b8' }} />
+                  <Sparkles size={13} />
                   <span>3D Tasarım</span>
                 </button>
               </div>
             </div>
 
             {/* Architectural Under-Stage Specifications Ribbon */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '10px',
-              marginTop: '16px',
-              textAlign: 'center'
-            }}>
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.55)',
-                border: '1px solid rgba(255, 255, 255, 0.07)',
-                borderRadius: '14px',
-                padding: '12px 10px'
-              }}>
-                <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
-                  Plaka Alanı
-                </div>
-                <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#ffffff' }}>
-                  {tileAreaM2} m²
-                </div>
-                <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
-                  Tek Karo ({tileWidth}×{tileHeight} cm)
-                </div>
+            <div className="product-understage-specs">
+              <div className="understage-spec-box">
+                <div className="spec-box-label">Plaka Alanı</div>
+                <div className="spec-box-val val-white">{tileAreaM2} m²</div>
+                <div className="spec-box-sub">Tek Karo ({tileWidth}×{tileHeight})</div>
               </div>
 
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.55)',
-                border: '1px solid rgba(255, 255, 255, 0.07)',
-                borderRadius: '14px',
-                padding: '12px 10px'
-              }}>
-                <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
-                  Kalite Sınıfı
-                </div>
-                <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#34d399' }}>
-                  1. Sınıf Porselen
-                </div>
-                <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
-                  TSE EN 14411
-                </div>
+              <div className="understage-spec-box">
+                <div className="spec-box-label">Kalite Sınıfı</div>
+                <div className="spec-box-val val-green">1. Sınıf</div>
+                <div className="spec-box-sub">TSE EN 14411</div>
               </div>
 
-              <div style={{
-                background: 'rgba(15, 23, 42, 0.55)',
-                border: '1px solid rgba(255, 255, 255, 0.07)',
-                borderRadius: '14px',
-                padding: '12px 10px'
-              }}>
-                <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
-                  Kenar Bitişi
-                </div>
-                <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#f3d375' }}>
-                  {product.rectified ? 'Lazer Rektifiye' : 'Rektifiyeli Kesim'}
-                </div>
-                <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
-                  {product.rectified ? '1 mm Sıfır Derz' : 'Hassas Derz'}
-                </div>
+              <div className="understage-spec-box">
+                <div className="spec-box-label">Kenar Bitişi</div>
+                <div className="spec-box-val val-gold">{product.rectified ? 'Rektifiye' : 'Derzli'}</div>
+                <div className="spec-box-sub">{product.rectified ? '1mm Derz' : 'Hassas'}</div>
               </div>
             </div>
           </div>
@@ -1007,28 +813,13 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 Banyonuzun veya salonunuzun bir fotoğrafını yükleyin. Yapay zeka motorumuz küvet, lavabo ve mobilyalarınıza dokunmadan bu seramiği mimari 3D render kalitesinde odanıza döşesin.
               </p>
 
-              {/* Dual Action Buttons */}
-              <div className="ai-remodel-btn-grid" style={{ display: 'grid', gridTemplateColumns: '1.3fr 0.9fr', gap: '10px' }}>
+              {/* Dual Action Buttons - Symmetrical on Mobile */}
+              <div className="ai-remodel-btn-grid">
                 <button
                   onClick={() => setShowAIRemodel(true)}
-                  style={{
-                    background: 'linear-gradient(135deg, #f5d77f 0%, #d4af37 50%, #aa7c11 100%)',
-                    color: '#070a10',
-                    border: 'none',
-                    borderRadius: '12px',
-                    padding: '12px 18px',
-                    fontSize: '0.86rem',
-                    fontWeight: '800',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    boxShadow: '0 6px 20px -2px rgba(212, 175, 55, 0.4)',
-                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
-                  }}
+                  className="btn-ai-remodel-primary"
                 >
-                  <Sparkles size={16} />
+                  <Sparkles size={15} style={{ flexShrink: 0 }} />
                   <span>Fotoğraf Yükle & Gör</span>
                 </button>
 
@@ -1037,37 +828,16 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                     setActiveView('room');
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  style={{
-                    background: activeView === 'room' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                    color: '#f1f5f9',
-                    border: activeView === 'room' ? '1px solid rgba(212, 175, 55, 0.4)' : '1px solid rgba(255, 255, 255, 0.14)',
-                    borderRadius: '12px',
-                    padding: '12px 16px',
-                    fontSize: '0.84rem',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '7px',
-                    transition: 'all 0.2s ease'
-                  }}
+                  className={`btn-ai-remodel-secondary ${activeView === 'room' ? 'active' : ''}`}
                 >
-                  <Eye size={15} style={{ color: '#d4af37' }} />
+                  <Eye size={15} style={{ color: '#d4af37', flexShrink: 0 }} />
                   <span>3D Tasarımda Gör</span>
                 </button>
               </div>
             </div>
 
             {/* Haute-Couture Conversion Suite (Teklif & Numune) */}
-            <div style={{
-              background: 'rgba(13, 18, 30, 0.75)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '20px',
-              padding: '24px',
-              marginBottom: '24px',
-              boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.6)'
-            }}>
+            <div className="product-conversion-card">
               {/* Status Header */}
               <div style={{
                 display: 'flex',
@@ -1103,62 +873,31 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 </span>
               </div>
 
-              {/* Primary Dual Actions (Teklif Al & Numune İste) */}
-              <div className="product-conversion-btn-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-                <div>
+              {/* Primary Dual Actions (Teklif Al & Numune İste) - Symmetrical on Mobile */}
+              <div className="product-conversion-btn-grid">
+                <div className="conversion-btn-col">
                   <button
                     onClick={() => setShowQuoteModal(true)}
-                    style={{
-                      width: '100%',
-                      background: 'linear-gradient(135deg, #d4af37 0%, #b8860b 100%)',
-                      color: '#070a10',
-                      border: 'none',
-                      borderRadius: '12px',
-                      padding: '14px 18px',
-                      fontSize: '0.9rem',
-                      fontWeight: '800',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      boxShadow: '0 6px 20px -2px rgba(212, 175, 55, 0.35)',
-                      transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
-                    }}
+                    className="btn-conversion-quote"
                   >
-                    <Send size={16} />
+                    <Send size={15} style={{ flexShrink: 0 }} />
                     <span>Teklif Talebi Al</span>
                   </button>
-                  <div style={{ fontSize: '0.7rem', color: '#64748b', textAlign: 'center', marginTop: '6px' }}>
+                  <div className="conversion-sub-note">
                     Metrajınıza özel bayi fiyatı
                   </div>
                 </div>
 
-                <div>
+                <div className="conversion-btn-col">
                   <button
                     onClick={() => setShowSampleModal(true)}
-                    style={{
-                      width: '100%',
-                      background: 'rgba(255, 255, 255, 0.04)',
-                      color: '#f8fafc',
-                      border: '1px solid rgba(255, 255, 255, 0.14)',
-                      borderRadius: '12px',
-                      padding: '14px 18px',
-                      fontSize: '0.9rem',
-                      fontWeight: '700',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      transition: 'all 0.2s ease'
-                    }}
+                    className="btn-conversion-sample"
                   >
-                    <Box size={16} style={{ color: '#d4af37' }} />
+                    <Box size={15} style={{ color: '#d4af37', flexShrink: 0 }} />
                     <span>15×15 Numune İste</span>
                   </button>
-                  <div style={{ fontSize: '0.7rem', color: '#64748b', textAlign: 'center', marginTop: '6px' }}>
-                    Özel kargo kutusuyla adrese teslim
+                  <div className="conversion-sub-note">
+                    Özel kargo ile adrese teslim
                   </div>
                 </div>
               </div>
@@ -1966,31 +1705,642 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
         />
       )}
 
+      {/* Mobile Sticky Bottom Action Bar (Native Mobile App Experience) */}
+      <div className="mobile-sticky-bar">
+        <div style={{ minWidth: 0, flex: 1, paddingRight: '8px' }}>
+          <div style={{ fontSize: '0.66rem', color: '#d4af37', fontWeight: '700', textTransform: 'uppercase', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '0.04em' }}>
+            {brandName}
+          </div>
+          <div style={{ fontSize: '0.84rem', fontWeight: '800', color: '#ffffff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {product.name}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mobile-sticky-wa-btn"
+            title="WhatsApp İle Sor"
+          >
+            <Share2 size={16} />
+          </a>
+
+          <button
+            onClick={() => setShowQuoteModal(true)}
+            className="mobile-sticky-quote-btn"
+          >
+            <Send size={14} />
+            <span>Teklif Al</span>
+          </button>
+        </div>
+      </div>
+
       <style jsx>{`
+        /* Header Bar */
+        .product-page-header {
+          border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+          background: rgba(8, 11, 17, 0.92);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          position: sticky;
+          top: 0;
+          z-index: 40;
+          padding: 12px 20px;
+        }
+
+        .product-header-inner {
+          max-width: 1280px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .desktop-breadcrumb {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.82rem;
+          color: #94a3b8;
+        }
+
+        .mobile-app-bar-title {
+          display: none;
+        }
+
+        .product-header-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .btn-header-copy {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(255, 255, 255, 0.04);
+          color: #cbd5e1;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 6px 14px;
+          border-radius: 9999px;
+          font-size: 0.78rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .btn-header-wa {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(37, 211, 102, 0.1);
+          color: #25d366;
+          border: 1px solid rgba(37, 211, 102, 0.25);
+          padding: 6px 14px;
+          border-radius: 9999px;
+          font-size: 0.78rem;
+          font-weight: 600;
+          text-decoration: none;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        /* Presentation Stage */
+        .product-stage-card {
+          position: relative;
+          border-radius: 24px;
+          overflow: hidden;
+          background: radial-gradient(ellipse at 50% 40%, rgba(30, 48, 40, 0.45) 0%, rgba(13, 20, 32, 0.75) 45%, #070a10 100%);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .product-stage-img {
+          width: 100%;
+          height: 100%;
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .product-stage-badges {
+          position: absolute;
+          top: 16px;
+          left: 16px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          z-index: 15;
+        }
+
+        .badge-stage-brand {
+          background: rgba(7, 10, 16, 0.85);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          color: #e2e8f0;
+          font-size: 0.72rem;
+          font-weight: 700;
+          padding: 5px 12px;
+          border-radius: 9999px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .badge-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #d4af37;
+          display: inline-block;
+        }
+
+        .badge-stage-finish {
+          background: rgba(212, 175, 55, 0.12);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          color: #f3d375;
+          font-size: 0.7rem;
+          font-weight: 600;
+          padding: 5px 12px;
+          border-radius: 9999px;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+        }
+
+        .btn-stage-zoom {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          background: rgba(7, 10, 16, 0.85);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #e2e8f0;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+          z-index: 15;
+        }
+
+        .perspective-room-watermark {
+          position: absolute;
+          top: 14px;
+          left: 14px;
+          right: 14px;
+          background: rgba(9, 13, 22, 0.9);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          padding: 8px 14px;
+          border-radius: 12px;
+          font-size: 0.74rem;
+          color: #f1f5f9;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          z-index: 20;
+        }
+
+        .btn-room-remodel-inline {
+          background: rgba(212, 175, 55, 0.15);
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          color: #f3d375;
+          font-weight: 700;
+          cursor: pointer;
+          font-size: 0.72rem;
+          padding: 4px 10px;
+          border-radius: 8px;
+          white-space: nowrap;
+        }
+
+        .product-stage-view-switcher {
+          position: absolute;
+          bottom: 16px;
+          display: flex;
+          background: rgba(7, 10, 16, 0.92);
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          border-radius: 9999px;
+          padding: 4px;
+          gap: 4px;
+          z-index: 20;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+          max-width: calc(100% - 24px);
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+        .product-stage-view-switcher::-webkit-scrollbar {
+          display: none;
+        }
+
+        .btn-view-tab {
+          background: transparent;
+          color: #94a3b8;
+          border: 1px solid transparent;
+          padding: 6px 13px;
+          border-radius: 9999px;
+          font-size: 0.74rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        .btn-view-tab.active {
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.1) 100%);
+          color: #ffffff;
+          border-color: rgba(212, 175, 55, 0.4);
+        }
+
+        /* Understage Specs */
+        .product-understage-specs {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+          margin-top: 14px;
+          text-align: center;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .understage-spec-box {
+          background: rgba(15, 23, 42, 0.55);
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-radius: 12px;
+          padding: 10px 8px;
+          min-width: 0;
+          overflow: hidden;
+          box-sizing: border-box;
+        }
+
+        .spec-box-label {
+          font-size: 0.67rem;
+          color: #94a3b8;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin-bottom: 3px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .spec-box-val {
+          font-size: 0.88rem;
+          font-weight: 800;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .val-white { color: #ffffff; }
+        .val-green { color: #34d399; }
+        .val-gold { color: #f3d375; }
+
+        .spec-box-sub {
+          font-size: 0.65rem;
+          color: #64748b;
+          margin-top: 2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        /* AI Buttons */
+        .ai-remodel-btn-grid {
+          display: grid;
+          grid-template-columns: 1.3fr 0.9fr;
+          gap: 10px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .btn-ai-remodel-primary {
+          background: linear-gradient(135deg, #f5d77f 0%, #d4af37 50%, #aa7c11 100%);
+          color: #070a10;
+          border: none;
+          border-radius: 12px;
+          padding: 11px 14px;
+          font-size: 0.82rem;
+          font-weight: 850;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          box-shadow: 0 4px 16px rgba(212, 175, 55, 0.35);
+          transition: all 0.15s ease;
+          min-width: 0;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .btn-ai-remodel-secondary {
+          background: rgba(255, 255, 255, 0.04);
+          color: #f1f5f9;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          border-radius: 12px;
+          padding: 11px 14px;
+          font-size: 0.82rem;
+          font-weight: 700;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          transition: all 0.15s ease;
+          min-width: 0;
+          width: 100%;
+          box-sizing: border-box;
+        }
+        .btn-ai-remodel-secondary.active {
+          background: rgba(212, 175, 55, 0.2);
+          border-color: rgba(212, 175, 55, 0.4);
+        }
+
+        /* Conversion Suite */
+        .product-conversion-card {
+          background: rgba(13, 18, 30, 0.75);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 20px;
+          padding: 22px;
+          margin-bottom: 22px;
+          box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+        }
+
+        .product-conversion-btn-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          margin-bottom: 14px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .conversion-btn-col {
+          min-width: 0;
+          width: 100%;
+        }
+
+        .btn-conversion-quote {
+          width: 100%;
+          background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+          color: #070a10;
+          border: none;
+          border-radius: 12px;
+          padding: 12px 10px;
+          font-size: 0.84rem;
+          font-weight: 850;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3);
+          transition: all 0.15s ease;
+          min-width: 0;
+          box-sizing: border-box;
+          white-space: nowrap;
+        }
+
+        .btn-conversion-sample {
+          width: 100%;
+          background: rgba(255, 255, 255, 0.05);
+          color: #f8fafc;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          border-radius: 12px;
+          padding: 12px 10px;
+          font-size: 0.84rem;
+          font-weight: 750;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          transition: all 0.15s ease;
+          min-width: 0;
+          box-sizing: border-box;
+          white-space: nowrap;
+        }
+
+        .conversion-sub-note {
+          font-size: 0.68rem;
+          color: #64748b;
+          text-align: center;
+          margin-top: 5px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .mobile-sticky-bar {
+          display: none;
+        }
+
+        /* ---------------- MOBILE RESPONSIVE OVERRIDES (NATIVE APP STYLE) ---------------- */
         @media (max-width: 768px) {
+          .product-page-header {
+            padding: 8px 12px !important;
+          }
+
+          .desktop-breadcrumb {
+            display: none !important;
+          }
+
+          .mobile-app-bar-title {
+            display: flex !important;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+          }
+
+          .mobile-back-icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            flex-shrink: 0;
+          }
+
+          .mobile-title-text {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+          }
+
+          .mobile-brand-label {
+            font-size: 0.65rem;
+            color: #d4af37;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            line-height: 1.1;
+          }
+
+          .mobile-product-label {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+          }
+
+          .product-header-actions .action-btn-text {
+            display: none !important;
+          }
+
+          .btn-header-copy,
+          .btn-header-wa {
+            padding: 7px !important;
+            border-radius: 8px !important;
+          }
+
           :global(.product-detail-main) {
-            padding: 16px 12px 90px !important;
+            padding: 12px 10px 100px !important;
           }
+
           :global(.product-hero-grid) {
-            grid-template-columns: 1fr !important;
-            gap: 24px !important;
+            grid-template-columns: 100% !important;
+            gap: 20px !important;
+            width: 100% !important;
           }
+
+          .product-stage-card {
+            aspect-ratio: 1 / 1 !important;
+            max-height: 360px !important;
+            border-radius: 18px !important;
+          }
+
+          .product-stage-badges {
+            top: 10px !important;
+            left: 10px !important;
+            gap: 6px !important;
+          }
+
+          .badge-stage-brand,
+          .badge-stage-finish {
+            padding: 4px 8px !important;
+            font-size: 0.65rem !important;
+          }
+
+          .btn-stage-zoom {
+            top: 10px !important;
+            right: 10px !important;
+            width: 32px !important;
+            height: 32px !important;
+          }
+
+          .product-stage-view-switcher {
+            bottom: 10px !important;
+            padding: 3px !important;
+            gap: 3px !important;
+          }
+
+          .btn-view-tab {
+            padding: 5px 9px !important;
+            font-size: 0.7rem !important;
+          }
+
+          .product-understage-specs {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 6px !important;
+            margin-top: 10px !important;
+          }
+
+          .understage-spec-box {
+            padding: 8px 4px !important;
+            border-radius: 10px !important;
+          }
+
+          .spec-box-label {
+            font-size: 0.62rem !important;
+          }
+
+          .spec-box-val {
+            font-size: 0.8rem !important;
+          }
+
+          .spec-box-sub {
+            font-size: 0.6rem !important;
+          }
+
           :global(.product-title) {
-            font-size: 1.55rem !important;
-            line-height: 1.2 !important;
+            font-size: 1.4rem !important;
+            line-height: 1.25 !important;
+            margin-bottom: 6px !important;
           }
+
           :global(.product-specs-grid) {
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 6px !important;
+            margin-bottom: 18px !important;
           }
-          :global(.ai-remodel-btn-grid) {
-            grid-template-columns: 1fr !important;
+
+          /* AI Box & Buttons on Mobile: Perfectly Symmetrical 50-50 */
+          .ai-remodel-btn-grid {
+            grid-template-columns: 1fr 1fr !important;
             gap: 8px !important;
           }
-          :global(.product-conversion-btn-grid) {
-            grid-template-columns: 1fr !important;
-            gap: 10px !important;
+
+          .btn-ai-remodel-primary,
+          .btn-ai-remodel-secondary {
+            padding: 10px 6px !important;
+            font-size: 0.76rem !important;
+            border-radius: 10px !important;
+            min-height: 42px !important;
+            gap: 4px !important;
           }
+
+          /* Conversion Box & Buttons on Mobile: Perfectly Symmetrical 50-50 */
+          .product-conversion-card {
+            padding: 14px 12px !important;
+            border-radius: 16px !important;
+            margin-bottom: 18px !important;
+          }
+
+          .product-conversion-btn-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 8px !important;
+            margin-bottom: 10px !important;
+          }
+
+          .btn-conversion-quote,
+          .btn-conversion-sample {
+            padding: 10px 4px !important;
+            font-size: 0.78rem !important;
+            border-radius: 10px !important;
+            min-height: 42px !important;
+            gap: 4px !important;
+          }
+
+          .conversion-sub-note {
+            font-size: 0.62rem !important;
+            margin-top: 4px !important;
+          }
+
           :global(.calc-input-row) {
             flex-direction: column !important;
             align-items: stretch !important;
@@ -1999,6 +2349,54 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
           :global(.calc-input-row > div),
           :global(.calc-input-row > button) {
             width: 100% !important;
+          }
+
+          /* Mobile Sticky Bar Display */
+          .mobile-sticky-bar {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(8, 11, 17, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(212, 175, 55, 0.25);
+            padding: 10px 14px;
+            z-index: 50;
+            box-shadow: 0 -8px 24px rgba(0,0,0,0.5);
+          }
+
+          .mobile-sticky-wa-btn {
+            background: rgba(37, 211, 102, 0.14);
+            border: 1px solid rgba(37, 211, 102, 0.35);
+            color: #25d366;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            flex-shrink: 0;
+          }
+
+          .mobile-sticky-quote-btn {
+            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+            color: #000000;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 850;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
+            white-space: nowrap;
           }
         }
       `}</style>
