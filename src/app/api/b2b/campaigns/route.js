@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyAuth } from '@/lib/auth-check';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -21,14 +23,18 @@ export async function GET(request) {
           product: {
             include: {
               brand: {
-                select: { name: true }
+                select: { name: true, slug: true }
               }
             }
           }
         },
         orderBy: { createdAt: 'desc' }
       });
-      return NextResponse.json(activeCampaigns);
+      return NextResponse.json(activeCampaigns, {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate'
+        }
+      });
     }
 
     // Protected view: Brand or Admin viewing campaigns of a specific brand

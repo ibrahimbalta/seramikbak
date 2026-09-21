@@ -3012,7 +3012,7 @@ export default function BrandPortalPage() {
                       Premium Vitrin ve Reklam Kampanyaları
                     </h2>
                     <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
-                      Kataloğunuzdaki seramikleri SeramikBak ana sayfasında "Yeni Koleksiyonlar" vitrininde yayına sokarak erişiminizi katlayın.
+                      Kataloğunuzdaki seramikleri SeramikBak ana sayfasının en üstündeki <strong>"Yeni Sezon / Vitrin"</strong> kayan şeridinde yayına sokarak marka görünürlüğünüzü ve tıklanma oranınızı katlayın.
                     </p>
                   </div>
 
@@ -3106,52 +3106,60 @@ export default function BrandPortalPage() {
                               boxShadow: '0 8px 24px rgba(212,175,55,0.1)'
                             }}>
                               <h4 style={{ fontSize: isMobile ? '0.7rem' : '0.75rem', color: '#d4af37', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px 0', borderBottom: '1px solid rgba(212,175,55,0.2)', paddingBottom: '6px' }}>
-                                Canlı Ana Sayfa Vitrin Önizlemesi (Görsel Taslak)
+                                Canlı Ana Sayfa Üst Vitrin Önizlemesi (Yeni Sezon Şeridi)
                               </h4>
                               
                               <div style={{
                                 width: '100%',
-                                maxWidth: isMobile ? '100%' : '240px',
+                                maxWidth: isMobile ? '100%' : '290px',
                                 margin: '0 auto',
-                                background: '#fff',
-                                borderRadius: '12px',
-                                border: '2px solid #d4af37',
-                                overflow: 'hidden',
+                                background: '#ffffff',
+                                borderRadius: '16px',
+                                border: '1.5px solid rgba(179, 142, 71, 0.4)',
+                                padding: '8px 14px 8px 8px',
                                 display: 'flex',
-                                flexDirection: 'column',
-                                boxShadow: '0 0 15px rgba(212,175,55,0.4)'
+                                alignItems: 'center',
+                                gap: '12px',
+                                boxShadow: '0 8px 20px rgba(0,0,0,0.18)'
                               }}>
-                                <div style={{ height: '140px', position: 'relative', background: '#f8fafc' }}>
+                                <div style={{ position: 'relative', width: '84px', height: '88px', flexShrink: 0, borderRadius: '12px', overflow: 'hidden' }}>
                                   <img 
-                                    src={selectedProd.imageUrl || '/textures/concrete_light_grey.jpg'} 
+                                    src={selectedProd.imageUrl || '/hero/hero_ceramics.jpg'} 
                                     alt="Mockup" 
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                                     onError={(e) => { 
                                       e.target.onerror = null;
-                                      e.target.src = '/textures/concrete_light_grey.jpg'; 
+                                      e.target.src = '/hero/hero_ceramics.jpg'; 
                                     }}
                                   />
                                   <span style={{
                                     position: 'absolute',
-                                    top: '8px',
-                                    right: '8px',
-                                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                                    color: '#000',
-                                    fontSize: '0.55rem',
-                                    fontWeight: '900',
-                                    padding: '2px 6px',
-                                    borderRadius: '8px',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
+                                    top: '5px',
+                                    left: '5px',
+                                    background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
+                                    color: '#ffffff',
+                                    fontSize: '0.52rem',
+                                    fontWeight: '850',
+                                    padding: '2px 5px',
+                                    borderRadius: '4px',
+                                    letterSpacing: '0.05em',
+                                    boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
+                                    lineHeight: '1',
+                                    textTransform: 'uppercase'
                                   }}>
-                                    YENİ KOLEKSİYON
+                                    YENİ SEZON
                                   </span>
                                 </div>
-                                <div style={{ padding: '10px', color: '#0f172a' }}>
-                                  <div style={{ fontSize: '0.62rem', color: '#94a3b8', fontWeight: '700' }}>{brandInfo.name.toUpperCase()}</div>
-                                  <div style={{ fontSize: '0.78rem', fontWeight: '800', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{selectedProd.name}</div>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px', fontSize: '0.68rem', borderTop: '1px solid #f1f5f9', paddingTop: '6px' }}>
-                                    <span style={{ background: '#f1f5f9', color: '#475569', padding: '1px 4px', borderRadius: '2px', fontSize: '0.6rem' }}>{selectedProd.width}x{selectedProd.height}</span>
-                                  </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', overflow: 'hidden' }}>
+                                  <span style={{ fontSize: '0.66rem', fontWeight: '800', color: '#b38e47', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                    {brandInfo.name}
+                                  </span>
+                                  <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: '1.25' }}>
+                                    {selectedProd.name}
+                                  </span>
+                                  <span style={{ fontSize: '0.62rem', color: '#64748b' }}>
+                                    {selectedProd.width}x{selectedProd.height} cm • Vitrin İlanı
+                                  </span>
                                 </div>
                               </div>
                             </div>

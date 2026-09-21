@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { slugify } from '@/lib/slugify';
 import LanguageSelector from '@/components/LanguageSelector';
@@ -741,6 +741,7 @@ export default function Home() {
   const [brands, setBrands] = useState([]);
   const [weeklyProducts, setWeeklyProducts] = useState([]);
   const [activeProduct, setActiveProduct] = useState(null);
+  const [vitrinCampaigns, setVitrinCampaigns] = useState([]);
 
   // New visual and search states
   const [heroSlideIndex, setHeroSlideIndex] = useState(0);
@@ -1726,6 +1727,18 @@ export default function Home() {
         console.error('Failed to load weekly products:', err);
         setMoodboardCombos(DEFAULT_MOODBOARD_COMBOS);
       });
+
+    // Fetch active showcase ad campaigns for top marquee banner
+    fetch('/api/b2b/campaigns')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setVitrinCampaigns(data);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load vitrin campaigns:', err);
+      });
   }, []);
 
   // Sync preloader state
@@ -2619,6 +2632,62 @@ export default function Home() {
       }
     } catch (err) {
       console.error('Failed to open product by code:', err);
+    }
+  };
+
+  const DEFAULT_VITRIN_ITEMS = [
+    { code: 'VIT-CON-GRY', brand: 'VitrA', name: 'Concrete Light Grey', img: '/hero/luxury_bathroom.png', badge: 'YENİ SEZON' },
+    { code: 'BIEN-NAT-OAK', brand: 'Bien', name: 'Natural Oak', img: '/hero/modern_living.png', badge: 'YENİ SEZON' },
+    { code: 'KUT-CAL-GLD', brand: 'Kütahya', name: 'Calacatta Gold', img: '/hero/scandinavian_kitchen.png', badge: 'YENİ SEZON' },
+    { code: 'EGE-TRA-CLA', brand: 'Ege Seramik', name: 'Travertino Classico', img: '/hero/hero_ceramics.jpg', badge: 'YENİ SEZON' },
+    { code: 'HITIT-NEXOS-ANTRASIT-LAPPATO-60X120', brand: 'Hitit Seramik', name: 'Nexos Antrasit Lappato', img: '/hero/luxury_bathroom.png', badge: 'YENİ SEZON' },
+    { code: 'BIEN-BOR-ANT', brand: 'Bien', name: 'Borneo Antrasit', img: '/hero/modern_living.png', badge: 'YENİ SEZON' },
+  ];
+
+  const displayVitrinItems = useMemo(() => {
+    const sponsored = (vitrinCampaigns || [])
+      .filter(c => c && c.product)
+      .map(c => ({
+        id: c.id,
+        campaignId: c.id,
+        productId: c.productId,
+        code: c.product.code,
+        brand: c.product.brand?.name || 'Seçkin Marka',
+        name: c.product.name,
+        img: c.product.imageUrl || '/hero/hero_ceramics.jpg',
+        badge: 'YENİ SEZON',
+        isSponsored: true,
+        product: c.product
+      }));
+
+    const sponsoredCodes = new Set(sponsored.map(s => s.code).filter(Boolean));
+    const filteredDefaults = DEFAULT_VITRIN_ITEMS.filter(d => !sponsoredCodes.has(d.code));
+
+    // Sponsored products from brand advertising campaigns are displayed FIRST at the top showcase
+    const combined = [...sponsored, ...filteredDefaults];
+    return combined;
+  }, [vitrinCampaigns]);
+
+  const handleVitrinItemClick = (item) => {
+    if (!item) return;
+    if (item.product) {
+      const enriched = enrichProductData(item.product);
+      handleProductCardClick(enriched);
+    } else if (item.code) {
+      openProductByCode(item.code);
+    }
+
+    // Track advertising click analytics for brand analytics and billing
+    if (item.campaignId && item.productId) {
+      fetch('/api/analytics/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'AD_CLICK',
+          productId: item.productId,
+          campaignId: item.campaignId
+        })
+      }).catch(() => {});
     }
   };
 
@@ -3562,132 +3631,62 @@ export default function Home() {
         )}
       </div>
 
-      {/* Premium Collections Banner */}
+      {/* Premium Collections Banner (Dynamically loaded with Brand Showcase Ads + Fallback) */}
       <div className="project-top-banner">
         <div className="banner-marquee-wrapper">
           <div className="banner-marquee-track">
             {/* First set */}
-            <div className="banner-item" onClick={() => openProductByCode('VIT-CON-GRY')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/luxury_bathroom.png" alt="VitrA Concrete" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
+            {displayVitrinItems.map((item, idx) => (
+              <div 
+                key={`vitrin-set1-${item.id || item.code}-${idx}`} 
+                className="banner-item" 
+                onClick={() => handleVitrinItemClick(item)}
+                title={`${item.brand} - ${item.name}`}
+              >
+                <div className="banner-img-wrapper">
+                  <img 
+                    src={item.img} 
+                    alt={`${item.brand} ${item.name}`} 
+                    className="banner-img"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/hero/hero_ceramics.jpg';
+                    }} 
+                  />
+                  <span className="banner-img-badge">{item.badge || 'YENİ SEZON'}</span>
+                </div>
+                <div className="banner-item-info">
+                  <span className="banner-brand-name">{item.brand}</span>
+                  <span className="banner-product-name">{item.name}</span>
+                </div>
               </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">VitrA</span>
-                <span className="banner-product-name">Concrete Light Grey</span>
+            ))}
+            {/* Duplicate set for seamless infinite marquee loop */}
+            {displayVitrinItems.map((item, idx) => (
+              <div 
+                key={`vitrin-set2-${item.id || item.code}-${idx}`} 
+                className="banner-item" 
+                onClick={() => handleVitrinItemClick(item)}
+                title={`${item.brand} - ${item.name}`}
+              >
+                <div className="banner-img-wrapper">
+                  <img 
+                    src={item.img} 
+                    alt={`${item.brand} ${item.name}`} 
+                    className="banner-img"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/hero/hero_ceramics.jpg';
+                    }} 
+                  />
+                  <span className="banner-img-badge">{item.badge || 'YENİ SEZON'}</span>
+                </div>
+                <div className="banner-item-info">
+                  <span className="banner-brand-name">{item.brand}</span>
+                  <span className="banner-product-name">{item.name}</span>
+                </div>
               </div>
-            </div>
-            <div className="banner-item" onClick={() => openProductByCode('BIEN-NAT-OAK')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/modern_living.png" alt="Bien Natural Oak" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
-              </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">Bien</span>
-                <span className="banner-product-name">Natural Oak</span>
-              </div>
-            </div>
-            <div className="banner-item" onClick={() => openProductByCode('KUT-CAL-GLD')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/scandinavian_kitchen.png" alt="Kütahya Calacatta" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
-              </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">Kütahya</span>
-                <span className="banner-product-name">Calacatta Gold</span>
-              </div>
-            </div>
-            <div className="banner-item" onClick={() => openProductByCode('EGE-TRA-CLA')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/hero_ceramics.jpg" alt="Ege Travertino" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
-              </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">Ege Seramik</span>
-                <span className="banner-product-name">Travertino Classico</span>
-              </div>
-            </div>
-            <div className="banner-item" onClick={() => openProductByCode('HITIT-NEXOS-ANTRASIT-LAPPATO-60X120')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/luxury_bathroom.png" alt="Hitit Nexos" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
-              </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">Hitit Seramik</span>
-                <span className="banner-product-name">Nexos Antrasit Lappato</span>
-              </div>
-            </div>
-            <div className="banner-item" onClick={() => openProductByCode('BIEN-BOR-ANT')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/modern_living.png" alt="Bien Borneo" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
-              </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">Bien</span>
-                <span className="banner-product-name">Borneo Antrasit</span>
-              </div>
-            </div>
-            {/* Duplicate set for seamless loop */}
-            <div className="banner-item" onClick={() => openProductByCode('VIT-CON-GRY')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/luxury_bathroom.png" alt="VitrA Concrete" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
-              </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">VitrA</span>
-                <span className="banner-product-name">Concrete Light Grey</span>
-              </div>
-            </div>
-            <div className="banner-item" onClick={() => openProductByCode('BIEN-NAT-OAK')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/modern_living.png" alt="Bien Natural Oak" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
-              </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">Bien</span>
-                <span className="banner-product-name">Natural Oak</span>
-              </div>
-            </div>
-            <div className="banner-item" onClick={() => openProductByCode('KUT-CAL-GLD')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/scandinavian_kitchen.png" alt="Kütahya Calacatta" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
-              </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">Kütahya</span>
-                <span className="banner-product-name">Calacatta Gold</span>
-              </div>
-            </div>
-            <div className="banner-item" onClick={() => openProductByCode('EGE-TRA-CLA')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/hero_ceramics.jpg" alt="Ege Travertino" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
-              </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">Ege Seramik</span>
-                <span className="banner-product-name">Travertino Classico</span>
-              </div>
-            </div>
-            <div className="banner-item" onClick={() => openProductByCode('HITIT-NEXOS-ANTRASIT-LAPPATO-60X120')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/luxury_bathroom.png" alt="Hitit Nexos" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
-              </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">Hitit Seramik</span>
-                <span className="banner-product-name">Nexos Antrasit Lappato</span>
-              </div>
-            </div>
-            <div className="banner-item" onClick={() => openProductByCode('BIEN-BOR-ANT')}>
-              <div className="banner-img-wrapper">
-                <img src="/hero/modern_living.png" alt="Bien Borneo" className="banner-img" />
-                <span className="banner-img-badge">YENİ SEZON</span>
-              </div>
-              <div className="banner-item-info">
-                <span className="banner-brand-name">Bien</span>
-                <span className="banner-product-name">Borneo Antrasit</span>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
