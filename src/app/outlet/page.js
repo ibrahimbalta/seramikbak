@@ -179,7 +179,7 @@ export default function OutletMarketplacePage() {
   };
 
   return (
-    <div style={{ background: '#090d16', color: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div style={{ background: '#090d16', color: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, -apple-system, sans-serif', width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
       {/* Header Navigation - Mobile App Bar */}
       <header className="outlet-app-header">
         <div className="outlet-header-inner">
@@ -436,11 +436,7 @@ export default function OutletMarketplacePage() {
             </p>
           </div>
         ) : (
-          <div className="outlet-items-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
-            gap: '20px'
-          }}>
+          <div className="outlet-items-grid">
             {items.map((item) => {
               const d = item.dealer;
               const prod = item.product;
@@ -450,7 +446,7 @@ export default function OutletMarketplacePage() {
               const totalPalletValue = Math.round(item.unitPrice * item.quantityM2);
 
               return (
-                <div key={item.id} style={{
+                <div key={item.id} className="outlet-item-card" style={{
                   background: 'rgba(30, 41, 59, 0.6)',
                   backdropFilter: 'blur(10px)',
                   borderRadius: '20px',
@@ -459,7 +455,11 @@ export default function OutletMarketplacePage() {
                   display: 'flex',
                   flexDirection: 'column',
                   boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  minWidth: 0,
+                  width: '100%',
+                  maxWidth: '100%',
+                  boxSizing: 'border-box'
                 }}>
                   {/* Image Header */}
                   <div style={{ position: 'relative', height: '190px', width: '100%', overflow: 'hidden' }}>
@@ -1301,6 +1301,38 @@ export default function OutletMarketplacePage() {
           transform: scale(0.97);
         }
 
+        .outlet-items-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 20px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .outlet-card-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+          margin-top: 6px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .btn-whatsapp-action,
+        .btn-quote-action {
+          min-width: 0;
+          width: 100%;
+          overflow: hidden;
+          box-sizing: border-box;
+        }
+
+        .btn-whatsapp-action span,
+        .btn-quote-action span {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
         .btn-whatsapp-action:active,
         .btn-quote-action:active {
           transform: scale(0.97);
@@ -1360,14 +1392,29 @@ export default function OutletMarketplacePage() {
             padding: 12px !important;
           }
 
-          :global(.outlet-items-grid) {
-            grid-template-columns: 1fr !important;
+          .outlet-items-grid {
+            grid-template-columns: 100% !important;
             gap: 14px !important;
+            width: 100% !important;
           }
 
-          :global(.outlet-card-actions) {
+          .outlet-item-card {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+          }
+
+          .outlet-card-actions {
             grid-template-columns: 1fr 1fr !important;
-            gap: 8px !important;
+            gap: 6px !important;
+            width: 100% !important;
+          }
+
+          .btn-whatsapp-action,
+          .btn-quote-action {
+            padding: 10px 4px !important;
+            font-size: 0.76rem !important;
+            gap: 4px !important;
           }
         }
       `}</style>

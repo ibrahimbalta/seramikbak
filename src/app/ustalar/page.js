@@ -233,7 +233,7 @@ export default function InstallersDirectoryPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#090d16', color: '#f8fafc', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#090d16', color: '#f8fafc', fontFamily: 'Inter, system-ui, sans-serif', width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
       {/* Header Navigation - Mobile App Bar */}
       <header className="ustalar-app-header">
         <div className="ustalar-header-inner">
@@ -363,7 +363,7 @@ export default function InstallersDirectoryPage() {
       </section>
 
       {/* INSTALLERS GRID */}
-      <main style={{ maxWidth: '1280px', margin: '0 auto', padding: '30px 16px' }}>
+      <main className="ustalar-main-container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <div>
             <h2 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 4px 0', color: '#ffffff' }}>
@@ -376,7 +376,7 @@ export default function InstallersDirectoryPage() {
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: '#64748b' }}>
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#94a3b8' }}>
             <Loader2 size={32} className="animate-spin" style={{ margin: '0 auto 12px auto' }} />
             <span>Ustalar yükleniyor...</span>
           </div>
@@ -412,11 +412,7 @@ export default function InstallersDirectoryPage() {
             </button>
           </div>
         ) : (
-          <div className="installers-grid" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
-            gap: '16px'
-          }}>
+          <div className="installers-grid">
             {installers.map(inst => {
               const portfolioList = parsePortfolio(inst.portfolioBeforeAfter);
               const waText = encodeURIComponent(
@@ -426,28 +422,17 @@ export default function InstallersDirectoryPage() {
               const waLink = `https://wa.me/${inst.phone.replace(/[^\d]/g, '')}?text=${waText}`;
 
               return (
-                <div key={inst.id} style={{
-                  background: 'rgba(15, 23, 42, 0.85)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: '16px',
-                  padding: '16px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  gap: '12px',
-                  boxShadow: '0 8px 20px rgba(0,0,0,0.3)',
-                  transition: 'all 0.2s ease'
-                }}>
+                <div key={inst.id} className="installer-card">
                   <div>
                     {/* Top Row: Name + Verified + Rating */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                      <div style={{ flex: 1, minWidth: 0, paddingRight: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px', gap: '8px' }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                           <h3 style={{ fontSize: '1.05rem', fontWeight: '900', color: '#ffffff', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                             {inst.name}
                           </h3>
                           {inst.verified && (
-                            <span title="Onaylı Seramik Ustası" style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)', color: '#10b981', padding: '1px 6px', borderRadius: '10px', fontSize: '0.65rem', fontWeight: '800', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                            <span title="Onaylı Seramik Ustası" style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)', color: '#10b981', padding: '1px 6px', borderRadius: '10px', fontSize: '0.65rem', fontWeight: '800', display: 'inline-flex', alignItems: 'center', gap: '3px', flexShrink: 0 }}>
                               <ShieldCheck size={11} />
                               Onaylı
                             </span>
@@ -467,22 +452,22 @@ export default function InstallersDirectoryPage() {
                       </div>
                     </div>
 
-                    {/* Inline Info Badge Bar (Single Row!) */}
+                    {/* Inline Info Badge Bar (Auto-Wrapping) */}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '0.7rem', background: 'rgba(212, 175, 55, 0.1)', color: '#d4af37', padding: '3px 8px', borderRadius: '6px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ fontSize: '0.7rem', background: 'rgba(212, 175, 55, 0.1)', color: '#d4af37', padding: '3px 8px', borderRadius: '6px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
                         <Award size={11} />
                         {inst.experienceYears} Yıl Tecrübe
                       </span>
 
                       {inst.contractRateM2 && (
-                        <span style={{ fontSize: '0.7rem', background: 'rgba(59, 130, 246, 0.12)', color: '#60a5fa', padding: '3px 8px', borderRadius: '6px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ fontSize: '0.7rem', background: 'rgba(59, 130, 246, 0.12)', color: '#60a5fa', padding: '3px 8px', borderRadius: '6px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
                           <Ruler size={11} />
                           {inst.contractRateM2}
                         </span>
                       )}
 
                       {inst.guaranteeBadge !== false && (
-                        <span style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.12)', color: '#34d399', padding: '3px 8px', borderRadius: '6px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.12)', color: '#34d399', padding: '3px 8px', borderRadius: '6px', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
                           <ShieldCheck size={11} />
                           Terazi & Derz Uyumlu
                         </span>
@@ -512,104 +497,41 @@ export default function InstallersDirectoryPage() {
                           setSelectedPortfolioInstaller(inst);
                           setActivePortfolioIndex(0);
                         }}
-                        style={{
-                          background: portfolioList.length > 0 ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                          border: portfolioList.length > 0 ? '1px solid rgba(59, 130, 246, 0.35)' : '1px solid rgba(255, 255, 255, 0.1)',
-                          color: portfolioList.length > 0 ? '#60a5fa' : '#94a3b8',
-                          padding: '5px 9px',
-                          borderRadius: '6px',
-                          fontSize: '0.7rem',
-                          fontWeight: '800',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          flex: 1
-                        }}
+                        className="btn-portfolio-trigger"
                       >
-                        <Camera size={12} />
-                        <span>{portfolioList.length > 0 ? `Portfolyo (${portfolioList.length})` : 'Portfolyo'}</span>
+                        <Camera size={12} style={{ flexShrink: 0 }} />
+                        <span className="btn-span-ellipsis">
+                          {portfolioList.length > 0 ? `Portfolyo (${portfolioList.length})` : 'Portfolyo'}
+                        </span>
                       </button>
 
                       <button
                         onClick={() => setSelectedContractInstaller(inst)}
-                        style={{
-                          background: 'rgba(212, 175, 55, 0.12)',
-                          border: '1px solid rgba(212, 175, 55, 0.3)',
-                          color: '#fef08a',
-                          padding: '5px 9px',
-                          borderRadius: '6px',
-                          fontSize: '0.7rem',
-                          fontWeight: '800',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          flex: 1
-                        }}
+                        className="btn-contract-trigger"
                       >
-                        <FileText size={12} />
-                        <span>Örnek Sözleşme</span>
+                        <FileText size={12} style={{ flexShrink: 0 }} />
+                        <span className="btn-span-ellipsis">Örnek Sözleşme</span>
                       </button>
                     </div>
                   </div>
 
                   {/* Symmetrical Dual Action Buttons */}
-                  <div className="installer-card-actions" style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '8px',
-                    marginTop: '8px'
-                  }}>
+                  <div className="installer-card-actions">
                     <a
                       href={waLink}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-wa-installer"
-                      style={{
-                        background: 'linear-gradient(135deg, #25d366 0%, #16a34a 100%)',
-                        color: '#ffffff',
-                        textDecoration: 'none',
-                        padding: '11px 8px',
-                        minHeight: '44px',
-                        borderRadius: '12px',
-                        fontSize: '0.8rem',
-                        fontWeight: '850',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        boxShadow: '0 4px 14px rgba(37, 211, 102, 0.25)',
-                        textAlign: 'center',
-                        boxSizing: 'border-box'
-                      }}
                     >
-                      <MessageSquare size={15} />
+                      <MessageSquare size={15} style={{ flexShrink: 0 }} />
                       <span>WhatsApp Teklif</span>
                     </a>
 
                     <a
                       href={`tel:${inst.phone.replace(/[^\d+]/g, '')}`}
                       className="btn-call-installer"
-                      style={{
-                        background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                        color: '#000000',
-                        textDecoration: 'none',
-                        padding: '11px 8px',
-                        minHeight: '44px',
-                        borderRadius: '12px',
-                        fontSize: '0.8rem',
-                        fontWeight: '850',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                        boxShadow: '0 4px 14px rgba(212, 175, 55, 0.25)',
-                        textAlign: 'center',
-                        boxSizing: 'border-box'
-                      }}
                     >
-                      <Phone size={15} />
+                      <Phone size={15} style={{ flexShrink: 0 }} />
                       <span>Hemen Ara</span>
                     </a>
                   </div>
@@ -1512,6 +1434,151 @@ export default function InstallersDirectoryPage() {
           transform: scale(0.97);
         }
 
+        /* Main Container */
+        .ustalar-main-container {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 30px 16px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        /* Grid */
+        .installers-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          gap: 16px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        /* Card */
+        .installer-card {
+          background: rgba(15, 23, 42, 0.85);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 16px;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          gap: 12px;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+          transition: all 0.2s ease;
+          min-width: 0;
+          width: 100%;
+          max-width: 100%;
+          box-sizing: border-box;
+          overflow: hidden;
+        }
+
+        /* Trigger Buttons */
+        .btn-portfolio-trigger {
+          background: rgba(59, 130, 246, 0.15);
+          border: 1px solid rgba(59, 130, 246, 0.35);
+          color: #60a5fa;
+          padding: 6px 8px;
+          border-radius: 8px;
+          font-size: 0.72rem;
+          font-weight: 800;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+          box-sizing: border-box;
+        }
+
+        .btn-contract-trigger {
+          background: rgba(212, 175, 55, 0.12);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          color: #fef08a;
+          padding: 6px 8px;
+          border-radius: 8px;
+          font-size: 0.72rem;
+          font-weight: 800;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+          box-sizing: border-box;
+        }
+
+        .btn-span-ellipsis {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        /* Dual Action Buttons */
+        .installer-card-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+          margin-top: 8px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .btn-wa-installer {
+          background: linear-gradient(135deg, #25d366 0%, #16a34a 100%);
+          color: #ffffff;
+          text-decoration: none;
+          padding: 11px 6px;
+          min-height: 44px;
+          border-radius: 12px;
+          font-size: 0.8rem;
+          font-weight: 850;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          box-shadow: 0 4px 14px rgba(37, 211, 102, 0.25);
+          text-align: center;
+          box-sizing: border-box;
+          min-width: 0;
+          width: 100%;
+          overflow: hidden;
+          white-space: nowrap;
+          transition: transform 0.15s ease;
+        }
+
+        .btn-call-installer {
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          color: #000000;
+          text-decoration: none;
+          padding: 11px 6px;
+          min-height: 44px;
+          border-radius: 12px;
+          font-size: 0.8rem;
+          font-weight: 850;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
+          text-align: center;
+          box-sizing: border-box;
+          min-width: 0;
+          width: 100%;
+          overflow: hidden;
+          white-space: nowrap;
+          transition: transform 0.15s ease;
+        }
+
+        .btn-wa-installer span,
+        .btn-call-installer span {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
         .btn-wa-installer:active,
         .btn-call-installer:active {
           transform: scale(0.97);
@@ -1568,14 +1635,34 @@ export default function InstallersDirectoryPage() {
             padding: 12px !important;
           }
 
-          :global(.installers-grid) {
-            grid-template-columns: 1fr !important;
-            gap: 14px !important;
+          .ustalar-main-container {
+            padding: 16px 10px !important;
           }
 
-          :global(.installer-card-actions) {
+          .installers-grid {
+            grid-template-columns: 100% !important;
+            gap: 12px !important;
+            width: 100% !important;
+          }
+
+          .installer-card {
+            padding: 14px 12px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+          }
+
+          .installer-card-actions {
             grid-template-columns: 1fr 1fr !important;
-            gap: 8px !important;
+            gap: 6px !important;
+            width: 100% !important;
+          }
+
+          .btn-wa-installer,
+          .btn-call-installer {
+            padding: 10px 4px !important;
+            font-size: 0.76rem !important;
+            gap: 4px !important;
           }
         }
       `}</style>
