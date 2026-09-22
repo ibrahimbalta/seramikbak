@@ -221,6 +221,8 @@ export default function RootLayout({ children }) {
         <meta name="content-language" content="tr" />
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="https://accounts.google.com" />
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}

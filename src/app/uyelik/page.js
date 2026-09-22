@@ -246,34 +246,111 @@ export default function UyelikPage() {
     }
   };
 
-  const [showGoogleModal, setShowGoogleModal] = useState(false);
-  const [googleEmailInput, setGoogleEmailInput] = useState('');
-  const [googleNameInput, setGoogleNameInput] = useState('');
+  const [googleLoading, setGoogleLoading] = useState(false);
 
+  const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '994830104230-v19gj9ts8ed2ngslcsfm0k8obpuulqb6.apps.googleusercontent.com';
+
+  // Handle Google OAuth implicit redirect callback (e.g. redirected with #access_token=...)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (typeof window !== 'undefined' && window.location.hash) {
+      try {
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+        const accessToken = params.get('access_token');
+        if (accessToken) {
+          window.history.replaceState(null, '', window.location.pathname);
+          setLoading(true);
+          setSuccess('Google ile doğrulama onaylandı, hesabınıza giriş yapılıyor...');
+          fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${accessToken}` }
+          })
+            .then((res) => res.json())
+            .then((info) => {
+              if (info.email) {
+                handleGoogleAuthSubmit({ email: info.email, name: info.name, picture: info.picture });
+              } else {
+                setError('Google hesap bilgileri alınamadı.');
+                setLoading(false);
+              }
+            })
+            .catch((err) => {
+              console.error('Failed to fetch userinfo from Google access token:', err);
+              setError('Google doğrulaması sırasında bir hata oluştu.');
+              setLoading(false);
+            });
+        }
+      } catch (err) {
+        console.warn('OAuth hash parsing error:', err);
+      }
+    }
+  }, []);
+
+  // Helper to ensure Google SDK is fully loaded in window.google
+  const ensureGoogleLoaded = () => {
+    return new Promise((resolve, reject) => {
+      if (typeof window === 'undefined') return reject(new Error('Window not defined'));
+      if (window.google?.accounts) return resolve(window.google);
+
+      // Check if script is already in document
+      const existingScript = document.querySelector('script[src*="accounts.google.com/gsi/client"]');
+      if (existingScript) {
+        let attempts = 0;
+        const interval = setInterval(() => {
+          attempts++;
+          if (window.google?.accounts) {
+            clearInterval(interval);
+            resolve(window.google);
+          } else if (attempts > 30) {
+            clearInterval(interval);
+            reject(new Error('Google SDK load timeout'));
+          }
+        }, 100);
+        return;
+      }
+
+      // If not yet added, create and inject
       const script = document.createElement('script');
       script.src = 'https://accounts.google.com/gsi/client';
       script.async = true;
       script.defer = true;
       script.onload = () => {
-        if (window.google?.accounts?.id && clientId) {
-          window.google.accounts.id.initialize({
-            client_id: clientId,
+        if (window.google?.accounts) {
+          resolve(window.google);
+        } else {
+          // brief tick for object initialization
+          setTimeout(() => {
+            if (window.google?.accounts) resolve(window.google);
+            else reject(new Error('Google accounts object not found'));
+          }, 150);
+        }
+      };
+      script.onerror = () => reject(new Error('Google script failed to load'));
+      document.head.appendChild(script);
+    });
+  };
+
+  // Background initialization on mount
+  useEffect(() => {
+    ensureGoogleLoaded()
+      .then((g) => {
+        if (g?.accounts?.id && GOOGLE_CLIENT_ID) {
+          g.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
             callback: (response) => {
               if (response.credential) {
                 handleGoogleAuthSubmit({ credential: response.credential });
               }
-            }
+            },
+            auto_select: false
           });
         }
-      };
-      document.body.appendChild(script);
-    }
+      })
+      .catch((err) => {
+        console.warn('Google GSI background preload notice:', err.message);
+      });
   }, []);
 
-  const handleGoogleAuthSubmit = async ({ credential, email: overrideEmail, name: overrideName }) => {
+  const handleGoogleAuthSubmit = async ({ credential, email: overrideEmail, name: overrideName, picture: overridePicture }) => {
     setError('');
     setSuccess('');
     setLoading(true);
@@ -285,7 +362,8 @@ export default function UyelikPage() {
         body: JSON.stringify({
           credential,
           email: overrideEmail,
-          name: overrideName
+          name: overrideName,
+          picture: overridePicture
         })
       });
 
@@ -305,58 +383,103 @@ export default function UyelikPage() {
       setError('Google girişi sırasında sunucu hatası oluştu.');
     } finally {
       setLoading(false);
+      setGoogleLoading(false);
     }
   };
 
-  const handleGoogleButtonClick = () => {
+  const redirectToGoogleOAuth = () => {
+    if (typeof window !== 'undefined') {
+      setSuccess('Google yetkilendirme sayfasına aktarılıyorsunuz...');
+      const origin = window.location.origin;
+      const redirectUri = encodeURIComponent(`${origin}/uyelik`);
+      const oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=email%20profile%20openid&prompt=select_account`;
+      window.location.href = oauthUrl;
+    }
+  };
+
+  const handleGoogleButtonClick = async () => {
     setError('');
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '994830104230-v19gj9ts8ed2ngslcsfm0k8obpuulqb6.apps.googleusercontent.com';
-    
-    if (typeof window !== 'undefined' && window.google?.accounts) {
-      setSuccess('Google Hesabınız doğrulanıyor, lütfen açılan Google penceresinden hesabınızı seçin...');
-      
+    setSuccess('');
+    setGoogleLoading(true);
+
+    try {
+      // 1. Ensure Google SDK is available or wait for it
+      let g = null;
       try {
-        if (window.google.accounts.id) {
-          window.google.accounts.id.initialize({
-            client_id: clientId,
-            callback: (response) => {
-              if (response.credential) {
-                handleGoogleAuthSubmit({ credential: response.credential });
-              }
-            }
-          });
-          window.google.accounts.id.prompt((notification) => {
-            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-              if (window.google.accounts.oauth2) {
-                const tokenClient = window.google.accounts.oauth2.initTokenClient({
-                  client_id: clientId,
-                  scope: 'email profile',
-                  callback: async (tokenResponse) => {
-                    if (tokenResponse.access_token) {
-                      try {
-                        const userinfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                          headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
-                        });
-                        const info = await userinfoRes.json();
-                        if (info.email) {
-                          handleGoogleAuthSubmit({ email: info.email, name: info.name, picture: info.picture });
-                        }
-                      } catch (err) {
-                        console.error('Failed to fetch userinfo:', err);
-                      }
-                    }
-                  }
-                });
-                tokenClient.requestAccessToken();
-              }
-            }
-          });
-        }
-      } catch (e) {
-        console.warn('Google Prompt error:', e);
+        g = await ensureGoogleLoaded();
+      } catch (sdkErr) {
+        console.warn('Google SDK direct load failed, switching to standard OAuth redirect:', sdkErr);
       }
-    } else {
-      setError('Google Servisleri yükleniyor, lütfen birkaç saniye bekleyip tekrar tıklayın.');
+
+      // 2. Fast Path: Token Client Popup
+      if (g?.accounts?.oauth2) {
+        setSuccess('Google Hesabınız doğrulanıyor, lütfen açılan Google penceresinden hesabınızı seçin...');
+        const tokenClient = g.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CLIENT_ID,
+          scope: 'email profile openid',
+          callback: async (tokenResponse) => {
+            if (tokenResponse.error) {
+              setGoogleLoading(false);
+              if (tokenResponse.error !== 'popup_closed_by_user') {
+                setError('Google girişi iptal edildi veya bir hata oluştu.');
+              } else {
+                setSuccess('');
+              }
+              return;
+            }
+            if (tokenResponse.access_token) {
+              try {
+                setSuccess('Google Hesabı onaylandı, profil bilgileri alınıyor...');
+                const userinfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+                });
+                const info = await userinfoRes.json();
+                if (info.email) {
+                  handleGoogleAuthSubmit({ 
+                    email: info.email, 
+                    name: info.name, 
+                    picture: info.picture 
+                  });
+                } else {
+                  setError('Google hesap bilgileri alınamadı.');
+                  setGoogleLoading(false);
+                }
+              } catch (err) {
+                console.error('Failed to fetch userinfo from Google token:', err);
+                setError('Google kullanıcı profili alınamadı.');
+                setGoogleLoading(false);
+              }
+            }
+          }
+        });
+        tokenClient.requestAccessToken({ prompt: 'select_account' });
+        return;
+      }
+
+      // 3. Fallback: Google GSI ID initialize & prompt
+      if (g?.accounts?.id) {
+        g.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: (response) => {
+            if (response.credential) {
+              handleGoogleAuthSubmit({ credential: response.credential });
+            }
+          }
+        });
+        g.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            redirectToGoogleOAuth();
+          }
+        });
+        return;
+      }
+
+      // 4. Guaranteed Universal Fallback: Standard Google OAuth2 redirect
+      redirectToGoogleOAuth();
+
+    } catch (e) {
+      console.warn('Google Auth button unexpected error:', e);
+      redirectToGoogleOAuth();
     }
   };
 
@@ -1738,14 +1861,23 @@ export default function UyelikPage() {
                 <span className="divider-text">veya</span>
               </div>
 
-              <button type="button" onClick={handleGoogleButtonClick} className="google-btn">
-                <svg className="google-icon" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                </svg>
-                <span>Google ile Giriş Yap</span>
+              <button 
+                type="button" 
+                onClick={handleGoogleButtonClick} 
+                className="google-btn"
+                disabled={loading || googleLoading}
+              >
+                {googleLoading ? (
+                  <Loader2 className="animate-spin" size={18} style={{ color: '#b38e47' }} />
+                ) : (
+                  <svg className="google-icon" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                  </svg>
+                )}
+                <span>{googleLoading ? 'Google Bağlanıyor...' : 'Google ile Giriş Yap'}</span>
               </button>
               <a 
                 href="#" 
@@ -1798,14 +1930,23 @@ export default function UyelikPage() {
                 <span className="divider-text">veya</span>
               </div>
 
-              <button type="button" onClick={handleGoogleButtonClick} className="google-btn">
-                <svg className="google-icon" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                </svg>
-                <span>Google ile Hızlı Kayıt Ol</span>
+              <button 
+                type="button" 
+                onClick={handleGoogleButtonClick} 
+                className="google-btn"
+                disabled={loading || googleLoading}
+              >
+                {googleLoading ? (
+                  <Loader2 className="animate-spin" size={18} style={{ color: '#b38e47' }} />
+                ) : (
+                  <svg className="google-icon" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                  </svg>
+                )}
+                <span>{googleLoading ? 'Google Bağlanıyor...' : 'Google ile Hızlı Kayıt Ol'}</span>
               </button>
             </form>
           )}
