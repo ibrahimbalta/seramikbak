@@ -1219,6 +1219,7 @@ export default function Home() {
   const [dealerSearchQuery, setDealerSearchQuery] = useState('');
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState(null);
+  const [dealerMobileView, setDealerMobileView] = useState('list'); // 'list' | 'map'
   
   // Leads Form State
   const [showLeadModal, setShowLeadModal] = useState(false);
@@ -6310,270 +6311,418 @@ export default function Home() {
 
           return (
             <div className="dealers-portal animate-fade-in" id="bayi-bul-section">
-              <div className="dealers-layout">
-                <div className="dealers-control-panel glass-panel">
-                  <div className="panel-title-row">
-                    <MapPin size={20} className="pin-title-icon" />
-                    <h3>En Yakın Bayiler</h3>
+              {/* App-like Top Bar */}
+              <div className="dealer-app-topbar">
+                <div className="dealer-title-group">
+                  <div className="dealer-section-pill">
+                    <MapPin size={13} className="pin-pill-icon" />
+                    <span>TÜRKİYE YETKİLİ SERAMİK AĞI</span>
                   </div>
-                  <p className="desc">Seçili seramik markasının size en yakın olan yetkili bayilerini inceleyin, mesafe hesaplayıp teklif talep edin.</p>
+                  <h3>En Yakın Yetkili Bayiler</h3>
+                  <p className="dealer-subtitle">
+                    Konumunuza en yakın yetkili showroomları bulun, yol tarifi alın veya anında fiyat teklifi talep edin.
+                  </p>
+                </div>
 
-                  {/* ACTIVE BRAND/PRODUCT SECTOR */}
-                  {activeProduct ? (
-                    <div className="active-product-badge">
-                      <span>Arama Yapılan Ürün:</span>
-                      <strong>{activeProduct.brand?.name} - {activeProduct.name}</strong>
-                    </div>
-                  ) : (
-                    <div className="active-product-badge warning">
-                      <span>Aktif seramik seçilmedi. Aşağıdan marka seçerek de bayileri listeleyebilirsiniz.</span>
-                    </div>
-                  )}
+                {/* Mobile View Toggle (List vs Map) */}
+                <div className="dealer-view-segmented-ctrl">
+                  <button 
+                    type="button" 
+                    className={`seg-btn ${dealerMobileView === 'list' ? 'active' : ''}`}
+                    onClick={() => setDealerMobileView('list')}
+                  >
+                    <span>📋 Bayi Listesi ({displayDealers.length})</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    className={`seg-btn ${dealerMobileView === 'map' ? 'active' : ''}`}
+                    onClick={() => setDealerMobileView('map')}
+                  >
+                    <span>🗺️ Haritada Gör</span>
+                  </button>
+                </div>
+              </div>
 
-                  {/* GEOLOCATION DETECTOR CARD */}
-                  <div className="locator-status-card">
-                    <div className="status-header">
-                      <span className="status-label">Cihaz Konum Durumu:</span>
-                      {isLocating ? (
-                        <span className="status-badge pulse-loading">
-                          <Loader2 size={12} className="animate-spin" />
-                          Algılanıyor...
-                        </span>
-                      ) : locationError ? (
-                        <span className="status-badge error">
-                          ⚠️ {locationError}
-                        </span>
-                      ) : userLocationName === 'Cihaz Konumunuz (GPS)' ? (
-                        <span className="status-badge success">
-                          ● Otomatik GPS Aktif
-                        </span>
-                      ) : (
-                        <span className="status-badge warning">
-                          ● Manuel Konum Seçili
-                        </span>
+              {/* Active Product Chip (if navigated with product) */}
+              {activeProduct ? (
+                <div className="dealer-active-product-chip">
+                  <div className="chip-product-text">
+                    <span className="chip-badge">SEÇİLİ ÜRÜN</span>
+                    <strong className="chip-title">{activeProduct.brand?.name} – {activeProduct.name}</strong>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setLocatorBrandId('');
+                      setActiveProduct(null);
+                    }}
+                    className="chip-clear-btn"
+                    title="Tüm markaları göster"
+                  >
+                    Tüm Markalar ✕
+                  </button>
+                </div>
+              ) : null}
+
+              {/* Layout Container */}
+              <div className={`dealers-layout ${dealerMobileView === 'map' ? 'show-map-mode' : 'show-list-mode'}`}>
+                
+                {/* Control & List Column */}
+                <div className="dealers-control-panel glass-panel">
+                  
+                  {/* Compact Unified Location Status Bar */}
+                  <div className="dealer-smart-location-bar">
+                    <div className="loc-bar-left">
+                      <div className="loc-icon-bubble">
+                        <MapPin size={16} />
+                      </div>
+                      <div className="loc-text-block">
+                        <div className="loc-status-indicator">
+                          {isLocating ? (
+                            <span className="loc-dot pulse-yellow">
+                              <Loader2 size={10} className="animate-spin inline-icon" />
+                              Konum aranıyor...
+                            </span>
+                          ) : locationError ? (
+                            <span className="loc-dot error">⚠️ Konum Belirlenemedi</span>
+                          ) : userLocationName.includes('GPS') ? (
+                            <span className="loc-dot success">● Canlı GPS Aktif</span>
+                          ) : (
+                            <span className="loc-dot blue">● Bölge: {userLocationName}</span>
+                          )}
+                        </div>
+                        <span className="loc-name-label">{userLocationName}</span>
+                      </div>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={detectUserLocation} 
+                      className="loc-refresh-btn"
+                      disabled={isLocating}
+                      title="Konumumu Yeniden Algıla"
+                    >
+                      <Navigation size={13} className={isLocating ? "animate-pulse" : ""} />
+                      <span>{isLocating ? 'Alınıyor...' : 'Konumu Bul'}</span>
+                    </button>
+                  </div>
+
+                  {/* Symmetrical Search & Filter Box */}
+                  <div className="dealer-filter-card">
+                    {/* Search Input */}
+                    <div className="dealer-search-box">
+                      <SearchIcon size={16} className="search-ico" />
+                      <input 
+                        type="text" 
+                        placeholder="Bayi adı, ilçe veya semt ara..." 
+                        value={dealerSearchQuery}
+                        onChange={(e) => setDealerSearchQuery(e.target.value)}
+                        className="dealer-search-field"
+                      />
+                      {dealerSearchQuery && (
+                        <button 
+                          type="button" 
+                          onClick={() => setDealerSearchQuery('')} 
+                          className="search-clear-cross"
+                        >
+                          ✕
+                        </button>
                       )}
                     </div>
-                    <div className="status-info-row">
-                      <div className="status-info">
-                        <strong>Mevcut Konum:</strong>
-                        <span>{userLocationName}</span>
-                      </div>
-                      <button 
-                        onClick={detectUserLocation} 
-                        className="btn-detect-loc"
-                        title="Konumumu Yeniden Algıla"
-                        disabled={isLocating}
-                      >
-                        <Navigation size={14} className={isLocating ? "animate-pulse" : ""} />
-                        <span>Konumu Bul</span>
-                      </button>
-                    </div>
-                  </div>
 
-                  {/* FILTERS WIDGET */}
-                  <div className="locator-filters-container">
-                    <div className="locator-filters-row">
-                      <div className="locator-filter-group">
-                        <label>Marka Filtresi</label>
-                        <select 
-                          value={locatorBrandId} 
-                          onChange={(e) => {
-                            setLocatorBrandId(e.target.value);
-                            setActiveDealerOnMap(null);
-                          }}
-                          className="locator-select"
+                    {/* Symmetrical Selects (Zero Cutoff) */}
+                    <div className="dealer-selects-row">
+                      <div className="dealer-select-wrap">
+                        <label className="select-field-label">Marka Filtresi</label>
+                        <div className="custom-select-box">
+                          <select 
+                            value={locatorBrandId} 
+                            onChange={(e) => {
+                              setLocatorBrandId(e.target.value);
+                              setActiveDealerOnMap(null);
+                            }}
+                            className="dealer-dropdown-select"
+                          >
+                            <option value="">Tüm Markalar</option>
+                            {brands.map(brand => (
+                              <option key={brand.id} value={brand.id}>{brand.name}</option>
+                            ))}
+                          </select>
+                          <ChevronDown size={14} className="dropdown-arrow-svg" />
+                        </div>
+                      </div>
+
+                      <div className="dealer-select-wrap">
+                        <label className="select-field-label">Mesafe Sınırı</label>
+                        <div className="custom-select-box">
+                          <select
+                            value={locatorMaxDistance}
+                            onChange={(e) => setLocatorMaxDistance(Number(e.target.value))}
+                            className="dealer-dropdown-select"
+                          >
+                            <option value={5}>5 km Çevresi</option>
+                            <option value={15}>15 km Çevresi</option>
+                            <option value={30}>30 km Çevresi</option>
+                            <option value={50}>50 km Çevresi</option>
+                            <option value={999}>Tüm Mesafeler</option>
+                          </select>
+                          <ChevronDown size={14} className="dropdown-arrow-svg" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Quick City Chips (Replaced GPS Simülatörü) */}
+                    <div className="dealer-quick-regions">
+                      <span className="regions-title">Popüler Bölgeler:</span>
+                      <div className="regions-scroll-list">
+                        <button 
+                          type="button"
+                          className={`region-pill ${userLocationName.includes('GPS') ? 'active' : ''}`}
+                          onClick={detectUserLocation}
                         >
-                          <option value="">Marka Seçin...</option>
-                          {brands.map(brand => (
-                            <option key={brand.id} value={brand.id}>{brand.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="locator-filter-group">
-                        <label>Mesafe Sınırı</label>
-                        <select
-                          value={locatorMaxDistance}
-                          onChange={(e) => setLocatorMaxDistance(Number(e.target.value))}
-                          className="locator-select"
+                          📍 Canlı GPS
+                        </button>
+                        <button 
+                          type="button"
+                          className={`region-pill ${userLocationName === 'Kadıköy Merkez' ? 'active' : ''}`}
+                          onClick={() => handleLocationChange('Kadıköy Merkez', 40.9901, 29.0278)}
                         >
-                          <option value={5}>5 km Yakınındakiler</option>
-                          <option value={15}>15 km Yakınındakiler</option>
-                          <option value={30}>30 km Yakınındakiler</option>
-                          <option value={50}>50 km Yakınındakiler</option>
-                          <option value={999}>Tüm Mesafe</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* SEARCH INPUT */}
-                    <div className="locator-search-group">
-                      <label>İl/İlçe veya Bayi Arama</label>
-                      <div className="locator-search-wrapper">
-                        <SearchIcon size={14} className="locator-search-icon" />
-                        <input 
-                          type="text" 
-                          placeholder="Bayi adı, il veya ilçe yazın..." 
-                          value={dealerSearchQuery}
-                          onChange={(e) => setDealerSearchQuery(e.target.value)}
-                          className="locator-search-input"
-                        />
-                        {dealerSearchQuery && (
-                          <button onClick={() => setDealerSearchQuery('')} className="locator-search-clear">✕</button>
-                        )}
+                          Kadıköy
+                        </button>
+                        <button 
+                          type="button"
+                          className={`region-pill ${userLocationName === 'Beşiktaş Showroom' ? 'active' : ''}`}
+                          onClick={() => handleLocationChange('Beşiktaş Showroom', 41.0428, 29.0075)}
+                        >
+                          Beşiktaş
+                        </button>
+                        <button 
+                          type="button"
+                          className={`region-pill ${userLocationName === 'Ataşehir Merkez' ? 'active' : ''}`}
+                          onClick={() => handleLocationChange('Ataşehir Merkez', 40.9950, 29.1170)}
+                        >
+                          Ataşehir
+                        </button>
+                        <button 
+                          type="button"
+                          className={`region-pill ${userLocationName === 'Ankara Çankaya' ? 'active' : ''}`}
+                          onClick={() => handleLocationChange('Ankara Çankaya', 39.9208, 32.8541)}
+                        >
+                          Ankara
+                        </button>
+                        <button 
+                          type="button"
+                          className={`region-pill ${userLocationName === 'İzmir Bornova' ? 'active' : ''}`}
+                          onClick={() => handleLocationChange('İzmir Bornova', 38.4682, 27.2185)}
+                        >
+                          İzmir
+                        </button>
+                        <button 
+                          type="button"
+                          className={`region-pill ${userLocationName === 'Bursa Nilüfer' ? 'active' : ''}`}
+                          onClick={() => handleLocationChange('Bursa Nilüfer', 40.2120, 28.9800)}
+                        >
+                          Bursa
+                        </button>
                       </div>
                     </div>
                   </div>
 
-                  {/* SIMULATED PRESETS FOR QUICK TEST */}
-                  <div className="control-group mini-presets">
-                    <label>Hızlı Konum Değiştir (GPS Simülatörü)</label>
-                    <div className="location-buttons-row">
-                      <button className={`loc-btn-mini ${userLocationName === 'Kadıköy Merkez' ? 'active' : ''}`} onClick={() => handleLocationChange('Kadıköy Merkez', 40.9901, 29.0278)}>Kadıköy</button>
-                      <button className={`loc-btn-mini ${userLocationName === 'Beşiktaş Showroom' ? 'active' : ''}`} onClick={() => handleLocationChange('Beşiktaş Showroom', 41.0428, 29.0075)}>Beşiktaş</button>
-                      <button className={`loc-btn-mini ${userLocationName === 'Ataşehir Merkez' ? 'active' : ''}`} onClick={() => handleLocationChange('Ataşehir Merkez', 40.9950, 29.1170)}>Ataşehir</button>
-                    </div>
-                  </div>
-
-                  {/* LIST CONTAINER */}
+                  {/* DEALERS LIST CONTAINER */}
                   <div className="dealers-list-container">
                     <div className="list-header-row">
-                      <h4>Bulunan Yetkili Bayiler</h4>
-                      <span className="results-count">{displayDealers.length} Bayi</span>
+                      <div className="list-title-badge">
+                        <h4>Yetkili Bayi Listesi</h4>
+                        <span className="results-count">{displayDealers.length} Nokta</span>
+                      </div>
+                      <span className="sort-hint">📍 En yakından sıralı</span>
                     </div>
 
                     {displayDealers.length > 0 ? (
                       <div className="dealers-list-scroll">
-                        {displayDealers.map((dealer, idx) => (
-                          <div 
-                            key={dealer.id}
-                            onClick={() => setActiveDealerOnMap(dealer)}
-                            className={`dealer-card-new ${activeDealerOnMap?.id === dealer.id ? 'active' : ''}`}
-                          >
-                            {(() => {
-                              const driveTime = Math.max(3, Math.round(dealer.distanceKm * 2 + 1));
-                              const score = (4.5 + (idx % 5) * 0.1).toFixed(1);
-                              const reviewsCount = 45 + (idx * 17) % 120;
-                              const isPremiumPartner = idx % 3 === 0;
+                        {displayDealers.map((dealer, idx) => {
+                          const driveTime = Math.max(3, Math.round(dealer.distanceKm * 2 + 1));
+                          const score = (4.6 + (idx % 4) * 0.1).toFixed(1);
+                          const reviewsCount = 45 + ((idx * 19) % 115);
+                          const isPremiumPartner = idx % 3 === 0;
+                          const currentHour = new Date().getHours();
+                          const isOpen = currentHour >= 9 && currentHour < 19;
 
-                              return (
-                                <>
-                                  <div className="dealer-card-header-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                      <span className="dealer-brand-label">{dealer.brand?.name} Yetkili Bayi</span>
-                                      {isPremiumPartner && (
-                                        <span style={{ fontSize: '0.6rem', background: '#fef3c7', color: '#d97706', fontWeight: '800', padding: '1px 6px', borderRadius: '8px', border: '1px solid #fde68a' }}>
-                                          🏆 ALTIN BAYİ
-                                        </span>
-                                      )}
-                                    </div>
-                                    <div className="dealer-badge-new">#{idx + 1} En Yakın</div>
-                                  </div>
-
-                                  <div className="dealer-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
-                                    <h5 style={{ margin: 0, fontSize: '0.92rem', fontWeight: '800', color: '#0f172a' }}>{dealer.name}</h5>
-                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px', minWidth: '65px' }}>
-                                      <strong className="distance-tag" style={{ color: '#0f172a', fontSize: '0.82rem', fontWeight: '800' }}>{dealer.distanceKm} km</strong>
-                                      <span style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: '700' }}>🚗 {driveTime} dk sürüş</span>
-                                    </div>
-                                  </div>
-
-                                  {/* Star Rating row */}
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '-4px' }}>
-                                    <div style={{ display: 'flex', color: '#fbbf24', fontSize: '0.75rem' }}>★★★★★</div>
-                                    <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#0f172a' }}>{score}</span>
-                                    <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>({reviewsCount} yorum)</span>
-                                  </div>
-
-                                  <p className="address" style={{ margin: '2px 0 0 0', fontSize: '0.76rem', color: '#475569', lineHeight: '1.4' }}>{dealer.address} • {dealer.district}, {dealer.city}</p>
-                                  
-                                  {/* Open/Closed Badge */}
-                                  {(() => {
-                                    const currentHour = new Date().getHours();
-                                    const isOpen = currentHour >= 9 && currentHour < 19;
-                                    return (
-                                      <div className={`dealer-status-hours ${isOpen ? 'open' : 'closed'}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', fontWeight: '700', padding: '2px 8px', borderRadius: '12px', background: isOpen ? '#ecfdf5' : '#fef2f2', color: isOpen ? '#10b981' : '#ef4444', width: 'fit-content' }}>
-                                        <span className="status-dot" style={{ width: '6px', height: '6px', borderRadius: '50%', background: isOpen ? '#10b981' : '#ef4444', display: 'inline-block' }} />
-                                        <span>{isOpen ? 'Açık' : 'Kapalı'} • {isOpen ? 'Kapanış 19:00' : 'Açılış 09:00'}</span>
-                                      </div>
-                                    );
-                                  })()}
-                                  
-                                  <div className="dealer-contact-new-row" style={{ marginTop: '2px' }}>
-                                    <span className="phone" style={{ fontSize: '0.78rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px' }}><Phone size={12} style={{ color: 'var(--accent-gold)' }} /> {dealer.phone || '0850 123 45 67'}</span>
-                                  </div>
-                                </>
-                              );
-                            })()}
-                            
-                            <div className="dealer-actions-new">
-                              <div className="dealer-quick-links">
-                                <a 
-                                  href={`https://www.google.com/maps/dir/?api=1&origin=${userCoords ? userCoords.lat + ',' + userCoords.lng : ''}&destination=${dealer.lat || 41.0082},${dealer.lng || 28.9784}&travelmode=driving`} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="quick-action-link maps"
-                                  title="Google Haritalar ile Yol Tarifi Al"
-                                >
-                                  <Navigation size={12} />
-                                  <span>Yol Tarifi</span>
-                                </a>
-                                <a 
-                                  href={`https://wa.me/${(dealer.phone || '').replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20%C3%BCzerinden%20${encodeURIComponent(dealer.brand?.name || '')}%20yetkili%20bayiniz%20${encodeURIComponent(dealer.name || '')}%20i%C3%A7in%20teklif%20almak%20istiyorum.`} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="quick-action-link whatsapp"
-                                  title="WhatsApp ile İletişim Kur"
-                                >
-                                  <MessageSquare size={12} />
-                                  <span>WhatsApp</span>
-                                </a>
-                                <Link 
-                                  href={`/bayi/${slugify(dealer.name || 'yetkili-bayi')}`}
-                                  target="_blank"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="quick-action-link showroom"
-                                  title="Showroom & Detay Sayfasını İncele"
-                                  style={{ textDecoration: 'none' }}
-                                >
-                                  <Sparkles size={12} />
-                                  <span>Showroom</span>
-                                </Link>
+                          return (
+                            <div 
+                              key={dealer.id}
+                              onClick={() => setActiveDealerOnMap(dealer)}
+                              className={`dealer-card-new ${activeDealerOnMap?.id === dealer.id ? 'active' : ''}`}
+                            >
+                              {/* Top Brand & Rank Meta */}
+                              <div className="dealer-card-top-meta">
+                                <div className="brand-badge-group">
+                                  <span className="dealer-brand-label">{dealer.brand?.name} YETKİLİ BAYİ</span>
+                                  {isPremiumPartner && (
+                                    <span className="premium-partner-pill">
+                                      🏆 ALTIN BAYİ
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="dealer-badge-new">#{idx + 1} En Yakın</div>
                               </div>
-                              <button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setLeadProduct(activeProduct || { name: `${dealer.brand?.name} Serisi`, brandId: dealer.brandId, brand: { name: dealer.brand?.name } });
-                                  setLeadDealer(dealer);
-                                  setLeadSuccessMsg('');
-                                  setShowLeadModal(true);
-                                }}
-                                className="btn-primary btn-sm flex-btn quote-btn"
-                              >
-                                Teklif Al
-                              </button>
+
+                              {/* Title & Distance */}
+                              <div className="dealer-header">
+                                <h5 className="dealer-name-title">{dealer.name}</h5>
+                                <div className="distance-col">
+                                  <strong className="distance-tag">{dealer.distanceKm} km</strong>
+                                  <span className="drive-time-tag">🚗 ~{driveTime} dk</span>
+                                </div>
+                              </div>
+
+                              {/* Stars & Opening Status */}
+                              <div className="dealer-rating-status-row">
+                                <div className="rating-wrap">
+                                  <span className="stars-gold">★★★★★</span>
+                                  <strong className="score-num">{score}</strong>
+                                  <span className="reviews-num">({reviewsCount})</span>
+                                </div>
+                                <div className={`dealer-status-hours ${isOpen ? 'open' : 'closed'}`}>
+                                  <span className="status-dot" />
+                                  <span>{isOpen ? 'Açık' : 'Kapalı'} • {isOpen ? '19:00\'a kadar' : 'Yarın 09:00'}</span>
+                                </div>
+                              </div>
+
+                              {/* Address */}
+                              <p className="dealer-address-text">
+                                <MapPin size={13} className="inline-address-pin" />
+                                <span>{dealer.address} • {dealer.district}, {dealer.city}</span>
+                              </p>
+
+                              {/* Direct Clickable Phone */}
+                              <div className="dealer-phone-bar">
+                                <a 
+                                  href={`tel:${(dealer.phone || '08501234567').replace(/[\s\-\(\)]/g, '')}`} 
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="dealer-call-link"
+                                  title="Bayiyi Doğrudan Ara"
+                                >
+                                  <Phone size={13} />
+                                  <span>{dealer.phone || '0850 123 45 67'}</span>
+                                  <span className="call-now-label">(Hemen Ara)</span>
+                                </a>
+                              </div>
+
+                              {/* Action Buttons (Symmetrical 3-Column + Full-Width CTA) */}
+                              <div className="dealer-actions-new">
+                                <div className="dealer-quick-links">
+                                  <a 
+                                    href={`https://www.google.com/maps/dir/?api=1&origin=${userCoords ? userCoords.lat + ',' + userCoords.lng : ''}&destination=${dealer.lat || 41.0082},${dealer.lng || 28.9784}&travelmode=driving`} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="quick-action-link maps"
+                                    title="Google Haritalar ile Yol Tarifi Al"
+                                  >
+                                    <Navigation size={13} />
+                                    <span>Yol Tarifi</span>
+                                  </a>
+                                  <a 
+                                    href={`https://wa.me/${(dealer.phone || '').replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20%C3%BCzerinden%20${encodeURIComponent(dealer.brand?.name || '')}%20yetkili%20bayiniz%20${encodeURIComponent(dealer.name || '')}%20i%C3%A7in%20teklif%20almak%20istiyorum.`} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="quick-action-link whatsapp"
+                                    title="WhatsApp ile İletişim Kur"
+                                  >
+                                    <MessageSquare size={13} />
+                                    <span>WhatsApp</span>
+                                  </a>
+                                  <Link 
+                                    href={`/bayi/${slugify(dealer.name || 'yetkili-bayi')}`}
+                                    target="_blank"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="quick-action-link showroom"
+                                    title="Showroom & Detay Sayfasını İncele"
+                                  >
+                                    <Store size={13} />
+                                    <span>Showroom</span>
+                                  </Link>
+                                </div>
+                                <button 
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setLeadProduct(activeProduct || { name: `${dealer.brand?.name} Serisi`, brandId: dealer.brandId, brand: { name: dealer.brand?.name } });
+                                    setLeadDealer(dealer);
+                                    setLeadSuccessMsg('');
+                                    setShowLeadModal(true);
+                                  }}
+                                  className="dealer-quote-main-btn"
+                                >
+                                  <span>⚡ Yetkili Bayiden Teklif Al</span>
+                                  <ChevronRight size={16} />
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : (
                       <div className="no-dealers-found">
-                        <MapPin size={24} className="no-dealers-icon" />
-                        <p>Kriterlere uygun yetkili bayi bulunamadı.</p>
-                        <span>Mesafe sınırını artırabilir veya arama kelimesini temizleyebilirsiniz.</span>
+                        <MapPin size={28} className="no-dealers-icon" />
+                        <h5>Kriterlere Uygun Bayi Bulunamadı</h5>
+                        <p>Mesafe sınırını artırarak veya arama kutusunu temizleyerek daha geniş bir alandaki bayileri görüntüleyebilirsiniz.</p>
+                        <button 
+                          type="button" 
+                          onClick={() => { setDealerSearchQuery(''); setLocatorMaxDistance(999); setLocatorBrandId(''); }}
+                          className="btn-reset-filters"
+                        >
+                          Filtreleri Temizle
+                        </button>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="dealers-map-panel glass-panel">
+                {/* Interactive Map Column */}
+                <div className={`dealers-map-panel glass-panel ${dealerMobileView === 'map' ? 'mobile-active' : 'mobile-hidden'}`}>
                   <MapComponent 
                     dealers={displayDealers} 
                     userCoords={userCoords} 
                     activeDealer={activeDealerOnMap} 
                   />
+                  {activeDealerOnMap && (
+                    <div className="mobile-map-active-card animate-slide-up">
+                      <div className="map-card-head">
+                        <div>
+                          <span className="map-brand-tag">{activeDealerOnMap.brand?.name} Yetkili Bayi</span>
+                          <h6 className="map-dealer-title">{activeDealerOnMap.name}</h6>
+                          <span className="map-dist-info">📍 {activeDealerOnMap.distanceKm} km mesafe • {activeDealerOnMap.district}</span>
+                        </div>
+                      </div>
+                      <div className="map-card-btns">
+                        <a 
+                          href={`https://www.google.com/maps/dir/?api=1&origin=${userCoords ? userCoords.lat + ',' + userCoords.lng : ''}&destination=${activeDealerOnMap.lat || 41.0082},${activeDealerOnMap.lng || 28.9784}&travelmode=driving`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="map-action-btn maps"
+                        >
+                          <Navigation size={13} />
+                          <span>Yol Tarifi</span>
+                        </a>
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setLeadProduct(activeProduct || { name: `${activeDealerOnMap.brand?.name} Serisi`, brandId: activeDealerOnMap.brandId, brand: { name: activeDealerOnMap.brand?.name } });
+                            setLeadDealer(activeDealerOnMap);
+                            setLeadSuccessMsg('');
+                            setShowLeadModal(true);
+                          }}
+                          className="map-action-btn quote"
+                        >
+                          <span>Teklif Al</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
+
               </div>
             </div>
           );
@@ -13473,384 +13622,497 @@ export default function Home() {
           }
         }
 
-        /* Dealers Panel styles */
+        /* Modern Dealer Portal Styles */
         .dealers-portal {
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 16px;
+          width: 100%;
         }
 
+        /* Top App Bar */
+        .dealer-app-topbar {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          flex-wrap: wrap;
+          gap: 14px;
+        }
+
+        .dealer-title-group {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .dealer-section-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 3px 10px;
+          background: rgba(179, 142, 71, 0.08);
+          border: 1px solid rgba(179, 142, 71, 0.2);
+          border-radius: 20px;
+          font-size: 0.65rem;
+          font-weight: 800;
+          color: #b38e47;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          width: fit-content;
+        }
+
+        .pin-pill-icon {
+          color: var(--accent-gold);
+        }
+
+        .dealer-title-group h3 {
+          font-size: 1.35rem;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 2px 0 0 0;
+          line-height: 1.2;
+        }
+
+        .dealer-subtitle {
+          font-size: 0.8rem;
+          color: #64748b;
+          margin: 0;
+          line-height: 1.4;
+        }
+
+        /* Segmented View Switcher on Mobile */
+        .dealer-view-segmented-ctrl {
+          display: none;
+        }
+
+        @media (max-width: 1024px) {
+          .dealer-view-segmented-ctrl {
+            display: flex;
+            width: 100%;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 12px;
+            gap: 6px;
+            border: 1px solid #e2e8f0;
+          }
+
+          .seg-btn {
+            flex: 1;
+            padding: 9px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #64748b;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .seg-btn.active {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            font-weight: 800;
+          }
+        }
+
+        /* Active Product Chip */
+        .dealer-active-product-chip {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          padding: 8px 14px;
+          background: #fffbeb;
+          border: 1px solid #fef08a;
+          border-radius: 10px;
+          font-size: 0.78rem;
+          box-shadow: 0 2px 6px rgba(217, 119, 6, 0.05);
+        }
+
+        .chip-product-text {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          min-width: 0;
+          flex-wrap: wrap;
+        }
+
+        .chip-badge {
+          background: #d97706;
+          color: #ffffff;
+          font-size: 0.62rem;
+          font-weight: 800;
+          padding: 2px 7px;
+          border-radius: 6px;
+          letter-spacing: 0.04em;
+          flex-shrink: 0;
+        }
+
+        .chip-title {
+          color: #92400e;
+          font-weight: 700;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .chip-clear-btn {
+          background: transparent;
+          border: 1px solid rgba(180, 83, 9, 0.25);
+          border-radius: 6px;
+          color: #b45309;
+          font-size: 0.7rem;
+          font-weight: 700;
+          padding: 4px 9px;
+          cursor: pointer;
+          white-space: nowrap;
+          transition: background 0.15s;
+          flex-shrink: 0;
+        }
+
+        .chip-clear-btn:hover {
+          background: rgba(180, 83, 9, 0.08);
+        }
+
+        /* Layout Grid */
         .dealers-layout {
           display: grid;
-          grid-template-columns: 380px 1fr;
-          gap: 24px;
+          grid-template-columns: 420px 1fr;
+          gap: 20px;
           min-height: 720px;
           height: auto;
         }
 
         @media (max-width: 1024px) {
           .dealers-layout {
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
             min-height: auto;
-            height: auto;
           }
-          .dealers-map-panel {
+
+          .dealers-layout.show-list-mode .dealers-map-panel.mobile-hidden {
+            display: none !important;
+          }
+
+          .dealers-layout.show-map-mode .dealers-control-panel .dealers-list-container {
+            display: none !important;
+          }
+
+          .dealers-layout.show-map-mode .dealers-map-panel.mobile-active {
+            display: block !important;
+            height: calc(100vh - 240px);
             min-height: 480px;
-            height: 480px;
           }
         }
 
+        /* Control Panel */
         .dealers-control-panel {
-          padding: 24px;
+          padding: 18px;
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 14px;
           overflow-y: auto;
           background: #ffffff;
           border-radius: var(--border-radius-lg);
           border: 1px solid var(--border-color);
-          box-shadow: var(--glass-shadow);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
 
-        /* Custom scrollbar for control panel list */
         .dealers-control-panel::-webkit-scrollbar {
           width: 5px;
-        }
-        .dealers-control-panel::-webkit-scrollbar-track {
-          background: transparent;
         }
         .dealers-control-panel::-webkit-scrollbar-thumb {
           background: rgba(0,0,0,0.1);
           border-radius: 10px;
         }
 
-        .panel-title-row {
+        /* Compact Smart Location Bar */
+        .dealer-smart-location-bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          border-radius: 12px;
+          color: #ffffff;
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
+        }
+
+        .loc-bar-left {
           display: flex;
           align-items: center;
           gap: 10px;
-          flex-shrink: 0;
+          min-width: 0;
+          flex: 1;
         }
 
-        .pin-title-icon {
-          color: var(--accent-gold);
-        }
-
-        .dealers-control-panel h3 {
-          font-size: 1.35rem;
-          font-weight: 700;
-          color: var(--text-primary);
-          flex-shrink: 0;
-        }
-
-        .dealers-control-panel .desc {
-          font-size: 0.8rem;
-          color: var(--text-secondary);
-          line-height: 1.5;
-          flex-shrink: 0;
-        }
-
-        .active-product-badge {
-          background: rgba(179, 142, 71, 0.05);
-          border: 1px solid rgba(179, 142, 71, 0.2);
-          color: var(--accent-gold-hover);
-          font-size: 0.75rem;
-          padding: 10px 14px;
-          border-radius: var(--border-radius-sm);
-          line-height: 1.4;
-          flex-shrink: 0;
-        }
-
-        .active-product-badge.warning {
-          background: rgba(217, 119, 6, 0.05);
-          border-color: rgba(217, 119, 6, 0.2);
-          color: var(--accent-orange);
-          flex-shrink: 0;
-        }
-
-        /* GEOLOCATION DETECTOR CARD */
-        .locator-status-card {
-          background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          padding: 16px;
-          border-radius: var(--border-radius-md);
-          color: #ffffff;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-          position: relative;
-          overflow: hidden;
-          flex-shrink: 0;
-        }
-
-        .status-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .status-label {
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: #94a3b8;
-        }
-
-        .status-badge {
-          font-size: 0.7rem;
-          font-weight: 700;
-          padding: 4px 10px;
-          border-radius: 20px;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .status-badge.success {
-          background-color: rgba(16, 185, 129, 0.15);
-          color: #34d399;
-          border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .status-badge.warning {
-          background-color: rgba(217, 119, 6, 0.15);
-          color: #fbbf24;
-          border: 1px solid rgba(217, 119, 6, 0.3);
-        }
-
-        .status-badge.error {
-          background-color: rgba(239, 68, 68, 0.15);
-          color: #fca5a5;
-          border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .status-badge.pulse-loading {
-          background-color: rgba(148, 163, 184, 0.15);
-          color: #cbd5e1;
-          border: 1px solid rgba(148, 163, 184, 0.3);
-          animation: pulse-silver 1.5s infinite;
-        }
-
-        .status-info-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 12px;
-          z-index: 1;
-        }
-
-        .status-info {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-        }
-
-        .status-info strong {
-          font-size: 0.72rem;
-          color: #94a3b8;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-
-        .status-info span {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: #f8fafc;
-        }
-
-        .btn-detect-loc {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
-          border: none;
-          color: #ffffff;
-          font-family: var(--font-title);
-          font-weight: 600;
-          font-size: 0.75rem;
-          padding: 8px 14px;
-          border-radius: var(--border-radius-sm);
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 4px 10px rgba(179, 142, 71, 0.25);
-          white-space: nowrap;
-        }
-
-        .btn-detect-loc:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 14px rgba(179, 142, 71, 0.4);
-        }
-
-        .btn-detect-loc:active {
-          transform: translateY(1px);
-        }
-
-        .btn-detect-loc:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        /* FILTERS WIDGET */
-        .locator-filters-container {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          background: #f8fafc;
-          padding: 16px;
-          border-radius: var(--border-radius-md);
-          border: 1px solid var(--border-color);
-          flex-shrink: 0;
-        }
-
-        .locator-filters-row {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-        }
-
-        .locator-filter-group {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-
-        .locator-filter-group label {
-          font-size: 0.72rem;
-          font-weight: 700;
-          color: var(--text-secondary);
-        }
-
-        .locator-select {
-          width: 100%;
-          padding: 10px 12px;
-          background-color: #ffffff;
-          border: 1px solid var(--border-color);
-          border-radius: var(--border-radius-sm);
-          color: var(--text-primary);
-          font-family: var(--font-body);
-          font-size: 0.8rem;
-          outline: none;
-          transition: all 0.3s ease;
-          cursor: pointer;
-        }
-
-        .locator-select:focus {
-          border-color: var(--accent-gold);
-          box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.15);
-        }
-
-        .locator-search-group {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-        }
-
-        .locator-search-group label {
-          font-size: 0.72rem;
-          font-weight: 700;
-          color: var(--text-secondary);
-        }
-
-        .locator-search-wrapper {
-          position: relative;
-          display: flex;
-          align-items: center;
-        }
-
-        .locator-search-icon {
-          position: absolute;
-          left: 12px;
-          color: var(--text-muted);
-        }
-
-        .locator-search-input {
-          width: 100%;
-          padding: 10px 12px 10px 36px;
-          background-color: #ffffff;
-          border: 1px solid var(--border-color);
-          border-radius: var(--border-radius-sm);
-          color: var(--text-primary);
-          font-family: var(--font-body);
-          font-size: 0.8rem;
-          outline: none;
-          transition: all 0.3s ease;
-        }
-
-        .locator-search-input:focus {
-          border-color: var(--accent-gold);
-          box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.15);
-        }
-
-        .locator-search-clear {
-          position: absolute;
-          right: 12px;
-          background: transparent;
-          border: none;
-          color: var(--text-muted);
-          cursor: pointer;
-          font-size: 0.85rem;
-          padding: 2px;
+        .loc-icon-bubble {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          background: rgba(255, 255, 255, 0.08);
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: color 0.2s;
-        }
-
-        .locator-search-clear:hover {
-          color: var(--text-primary);
-        }
-
-        /* SIMULATED PRESETS */
-        .mini-presets {
+          color: var(--accent-gold);
           flex-shrink: 0;
         }
 
-        .mini-presets label {
-          display: block;
-          font-size: 0.72rem;
-          font-weight: 700;
-          color: var(--text-secondary);
-          margin-bottom: 6px;
-        }
-
-        .location-buttons-row {
+        .loc-text-block {
           display: flex;
-          gap: 6px;
-          background: #f1f5f9;
-          padding: 4px;
-          border-radius: var(--border-radius-sm);
-          border: 1px solid rgba(0, 0, 0, 0.03);
+          flex-direction: column;
+          min-width: 0;
+          gap: 1px;
         }
 
-        .loc-btn-mini {
-          flex: 1;
+        .loc-status-indicator {
+          font-size: 0.65rem;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .loc-dot.success {
+          color: #34d399;
+        }
+
+        .loc-dot.blue {
+          color: #60a5fa;
+        }
+
+        .loc-dot.pulse-yellow {
+          color: #fbbf24;
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+        }
+
+        .loc-dot.error {
+          color: #f87171;
+        }
+
+        .loc-name-label {
+          font-size: 0.84rem;
+          font-weight: 800;
+          color: #f8fafc;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .loc-refresh-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 7px 12px;
+          background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
+          border: none;
+          border-radius: 8px;
+          color: #ffffff;
+          font-weight: 800;
+          font-size: 0.72rem;
+          cursor: pointer;
+          white-space: nowrap;
+          flex-shrink: 0;
+          transition: transform 0.2s, box-shadow 0.2s;
+          box-shadow: 0 2px 8px rgba(179, 142, 71, 0.3);
+        }
+
+        .loc-refresh-btn:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.4);
+        }
+
+        .loc-refresh-btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        /* Filter Card (Search + Selects + Regions) */
+        .dealer-filter-card {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          padding: 12px;
+          background: #f8fafc;
+          border-radius: 12px;
+          border: 1px solid #e2e8f0;
+        }
+
+        .dealer-search-box {
+          position: relative;
+          display: flex;
+          align-items: center;
+          width: 100%;
+        }
+
+        .search-ico {
+          position: absolute;
+          left: 12px;
+          color: #94a3b8;
+          pointer-events: none;
+        }
+
+        .dealer-search-field {
+          width: 100%;
+          padding: 9px 34px 9px 34px;
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          border-radius: 9px;
+          font-size: 0.8rem;
+          color: #0f172a;
+          outline: none;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .dealer-search-field:focus {
+          border-color: var(--accent-gold);
+          box-shadow: 0 0 0 3px rgba(179, 142, 71, 0.12);
+        }
+
+        .search-clear-cross {
+          position: absolute;
+          right: 10px;
           background: transparent;
           border: none;
-          color: var(--text-secondary);
-          font-family: var(--font-title);
-          font-weight: 600;
-          font-size: 0.72rem;
-          padding: 6px 10px;
-          border-radius: calc(var(--border-radius-sm) - 2px);
+          color: #94a3b8;
+          font-size: 0.85rem;
           cursor: pointer;
-          transition: all 0.2s ease;
-          text-align: center;
+          padding: 2px;
         }
 
-        .loc-btn-mini:hover {
-          color: var(--text-primary);
+        .search-clear-cross:hover {
+          color: #0f172a;
         }
 
-        .loc-btn-mini.active {
+        /* Symmetrical Selects (No Truncation) */
+        .dealer-selects-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          width: 100%;
+        }
+
+        .dealer-select-wrap {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          min-width: 0;
+        }
+
+        .select-field-label {
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: #64748b;
+        }
+
+        .custom-select-box {
+          position: relative;
+          display: flex;
+          align-items: center;
+          width: 100%;
+        }
+
+        .dealer-dropdown-select {
+          width: 100%;
+          appearance: none;
+          -webkit-appearance: none;
+          padding: 8px 24px 8px 10px;
           background: #ffffff;
-          color: var(--accent-gold);
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          font-size: 0.78rem;
+          font-weight: 600;
+          color: #0f172a;
+          outline: none;
+          cursor: pointer;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+          transition: border-color 0.2s;
         }
 
-        /* LIST CONTAINER */
+        .dealer-dropdown-select:focus {
+          border-color: var(--accent-gold);
+        }
+
+        .dropdown-arrow-svg {
+          position: absolute;
+          right: 8px;
+          color: #64748b;
+          pointer-events: none;
+        }
+
+        /* Quick Regions Scroll Row */
+        .dealer-quick-regions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-top: 2px;
+          overflow: hidden;
+        }
+
+        .regions-title {
+          font-size: 0.68rem;
+          font-weight: 800;
+          color: #94a3b8;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+
+        .regions-scroll-list {
+          display: flex;
+          gap: 6px;
+          overflow-x: auto;
+          padding-bottom: 2px;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+
+        .regions-scroll-list::-webkit-scrollbar {
+          display: none;
+        }
+
+        .region-pill {
+          padding: 4px 10px;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          color: #475569;
+          white-space: nowrap;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          flex-shrink: 0;
+        }
+
+        .region-pill:hover {
+          border-color: var(--accent-gold);
+          color: var(--accent-gold-hover);
+        }
+
+        .region-pill.active {
+          background: #0f172a;
+          border-color: #0f172a;
+          color: var(--accent-gold);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dealers List Container */
         .dealers-list-container {
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 10px;
         }
 
         .list-header-row {
@@ -13858,94 +14120,113 @@ export default function Home() {
           justify-content: space-between;
           align-items: center;
           padding-bottom: 6px;
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid #f1f5f9;
         }
 
-        .list-header-row h4 {
-          font-size: 0.9rem;
-          font-weight: 700;
-          color: var(--text-primary);
+        .list-title-badge {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .list-title-badge h4 {
+          font-size: 0.92rem;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 0;
         }
 
         .results-count {
-          font-size: 0.72rem;
-          font-weight: 600;
+          font-size: 0.7rem;
+          font-weight: 800;
           background: #f1f5f9;
-          color: var(--text-secondary);
+          color: #475569;
           padding: 2px 8px;
-          border-radius: 12px;
+          border-radius: 10px;
+          border: 1px solid #e2e8f0;
+        }
+
+        .sort-hint {
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: #94a3b8;
         }
 
         .dealers-list-scroll {
           display: flex;
           flex-direction: column;
           gap: 12px;
-          padding-right: 2px;
         }
 
-        .dealers-list-scroll::-webkit-scrollbar {
-          width: 4px;
-        }
-        .dealers-list-scroll::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .dealers-list-scroll::-webkit-scrollbar-thumb {
-          background: rgba(0,0,0,0.08);
-          border-radius: 10px;
-        }
-
-        /* NEW DEALER CARD */
+        /* Modern Dealer Card */
         .dealer-card-new {
-          padding: 16px;
+          padding: 14px;
           background: #ffffff;
-          border: 1px solid var(--border-color);
-          border-radius: var(--border-radius-md);
+          border: 1px solid #e2e8f0;
+          border-radius: 14px;
           cursor: pointer;
           display: flex;
           flex-direction: column;
-          gap: 10px;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          gap: 8px;
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
-          overflow: hidden;
-          flex-shrink: 0;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
         }
 
         .dealer-card-new:hover {
-          transform: translateY(-2px);
-          border-color: rgba(179, 142, 71, 0.3);
-          box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.05);
+          transform: translateY(-1px);
+          border-color: #cbd5e1;
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
         }
 
         .dealer-card-new.active {
           border-color: var(--accent-gold);
           border-left: 4px solid var(--accent-gold);
-          background: linear-gradient(90deg, rgba(179, 142, 71, 0.02) 0%, #ffffff 100%);
-          box-shadow: 0 12px 25px -10px rgba(179, 142, 71, 0.12);
+          background: #faf9f6;
+          box-shadow: 0 8px 20px rgba(179, 142, 71, 0.1);
         }
 
-        .dealer-card-header-meta {
+        .dealer-card-top-meta {
           display: flex;
           justify-content: space-between;
           align-items: center;
           gap: 8px;
         }
 
+        .brand-badge-group {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-wrap: wrap;
+        }
+
         .dealer-brand-label {
           font-size: 0.65rem;
-          font-weight: 700;
+          font-weight: 800;
           color: var(--accent-gold);
           text-transform: uppercase;
           letter-spacing: 0.05em;
         }
 
+        .premium-partner-pill {
+          font-size: 0.58rem;
+          background: #fef3c7;
+          color: #b45309;
+          font-weight: 800;
+          padding: 1px 6px;
+          border-radius: 6px;
+          border: 1px solid #fde68a;
+        }
+
         .dealer-badge-new {
           background: #f8fafc;
-          border: 1px solid var(--border-color);
-          font-size: 0.6rem;
+          border: 1px solid #e2e8f0;
+          font-size: 0.62rem;
           font-weight: 700;
           padding: 2px 8px;
           border-radius: 12px;
-          color: var(--text-secondary);
+          color: #64748b;
+          white-space: nowrap;
         }
 
         .dealer-card-new.active .dealer-badge-new {
@@ -13958,50 +14239,88 @@ export default function Home() {
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
-          gap: 12px;
+          gap: 10px;
         }
 
-        .dealer-header h5 {
+        .dealer-name-title {
           font-size: 0.95rem;
-          font-weight: 700;
-          color: var(--text-primary);
+          font-weight: 800;
+          color: #0f172a;
           margin: 0;
           line-height: 1.3;
         }
 
+        .distance-col {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 1px;
+          flex-shrink: 0;
+        }
+
         .distance-tag {
           color: var(--accent-gold);
-          font-size: 0.85rem;
-          font-weight: 700;
+          font-size: 0.88rem;
+          font-weight: 800;
           white-space: nowrap;
         }
 
-        .dealer-card-new .address {
-          font-size: 0.75rem;
-          color: var(--text-secondary);
-          line-height: 1.4;
-          margin: 0;
+        .drive-time-tag {
+          font-size: 0.65rem;
+          font-weight: 700;
+          color: #94a3b8;
+          white-space: nowrap;
         }
 
-        /* Business Hours Badge */
+        .dealer-rating-status-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .rating-wrap {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .stars-gold {
+          color: #f59e0b;
+          font-size: 0.72rem;
+          letter-spacing: 1px;
+        }
+
+        .score-num {
+          font-size: 0.72rem;
+          font-weight: 800;
+          color: #0f172a;
+        }
+
+        .reviews-num {
+          font-size: 0.68rem;
+          color: #94a3b8;
+        }
+
         .dealer-status-hours {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          font-size: 0.72rem;
-          font-weight: 600;
-          padding: 4px 10px;
-          border-radius: 20px;
+          gap: 5px;
+          font-size: 0.68rem;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: 12px;
           width: fit-content;
         }
 
         .dealer-status-hours.open {
-          background-color: rgba(16, 185, 129, 0.08);
+          background-color: #ecfdf5;
           color: #059669;
         }
 
         .dealer-status-hours.closed {
-          background-color: rgba(239, 68, 68, 0.08);
+          background-color: #fef2f2;
           color: #dc2626;
         }
 
@@ -14021,33 +14340,64 @@ export default function Home() {
           background-color: #ef4444;
         }
 
-        .dealer-contact-new-row {
+        .dealer-address-text {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
+          gap: 5px;
+          font-size: 0.75rem;
+          color: #475569;
+          line-height: 1.35;
+          margin: 0;
+        }
+
+        .inline-address-pin {
+          color: #94a3b8;
+          flex-shrink: 0;
           margin-top: 2px;
         }
 
-        .dealer-contact-new-row .phone {
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: var(--text-secondary);
+        .dealer-phone-bar {
           display: flex;
           align-items: center;
-          gap: 6px;
         }
 
-        /* CARD ACTION LINKS */
+        .dealer-call-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.76rem;
+          font-weight: 700;
+          color: #334155;
+          text-decoration: none;
+          padding: 4px 8px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 6px;
+          transition: background 0.15s;
+        }
+
+        .dealer-call-link:hover {
+          background: #f1f5f9;
+        }
+
+        .call-now-label {
+          color: var(--accent-gold);
+          font-size: 0.68rem;
+        }
+
+        /* Action Buttons: 3 Columns + 1 Full CTA */
         .dealer-actions-new {
           display: flex;
           flex-direction: column;
           gap: 8px;
-          margin-top: 6px;
-          border-top: 1px dashed var(--border-color);
+          margin-top: 4px;
+          border-top: 1px dashed #e2e8f0;
           padding-top: 10px;
         }
 
         .dealer-quick-links {
-          display: flex;
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
           gap: 6px;
           width: 100%;
         }
@@ -14056,103 +14406,122 @@ export default function Home() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 4px;
-          padding: 6px 8px;
+          gap: 5px;
+          padding: 7px 6px;
           font-family: var(--font-title);
           font-weight: 700;
-          font-size: 0.65rem;
+          font-size: 0.7rem;
           text-decoration: none;
           border-radius: 8px;
-          transition: all 0.2s ease-in-out;
-          flex: 1;
+          transition: all 0.15s ease-in-out;
           white-space: nowrap;
+          text-align: center;
         }
 
         .quick-action-link.maps {
-          background-color: rgba(15, 23, 42, 0.04);
+          background-color: #f1f5f9;
           color: #0f172a;
-          border: 1px solid rgba(15, 23, 42, 0.08);
+          border: 1px solid #e2e8f0;
         }
 
         .quick-action-link.maps:hover {
-          background-color: rgba(15, 23, 42, 0.08);
-          transform: translateY(-1px);
+          background-color: #e2e8f0;
         }
 
         .quick-action-link.whatsapp {
-          background-color: rgba(37, 211, 102, 0.05);
-          color: #128c7e;
-          border: 1px solid rgba(37, 211, 102, 0.12);
+          background-color: #ecfdf5;
+          color: #059669;
+          border: 1px solid #a7f3d0;
         }
 
         .quick-action-link.whatsapp:hover {
-          background-color: rgba(37, 211, 102, 0.1);
-          transform: translateY(-1px);
+          background-color: #d1fae5;
         }
 
         .quick-action-link.showroom {
-          background-color: rgba(179, 142, 71, 0.05);
-          color: #b38e47;
-          border: 1px solid rgba(179, 142, 71, 0.12);
+          background-color: #fffbeb;
+          color: #b45309;
+          border: 1px solid #fde68a;
         }
 
         .quick-action-link.showroom:hover {
-          background-color: rgba(179, 142, 71, 0.1);
-          transform: translateY(-1px);
+          background-color: #fef3c7;
         }
 
-        .quote-btn {
-          font-size: 0.72rem !important;
-          padding: 8px 12px !important;
-          border-radius: 8px !important;
+        .dealer-quote-main-btn {
           width: 100%;
+          padding: 10px 14px;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          color: #ffffff;
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          border-radius: 9px;
+          font-size: 0.78rem;
+          font-weight: 800;
+          letter-spacing: 0.02em;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-weight: 700 !important;
-          text-transform: uppercase;
-          letter-spacing: 0.03em;
-          box-shadow: 0 2px 4px rgba(179, 142, 71, 0.08);
-          transition: all 0.2s ease-in-out !important;
+          gap: 6px;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+          transition: all 0.2s ease;
         }
 
-        .quote-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 10px rgba(179, 142, 71, 0.15);
+        .dealer-quote-main-btn:hover {
+          background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
+          color: #0f172a;
+          border-color: var(--accent-gold);
+          box-shadow: 0 6px 16px rgba(179, 142, 71, 0.3);
         }
 
-        /* EMPTY STATE */
+        /* Empty State */
         .no-dealers-found {
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           text-align: center;
-          padding: 40px 20px;
+          padding: 36px 16px;
           background: #f8fafc;
-          border: 1px dashed var(--border-color);
-          border-radius: var(--border-radius-md);
-          color: var(--text-secondary);
-          gap: 8px;
+          border: 1px dashed #cbd5e1;
+          border-radius: 14px;
+          color: #64748b;
+          gap: 6px;
         }
 
         .no-dealers-icon {
-          color: var(--text-muted);
-          margin-bottom: 4px;
+          color: #94a3b8;
+          margin-bottom: 2px;
         }
 
-        .no-dealers-found p {
-          font-size: 0.8rem;
-          font-weight: 700;
-          color: var(--text-primary);
+        .no-dealers-found h5 {
+          font-size: 0.9rem;
+          font-weight: 800;
+          color: #0f172a;
           margin: 0;
         }
 
-        .no-dealers-found span {
-          font-size: 0.72rem;
-          color: var(--text-muted);
+        .no-dealers-found p {
+          font-size: 0.75rem;
+          color: #64748b;
+          margin: 0;
+          max-width: 320px;
+          line-height: 1.4;
         }
 
+        .btn-reset-filters {
+          margin-top: 8px;
+          padding: 6px 14px;
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: #0f172a;
+          cursor: pointer;
+        }
+
+        /* Map Panel */
         .dealers-map-panel {
           overflow: hidden;
           background-color: #f1f3f5;
@@ -14162,6 +14531,96 @@ export default function Home() {
           min-height: 600px;
           height: 100%;
           position: relative;
+        }
+
+        /* Mobile Map Floating Card */
+        .mobile-map-active-card {
+          position: absolute;
+          bottom: 16px;
+          left: 14px;
+          right: 14px;
+          background: #ffffff;
+          border-radius: 14px;
+          padding: 12px 14px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          border: 1px solid #e2e8f0;
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .map-card-head {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+        }
+
+        .map-brand-tag {
+          font-size: 0.62rem;
+          font-weight: 800;
+          color: var(--accent-gold);
+          text-transform: uppercase;
+        }
+
+        .map-dealer-title {
+          font-size: 0.92rem;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 2px 0 0 0;
+        }
+
+        .map-dist-info {
+          font-size: 0.72rem;
+          color: #64748b;
+          font-weight: 600;
+        }
+
+        .map-card-btns {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+        }
+
+        .map-action-btn {
+          padding: 8px 12px;
+          border-radius: 8px;
+          font-size: 0.74rem;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        .map-action-btn.maps {
+          background: #f1f5f9;
+          color: #0f172a;
+          border: 1px solid #e2e8f0;
+        }
+
+        .map-action-btn.quote {
+          background: linear-gradient(135deg, var(--accent-gold) 0%, #987532 100%);
+          color: #ffffff;
+          border: none;
+        }
+
+        /* Mobile specific spacing & bottom safety */
+        @media (max-width: 768px) {
+          .dealers-portal {
+            padding-bottom: 120px !important;
+          }
+
+          .dealers-control-panel {
+            padding: 14px;
+            border-radius: 12px;
+          }
+
+          .dealer-app-topbar h3 {
+            font-size: 1.2rem;
+          }
         }
 
         /* KEYFRAME ANIMATIONS */
