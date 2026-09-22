@@ -28,6 +28,7 @@ import {
   FileText,
   HelpCircle,
   ArrowRight,
+  ArrowLeft,
   UploadCloud,
   ChevronDown,
   ChevronRight,
@@ -8481,212 +8482,292 @@ export default function Home() {
         </div>
       )}
 
-      {/* COMPARISON MODAL */}
+      {/* APP-LIKE FULL-SCREEN COMPARISON MODAL */}
       {showComparisonModal && (
-        <div className="compare-modal-overlay animate-fade-in" onClick={() => setShowComparisonModal(false)}>
-          <div className="compare-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="compare-modal-header">
-              <div>
-                <h2>Teknik Detay Karşılaştırma Sihirbazı</h2>
-                <p>Seçtiğiniz seramik modellerinin tüm teknik detay ve mimari özelliklerinin yan yana analizi</p>
+        <div className="compare-app-overlay animate-fade-in">
+          <div className="compare-app-modal">
+            {/* 1. App Top Navigation Bar */}
+            <div className="compare-app-header">
+              <button 
+                type="button" 
+                className="compare-app-back-btn" 
+                onClick={() => setShowComparisonModal(false)}
+              >
+                <ArrowLeft size={18} />
+                <span>Kapat</span>
+              </button>
+              
+              <div className="compare-app-title-group">
+                <h3>Ürün Karşılaştırma</h3>
+                <span className="compare-app-count-pill">{comparedProducts.length} Model Karşılaştırılıyor</span>
               </div>
-              <button className="compare-modal-close" onClick={() => setShowComparisonModal(false)}>✕</button>
+
+              <button 
+                type="button" 
+                className="compare-app-clear-btn" 
+                onClick={() => {
+                  setComparedProducts([]);
+                  setShowComparisonModal(false);
+                }}
+                title="Tüm modelleri temizle"
+              >
+                <Trash2 size={15} />
+                <span>Temizle</span>
+              </button>
             </div>
 
-            {/* Mobile swipe hint */}
-            <div className="compare-mobile-scroll-hint">
-              <span>👉 Diğer modelleri görmek için tabloyu sağa kaydırın</span>
-            </div>
+            {/* 2. Main Scrollable Container */}
+            <div className="compare-app-scroll-container">
+              {/* STICKY TOP PRODUCT SHOWCASE: Pins to top so products never disappear while scrolling */}
+              <div className="compare-app-sticky-products">
+                <div 
+                  className="compare-products-grid" 
+                  style={{ gridTemplateColumns: `repeat(${comparedProducts.length}, minmax(${comparedProducts.length <= 2 ? '1fr' : '155px'}, 1fr))` }}
+                >
+                  {comparedProducts.map(p => (
+                    <div key={p.id} className="compare-app-product-card">
+                      <button 
+                        type="button"
+                        className="compare-app-remove-card-btn" 
+                        onClick={() => toggleCompareProduct(p)}
+                        title="Bu Modeli Kaldır"
+                      >
+                        ✕
+                      </button>
 
-            <div className="compare-modal-body">
-              <div className="compare-table-wrapper">
-                <table className="compare-table">
-                  <thead>
-                    <tr>
-                      <th className="feature-col">Özellikler</th>
-                      {comparedProducts.map(p => (
-                        <th key={p.id} className="product-col">
-                          <div className="compare-product-header">
-                            <button 
-                              type="button"
-                              className="compare-product-remove" 
-                              onClick={() => toggleCompareProduct(p)}
-                              title="Bu Ürünü Kaldır"
-                            >
-                              ✕ Kaldır
-                            </button>
-                            <div className="compare-product-img">
-                              <img 
-                                src={p.imageUrl || p.textureUrl || '/textures/calacatta_gold.jpg'} 
-                                alt={p.name}
-                                onError={(e) => { e.currentTarget.src = '/textures/calacatta_gold.jpg'; }}
-                              />
-                            </div>
-                            <span className="compare-product-brand">{p.brand?.name}</span>
-                            <h3 className="compare-product-title">{p.name}</h3>
-                            <span className="compare-product-code">{p.code}</span>
-                          </div>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
+                      <div className="compare-app-product-img-box">
+                        <img 
+                          src={p.imageUrl || p.textureUrl || '/textures/calacatta_gold.jpg'} 
+                          alt={p.name}
+                          onError={(e) => { e.currentTarget.src = '/textures/calacatta_gold.jpg'; }}
+                        />
+                        <span className="compare-app-size-tag">{p.width || 60}×{p.height || 60} cm</span>
+                      </div>
 
-                    {/* Boyut ve Görünüm */}
-                    <tr className="section-row">
-                      <td colSpan={comparedProducts.length + 1}>Boyut ve Görünüm Detayları</td>
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Ebat (Genişlik x Yükseklik)</td>
-                      {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">{p.width}x{p.height} cm</td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Renk</td>
-                      {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">
-                          <span className="color-badge" style={{ backgroundColor: p.color === 'Beyaz' ? '#ffffff' : p.color === 'Gri' ? '#8e939f' : p.color === 'Antrasit' ? '#2e3035' : p.color === 'Bej' ? '#f4ece1' : p.color === 'Kahverengi' ? '#8b5a2b' : '#cccccc', border: '1px solid #e2e8f0' }} />
-                          {p.color}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Bitiş / Yüzey</td>
-                      {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">{p.finish}</td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Stil / Tasarım</td>
-                      {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">{p.style}</td>
-                      ))}
-                    </tr>
+                      <div className="compare-app-card-meta">
+                        <span className="compare-app-brand-name">{p.brand?.name || 'Yetkili Marka'}</span>
+                        <h4 className="compare-app-product-name" title={p.name}>{p.name}</h4>
+                      </div>
 
-                    {/* Teknik Özellikler */}
-                    <tr className="section-row">
-                      <td colSpan={comparedProducts.length + 1}>Teknik Dayanıklılık Değerleri</td>
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Aşınma Dayanımı (PEI Sınıfı)</td>
+                      {/* Quick Action Buttons */}
+                      <div className="compare-app-card-actions">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowComparisonModal(false);
+                            navigateTo3DStudio(p);
+                          }}
+                          className="compare-app-btn-3d"
+                          title="3D Sanal Stüdyoda Canlı Gör"
+                        >
+                          <Sparkles size={13} />
+                          <span>3D Gör</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowComparisonModal(false);
+                            navigateToDealers(p);
+                          }}
+                          className="compare-app-btn-dealer"
+                          title="En Yakın Yetkili Bayileri Listele"
+                        >
+                          <Store size={13} />
+                          <span>Bayi Bul</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 3. Specs Comparison Content */}
+              <div className="compare-app-specs-content">
+                {/* SECTION 1: BOYUT & GÖRÜNÜM */}
+                <div className="compare-spec-section">
+                  <div className="compare-section-header">
+                    <Layers size={15} />
+                    <span>Boyut & Tasarım Özellikleri</span>
+                  </div>
+
+                  {/* Spec Row: Ebat */}
+                  <div className="compare-spec-row">
+                    <div className="spec-row-label">Ebat (Genişlik × Yükseklik)</div>
+                    <div 
+                      className="spec-values-grid" 
+                      style={{ gridTemplateColumns: `repeat(${comparedProducts.length}, minmax(${comparedProducts.length <= 2 ? '1fr' : '155px'}, 1fr))` }}
+                    >
                       {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">
+                        <div key={p.id} className="spec-val-box font-bold">
+                          {p.width || '—'} × {p.height || '—'} cm
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Spec Row: Renk */}
+                  <div className="compare-spec-row">
+                    <div className="spec-row-label">Renk Tonu</div>
+                    <div 
+                      className="spec-values-grid" 
+                      style={{ gridTemplateColumns: `repeat(${comparedProducts.length}, minmax(${comparedProducts.length <= 2 ? '1fr' : '155px'}, 1fr))` }}
+                    >
+                      {comparedProducts.map(p => (
+                        <div key={p.id} className="spec-val-box">
+                          <span 
+                            className="color-dot" 
+                            style={{ backgroundColor: p.color === 'Beyaz' ? '#ffffff' : p.color === 'Gri' ? '#8e939f' : p.color === 'Antrasit' ? '#2e3035' : p.color === 'Bej' ? '#f4ece1' : p.color === 'Kahverengi' ? '#8b5a2b' : '#cbd5e1' }} 
+                          />
+                          <span>{p.color || 'Belirtilmemiş'}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Spec Row: Yüzey / Bitiş */}
+                  <div className="compare-spec-row">
+                    <div className="spec-row-label">Yüzey / Bitiş Tipi</div>
+                    <div 
+                      className="spec-values-grid" 
+                      style={{ gridTemplateColumns: `repeat(${comparedProducts.length}, minmax(${comparedProducts.length <= 2 ? '1fr' : '155px'}, 1fr))` }}
+                    >
+                      {comparedProducts.map(p => (
+                        <div key={p.id} className="spec-val-box">
+                          <span className="spec-pill">{p.finish || 'Mat'}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Spec Row: Stil / Doku */}
+                  <div className="compare-spec-row">
+                    <div className="spec-row-label">Stil & Doku Deseni</div>
+                    <div 
+                      className="spec-values-grid" 
+                      style={{ gridTemplateColumns: `repeat(${comparedProducts.length}, minmax(${comparedProducts.length <= 2 ? '1fr' : '155px'}, 1fr))` }}
+                    >
+                      {comparedProducts.map(p => (
+                        <div key={p.id} className="spec-val-box">
+                          <span className="spec-pill">{p.style || 'Mermer Desenli'}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* SECTION 2: TEKNİK DAYANIKLILIK */}
+                <div className="compare-spec-section">
+                  <div className="compare-section-header">
+                    <CheckCircle size={15} />
+                    <span>Teknik & Mimari Dayanıklılık</span>
+                  </div>
+
+                  {/* Spec Row: Aşınma (PEI) */}
+                  <div className="compare-spec-row">
+                    <div className="spec-row-label">Aşınma Dayanımı (PEI Sınıfı)</div>
+                    <div 
+                      className="spec-values-grid" 
+                      style={{ gridTemplateColumns: `repeat(${comparedProducts.length}, minmax(${comparedProducts.length <= 2 ? '1fr' : '155px'}, 1fr))` }}
+                    >
+                      {comparedProducts.map(p => (
+                        <div key={p.id} className="spec-val-box">
                           {p.peiRating ? (
-                            <span className={`tech-badge pei-class-${p.peiRating}`}>
-                              PEI {p.peiRating} ({p.peiRating >= 4 ? 'Yoğun Trafik' : 'Orta Trafik'})
+                            <span className="spec-tag gold">
+                              PEI {p.peiRating} ({p.peiRating >= 4 ? 'Yoğun Trafik' : 'Konut/Orta'})
                             </span>
                           ) : (
-                            <span className="text-muted">Belirtilmemiş</span>
+                            <span className="spec-val-muted">Standart Konut</span>
                           )}
-                        </td>
+                        </div>
                       ))}
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Kaymazlık Sınıfı (R Değeri)</td>
+                    </div>
+                  </div>
+
+                  {/* Spec Row: Kaymazlık (R Değeri) */}
+                  <div className="compare-spec-row">
+                    <div className="spec-row-label">Kaymazlık Derecesi (R Değeri)</div>
+                    <div 
+                      className="spec-values-grid" 
+                      style={{ gridTemplateColumns: `repeat(${comparedProducts.length}, minmax(${comparedProducts.length <= 2 ? '1fr' : '155px'}, 1fr))` }}
+                    >
                       {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">
+                        <div key={p.id} className="spec-val-box">
                           {p.slipResistance ? (
-                            <span className={`tech-badge slip-class-${p.slipResistance}`}>
-                              {p.slipResistance} ({p.slipResistance === 'R11' ? 'Islak Alan/Dış Mekan' : p.slipResistance === 'R10' ? 'Mutfak/Banyo Yer' : 'İç Mekan Duvar/Yer'})
+                            <span className="spec-tag blue">
+                              {p.slipResistance} ({p.slipResistance === 'R11' ? 'Islak/Dış Alan' : 'Mutfak/Banyo'})
                             </span>
                           ) : (
-                            <span className="text-muted">Belirtilmemiş</span>
+                            <span className="spec-val-muted">Standart Kaymazlık</span>
                           )}
-                        </td>
+                        </div>
                       ))}
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Dona Dayanıklılık</td>
+                    </div>
+                  </div>
+
+                  {/* Spec Row: Dona Dayanıklılık */}
+                  <div className="compare-spec-row">
+                    <div className="spec-row-label">Dış Mekan & Don Mukavemeti</div>
+                    <div 
+                      className="spec-values-grid" 
+                      style={{ gridTemplateColumns: `repeat(${comparedProducts.length}, minmax(${comparedProducts.length <= 2 ? '1fr' : '155px'}, 1fr))` }}
+                    >
                       {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">
+                        <div key={p.id} className="spec-val-box">
                           {p.frostResistance !== null ? (
                             p.frostResistance ? (
-                              <span className="tech-badge success">✓ Dona Dayanıklı (Dış Mekan Uygun)</span>
+                              <span className="spec-tag green">✓ Dona Dayanıklı</span>
                             ) : (
-                              <span className="tech-badge danger">✗ Dona Dayanıklı Değil (Sadece İç Mekan)</span>
+                              <span className="spec-tag gray">Sadece İç Mekan</span>
                             )
                           ) : (
-                            <span className="text-muted">Belirtilmemiş</span>
+                            <span className="spec-val-muted">İç Mekan Uyumlu</span>
                           )}
-                        </td>
+                        </div>
                       ))}
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Kalınlık</td>
+                    </div>
+                  </div>
+
+                  {/* Spec Row: Kalınlık */}
+                  <div className="compare-spec-row">
+                    <div className="spec-row-label">Gövde Kalınlığı</div>
+                    <div 
+                      className="spec-values-grid" 
+                      style={{ gridTemplateColumns: `repeat(${comparedProducts.length}, minmax(${comparedProducts.length <= 2 ? '1fr' : '155px'}, 1fr))` }}
+                    >
                       {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">
-                          {p.thickness ? `${p.thickness} mm` : <span className="text-muted">Belirtilmemiş</span>}
-                        </td>
+                        <div key={p.id} className="spec-val-box font-medium">
+                          {p.thickness ? `${p.thickness} mm` : '8.5 - 9 mm'}
+                        </div>
                       ))}
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Kenar Tipi (Rektifiyeli)</td>
+                    </div>
+                  </div>
+
+                  {/* Spec Row: Kenar Tipi / Rektifiye */}
+                  <div className="compare-spec-row">
+                    <div className="spec-row-label">Kenar Tipi (Rektifiye Kesim)</div>
+                    <div 
+                      className="spec-values-grid" 
+                      style={{ gridTemplateColumns: `repeat(${comparedProducts.length}, minmax(${comparedProducts.length <= 2 ? '1fr' : '155px'}, 1fr))` }}
+                    >
                       {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value">
+                        <div key={p.id} className="spec-val-box">
                           {p.rectified !== null ? (
                             p.rectified ? (
-                              <span className="tech-badge info">✓ Rektifiyeli (Sıfır Derz Uyumlu)</span>
+                              <span className="spec-tag green">✓ Rektifiyeli (Sıfır Derz)</span>
                             ) : (
-                              <span className="tech-badge warning">✗ Rektifiyesiz (Derzli Döşeme)</span>
+                              <span className="spec-tag gray">Rektifiyesiz (Derzli)</span>
                             )
                           ) : (
-                            <span className="text-muted">Belirtilmemiş</span>
+                            <span className="spec-val-muted">Lazer Kesim</span>
                           )}
-                        </td>
+                        </div>
                       ))}
-                    </tr>
+                    </div>
+                  </div>
+                </div>
 
-                    {/* Fiyat ve Hızlı Aksiyonlar */}
-                    <tr className="section-row">
-                      <td colSpan={comparedProducts.length + 1}>Fiyat & Hızlı İşlemler</td>
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Metrekare Fiyatı</td>
-                      {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value highlight-price-cell">
-                          {p.cheapestOffer?.price ? (
-                            <strong className="compare-price-val">{p.cheapestOffer.price} ₺/m²</strong>
-                          ) : (
-                            <span className="text-muted">Yetkili Bayiden Teklif Alın</span>
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                    <tr>
-                      <td className="feature-name">Doğrudan Deneyim</td>
-                      {comparedProducts.map(p => (
-                        <td key={p.id} className="feature-value compare-actions-cell">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowComparisonModal(false);
-                              navigateTo3DStudio(p);
-                            }}
-                            className="btn-table-action btn-table-3d"
-                            title={`${p.name} mekana giydir ve 3D gör`}
-                          >
-                            <Sparkles size={13} />
-                            <span>3D Mekanda Gör</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setShowComparisonModal(false);
-                              navigateToDealers(p);
-                            }}
-                            className="btn-table-action btn-table-dealer"
-                            title={`${p.name} için yetkili bayileri gör`}
-                          >
-                            <Store size={13} />
-                            <span>Bayi Bul & Teklif Al</span>
-                          </button>
-                        </td>
-                      ))}
-                    </tr>
-
-                  </tbody>
-                </table>
+                {/* Bottom Padding */}
+                <div style={{ height: '30px' }} />
               </div>
             </div>
           </div>
@@ -16340,291 +16421,439 @@ export default function Home() {
           box-shadow: none;
         }
 
-        /* Comparison Modal */
-        .compare-modal-overlay {
+        /* ==========================================================================
+           APP-LIKE FULL-SCREEN COMPARISON MODAL STYLES (NATIVE MOBILE & DESKTOP)
+           ========================================================================== */
+        .compare-app-overlay {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(15, 23, 42, 0.8);
-          backdrop-filter: blur(8px);
+          background: rgba(15, 23, 42, 0.85);
+          backdrop-filter: blur(12px);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 10000;
-          padding: 24px;
+          padding: 20px;
         }
 
-        .compare-modal-content {
-          background: white;
+        .compare-app-modal {
+          background: #ffffff;
           width: 100%;
-          max-width: 1150px;
-          max-height: 90vh;
+          max-width: 1100px;
+          height: 90vh;
+          max-height: 850px;
           border-radius: 16px;
           overflow: hidden;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.4);
           display: flex;
           flex-direction: column;
-          border: 1px solid rgba(212, 175, 55, 0.3);
+          border: 1.5px solid rgba(212, 175, 55, 0.35);
+          position: relative;
         }
 
-        .compare-modal-header {
-          padding: 18px 24px;
-          border-bottom: 1px solid #f1f5f9;
+        /* 1. App Header Bar */
+        .compare-app-header {
           display: flex;
+          align-items: center;
           justify-content: space-between;
+          padding: 14px 20px;
+          background: #0f172a;
+          color: #ffffff;
+          border-bottom: 1.5px solid rgba(212, 175, 55, 0.3);
+          flex-shrink: 0;
+          z-index: 30;
+        }
+
+        .compare-app-back-btn {
+          display: inline-flex;
           align-items: center;
-          background: #ffffff;
-        }
-
-        .compare-modal-header h2 {
-          margin: 0;
-          font-size: 1.25rem;
-          font-weight: 800;
-          letter-spacing: -0.02em;
-          color: #0f172a;
-        }
-
-        .compare-modal-header p {
-          margin: 3px 0 0 0;
+          gap: 6px;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #ffffff;
+          padding: 7px 14px;
+          border-radius: 8px;
           font-size: 0.8rem;
-          color: #64748b;
-        }
-
-        .compare-modal-close {
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          background: #f1f5f9;
-          border: none;
-          font-size: 0.9rem;
-          font-weight: bold;
-          color: #64748b;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          font-weight: 700;
           cursor: pointer;
           transition: all 0.2s ease;
         }
 
-        .compare-modal-close:hover {
-          background: #ef4444;
-          color: white;
+        .compare-app-back-btn:hover {
+          background: rgba(255, 255, 255, 0.18);
+          transform: translateX(-2px);
         }
 
-        .compare-mobile-scroll-hint {
-          display: none;
-          background: #fffdf5;
-          border-bottom: 1px solid rgba(212, 175, 55, 0.25);
-          padding: 6px 12px;
-          font-size: 0.72rem;
-          font-weight: 700;
-          color: #b38e47;
+        .compare-app-title-group {
           text-align: center;
         }
 
-        .compare-modal-body {
-          flex-grow: 1;
-          overflow-y: auto;
-          padding: 20px 24px;
+        .compare-app-title-group h3 {
+          margin: 0;
+          font-size: 1.05rem;
+          font-weight: 800;
+          color: #ffffff;
+          letter-spacing: -0.01em;
         }
 
-        .compare-table-wrapper {
+        .compare-app-count-pill {
+          font-size: 0.72rem;
+          color: var(--accent-gold, #d4af37);
+          font-weight: 600;
+        }
+
+        .compare-app-clear-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          background: rgba(239, 68, 68, 0.12);
+          border: 1px solid rgba(239, 68, 68, 0.25);
+          color: #f87171;
+          padding: 6px 12px;
+          border-radius: 8px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .compare-app-clear-btn:hover {
+          background: #ef4444;
+          color: #ffffff;
+        }
+
+        /* 2. Scroll Container */
+        .compare-app-scroll-container {
+          flex: 1;
+          overflow-y: auto;
+          overflow-x: hidden;
+          background: #f8fafc;
+          position: relative;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        /* STICKY PINNED PRODUCTS ROW */
+        .compare-app-sticky-products {
+          position: sticky;
+          top: 0;
+          z-index: 25;
+          background: #ffffff;
+          border-bottom: 1.5px solid #e2e8f0;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+          padding: 12px 16px;
           overflow-x: auto;
           -webkit-overflow-scrolling: touch;
         }
 
-        .compare-table {
-          width: 100%;
-          border-collapse: separate;
-          border-spacing: 0;
-          text-align: left;
+        .compare-products-grid {
+          display: grid;
+          gap: 12px;
+          align-items: stretch;
         }
 
-        .compare-table th, .compare-table td {
-          padding: 12px 16px;
-          border-bottom: 1.5px solid #f1f5f9;
-        }
-
-        .compare-table th {
-          background: #f8fafc;
-        }
-
-        .feature-col {
-          width: 200px;
-          min-width: 180px;
-          font-weight: 700;
-          color: #475569;
-          font-size: 0.82rem;
-          background: white !important;
-          border-right: 1.5px solid #e2e8f0;
-          position: sticky;
-          left: 0;
-          z-index: 10;
-        }
-
-        .product-col {
-          min-width: 190px;
-          vertical-align: top;
-          text-align: center;
-          border-right: 1.5px solid #f1f5f9;
-        }
-
-        .compare-product-header {
+        .compare-app-product-card {
+          background: #ffffff;
+          border: 1.5px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 10px;
+          position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
-          position: relative;
-          padding-top: 14px;
+          text-align: center;
+          gap: 8px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+          transition: border-color 0.2s ease;
         }
 
-        .compare-product-remove {
+        .compare-app-product-card:hover {
+          border-color: rgba(212, 175, 55, 0.5);
+        }
+
+        .compare-app-remove-card-btn {
           position: absolute;
-          top: -6px;
-          font-size: 0.68rem;
+          top: 6px;
+          right: 6px;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: #fee2e2;
           color: #ef4444;
-          background: rgba(239, 68, 68, 0.1);
           border: none;
-          padding: 2px 8px;
-          border-radius: 12px;
-          font-weight: 700;
+          font-size: 0.65rem;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.15s ease;
+          z-index: 2;
         }
 
-        .compare-product-remove:hover {
+        .compare-app-remove-card-btn:hover {
           background: #ef4444;
-          color: white;
+          color: #ffffff;
+          transform: scale(1.1);
         }
 
-        .compare-product-img {
-          width: 72px;
-          height: 72px;
-          border-radius: 8px;
+        .compare-app-product-img-box {
+          position: relative;
+          width: 64px;
+          height: 64px;
+          border-radius: 10px;
           overflow: hidden;
-          border: 1px solid #e2e8f0;
-          margin-bottom: 10px;
-          background: #f8fafc;
+          border: 1.5px solid rgba(212, 175, 55, 0.3);
+          background: #f1f5f9;
+          flex-shrink: 0;
         }
 
-        .compare-product-img img {
+        .compare-app-product-img-box img {
           width: 100%;
           height: 100%;
           object-fit: cover;
           display: block;
         }
 
-        .compare-product-brand {
-          font-size: 0.65rem;
+        .compare-app-size-tag {
+          position: absolute;
+          bottom: 2px;
+          left: 2px;
+          right: 2px;
+          background: rgba(15, 23, 42, 0.75);
+          backdrop-filter: blur(2px);
+          color: #ffffff;
+          font-size: 0.55rem;
           font-weight: 700;
-          color: var(--accent-gold, #b38e47);
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-
-        .compare-product-title {
-          margin: 3px 0 2px 0;
-          font-size: 0.86rem;
-          font-weight: 800;
-          color: #0f172a;
-          line-height: 1.25;
-        }
-
-        .compare-product-code {
-          font-size: 0.68rem;
-          color: #64748b;
-          font-family: monospace;
-        }
-
-        .section-row td {
-          background: #f8fafc;
-          color: #1e293b;
-          font-weight: 800;
-          font-size: 0.78rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          padding: 8px 14px;
-          border-top: 1px solid #e2e8f0;
-        }
-
-        .feature-name {
-          font-weight: 600;
-          color: #64748b;
-          font-size: 0.78rem;
-          border-right: 1.5px solid #e2e8f0;
-          position: sticky;
-          left: 0;
-          background: white;
-          z-index: 9;
-        }
-
-        .feature-value {
-          text-align: center;
-          font-size: 0.82rem;
-          color: #334155;
-          font-weight: 500;
-          border-right: 1.5px solid #f1f5f9;
-        }
-
-        .highlight-price-cell {
-          background: #f0fdf4;
-        }
-
-        .compare-price-val {
-          font-size: 0.92rem;
-          font-weight: 800;
-          color: #059669;
-        }
-
-        .compare-actions-cell {
-          padding: 10px 8px !important;
-          vertical-align: middle;
-        }
-
-        .btn-table-action {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 5px;
-          padding: 7px 10px;
-          border-radius: 6px;
-          font-size: 0.72rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          border: none;
-          margin-bottom: 6px;
+          border-radius: 4px;
+          padding: 1px 2px;
           white-space: nowrap;
         }
 
-        .btn-table-action:last-child {
-          margin-bottom: 0;
+        .compare-app-card-meta {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          width: 100%;
+          overflow: hidden;
         }
 
-        .btn-table-3d {
+        .compare-app-brand-name {
+          font-size: 0.62rem;
+          font-weight: 800;
+          color: var(--accent-gold, #b38e47);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+
+        .compare-app-product-name {
+          margin: 0;
+          font-size: 0.8rem;
+          font-weight: 800;
+          color: #0f172a;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .compare-app-card-actions {
+          display: flex;
+          gap: 6px;
+          width: 100%;
+          margin-top: auto;
+        }
+
+        .compare-app-btn-3d {
+          flex: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
           background: #0f172a;
           color: #ffffff;
+          border: none;
+          padding: 6px 8px;
+          border-radius: 6px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          white-space: nowrap;
         }
 
-        .btn-table-3d:hover {
+        .compare-app-btn-3d:hover {
           background: var(--accent-gold, #d4af37);
           color: #0f172a;
         }
 
-        .btn-table-dealer {
+        .compare-app-btn-dealer {
+          flex: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
           background: rgba(212, 175, 55, 0.15);
           color: #987532;
           border: 1px solid rgba(212, 175, 55, 0.35);
+          padding: 6px 8px;
+          border-radius: 6px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          white-space: nowrap;
         }
 
-        .btn-table-dealer:hover {
+        .compare-app-btn-dealer:hover {
           background: var(--accent-gold, #d4af37);
           color: #0f172a;
         }
 
-        /* MOBILE COMPARISON STICKY BAR & MODAL */
+        /* 3. Specs Comparison Sections & Rows */
+        .compare-app-specs-content {
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .compare-spec-section {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .compare-section-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 14px;
+          background: #f1f5f9;
+          font-size: 0.76rem;
+          font-weight: 800;
+          color: #334155;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          border-bottom: 1px solid #e2e8f0;
+        }
+
+        .compare-spec-row {
+          display: flex;
+          flex-direction: column;
+          border-bottom: 1px solid #f1f5f9;
+        }
+
+        .compare-spec-row:last-child {
+          border-bottom: none;
+        }
+
+        .spec-row-label {
+          padding: 8px 14px 4px 14px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          color: #64748b;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+        }
+
+        .spec-values-grid {
+          display: grid;
+          gap: 12px;
+          padding: 4px 14px 10px 14px;
+          align-items: center;
+        }
+
+        .spec-val-box {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          font-size: 0.8rem;
+          color: #0f172a;
+          gap: 6px;
+          background: #f8fafc;
+          padding: 8px 10px;
+          border-radius: 8px;
+          min-height: 36px;
+          word-break: break-word;
+        }
+
+        .spec-val-box.font-bold {
+          font-weight: 800;
+          color: #0f172a;
+        }
+
+        .spec-val-box.font-medium {
+          font-weight: 700;
+          color: #334155;
+        }
+
+        .spec-val-muted {
+          font-size: 0.72rem;
+          color: #94a3b8;
+          font-weight: 500;
+        }
+
+        .color-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          display: inline-block;
+          border: 1px solid #cbd5e1;
+          flex-shrink: 0;
+        }
+
+        .spec-pill {
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          padding: 2px 8px;
+          border-radius: 12px;
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: #1e293b;
+        }
+
+        .spec-tag {
+          padding: 3px 8px;
+          border-radius: 6px;
+          font-size: 0.7rem;
+          font-weight: 700;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .spec-tag.gold {
+          background: rgba(212, 175, 55, 0.15);
+          color: #987532;
+          border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .spec-tag.blue {
+          background: #eff6ff;
+          color: #1d4ed8;
+          border: 1px solid #bfdbfe;
+        }
+
+        .spec-tag.green {
+          background: #f0fdf4;
+          color: #15803d;
+          border: 1px solid #bbf7d0;
+        }
+
+        .spec-tag.gray {
+          background: #f1f5f9;
+          color: #64748b;
+          border: 1px solid #e2e8f0;
+        }
+
+        /* ==========================================================================
+           NATIVE MOBILE APP IMMERSION (< 768px)
+           ========================================================================== */
         @media (max-width: 768px) {
           .sticky-compare-bar {
             padding: 8px 12px;
@@ -16742,82 +16971,101 @@ export default function Home() {
             height: 42px;
           }
 
-          /* Modal on Mobile */
-          .compare-modal-overlay {
-            padding: 8px 6px;
-            align-items: flex-end;
+          /* Full Screen Mobile Native App Modal */
+          .compare-app-overlay {
+            padding: 0 !important;
+            background: #0f172a;
           }
 
-          .compare-modal-content {
-            max-height: 94vh;
-            border-radius: 14px 14px 0 0;
-            margin-top: auto;
+          .compare-app-modal {
+            max-width: 100vw !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+            max-height: 100vh !important;
+            border-radius: 0 !important;
+            border: none !important;
           }
 
-          .compare-modal-header {
-            padding: 12px 14px;
+          .compare-app-header {
+            padding: 10px 12px;
           }
 
-          .compare-modal-header h2 {
-            font-size: 1rem;
+          .compare-app-back-btn {
+            padding: 6px 10px;
+            font-size: 0.75rem;
           }
 
-          .compare-modal-header p {
+          .compare-app-title-group h3 {
+            font-size: 0.92rem;
+          }
+
+          .compare-app-count-pill {
+            font-size: 0.65rem;
+          }
+
+          .compare-app-clear-btn {
+            padding: 5px 9px;
             font-size: 0.7rem;
           }
 
-          .compare-mobile-scroll-hint {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-
-          .compare-modal-body {
+          .compare-app-sticky-products {
             padding: 8px 10px;
           }
 
-          .feature-col {
-            width: 105px;
-            min-width: 105px;
-            max-width: 105px;
-            font-size: 0.7rem;
-            padding: 8px 6px;
-            box-shadow: 3px 0 8px rgba(0,0,0,0.06);
+          .compare-products-grid {
+            gap: 8px;
           }
 
-          .product-col {
-            min-width: 140px;
-            max-width: 160px;
+          .compare-app-product-card {
             padding: 8px 6px;
+            gap: 6px;
+            border-radius: 10px;
           }
 
-          .compare-product-img {
+          .compare-app-product-img-box {
             width: 52px;
             height: 52px;
-            margin-bottom: 6px;
+            border-radius: 8px;
           }
 
-          .compare-product-title {
-            font-size: 0.76rem;
-          }
-
-          .feature-name {
-            font-size: 0.7rem;
-            padding: 8px 6px;
-          }
-
-          .feature-value {
+          .compare-app-product-name {
             font-size: 0.72rem;
-            padding: 8px 6px;
           }
 
-          .compare-price-val {
-            font-size: 0.82rem;
+          .compare-app-brand-name {
+            font-size: 0.58rem;
           }
 
-          .btn-table-action {
-            padding: 6px 8px;
-            font-size: 0.68rem;
+          .compare-app-btn-3d, .compare-app-btn-dealer {
+            padding: 5px 4px;
+            font-size: 0.64rem;
+            gap: 3px;
+          }
+
+          .compare-app-specs-content {
+            padding: 10px;
+            gap: 12px;
+          }
+
+          .spec-row-label {
+            padding: 6px 10px 3px 10px;
+            font-size: 0.65rem;
+          }
+
+          .spec-values-grid {
+            gap: 8px;
+            padding: 3px 10px 8px 10px;
+          }
+
+          .spec-val-box {
+            font-size: 0.72rem;
+            padding: 6px 6px;
+            min-height: 32px;
+          }
+
+          .spec-tag {
+            font-size: 0.64rem;
+            padding: 2px 6px;
           }
         }
 
