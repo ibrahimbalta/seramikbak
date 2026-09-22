@@ -1768,12 +1768,16 @@ export default function Home() {
     }
   }, [activeTab]);
 
-  // Sync nearest dealers whenever locator brand or user coordinates change
+  // Sync nearest dealers whenever locator brand, user coordinates, or active product changes
   useEffect(() => {
-    if (activeTab === 'dealers' && locatorBrandId && userCoords) {
-      fetchNearestDealers(locatorBrandId, userCoords.lat, userCoords.lng);
+    if (activeTab === 'dealers' && userCoords) {
+      const targetBrand = locatorBrandId || activeProduct?.brandId || activeProduct?.brand?.id || (brands.length > 0 ? brands[0].id : '');
+      if (targetBrand && !locatorBrandId) {
+        setLocatorBrandId(targetBrand);
+      }
+      fetchNearestDealers(targetBrand || '', userCoords.lat, userCoords.lng);
     }
-  }, [locatorBrandId, userCoords, activeTab]);
+  }, [locatorBrandId, userCoords, activeTab, activeProduct]);
 
   // Check for kiosk mode query parameter on mount
   useEffect(() => {
@@ -3549,10 +3553,40 @@ export default function Home() {
   };
 
   const navigateToDealers = (product) => {
-    setActiveProduct(product);
+    const targetProd = product || activeProduct || studioFloorProduct || studioWallProduct;
+    if (targetProd) {
+      setActiveProduct(targetProd);
+      const bId = targetProd.brandId || targetProd.brand?.id || (brands.find(b => b.name?.toLowerCase() === targetProd.brand?.name?.toLowerCase())?.id) || '';
+      if (bId) {
+        setLocatorBrandId(bId);
+      }
+      if (targetProd.id) {
+        logInteraction('CLICK', targetProd.id, targetProd.brandId);
+      }
+    }
+    setLocatorMaxDistance(999);
     setActiveTab('dealers');
-    logInteraction('CLICK', product.id, product.brandId);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const coords = userCoords || { lat: 40.9901, lng: 29.0278 };
+    const brandIdToFetch = (targetProd?.brandId || targetProd?.brand?.id || locatorBrandId || '');
+    fetchNearestDealers(brandIdToFetch, coords.lat, coords.lng);
+
+    if (typeof window !== 'undefined' && navigator.geolocation) {
+      detectUserLocation();
+    }
+
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        const dealersEl = document.getElementById('bayi-bul-section') || document.querySelector('.dealers-portal');
+        if (dealersEl) {
+          const yOffset = -70;
+          const y = dealersEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 150);
+    }
   };
 
   const handleCampaignSubmit = async (e) => {
@@ -6156,8 +6190,8 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="studio-summary-cards-wrap">
-                  {[
+                {(() => {
+                  const appliedSurfaces = [
                     { target: 'floor', label: 'Zemin', product: studioApplyFloor ? studioFloorProduct : null },
                     { target: 'walls', label: 'Ana Duvarlar', product: studioApplyWalls ? studioWallProduct : null },
                     { target: 'accent', label: 'Lavabo Arkası', product: studioApplyAccent ? studioAccentProduct : null },
@@ -6166,47 +6200,86 @@ export default function Home() {
                     { target: 'showerFloor', label: 'Duş Tabanı', product: studioApplyShowerFloor ? studioShowerFloorProduct : null },
                     { target: 'stripe', label: 'Yatay Bordür', product: studioApplyStripeWall ? studioStripeWallProduct : null },
                     { target: 'leftWallAccent', label: 'Sol Duvar Ara', product: studioApplyLeftWallAccent ? studioLeftWallAccentProduct : null }
-                  ].filter(s => s.product).map(s => (
-                    <div key={s.target} className="summary-surface-item">
-                      <div className="summary-item-left">
-                        <span className="summary-target-label">{s.label}:</span>
-                        <strong className="summary-prod-name">{s.product.name}</strong>
-                        <span className="summary-prod-meta">{s.product.brand?.name} • {s.product.width}x{s.product.height} cm</span>
-                      </div>
-                      {s.product.cheapestOffer?.price && (
-                        <span className="summary-prod-price">{s.product.cheapestOffer.price} ₺/m²</span>
-                      )}
-                    </div>
-                  ))}
+                  ].filter(s => s.product);
 
-                  {![studioApplyFloor && studioFloorProduct, studioApplyWalls && studioWallProduct, studioApplyAccent && studioAccentProduct, studioApplyShower && studioShowerProduct].some(Boolean) && activeProduct && (
-                    <div className="summary-surface-item">
-                      <div className="summary-item-left">
-                        <span className="summary-target-label">Seçili Model:</span>
-                        <strong className="summary-prod-name">{activeProduct.name}</strong>
-                        <span className="summary-prod-meta">{activeProduct.brand?.name} • {activeProduct.width}x{activeProduct.height} cm</span>
-                      </div>
-                      {activeProduct.cheapestOffer?.price && (
-                        <span className="summary-prod-price">{activeProduct.cheapestOffer.price} ₺/m²</span>
-                      )}
-                    </div>
-                  )}
-                </div>
+                  const surfacesList = appliedSurfaces.length > 0 
+                    ? appliedSurfaces 
+                    : (activeProduct ? [{ target: 'selected', label: 'Seçili Model', product: activeProduct }] : []);
 
-                {/* Eylem Butonu - Yetkili Bayilerden Teklif Al */}
-                <div className="studio-quote-action-row">
-                  <Link
-                    href={(() => {
-                      const brand = studioFloorProduct?.brand?.name || studioWallProduct?.brand?.name || studioAccentProduct?.brand?.name || studioShowerProduct?.brand?.name || activeProduct?.brand?.name;
-                      return brand ? `/bayiler?brand=${encodeURIComponent(brand)}` : '/bayiler';
-                    })()}
-                    className="btn-primary studio-quote-btn"
-                    style={{ textDecoration: 'none', color: '#0f172a' }}
-                  >
-                    <Store size={18} />
-                    <span>Yetkili Bayilerden Fiyat Teklifi Al</span>
-                  </Link>
-                </div>
+                  return (
+                    <>
+                      <div className="studio-summary-cards-grid">
+                        {surfacesList.map(s => {
+                          const prodImage = s.product.imageUrl || s.product.textureUrl || '/textures/calacatta_gold.jpg';
+                          const brandName = s.product.brand?.name || 'Yetkili Marka';
+                          const price = s.product.cheapestOffer?.price;
+
+                          return (
+                            <div key={s.target} className="summary-surface-card">
+                              <div className="surface-card-header">
+                                <span className="surface-target-pill">
+                                  <span className="surface-status-dot" />
+                                  {s.label.toUpperCase()}
+                                </span>
+                                {price && (
+                                  <span className="surface-price-badge">{price} ₺/m²</span>
+                                )}
+                              </div>
+
+                              <div className="surface-card-content">
+                                <div className="surface-thumb-container">
+                                  <img 
+                                    src={prodImage} 
+                                    alt={s.product.name}
+                                    className="surface-tile-thumb"
+                                    onError={(e) => { e.currentTarget.src = '/textures/calacatta_gold.jpg'; }}
+                                  />
+                                </div>
+                                <div className="surface-meta-container">
+                                  <strong className="surface-title" title={s.product.name}>{s.product.name}</strong>
+                                  <span className="surface-details">
+                                    {brandName} • {s.product.width || 60}×{s.product.height || 120} cm • {s.product.finish || 'Lappato'}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => navigateToDealers(s.product)}
+                                className="btn-surface-dealer-quote"
+                                title={`${brandName} yetkili bayilerini konuma göre gör ve teklif al`}
+                              >
+                                <Store size={15} />
+                                <span>Yetkili Bayiden Fiyat Teklifi Al</span>
+                                <ArrowRight size={14} />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Symmetrical Bottom Action Bar */}
+                      <div className="studio-summary-footer-bar">
+                        <div className="summary-footer-info">
+                          <Sparkles size={16} style={{ color: 'var(--accent-gold)' }} />
+                          <span>Mekanınızdaki seramikler için en yakın yetkili bayilerden anında özel teklif alın.</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const primaryProduct = studioFloorProduct || studioWallProduct || activeProduct;
+                            navigateToDealers(primaryProduct);
+                          }}
+                          className="btn-all-dealers-quote"
+                        >
+                          <MapPin size={16} />
+                          <span>Konumuma En Yakın Bayileri Haritada Gör</span>
+                          <ArrowRight size={15} />
+                        </button>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -6226,6 +6299,11 @@ export default function Home() {
             const matchesSearch = !q || name.includes(q) || district.includes(q) || city.includes(q) || address.includes(q);
             return matchesDistance && matchesSearch;
           });
+
+          // Fallback: If distance filter (e.g. 50km) hides all dealers, show all available dealers for that brand sorted by proximity
+          const displayDealers = (filteredDealers.length === 0 && safeNearestDealers.length > 0 && !dealerSearchQuery)
+            ? safeNearestDealers 
+            : filteredDealers;
 
           return (
             <div className="dealers-portal animate-fade-in" id="bayi-bul-section">
@@ -6357,12 +6435,12 @@ export default function Home() {
                   <div className="dealers-list-container">
                     <div className="list-header-row">
                       <h4>Bulunan Yetkili Bayiler</h4>
-                      <span className="results-count">{filteredDealers.length} Bayi</span>
+                      <span className="results-count">{displayDealers.length} Bayi</span>
                     </div>
 
-                    {filteredDealers.length > 0 ? (
+                    {displayDealers.length > 0 ? (
                       <div className="dealers-list-scroll">
-                        {filteredDealers.map((dealer, idx) => (
+                        {displayDealers.map((dealer, idx) => (
                           <div 
                             key={dealer.id}
                             onClick={() => setActiveDealerOnMap(dealer)}
@@ -6488,7 +6566,7 @@ export default function Home() {
 
                 <div className="dealers-map-panel glass-panel">
                   <MapComponent 
-                    dealers={filteredDealers} 
+                    dealers={displayDealers} 
                     userCoords={userCoords} 
                     activeDealer={activeDealerOnMap} 
                   />
@@ -12719,106 +12797,197 @@ export default function Home() {
         }
 
         /* 6. Adım 4: Tasarım Özeti & Teklif Al */
+        /* 6. Adım 4: Tasarım Özeti & Teklif Al - Symmetrical Surface Grid */
         .studio-quote-hero-box {
           background: linear-gradient(180deg, #ffffff 0%, #fcfbf7 100%);
           border: 1.5px solid rgba(212, 175, 55, 0.35);
+          border-radius: 12px;
+          padding: 20px;
         }
 
-        .studio-summary-cards-wrap {
+        .studio-summary-cards-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-          gap: 10px;
-          margin: 12px 0 18px 0;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 16px;
+          margin: 16px 0 20px 0;
         }
 
-        .summary-surface-item {
+        .summary-surface-card {
           background: #ffffff;
           border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          padding: 10px 12px;
+          border-radius: 12px;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+          transition: all 0.25s ease;
+        }
+
+        .summary-surface-card:hover {
+          border-color: rgba(212, 175, 55, 0.5);
+          box-shadow: 0 8px 20px rgba(212, 175, 55, 0.12);
+          transform: translateY(-2px);
+        }
+
+        .surface-card-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 8px;
+          border-bottom: 1px solid #f1f5f9;
+          padding-bottom: 8px;
         }
 
-        .summary-item-left {
-          display: flex;
-          flex-direction: column;
-          gap: 2px;
-          overflow: hidden;
-        }
-
-        .summary-target-label {
-          font-size: 0.68rem;
+        .surface-target-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.7rem;
           font-weight: 800;
-          color: var(--accent-gold, #b38e47);
-          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          color: #b38e47;
+          background: rgba(212, 175, 55, 0.1);
+          padding: 3px 8px;
+          border-radius: 20px;
         }
 
-        .summary-prod-name {
-          font-size: 0.78rem;
-          font-weight: 700;
-          color: #0f172a;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+        .surface-status-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #10b981;
+          display: inline-block;
         }
 
-        .summary-prod-meta {
-          font-size: 0.65rem;
-          color: var(--text-muted, #64748b);
-        }
-
-        .summary-prod-price {
-          font-size: 0.8rem;
+        .surface-price-badge {
+          font-size: 0.82rem;
           font-weight: 800;
-          color: #10b981;
-          white-space: nowrap;
+          color: #059669;
+          background: #ecfdf5;
+          padding: 2px 8px;
+          border-radius: 6px;
+          border: 1px solid rgba(16, 185, 129, 0.2);
         }
 
-        .studio-quote-action-row {
+        .surface-card-content {
           display: flex;
           align-items: center;
           gap: 12px;
+        }
+
+        .surface-thumb-container {
+          width: 54px;
+          height: 54px;
+          border-radius: 8px;
+          overflow: hidden;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          flex-shrink: 0;
+          box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .surface-tile-thumb {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+
+        .surface-meta-container {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          overflow: hidden;
+          flex: 1;
+        }
+
+        .surface-title {
+          font-size: 0.86rem;
+          font-weight: 700;
+          color: #0f172a;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .surface-details {
+          font-size: 0.72rem;
+          color: #64748b;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .btn-surface-dealer-quote {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 14px;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          color: #ffffff;
+          border: none;
+          border-radius: 8px;
+          font-size: 0.78rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+        }
+
+        .btn-surface-dealer-quote:hover {
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          color: #0f172a;
+          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
+          transform: translateY(-1px);
+        }
+
+        .btn-surface-dealer-quote span {
+          flex: 1;
+          text-align: center;
+        }
+
+        .studio-summary-footer-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 10px;
+          padding: 14px 18px;
           flex-wrap: wrap;
         }
 
-        .studio-quote-btn {
-          flex: 1;
-          min-width: 240px;
-          padding: 12px 20px;
-          font-size: 0.88rem;
-          font-weight: 800;
-          border-radius: 8px;
-          display: inline-flex;
+        .summary-footer-info {
+          display: flex;
           align-items: center;
-          justify-content: center;
           gap: 8px;
-          cursor: pointer;
+          font-size: 0.8rem;
+          color: #475569;
+          font-weight: 500;
         }
 
-        .studio-whatsapp-btn {
-          flex: 1;
-          min-width: 240px;
-          background: #25d366;
-          color: #ffffff;
-          border: none;
-          padding: 12px 20px;
-          font-size: 0.88rem;
-          font-weight: 800;
-          border-radius: 8px;
+        .btn-all-dealers-quote {
           display: inline-flex;
           align-items: center;
-          justify-content: center;
           gap: 8px;
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          color: #0f172a;
+          border: none;
+          padding: 10px 18px;
+          border-radius: 8px;
+          font-size: 0.82rem;
+          font-weight: 800;
           cursor: pointer;
           transition: all 0.2s ease;
+          box-shadow: 0 4px 12px rgba(212, 175, 55, 0.25);
         }
 
-        .studio-whatsapp-btn:hover {
-          background: #20ba5a;
-          box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+        .btn-all-dealers-quote:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
         }
 
         /* ==========================================================================
@@ -13101,42 +13270,34 @@ export default function Home() {
             height: 10px;
           }
 
-          /* Step 4: Teklif ve Butonlar */
-          .studio-summary-cards-wrap {
+          /* Step 4: Teklif ve Butonlar (Mobil) */
+          .studio-summary-cards-grid {
             grid-template-columns: 1fr !important;
-            gap: 6px;
-            margin: 8px 0 12px 0;
+            gap: 10px;
+            margin: 10px 0 14px 0;
           }
 
-          .summary-surface-item {
-            padding: 8px 10px;
-            border-radius: 6px;
+          .summary-surface-card {
+            padding: 12px;
+            gap: 10px;
           }
 
-          .summary-target-label {
-            font-size: 0.64rem;
-          }
-
-          .summary-prod-name {
+          .btn-surface-dealer-quote {
+            padding: 9px 12px;
             font-size: 0.74rem;
           }
 
-          .summary-prod-price {
-            font-size: 0.74rem;
-          }
-
-          .studio-quote-action-row {
+          .studio-summary-footer-bar {
             flex-direction: column;
-            gap: 8px;
-            width: 100%;
+            align-items: stretch;
+            gap: 10px;
+            padding: 12px;
           }
 
-          .studio-quote-btn, .studio-whatsapp-btn {
+          .btn-all-dealers-quote {
             width: 100%;
-            min-width: 0;
-            padding: 10px 14px;
-            font-size: 0.8rem;
-            border-radius: 6px;
+            justify-content: center;
+            font-size: 0.78rem;
           }
         }
 
@@ -13151,16 +13312,19 @@ export default function Home() {
           display: grid;
           grid-template-columns: 380px 1fr;
           gap: 24px;
-          height: 700px;
+          min-height: 720px;
+          height: auto;
         }
 
         @media (max-width: 1024px) {
           .dealers-layout {
             grid-template-columns: 1fr;
+            min-height: auto;
             height: auto;
           }
           .dealers-map-panel {
-            height: 450px;
+            min-height: 480px;
+            height: 480px;
           }
         }
 
@@ -13823,6 +13987,9 @@ export default function Home() {
           border-radius: var(--border-radius-lg);
           border: 1px solid var(--border-color);
           box-shadow: var(--glass-shadow);
+          min-height: 600px;
+          height: 100%;
+          position: relative;
         }
 
         /* KEYFRAME ANIMATIONS */

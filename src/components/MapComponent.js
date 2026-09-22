@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import 'leaflet/dist/leaflet.css';
 
 export default function MapComponent({ dealers = [], userCoords = null, activeDealer = null }) {
   const mapRef = useRef(null);
@@ -71,6 +72,14 @@ export default function MapComponent({ dealers = [], userCoords = null, activeDe
 
       const map = mapInstanceRef.current;
       if (!map) return;
+
+      // Ensure proper sizing when switching tabs or containers dynamically
+      setTimeout(() => {
+        try { map.invalidateSize(); } catch (e) {}
+      }, 100);
+      setTimeout(() => {
+        try { map.invalidateSize(); } catch (e) {}
+      }, 400);
 
       // Clear existing markers safely
       markersRef.current.forEach((marker) => {
