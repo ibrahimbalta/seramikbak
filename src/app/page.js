@@ -58,6 +58,8 @@ import {
   RotateCcw,
   Smartphone,
   Store,
+  Scale,
+  Trash2,
   QrCode,
   Maximize2,
   Compass,
@@ -8395,19 +8397,40 @@ export default function Home() {
 
       {/* COMPARISON STICKY BAR */}
       {comparedProducts.length > 0 && (
-        <div className="sticky-compare-bar">
+        <div className="sticky-compare-bar animate-slide-up">
           <div className="compare-bar-container">
+            {/* Header row / Info */}
             <div className="compare-bar-info">
-              <h4>Ürün Karşılaştırma</h4>
-              <p>{comparedProducts.length}/4 ürün seçildi</p>
+              <div className="compare-bar-info-main">
+                <h4>
+                  <Scale size={16} className="compare-icon-gold" />
+                  <span>Karşılaştırma</span>
+                </h4>
+                <span className="compare-badge">{comparedProducts.length}/4</span>
+              </div>
+              <button 
+                type="button"
+                className="btn-compare-clear-mobile"
+                onClick={() => setComparedProducts([])}
+                title="Tümünü Temizle"
+              >
+                <Trash2 size={13} />
+                <span>Temizle</span>
+              </button>
             </div>
             
+            {/* Thumbnails row */}
             <div className="compare-bar-items">
               {comparedProducts.map(p => (
                 <div key={p.id} className="compare-bar-item">
                   <div className="compare-bar-item-thumb">
-                    <img src={p.imageUrl} alt={p.name} />
+                    <img 
+                      src={p.imageUrl || p.textureUrl || '/textures/calacatta_gold.jpg'} 
+                      alt={p.name}
+                      onError={(e) => { e.currentTarget.src = '/textures/calacatta_gold.jpg'; }}
+                    />
                     <button 
+                      type="button"
                       className="compare-bar-item-remove"
                       onClick={() => toggleCompareProduct(p)}
                       title="Çıkar"
@@ -8415,7 +8438,7 @@ export default function Home() {
                       ✕
                     </button>
                   </div>
-                  <span className="compare-bar-item-name">{p.name}</span>
+                  <span className="compare-bar-item-name" title={p.name}>{p.name}</span>
                 </div>
               ))}
               
@@ -8425,24 +8448,33 @@ export default function Home() {
                   <div className="compare-bar-item-thumb">
                     <span className="empty-slot-plus">+</span>
                   </div>
-                  <span className="compare-bar-item-name">Boş Yuva</span>
+                  <span className="compare-bar-item-name">Model Ekle</span>
                 </div>
               ))}
             </div>
 
+            {/* Actions */}
             <div className="compare-bar-actions">
               <button 
-                className="btn-compare-clear"
+                type="button"
+                className="btn-compare-clear desktop-only-clear"
                 onClick={() => setComparedProducts([])}
               >
-                Tümünü Temizle
+                <Trash2 size={14} />
+                <span>Temizle</span>
               </button>
               <button 
+                type="button"
                 className="btn-compare-submit"
                 onClick={() => setShowComparisonModal(true)}
                 disabled={comparedProducts.length < 2}
+                title={comparedProducts.length < 2 ? 'En az 2 model seçin' : 'Modelleri yan yana karşılaştır'}
               >
-                {comparedProducts.length < 2 ? 'En Az 2 Ürün Seçin' : 'Karşılaştır'}
+                <Scale size={16} />
+                <span>
+                  {comparedProducts.length < 2 ? 'En Az 2 Model Seçin' : `Karşılaştır (${comparedProducts.length})`}
+                </span>
+                {comparedProducts.length >= 2 && <ArrowRight size={15} />}
               </button>
             </div>
           </div>
@@ -8451,7 +8483,7 @@ export default function Home() {
 
       {/* COMPARISON MODAL */}
       {showComparisonModal && (
-        <div className="compare-modal-overlay" onClick={() => setShowComparisonModal(false)}>
+        <div className="compare-modal-overlay animate-fade-in" onClick={() => setShowComparisonModal(false)}>
           <div className="compare-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="compare-modal-header">
               <div>
@@ -8459,6 +8491,11 @@ export default function Home() {
                 <p>Seçtiğiniz seramik modellerinin tüm teknik detay ve mimari özelliklerinin yan yana analizi</p>
               </div>
               <button className="compare-modal-close" onClick={() => setShowComparisonModal(false)}>✕</button>
+            </div>
+
+            {/* Mobile swipe hint */}
+            <div className="compare-mobile-scroll-hint">
+              <span>👉 Diğer modelleri görmek için tabloyu sağa kaydırın</span>
             </div>
 
             <div className="compare-modal-body">
@@ -8471,6 +8508,7 @@ export default function Home() {
                         <th key={p.id} className="product-col">
                           <div className="compare-product-header">
                             <button 
+                              type="button"
                               className="compare-product-remove" 
                               onClick={() => toggleCompareProduct(p)}
                               title="Bu Ürünü Kaldır"
@@ -8478,7 +8516,11 @@ export default function Home() {
                               ✕ Kaldır
                             </button>
                             <div className="compare-product-img">
-                              <img src={p.imageUrl} alt={p.name} />
+                              <img 
+                                src={p.imageUrl || p.textureUrl || '/textures/calacatta_gold.jpg'} 
+                                alt={p.name}
+                                onError={(e) => { e.currentTarget.src = '/textures/calacatta_gold.jpg'; }}
+                              />
                             </div>
                             <span className="compare-product-brand">{p.brand?.name}</span>
                             <h3 className="compare-product-title">{p.name}</h3>
@@ -8594,6 +8636,55 @@ export default function Home() {
                         </td>
                       ))}
                     </tr>
+
+                    {/* Fiyat ve Hızlı Aksiyonlar */}
+                    <tr className="section-row">
+                      <td colSpan={comparedProducts.length + 1}>Fiyat & Hızlı İşlemler</td>
+                    </tr>
+                    <tr>
+                      <td className="feature-name">Metrekare Fiyatı</td>
+                      {comparedProducts.map(p => (
+                        <td key={p.id} className="feature-value highlight-price-cell">
+                          {p.cheapestOffer?.price ? (
+                            <strong className="compare-price-val">{p.cheapestOffer.price} ₺/m²</strong>
+                          ) : (
+                            <span className="text-muted">Yetkili Bayiden Teklif Alın</span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <td className="feature-name">Doğrudan Deneyim</td>
+                      {comparedProducts.map(p => (
+                        <td key={p.id} className="feature-value compare-actions-cell">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowComparisonModal(false);
+                              navigateTo3DStudio(p);
+                            }}
+                            className="btn-table-action btn-table-3d"
+                            title={`${p.name} mekana giydir ve 3D gör`}
+                          >
+                            <Sparkles size={13} />
+                            <span>3D Mekanda Gör</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowComparisonModal(false);
+                              navigateToDealers(p);
+                            }}
+                            className="btn-table-action btn-table-dealer"
+                            title={`${p.name} için yetkili bayileri gör`}
+                          >
+                            <Store size={13} />
+                            <span>Bayi Bul & Teklif Al</span>
+                          </button>
+                        </td>
+                      ))}
+                    </tr>
+
                   </tbody>
                 </table>
               </div>
@@ -16043,13 +16134,13 @@ export default function Home() {
           bottom: 0;
           left: 0;
           right: 0;
-          background: rgba(15, 23, 42, 0.95);
-          backdrop-filter: blur(12px);
-          border-top: 1.5px solid rgba(255, 255, 255, 0.1);
+          background: rgba(15, 23, 42, 0.97);
+          backdrop-filter: blur(16px);
+          border-top: 1.5px solid rgba(212, 175, 55, 0.35);
           color: white;
-          padding: 16px 24px;
+          padding: 14px 24px;
           z-index: 9999;
-          box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.5);
+          box-shadow: 0 -10px 30px -5px rgba(0, 0, 0, 0.6);
           animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -16064,45 +16155,75 @@ export default function Home() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 24px;
+          gap: 20px;
         }
 
-        .compare-bar-info h4 {
+        .compare-bar-info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-shrink: 0;
+        }
+
+        .compare-bar-info-main {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .compare-bar-info-main h4 {
           margin: 0;
-          font-size: 1rem;
+          font-size: 0.95rem;
           font-weight: 700;
-          letter-spacing: -0.02em;
+          letter-spacing: -0.01em;
+          color: var(--accent-gold, #c5a059);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .compare-icon-gold {
           color: var(--accent-gold, #c5a059);
         }
 
-        .compare-bar-info p {
-          margin: 4px 0 0 0;
-          font-size: 0.8rem;
-          color: #94a3b8;
+        .compare-badge {
+          background: rgba(212, 175, 55, 0.15);
+          color: var(--accent-gold, #d4af37);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          font-size: 0.72rem;
+          font-weight: 800;
+          padding: 2px 8px;
+          border-radius: 12px;
+        }
+
+        .btn-compare-clear-mobile {
+          display: none;
         }
 
         .compare-bar-items {
           display: flex;
-          gap: 16px;
+          gap: 12px;
           flex-grow: 1;
           justify-content: center;
+          align-items: center;
         }
 
         .compare-bar-item {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 6px;
-          width: 80px;
+          gap: 4px;
+          width: 74px;
+          flex-shrink: 0;
         }
 
         .compare-bar-item-thumb {
           position: relative;
-          width: 60px;
-          height: 60px;
+          width: 54px;
+          height: 54px;
           border-radius: 8px;
           overflow: hidden;
-          border: 1.5px solid rgba(255, 255, 255, 0.2);
+          border: 1.5px solid rgba(212, 175, 55, 0.35);
           background: #1e293b;
           display: flex;
           align-items: center;
@@ -16113,28 +16234,35 @@ export default function Home() {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          display: block;
         }
 
         .compare-bar-item-remove {
           position: absolute;
           top: -2px;
           right: -2px;
-          width: 16px;
-          height: 16px;
+          width: 17px;
+          height: 17px;
           border-radius: 50%;
           background: #ef4444;
           color: white;
           border: none;
-          font-size: 0.6rem;
+          font-size: 0.62rem;
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+          box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+          transition: transform 0.15s ease;
+          z-index: 2;
+        }
+
+        .compare-bar-item-remove:hover {
+          transform: scale(1.15);
         }
 
         .compare-bar-item-name {
-          font-size: 0.7rem;
+          font-size: 0.68rem;
           color: #cbd5e1;
           text-align: center;
           white-space: nowrap;
@@ -16144,24 +16272,26 @@ export default function Home() {
         }
 
         .compare-bar-item.empty .compare-bar-item-thumb {
-          border: 1.5px dashed rgba(255, 255, 255, 0.15);
-          background: transparent;
+          border: 1.5px dashed rgba(255, 255, 255, 0.2);
+          background: rgba(255, 255, 255, 0.02);
         }
 
         .empty-slot-plus {
-          font-size: 1.2rem;
-          color: rgba(255, 255, 255, 0.25);
+          font-size: 1.1rem;
+          color: rgba(255, 255, 255, 0.3);
           font-weight: 300;
         }
 
         .compare-bar-actions {
           display: flex;
-          gap: 12px;
+          align-items: center;
+          gap: 10px;
+          flex-shrink: 0;
         }
 
         .btn-compare-clear {
-          padding: 8px 16px;
-          font-size: 0.8rem;
+          padding: 8px 14px;
+          font-size: 0.78rem;
           font-weight: 600;
           color: #94a3b8;
           background: transparent;
@@ -16169,84 +16299,96 @@ export default function Home() {
           border-radius: 8px;
           cursor: pointer;
           transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
         }
 
         .btn-compare-clear:hover {
           color: white;
           border-color: rgba(255, 255, 255, 0.4);
+          background: rgba(255, 255, 255, 0.05);
         }
 
         .btn-compare-submit {
-          padding: 8px 20px;
-          font-size: 0.8rem;
-          font-weight: 700;
+          padding: 10px 22px;
+          font-size: 0.84rem;
+          font-weight: 800;
           color: #0f172a;
-          background: var(--accent-gold, #c5a059);
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
           border: none;
           border-radius: 8px;
           cursor: pointer;
           transition: all 0.2s ease;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
+          white-space: nowrap;
         }
 
         .btn-compare-submit:hover:not(:disabled) {
-          background: #d8b467;
+          background: linear-gradient(135deg, #e5be48 0%, #c49a4f 100%);
           transform: translateY(-1px);
+          box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
         }
 
         .btn-compare-submit:disabled {
           background: #334155;
           color: #64748b;
           cursor: not-allowed;
+          box-shadow: none;
         }
 
-        /* Comparison Modal Overlay */
+        /* Comparison Modal */
         .compare-modal-overlay {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(15, 23, 42, 0.75);
+          background: rgba(15, 23, 42, 0.8);
           backdrop-filter: blur(8px);
           display: flex;
           align-items: center;
           justify-content: center;
-          z-index: 1000;
+          z-index: 10000;
           padding: 24px;
         }
 
         .compare-modal-content {
           background: white;
           width: 100%;
-          max-width: 1100px;
+          max-width: 1150px;
           max-height: 90vh;
           border-radius: 16px;
           overflow: hidden;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
           display: flex;
           flex-direction: column;
-          border: 1px solid #e2e8f0;
+          border: 1px solid rgba(212, 175, 55, 0.3);
         }
 
         .compare-modal-header {
-          padding: 20px 28px;
+          padding: 18px 24px;
           border-bottom: 1px solid #f1f5f9;
           display: flex;
           justify-content: space-between;
           align-items: center;
+          background: #ffffff;
         }
 
         .compare-modal-header h2 {
           margin: 0;
-          font-size: 1.4rem;
+          font-size: 1.25rem;
           font-weight: 800;
           letter-spacing: -0.02em;
           color: #0f172a;
         }
 
         .compare-modal-header p {
-          margin: 4px 0 0 0;
-          font-size: 0.85rem;
+          margin: 3px 0 0 0;
+          font-size: 0.8rem;
           color: #64748b;
         }
 
@@ -16271,19 +16413,32 @@ export default function Home() {
           color: white;
         }
 
+        .compare-mobile-scroll-hint {
+          display: none;
+          background: #fffdf5;
+          border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+          padding: 6px 12px;
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: #b38e47;
+          text-align: center;
+        }
+
         .compare-modal-body {
           flex-grow: 1;
           overflow-y: auto;
-          padding: 24px 28px;
+          padding: 20px 24px;
         }
 
         .compare-table-wrapper {
           overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
         }
 
         .compare-table {
           width: 100%;
-          border-collapse: collapse;
+          border-collapse: separate;
+          border-spacing: 0;
           text-align: left;
         }
 
@@ -16297,19 +16452,20 @@ export default function Home() {
         }
 
         .feature-col {
-          width: 220px;
+          width: 200px;
+          min-width: 180px;
           font-weight: 700;
           color: #475569;
-          font-size: 0.85rem;
+          font-size: 0.82rem;
           background: white !important;
-          border-right: 1.5px solid #f1f5f9;
+          border-right: 1.5px solid #e2e8f0;
           position: sticky;
           left: 0;
           z-index: 10;
         }
 
         .product-col {
-          min-width: 200px;
+          min-width: 190px;
           vertical-align: top;
           text-align: center;
           border-right: 1.5px solid #f1f5f9;
@@ -16320,19 +16476,19 @@ export default function Home() {
           flex-direction: column;
           align-items: center;
           position: relative;
-          padding-top: 16px;
+          padding-top: 14px;
         }
 
         .compare-product-remove {
           position: absolute;
-          top: -8px;
-          font-size: 0.7rem;
+          top: -6px;
+          font-size: 0.68rem;
           color: #ef4444;
           background: rgba(239, 68, 68, 0.1);
           border: none;
           padding: 2px 8px;
           border-radius: 12px;
-          font-weight: 600;
+          font-weight: 700;
           cursor: pointer;
           transition: all 0.2s ease;
         }
@@ -16343,56 +16499,60 @@ export default function Home() {
         }
 
         .compare-product-img {
-          width: 80px;
-          height: 80px;
+          width: 72px;
+          height: 72px;
           border-radius: 8px;
           overflow: hidden;
           border: 1px solid #e2e8f0;
-          margin-bottom: 12px;
+          margin-bottom: 10px;
+          background: #f8fafc;
         }
 
         .compare-product-img img {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          display: block;
         }
 
         .compare-product-brand {
           font-size: 0.65rem;
           font-weight: 700;
-          color: #94a3b8;
+          color: var(--accent-gold, #b38e47);
           text-transform: uppercase;
           letter-spacing: 0.05em;
         }
 
         .compare-product-title {
-          margin: 4px 0 2px 0;
-          font-size: 0.9rem;
+          margin: 3px 0 2px 0;
+          font-size: 0.86rem;
           font-weight: 800;
           color: #0f172a;
+          line-height: 1.25;
         }
 
         .compare-product-code {
-          font-size: 0.7rem;
+          font-size: 0.68rem;
           color: #64748b;
           font-family: monospace;
         }
 
         .section-row td {
-          background: #f1f5f9;
-          color: #334155;
+          background: #f8fafc;
+          color: #1e293b;
           font-weight: 800;
-          font-size: 0.8rem;
+          font-size: 0.78rem;
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          padding: 8px 16px;
+          padding: 8px 14px;
+          border-top: 1px solid #e2e8f0;
         }
 
         .feature-name {
           font-weight: 600;
           color: #64748b;
-          font-size: 0.8rem;
-          border-right: 1.5px solid #f1f5f9;
+          font-size: 0.78rem;
+          border-right: 1.5px solid #e2e8f0;
           position: sticky;
           left: 0;
           background: white;
@@ -16401,16 +16561,264 @@ export default function Home() {
 
         .feature-value {
           text-align: center;
-          font-size: 0.85rem;
+          font-size: 0.82rem;
           color: #334155;
           font-weight: 500;
           border-right: 1.5px solid #f1f5f9;
         }
 
-        .feature-value.highlight-gold {
-          color: #b38e47;
+        .highlight-price-cell {
+          background: #f0fdf4;
+        }
+
+        .compare-price-val {
+          font-size: 0.92rem;
+          font-weight: 800;
+          color: #059669;
+        }
+
+        .compare-actions-cell {
+          padding: 10px 8px !important;
+          vertical-align: middle;
+        }
+
+        .btn-table-action {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          padding: 7px 10px;
+          border-radius: 6px;
+          font-size: 0.72rem;
           font-weight: 700;
-          font-size: 0.9rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border: none;
+          margin-bottom: 6px;
+          white-space: nowrap;
+        }
+
+        .btn-table-action:last-child {
+          margin-bottom: 0;
+        }
+
+        .btn-table-3d {
+          background: #0f172a;
+          color: #ffffff;
+        }
+
+        .btn-table-3d:hover {
+          background: var(--accent-gold, #d4af37);
+          color: #0f172a;
+        }
+
+        .btn-table-dealer {
+          background: rgba(212, 175, 55, 0.15);
+          color: #987532;
+          border: 1px solid rgba(212, 175, 55, 0.35);
+        }
+
+        .btn-table-dealer:hover {
+          background: var(--accent-gold, #d4af37);
+          color: #0f172a;
+        }
+
+        /* MOBILE COMPARISON STICKY BAR & MODAL */
+        @media (max-width: 768px) {
+          .sticky-compare-bar {
+            padding: 8px 12px;
+            padding-bottom: max(10px, env(safe-area-inset-bottom, 10px));
+            border-top: 1.5px solid rgba(212, 175, 55, 0.4);
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+            max-width: 100vw;
+            overflow: hidden;
+          }
+
+          .compare-bar-container {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            width: 100%;
+          }
+
+          .compare-bar-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+          }
+
+          .compare-bar-info-main h4 {
+            font-size: 0.82rem;
+          }
+
+          .btn-compare-clear-mobile {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            cursor: pointer;
+          }
+
+          .desktop-only-clear {
+            display: none !important;
+          }
+
+          .compare-bar-items {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 2px 0;
+          }
+
+          .compare-bar-items::-webkit-scrollbar {
+            display: none;
+          }
+
+          .compare-bar-item {
+            width: 46px;
+            min-width: 46px;
+            gap: 0;
+          }
+
+          .compare-bar-item-thumb {
+            width: 46px;
+            height: 46px;
+            border-radius: 8px;
+            border: 1.5px solid rgba(212, 175, 55, 0.45);
+          }
+
+          .compare-bar-item-remove {
+            width: 18px;
+            height: 18px;
+            font-size: 0.65rem;
+            top: -4px;
+            right: -4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+          }
+
+          .compare-bar-item-name {
+            display: none;
+          }
+
+          .compare-bar-item.empty {
+            width: 46px;
+            min-width: 46px;
+          }
+
+          .compare-bar-item.empty .compare-bar-item-thumb {
+            width: 46px;
+            height: 46px;
+            border: 1.5px dashed rgba(255, 255, 255, 0.2);
+          }
+
+          .empty-slot-plus {
+            font-size: 1rem;
+          }
+
+          .compare-bar-actions {
+            width: 100%;
+          }
+
+          .btn-compare-submit {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            border-radius: 10px;
+            justify-content: center;
+            height: 42px;
+          }
+
+          /* Modal on Mobile */
+          .compare-modal-overlay {
+            padding: 8px 6px;
+            align-items: flex-end;
+          }
+
+          .compare-modal-content {
+            max-height: 94vh;
+            border-radius: 14px 14px 0 0;
+            margin-top: auto;
+          }
+
+          .compare-modal-header {
+            padding: 12px 14px;
+          }
+
+          .compare-modal-header h2 {
+            font-size: 1rem;
+          }
+
+          .compare-modal-header p {
+            font-size: 0.7rem;
+          }
+
+          .compare-mobile-scroll-hint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .compare-modal-body {
+            padding: 8px 10px;
+          }
+
+          .feature-col {
+            width: 105px;
+            min-width: 105px;
+            max-width: 105px;
+            font-size: 0.7rem;
+            padding: 8px 6px;
+            box-shadow: 3px 0 8px rgba(0,0,0,0.06);
+          }
+
+          .product-col {
+            min-width: 140px;
+            max-width: 160px;
+            padding: 8px 6px;
+          }
+
+          .compare-product-img {
+            width: 52px;
+            height: 52px;
+            margin-bottom: 6px;
+          }
+
+          .compare-product-title {
+            font-size: 0.76rem;
+          }
+
+          .feature-name {
+            font-size: 0.7rem;
+            padding: 8px 6px;
+          }
+
+          .feature-value {
+            font-size: 0.72rem;
+            padding: 8px 6px;
+          }
+
+          .compare-price-val {
+            font-size: 0.82rem;
+          }
+
+          .btn-table-action {
+            padding: 6px 8px;
+            font-size: 0.68rem;
+          }
         }
 
         .marketplace-link {
