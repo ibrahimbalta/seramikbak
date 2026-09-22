@@ -203,6 +203,7 @@ export const viewport = {
 import { LanguageProvider } from "@/lib/languageContext";
 import CookieBanner from "@/components/CookieBanner";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import Script from "next/script";
 
 export default function RootLayout({ children }) {
   return (
@@ -222,7 +223,6 @@ export default function RootLayout({ children }) {
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
@@ -252,6 +252,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />
         <LanguageProvider>
           {children}
           <CookieBanner />
