@@ -1124,6 +1124,7 @@ export default function Home() {
   const [studioToast, setStudioToast] = useState(null);
   const [studioTileCategory, setStudioTileCategory] = useState('all'); // all, marble, wood, concrete, glossy, matte
   const [studioSettingsTab, setStudioSettingsTab] = useState('pattern'); // pattern, light, fixtures
+  const isProductPreselectedRef = useRef(false);
 
   const showStudioToast = (msg) => {
     setStudioToast(msg);
@@ -1782,28 +1783,73 @@ export default function Home() {
         setIsKioskMode(true);
       }
 
-      // Check for direct product code or showroom QR scans
-      const codeParam = params.get('code');
+      // Check for direct product code, slug, or showroom QR scans
+      const targetProductParam = params.get('product') || params.get('slug') || params.get('productId') || params.get('code');
       const tabParam = params.get('tab');
-      if (codeParam) {
-        if (tabParam === 'studio') {
+      const hashStudio = typeof window !== 'undefined' && window.location.hash === '#studio';
+
+      // 1. Load preselected product from localStorage (instant 0ms retrieval)
+      const preselected = localStorage.getItem('seramikbak_preselected_product');
+      if (preselected) {
+        try {
+          const prod = JSON.parse(preselected);
+          if (prod && (prod.name || prod.id || prod.imageUrl)) {
+            isProductPreselectedRef.current = true;
+            setActiveProduct(prod);
+            setStudioFloorProduct(prod);
+            setStudioWallProduct(prod);
+            setStudioApplyFloor(true);
+            setStudioApplyWalls(true);
+            setStudioApplyAccent(false);
+            setStudioApplyShower(false);
+            setStudioApplyShowerFloor(false);
+            setStudioApplyToiletWall(false);
+            setStudioApplyLeftWallAccent(false);
+            setStudioApplyStripeWall(false);
+            setStudioRoomType('bathroom');
+            setActiveTab('studio');
+            showStudioToast(`✨ ${prod.name || 'Seçilen ürün'} 3D mekana giydirildi`);
+          }
+        } catch (e) {
+          console.error('Failed to load preselected product:', e);
+        }
+        localStorage.removeItem('seramikbak_preselected_product');
+      }
+
+      // 2. Direct product parameter in URL
+      if (targetProductParam) {
+        if (tabParam === 'studio' || hashStudio || !preselected) {
+          isProductPreselectedRef.current = true;
           setActiveTab('studio');
-          fetch(`/api/search?q=${encodeURIComponent(codeParam)}&fullDetail=true`)
+          setStudioRoomType('bathroom');
+          fetch(`/api/search?q=${encodeURIComponent(targetProductParam)}&fullDetail=true`)
             .then(res => res.json())
             .then(data => {
               if (data && data.length > 0) {
-                const enriched = enrichProductData(data[0]);
+                const matched = Array.isArray(data) 
+                  ? (data.find(p => p.slug === targetProductParam || p.id === targetProductParam || p.code === targetProductParam) || data[0])
+                  : data;
+                const enriched = enrichProductData(matched);
+                isProductPreselectedRef.current = true;
                 setActiveProduct(enriched);
                 setStudioFloorProduct(enriched);
                 setStudioWallProduct(enriched);
                 setStudioApplyFloor(true);
                 setStudioApplyWalls(true);
+                setStudioApplyAccent(false);
+                setStudioApplyShower(false);
+                setStudioApplyShowerFloor(false);
+                setStudioApplyToiletWall(false);
+                setStudioApplyLeftWallAccent(false);
+                setStudioApplyStripeWall(false);
+                setStudioRoomType('bathroom');
+                setActiveTab('studio');
                 showStudioToast(`✨ ${enriched.name} 3D mekana giydirildi`);
               }
             })
             .catch(err => console.error('Studio product fetch error:', err));
         } else {
-          openProductByCode(codeParam).then(() => {
+          openProductByCode(targetProductParam).then(() => {
             if (tabParam) {
               setActiveTab(tabParam);
             }
@@ -1811,24 +1857,6 @@ export default function Home() {
         }
       } else if (tabParam) {
         setActiveTab(tabParam);
-      }
-
-      // Load preselected favorite product in studio
-      const preselected = localStorage.getItem('seramikbak_preselected_product');
-      if (preselected) {
-        try {
-          const prod = JSON.parse(preselected);
-          setActiveProduct(prod);
-          setStudioFloorProduct(prod);
-          setStudioWallProduct(prod);
-          setStudioApplyFloor(true);
-          setStudioApplyWalls(true);
-          setActiveTab('studio');
-          showStudioToast(`✨ ${prod.name || 'Seçilen ürün'} 3D mekana giydirildi`);
-        } catch (e) {
-          console.error('Failed to load preselected product:', e);
-        }
-        localStorage.removeItem('seramikbak_preselected_product');
       }
 
       // Auto-scroll to 3D studio if requested via tab or hash
@@ -2138,9 +2166,11 @@ export default function Home() {
       } else {
         setProducts(sortedData);
         if (sortedData.length > 0) {
-          setActiveProduct(sortedData[0]);
-          setStudioFloorProduct(sortedData[0]);
-          setStudioWallProduct(sortedData[0]);
+          if (!isProductPreselectedRef.current) {
+            setActiveProduct(prev => prev || sortedData[0]);
+            setStudioFloorProduct(prev => prev || sortedData[0]);
+            setStudioWallProduct(prev => prev || sortedData[0]);
+          }
         }
         if (sortedData.length >= 2) {
           const generated = sortedData.slice(0, 8).map((p, idx) => generateMoodboardFromProduct(p, idx));
@@ -3466,6 +3496,7 @@ export default function Home() {
   };
 
   const navigateTo3DStudio = (product, targetSurface = null) => {
+    isProductPreselectedRef.current = false;
     setActiveProduct(product);
     
     // Yüzeye uygula: Eğer belirli bir yüzey seçilmişse oraya uygula, aksi halde zemin & duvar

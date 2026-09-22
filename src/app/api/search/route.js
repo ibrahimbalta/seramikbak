@@ -47,6 +47,8 @@ export async function GET(request) {
     const pei = searchParams.get('pei');
     const slip = searchParams.get('slip');
     const thicknessRange = searchParams.get('thicknessRange');
+    const slug = searchParams.get('slug');
+    const productId = searchParams.get('productId');
 
     // Pagination parameters (Clamped to prevent Denial-of-Service)
     const limitParam = searchParams.get('limit');
@@ -139,20 +141,41 @@ export async function GET(request) {
       }
     }
 
+    if (slug) {
+      andConditions.push({ slug: slug });
+    }
+
+    if (productId) {
+      andConditions.push({ id: productId });
+    }
+
     if (query) {
-      const tokens = query.trim().split(/\s+/).filter(Boolean);
+      const trimmedQuery = query.trim();
+      const tokens = trimmedQuery.split(/\s+/).filter(Boolean);
       if (tokens.length > 0) {
         tokens.forEach(token => {
           andConditions.push({
             OR: [
               { name: { contains: token } },
               { code: { contains: token } },
+              { slug: { contains: token } },
+              { id: token },
               { style: { contains: token } },
               { color: { contains: token } },
               { finish: { contains: token } },
               { brand: { name: { contains: token } } }
             ]
           });
+        });
+      }
+      // If the query has dashes or underscores (typical for slug or product code), also search slug directly
+      if (trimmedQuery.includes('-') || trimmedQuery.includes('_')) {
+        andConditions.push({
+          OR: [
+            { slug: { contains: trimmedQuery } },
+            { code: { contains: trimmedQuery } },
+            { name: { contains: trimmedQuery.replace(/[-_]/g, ' ') } }
+          ]
         });
       }
 

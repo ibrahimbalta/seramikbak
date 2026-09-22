@@ -52,12 +52,14 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
   const [copied, setCopied] = useState(false);
   const [showImageZoom, setShowImageZoom] = useState(false);
 
-  // Otomatik 3D Tasarım Görünümü Desteği (?view=3d veya ?view=room)
+  // Otomatik 3D Tasarım Görünümü Desteği (?view=3d veya ?view=room veya ?view=studio)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       const viewParam = urlParams.get('view');
-      if (viewParam === '3d' || viewParam === 'room') {
+      if (viewParam === '3d' || viewParam === 'studio') {
+        handleGoTo3DStudio();
+      } else if (viewParam === 'room') {
         setActiveView('room');
       }
     }
@@ -278,8 +280,41 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
     return '/textures/calacatta_gold.jpg';
   };
 
+  const handleGoTo3DStudio = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (typeof window !== 'undefined') {
+      try {
+        const enrichedForStudio = {
+          ...product,
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          code: product.code || product.sku,
+          brandId: product.brandId || product.brand?.id,
+          brand: product.brand,
+          imageUrl: product.imageUrl,
+          textureUrl: product.textureUrl || product.imageUrl,
+          width: parseFloat(product.width) || tileWidth || 60,
+          height: parseFloat(product.height) || tileHeight || 120,
+          finish: product.finish || 'Full Lappato',
+          style: product.style || 'Mermer',
+          color: product.color || 'Beyaz',
+          rectified: product.rectified,
+          material: product.material,
+          category: product.category,
+          thickness: product.thickness
+        };
+        localStorage.setItem('seramikbak_preselected_product', JSON.stringify(enrichedForStudio));
+      } catch (err) {
+        console.error('Failed to set preselected product in localStorage:', err);
+      }
+      const targetParam = product.slug || product.code || product.id;
+      window.location.href = `/?tab=studio&product=${encodeURIComponent(targetParam)}#studio`;
+    }
+  };
+
   const handleSelectRoomView = () => {
-    setActiveView('room');
+    handleGoTo3DStudio();
   };
 
   // Dynamic Room Render state (Birebir ürün dokusunun mimari mekanda sergilenmesi)
@@ -542,12 +577,21 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                     <span><strong>{product.name} ({productDimensions})</strong> 3D Simülasyon</span>
                   </span>
 
-                  <button
-                    onClick={() => setShowAIRemodel(true)}
-                    className="btn-room-remodel-inline"
-                  >
-                    Evinde Dene →
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button
+                      onClick={handleGoTo3DStudio}
+                      className="btn-room-remodel-inline"
+                      style={{ background: 'linear-gradient(135deg, #d4af37 0%, #b89327 100%)', color: '#0b0f19', fontWeight: '700' }}
+                    >
+                      3D Stüdyoda Aç →
+                    </button>
+                    <button
+                      onClick={() => setShowAIRemodel(true)}
+                      className="btn-room-remodel-inline"
+                    >
+                      Evinde Dene →
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -572,8 +616,9 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 )}
 
                 <button
-                  onClick={handleSelectRoomView}
+                  onClick={handleGoTo3DStudio}
                   className={`btn-view-tab ${activeView === 'room' ? 'active' : ''}`}
+                  title="3D Sanal Stüdyoda Döşenmiş Gör"
                 >
                   <Sparkles size={13} />
                   <span>3D Tasarım</span>
@@ -824,11 +869,9 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 </button>
 
                 <button
-                  onClick={() => {
-                    setActiveView('room');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className={`btn-ai-remodel-secondary ${activeView === 'room' ? 'active' : ''}`}
+                  onClick={handleGoTo3DStudio}
+                  className="btn-ai-remodel-secondary"
+                  title="3D Sanal Stüdyoda Döşenmiş Gör"
                 >
                   <Eye size={15} style={{ color: '#d4af37', flexShrink: 0 }} />
                   <span>3D Tasarımda Gör</span>

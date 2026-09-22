@@ -407,7 +407,14 @@ export default function BrandShowcaseClient({ brand, products = [], dealers = []
                     </Link>
 
                     <Link
-                      href={`/urun/${productSlug}?view=3d`}
+                      href={`/?tab=studio&product=${productSlug}#studio`}
+                      onClick={() => {
+                        if (typeof window !== 'undefined') {
+                          try {
+                            localStorage.setItem('seramikbak_preselected_product', JSON.stringify(product));
+                          } catch (e) {}
+                        }
+                      }}
                       style={{
                         background: 'rgba(255, 255, 255, 0.05)',
                         color: '#cbd5e1',
@@ -420,7 +427,7 @@ export default function BrandShowcaseClient({ brand, products = [], dealers = []
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}
-                      title="3D Tasarımda Gör"
+                      title="3D Sanal Stüdyoda Gör"
                     >
                       3D
                     </Link>
