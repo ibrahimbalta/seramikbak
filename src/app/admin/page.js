@@ -57,6 +57,7 @@ export default function AdminPage() {
 
   // Sidebar & Mobile State
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [expandedGroups, setExpandedGroups] = useState({ data: true, sales: true, finance: true, settings: true });
 
@@ -2279,18 +2280,30 @@ export default function AdminPage() {
       )}
 
       {/* Sidebar Navigation */}
-      <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-header">
-          <div className="sidebar-logo">
-            <div className="logo-icon">SB</div>
-            <div>
-              <span className="logo-text">SeramikBak</span>
-              <span className="system-badge">Admin Yetkisi</span>
+      <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''} ${isSidebarCollapsed && !isMobile ? 'collapsed' : ''}`}>
+        <div className="sidebar-header" style={{ justifyContent: isSidebarCollapsed && !isMobile ? 'center' : 'space-between' }}>
+          {(!isSidebarCollapsed || isMobile) && (
+            <div className="sidebar-logo">
+              <div className="logo-icon">SB</div>
+              <div>
+                <span className="logo-text">SeramikBak</span>
+                <span className="system-badge">Admin Yetkisi</span>
+              </div>
             </div>
-          </div>
-          {isMobile && (
+          )}
+          {isMobile ? (
             <button className="sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Menüyü Kapat">
               <X size={20} />
+            </button>
+          ) : (
+            <button 
+              type="button"
+              className="sidebar-collapse-btn" 
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
+              title={isSidebarCollapsed ? "Menüyü Genişlet" : "Menüyü Daralt"}
+              aria-label={isSidebarCollapsed ? "Menüyü Genişlet" : "Menüyü Daralt"}
+            >
+              {isSidebarCollapsed ? <Menu size={20} /> : <X size={18} />}
             </button>
           )}
         </div>
@@ -2305,123 +2318,263 @@ export default function AdminPage() {
         <nav className="sidebar-nav">
           {/* Grup 1: Veri Yönetimi */}
           <div className="nav-group">
-            <button className="nav-group-title" onClick={() => toggleGroup('data')}>
-              <LayoutGrid size={15} />
-              <span>Veri Yönetimi</span>
-              {expandedGroups.data ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            </button>
-            {expandedGroups.data && (
+            {!isSidebarCollapsed && (
+              <button className="nav-group-title" onClick={() => toggleGroup('data')}>
+                <LayoutGrid size={15} />
+                <span>Veri Yönetimi</span>
+                {expandedGroups.data ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              </button>
+            )}
+            {(expandedGroups.data || isSidebarCollapsed) && (
               <div className="nav-group-items">
-                <button className={`nav-item ${activeTab === 'scraper' ? 'active' : ''}`} onClick={() => handleTabSelect('scraper')}>
-                  <Terminal size={16} />
-                  <span>Ürün Kazıma</span>
+                <button 
+                  className={`nav-item ${activeTab === 'scraper' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('scraper')}
+                  title="Ürün Kazıma"
+                >
+                  <div className="nav-icon-wrap">
+                    <Terminal size={17} />
+                  </div>
+                  {!isSidebarCollapsed && <span>Ürün Kazıma</span>}
                 </button>
-                <button className={`nav-item ${activeTab === 'products' ? 'active' : ''}`} onClick={() => handleTabSelect('products')}>
-                  <Package size={16} />
-                  <span>Ürün Yönetimi</span>
+                <button 
+                  className={`nav-item ${activeTab === 'products' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('products')}
+                  title="Ürün Yönetimi"
+                >
+                  <div className="nav-icon-wrap">
+                    <Package size={17} />
+                  </div>
+                  {!isSidebarCollapsed && <span>Ürün Yönetimi</span>}
                 </button>
               </div>
             )}
           </div>
+
+          {isSidebarCollapsed && <div className="collapsed-divider" />}
 
           {/* Grup 2: Satış & CRM */}
           <div className="nav-group">
-            <button className="nav-group-title" onClick={() => toggleGroup('sales')}>
-              <Users size={15} />
-              <span>Satış & CRM</span>
-              {expandedGroups.sales ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            </button>
-            {expandedGroups.sales && (
+            {!isSidebarCollapsed && (
+              <button className="nav-group-title" onClick={() => toggleGroup('sales')}>
+                <Users size={15} />
+                <span>Satış & CRM</span>
+                {expandedGroups.sales ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              </button>
+            )}
+            {(expandedGroups.sales || isSidebarCollapsed) && (
               <div className="nav-group-items">
-                <button className={`nav-item ${activeTab === 'dealers' ? 'active' : ''}`} onClick={() => handleTabSelect('dealers')}>
-                  <MapPin size={16} />
-                  <span>Bayi Teşkilatı</span>
+                <button 
+                  className={`nav-item ${activeTab === 'dealers' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('dealers')}
+                  title="Bayi Teşkilatı"
+                >
+                  <div className="nav-icon-wrap">
+                    <MapPin size={17} />
+                  </div>
+                  {!isSidebarCollapsed && <span>Bayi Teşkilatı</span>}
                 </button>
-                <button className={`nav-item ${activeTab === 'architects' ? 'active' : ''}`} onClick={() => handleTabSelect('architects')}>
-                  <Compass size={16} />
-                  <span>Mimarlık & Tasarım</span>
+                <button 
+                  className={`nav-item ${activeTab === 'architects' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('architects')}
+                  title="Mimarlık & Tasarım"
+                >
+                  <div className="nav-icon-wrap">
+                    <Compass size={17} />
+                  </div>
+                  {!isSidebarCollapsed && <span>Mimarlık & Tasarım</span>}
                 </button>
-                <button className={`nav-item ${activeTab === 'leads' ? 'active' : ''}`} onClick={() => handleTabSelect('leads')}>
-                  <FileText size={16} />
-                  <span>Teklif Talepleri</span>
-                  {leads.length > 0 && <span className="nav-badge">{leads.length}</span>}
-                </button>
-                <button className={`nav-item ${activeTab === 'projects' ? 'active' : ''}`} onClick={() => handleTabSelect('projects')}>
-                  <Building2 size={16} />
-                  <span>Proje Talepleri</span>
-                  {projects.length > 0 && <span className="nav-badge">{projects.length}</span>}
-                </button>
-                <button className={`nav-item ${activeTab === 'installers' ? 'active' : ''}`} onClick={() => handleTabSelect('installers')}>
-                  <Wrench size={16} />
-                  <span>Seramik Ustaları</span>
-                  {installerStats.pending > 0 && <span className="nav-badge" style={{ background: '#ef4444' }}>{installerStats.pending}</span>}
-                </button>
-                <button className={`nav-item ${activeTab === 'contact_messages' ? 'active' : ''}`} onClick={() => handleTabSelect('contact_messages')}>
-                  <Mail size={16} />
-                  <span>İletişim Mesajları</span>
-                  {contactMessages.filter(m => m.status === 'UNREAD').length > 0 && (
-                    <span className="nav-badge" style={{ background: '#ef4444' }}>
-                      {contactMessages.filter(m => m.status === 'UNREAD').length}
-                    </span>
+                <button 
+                  className={`nav-item ${activeTab === 'leads' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('leads')}
+                  title={`Teklif Talepleri ${leads.length > 0 ? `(${leads.length})` : ''}`}
+                >
+                  <div className="nav-icon-wrap">
+                    <FileText size={17} />
+                    {isSidebarCollapsed && leads.length > 0 && (
+                      <span className="collapsed-badge">{leads.length}</span>
+                    )}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <>
+                      <span>Teklif Talepleri</span>
+                      {leads.length > 0 && <span className="nav-badge">{leads.length}</span>}
+                    </>
                   )}
                 </button>
-                <button className={`nav-item ${activeTab === 'sample_orders' ? 'active' : ''}`} onClick={() => handleTabSelect('sample_orders')}>
-                  <Truck size={16} />
-                  <span>Numune Talepleri</span>
-                  {sampleOrders.filter(o => o.status === 'PENDING').length > 0 && (
-                    <span className="nav-badge" style={{ background: '#f59e0b', color: '#0f172a' }}>
-                      {sampleOrders.filter(o => o.status === 'PENDING').length}
-                    </span>
+                <button 
+                  className={`nav-item ${activeTab === 'projects' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('projects')}
+                  title={`Proje Talepleri ${projects.length > 0 ? `(${projects.length})` : ''}`}
+                >
+                  <div className="nav-icon-wrap">
+                    <Building2 size={17} />
+                    {isSidebarCollapsed && projects.length > 0 && (
+                      <span className="collapsed-badge">{projects.length}</span>
+                    )}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <>
+                      <span>Proje Talepleri</span>
+                      {projects.length > 0 && <span className="nav-badge">{projects.length}</span>}
+                    </>
+                  )}
+                </button>
+                <button 
+                  className={`nav-item ${activeTab === 'installers' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('installers')}
+                  title={`Seramik Ustaları ${installerStats.pending > 0 ? `(${installerStats.pending})` : ''}`}
+                >
+                  <div className="nav-icon-wrap">
+                    <Wrench size={17} />
+                    {isSidebarCollapsed && installerStats.pending > 0 && (
+                      <span className="collapsed-badge alert">{installerStats.pending}</span>
+                    )}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <>
+                      <span>Seramik Ustaları</span>
+                      {installerStats.pending > 0 && <span className="nav-badge" style={{ background: '#ef4444' }}>{installerStats.pending}</span>}
+                    </>
+                  )}
+                </button>
+                <button 
+                  className={`nav-item ${activeTab === 'contact_messages' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('contact_messages')}
+                  title={`İletişim Mesajları ${contactMessages.filter(m => m.status === 'UNREAD').length > 0 ? `(${contactMessages.filter(m => m.status === 'UNREAD').length})` : ''}`}
+                >
+                  <div className="nav-icon-wrap">
+                    <Mail size={17} />
+                    {isSidebarCollapsed && contactMessages.filter(m => m.status === 'UNREAD').length > 0 && (
+                      <span className="collapsed-badge alert">{contactMessages.filter(m => m.status === 'UNREAD').length}</span>
+                    )}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <>
+                      <span>İletişim Mesajları</span>
+                      {contactMessages.filter(m => m.status === 'UNREAD').length > 0 && (
+                        <span className="nav-badge" style={{ background: '#ef4444' }}>
+                          {contactMessages.filter(m => m.status === 'UNREAD').length}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </button>
+                <button 
+                  className={`nav-item ${activeTab === 'sample_orders' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('sample_orders')}
+                  title={`Numune Talepleri ${sampleOrders.filter(o => o.status === 'PENDING').length > 0 ? `(${sampleOrders.filter(o => o.status === 'PENDING').length})` : ''}`}
+                >
+                  <div className="nav-icon-wrap">
+                    <Truck size={17} />
+                    {isSidebarCollapsed && sampleOrders.filter(o => o.status === 'PENDING').length > 0 && (
+                      <span className="collapsed-badge warning">{sampleOrders.filter(o => o.status === 'PENDING').length}</span>
+                    )}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <>
+                      <span>Numune Talepleri</span>
+                      {sampleOrders.filter(o => o.status === 'PENDING').length > 0 && (
+                        <span className="nav-badge" style={{ background: '#f59e0b', color: '#0f172a' }}>
+                          {sampleOrders.filter(o => o.status === 'PENDING').length}
+                        </span>
+                      )}
+                    </>
                   )}
                 </button>
               </div>
             )}
           </div>
+
+          {isSidebarCollapsed && <div className="collapsed-divider" />}
 
           {/* Grup 3: Finans & SaaS */}
           <div className="nav-group">
-            <button className="nav-group-title" onClick={() => toggleGroup('finance')}>
-              <CreditCard size={15} />
-              <span>Finans & SaaS</span>
-              {expandedGroups.finance ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            </button>
-            {expandedGroups.finance && (
+            {!isSidebarCollapsed && (
+              <button className="nav-group-title" onClick={() => toggleGroup('finance')}>
+                <CreditCard size={15} />
+                <span>Finans & SaaS</span>
+                {expandedGroups.finance ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              </button>
+            )}
+            {(expandedGroups.finance || isSidebarCollapsed) && (
               <div className="nav-group-items">
-                <button className={`nav-item ${activeTab === 'saas' ? 'active' : ''}`} onClick={() => handleTabSelect('saas')}>
-                  <CreditCard size={16} />
-                  <span>SaaS Abonelik</span>
+                <button 
+                  className={`nav-item ${activeTab === 'saas' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('saas')}
+                  title="SaaS Abonelik"
+                >
+                  <div className="nav-icon-wrap">
+                    <CreditCard size={17} />
+                  </div>
+                  {!isSidebarCollapsed && <span>SaaS Abonelik</span>}
                 </button>
-                <button className={`nav-item ${activeTab === 'campaigns' ? 'active' : ''}`} onClick={() => handleTabSelect('campaigns')}>
-                  <Sparkles size={16} />
-                  <span>Sponsorlu Reklam</span>
-                  {campaigns.filter(c => c.status === 'PENDING_APPROVAL').length > 0 && (
-                    <span className="nav-badge gold">{campaigns.filter(c => c.status === 'PENDING_APPROVAL').length}</span>
+                <button 
+                  className={`nav-item ${activeTab === 'campaigns' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('campaigns')}
+                  title={`Sponsorlu Reklam ${campaigns.filter(c => c.status === 'PENDING_APPROVAL').length > 0 ? `(${campaigns.filter(c => c.status === 'PENDING_APPROVAL').length})` : ''}`}
+                >
+                  <div className="nav-icon-wrap">
+                    <Sparkles size={17} />
+                    {isSidebarCollapsed && campaigns.filter(c => c.status === 'PENDING_APPROVAL').length > 0 && (
+                      <span className="collapsed-badge gold">{campaigns.filter(c => c.status === 'PENDING_APPROVAL').length}</span>
+                    )}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <>
+                      <span>Sponsorlu Reklam</span>
+                      {campaigns.filter(c => c.status === 'PENDING_APPROVAL').length > 0 && (
+                        <span className="nav-badge gold">{campaigns.filter(c => c.status === 'PENDING_APPROVAL').length}</span>
+                      )}
+                    </>
                   )}
                 </button>
               </div>
             )}
           </div>
 
+          {isSidebarCollapsed && <div className="collapsed-divider" />}
+
           {/* Grup 4: Ayarlar */}
           <div className="nav-group">
-            <button className="nav-group-title" onClick={() => toggleGroup('settings')}>
-              <Settings size={15} />
-              <span>Ayarlar</span>
-              {expandedGroups.settings ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            </button>
-            {expandedGroups.settings && (
+            {!isSidebarCollapsed && (
+              <button className="nav-group-title" onClick={() => toggleGroup('settings')}>
+                <Settings size={15} />
+                <span>Ayarlar</span>
+                {expandedGroups.settings ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              </button>
+            )}
+            {(expandedGroups.settings || isSidebarCollapsed) && (
               <div className="nav-group-items">
-                <button className={`nav-item ${activeTab === 'brands' ? 'active' : ''}`} onClick={() => handleTabSelect('brands')}>
-                  <Building2 size={16} />
-                  <span>Marka Hesapları</span>
+                <button 
+                  className={`nav-item ${activeTab === 'brands' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('brands')}
+                  title="Marka Hesapları"
+                >
+                  <div className="nav-icon-wrap">
+                    <Building2 size={17} />
+                  </div>
+                  {!isSidebarCollapsed && <span>Marka Hesapları</span>}
                 </button>
-                <button className={`nav-item ${activeTab === 'pages' ? 'active' : ''}`} onClick={() => handleTabSelect('pages')}>
-                  <Globe size={16} />
-                  <span>Kurumsal Sayfalar</span>
+                <button 
+                  className={`nav-item ${activeTab === 'pages' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('pages')}
+                  title="Kurumsal Sayfalar"
+                >
+                  <div className="nav-icon-wrap">
+                    <Globe size={17} />
+                  </div>
+                  {!isSidebarCollapsed && <span>Kurumsal Sayfalar</span>}
                 </button>
-                <button className={`nav-item ${activeTab === 'security' ? 'active' : ''}`} onClick={() => handleTabSelect('security')}>
-                  <ShieldCheck size={16} />
-                  <span>Güvenlik & Yedekleme</span>
+                <button 
+                  className={`nav-item ${activeTab === 'security' ? 'active' : ''}`} 
+                  onClick={() => handleTabSelect('security')}
+                  title="Güvenlik & Yedekleme"
+                >
+                  <div className="nav-icon-wrap">
+                    <ShieldCheck size={17} />
+                  </div>
+                  {!isSidebarCollapsed && <span>Güvenlik & Yedekleme</span>}
                 </button>
               </div>
             )}
@@ -2429,13 +2582,23 @@ export default function AdminPage() {
         </nav>
 
         <div className="sidebar-footer">
-          <Link href="/" className="sidebar-footer-btn">
+          <Link 
+            href="/" 
+            className="sidebar-footer-btn" 
+            title="Portala Git"
+            style={{ justifyContent: isSidebarCollapsed && !isMobile ? 'center' : 'flex-start' }}
+          >
             <ArrowLeft size={16} />
-            <span>Portala Git</span>
+            {(!isSidebarCollapsed || isMobile) && <span>Portala Git</span>}
           </Link>
-          <button onClick={() => setIsLoggedIn(false)} className="sidebar-footer-btn logout">
+          <button 
+            onClick={() => setIsLoggedIn(false)} 
+            className="sidebar-footer-btn logout" 
+            title="Çıkış Yap"
+            style={{ justifyContent: isSidebarCollapsed && !isMobile ? 'center' : 'flex-start' }}
+          >
             <LogOut size={16} />
-            <span>Çıkış Yap</span>
+            {(!isSidebarCollapsed || isMobile) && <span>Çıkış Yap</span>}
           </button>
         </div>
       </aside>
@@ -6957,8 +7120,14 @@ export default function AdminPage() {
           z-index: 100;
           overflow-y: auto;
           overflow-x: hidden;
-          transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease;
+          transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease;
           box-shadow: 1px 0 3px rgba(0, 0, 0, 0.02);
+          flex-shrink: 0;
+        }
+
+        .admin-sidebar.collapsed {
+          width: 72px;
+          min-width: 72px;
         }
 
         .admin-sidebar::-webkit-scrollbar {
@@ -7020,7 +7189,7 @@ export default function AdminPage() {
           margin-top: 2px;
         }
 
-        .sidebar-close {
+        .sidebar-close, .sidebar-collapse-btn {
           background: #f1f5f9;
           border: 1px solid #e2e8f0;
           color: #475569;
@@ -7032,10 +7201,89 @@ export default function AdminPage() {
           align-items: center;
           justify-content: center;
           transition: all 0.2s ease;
+          flex-shrink: 0;
         }
-        .sidebar-close:hover {
+        .sidebar-close:hover, .sidebar-collapse-btn:hover {
           background: #e2e8f0;
           color: #0f172a;
+          border-color: #cbd5e1;
+        }
+
+        .admin-sidebar.collapsed .sidebar-header {
+          padding: 16px 8px;
+          justify-content: center;
+        }
+
+        .admin-sidebar.collapsed .sidebar-nav {
+          padding: 8px 6px;
+        }
+
+        .admin-sidebar.collapsed .nav-item {
+          padding: 10px 0;
+          justify-content: center;
+          gap: 0;
+          min-height: 42px;
+          border-radius: 10px;
+          margin: 1px 0;
+        }
+
+        .admin-sidebar.collapsed .nav-item.active::before {
+          left: 2px;
+          width: 3.5px;
+          height: 20px;
+        }
+
+        .admin-sidebar.collapsed .sidebar-footer {
+          padding: 12px 6px;
+        }
+
+        .admin-sidebar.collapsed .sidebar-footer-btn {
+          padding: 10px 0;
+          justify-content: center;
+          gap: 0;
+        }
+
+        .nav-icon-wrap {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .collapsed-badge {
+          position: absolute;
+          top: -6px;
+          right: -9px;
+          min-width: 15px;
+          height: 15px;
+          padding: 0 4px;
+          background: #2563eb;
+          color: #ffffff;
+          font-size: 0.58rem;
+          font-weight: 800;
+          border-radius: 9999px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1.5px solid #ffffff;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .collapsed-badge.alert {
+          background: #ef4444;
+        }
+        .collapsed-badge.warning {
+          background: #f59e0b;
+          color: #0f172a;
+        }
+        .collapsed-badge.gold {
+          background: #d4af37;
+          color: #0f172a;
+        }
+
+        .collapsed-divider {
+          height: 1px;
+          background: #f1f5f9;
+          margin: 6px 8px;
         }
 
         .sidebar-mobile-notice {
