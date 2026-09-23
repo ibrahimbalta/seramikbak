@@ -30,7 +30,6 @@ import {
   X
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
-import AIRemodelModal from '@/components/AIRemodelModal';
 import { generateTilePreview, loadImage } from '@/components/TilePerspectiveEngine';
 
 
@@ -119,9 +118,6 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
 
   // Quote Modal State
   const [showQuoteModal, setShowQuoteModal] = useState(false);
-
-  // AI Remodel Modal State
-  const [showAIRemodel, setShowAIRemodel] = useState(false);
   const [quoteSubmitting, setQuoteSubmitting] = useState(false);
   const [quoteSuccess, setQuoteSuccess] = useState('');
   const [quoteError, setQuoteError] = useState('');
@@ -585,12 +581,6 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                     >
                       3D Stüdyoda Aç →
                     </button>
-                    <button
-                      onClick={() => setShowAIRemodel(true)}
-                      className="btn-room-remodel-inline"
-                    >
-                      3D Mekanda Gör →
-                    </button>
                   </div>
                 </div>
               )}
@@ -810,7 +800,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                     color: '#f3d375',
                     flexShrink: 0
                   }}>
-                    <Sparkles size={18} />
+                    <Eye size={18} />
                   </div>
                   <div>
                     <span style={{
@@ -821,7 +811,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                       letterSpacing: '0.12em',
                       display: 'block'
                     }}>
-                      MİMARİ YAPAY ZEKA SİMÜLASYONU
+                      3D SANAL TASARIM STÜDYOSU
                     </span>
                     <h3 style={{
                       fontSize: '1.08rem',
@@ -830,7 +820,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                       margin: '2px 0 0',
                       letterSpacing: '-0.01em'
                     }}>
-                      Bu Seramiği Kendi Odanızda Görün
+                      Bu Seramiği 3D Tasarımda Görün
                     </h3>
                   </div>
                 </div>
@@ -845,7 +835,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   borderRadius: '9999px',
                   whiteSpace: 'nowrap'
                 }}>
-                  ● Canlı Render
+                  ● Etkileşimli 3D
                 </span>
               </div>
 
@@ -855,28 +845,17 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 lineHeight: 1.5,
                 margin: '0 0 18px 0'
               }}>
-                Bu seramiği lüks ebeveyn banyosu, modern mutfak ve geniş salon gibi mimari 3D mekanlarda ultra gerçekçi ışık, derz ve yansımalarla anında canlandırın.
+                Bu seramiği 3D sanal stüdyomuzda banyo, mutfak veya salon mekanlarında canlı olarak döşeyin; derz renklerini, döşeme yönünü ve ışık açılarını serbestçe deneyimleyin.
               </p>
 
-              {/* Dual Action Buttons - Symmetrical on Mobile */}
-              <div className="ai-remodel-btn-grid">
-                <button
-                  onClick={() => setShowAIRemodel(true)}
-                  className="btn-ai-remodel-primary"
-                >
-                  <Sparkles size={15} style={{ flexShrink: 0 }} />
-                  <span>3D Mimari Mekanda Gör</span>
-                </button>
-
-                <button
-                  onClick={handleGoTo3DStudio}
-                  className="btn-ai-remodel-secondary"
-                  title="3D Sanal Stüdyoda Döşenmiş Gör"
-                >
-                  <Eye size={15} style={{ color: '#d4af37', flexShrink: 0 }} />
-                  <span>3D Tasarımda Gör</span>
-                </button>
-              </div>
+              <button
+                onClick={handleGoTo3DStudio}
+                className="btn-ai-remodel-primary"
+                style={{ width: '100%', justifyContent: 'center' }}
+              >
+                <Eye size={16} style={{ flexShrink: 0 }} />
+                <span>3D Sanal Stüdyoda Aç & Tasarla →</span>
+              </button>
             </div>
 
             {/* Haute-Couture Conversion Suite (Teklif & Numune) */}
@@ -1724,28 +1703,6 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
             )}
           </div>
         </div>
-      )}
-
-      {/* ---------------- AI REMODEL MODAL ---------------- */}
-      {showAIRemodel && (
-        <AIRemodelModal
-          isOpen={showAIRemodel}
-          onClose={() => setShowAIRemodel(false)}
-          selectedProduct={product}
-          onGoToDealers={() => {
-            setShowAIRemodel(false);
-            const dealersEl = document.getElementById('authorized-dealers-section');
-            if (dealersEl) {
-              dealersEl.scrollIntoView({ behavior: 'smooth' });
-            } else {
-              setShowQuoteModal(true);
-            }
-          }}
-          onRequestSample={() => {
-            setShowAIRemodel(false);
-            setShowSampleModal(true);
-          }}
-        />
       )}
 
       {/* Mobile Sticky Bottom Action Bar (Native Mobile App Experience) */}
