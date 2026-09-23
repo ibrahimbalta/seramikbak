@@ -5701,11 +5701,13 @@ Yetkili Satış & Showroom Departmanı`;
                     {[
                       { text: 'Müşteri adı ve telefon bilgisi', included: true },
                       { text: 'Aylık 50 müşteri talebi limiti', included: true },
-                      { text: 'Temel talep yönetimi', included: true },
-                      { text: 'E-posta destek', included: true },
-                      { text: 'Öncelikli listeleme', included: false },
-                      { text: 'Anlık bildirimler', included: false },
-                      { text: 'Reklam kampanyaları', included: false },
+                      { text: 'Temel talep ve müşteri yönetimi', included: true },
+                      { text: 'Envanter yönetimi (Manuel ürün ekleme)', included: true },
+                      { text: 'E-posta destek hattı', included: true },
+                      { text: 'Arama sonuçlarında öncelikli listeleme', included: false },
+                      { text: 'Anlık Web Push bildirimleri', included: false },
+                      { text: 'Outlet & Proje Fazlası Borsası', included: false },
+                      { text: '3D QR Etiket & WhatsApp Teklif Motoru', included: false },
                     ].map((f, i) => (
                       <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: f.included ? '#334155' : '#cbd5e1' }}>
                         {f.included ? <Check size={15} style={{ color: '#10b981', flexShrink: 0 }} /> : <X size={15} style={{ color: '#e2e8f0', flexShrink: 0 }} />}
@@ -5776,11 +5778,13 @@ Yetkili Satış & Showroom Departmanı`;
                     {[
                       { text: 'Tam müşteri bilgisi (ad, tel, e-posta)', included: true },
                       { text: 'Sınırsız müşteri talebi', included: true },
-                      { text: 'Gelişmiş talep yönetimi', included: true },
+                      { text: 'Gelişmiş talep ve müşteri yönetimi', included: true },
+                      { text: 'Arama sonuçları & en yakın bayilerde öncelik', included: true },
+                      { text: 'Anlık Web Push ve E-posta bildirimleri', included: true },
+                      { text: 'Envanter yönetimi (Excel / CSV toplu yükleme)', included: true },
+                      { text: 'Outlet & Proje Fazlası Borsasında ilan açma', included: true },
                       { text: 'Öncelikli telefon + e-posta destek', included: true },
-                      { text: 'Arama sonuçlarında öncelikli listeleme', included: true },
-                      { text: 'Anlık SMS/E-posta bildirimleri', included: true },
-                      { text: 'Reklam kampanyaları', included: false },
+                      { text: '3D QR Etiket & WhatsApp Teklif Motoru', included: false },
                     ].map((f, i) => (
                       <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: f.included ? '#334155' : '#cbd5e1' }}>
                         {f.included ? <Check size={15} style={{ color: '#f59e0b', flexShrink: 0 }} /> : <X size={15} style={{ color: '#e2e8f0', flexShrink: 0 }} />}
@@ -5846,14 +5850,14 @@ Yetkili Satış & Showroom Departmanı`;
                   <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 auto 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {[
                       { text: '📱 Showroom Akıllı QR Kod Etiket Üretici (3D Destekli)', included: true },
-                      { text: '💬 WhatsApp Hızlı Teklif Motoru & Mini CRM', included: true },
-                      { text: 'Tam müşteri bilgisi + adres detayı', included: true },
+                      { text: '💬 WhatsApp Hızlı Teklif Motoru & Müşteri Takip Sistemi', included: true },
+                      { text: 'Tam müşteri bilgisi + proje ve adres detayı', included: true },
                       { text: 'Sınırsız müşteri talebi', included: true },
-                      { text: 'Gelişmiş CRM entegrasyonu', included: true },
-                      { text: '7/24 VIP Destek Hattı', included: true },
-                      { text: 'En üst sırada öncelikli listeleme', included: true },
-                      { text: 'Anlık SMS/E-posta/WhatsApp bildirim', included: true },
-                      { text: 'Sponsorlu reklam kampanyaları', included: true },
+                      { text: '🏆 Haritada ve aramalarda en üst sırada VIP listeleme', included: true },
+                      { text: 'Envanter & Otomatik XML Feed Entegrasyonu', included: true },
+                      { text: 'Outlet Borsasında sınırsız ilan & WhatsApp alıcı ağı', included: true },
+                      { text: 'Anlık Web Push ve E-posta bildirimleri', included: true },
+                      { text: '7/24 Öncelikli VIP Destek Hattı', included: true },
                     ].map((f, i) => (
                       <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#334155' }}>
                         <Check size={15} style={{ color: '#7c3aed', flexShrink: 0 }} />
@@ -5914,13 +5918,15 @@ Yetkili Satış & Showroom Departmanı`;
                   <tbody>
                     {[
                       { feature: 'Yıllık Ücret', lite: '₺2.990', standart: '₺5.990', premium: '₺11.990' },
-                      { feature: 'Müşteri Bilgi Erişimi', lite: 'Ad + Telefon', standart: 'Tam Bilgi', premium: 'Tam + Adres' },
-                      { feature: 'Aylık Talep Limiti', lite: '50', standart: 'Sınırsız', premium: 'Sınırsız' },
-                      { feature: 'Öncelikli Listeleme', lite: false, standart: true, premium: 'VIP Üst Sıra' },
-                      { feature: 'Anlık Bildirimler', lite: false, standart: true, premium: true },
-                      { feature: 'Destek Kanalı', lite: 'E-posta', standart: 'Tel + E-posta', premium: '7/24 VIP' },
-                      { feature: 'Reklam Kampanyaları', lite: false, standart: false, premium: true },
-                      { feature: 'CRM Entegrasyonu', lite: false, standart: false, premium: true },
+                      { feature: 'Müşteri Bilgi Erişimi', lite: 'Ad + Telefon', standart: 'Tam Bilgi (Tel, E-posta)', premium: 'Tam Bilgi + Adres Detayı' },
+                      { feature: 'Aylık Müşteri Talebi Limiti', lite: '50 Talep', standart: 'Sınırsız', premium: 'Sınırsız' },
+                      { feature: 'Arama & Harita Öncelikli Listeleme', lite: false, standart: true, premium: '🏆 VIP En Üst Sıra' },
+                      { feature: 'Anlık Bildirimler', lite: false, standart: 'Web Push & E-posta', premium: 'Web Push & E-posta' },
+                      { feature: 'Envanter & Stok Yönetimi', lite: 'Manuel', standart: 'Excel / CSV', premium: 'XML Feed + Excel' },
+                      { feature: 'Outlet & Proje Fazlası Borsası', lite: false, standart: '5 İlan', premium: 'Sınırsız + Alıcı Ağı' },
+                      { feature: 'Showroom 3D QR Etiket Üretici', lite: false, standart: false, premium: true },
+                      { feature: 'WhatsApp Hızlı Teklif Motoru', lite: false, standart: false, premium: true },
+                      { feature: 'Destek Kanalı', lite: 'E-posta', standart: 'Telefon + E-posta', premium: '7/24 VIP Destek' },
                     ].map((row, i) => (
                       <tr key={i} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
                         <td style={{ padding: '13px 16px', fontWeight: '600', color: '#ffffff' }}>{row.feature}</td>
