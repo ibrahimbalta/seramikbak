@@ -589,7 +589,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                       onClick={() => setShowAIRemodel(true)}
                       className="btn-room-remodel-inline"
                     >
-                      Evinde Dene →
+                      3D Mekanda Gör →
                     </button>
                   </div>
                 </div>
@@ -855,7 +855,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 lineHeight: 1.5,
                 margin: '0 0 18px 0'
               }}>
-                Banyonuzun veya salonunuzun bir fotoğrafını yükleyin. Yapay zeka motorumuz küvet, lavabo ve mobilyalarınıza dokunmadan bu seramiği mimari 3D render kalitesinde odanıza döşesin.
+                Bu seramiği lüks ebeveyn banyosu, modern mutfak ve geniş salon gibi mimari 3D mekanlarda ultra gerçekçi ışık, derz ve yansımalarla anında canlandırın.
               </p>
 
               {/* Dual Action Buttons - Symmetrical on Mobile */}
@@ -865,7 +865,7 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                   className="btn-ai-remodel-primary"
                 >
                   <Sparkles size={15} style={{ flexShrink: 0 }} />
-                  <span>Fotoğraf Yükle & Gör</span>
+                  <span>3D Mimari Mekanda Gör</span>
                 </button>
 
                 <button
