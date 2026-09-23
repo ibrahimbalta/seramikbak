@@ -300,49 +300,20 @@ Key Requirements:
     }
 
     try {
-      setLoadingStepText('1/3 Zemin yüzeyi ve süpürgelik hatları analiz ediliyor...');
+      setLoadingStepText('1/3 Odanız taranıyor ve zemin perspektif hatları analiz ediliyor...');
 
       // Rapidly downscale image in-browser to max 800px for ultra-fast AI vision processing
       const optimizedAiImage = await downscaleImageForAI(currentPhoto, 800);
 
       // Load original high-res room photo and 4K tile texture (routed through /api/proxy if external to bypass CORS)
       const rawTileSource = targetTile?.textureUrl || targetTile?.imageUrl || '/textures/calacatta_gold.jpg';
-      const isHttp = typeof rawTileSource === 'string' && rawTileSource.startsWith('http');
-      const tileSource = isHttp ? `/api/proxy?url=${encodeURIComponent(rawTileSource)}` : rawTileSource;
-
-      setLoadingStepText('2/3 Photo-realistic interior design render işleniyor...');
-
-      // Priority 1: Call Generative AI Re-Tile endpoint with exact architectural prompt
-      try {
-        const reTileRes = await fetch('/api/ai/re-tile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image: optimizedAiImage || currentPhoto,
-            tileImageUrl: tileSource,
-            productName: targetTile?.name,
-            style: targetTile?.style,
-            color: targetTile?.color,
-            finish: targetTile?.finish,
-            width: targetTile?.width,
-            height: targetTile?.height,
-            roomType: surfaceToApply,
-            promptOverride: architecturalPromptText
-          }),
-        }).then((r) => r.json());
-
-        if (reTileRes?.success && reTileRes?.imageUrl && reTileRes.method !== 'static-fallback' && reTileRes.method !== 'error-fallback') {
-          setLoadingStepText('3/3 8K Photo-realistic render tamamlandı!');
-          setAiResultImage(reTileRes.imageUrl);
-          setIsGenerating(false);
-          return;
-        }
-      } catch (aiErr) {
-        console.warn('[AI Remodel] Re-Tile API bypassed, proceeding to PBR perspective engine:', aiErr);
+      let tileSource = rawTileSource;
+      if (typeof rawTileSource === 'string' && (rawTileSource.startsWith('http://') || rawTileSource.startsWith('https://'))) {
+        tileSource = `/api/proxy?url=${encodeURIComponent(rawTileSource)}`;
       }
 
       setLoadingStepText(
-        '2/3 ' + (surfaceToApply === 'floor' ? 'Zemin yüzeyi' : surfaceToApply === 'walls' ? 'Duvar yüzeyleri' : 'Zemin ve duvarlar') + ' 3D perspektife oturtuluyor...'
+        '2/3 ' + (surfaceToApply === 'floor' ? 'Zemin yüzeyi' : surfaceToApply === 'walls' ? 'Duvar yüzeyleri' : 'Zemin ve duvarlar') + ' 3D mimari perspektife oturtuluyor...'
       );
 
       let surfaces = { floor: null, walls: null };
@@ -369,7 +340,7 @@ Key Requirements:
             }),
           }).then((r) => r.json());
 
-          if (renderRes.success && renderRes.maskData) {
+          if (renderRes.success && renderRes.maskData && renderRes.isDetected) {
             setDetectedMaskData(renderRes.maskData);
             if (surfaceToApply === 'both') {
               surfaces = {
@@ -389,10 +360,10 @@ Key Requirements:
             }
           }
         } catch (apiErr) {
-          console.warn('[AI Remodel] API bypassed, falling back to client detector:', apiErr);
+          console.warn('[AI Remodel] API vision bypassed, falling back to client detector:', apiErr);
         }
 
-        // Client-Side Computer Vision Engine Fallback
+        // Client-Side Computer Vision Engine Fallback (analyzes actual pixels of user's room)
         if (!surfaces.floor && (!surfaces.walls || surfaces.walls.length === 0)) {
           const baseImg = await loadImage(currentPhoto);
           const clientSurfaces = detectTileSurfacesClientSide(
@@ -411,10 +382,12 @@ Key Requirements:
         }
       }
 
-      setLoadingStepText('3/3 ' + (targetTile?.name || 'Seramik') + ' mimari render kalitesinde giydiriliyor...');
+      setLoadingStepText('3/3 ' + (targetTile?.name || 'Seçili seramik') + ' doğal ışık ve gölgelerle mekanınıza döşeniyor...');
 
       const fallbackTexture = (targetTile?.color || '').toLowerCase().includes('siyah') || (targetTile?.color || '').toLowerCase().includes('antrasit')
         ? '/textures/albatros_antrasit.jpg'
+        : (targetTile?.color || '').toLowerCase().includes('gri') || (targetTile?.style || '').toLowerCase().includes('beton') || (targetTile?.style || '').toLowerCase().includes('taş') || (targetTile?.name || '').toLowerCase().includes('smeralda')
+        ? '/textures/loft_beton.jpg'
         : (targetTile?.width === 20 || (targetTile?.name || '').toLowerCase().includes('ahşap'))
         ? '/textures/natural_oak.jpg'
         : '/textures/calacatta_gold.jpg';
@@ -427,7 +400,7 @@ Key Requirements:
       const isDark = (targetTile?.color || '').toLowerCase().includes('antrasit') || (targetTile?.color || '').toLowerCase().includes('siyah') || (targetTile?.name || '').toLowerCase().includes('antrasit') || (targetTile?.name || '').toLowerCase().includes('siyah');
       const isPlank = ((targetTile?.width || 60) / (targetTile?.height || 120)) <= 0.35;
 
-      // Generate preview using high-fidelity PBR 3D engine with specular reflections & custom masks
+      // Generate preview using high-fidelity PBR 3D engine on USER'S ACTUAL ROOM PHOTO with specular reflections & shadows
       const resultDataUrl = generateTilePreview(roomImg, tileImg, surfaces, {
         groutColor: isPlank ? '#241a14' : isDark ? '#1a1a1a' : '#cbd5e1',
         groutWidth: groutMm,

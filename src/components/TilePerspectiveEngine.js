@@ -325,11 +325,11 @@ export function detectTileSurfacesClientSide(roomImg, canvasW, canvasH) {
   const imgData = tCtx.getImageData(0, 0, dw, dh);
   const data = imgData.data;
 
-  // 1. Find floor horizon / baseboard line (typically in lower 45% - 75% of room photo)
-  const startRow = Math.round(dh * 0.52);
-  const endRow = Math.round(dh * 0.85);
+  // 1. Find floor horizon / baseboard line (typically in lower 40% - 80% of room photo)
+  const startRow = Math.round(dh * 0.40);
+  const endRow = Math.round(dh * 0.82);
 
-  let bestHorizonRow = Math.round(dh * 0.65);
+  let bestHorizonRow = Math.round(dh * 0.55);
   let maxHorizontalDiff = -1;
 
   for (let y = startRow; y < endRow; y++) {
@@ -350,12 +350,11 @@ export function detectTileSurfacesClientSide(roomImg, canvasW, canvasH) {
   const horizonPct = Math.round((bestHorizonRow / dh) * 100);
 
   // 2. Scan for white fixtures (bathtubs, toilets, sinks) resting on the ground
-  // High luminance (> 180) in lower-middle regions
+  // High luminance (> 205) in lower-middle regions with compact bounds
   const excludes = [];
-  const fixtureBoxes = [];
 
   const checkYStart = Math.round(bestHorizonRow);
-  const checkYEnd = Math.round(dh * 0.95);
+  const checkYEnd = Math.round(dh * 0.92);
   const xStep = 10;
   const yStep = 8;
 
@@ -367,7 +366,7 @@ export function detectTileSurfacesClientSide(roomImg, canvasW, canvasH) {
       const g = data[idx + 1];
       const b = data[idx + 2];
       const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-      const isWhiteFixture = lum > 195 && Math.abs(r - g) < 20 && Math.abs(g - b) < 20;
+      const isWhiteFixture = lum > 205 && Math.abs(r - g) < 18 && Math.abs(g - b) < 18;
 
       if (isWhiteFixture) {
         if (!currentFixture) {
@@ -383,7 +382,7 @@ export function detectTileSurfacesClientSide(roomImg, canvasW, canvasH) {
     }
   }
 
-  if (currentFixture && currentFixture.count > 12) {
+  if (currentFixture && currentFixture.count > 16) {
     // Convert to percentage box
     const pad = 2;
     const fx1 = Math.max(0, Math.round((currentFixture.minX / dw) * 100) - pad);
@@ -391,12 +390,19 @@ export function detectTileSurfacesClientSide(roomImg, canvasW, canvasH) {
     const fy1 = Math.max(0, Math.round((currentFixture.minY / dh) * 100) - pad);
     const fy2 = Math.min(100, Math.round((currentFixture.maxY / dh) * 100) + pad);
 
-    excludes.push([
-      [fx1, fy1],
-      [fx2, fy1],
-      [fx2, fy2],
-      [fx1, fy2]
-    ]);
+    const fixtureWidth = fx2 - fx1;
+    const fixtureHeight = fy2 - fy1;
+
+    // Strict safety check: Only exclude if it is a compact object (fixture), NOT an existing light floor!
+    // If width >= 38% or it spans across the entire bottom, it's the floor itself, so don't exclude!
+    if (fixtureWidth < 38 && fixtureHeight < 45 && fy1 > 10) {
+      excludes.push([
+        [fx1, fy1],
+        [fx2, fy1],
+        [fx2, fy2],
+        [fx1, fy2]
+      ]);
+    }
   }
 
   return {

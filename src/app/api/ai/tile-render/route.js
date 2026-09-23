@@ -38,10 +38,10 @@ function normalizeExcludeList(excludes) {
 
 // Active and fast Gemini models
 const GEMINI_MODELS = [
-  'gemini-3.6-flash',
-  'gemini-3.1-flash-lite-preview',
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
   'gemini-flash-latest',
-  'gemini-3-flash-preview'
+  'gemini-2.0-flash-lite'
 ];
 
 /**
@@ -130,25 +130,27 @@ export async function POST(req) {
                    dbGeminiKey ||
                    process.env.GEMINI_API_KEY;
 
-    // Fallback architectural masks
+    // Fallback architectural masks (clean floor plane without arbitrary holes)
     const fallbackFloor = {
-      polygon: [[0, 68], [100, 68], [100, 100], [0, 100]],
-      exclude: [[[35, 62], [65, 62], [65, 85], [35, 85]]]
+      polygon: [[0, 60], [100, 60], [100, 100], [0, 100]],
+      exclude: []
     };
 
     const fallbackWalls = [
       {
         name: 'back_wall',
-        polygon: [[20, 20], [80, 20], [80, 68], [20, 68]],
-        exclude: [[[35, 25], [65, 25], [65, 55], [35, 55]]]
+        polygon: [[15, 15], [85, 15], [85, 60], [15, 60]],
+        exclude: []
       }
     ];
 
     let maskData = { floor: null, walls: [] };
+    let isDetected = false;
 
     // If customMask is supplied by client MaskBrushEditor, honor it directly
     if (customMask && (customMask.floor || customMask.walls)) {
       maskData = customMask;
+      isDetected = true;
     } else if (apiKey) {
       // 2. Perform semantic segmentation using Gemini Vision
       const prompt = `You are an expert interior architecture AI system.
@@ -210,11 +212,12 @@ Coordinates are percentages (0-100). Return raw JSON only.`;
             const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
             if (text) {
               const parsed = JSON.parse(cleanJsonString(text));
-              if (parsed.floor) {
+              if (parsed.floor && parsed.floor.polygon && parsed.floor.polygon.length >= 4) {
                 maskData.floor = {
                   polygon: normalizePolygon(parsed.floor.polygon),
                   exclude: normalizeExcludeList(parsed.floor.exclude)
                 };
+                isDetected = true;
               }
               if (Array.isArray(parsed.walls)) {
                 maskData.walls = parsed.walls.map(w => ({
@@ -223,7 +226,7 @@ Coordinates are percentages (0-100). Return raw JSON only.`;
                   exclude: normalizeExcludeList(w.exclude)
                 })).filter(w => w.polygon && w.polygon.length >= 4);
               }
-              break;
+              if (isDetected) break;
             }
           }
         } catch (err) {
@@ -257,6 +260,7 @@ Key Requirements:
       layout,
       groutWidth: resolvedProduct.groutWidth,
       maskData,
+      isDetected,
       architecturalPrompt,
       processingTime: `${processingTime}ms`
     });

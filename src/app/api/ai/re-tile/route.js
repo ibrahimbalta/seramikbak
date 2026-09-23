@@ -252,8 +252,19 @@ CRITICAL RULES FOR AI RENDERING:
       }
     }
 
+    // If a room image was provided (e.g. user-uploaded bathroom or sample room),
+    // NEVER replace the user's room with a random text-to-image synthetic hallucination!
+    if (image) {
+      console.log('[AI Re-Tile] Generative image editing unavailable. Deferring to PBR Perspective Engine to preserve original room.');
+      return NextResponse.json({
+        success: false,
+        reason: 'defer_to_pbr',
+        message: 'Gerçek oda fotoğrafını korumak için PBR perspektif motoruna yönlendirildi.'
+      });
+    }
+
     // -----------------------------------------------------------------------
-    // Strategy 2: Pollinations Fallback (text-to-image with exact architectural prompt)
+    // Strategy 2: Pollinations Fallback (only for pure text-prompt tests without image)
     // -----------------------------------------------------------------------
     console.log('[AI Re-Tile] Falling back to Pollinations text-to-image with architectural prompt');
 
