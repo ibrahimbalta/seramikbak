@@ -215,14 +215,20 @@ Key Requirements:
   // -----------------------------------------------------------------------
   // Fast & Photorealistic AI Remodel Execution (< 3 seconds)
   // -----------------------------------------------------------------------
-  const handleGenerateAIRemodel = async (targetTile = selectedTile, photoOverride = null) => {
+  const handleGenerateAIRemodel = async (
+    targetTile = selectedTile, 
+    photoOverride = null, 
+    customMaskOverride = undefined, 
+    surfaceOverride = null
+  ) => {
     const currentPhoto = photoOverride || photoPreview;
     if (!currentPhoto) {
       setErrorMsg('Lütfen önce kendi mekan fotoğrafınızı yükleyin veya örnek bir oda seçin.');
       return;
     }
 
-    const surfaceToApply = applySurface || 'both';
+    const surfaceToApply = surfaceOverride || applySurface || 'floor';
+    const activeMaskCanvas = customMaskOverride !== undefined ? customMaskOverride : customMaskCanvas;
     setIsGenerating(true);
     setErrorMsg('');
     setAiResultImage(null);
@@ -319,11 +325,18 @@ Key Requirements:
       let surfaces = { floor: null, walls: null };
 
       // If user already painted with MaskBrushEditor, use it directly (0 API quota)
-      if (customMaskCanvas) {
-        surfaces = {
-          floor: { polygon: [[0, 0], [100, 0], [100, 100], [0, 100]], exclude: [] },
-          walls: []
-        };
+      if (activeMaskCanvas) {
+        if (surfaceToApply === 'walls') {
+          surfaces = {
+            floor: null,
+            walls: [{ polygon: [[0, 0], [100, 0], [100, 100], [0, 100]], exclude: [] }]
+          };
+        } else {
+          surfaces = {
+            floor: { polygon: [[0, 0], [100, 0], [100, 100], [0, 100]], exclude: [] },
+            walls: []
+          };
+        }
       } else {
         // Try AI Tile-Render API for semantic surface and clean edge mask detection
         try {
@@ -408,7 +421,7 @@ Key Requirements:
         tileHCm: targetTile?.height || 120,
         finish: targetTile?.finish || 'Full Lappato',
         layout,
-        customMaskCanvas,
+        customMaskCanvas: activeMaskCanvas,
         subdivisions: 28,
       });
 
@@ -557,8 +570,21 @@ Key Requirements:
           </span>
         </div>
 
-        {/* Architectural AI Prompt Directive Card */}
-        <div style={{
+        {showMaskEditor ? (
+          <MaskBrushEditor
+            backgroundImage={photoPreview}
+            initialMask={customMaskCanvas || detectedMaskData}
+            onSaveMask={({ maskCanvas }) => {
+              setCustomMaskCanvas(maskCanvas);
+              setShowMaskEditor(false);
+              handleGenerateAIRemodel(selectedTile, photoPreview, maskCanvas, applySurface);
+            }}
+            onCancel={() => setShowMaskEditor(false)}
+          />
+        ) : (
+          <>
+            {/* Architectural AI Prompt Directive Card */}
+            <div style={{
           background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(9, 13, 22, 0.9) 100%)',
           border: '1px solid rgba(212, 175, 55, 0.35)',
           borderRadius: '16px',
@@ -604,35 +630,130 @@ Key Requirements:
             
             {/* PHOTO SECTION */}
             {photoPreview ? (
-              /* Ready Photo Preview Card */
-              <div style={{ position: 'relative', width: '100%', borderRadius: '20px', overflow: 'hidden', border: '2px solid rgba(212,175,55,0.4)', background: '#000000', maxHeight: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <img 
-                  src={photoPreview} 
-                  alt="Seçili Mekan" 
-                  style={{ width: '100%', maxHeight: '320px', objectFit: 'contain' }} 
-                />
-                
-                <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', border: '1px solid rgba(52,211,153,0.4)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.78rem', color: '#34d399', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <CheckCircle2 size={16} />
-                  <span>{isUserUploaded ? '📸 Kendi Mekanınız Hazır' : '🏠 Seçilen Örnek Mekan'}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {/* Ready Photo Preview Card */}
+                <div style={{ position: 'relative', width: '100%', borderRadius: '20px', overflow: 'hidden', border: '2px solid rgba(212,175,55,0.4)', background: '#000000', maxHeight: '320px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img 
+                    src={photoPreview} 
+                    alt="Seçili Mekan" 
+                    style={{ width: '100%', maxHeight: '320px', objectFit: 'contain' }} 
+                  />
+                  
+                  <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', border: '1px solid rgba(52,211,153,0.4)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.78rem', color: '#34d399', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <CheckCircle2 size={16} />
+                    <span>{isUserUploaded ? '📸 Kendi Mekanınız Hazır' : '🏠 Seçilen Örnek Mekan'}</span>
+                  </div>
+
+                  <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)', color: '#ffffff', padding: '6px 12px', borderRadius: '16px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <UploadCloud size={14} />
+                      <span>Değiştir</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setPhotoPreview(null); setUserPhoto(null); setCustomMaskCanvas(null); }}
+                      style={{ background: 'rgba(239,68,68,0.75)', border: 'none', color: '#ffffff', width: '28px', height: '28px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
                 </div>
 
-                <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', gap: '8px' }}>
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)', color: '#ffffff', padding: '6px 12px', borderRadius: '16px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
-                  >
-                    <UploadCloud size={14} />
-                    <span>Değiştir</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setPhotoPreview(null); setUserPhoto(null); }}
-                    style={{ background: 'rgba(239,68,68,0.75)', border: 'none', color: '#ffffff', width: '28px', height: '28px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >
-                    ✕
-                  </button>
+                {/* Surface Selection Bar */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '10px',
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '16px',
+                  padding: '12px 16px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Layers size={18} style={{ color: '#d4af37' }} />
+                    <span style={{ fontSize: '0.86rem', fontWeight: '800', color: '#ffffff' }}>
+                      Döşenecek Alanı Seçin:
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setApplySurface('floor');
+                        setCustomMaskCanvas(null);
+                      }}
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: '10px',
+                        border: applySurface === 'floor' && !customMaskCanvas ? '1.5px solid #d4af37' : '1px solid rgba(255,255,255,0.12)',
+                        background: applySurface === 'floor' && !customMaskCanvas ? 'rgba(212,175,55,0.18)' : 'rgba(255,255,255,0.04)',
+                        color: applySurface === 'floor' && !customMaskCanvas ? '#d4af37' : '#cbd5e1',
+                        fontSize: '0.82rem',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <Home size={14} />
+                      <span>🏠 Zemin (Taban)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setApplySurface('walls');
+                        setCustomMaskCanvas(null);
+                      }}
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: '10px',
+                        border: applySurface === 'walls' && !customMaskCanvas ? '1.5px solid #d4af37' : '1px solid rgba(255,255,255,0.12)',
+                        background: applySurface === 'walls' && !customMaskCanvas ? 'rgba(212,175,55,0.18)' : 'rgba(255,255,255,0.04)',
+                        color: applySurface === 'walls' && !customMaskCanvas ? '#d4af37' : '#cbd5e1',
+                        fontSize: '0.82rem',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <Grid size={14} />
+                      <span>🧱 Duvar / Ayna Arkası</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowMaskEditor(true);
+                      }}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: '10px',
+                        border: customMaskCanvas ? '1.5px solid #38bdf8' : '1px solid rgba(56, 189, 248, 0.4)',
+                        background: customMaskCanvas ? 'rgba(56, 189, 248, 0.22)' : 'rgba(56, 189, 248, 0.1)',
+                        color: '#38bdf8',
+                        fontSize: '0.82rem',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <Paintbrush size={14} />
+                      <span>{customMaskCanvas ? '✓ Özel Boyanmış Alan (Fırça)' : '🖌️ Fırça ile Alanı Boya / Seç'}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -857,6 +978,95 @@ Key Requirements:
               <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
                 ↔ Çizgiyi sağa/sola sürükleyerek Öncesi / Sonrası halini karşılaştırın
               </span>
+            </div>
+
+            {/* Quick Surface & Brush Fix Bar */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '10px',
+              background: 'rgba(255, 255, 255, 0.04)',
+              padding: '10px 14px',
+              borderRadius: '14px',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
+            }}>
+              <span style={{ fontSize: '0.8rem', color: '#cbd5e1', fontWeight: '700' }}>
+                Farklı yüzeye döşe veya fırça ile düzelt:
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setApplySurface('floor');
+                    setCustomMaskCanvas(null);
+                    handleGenerateAIRemodel(selectedTile, photoPreview, null, 'floor');
+                  }}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    border: applySurface === 'floor' && !customMaskCanvas ? '1.5px solid #d4af37' : '1px solid rgba(255,255,255,0.12)',
+                    background: applySurface === 'floor' && !customMaskCanvas ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.04)',
+                    color: applySurface === 'floor' && !customMaskCanvas ? '#d4af37' : '#cbd5e1',
+                    fontSize: '0.78rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Home size={13} />
+                  <span>🏠 Zemin (Taban)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setApplySurface('walls');
+                    setCustomMaskCanvas(null);
+                    handleGenerateAIRemodel(selectedTile, photoPreview, null, 'walls');
+                  }}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    border: applySurface === 'walls' && !customMaskCanvas ? '1.5px solid #d4af37' : '1px solid rgba(255,255,255,0.12)',
+                    background: applySurface === 'walls' && !customMaskCanvas ? 'rgba(212,175,55,0.2)' : 'rgba(255,255,255,0.04)',
+                    color: applySurface === 'walls' && !customMaskCanvas ? '#d4af37' : '#cbd5e1',
+                    fontSize: '0.78rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Grid size={13} />
+                  <span>🧱 Duvar / Ayna Arkası</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMaskEditor(true);
+                  }}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(56, 189, 248, 0.45)',
+                    background: 'rgba(56, 189, 248, 0.15)',
+                    color: '#38bdf8',
+                    fontSize: '0.78rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Paintbrush size={14} />
+                  <span>🖌️ Alanı Fırça ile Düzelt</span>
+                </button>
+              </div>
             </div>
 
             {/* Before / After Slider Box */}
@@ -1155,6 +1365,8 @@ Key Requirements:
               </button>
             </div>
           </div>
+        )}
+          </>
         )}
 
       </div>

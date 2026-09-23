@@ -54,37 +54,58 @@ export default function MaskBrushEditor({
       canvas.width = w;
       canvas.height = h;
 
-      // Draw initial polygons onto mask overlay
       ctx.clearRect(0, 0, w, h);
 
-      if (initialMask?.floor?.polygon && initialMask.floor.polygon.length >= 3) {
-        ctx.fillStyle = 'rgba(56, 189, 248, 0.45)'; // Sky blue tile mask
-        ctx.beginPath();
-        const poly = initialMask.floor.polygon;
-        ctx.moveTo((poly[0][0] / 100) * w, (poly[0][1] / 100) * h);
-        for (let i = 1; i < poly.length; i++) {
-          ctx.lineTo((poly[i][0] / 100) * w, (poly[i][1] / 100) * h);
-        }
-        ctx.closePath();
-        ctx.fill();
+      // If initialMask is already a drawn HTML5 Canvas from previous brush session
+      if (typeof HTMLCanvasElement !== 'undefined' && initialMask instanceof HTMLCanvasElement) {
+        ctx.drawImage(initialMask, 0, 0, w, h);
+      } else {
+        // Draw floor polygon if present
+        if (initialMask?.floor?.polygon && initialMask.floor.polygon.length >= 3) {
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.45)'; // Sky blue tile mask
+          ctx.beginPath();
+          const poly = initialMask.floor.polygon;
+          ctx.moveTo((poly[0][0] / 100) * w, (poly[0][1] / 100) * h);
+          for (let i = 1; i < poly.length; i++) {
+            ctx.lineTo((poly[i][0] / 100) * w, (poly[i][1] / 100) * h);
+          }
+          ctx.closePath();
+          ctx.fill();
 
-        // Punch holes for initial exclusions (bathtub, fixtures)
-        if (initialMask.floor.exclude && initialMask.floor.exclude.length > 0) {
-          ctx.save();
-          ctx.globalCompositeOperation = 'destination-out';
-          initialMask.floor.exclude.forEach((exc) => {
-            if (exc && exc.length >= 3) {
-              ctx.beginPath();
-              ctx.moveTo((exc[0][0] / 100) * w, (exc[0][1] / 100) * h);
-              for (let k = 1; k < exc.length; k++) {
-                ctx.lineTo((exc[k][0] / 100) * w, (exc[k][1] / 100) * h);
+          // Exclusions
+          if (initialMask.floor.exclude && initialMask.floor.exclude.length > 0) {
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-out';
+            initialMask.floor.exclude.forEach((exc) => {
+              if (exc && exc.length >= 3) {
+                ctx.beginPath();
+                ctx.moveTo((exc[0][0] / 100) * w, (exc[0][1] / 100) * h);
+                for (let k = 1; k < exc.length; k++) {
+                  ctx.lineTo((exc[k][0] / 100) * w, (exc[k][1] / 100) * h);
+                }
+                ctx.closePath();
+                ctx.fill();
               }
-              ctx.closePath();
-              ctx.fill();
-            }
-          });
-          ctx.restore();
+            });
+            ctx.restore();
+          }
         }
+
+        // Draw wall polygons if present
+        const walls = Array.isArray(initialMask?.walls) ? initialMask.walls : (initialMask?.walls ? [initialMask.walls] : []);
+        walls.forEach((wall) => {
+          if (wall?.polygon && wall.polygon.length >= 3) {
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+            ctx.beginPath();
+            const poly = wall.polygon;
+            ctx.moveTo((poly[0][0] / 100) * w, (poly[0][1] / 100) * h);
+            for (let i = 1; i < poly.length; i++) {
+              ctx.lineTo((poly[i][0] / 100) * w, (poly[i][1] / 100) * h);
+            }
+            ctx.closePath();
+            ctx.fill();
+          }
+        });
       }
 
       // Save initial state to history
@@ -116,6 +137,34 @@ export default function MaskBrushEditor({
       ctx.drawImage(img, 0, 0);
     };
     img.src = prevState;
+  };
+
+  const handleClear = () => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    saveHistory();
+  };
+
+  const handleFillFloor = () => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+    ctx.fillRect(0, canvas.height * 0.55, canvas.width, canvas.height * 0.45);
+    saveHistory();
+  };
+
+  const handleFillWall = () => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height * 0.80);
+    saveHistory();
   };
 
   const getCanvasCoords = (e) => {
@@ -204,12 +253,63 @@ export default function MaskBrushEditor({
             <span>Akıllı Yüzey & Maske Düzeltme</span>
           </h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>
-            Mavi alanlar seramik döşenecek bölgelerdir. Fırça ile alan ekleyebilir, silgi ile mobilyaları koruyabilirsiniz.
+            Mavi alanlar seramik döşenecek bölgelerdir. Fırça ile boyayabilir, silgi ile lavabo ve mobilyaları temizleyebilirsiniz.
           </p>
         </div>
 
         {/* Action Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={handleClear}
+            style={{
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              color: '#f87171',
+              padding: '7px 12px',
+              borderRadius: '10px',
+              fontSize: '0.76rem',
+              fontWeight: '700',
+              cursor: 'pointer'
+            }}
+          >
+            🧹 Sıfırla
+          </button>
+
+          <button
+            type="button"
+            onClick={handleFillFloor}
+            style={{
+              background: 'rgba(212, 175, 55, 0.15)',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              color: '#d4af37',
+              padding: '7px 12px',
+              borderRadius: '10px',
+              fontSize: '0.76rem',
+              fontWeight: '700',
+              cursor: 'pointer'
+            }}
+          >
+            🏠 Tabanı Seç
+          </button>
+
+          <button
+            type="button"
+            onClick={handleFillWall}
+            style={{
+              background: 'rgba(56, 189, 248, 0.15)',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              color: '#38bdf8',
+              padding: '7px 12px',
+              borderRadius: '10px',
+              fontSize: '0.76rem',
+              fontWeight: '700',
+              cursor: 'pointer'
+            }}
+          >
+            🧱 Duvarı Seç
+          </button>
+
           <button
             type="button"
             onClick={handleUndo}

@@ -114,22 +114,22 @@ export function createTiledPattern(
   let cellW, cellH;
   if (isPlank) {
     // Narrow wood plank e.g. 20x120
-    cellW = 140;
-    cellH = Math.round(140 / Math.min(ratio, 1 / ratio));
-    cols = Math.max(cols || 8, 8);
-    rows = Math.max(rows || 4, 4);
+    cellW = 75;
+    cellH = Math.round(75 / Math.min(ratio, 1 / ratio));
+    cols = Math.max(cols || 14, 14);
+    rows = Math.max(rows || 6, 6);
   } else if (Math.abs(ratio - 1) < 0.15) {
     // Square tile e.g. 60x60 or 80x80 or 120x120
-    cellW = 380;
-    cellH = 380;
-    cols = Math.max(cols || 4, 4);
-    rows = Math.max(rows || 4, 4);
+    cellW = 160;
+    cellH = 160;
+    cols = Math.max(cols || 8, 8);
+    rows = Math.max(rows || 8, 8);
   } else {
     // Large rectangular slab e.g. 60x120 cm (Architectural Grand Format)
-    cellW = 420;
-    cellH = Math.round(420 / ratio);
-    cols = Math.max(cols || 3, 3);
-    rows = Math.max(rows || 3, 3);
+    cellW = 150;
+    cellH = Math.round(150 / ratio);
+    cols = Math.max(cols || 8, 8);
+    rows = Math.max(rows || 6, 6);
   }
 
   const patternW = cols * (cellW + groutPx) + groutPx;
@@ -240,7 +240,26 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28, 
   ctx.clip();
 
   // Non-linear camera perspective foreshortening for ground floor planes
-  const depthPower = isFloor ? 1.48 : 1.0;
+  const depthPower = isFloor ? 1.55 : 1.0;
+
+  // Construct true 3D perspective quad for mesh mapping (vanishing point convergence for floors)
+  let meshQuad = quad;
+  if (isFloor && quad.length >= 4) {
+    const centerX = (quad[0][0] + quad[1][0]) * 0.5;
+    // Top corners converge towards the room's central vanishing point
+    const tlX = quad[0][0] + (centerX - quad[0][0]) * 0.38;
+    const trX = quad[1][0] - (quad[1][0] - centerX) * 0.38;
+    // Bottom corners fan out towards viewer camera
+    const blX = quad[3][0] - (centerX - quad[3][0]) * 0.28;
+    const brX = quad[2][0] + (quad[2][0] - centerX) * 0.28;
+
+    meshQuad = [
+      [tlX, quad[0][1]],
+      [trX, quad[1][1]],
+      [brX, quad[2][1]],
+      [blX, quad[3][1]]
+    ];
+  }
 
   // Render subdivided perspective-mapped mesh
   for (let j = 0; j < subs; j++) {
@@ -254,10 +273,10 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28, 
       const v1 = isFloor ? Math.pow(v1Linear, depthPower) : v1Linear;
 
       // 4 corners of sub-quad in canvas space
-      const p00 = bilinear(quad, u0, v0);
-      const p10 = bilinear(quad, u1, v0);
-      const p01 = bilinear(quad, u0, v1);
-      const p11 = bilinear(quad, u1, v1);
+      const p00 = bilinear(meshQuad, u0, v0);
+      const p10 = bilinear(meshQuad, u1, v0);
+      const p01 = bilinear(meshQuad, u0, v1);
+      const p11 = bilinear(meshQuad, u1, v1);
 
       // Corresponding source region in pattern texture
       const sx0 = u0 * pw;
@@ -415,7 +434,18 @@ export function detectTileSurfacesClientSide(roomImg, canvasW, canvasH) {
       ],
       exclude: excludes
     },
-    walls: [] // Keep empty on auto-detect so original walls, bathtub, mirror and shower glass remain 100% crystal sharp
+    walls: [
+      {
+        name: 'back_wall',
+        polygon: [
+          [0, 0],
+          [100, 0],
+          [100, Math.max(horizonPct, 75)],
+          [0, Math.max(horizonPct, 75)]
+        ],
+        exclude: excludes
+      }
+    ]
   };
 }
 
@@ -578,8 +608,8 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
 
   const groutPx = Math.max(1.0, Math.min(3.5, (groutWidth || 2) * 0.7));
 
-  const floorCols = isPlank ? 8 : Math.abs(ratio - 1) < 0.15 ? 4 : 3;
-  const floorRows = isPlank ? 4 : Math.abs(ratio - 1) < 0.15 ? 4 : 3;
+  const floorCols = isPlank ? 14 : Math.abs(ratio - 1) < 0.15 ? 8 : 8;
+  const floorRows = isPlank ? 6 : Math.abs(ratio - 1) < 0.15 ? 8 : 6;
 
   // Step 2: Create floor pattern with realistic scale, layout and multi-face veining
   const floorPattern = createTiledPattern(
@@ -595,8 +625,8 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
 
   const wallPattern = createTiledPattern(
     tileImg,
-    3,
-    3,
+    8,
+    6,
     tileWCm,
     tileHCm,
     groutPx,
@@ -668,12 +698,21 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
   });
 
   // Step 4: Extract Subtle Neutral Contact Shadows & Specular Catchlights
-  const { specCanvas, shadowCanvas } = extractDeTexturedLighting(
+  // Step 4: Extract Subtle Neutral Contact Shadows, Specular Catchlights & Macro Ambient Illumination
+  const { smoothLumCanvas, specCanvas, shadowCanvas } = extractDeTexturedLighting(
     roomImg,
     canvasW,
     canvasH,
     isGlossy
   );
+
+  // Modulate tiles with the room's real ambient illumination (soft multiply blend)
+  // This blends the tiles into the room's real lighting environment instead of looking like a flat sticker
+  tCtx.save();
+  tCtx.globalCompositeOperation = 'multiply';
+  tCtx.globalAlpha = 0.50;
+  tCtx.drawImage(smoothLumCanvas, 0, 0, canvasW, canvasH);
+  tCtx.restore();
 
   // If client provided a customMaskCanvas (from MaskBrushEditor), apply it as alpha clip
   if (customMaskCanvas) {
@@ -683,7 +722,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     tCtx.restore();
   }
 
-  // Step 5: Draw pristine, razor-sharp tiles onto main canvas
+  // Step 5: Draw natural, realistic tiles onto main canvas
   ctx.save();
   ctx.globalAlpha = 1.0;
   ctx.drawImage(tileLayer, 0, 0);
@@ -691,28 +730,33 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
 
   // Step 6: PBR Lighting Compositing (Only within rendered floor area)
   if (renderedQuads.length > 0) {
-    ctx.save();
-    ctx.beginPath();
+    const lightCanvas = document.createElement('canvas');
+    lightCanvas.width = canvasW;
+    lightCanvas.height = canvasH;
+    const lCtx = lightCanvas.getContext('2d');
+
+    lCtx.save();
+    lCtx.beginPath();
     renderedQuads.forEach(({ quad }) => {
-      ctx.moveTo(quad[0][0], quad[0][1]);
-      for (let i = 1; i < quad.length; i++) ctx.lineTo(quad[i][0], quad[i][1]);
-      ctx.closePath();
+      lCtx.moveTo(quad[0][0], quad[0][1]);
+      for (let i = 1; i < quad.length; i++) lCtx.lineTo(quad[i][0], quad[i][1]);
+      lCtx.closePath();
     });
-    ctx.clip();
+    lCtx.clip();
 
     // 6A. Ambient Contact Shadows under furniture / fixtures
-    ctx.save();
-    ctx.globalCompositeOperation = 'multiply';
-    ctx.globalAlpha = 0.35;
-    ctx.drawImage(shadowCanvas, 0, 0);
-    ctx.restore();
+    lCtx.save();
+    lCtx.globalCompositeOperation = 'multiply';
+    lCtx.globalAlpha = 0.35;
+    lCtx.drawImage(shadowCanvas, 0, 0);
+    lCtx.restore();
 
     // 6B. Natural Specular Window Glare
-    ctx.save();
-    ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = isGlossy ? 0.35 : 0.15;
-    ctx.drawImage(specCanvas, 0, 0);
-    ctx.restore();
+    lCtx.save();
+    lCtx.globalCompositeOperation = 'screen';
+    lCtx.globalAlpha = isGlossy ? 0.35 : 0.15;
+    lCtx.drawImage(specCanvas, 0, 0);
+    lCtx.restore();
 
     // 6C. PBR Fresnel Clearcoat Sheen for Polished Full Lappato finishes
     if (isGlossy) {
@@ -721,25 +765,35 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
           const minY = Math.min(...quad.map((pt) => pt[1]));
           const maxY = Math.max(...quad.map((pt) => pt[1]));
 
-          ctx.save();
-          const sheenGrad = ctx.createLinearGradient(0, minY, 0, maxY);
+          lCtx.save();
+          const sheenGrad = lCtx.createLinearGradient(0, minY, 0, maxY);
           sheenGrad.addColorStop(0, 'rgba(255, 255, 255, 0.18)');
           sheenGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.05)');
           sheenGrad.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
 
-          ctx.fillStyle = sheenGrad;
-          ctx.globalCompositeOperation = 'screen';
-          ctx.beginPath();
-          ctx.moveTo(quad[0][0], quad[0][1]);
-          for (let i = 1; i < quad.length; i++) ctx.lineTo(quad[i][0], quad[i][1]);
-          ctx.closePath();
-          ctx.fill();
-          ctx.restore();
+          lCtx.fillStyle = sheenGrad;
+          lCtx.globalCompositeOperation = 'screen';
+          lCtx.beginPath();
+          lCtx.moveTo(quad[0][0], quad[0][1]);
+          for (let i = 1; i < quad.length; i++) lCtx.lineTo(quad[i][0], quad[i][1]);
+          lCtx.closePath();
+          lCtx.fill();
+          lCtx.restore();
         }
       });
     }
 
-    ctx.restore();
+    lCtx.restore();
+
+    // If client provided a customMaskCanvas (from MaskBrushEditor), also clip lighting pass
+    if (customMaskCanvas) {
+      lCtx.save();
+      lCtx.globalCompositeOperation = 'destination-in';
+      lCtx.drawImage(customMaskCanvas, 0, 0, canvasW, canvasH);
+      lCtx.restore();
+    }
+
+    ctx.drawImage(lightCanvas, 0, 0);
   }
 
   return canvas.toDataURL('image/jpeg', 0.94);
