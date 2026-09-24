@@ -275,13 +275,16 @@ export default function DealerProfileClient({ dealer, products }) {
       <div className="profile-header-bar">
         <Link href="/" className="back-link">
           <ChevronLeft size={16} />
-          Geri Dön
+          <span>Geri Dön</span>
         </Link>
         <div className="header-title-container">
-          <span className="header-title">Yetkili Bayi Profili</span>
+          <span className="header-title">
+            <span>Yetkili Bayi</span>
+            <span className="header-title-sub"> Profili</span>
+          </span>
           <span className="header-dot"></span>
         </div>
-        <div style={{ width: '100px' }} className="desktop-header-spacer"></div>
+        <div className="desktop-header-spacer"></div>
       </div>
 
       {/* Main Container */}
