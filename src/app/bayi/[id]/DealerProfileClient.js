@@ -278,11 +278,16 @@ export default function DealerProfileClient({ dealer, products }) {
           <span>Geri Dön</span>
         </Link>
         <div className="header-title-container">
-          <span className="header-title">
-            <span>Yetkili Bayi</span>
-            <span className="header-title-sub"> Profili</span>
-          </span>
-          <span className="header-dot"></span>
+          <div className="official-dealer-badge">
+            <span className="dealer-badge-seal">
+              <ShieldCheck size={13} strokeWidth={2.6} />
+            </span>
+            <span className="dealer-badge-title">Yetkili Bayi</span>
+            <span className="dealer-badge-tag">
+              <span className="dealer-badge-live-dot"></span>
+              <span>Onaylı</span>
+            </span>
+          </div>
         </div>
         <div className="desktop-header-spacer"></div>
       </div>
