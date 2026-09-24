@@ -444,41 +444,186 @@ export default function UyelikPage() {
             flex-direction: column;
           }
           .dashboard-header {
-            padding: 24px 32px;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 20px 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #0f172a;
             color: #ffffff;
+            gap: 16px;
+          }
+          .dashboard-header-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+          }
+          .dashboard-brand-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+          }
+          .dashboard-brand-logo {
+            background: linear-gradient(135deg, #182030 0%, #0b0f19 100%);
+            border: 1.5px solid #d4af37;
+            color: #ffffff;
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+          }
+          .dashboard-brand-title {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            color: #ffffff;
+            line-height: 1.2;
+          }
+          .dashboard-brand-subtitle {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            font-weight: 500;
+            display: block;
+          }
+          .dashboard-user-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            color: #e2e8f0;
+            font-weight: 600;
+          }
+          .dashboard-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .dashboard-hdr-btn {
+            height: 36px;
+            min-height: 36px;
+            padding: 0 14px;
+            border-radius: 9px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-sizing: border-box;
+            line-height: 1;
+          }
+          .dashboard-hdr-btn.btn-studio {
+            background: linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(179,142,71,0.1) 100%);
+            color: #fbbf24;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.12);
+          }
+          .dashboard-hdr-btn.btn-studio:hover {
+            background: linear-gradient(135deg, rgba(212,175,55,0.3) 0%, rgba(179,142,71,0.2) 100%);
+            transform: translateY(-1px);
+          }
+          .dashboard-hdr-btn.btn-home {
+            background: rgba(255, 255, 255, 0.08);
+            color: #f1f5f9;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+          }
+          .dashboard-hdr-btn.btn-home:hover {
+            background: rgba(255, 255, 255, 0.14);
+            color: #ffffff;
+            transform: translateY(-1px);
+          }
+          .dashboard-hdr-btn.btn-logout {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+          }
+          .dashboard-hdr-btn.btn-logout:hover {
+            background: rgba(239, 68, 68, 0.22);
+            color: #ef4444;
+            transform: translateY(-1px);
           }
           .dashboard-nav {
             display: flex;
             gap: 8px;
-            padding: 16px 32px;
+            padding: 14px 28px;
             background: #f8fafc;
             border-bottom: 1px solid #e2e8f0;
             overflow-x: auto;
           }
           .dashboard-nav-btn {
-            background: transparent;
-            border: none;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             padding: 8px 16px;
             font-size: 0.82rem;
             font-weight: 600;
             color: #64748b;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
             transition: all 0.2s;
             white-space: nowrap;
           }
           .dashboard-nav-btn.active {
-            background: #ffffff;
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.15);
+          }
+          .tab-pill-badge {
+            background: rgba(212, 175, 55, 0.15);
+            color: #b38e47;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+          }
+          .dashboard-nav-btn.active .tab-pill-badge {
+            background: #d4af37;
             color: #0f172a;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+          }
+          .clickable-stat {
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          }
+          .clickable-stat:hover {
+            transform: translateY(-2px);
+            border-color: #cbd5e1;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+          }
+          .stat-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+          }
+          .stat-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 600;
+          }
+          .stat-value {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #0f172a;
           }
           .dashboard-content {
             flex: 1;
@@ -641,19 +786,55 @@ export default function UyelikPage() {
           /* MOBILE RESPONSIVE DASHBOARD STYLES */
           @media (max-width: 768px) {
             .uyelik-page-wrapper {
-              padding: 10px 8px !important;
+              padding: 8px 6px !important;
             }
             .dashboard-container {
-              border-radius: 16px !important;
+              border-radius: 18px !important;
               min-height: auto !important;
               box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+              border: 1px solid #e2e8f0 !important;
             }
             .dashboard-header {
-              padding: 14px 16px !important;
-              flex-direction: row !important;
-              flex-wrap: wrap !important;
+              padding: 14px 14px 12px 14px !important;
+              flex-direction: column !important;
+              align-items: stretch !important;
+              gap: 12px !important;
+            }
+            .dashboard-header-brand {
+              display: flex !important;
               justify-content: space-between !important;
-              gap: 10px !important;
+              align-items: center !important;
+              width: 100% !important;
+            }
+            .dashboard-user-pill {
+              display: inline-flex !important;
+              padding: 4px 10px !important;
+              font-size: 0.70rem !important;
+            }
+            .dashboard-header-actions {
+              display: grid !important;
+              grid-template-columns: repeat(3, 1fr) !important;
+              gap: 7px !important;
+              width: 100% !important;
+              align-items: stretch !important;
+            }
+            .dashboard-hdr-btn {
+              height: 38px !important;
+              min-height: 38px !important;
+              max-height: 38px !important;
+              width: 100% !important;
+              padding: 0 4px !important;
+              font-size: 0.73rem !important;
+              font-weight: 700 !important;
+              border-radius: 10px !important;
+              display: flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+              gap: 5px !important;
+              white-space: nowrap !important;
+              overflow: hidden !important;
+              text-overflow: ellipsis !important;
+              box-sizing: border-box !important;
             }
             .dashboard-nav {
               padding: 8px 10px !important;
@@ -662,77 +843,98 @@ export default function UyelikPage() {
               white-space: nowrap !important;
               -webkit-overflow-scrolling: touch !important;
               scrollbar-width: none !important;
+              background: #f8fafc !important;
             }
             .dashboard-nav::-webkit-scrollbar {
               display: none !important;
             }
             .dashboard-nav-btn {
-              padding: 8px 14px !important;
-              font-size: 0.78rem !important;
+              padding: 8px 12px !important;
+              font-size: 0.76rem !important;
+              font-weight: 700 !important;
               flex-shrink: 0 !important;
-              border-radius: 8px !important;
+              border-radius: 10px !important;
+              background: #ffffff !important;
+              border: 1px solid #e2e8f0 !important;
             }
             .dashboard-nav-btn.active {
-              background: #ffffff !important;
-              color: #0f172a !important;
-              border: 1px solid #b38e47 !important;
-              box-shadow: 0 2px 8px rgba(179, 142, 71, 0.15) !important;
+              background: #0f172a !important;
+              color: #ffffff !important;
+              border: 1px solid #0f172a !important;
+              box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2) !important;
             }
             .dashboard-content {
-              padding: 16px 12px !important;
+              padding: 14px 10px !important;
             }
             .dashboard-welcome-banner {
-              padding: 18px 14px !important;
+              padding: 16px 14px !important;
               border-radius: 14px !important;
-              margin-bottom: 20px !important;
+              margin-bottom: 14px !important;
             }
             .dashboard-welcome-banner h2 {
-              font-size: 1.2rem !important;
+              font-size: 1.15rem !important;
+              margin-bottom: 4px !important;
+            }
+            .dashboard-welcome-banner p {
+              font-size: 0.76rem !important;
+              line-height: 1.35 !important;
             }
             .stats-grid {
-              grid-template-columns: repeat(2, 1fr) !important;
-              gap: 10px !important;
-              margin-bottom: 20px !important;
+              grid-template-columns: repeat(3, 1fr) !important;
+              gap: 6px !important;
+              margin-bottom: 16px !important;
             }
             .stat-card {
-              padding: 12px 10px !important;
-              gap: 10px !important;
+              padding: 10px 6px !important;
+              gap: 6px !important;
               border-radius: 12px !important;
+              flex-direction: column !important;
+              align-items: center !important;
+              text-align: center !important;
+              background: #f8fafc !important;
             }
             .stat-icon {
-              width: 36px !important;
-              height: 36px !important;
+              width: 32px !important;
+              height: 32px !important;
+              border-radius: 8px !important;
+            }
+            .stat-label {
+              font-size: 0.65rem !important;
+              font-weight: 600 !important;
+              color: #64748b !important;
+              white-space: nowrap !important;
+            }
+            .stat-value {
+              font-size: 1.05rem !important;
+              font-weight: 850 !important;
+              color: #0f172a !important;
             }
             .tools-grid {
               grid-template-columns: 1fr !important;
-              gap: 12px !important;
+              gap: 10px !important;
             }
             .tool-card {
-              padding: 16px 14px !important;
-              border-radius: 14px !important;
+              padding: 14px 12px !important;
+              border-radius: 12px !important;
+              gap: 12px !important;
             }
             .fav-grid {
               grid-template-columns: repeat(2, 1fr) !important;
-              gap: 10px !important;
+              gap: 8px !important;
             }
-            .fav-img-box {
-              height: 120px !important;
-            }
-            .fav-info {
-              padding: 10px !important;
-            }
-            .project-card {
-              padding: 14px 12px !important;
+            .fav-card {
               border-radius: 12px !important;
             }
-          }
-
-          @media (max-width: 480px) {
-            .stats-grid {
-              grid-template-columns: 1fr !important;
+            .fav-img-box {
+              height: 110px !important;
             }
-            .fav-grid {
-              grid-template-columns: 1fr !important;
+            .fav-info {
+              padding: 8px !important;
+            }
+            .project-card {
+              padding: 12px 10px !important;
+              border-radius: 12px !important;
+              margin-bottom: 12px !important;
             }
           }
         `}</style>
@@ -740,32 +942,38 @@ export default function UyelikPage() {
         <div className="dashboard-container">
           {/* Header */}
           <div className="dashboard-header">
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: 'inherit' }}>
-              <div style={{ background: 'linear-gradient(135deg, #182030 0%, #0b0f19 100%)', border: '1.5px solid #d4af37', color: '#fff', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '1rem', boxShadow: '0 2px 8px rgba(15, 23, 42, 0.25)' }}>SB</div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '800' }}>SeramikBak</h3>
-                <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Müşteri Cockpit Paneli</span>
+            <div className="dashboard-header-brand">
+              <Link href="/" className="dashboard-brand-link">
+                <div className="dashboard-brand-logo">SB</div>
+                <div>
+                  <h3 className="dashboard-brand-title">SeramikBak</h3>
+                  <span className="dashboard-brand-subtitle">Müşteri Cockpit Paneli</span>
+                </div>
+              </Link>
+              <div className="dashboard-user-pill">
+                <User size={12} />
+                <span>{currentUser.name?.split(' ')[0] || 'Hesabım'}</span>
               </div>
-            </Link>
+            </div>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="dashboard-header-actions">
               <Link
                 href="/?tab=studio#studio"
-                style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(179,142,71,0.1) 100%)', color: '#d4af37', border: '1px solid rgba(212, 175, 55, 0.4)', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '800', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+                className="dashboard-hdr-btn btn-studio"
               >
                 <Layers size={13} />
                 <span>3D Stüdyo</span>
               </Link>
               <Link
                 href="/"
-                style={{ background: 'rgba(255, 255, 255, 0.08)', color: '#e2e8f0', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+                className="dashboard-hdr-btn btn-home"
               >
                 <Home size={13} />
                 <span>Anasayfa</span>
               </Link>
               <button 
                 onClick={handleLogout}
-                style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#f87171', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '8px', padding: '6px 12px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                className="dashboard-hdr-btn btn-logout"
               >
                 <LogOut size={13} />
                 <span>Çıkış Yap</span>
@@ -781,11 +989,13 @@ export default function UyelikPage() {
             </button>
             <button className={`dashboard-nav-btn ${activeTab === 'favorites' ? 'active' : ''}`} onClick={() => setActiveTab('favorites')}>
               <Heart size={14} />
-              <span>Favori Ürünlerim ({userFavorites.length})</span>
+              <span>Favorilerim</span>
+              {userFavorites.length > 0 && <span className="tab-pill-badge">{userFavorites.length}</span>}
             </button>
             <button className={`dashboard-nav-btn ${activeTab === 'projects' ? 'active' : ''}`} onClick={() => setActiveTab('projects')}>
               <Building2 size={14} />
-              <span>Proje Taleplerim ({userProjects.length})</span>
+              <span>Proje Taleplerim</span>
+              {userProjects.length > 0 && <span className="tab-pill-badge">{userProjects.length}</span>}
             </button>
             <button className={`dashboard-nav-btn ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
               <Settings size={14} />
@@ -825,33 +1035,45 @@ export default function UyelikPage() {
                 </div>
 
                 <div className="stats-grid">
-                  <div className="stat-card">
-                    <div className="stat-icon" style={{ background: 'rgba(212,175,55,0.1)', color: '#b38e47' }}>
-                      <Heart size={20} />
+                  <div 
+                    className="stat-card clickable-stat"
+                    onClick={() => setActiveTab('favorites')}
+                    title="Favorilere Git"
+                  >
+                    <div className="stat-icon" style={{ background: 'rgba(212,175,55,0.12)', color: '#b38e47' }}>
+                      <Heart size={18} />
                     </div>
-                    <div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>Favori Ürünler</div>
-                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{userFavorites.length} Ürün</div>
-                    </div>
-                  </div>
-
-                  <div className="stat-card">
-                    <div className="stat-icon" style={{ background: 'rgba(2,132,199,0.1)', color: '#0284c7' }}>
-                      <Building2 size={20} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>Toplu Talepler</div>
-                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{userProjects.length} Proje</div>
+                    <div className="stat-content">
+                      <div className="stat-label">Favori Ürünler</div>
+                      <div className="stat-value">{userFavorites.length} Ürün</div>
                     </div>
                   </div>
 
-                  <div className="stat-card">
-                    <div className="stat-icon" style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>
-                      <Bell size={20} />
+                  <div 
+                    className="stat-card clickable-stat"
+                    onClick={() => setActiveTab('projects')}
+                    title="Proje Taleplerine Git"
+                  >
+                    <div className="stat-icon" style={{ background: 'rgba(2,132,199,0.12)', color: '#0284c7' }}>
+                      <Building2 size={18} />
                     </div>
-                    <div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>Fiyat Alarmları</div>
-                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>Aktif</div>
+                    <div className="stat-content">
+                      <div className="stat-label">Toplu Talepler</div>
+                      <div className="stat-value">{userProjects.length} Proje</div>
+                    </div>
+                  </div>
+
+                  <div 
+                    className="stat-card clickable-stat"
+                    onClick={() => window.location.href = '/?tab=studio#studio'}
+                    title="3D Stüdyoyu Aç"
+                  >
+                    <div className="stat-icon" style={{ background: 'rgba(16,185,129,0.12)', color: '#10b981' }}>
+                      <Layers size={18} />
+                    </div>
+                    <div className="stat-content">
+                      <div className="stat-label">3D Stüdyo</div>
+                      <div className="stat-value" style={{ color: '#d4af37' }}>Aktif</div>
                     </div>
                   </div>
                 </div>
