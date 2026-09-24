@@ -13,7 +13,8 @@ import {
   MapPin, 
   Sparkles, 
   FileText, 
-  Loader2 
+  Loader2,
+  ChevronDown
 } from 'lucide-react';
 
 export default function BimSpecDownloadModal({ isOpen, onClose, product }) {
@@ -106,131 +107,93 @@ export default function BimSpecDownloadModal({ isOpen, onClose, product }) {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      background: 'rgba(9, 13, 22, 0.85)',
-      backdropFilter: 'blur(8px)',
-      zIndex: 99999,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '16px'
-    }} onClick={onClose}>
-      
-      <div style={{
-        background: '#ffffff',
-        borderRadius: '20px',
-        width: '100%',
-        maxWidth: '560px',
-        boxShadow: '0 25px 60px rgba(0, 0, 0, 0.35)',
-        border: '1px solid rgba(212, 175, 55, 0.3)',
-        overflow: 'hidden',
-        position: 'relative'
-      }} onClick={(e) => e.stopPropagation()}>
+    <div className="bim-modal-backdrop" onClick={onClose}>
+      <div className="bim-modal-dialog" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
-        <div style={{
-          background: 'linear-gradient(135deg, #090d16 0%, #1e293b 100%)',
-          padding: '24px 28px',
-          color: '#ffffff',
-          position: 'relative',
-          borderBottom: '2px solid #d4af37'
-        }}>
-          <button 
-            onClick={onClose}
-            style={{
-              position: 'absolute',
-              top: '20px',
-              right: '20px',
-              background: 'rgba(255,255,255,0.1)',
-              border: 'none',
-              borderRadius: '50%',
-              width: '32px',
-              height: '32px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#ffffff',
-              cursor: 'pointer'
-            }}
-          >
-            <X size={18} />
-          </button>
-
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.4)', padding: '4px 10px', borderRadius: '12px', fontSize: '0.72rem', color: '#d4af37', fontWeight: '800', marginBottom: '8px' }}>
-            <Sparkles size={13} />
-            <span>MİMARİ ŞARTNAME & 4K BIM KÜTÜPHANESİ</span>
+        <div className="bim-modal-header">
+          {/* Top Bar with Badge & Symmetrical Close Button */}
+          <div className="bim-modal-header-top">
+            <div className="bim-badge">
+              <Sparkles size={13} className="bim-sparkle-icon" />
+              <span>MİMARİ ŞARTNAME & 4K BIM</span>
+            </div>
+            <button 
+              type="button"
+              className="bim-close-btn" 
+              onClick={onClose}
+              aria-label="Kapat"
+            >
+              <X size={17} />
+            </button>
           </div>
 
-          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 4px 0', color: '#ffffff' }}>
-            {product.brand?.name || 'Seramik'} - {product.name}
+          <h3 className="bim-modal-title">
+            <span className="brand-name">{product.brand?.name || 'Seramik'}</span>
+            <span className="title-sep"> — </span>
+            <span className="prod-name">{product.name}</span>
           </h3>
-          <p style={{ fontSize: '0.8rem', color: '#94a3b8', margin: 0 }}>
+          <p className="bim-modal-subtitle">
             Revit (.RFA), AutoCAD (.DWG) ve 4K Dikişsiz PBR Kaplama Paketini Ücretsiz İndirin
           </p>
         </div>
 
-        {/* Content */}
-        <div style={{ padding: '24px 28px', maxHeight: '80vh', overflowY: 'auto' }}>
+        {/* Content Body */}
+        <div className="bim-modal-body">
           {success ? (
-            <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-              <CheckCircle size={56} style={{ color: '#10b981', margin: '0 auto 16px auto' }} />
-              <h4 style={{ fontSize: '1.3rem', fontWeight: '800', color: '#0f172a', margin: '0 0 8px 0' }}>
+            <div className="bim-success-view">
+              <div className="bim-success-icon-wrap">
+                <CheckCircle size={52} className="bim-success-icon" />
+              </div>
+              <h4 className="bim-success-title">
                 Şartname Paketi İndiriliyor!
               </h4>
-              <p style={{ fontSize: '0.85rem', color: '#64748b', maxWidth: '400px', margin: '0 auto', lineHeight: '1.5' }}>
-                <strong>{officeName}</strong> adına oluşturulan 4K BIM ve CAD dosyası bilgisayarınıza aktarılıyor. {product.brand?.name} kurumsal satış ekibi proje talebinizle ilgili en kısa sürede destek sağlayacaktır.
+              <p className="bim-success-desc">
+                <strong>{officeName}</strong> adına oluşturulan 4K BIM ve CAD dosyası cihazınıza aktarılıyor. {product.brand?.name} yetkili proje ekibi teknik şartname desteği için sizinle iletişime geçecektir.
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={handleSubmit} className="bim-form">
               
               {error && (
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '10px 14px', borderRadius: '10px', fontSize: '0.82rem', fontWeight: '600' }}>
+                <div className="bim-error-alert">
                   {error}
                 </div>
               )}
 
               {/* Format selection */}
-              <div>
-                <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+              <div className="bim-field-group">
+                <label className="bim-section-label">
                   İstediğiniz Dosya Formatı
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                <div className="bim-format-grid">
                   {[
-                    { id: 'REVIT_BIM', label: 'Revit BIM (.RFA)' },
-                    { id: 'AUTOCAD_DWG', label: 'AutoCAD (.DWG)' },
-                    { id: '4K_TEXTURES', label: '4K PBR Kaplama' }
-                  ].map(fmt => (
-                    <button
-                      key={fmt.id}
-                      type="button"
-                      onClick={() => setFileType(fmt.id)}
-                      style={{
-                        padding: '10px 6px',
-                        borderRadius: '8px',
-                        border: fileType === fmt.id ? '2px solid #d4af37' : '1px solid #e2e8f0',
-                        background: fileType === fmt.id ? '#fefce8' : '#f8fafc',
-                        color: fileType === fmt.id ? '#854d0e' : '#475569',
-                        fontWeight: '700',
-                        fontSize: '0.75rem',
-                        cursor: 'pointer',
-                        textAlign: 'center'
-                      }}
-                    >
-                      {fmt.label}
-                    </button>
-                  ))}
+                    { id: 'REVIT_BIM', label: 'Revit BIM', ext: '(.RFA)' },
+                    { id: 'AUTOCAD_DWG', label: 'AutoCAD', ext: '(.DWG)' },
+                    { id: '4K_TEXTURES', label: '4K PBR', ext: 'Kaplama' }
+                  ].map(fmt => {
+                    const isSelected = fileType === fmt.id;
+                    return (
+                      <button
+                        key={fmt.id}
+                        type="button"
+                        onClick={() => setFileType(fmt.id)}
+                        className={`bim-format-card ${isSelected ? 'active' : ''}`}
+                      >
+                        <span className="fmt-main">{fmt.label}</span>
+                        <span className="fmt-ext">{fmt.ext}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Architect and office info */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                    <Building size={13} style={{ color: '#d4af37' }} />
-                    Mimarlık Ofisi / Şirket *
+              <div className="bim-fields-row">
+                <div className="bim-input-wrapper">
+                  <label className="bim-label">
+                    <Building size={14} className="bim-label-icon" />
+                    <span>Mimarlık Ofisi / Şirket *</span>
                   </label>
                   <input
                     type="text"
@@ -238,14 +201,14 @@ export default function BimSpecDownloadModal({ isOpen, onClose, product }) {
                     placeholder="Örn: Tabanlıoğlu Mimarlık"
                     value={officeName}
                     onChange={(e) => setOfficeName(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                    className="bim-input"
                   />
                 </div>
 
-                <div>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                    <User size={13} style={{ color: '#d4af37' }} />
-                    Yetkili Mimar Adı *
+                <div className="bim-input-wrapper">
+                  <label className="bim-label">
+                    <User size={14} className="bim-label-icon" />
+                    <span>Yetkili Mimar Adı *</span>
                   </label>
                   <input
                     type="text"
@@ -253,76 +216,79 @@ export default function BimSpecDownloadModal({ isOpen, onClose, product }) {
                     placeholder="Örn: Mimar Selin Aksoy"
                     value={architectName}
                     onChange={(e) => setArchitectName(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                    className="bim-input"
                   />
                 </div>
               </div>
 
               {/* Contact info */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                    <Phone size={13} style={{ color: '#d4af37' }} />
-                    Telefon Numarası *
+              <div className="bim-fields-row">
+                <div className="bim-input-wrapper">
+                  <label className="bim-label">
+                    <Phone size={14} className="bim-label-icon" />
+                    <span>Telefon Numarası *</span>
                   </label>
                   <input
                     type="tel"
                     required
-                    placeholder="0532 ..."
+                    placeholder="0532 123 45 67"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                    className="bim-input"
                   />
                 </div>
 
-                <div>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                    <Mail size={13} style={{ color: '#d4af37' }} />
-                    Kurumsal E-posta
+                <div className="bim-input-wrapper">
+                  <label className="bim-label">
+                    <Mail size={14} className="bim-label-icon" />
+                    <span>Kurumsal E-posta</span>
                   </label>
                   <input
                     type="email"
                     placeholder="ofis@mimarlik.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                    className="bim-input"
                   />
                 </div>
               </div>
 
-              {/* Project details */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                    <MapPin size={13} style={{ color: '#d4af37' }} />
-                    Proje İli
+              {/* Project details - Always 2 columns & perfectly aligned */}
+              <div className="bim-fields-row bim-fields-row-2col">
+                <div className="bim-input-wrapper">
+                  <label className="bim-label">
+                    <MapPin size={14} className="bim-label-icon" />
+                    <span>Proje İli</span>
                   </label>
                   <input
                     type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    placeholder="İstanbul, Muğla, İzmir..."
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', boxSizing: 'border-box' }}
+                    placeholder="İstanbul, İzmir..."
+                    className="bim-input"
                   />
                 </div>
 
-                <div>
-                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                    <FileText size={13} style={{ color: '#d4af37' }} />
-                    Proje Türü
+                <div className="bim-input-wrapper">
+                  <label className="bim-label">
+                    <FileText size={14} className="bim-label-icon" />
+                    <span>Proje Türü</span>
                   </label>
-                  <select
-                    value={projectType}
-                    onChange={(e) => setProjectType(e.target.value)}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff', boxSizing: 'border-box' }}
-                  >
-                    <option value="Otel / Resort">Otel / Resort</option>
-                    <option value="Konut / Rezidans">Konut / Rezidans</option>
-                    <option value="Villa Projesi">Villa Projesi</option>
-                    <option value="Ticari / Ofis">Ticari / Ofis</option>
-                    <option value="Restoran & Cafe">Restoran & Cafe</option>
-                    <option value="Karma Yaşam">Karma Yaşam</option>
-                  </select>
+                  <div className="bim-select-container">
+                    <select
+                      value={projectType}
+                      onChange={(e) => setProjectType(e.target.value)}
+                      className="bim-select"
+                    >
+                      <option value="Otel / Resort">Otel / Resort</option>
+                      <option value="Konut / Rezidans">Konut / Rezidans</option>
+                      <option value="Villa Projesi">Villa Projesi</option>
+                      <option value="Ticari / Ofis">Ticari / Ofis</option>
+                      <option value="Restoran & Cafe">Restoran & Cafe</option>
+                      <option value="Karma Yaşam">Karma Yaşam</option>
+                    </select>
+                    <ChevronDown size={15} className="bim-select-arrow" />
+                  </div>
                 </div>
               </div>
 
@@ -330,38 +296,22 @@ export default function BimSpecDownloadModal({ isOpen, onClose, product }) {
               <button
                 type="submit"
                 disabled={loading}
-                style={{
-                  marginTop: '8px',
-                  background: 'linear-gradient(135deg, #090d16 0%, #1e293b 100%)',
-                  color: '#ffffff',
-                  border: '1px solid #d4af37',
-                  borderRadius: '10px',
-                  padding: '14px',
-                  fontWeight: '800',
-                  fontSize: '0.9rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  boxShadow: '0 4px 16px rgba(212, 175, 55, 0.25)',
-                  transition: 'all 0.2s ease'
-                }}
+                className="bim-submit-btn"
               >
                 {loading ? (
                   <>
                     <Loader2 size={18} className="animate-spin" />
-                    <span>Şartname Dosyası Hazırlanıyor...</span>
+                    <span>Şartname Paketi Hazırlanıyor...</span>
                   </>
                 ) : (
                   <>
-                    <Download size={18} style={{ color: '#d4af37' }} />
+                    <Download size={18} className="bim-download-icon" />
                     <span>Şartname & BIM Paketini İndir</span>
                   </>
                 )}
               </button>
 
-              <div style={{ textAlign: 'center', fontSize: '0.68rem', color: '#94a3b8' }}>
+              <div className="bim-footer-note">
                 İndirdiğiniz dosyalar resmi Autodesk Revit (.RFA) ve DWG kütüphanesi standartlarına uygundur.
               </div>
 
@@ -370,6 +320,448 @@ export default function BimSpecDownloadModal({ isOpen, onClose, product }) {
         </div>
 
       </div>
+
+      <style jsx>{`
+        .bim-modal-backdrop {
+          position: fixed;
+          inset: 0;
+          background: rgba(9, 13, 22, 0.85);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          z-index: 99999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 16px;
+          animation: bimFadeIn 0.2s ease-out;
+        }
+
+        .bim-modal-dialog {
+          background: #ffffff;
+          border-radius: 20px;
+          width: 100%;
+          max-width: 540px;
+          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45), 0 0 30px rgba(212, 175, 55, 0.1);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          max-height: 90vh;
+          animation: bimSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Header */
+        .bim-modal-header {
+          background: linear-gradient(135deg, #090d16 0%, #162032 100%);
+          padding: 20px 24px;
+          color: #ffffff;
+          border-bottom: 2px solid #d4af37;
+          flex-shrink: 0;
+        }
+
+        .bim-modal-header-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 10px;
+        }
+
+        .bim-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(212, 175, 55, 0.15);
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          padding: 4px 10px;
+          border-radius: 20px;
+          font-size: 0.68rem;
+          color: #d4af37;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+        }
+
+        .bim-close-btn {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #cbd5e1;
+          cursor: pointer;
+          transition: all 0.2s;
+          flex-shrink: 0;
+        }
+
+        .bim-close-btn:hover {
+          background: rgba(255, 255, 255, 0.2);
+          color: #ffffff;
+          transform: scale(1.05);
+        }
+
+        .bim-modal-title {
+          font-size: 1.15rem;
+          font-weight: 800;
+          margin: 0 0 4px 0;
+          color: #ffffff;
+          line-height: 1.35;
+          letter-spacing: -0.01em;
+        }
+
+        .brand-name {
+          color: #ffffff;
+        }
+
+        .title-sep {
+          color: #d4af37;
+        }
+
+        .prod-name {
+          color: #f1f5f9;
+        }
+
+        .bim-modal-subtitle {
+          font-size: 0.76rem;
+          color: #94a3b8;
+          margin: 0;
+          line-height: 1.45;
+        }
+
+        /* Body */
+        .bim-modal-body {
+          padding: 22px 24px;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          flex: 1;
+        }
+
+        .bim-form {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .bim-error-alert {
+          background: #fef2f2;
+          border: 1px solid #fecaca;
+          color: #dc2626;
+          padding: 10px 14px;
+          border-radius: 10px;
+          font-size: 0.8rem;
+          font-weight: 700;
+        }
+
+        .bim-field-group {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .bim-section-label {
+          font-size: 0.72rem;
+          font-weight: 800;
+          color: #475569;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+
+        /* Format selector buttons */
+        .bim-format-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+        }
+
+        .bim-format-card {
+          padding: 8px 6px;
+          min-height: 48px;
+          border-radius: 10px;
+          border: 1.5px solid #e2e8f0;
+          background: #f8fafc;
+          color: #475569;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 2px;
+          transition: all 0.2s;
+          box-sizing: border-box;
+        }
+
+        .bim-format-card:hover {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+        }
+
+        .bim-format-card.active {
+          border-color: #d4af37;
+          background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+          color: #854d0e;
+          box-shadow: 0 2px 8px rgba(212, 175, 55, 0.2);
+        }
+
+        .fmt-main {
+          font-size: 0.76rem;
+          font-weight: 800;
+          white-space: nowrap;
+        }
+
+        .fmt-ext {
+          font-size: 0.65rem;
+          font-weight: 600;
+          opacity: 0.85;
+          white-space: nowrap;
+        }
+
+        /* Symmetrical Fields Grid */
+        .bim-fields-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .bim-input-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+          width: 100%;
+          min-width: 0;
+          box-sizing: border-box;
+        }
+
+        .bim-label {
+          font-size: 0.74rem;
+          font-weight: 700;
+          color: #334155;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          min-height: 18px;
+          line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        :global(.bim-label-icon) {
+          color: #d4af37;
+          flex-shrink: 0;
+        }
+
+        .bim-input {
+          width: 100%;
+          height: 42px;
+          padding: 0 12px;
+          border-radius: 9px;
+          border: 1.5px solid #cbd5e1;
+          font-size: 0.84rem;
+          color: #0f172a;
+          background: #ffffff;
+          box-sizing: border-box;
+          outline: none;
+          transition: all 0.2s;
+        }
+
+        .bim-input::placeholder {
+          color: #94a3b8;
+          font-size: 0.8rem;
+        }
+
+        .bim-input:focus {
+          border-color: #d4af37;
+          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+        /* Custom Select styling */
+        .bim-select-container {
+          position: relative;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .bim-select {
+          width: 100%;
+          height: 42px;
+          padding: 0 32px 0 12px;
+          border-radius: 9px;
+          border: 1.5px solid #cbd5e1;
+          font-size: 0.84rem;
+          color: #0f172a;
+          background: #ffffff;
+          box-sizing: border-box;
+          outline: none;
+          appearance: none;
+          -webkit-appearance: none;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .bim-select:focus {
+          border-color: #d4af37;
+          box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+
+        :global(.bim-select-arrow) {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #64748b;
+          pointer-events: none;
+        }
+
+        /* Submit Button */
+        .bim-submit-btn {
+          margin-top: 4px;
+          height: 46px;
+          width: 100%;
+          background: linear-gradient(135deg, #090d16 0%, #1e293b 100%);
+          color: #ffffff;
+          border: 1.5px solid #d4af37;
+          border-radius: 11px;
+          font-weight: 800;
+          font-size: 0.88rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          cursor: pointer;
+          box-shadow: 0 4px 16px rgba(212, 175, 55, 0.22);
+          transition: all 0.2s;
+          box-sizing: border-box;
+        }
+
+        .bim-submit-btn:hover:not(:disabled) {
+          background: linear-gradient(135deg, #111827 0%, #253348 100%);
+          box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+          transform: translateY(-1px);
+        }
+
+        .bim-submit-btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        :global(.bim-download-icon) {
+          color: #d4af37;
+        }
+
+        .bim-footer-note {
+          text-align: center;
+          font-size: 0.68rem;
+          color: #94a3b8;
+          line-height: 1.4;
+          margin-top: -4px;
+        }
+
+        /* Success View */
+        .bim-success-view {
+          text-align: center;
+          padding: 28px 12px;
+        }
+
+        .bim-success-icon-wrap {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 14px;
+        }
+
+        :global(.bim-success-icon) {
+          color: #10b981;
+        }
+
+        .bim-success-title {
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: #0f172a;
+          margin: 0 0 8px 0;
+        }
+
+        .bim-success-desc {
+          font-size: 0.82rem;
+          color: #64748b;
+          max-width: 420px;
+          margin: 0 auto;
+          line-height: 1.5;
+        }
+
+        /* Mobile specific media query: 100% Symmetrical and Easy to use */
+        @media (max-width: 540px) {
+          .bim-modal-backdrop {
+            padding: 8px;
+            align-items: flex-end;
+          }
+
+          .bim-modal-dialog {
+            border-radius: 20px 20px 14px 14px;
+            max-height: 94vh;
+          }
+
+          .bim-modal-header {
+            padding: 16px 18px;
+          }
+
+          .bim-modal-title {
+            font-size: 1.05rem;
+          }
+
+          .bim-modal-subtitle {
+            font-size: 0.72rem;
+          }
+
+          .bim-modal-body {
+            padding: 16px 18px 20px 18px;
+          }
+
+          .bim-fields-row {
+            grid-template-columns: 1fr;
+            gap: 11px;
+          }
+
+          .bim-fields-row-2col {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+          }
+
+          .bim-input, .bim-select {
+            height: 44px;
+            font-size: 0.85rem;
+          }
+
+          .bim-label {
+            font-size: 0.74rem;
+            min-height: 18px;
+          }
+
+          .bim-submit-btn {
+            height: 48px;
+            font-size: 0.88rem;
+          }
+        }
+
+        @keyframes bimFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes bimSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+      `}</style>
     </div>
   );
 }
