@@ -17,6 +17,7 @@ import {
   Lock, 
   Compass, 
   Building2, 
+  MapPin, 
   Package, 
   Tag, 
   Printer, 
@@ -1339,23 +1340,26 @@ export default function ArchitectPortalPage() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>
                 <div style={{
-                  width: '34px',
-                  height: '34px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                  color: '#090d16',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '11px',
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.06) 100%)',
+                  border: '1px solid rgba(212, 175, 55, 0.35)',
+                  color: '#d4af37',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexShrink: 0
+                  flexShrink: 0,
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)'
                 }}>
                   <Compass size={18} />
                 </div>
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <h4 style={{ fontSize: '0.88rem', fontWeight: '800', margin: 0, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {architectInfo?.officeName}
+                  <h4 style={{ fontSize: '0.88rem', fontWeight: '800', margin: 0, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', letterSpacing: '-0.01em' }}>
+                    {architectInfo?.officeName || 'Mimar Portalı'}
                   </h4>
-                  <span style={{ fontSize: '0.68rem', color: '#d4af37', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                  <span style={{ fontSize: '0.67rem', color: '#d4af37', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                    <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#d4af37', flexShrink: 0 }} />
                     {activeTab === 'projects' && 'Projeler & Moodboard'}
                     {activeTab === 'calculator' && 'Akıllı Metraj & Sarf'}
                     {activeTab === 'vault' && '3D & BIM Varlıklar'}
@@ -1366,7 +1370,7 @@ export default function ArchitectPortalPage() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                <NotificationBell userType="ARCHITECT" userId={architectInfo?.id} />
+                <NotificationBell userType="ARCHITECT" userId={architectInfo?.id} compact={true} />
                 <button
                   onClick={() => setShowNewProjectModal(true)}
                   style={{
@@ -1374,28 +1378,31 @@ export default function ArchitectPortalPage() {
                     color: '#090d16',
                     border: 'none',
                     borderRadius: '8px',
-                    padding: '7px 11px',
+                    height: '34px',
+                    padding: '0 10px',
                     fontSize: '0.74rem',
                     fontWeight: '800',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '4px'
+                    gap: '4px',
+                    boxShadow: '0 2px 8px rgba(212, 175, 55, 0.25)',
+                    whiteSpace: 'nowrap'
                   }}
                 >
-                  <Plus size={14} />
+                  <Plus size={15} strokeWidth={2.5} />
                   <span>Proje</span>
                 </button>
                 <button
                   onClick={handleLogout}
                   title="Çıkış Yap"
                   style={{
-                    background: 'rgba(239, 68, 68, 0.12)',
+                    background: 'rgba(239, 68, 68, 0.1)',
                     border: '1px solid rgba(239, 68, 68, 0.25)',
                     borderRadius: '8px',
                     color: '#f87171',
-                    width: '32px',
-                    height: '32px',
+                    width: '34px',
+                    height: '34px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1481,21 +1488,58 @@ export default function ArchitectPortalPage() {
           {/* ======================================================== */}
           {activeTab === 'projects' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-              {/* Project selector bar */}
+              {/* Proje Kontrol Masası / Control Hub */}
               <div style={{
-                background: 'rgba(255, 255, 255, 0.03)',
+                background: 'linear-gradient(180deg, rgba(17, 24, 39, 0.75) 0%, rgba(10, 15, 29, 0.85) 100%)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                padding: isMobile ? '14px' : '18px 20px',
+                borderRadius: isMobile ? '18px' : '20px',
+                padding: isMobile ? '16px 14px' : '20px 24px',
                 display: 'flex',
                 flexDirection: isMobile ? 'column' : 'row',
                 justifyContent: 'space-between',
                 alignItems: isMobile ? 'stretch' : 'center',
-                gap: '14px'
+                gap: isMobile ? '14px' : '18px',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+                backdropFilter: 'blur(12px)'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: '600' }}>Aktif Proje:</span>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', width: isMobile ? '100%' : 'auto' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0, flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <span style={{
+                      fontSize: '0.70rem',
+                      color: '#d4af37',
+                      fontWeight: '800',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}>
+                      <Layers size={13} />
+                      <span>Aktif Proje Seçimi</span>
+                    </span>
+                    <span style={{
+                      fontSize: '0.68rem',
+                      color: '#94a3b8',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      padding: '2px 8px',
+                      borderRadius: '10px',
+                      fontWeight: '600'
+                    }}>
+                      {projects.length} Proje Kayıtlı
+                    </span>
+                  </div>
+
+                  {/* Horizontal Scrollable Project Strip */}
+                  <div style={{
+                    display: 'flex',
+                    gap: '8px',
+                    overflowX: 'auto',
+                    paddingBottom: '2px',
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    WebkitOverflowScrolling: 'touch',
+                    width: '100%'
+                  }}>
                     {projects.map(p => {
                       const isSel = activeProject?.id === p.id;
                       return (
@@ -1503,17 +1547,42 @@ export default function ArchitectPortalPage() {
                           key={p.id}
                           onClick={() => setActiveProject(p)}
                           style={{
-                            background: isSel ? 'rgba(212, 175, 55, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                            background: isSel 
+                              ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.08) 100%)' 
+                              : 'rgba(255, 255, 255, 0.04)',
                             color: isSel ? '#d4af37' : '#cbd5e1',
                             border: isSel ? '1px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.08)',
                             padding: '8px 14px',
                             borderRadius: '10px',
-                            fontSize: '0.82rem',
-                            fontWeight: isSel ? '700' : '500',
-                            cursor: 'pointer'
+                            fontSize: '0.80rem',
+                            fontWeight: isSel ? '800' : '600',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            flexShrink: 0,
+                            boxShadow: isSel ? '0 2px 10px rgba(212, 175, 55, 0.15)' : 'none',
+                            transition: 'all 0.2s ease'
                           }}
                         >
-                          {p.title} ({p.items?.length || 0} Karo)
+                          <span style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            background: isSel ? '#d4af37' : 'rgba(255, 255, 255, 0.2)',
+                            boxShadow: isSel ? '0 0 6px #d4af37' : 'none'
+                          }} />
+                          <span>{p.title}</span>
+                          <span style={{
+                            fontSize: '0.70rem',
+                            opacity: 0.8,
+                            padding: '1px 5px',
+                            borderRadius: '6px',
+                            background: isSel ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.06)'
+                          }}>
+                            {p.items?.length || 0} Karo
+                          </span>
                         </button>
                       );
                     })}
@@ -1525,76 +1594,9 @@ export default function ArchitectPortalPage() {
                     display: 'grid',
                     gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, auto)',
                     gap: isMobile ? '8px' : '10px',
-                    width: isMobile ? '100%' : 'auto'
+                    width: isMobile ? '100%' : 'auto',
+                    flexShrink: 0
                   }}>
-                    <button
-                      onClick={() => setShowShareModal(true)}
-                      style={{
-                        background: 'rgba(212, 175, 55, 0.15)',
-                        color: '#d4af37',
-                        border: '1px solid rgba(212, 175, 55, 0.35)',
-                        borderRadius: '8px',
-                        padding: '10px 12px',
-                        fontSize: '0.8rem',
-                        fontWeight: '700',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px'
-                      }}
-                      title="İşverene onaylatmak için logosuz, beyaz etiketli sunum linki üretir"
-                    >
-                      <Share2 size={14} />
-                      <span>Sunum Linki</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setCalcArea(activeProject.totalAreaM2 ? String(activeProject.totalAreaM2) : '150');
-                        setActiveTab('calculator');
-                      }}
-                      style={{
-                        background: 'rgba(56, 189, 248, 0.15)',
-                        color: '#38bdf8',
-                        border: '1px solid rgba(56, 189, 248, 0.35)',
-                        borderRadius: '8px',
-                        padding: '10px 12px',
-                        fontSize: '0.8rem',
-                        fontWeight: '700',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <Calculator size={14} />
-                      <span>Metraj & Sarf</span>
-                    </button>
-
-                    <button
-                      onClick={() => handleGenerateSpec(activeProject)}
-                      disabled={specLoading}
-                      style={{
-                        background: '#1e293b',
-                        color: '#fff',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        borderRadius: '8px',
-                        padding: '10px 12px',
-                        fontSize: '0.8rem',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      {specLoading ? <Loader2 size={14} className="animate-spin" /> : <FileText size={14} />}
-                      <span>Şartname</span>
-                    </button>
-
                     <button
                       onClick={() => {
                         setSelectedTargetProjectId(activeProject.id);
@@ -1604,19 +1606,96 @@ export default function ArchitectPortalPage() {
                         background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                         color: '#090d16',
                         border: 'none',
-                        borderRadius: '8px',
-                        padding: '10px 12px',
-                        fontSize: '0.8rem',
+                        borderRadius: '11px',
+                        height: '44px',
+                        padding: '0 12px',
+                        fontSize: '0.80rem',
+                        fontWeight: '800',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        boxShadow: '0 2px 10px rgba(212, 175, 55, 0.25)',
+                        transition: 'transform 0.15s ease'
+                      }}
+                    >
+                      <Plus size={16} strokeWidth={2.5} />
+                      <span>Karo Ekle</span>
+                    </button>
+
+                    <button
+                      onClick={() => setShowShareModal(true)}
+                      style={{
+                        background: 'rgba(212, 175, 55, 0.1)',
+                        color: '#d4af37',
+                        border: '1px solid rgba(212, 175, 55, 0.3)',
+                        borderRadius: '11px',
+                        height: '44px',
+                        padding: '0 12px',
+                        fontSize: '0.80rem',
                         fontWeight: '700',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '6px'
+                        gap: '6px',
+                        transition: 'all 0.15s ease'
+                      }}
+                      title="İşverene onaylatmak için logosuz, beyaz etiketli sunum linki üretir"
+                    >
+                      <Share2 size={15} />
+                      <span>Sunum Linki</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setCalcArea(activeProject.totalAreaM2 ? String(activeProject.totalAreaM2) : '150');
+                        setActiveTab('calculator');
+                      }}
+                      style={{
+                        background: 'rgba(56, 189, 248, 0.1)',
+                        color: '#38bdf8',
+                        border: '1px solid rgba(56, 189, 248, 0.3)',
+                        borderRadius: '11px',
+                        height: '44px',
+                        padding: '0 12px',
+                        fontSize: '0.80rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.15s ease'
                       }}
                     >
-                      <Plus size={14} />
-                      <span>Karo Ekle</span>
+                      <Calculator size={15} />
+                      <span>Metraj & Sarf</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleGenerateSpec(activeProject)}
+                      disabled={specLoading}
+                      style={{
+                        background: 'rgba(168, 85, 247, 0.1)',
+                        color: '#c084fc',
+                        border: '1px solid rgba(168, 85, 247, 0.3)',
+                        borderRadius: '11px',
+                        height: '44px',
+                        padding: '0 12px',
+                        fontSize: '0.80rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {specLoading ? <Loader2 size={15} className="animate-spin" /> : <FileText size={15} />}
+                      <span>Şartname</span>
                     </button>
                   </div>
                 )}
@@ -1625,34 +1704,112 @@ export default function ArchitectPortalPage() {
               {/* Active Project Card / Moodboard Grid */}
               {activeProject ? (
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
+                  background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(10, 15, 29, 0.8) 100%)',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: isMobile ? '16px' : '20px',
-                  padding: isMobile ? '16px 14px' : '24px'
+                  borderRadius: isMobile ? '18px' : '22px',
+                  padding: isMobile ? '16px 14px' : '24px',
+                  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.3)'
                 }}>
                   {/* Project Info Header */}
                   <div style={{
-                    display: 'flex',
-                    flexDirection: isMobile ? 'column' : 'row',
-                    justifyContent: 'space-between',
-                    alignItems: isMobile ? 'flex-start' : 'flex-start',
                     borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-                    paddingBottom: '16px',
-                    marginBottom: '18px',
-                    gap: '10px'
+                    paddingBottom: '14px',
+                    marginBottom: '16px'
                   }}>
-                    <div>
-                      <h2 style={{ fontSize: isMobile ? '1.15rem' : '1.3rem', fontWeight: '800', margin: '0 0 6px 0', color: '#fff' }}>
-                        {activeProject.title}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: isMobile ? 'flex-start' : 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: '8px'
+                    }}>
+                      <h2 style={{
+                        fontSize: isMobile ? '1.25rem' : '1.45rem',
+                        fontWeight: '800',
+                        margin: 0,
+                        color: '#fff',
+                        letterSpacing: '-0.02em',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <span>{activeProject.title}</span>
                       </h2>
-                      <div style={{ display: 'flex', gap: '8px 12px', fontSize: '0.8rem', color: '#94a3b8', flexWrap: 'wrap' }}>
-                        <span>📍 {activeProject.city}</span>
-                        <span>🏢 {activeProject.projectType}</span>
-                        <span>📐 {activeProject.totalAreaM2} m² Proje Alanı</span>
-                        <span style={{ color: '#d4af37', fontWeight: '700' }}>
-                          Durum: {activeProject.status === 'SPEC_IN' ? 'Şartname Aşaması' : 'Tasarım'}
-                        </span>
+
+                      {/* Status Badge */}
+                      <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '4px 10px',
+                        borderRadius: '20px',
+                        background: activeProject.status === 'SPEC_IN' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(212, 175, 55, 0.12)',
+                        border: `1px solid ${activeProject.status === 'SPEC_IN' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(212, 175, 55, 0.3)'}`,
+                        color: activeProject.status === 'SPEC_IN' ? '#34d399' : '#d4af37',
+                        fontSize: '0.72rem',
+                        fontWeight: '700',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        <span style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          background: activeProject.status === 'SPEC_IN' ? '#10b981' : '#d4af37',
+                          boxShadow: `0 0 6px ${activeProject.status === 'SPEC_IN' ? '#10b981' : '#d4af37'}`
+                        }} />
+                        <span>{activeProject.status === 'SPEC_IN' ? 'Şartname Aşaması' : 'Tasarım / Moodboard'}</span>
                       </div>
+                    </div>
+
+                    {/* Metadata Chips */}
+                    <div style={{
+                      display: 'flex',
+                      gap: '6px',
+                      flexWrap: 'wrap',
+                      marginTop: '10px'
+                    }}>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        background: 'rgba(255, 255, 255, 0.04)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '8px',
+                        padding: '4px 10px',
+                        fontSize: '0.75rem',
+                        color: '#cbd5e1'
+                      }}>
+                        <MapPin size={12} style={{ color: '#d4af37' }} />
+                        <span>{activeProject.city}</span>
+                      </span>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        background: 'rgba(255, 255, 255, 0.04)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '8px',
+                        padding: '4px 10px',
+                        fontSize: '0.75rem',
+                        color: '#cbd5e1'
+                      }}>
+                        <Building2 size={12} style={{ color: '#38bdf8' }} />
+                        <span>{activeProject.projectType}</span>
+                      </span>
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        background: 'rgba(255, 255, 255, 0.04)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '8px',
+                        padding: '4px 10px',
+                        fontSize: '0.75rem',
+                        color: '#cbd5e1'
+                      }}>
+                        <Layers size={12} style={{ color: '#c084fc' }} />
+                        <span>{activeProject.totalAreaM2} m² Proje Alanı</span>
+                      </span>
                     </div>
                   </div>
 
@@ -1753,16 +1910,19 @@ export default function ArchitectPortalPage() {
                                   position: 'absolute',
                                   top: '10px',
                                   right: '10px',
-                                  background: 'rgba(239, 68, 68, 0.85)',
-                                  color: '#fff',
-                                  border: 'none',
-                                  borderRadius: '6px',
-                                  width: '26px',
-                                  height: '26px',
+                                  background: 'rgba(15, 23, 42, 0.75)',
+                                  backdropFilter: 'blur(8px)',
+                                  border: '1px solid rgba(239, 68, 68, 0.4)',
+                                  color: '#f87171',
+                                  borderRadius: '50%',
+                                  width: '30px',
+                                  height: '30px',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  cursor: 'pointer'
+                                  cursor: 'pointer',
+                                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
+                                  transition: 'all 0.2s ease'
                                 }}
                               >
                                 <Trash2 size={13} />
@@ -1814,21 +1974,22 @@ export default function ArchitectPortalPage() {
                                   title="3D Kiosk'ta Canlı Odaya Uygula"
                                   style={{
                                     flex: 1,
-                                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.08) 100%)',
+                                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.06) 100%)',
                                     color: '#d4af37',
-                                    border: '1px solid rgba(212, 175, 55, 0.4)',
-                                    borderRadius: '8px',
-                                    padding: '6px 6px',
-                                    fontSize: '0.7rem',
+                                    border: '1px solid rgba(212, 175, 55, 0.35)',
+                                    borderRadius: '9px',
+                                    height: '36px',
+                                    padding: '0 6px',
+                                    fontSize: '0.72rem',
                                     fontWeight: '700',
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    gap: '4px'
+                                    gap: '5px'
                                   }}
                                 >
-                                  <Box size={12} />
+                                  <Box size={13} />
                                   <span>3D Gör</span>
                                 </button>
 
@@ -1837,21 +1998,22 @@ export default function ArchitectPortalPage() {
                                   title="PBR Doku Haritaları ve Render Ayarları"
                                   style={{
                                     flex: 1,
-                                    background: 'rgba(168, 85, 247, 0.15)',
+                                    background: 'rgba(168, 85, 247, 0.12)',
                                     color: '#c084fc',
                                     border: '1px solid rgba(168, 85, 247, 0.3)',
-                                    borderRadius: '8px',
-                                    padding: '6px 6px',
-                                    fontSize: '0.7rem',
+                                    borderRadius: '9px',
+                                    height: '36px',
+                                    padding: '0 6px',
+                                    fontSize: '0.72rem',
                                     fontWeight: '700',
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    gap: '4px'
+                                    gap: '5px'
                                   }}
                                 >
-                                  <Sliders size={12} />
+                                  <Sliders size={13} />
                                   <span>PBR Doku</span>
                                 </button>
 
@@ -1859,21 +2021,22 @@ export default function ArchitectPortalPage() {
                                   onClick={() => handleDownloadAsset(p, 'REVIT_BIM')}
                                   style={{
                                     flex: 1,
-                                    background: 'rgba(255, 255, 255, 0.06)',
-                                    color: '#cbd5e1',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    borderRadius: '8px',
-                                    padding: '6px 6px',
-                                    fontSize: '0.7rem',
-                                    fontWeight: '600',
+                                    background: 'rgba(56, 189, 248, 0.1)',
+                                    color: '#38bdf8',
+                                    border: '1px solid rgba(56, 189, 248, 0.25)',
+                                    borderRadius: '9px',
+                                    height: '36px',
+                                    padding: '0 6px',
+                                    fontSize: '0.72rem',
+                                    fontWeight: '700',
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    gap: '4px'
+                                    gap: '5px'
                                   }}
                                 >
-                                  <Box size={12} />
+                                  <Download size={13} />
                                   <span>BIM (.rvt)</span>
                                 </button>
 
@@ -1889,16 +2052,17 @@ export default function ArchitectPortalPage() {
                                     flex: 1,
                                     background: 'rgba(212, 175, 55, 0.12)',
                                     color: '#d4af37',
-                                    border: '1px solid rgba(212, 175, 55, 0.25)',
-                                    borderRadius: '8px',
-                                    padding: '6px 6px',
-                                    fontSize: '0.7rem',
+                                    border: '1px solid rgba(212, 175, 55, 0.28)',
+                                    borderRadius: '9px',
+                                    height: '36px',
+                                    padding: '0 6px',
+                                    fontSize: '0.72rem',
                                     fontWeight: '700',
                                     cursor: 'pointer',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    gap: '4px'
+                                    gap: '5px'
                                   }}
                                 >
                                   <Package size={12} />
@@ -4705,16 +4869,17 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
           bottom: 0,
           left: 0,
           right: 0,
-          height: '64px',
-          background: 'rgba(7, 11, 20, 0.96)',
-          backdropFilter: 'blur(16px)',
+          height: '66px',
+          background: 'rgba(8, 12, 22, 0.95)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           borderTop: '1px solid rgba(212, 175, 55, 0.25)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           zIndex: 1000,
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-          boxShadow: '0 -4px 25px rgba(0, 0, 0, 0.7)'
+          boxShadow: '0 -4px 30px rgba(0, 0, 0, 0.8)'
         }}>
           {[
             { id: 'projects', label: 'Projeler', icon: <Layers size={19} /> },
