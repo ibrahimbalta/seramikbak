@@ -31,7 +31,11 @@ import {
   Calculator,
   Wrench,
   Truck,
-  Menu
+  Menu,
+  Lock,
+  Crown,
+  ArrowRight,
+  Check
 } from 'lucide-react';
 import QuoteModal from '@/components/QuoteModal';
 
@@ -119,6 +123,12 @@ export default function ShowroomKioskPage() {
   const [selectedBrandId, setSelectedBrandId] = useState('all');
   const [selectedDealer, setSelectedDealer] = useState(null);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+
+  // Kiosk Subscription & Yetkilendirme Durumu
+  const [authChecking, setAuthChecking] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [authError, setAuthError] = useState(null);
+  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
 
   // 3D Sanal Stüdyo Yüzey Seçimleri
   const [selectedProduct, setSelectedProduct] = useState(BRAND_CATALOG[0]);
@@ -308,55 +318,98 @@ export default function ShowroomKioskPage() {
     }
   }, []);
 
-  // Veritabanından Markaları ve Bayileri Yükle
+  // Veritabanından Markaları, Bayiyi ve Kiosk Abonelik Yetkisini Kontrol Et
   useEffect(() => {
-    async function loadMetaData() {
+    async function loadMetaDataAndAuth() {
+      setAuthChecking(true);
       try {
-        const [brandRes, dealerRes] = await Promise.all([
+        // 1. Determine dealer ID from URL search params or localStorage
+        let targetDealerId = null;
+        let savedDealerObj = null;
+
+        if (typeof window !== 'undefined') {
+          const urlParams = new URLSearchParams(window.location.search);
+          const queryDealerId = urlParams.get('dealerId');
+          if (queryDealerId) {
+            targetDealerId = queryDealerId;
+          }
+
+          try {
+            const saved = localStorage.getItem('sb_dealer_session');
+            if (saved) {
+              savedDealerObj = JSON.parse(saved);
+              if (!targetDealerId && savedDealerObj?.id) {
+                targetDealerId = savedDealerObj.id;
+              }
+            }
+          } catch (e) {
+            console.warn('Session parse error:', e);
+          }
+        }
+
+        // 2. Fetch brands and auth status concurrently
+        const authUrl = targetDealerId 
+          ? `/api/dealers/kiosk-auth?dealerId=${encodeURIComponent(targetDealerId)}`
+          : '/api/dealers/kiosk-auth';
+
+        const [brandRes, authRes] = await Promise.all([
           fetch('/api/brands').then(r => r.json()).catch(() => null),
-          fetch('/api/dealers').then(r => r.json()).catch(() => null)
+          fetch(authUrl).then(async r => {
+            const data = await r.json().catch(() => ({}));
+            return { ok: r.ok, status: r.status, data };
+          }).catch(err => ({ ok: false, data: { message: 'Bağlantı hatası' } }))
         ]);
 
         if (brandRes && Array.isArray(brandRes)) {
           setBrands(brandRes);
         }
 
-        // Eğer localStorage'da giriş yapmış bir bayi varsa onu koru; yoksa ilk bayiyi ata
-        let hasActiveSession = false;
-        if (typeof window !== 'undefined') {
-          try {
-            const saved = localStorage.getItem('sb_dealer_session');
-            if (saved) {
-              const parsed = JSON.parse(saved);
-              if (parsed && (parsed.id || parsed.name)) {
-                hasActiveSession = true;
-                if (dealerRes && dealerRes.dealers) {
-                  const dbMatch = dealerRes.dealers.find(d => d.id === parsed.id || d.email === parsed.email);
-                  if (dbMatch) {
-                    setSelectedDealer({ ...parsed, ...dbMatch });
-                  } else {
-                    setSelectedDealer(parsed);
-                  }
-                } else {
-                  setSelectedDealer(parsed);
-                }
-              }
+        if (authRes?.data?.authorized) {
+          setIsAuthorized(true);
+          setAuthError(null);
+          if (authRes.data.dealer) {
+            setSelectedDealer(authRes.data.dealer);
+            if (authRes.data.dealer.brandId) {
+              setSelectedBrandId(authRes.data.dealer.brandId);
             }
-          } catch (e) {}
-        }
-
-        if (!hasActiveSession && dealerRes && dealerRes.dealers && dealerRes.dealers.length > 0) {
-          setSelectedDealer(dealerRes.dealers[0]);
+          } else if (savedDealerObj) {
+            setSelectedDealer(savedDealerObj);
+          }
+          if (authRes.data.subscription) {
+            setSubscriptionInfo(authRes.data.subscription);
+          }
+        } else {
+          setIsAuthorized(false);
+          setAuthError({
+            reason: authRes?.data?.reason || 'NO_SUBSCRIPTION',
+            message: authRes?.data?.message || 'Kiosk Teşhir Modu yalnızca aktif paket aboneliği olan bayilerimize özeldir.'
+          });
+          if (authRes?.data?.dealer) {
+            setSelectedDealer(authRes.data.dealer);
+          } else if (savedDealerObj) {
+            setSelectedDealer(savedDealerObj);
+          }
+          if (authRes?.data?.subscription) {
+            setSubscriptionInfo(authRes.data.subscription);
+          }
         }
       } catch (err) {
-        console.error('Kiosk meta data fetch error:', err);
+        console.error('Kiosk meta & auth fetch error:', err);
+        setIsAuthorized(false);
+        setAuthError({
+          reason: 'SERVER_ERROR',
+          message: 'Yetkilendirme kontrolü sırasında bir hata oluştu.'
+        });
+      } finally {
+        setAuthChecking(false);
       }
     }
-    loadMetaData();
+    loadMetaDataAndAuth();
   }, []);
 
   // Seçilen Markaya (veya Tüm Markalara) Göre Veritabanından Ürünleri Canlı Yükle
   useEffect(() => {
+    if (!isAuthorized) return;
     let isSubscribed = true;
     async function loadProductsForBrand() {
       setIsLoadingProducts(true);
@@ -431,7 +484,7 @@ export default function ShowroomKioskPage() {
     }
     loadProductsForBrand();
     return () => { isSubscribed = false; };
-  }, [selectedBrandId]);
+  }, [selectedBrandId, isAuthorized]);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -763,7 +816,7 @@ export default function ShowroomKioskPage() {
   const vatAmount = Math.round(subtotalBeforeVat * 0.20);
   const grandTotal = subtotalBeforeVat + vatAmount;
 
-  if (!mounted) {
+  if (!mounted || authChecking) {
     return (
       <main style={{ 
         minHeight: '100vh', 
@@ -786,8 +839,192 @@ export default function ShowroomKioskPage() {
         <h2 style={{ marginTop: '20px', fontSize: '1.25rem', fontWeight: '800', color: '#f8fafc', letterSpacing: '-0.02em' }}>
           Seramik<span style={{ color: '#f59e0b' }}>Bak</span> Kiosk
         </h2>
-        <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '6px' }}>3D Showroom Sanal Stüdyosu Hazırlanıyor...</p>
+        <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '6px' }}>
+          {authChecking ? 'Yetkili Bayi ve Abonelik Durumu Doğrulanıyor...' : '3D Showroom Sanal Stüdyosu Hazırlanıyor...'}
+        </p>
         <style>{`@keyframes kioskSpin { to { transform: rotate(360deg); } }`}</style>
+      </main>
+    );
+  }
+
+  if (!isAuthorized) {
+    return (
+      <main style={{
+        minHeight: '100vh',
+        background: 'radial-gradient(ellipse at 50% 30%, #1a1a2e 0%, #0b0f19 80%)',
+        color: '#f8fafc',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px',
+        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      }}>
+        <div style={{
+          maxWidth: '560px',
+          width: '100%',
+          background: 'rgba(15, 23, 42, 0.85)',
+          border: '1px solid rgba(245, 158, 11, 0.35)',
+          borderRadius: '24px',
+          padding: '40px 32px',
+          textAlign: 'center',
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(245, 158, 11, 0.1)',
+          backdropFilter: 'blur(20px)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '20px'
+        }}>
+          {/* Glowing Lock Icon */}
+          <div style={{
+            width: '76px',
+            height: '76px',
+            borderRadius: '22px',
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.05) 100%)',
+            border: '2px solid rgba(245, 158, 11, 0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fbbf24',
+            boxShadow: '0 8px 24px rgba(245, 158, 11, 0.25)'
+          }}>
+            <Lock size={36} />
+          </div>
+
+          <div>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(245, 158, 11, 0.12)',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              color: '#fbbf24',
+              padding: '4px 12px',
+              borderRadius: '20px',
+              fontSize: '0.72rem',
+              fontWeight: '800',
+              marginBottom: '12px',
+              letterSpacing: '0.04em'
+            }}>
+              <Crown size={12} />
+              <span>BAYİ PAKET ABONELİĞİ GEREKİR</span>
+            </div>
+            <h1 style={{
+              fontSize: '1.5rem',
+              fontWeight: '900',
+              margin: '0 0 8px 0',
+              color: '#ffffff',
+              letterSpacing: '-0.02em'
+            }}>
+              Kiosk Teşhir Modu Kilitli
+            </h1>
+            <p style={{
+              fontSize: '0.88rem',
+              color: '#94a3b8',
+              lineHeight: 1.6,
+              margin: 0
+            }}>
+              {authError?.message || 'Kiosk Teşhir Modu, yalnızca aktif paket aboneliği (Lite, Standart veya Premium) bulunan SeramikBak yetkili bayileri tarafından kullanılabilir.'}
+            </p>
+          </div>
+
+          {/* Dealer Info Card if identified */}
+          {selectedDealer && (
+            <div style={{
+              width: '100%',
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '14px',
+              padding: '14px 18px',
+              textAlign: 'left',
+              boxSizing: 'border-box'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <span style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '700' }}>TANIMLI SHOWROOM:</span>
+                <span style={{
+                  fontSize: '0.68rem',
+                  fontWeight: '800',
+                  color: authError?.reason === 'PENDING_APPROVAL' ? '#fbbf24' : '#f87171',
+                  background: authError?.reason === 'PENDING_APPROVAL' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)',
+                  padding: '2px 8px',
+                  borderRadius: '6px'
+                }}>
+                  {authError?.reason === 'PENDING_APPROVAL' ? 'Onay Bekliyor' : authError?.reason === 'EXPIRED' ? 'Süresi Doldu' : 'Paket Yok'}
+                </span>
+              </div>
+              <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#f8fafc' }}>
+                {selectedDealer.name}
+              </div>
+              {selectedDealer.city && (
+                <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>
+                  {selectedDealer.city} {selectedDealer.district ? `· ${selectedDealer.district}` : ''}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', marginTop: '6px' }}>
+            <Link
+              href="/bayi"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                width: '100%',
+                padding: '14px 20px',
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                color: '#ffffff',
+                textDecoration: 'none',
+                borderRadius: '12px',
+                fontWeight: '800',
+                fontSize: '0.9rem',
+                boxShadow: '0 4px 16px rgba(245, 158, 11, 0.35)',
+                boxSizing: 'border-box',
+                transition: 'all 0.2s'
+              }}
+            >
+              <span>{selectedDealer ? 'Bayi Paneline Dön & Paket Seç' : 'Bayi Girişi Yap'}</span>
+              <ArrowRight size={16} />
+            </Link>
+
+            <Link
+              href="/"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                width: '100%',
+                padding: '12px 18px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                color: '#94a3b8',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                textDecoration: 'none',
+                borderRadius: '12px',
+                fontWeight: '700',
+                fontSize: '0.82rem',
+                boxSizing: 'border-box'
+              }}
+            >
+              <Home size={14} />
+              <span>Ana Sayfaya Dön</span>
+            </Link>
+          </div>
+
+          {/* Support / Contact info */}
+          <div style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '4px' }}>
+            Paket abonelikleri hakkında bilgi almak için:{' '}
+            <a
+              href="https://wa.me/905321381061?text=Merhaba,%20Kiosk%20Teşhir%20Modu%20paket%20aboneliği%20hakkında%20bilgi%20almak%20istiyorum."
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#d4af37', textDecoration: 'underline', fontWeight: '700' }}
+            >
+              WhatsApp Destek Hattı
+            </a>
+          </div>
+        </div>
       </main>
     );
   }

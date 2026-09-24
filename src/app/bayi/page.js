@@ -310,6 +310,16 @@ Yetkili Satış & Showroom Departmanı`;
   }, []);
 
   const handleMobileTabChange = (tabId) => {
+    if (tabId === 'kiosk-mode') {
+      setShowMobileMoreMenu(false);
+      if (hasActiveSaaS) {
+        window.open(dealerInfo?.id ? `/kiosk?dealerId=${dealerInfo.id}` : '/kiosk', '_blank');
+      } else {
+        setActivePortalTab('subscription');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
     if (tabId === 'stock-exchange') {
       setShowMobileMoreMenu(false);
       window.location.href = '/bayi/stok-borsasi';
@@ -327,6 +337,11 @@ Yetkili Satış & Showroom Departmanı`;
   const hasPending = saasInfo?.status === 'PENDING_APPROVAL' || saasInfo?.pendingStatus === 'PENDING_APPROVAL';
   const requestedPlan = saasInfo?.status === 'PENDING_APPROVAL' ? saasInfo.plan : (saasInfo?.pendingStatus === 'PENDING_APPROVAL' ? saasInfo.pendingPlan : null);
   const isRejected = saasInfo?.status === 'REJECTED' || saasInfo?.pendingStatus === 'REJECTED';
+  const hasActiveSaaS = Boolean(
+    saasInfo &&
+    saasInfo.status === 'ACTIVE' &&
+    (!saasInfo.expiresAt || new Date(saasInfo.expiresAt) > new Date())
+  );
 
   // Profile Form State
   const [showSettings, setShowSettings] = useState(false);
@@ -2369,6 +2384,7 @@ Yetkili Satış & Showroom Departmanı`;
           }}>
             {[
               { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
+              { id: 'kiosk-mode', label: '🖥️ Kiosk Teşhir Modu', icon: <Eye size={18} />, isSaaSFeature: true },
               { id: 'stock-exchange', label: '🤝 Bayi Stok Borsası', icon: <Building2 size={18} /> },
               { id: 'quick-quote', label: '💬 WhatsApp & PDF Teklif', icon: <Calculator size={18} />, isPremiumFeature: true },
               { id: 'showroom-qr', label: '📱 Showroom QR Etiketleri', icon: <QrCode size={18} />, isPremiumFeature: true },
@@ -2385,6 +2401,15 @@ Yetkili Satış & Showroom Departmanı`;
                 <button
                   key={link.id}
                   onClick={() => {
+                    if (link.id === 'kiosk-mode') {
+                      if (hasActiveSaaS) {
+                        window.open(dealerInfo?.id ? `/kiosk?dealerId=${dealerInfo.id}` : '/kiosk', '_blank');
+                      } else {
+                        setActivePortalTab('subscription');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
+                      return;
+                    }
                     if (link.id === 'stock-exchange') {
                       window.location.href = '/bayi/stok-borsasi';
                       return;
@@ -2421,6 +2446,24 @@ Yetkili Satış & Showroom Departmanı`;
                   {!isSidebarCollapsed && (
                     <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1, gap: '6px', overflow: 'hidden' }}>
                       <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{link.label}</span>
+                      {link.isSaaSFeature && (
+                        <span style={{
+                          fontSize: '0.6rem',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          background: hasActiveSaaS ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                          color: hasActiveSaaS ? '#34d399' : '#fbbf24',
+                          border: hasActiveSaaS ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(245, 158, 11, 0.3)',
+                          fontWeight: '800',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          flexShrink: 0
+                        }}>
+                          {hasActiveSaaS ? <Check size={9} /> : <Lock size={9} />}
+                          {hasActiveSaaS ? 'AKTİF' : 'PAKET'}
+                        </span>
+                      )}
                       {link.isPremiumFeature && (
                         <span style={{
                           fontSize: '0.6rem',
@@ -5699,6 +5742,7 @@ Yetkili Satış & Showroom Departmanı`;
                   </div>
                   <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 auto 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {[
+                      { text: 'Kiosk Teşhir Modu (Mağaza İçi Tablet & Ekran)', included: true },
                       { text: 'Müşteri adı ve telefon bilgisi', included: true },
                       { text: 'Aylık 50 müşteri talebi limiti', included: true },
                       { text: 'Temel talep ve müşteri yönetimi', included: true },
@@ -5776,6 +5820,7 @@ Yetkili Satış & Showroom Departmanı`;
                   </div>
                   <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 auto 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {[
+                      { text: 'Kiosk Teşhir Modu (Mağaza İçi Tablet & Ekran)', included: true },
                       { text: 'Tam müşteri bilgisi (ad, tel, e-posta)', included: true },
                       { text: 'Sınırsız müşteri talebi', included: true },
                       { text: 'Gelişmiş talep ve müşteri yönetimi', included: true },
@@ -5849,6 +5894,7 @@ Yetkili Satış & Showroom Departmanı`;
                   </div>
                   <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 auto 0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {[
+                      { text: '🖥️ Kiosk Teşhir Modu (Mağaza İçi Tablet & Ekran)', included: true },
                       { text: '📱 Showroom Akıllı QR Kod Etiket Üretici (3D Destekli)', included: true },
                       { text: '💬 WhatsApp Hızlı Teklif Motoru & Müşteri Takip Sistemi', included: true },
                       { text: 'Tam müşteri bilgisi + proje ve adres detayı', included: true },
@@ -7131,47 +7177,126 @@ Yetkili Satış & Showroom Departmanı`;
               {/* Kiosk Mode tool */}
               <div className="glass-panel" style={{
                 background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                border: hasActiveSaaS ? '1px solid rgba(212, 175, 55, 0.25)' : '1px solid rgba(255, 255, 255, 0.08)',
                 borderRadius: isMobile ? '14px' : '16px',
                 padding: isMobile ? '16px' : '24px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 gap: isMobile ? '12px' : '16px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.01)'
+                boxShadow: hasActiveSaaS ? '0 4px 16px rgba(212, 175, 55, 0.06)' : '0 4px 12px rgba(0,0,0,0.01)'
               }}>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(212,175,55,0.1)', color: '#d4af37', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <Activity size={18} />
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: '0 0 2px 0', color: '#ffffff' }}>Kiosk Teşhir Modu</h4>
-                    <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>Bu cihazı veya mağazadaki bir tableti dijital kiosk ekranına dönüştürün.</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => window.open('/kiosk', '_blank')}
-                  style={{
-                    width: '100%',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    color: '#ffffff',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                  <div style={{
+                    width: '38px',
+                    height: '38px',
                     borderRadius: '10px',
-                    padding: '10px 14px',
-                    fontSize: '0.8rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
+                    background: hasActiveSaaS ? 'rgba(212,175,55,0.12)' : 'rgba(255,255,255,0.05)',
+                    color: hasActiveSaaS ? '#d4af37' : '#94a3b8',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '6px',
-                    boxSizing: 'border-box'
-                  }}
-                >
-                  <ExternalLink size={13} />
-                  <span>Kiosk Teşhir Modunu Aç</span>
-                </button>
+                    flexShrink: 0
+                  }}>
+                    <Activity size={18} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                      <h4 style={{ fontSize: '0.85rem', fontWeight: '800', margin: 0, color: '#ffffff' }}>Kiosk Teşhir Modu</h4>
+                      {hasActiveSaaS ? (
+                        <span style={{
+                          background: 'rgba(16, 185, 129, 0.15)',
+                          color: '#34d399',
+                          border: '1px solid rgba(16, 185, 129, 0.3)',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.65rem',
+                          fontWeight: '800',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <Check size={10} /> {saasInfo?.plan} Paketi Aktif
+                        </span>
+                      ) : (
+                        <span style={{
+                          background: 'rgba(245, 158, 11, 0.15)',
+                          color: '#fbbf24',
+                          border: '1px solid rgba(245, 158, 11, 0.3)',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.65rem',
+                          fontWeight: '800',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <Lock size={10} /> Paket Aboneliği Gerekir
+                        </span>
+                      )}
+                    </div>
+                    <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.4 }}>
+                      {hasActiveSaaS 
+                        ? 'Bu cihazı veya mağazadaki bir tableti dijital kiosk ekranına dönüştürün.' 
+                        : 'Mağaza içi tabletlerde dijital seramik teşhir deneyimi sunun. Bu özellik yalnızca aktif paket aboneliği olan bayilere açıktır.'}
+                    </p>
+                  </div>
+                </div>
+
+                {hasActiveSaaS ? (
+                  <button
+                    type="button"
+                    onClick={() => window.open(dealerInfo?.id ? `/kiosk?dealerId=${dealerInfo.id}` : '/kiosk', '_blank')}
+                    style={{
+                      width: '100%',
+                      background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%)',
+                      color: '#d4af37',
+                      border: '1px solid rgba(212, 175, 55, 0.3)',
+                      borderRadius: '10px',
+                      padding: '10px 14px',
+                      fontSize: '0.8rem',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      boxSizing: 'border-box',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <ExternalLink size={13} />
+                    <span>Kiosk Teşhir Modunu Aç</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActivePortalTab('subscription');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    style={{
+                      width: '100%',
+                      background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%)',
+                      color: '#fbbf24',
+                      border: '1px solid rgba(245, 158, 11, 0.4)',
+                      borderRadius: '10px',
+                      padding: '10px 14px',
+                      fontSize: '0.8rem',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      boxSizing: 'border-box',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <Lock size={13} />
+                    <span>Paket Aboneliği Başlat 🔒</span>
+                  </button>
+                )}
               </div>
 
               {/* Analytics tool */}
@@ -8943,6 +9068,7 @@ Yetkili Satış & Showroom Departmanı`;
             }}>
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={16} /> },
+                { id: 'kiosk-mode', label: 'Kiosk Teşhir', icon: <Eye size={16} />, isSaaSFeature: true },
                 { id: 'stock-exchange', label: 'Stok Borsası', icon: <RefreshCw size={16} /> },
                 { id: 'quick-quote', label: 'WhatsApp Teklif', icon: <Calculator size={16} />, isPremiumFeature: true },
                 { id: 'showroom-qr', label: 'Showroom QR', icon: <QrCode size={16} />, isPremiumFeature: true },
@@ -8982,6 +9108,23 @@ Yetkili Satış & Showroom Departmanı`;
                       <span style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>{item.icon}</span>
                       <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</span>
                     </div>
+                    {item.isSaaSFeature && (
+                      <span style={{
+                        fontSize: '0.55rem',
+                        padding: '1px 5px',
+                        borderRadius: '4px',
+                        background: hasActiveSaaS ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                        color: hasActiveSaaS ? '#34d399' : '#fbbf24',
+                        fontWeight: '800',
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '2px'
+                      }}>
+                        {hasActiveSaaS ? <Check size={8} /> : <Lock size={8} />}
+                        {hasActiveSaaS ? 'AKTİF' : 'PAKET'}
+                      </span>
+                    )}
                     {item.isPremiumFeature && (
                       <span style={{
                         fontSize: '0.55rem',
