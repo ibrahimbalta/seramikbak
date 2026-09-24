@@ -4575,7 +4575,7 @@ export default function Home() {
                 {/* 1. Evini Yenileyenler */}
                 <div 
                   onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  className="persona-banner-card"
+                  className="persona-banner-card card-studio"
                   style={{ textDecoration: 'none', cursor: 'pointer' }}
                   role="button"
                   tabIndex={0}
@@ -4585,8 +4585,8 @@ export default function Home() {
                       <Sparkles size={11} className="promo-sparkle-icon" />
                       <span>AI 3D MEKAN</span>
                     </div>
-                    <h5>3D Sanal Stüdyo</h5>
-                    <p>Seramiklerinizi odanızda canlı görün</p>
+                    <h5 className="persona-card-title">3D Sanal Stüdyo</h5>
+                    <p className="persona-card-desc">Seramiklerinizi odanızda canlı görün</p>
                     <div className="promo-action-btn-gold">
                       <span>Hemen Deneyin</span>
                       <ArrowRight size={12} />
@@ -4600,7 +4600,7 @@ export default function Home() {
 
                 {/* 2. Mimarlar & Müteahhitler */}
                 <div 
-                  className="persona-banner-card"
+                  className="persona-banner-card card-calculator"
                   onClick={() => {
                     setShowCalculatorWidget(prev => !prev);
                     setTimeout(() => {
@@ -4616,8 +4616,8 @@ export default function Home() {
                       <FileText size={11} className="promo-sparkle-icon" />
                       <span>MİMAR & METRAJ</span>
                     </div>
-                    <h5>Metraj & Maliyet Robotu</h5>
-                    <p>Kutu ve fire ihtiyacını anında hesaplayın</p>
+                    <h5 className="persona-card-title">Metraj & Maliyet Robotu</h5>
+                    <p className="persona-card-desc">Kutu ve fire ihtiyacını anında hesaplayın</p>
                     <div className="promo-action-btn-gold">
                       <span>{showCalculatorWidget ? 'Robotu Kapat ✕' : 'Metrajı Başlat'}</span>
                       <ArrowRight size={12} />
@@ -4631,7 +4631,7 @@ export default function Home() {
 
                 {/* 3. Hemen Satın Almak İsteyenler */}
                 <div 
-                  className="persona-banner-card"
+                  className="persona-banner-card card-dealers"
                   onClick={() => {
                     setActiveTab('dealers');
                     setTimeout(() => {
@@ -4649,8 +4649,8 @@ export default function Home() {
                       <Store size={11} className="promo-sparkle-icon" />
                       <span>YETKİLİ BAYİ AĞI</span>
                     </div>
-                    <h5>En Yakın Bayiyi Bul</h5>
-                    <p>81 ildeki 150+ showroom ve stoka ulaşın</p>
+                    <h5 className="persona-card-title">En Yakın Bayiyi Bul</h5>
+                    <p className="persona-card-desc">81 ildeki 150+ showroom ve stoka ulaşın</p>
                     <div className="promo-action-btn-gold">
                       <span>Bayi Haritası</span>
                       <ArrowRight size={12} />
@@ -10009,25 +10009,44 @@ export default function Home() {
           color: inherit;
         }
 
+        :global(.persona-banner-card .persona-card-title),
         :global(.persona-banner-card .promo-text-column h5) {
-          font-size: 0.94rem;
-          color: #0f172a;
-          font-weight: 800;
-          letter-spacing: -0.01em;
+          font-size: 1.02rem;
+          color: #0f172a !important;
+          font-weight: 850;
+          letter-spacing: -0.015em;
           line-height: 1.25;
-          margin: 0;
+          margin: 2px 0 2px 0;
           white-space: nowrap;
+          transition: color 0.2s ease;
         }
 
+        :global(.persona-banner-card .persona-card-desc),
         :global(.persona-banner-card .promo-text-column p) {
-          font-size: 0.68rem;
-          color: #64748b;
+          font-size: 0.76rem;
+          color: #334155 !important;
+          font-weight: 600;
           margin: 2px 0 8px 0;
-          line-height: 1.25;
+          line-height: 1.35;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          max-width: 200px;
+          max-width: 220px;
+        }
+
+        :global(.persona-banner-card.card-studio:hover .persona-card-title),
+        :global(.persona-banner-card.card-studio:hover h5) {
+          color: #b45309 !important;
+        }
+
+        :global(.persona-banner-card.card-calculator:hover .persona-card-title),
+        :global(.persona-banner-card.card-calculator:hover h5) {
+          color: #0369a1 !important;
+        }
+
+        :global(.persona-banner-card.card-dealers:hover .persona-card-title),
+        :global(.persona-banner-card.card-dealers:hover h5) {
+          color: #047857 !important;
         }
 
         :global(.persona-banner-card .promo-action-btn-gold) {
@@ -10267,15 +10286,19 @@ export default function Home() {
             border: 1.5px solid #e2e8f0 !important;
             background: #ffffff !important;
           }
+          :global(.persona-banner-card .persona-card-title),
           :global(.persona-banner-card .promo-text-column h5) {
-            font-size: 0.84rem !important;
-            font-weight: 800 !important;
+            font-size: 0.88rem !important;
+            font-weight: 850 !important;
+            color: #0f172a !important;
             margin: 0 !important;
           }
+          :global(.persona-banner-card .persona-card-desc),
           :global(.persona-banner-card .promo-text-column p) {
-            font-size: 0.65rem !important;
+            font-size: 0.70rem !important;
             margin: 2px 0 6px 0 !important;
-            color: #64748b !important;
+            color: #334155 !important;
+            font-weight: 600 !important;
           }
           :global(.persona-banner-card .promo-image-column) {
             width: 62px !important;
@@ -12040,7 +12063,7 @@ export default function Home() {
           border-color: rgba(251, 191, 36, 0.7);
         }
 
-        .promo-text-column {
+        .studio-promo-card-banner .promo-text-column {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
@@ -12048,7 +12071,7 @@ export default function Home() {
           z-index: 1;
         }
 
-        .promo-top-badge {
+        .studio-promo-card-banner .promo-top-badge {
           display: inline-flex;
           align-items: center;
           gap: 4px;
@@ -12064,11 +12087,11 @@ export default function Home() {
           border: 1px solid rgba(245, 158, 11, 0.25);
         }
 
-        .promo-sparkle-icon {
+        .studio-promo-card-banner .promo-sparkle-icon {
           color: #fbbf24;
         }
 
-        .promo-text-column h5 {
+        .studio-promo-card-banner .promo-text-column h5 {
           font-size: 0.88rem;
           color: #ffffff;
           font-weight: 800;
@@ -12077,14 +12100,14 @@ export default function Home() {
           margin: 0;
         }
 
-        .promo-text-column p {
+        .studio-promo-card-banner .promo-text-column p {
           font-size: 0.68rem;
           color: #94a3b8;
           margin: 2px 0 6px 0;
           line-height: 1.2;
         }
 
-        .promo-action-btn-gold {
+        .studio-promo-card-banner .promo-action-btn-gold {
           background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
           color: #0f172a;
           border: none;
@@ -12107,7 +12130,7 @@ export default function Home() {
           box-shadow: 0 6px 16px rgba(245, 158, 11, 0.45);
         }
 
-        .promo-image-column {
+        .studio-promo-card-banner .promo-image-column {
           width: 76px;
           height: 64px;
           border-radius: 10px;
@@ -12119,7 +12142,7 @@ export default function Home() {
           z-index: 1;
         }
 
-        .promo-image-column img {
+        .studio-promo-card-banner .promo-image-column img {
           width: 100%;
           height: 100%;
           object-fit: cover;
@@ -12130,7 +12153,7 @@ export default function Home() {
           transform: scale(1.08);
         }
 
-        .promo-image-badge {
+        .studio-promo-card-banner .promo-image-badge {
           position: absolute;
           bottom: 4px;
           right: 4px;
