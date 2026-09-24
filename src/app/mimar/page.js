@@ -556,8 +556,8 @@ export default function ArchitectPortalPage() {
     }
   };
 
-  // Open product directly in 3D Kiosk Visualizer Studio
-  const handleOpenIn3DKiosk = (product) => {
+  // Open product directly in 3D Banyo Stüdyosu (normal users' 3D studio on homepage)
+  const handleOpenIn3DStudio = (product) => {
     if (!product) return;
     try {
       const selectedObj = {
@@ -566,14 +566,17 @@ export default function ArchitectPortalPage() {
         imageUrl: product.imageUrl || product.textureUrl || '/textures/calacatta_gold.jpg',
         unitPrice: product.unitPrice || 480
       };
+      localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
       sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
-      localStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
     } catch (e) {
-      console.error('Kiosk storage error:', e);
+      console.error('3D Studio storage error:', e);
     }
-    const url = `/kiosk?productId=${encodeURIComponent(product.id)}&code=${encodeURIComponent(product.code || '')}`;
+    const codeParam = product.code ? `code=${encodeURIComponent(product.code)}&` : '';
+    const idParam = product.id ? `productId=${encodeURIComponent(product.id)}&` : '';
+    const url = `/?${codeParam}${idParam}tab=studio#studio`;
     window.open(url, '_blank');
   };
+  const handleOpenIn3DKiosk = handleOpenIn3DStudio;
 
   // Download BIM / CAD / 4K Textures package (also triggers SpecInLead radar for brand!)
   const handleDownloadAsset = async (product, assetFormat) => {
@@ -1970,8 +1973,8 @@ export default function ArchitectPortalPage() {
                                 gap: '6px'
                               }}>
                                 <button
-                                  onClick={() => handleOpenIn3DKiosk(p)}
-                                  title="3D Kiosk'ta Canlı Odaya Uygula"
+                                  onClick={() => handleOpenIn3DStudio(p)}
+                                  title="3D Banyo Stüdyosu'nda Canlı Odaya Uygula"
                                   style={{
                                     flex: 1,
                                     background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.06) 100%)',
@@ -2699,13 +2702,13 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                       
-                      {/* Floating 3D Kiosk Button */}
+                      {/* Floating 3D Studio Button */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleOpenIn3DKiosk(p);
+                          handleOpenIn3DStudio(p);
                         }}
-                        title="3D Kiosk Odasında Canlı İncele"
+                        title="3D Banyo Stüdyosu'nda Canlı İncele"
                         style={{
                           position: 'absolute',
                           top: '8px',
@@ -2726,7 +2729,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                         }}
                       >
                         <Box size={12} />
-                        <span>3D Kiosk</span>
+                        <span>3D Stüdyo</span>
                       </button>
 
                       <span style={{
@@ -2766,9 +2769,9 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                         flexDirection: 'column',
                         gap: '6px'
                       }}>
-                        {/* 3D Kiosk Studio Button */}
+                        {/* 3D Studio Button */}
                         <button
-                          onClick={() => handleOpenIn3DKiosk(p)}
+                          onClick={() => handleOpenIn3DStudio(p)}
                           style={{
                             width: '100%',
                             background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
@@ -2788,7 +2791,7 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                           }}
                         >
                           <Box size={13} />
-                          <span>3D Kiosk'ta Gör</span>
+                          <span>3D Stüdyoda Kapla</span>
                           <ExternalLink size={11} style={{ opacity: 0.8 }} />
                         </button>
 
@@ -4143,14 +4146,14 @@ Tarih: ${new Date().toLocaleDateString('tr-TR')}
                             {brandName}
                           </div>
 
-                          {/* Top Right 3D Kiosk Button */}
+                          {/* Top Right 3D Studio Button */}
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleOpenIn3DKiosk(p);
+                              handleOpenIn3DStudio(p);
                             }}
-                            title="3D Kiosk'ta İncele"
+                            title="3D Banyo Stüdyosu'nda İncele"
                             style={{
                               position: 'absolute',
                               top: '8px',
