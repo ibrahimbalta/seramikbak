@@ -42,7 +42,9 @@ import {
   Share2,
   Sliders,
   Tv,
-  TrendingDown
+  TrendingDown,
+  ChevronUp,
+  ChevronDown
 } from 'lucide-react';
 import QuoteModal from '@/components/QuoteModal';
 
@@ -301,6 +303,7 @@ export default function ShowroomKioskPage() {
   const [walkthroughMode, setWalkthroughMode] = useState(false);
   const [isPresentationMode, setIsPresentationMode] = useState(false); // Tam Ekran Müşteri Sunum Modu (Zen)
   const [bottomTab, setBottomTab] = useState('design'); // 'design' | 'atmosphere' | 'quote' | 'presets'
+  const [isBottomDockCollapsed, setIsBottomDockCollapsed] = useState(false); // Alttaki menüyü gizle / 3D tam görünüm modu
 
   // Filtreler & Modallar
   const [searchTerm, setSearchTerm] = useState('');
@@ -1611,15 +1614,61 @@ export default function ShowroomKioskPage() {
               </div>
             )}
 
-            {/* Mobile Floating Left Drawer Trigger Button */}
-            <button 
-              onClick={() => setIsMobileMenuOpen(true)} 
-              className="canvas-mobile-floating-menu-btn"
-              title="Kaplama & Seramik Menüsünü Aç"
-            >
-              <Menu size={16} />
-              <span>Menü & Kaplamalar</span>
-            </button>
+            {/* Canvas Unified Top Bar (Floating non-intrusive toolbar) */}
+            <div className="canvas-top-bar">
+              <div className="canvas-top-left-group">
+                <button 
+                  onClick={() => setIsMobileMenuOpen(true)} 
+                  className="canvas-mobile-floating-menu-btn"
+                  title="Kaplama & Seramik Menüsünü Aç"
+                >
+                  <Palette size={15} />
+                  <span>Katalog & Seramikler</span>
+                </button>
+
+                {/* Compact Active Surface Pill */}
+                {!isPresentationMode && (
+                  <div className="canvas-active-target-pill">
+                    <span className="pill-target-name">
+                      {activeTargetSurface === 'floor' && (applyFloor ? `Zemin (${floorProduct?.name?.split(' ')[0] || 'Karo'})` : 'Zemin: Pasif')}
+                      {activeTargetSurface === 'walls' && (applyWalls ? `Duvar (${wallProduct?.name?.split(' ')[0] || 'Karo'})` : 'Duvar: Pasif')}
+                      {activeTargetSurface === 'shower' && (applyShower ? 'Duş: Kaplı' : 'Duş: Pasif')}
+                      {activeTargetSurface === 'showerFloor' && (applyShowerFloor ? 'Duş Tabanı: Kaplı' : 'Duş Tabanı: Pasif')}
+                      {activeTargetSurface === 'toilet' && (applyToiletWall ? 'Klozet: Kaplı' : 'Klozet: Pasif')}
+                      {activeTargetSurface === 'accent' && (applyAccent ? 'Vurgu: Kaplı' : 'Vurgu: Pasif')}
+                      {activeTargetSurface === 'stripe' && (applyStripeWall ? 'Bordür: Kaplı' : 'Bordür: Pasif')}
+                    </span>
+                    {(activeTargetSurface === 'floor' && applyFloor) && (
+                      <button onClick={() => handleToggleTargetFromCanvas('floor')} className="pill-remove-btn" title="Zemin kaplamasını kaldır">✕</button>
+                    )}
+                    {(activeTargetSurface === 'walls' && applyWalls) && (
+                      <button onClick={() => handleToggleTargetFromCanvas('walls')} className="pill-remove-btn" title="Duvar kaplamasını kaldır">✕</button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="canvas-top-right-group">
+                {/* 3D Odak / Tam Görünüm Modu Butonu (Alttaki Menüyü Gizler / Açar) */}
+                <button
+                  onClick={() => setIsBottomDockCollapsed(!isBottomDockCollapsed)}
+                  className={`canvas-focus-toggle-btn ${isBottomDockCollapsed ? 'active-gold' : ''}`}
+                  title={isBottomDockCollapsed ? 'Tasarım Menüsünü Aç' : '3D Tam Görünüm (Menüyü Gizle)'}
+                >
+                  {isBottomDockCollapsed ? <Sliders size={13} /> : <Eye size={13} />}
+                  <span>{isBottomDockCollapsed ? 'Menü' : '3D Odak'}</span>
+                </button>
+
+                {/* Fullscreen Expand Button */}
+                <button 
+                  onClick={toggleFullscreen} 
+                  className="canvas-expand-touch-btn"
+                  title="3D Stüdyo Tam Ekran Modu"
+                >
+                  {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+                </button>
+              </div>
+            </div>
 
             {/* Müşteri Sunum Modu Floating Top Banner */}
             {isPresentationMode && (
@@ -1646,131 +1695,76 @@ export default function ShowroomKioskPage() {
               </div>
             )}
 
-            {/* Target Surface Overlay Badge inside 3D Canvas */}
-            {!isPresentationMode && (
-              <div className="canvas-active-target-overlay">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <span className="overlay-label">Aktif Yüzey:</span>
-                  <strong className="overlay-target-name">
-                    {activeTargetSurface === 'floor' && (applyFloor ? `Zemin (${floorProduct?.name?.split(' ')[0] || 'Seramik'})` : 'Zemin (Kaplama Yok)')}
-                    {activeTargetSurface === 'walls' && (applyWalls ? `Duvar (${wallProduct?.name?.split(' ')[0] || 'Seramik'})` : 'Duvar (Kaplama Yok - Pasif)')}
-                    {activeTargetSurface === 'shower' && (applyShower ? 'Duş Duvarı' : 'Duş Duvarı (Kaplama Yok)')}
-                    {activeTargetSurface === 'showerFloor' && (applyShowerFloor ? 'Duş Tabanı' : 'Duş Tabanı (Kaplama Yok)')}
-                    {activeTargetSurface === 'toilet' && (applyToiletWall ? 'Klozet Arkası' : 'Klozet Arkası (Kaplama Yok)')}
-                    {activeTargetSurface === 'accent' && (applyAccent ? 'Lavabo Arkası' : 'Lavabo Arkası (Kaplama Yok)')}
-                    {activeTargetSurface === 'stripe' && (applyStripeWall ? 'Yatay Bordür' : 'Yatay Bordür (Kaplama Yok)')}
-                  </strong>
-                  
-                  {/* Quick Toggle / Clear button on current target */}
-                  {activeTargetSurface === 'walls' && applyWalls && (
-                    <button
-                      onClick={() => handleToggleTargetFromCanvas('walls')}
-                      style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.5)', color: '#fca5a5', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
-                      title="Duvar seramiğini kaldır"
-                    >
-                      ✕ Duvarı Kaldır
-                    </button>
-                  )}
-                  {activeTargetSurface === 'walls' && !applyWalls && (
-                    <button
-                      onClick={() => handleToggleTargetFromCanvas('walls')}
-                      style={{ background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.5)', color: '#86efac', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
-                      title="Duvar seramik kaplamasını aktif et"
-                    >
-                      + Duvar Kapla
-                    </button>
-                  )}
-                  {activeTargetSurface === 'floor' && applyFloor && (
-                    <button
-                      onClick={() => handleToggleTargetFromCanvas('floor')}
-                      style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.5)', color: '#fca5a5', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
-                      title="Zemin seramiğini kaldır"
-                    >
-                      ✕ Zemini Kaldır
-                    </button>
-                  )}
-                  {activeTargetSurface === 'floor' && !applyFloor && (
-                    <button
-                      onClick={() => handleToggleTargetFromCanvas('floor')}
-                      style={{ background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.5)', color: '#86efac', padding: '2px 8px', borderRadius: '6px', fontSize: '0.68rem', fontWeight: '800', cursor: 'pointer' }}
-                      title="Zemin seramik kaplamasını aktif et"
-                    >
-                      + Zemin Kapla
-                    </button>
-                  )}
-                </div>
-                <span className="overlay-sub-hint">(3D sahnede yüzeye dokunarak seramiği ekleyebilir veya çıkarabilirsiniz)</span>
-              </div>
-            )}
+            {/* Mobile Bottom Single Quick Surface Chips Bar */}
+            <div className={`canvas-mobile-surface-chips ${isBottomDockCollapsed ? 'dock-collapsed' : ''}`}>
+              {getRoomSurfaces(roomType).map(surf => {
+                const isTarget = activeTargetSurface === surf.id;
+                const isApplied = surf.applied && surf.product;
 
-            {/* Mobile Bottom Quick Surface Chips Bar (Dokunarak Ekle/Çıkar - Çekmece Kapalıyken Gösterilir) */}
-            {!isMobileMenuOpen && (
-              <div className="canvas-mobile-surface-chips">
-                {getRoomSurfaces(roomType).map(surf => {
-                  const isTarget = activeTargetSurface === surf.id;
-                  const isApplied = surf.applied && surf.product;
-
-                  return (
-                    <button
-                      key={surf.id}
-                      onClick={() => handleToggleTargetFromCanvas(surf.id)}
-                      className={`chip-surface-btn ${isTarget ? 'active' : ''} ${isApplied ? 'applied' : ''}`}
-                      title={`${surf.name} kaplamasını dokunarak ekle/çıkar`}
-                    >
-                      {isApplied ? '✓ ' : '+ '}
-                      {surf.shortName || surf.name.split(' ')[0]}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Canvas Mobile Expand Button */}
-            <button 
-              onClick={toggleFullscreen} 
-              className="canvas-expand-touch-btn"
-              title="3D Stüdyo Tam Ekran Modu"
-            >
-              {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-              <span>{isFullscreen ? 'Küçült' : 'Büyüt'}</span>
-            </button>
-
-            {/* Mobile Quick Surface Chips Bar at Bottom of 3D Canvas */}
-            <div className="canvas-mobile-surface-chips">
-              {[
-                { id: 'floor', label: 'Zemin' },
-                { id: 'walls', label: 'Duvar' },
-                { id: 'shower', label: 'Duş' },
-                { id: 'showerFloor', label: 'Duş Zem' },
-                { id: 'toilet', label: 'Klozet' },
-                { id: 'accent', label: 'Vurgu' },
-                { id: 'stripe', label: 'Bordür' }
-              ].map(chip => (
-                <button
-                  key={chip.id}
-                  onClick={() => {
-                    setActiveTargetSurface(chip.id);
-                    setIsMobileMenuOpen(true);
-                  }}
-                  className={`chip-surface-btn ${activeTargetSurface === chip.id ? 'active' : ''}`}
-                >
-                  {chip.label}
-                </button>
-              ))}
+                return (
+                  <button
+                    key={surf.id}
+                    onClick={() => {
+                      setActiveTargetSurface(surf.id);
+                      setIsMobileMenuOpen(true);
+                    }}
+                    className={`chip-surface-btn ${isTarget ? 'active' : ''} ${isApplied ? 'applied' : ''}`}
+                    title={`${surf.name} kaplamasını seç & değiştir`}
+                  >
+                    {isApplied ? '✓ ' : '+ '}
+                    {surf.shortName || surf.name.split(' ')[0]}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Bottom Panel Toggle Tabs (4 Profesyonel Showroom Sekmesi) */}
-          <div className="bottom-panel-tabs">
-            <button
-              onClick={() => setBottomTab('design')}
-              className={`panel-tab-btn ${bottomTab === 'design' ? 'active' : ''}`}
+          {/* Collapsible Bottom Showroom Dock (Görsel Tasarımı Tam Gösteren Gizlenebilir Menü) */}
+          <div className={`kiosk-bottom-dock ${isBottomDockCollapsed ? 'is-collapsed' : 'is-expanded'}`}>
+            {/* Dock Toggle / Collapse Header Bar */}
+            <div 
+              className="dock-toggle-bar"
+              onClick={() => setIsBottomDockCollapsed(!isBottomDockCollapsed)}
+              role="button"
+              tabIndex={0}
+              title={isBottomDockCollapsed ? 'Tasarım Menüsünü Aç' : 'Menüyü Gizle • 3D Alanı Büyüt'}
             >
-              <Palette size={14} />
-              <span>3D Tasarım & Donatılar</span>
-            </button>
+              <div className="dock-toggle-left">
+                <div className="dock-pill-indicator" />
+                <span className="dock-toggle-title">
+                  {isBottomDockCollapsed ? '🔼 3D Tasarım & Fiyat Menüsünü Aç' : '🔽 Menüyü Gizle • 3D Tam Görünüm'}
+                </span>
+              </div>
+              <div className="dock-toggle-right">
+                {isBottomDockCollapsed ? (
+                  <div className="dock-collapsed-summary">
+                    <span className="dock-summary-chip">₺{discountedUnitPrice}/m²</span>
+                    <span className="dock-summary-chip gold">₺{grandTotal.toLocaleString('tr-TR')}</span>
+                    <ChevronUp size={16} className="dock-chevron-icon" />
+                  </div>
+                ) : (
+                  <div className="dock-collapsed-summary">
+                    <span className="dock-collapse-hint">Görsel alanı tam görmek için dokunun</span>
+                    <ChevronDown size={16} className="dock-chevron-icon" />
+                  </div>
+                )}
+              </div>
+            </div>
 
-            <button
+            {/* Bottom Dock Content Body (Tabs + Panel) */}
+            {!isBottomDockCollapsed && (
+              <div className="dock-content-body">
+                {/* Bottom Panel Toggle Tabs (4 Profesyonel Showroom Sekmesi) */}
+                <div className="bottom-panel-tabs">
+                  <button
+                    onClick={() => setBottomTab('design')}
+                    className={`panel-tab-btn ${bottomTab === 'design' ? 'active' : ''}`}
+                  >
+                    <Palette size={14} />
+                    <span>3D Tasarım & Donatılar</span>
+                  </button>
+
+                  <button
               onClick={() => setBottomTab('atmosphere')}
               className={`panel-tab-btn ${bottomTab === 'atmosphere' ? 'active' : ''}`}
             >
@@ -2247,6 +2241,9 @@ export default function ShowroomKioskPage() {
               </div>
             </div>
           )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -2962,71 +2959,252 @@ export default function ShowroomKioskPage() {
           position: relative;
         }
 
-        .canvas-active-target-overlay {
+        /* Canvas Unified Top Bar */
+        .canvas-top-bar {
           position: absolute;
-          top: 10px;
-          left: 10px;
-          background: rgba(15, 23, 42, 0.88);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(245, 158, 11, 0.4);
-          padding: 6px 12px;
-          border-radius: 10px;
+          top: 12px;
+          left: 12px;
+          right: 12px;
           display: flex;
-          flex-direction: column;
-          gap: 1px;
+          justify-content: space-between;
+          align-items: center;
           pointer-events: none;
-          z-index: 10;
+          z-index: 25;
         }
 
-        .overlay-label {
-          font-size: 0.58rem;
-          color: #94a3b8;
-          font-weight: 700;
-          text-transform: uppercase;
+        .canvas-top-left-group, .canvas-top-right-group {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          pointer-events: auto;
         }
 
-        .overlay-target-name {
-          font-size: 0.78rem;
-          font-weight: 900;
-          color: #fbbf24;
-        }
-
-        .overlay-sub-hint {
-          font-size: 0.55rem;
-          color: #64748b;
-        }
-
-        .canvas-expand-touch-btn {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          background: rgba(15, 23, 42, 0.88);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(245, 158, 11, 0.4);
-          color: #fbbf24;
-          padding: 6px 12px;
-          border-radius: 10px;
-          font-size: 0.75rem;
-          font-weight: 800;
+        .canvas-mobile-floating-menu-btn {
           display: flex;
           align-items: center;
           gap: 6px;
+          background: rgba(15, 23, 42, 0.92);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid #f59e0b;
+          color: #fbbf24;
+          font-weight: 800;
+          font-size: 0.74rem;
+          padding: 6px 12px;
+          border-radius: 20px;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
           cursor: pointer;
-          z-index: 12;
+          transition: all 0.2s ease;
+        }
+
+        .canvas-mobile-floating-menu-btn:hover {
+          background: #f59e0b;
+          color: #0f172a;
+          transform: translateY(-1px);
+        }
+
+        .canvas-active-target-pill {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(15, 23, 42, 0.90);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(245, 158, 11, 0.35);
+          padding: 4px 10px;
+          border-radius: 14px;
+          font-size: 0.72rem;
+          color: #f8fafc;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          white-space: nowrap;
+        }
+
+        .pill-target-name {
+          font-weight: 800;
+          color: #fbbf24;
+        }
+
+        .pill-remove-btn {
+          background: rgba(239, 68, 68, 0.2);
+          border: 1px solid rgba(239, 68, 68, 0.5);
+          color: #fca5a5;
+          border-radius: 50%;
+          width: 16px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.60rem;
+          cursor: pointer;
+          padding: 0;
+          transition: all 0.15s ease;
+        }
+
+        .pill-remove-btn:hover {
+          background: #ef4444;
+          color: #ffffff;
+        }
+
+        .canvas-focus-toggle-btn {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          background: rgba(15, 23, 42, 0.90);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(56, 189, 248, 0.4);
+          color: #38bdf8;
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 0.72rem;
+          font-weight: 800;
+          cursor: pointer;
           box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
           transition: all 0.2s ease;
         }
 
-        .canvas-expand-touch-btn:hover {
-          background: #f59e0b;
-          color: #0f172a;
+        .canvas-focus-toggle-btn:hover {
+          background: rgba(56, 189, 248, 0.15);
+          transform: translateY(-1px);
+        }
+
+        .canvas-focus-toggle-btn.active-gold {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
           border-color: #f59e0b;
+          color: #0f172a;
+          box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+        }
+
+        .canvas-expand-touch-btn {
+          background: rgba(15, 23, 42, 0.90);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #94a3b8;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .canvas-expand-touch-btn:hover {
+          background: #1e293b;
+          color: #ffffff;
+          border-color: #f59e0b;
+        }
+
+        /* Collapsible Bottom Showroom Dock */
+        .kiosk-bottom-dock {
+          display: flex;
+          flex-direction: column;
+          flex-shrink: 0;
+          background: #0f172a;
+          border: 1px solid #1e293b;
+          border-radius: 12px;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          overflow: hidden;
+        }
+
+        .kiosk-bottom-dock.is-collapsed {
+          background: rgba(15, 23, 42, 0.96);
+          border-color: rgba(245, 158, 11, 0.4);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .dock-toggle-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px 14px;
+          background: linear-gradient(90deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          cursor: pointer;
+          user-select: none;
+          transition: background 0.2s ease;
+        }
+
+        .dock-toggle-bar:hover {
+          background: rgba(30, 41, 59, 0.95);
+        }
+
+        .dock-toggle-left {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .dock-pill-indicator {
+          width: 28px;
+          height: 4px;
+          background: #f59e0b;
+          border-radius: 2px;
+          opacity: 0.85;
+        }
+
+        .dock-toggle-title {
+          font-size: 0.74rem;
+          font-weight: 800;
+          color: #f8fafc;
+          letter-spacing: 0.01em;
+        }
+
+        .dock-toggle-right {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .dock-collapsed-summary {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .dock-summary-chip {
+          background: #090d16;
+          border: 1px solid #334155;
+          color: #94a3b8;
+          font-size: 0.68rem;
+          font-weight: 800;
+          padding: 2px 8px;
+          border-radius: 6px;
+        }
+
+        .dock-summary-chip.gold {
+          border-color: #f59e0b;
+          color: #fbbf24;
+        }
+
+        .dock-collapse-hint {
+          font-size: 0.64rem;
+          color: #64748b;
+          font-weight: 600;
+        }
+
+        .dock-chevron-icon {
+          color: #f59e0b;
+        }
+
+        .dock-content-body {
+          display: flex;
+          flex-direction: column;
+          animation: dockFadeIn 0.2s ease;
+        }
+
+        @keyframes dockFadeIn {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         .bottom-panel-tabs {
           display: flex;
           gap: 6px;
           flex-shrink: 0;
+          padding: 0 10px;
         }
 
         .panel-tab-btn {
@@ -3797,79 +3975,71 @@ export default function ShowroomKioskPage() {
             }
           }
 
-          /* Mobile Floating Drawer Trigger Button over 3D Canvas */
-          .canvas-mobile-floating-menu-btn {
+          /* Canvas Top Bar on Mobile */
+          .canvas-top-bar {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 25;
+          }
+
+          .canvas-top-left-group, .canvas-top-right-group {
             display: flex;
             align-items: center;
-            gap: 5px;
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            z-index: 15;
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid #f59e0b;
-            color: #fbbf24;
-            font-weight: 800;
-            font-size: 0.72rem;
-            padding: 6px 12px;
-            border-radius: 18px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-            cursor: pointer;
-            transition: transform 0.15s ease;
+            gap: 4px;
+            pointer-events: auto;
           }
 
-          .canvas-mobile-floating-menu-btn:active {
-            transform: scale(0.95);
+          .canvas-mobile-floating-menu-btn {
+            padding: 5px 8px;
+            font-size: 0.66rem;
+            border-radius: 14px;
           }
 
-          .canvas-active-target-overlay {
-            position: absolute;
-            top: 46px;
-            left: 8px;
-            max-width: calc(100% - 60px);
-            padding: 3px 8px;
-            border-radius: 8px;
-            background: rgba(15, 23, 42, 0.92);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            white-space: nowrap;
+          .canvas-active-target-pill {
+            padding: 3px 6px;
+            font-size: 0.62rem;
+            max-width: 130px;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: nowrap;
           }
 
-          .overlay-label {
-            font-size: 0.5rem;
+          .canvas-focus-toggle-btn {
+            padding: 5px 8px;
+            font-size: 0.66rem;
+            border-radius: 14px;
           }
 
-          .overlay-target-name {
-            font-size: 0.68rem;
-          }
-
-          .overlay-sub-hint {
-            display: none !important;
+          .canvas-expand-touch-btn {
+            width: 28px;
+            height: 28px;
           }
 
           /* Mobile Bottom Quick Surface Chips Bar */
           .canvas-mobile-surface-chips {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             overflow-x: auto;
             position: absolute;
-            bottom: 12px;
-            left: 10px;
-            right: 10px;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
             z-index: 15;
-            background: rgba(15, 23, 42, 0.88);
+            background: rgba(15, 23, 42, 0.90);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            padding: 6px;
-            border-radius: 14px;
+            padding: 4px 6px;
+            border-radius: 12px;
             border: 1px solid rgba(245, 158, 11, 0.3);
             -webkit-overflow-scrolling: touch;
-            pointer-events: none;
+            pointer-events: auto;
           }
 
           .chip-surface-btn {
@@ -3877,10 +4047,10 @@ export default function ShowroomKioskPage() {
             background: #090d16;
             border: 1px solid #1e293b;
             color: #94a3b8;
-            font-size: 0.68rem;
+            font-size: 0.66rem;
             font-weight: 700;
-            padding: 5px 10px;
-            border-radius: 8px;
+            padding: 4px 8px;
+            border-radius: 7px;
             cursor: pointer;
             white-space: nowrap;
             pointer-events: auto;
@@ -3906,6 +4076,77 @@ export default function ShowroomKioskPage() {
             border-color: #22c55e;
             font-weight: 900;
             box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+          }
+
+          /* Collapsible Bottom Showroom Dock on Mobile */
+          .kiosk-bottom-dock {
+            border-radius: 16px 16px 0 0;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            border-bottom: none;
+            box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.7);
+            z-index: 30;
+            max-height: 56vh;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: max-height 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          }
+
+          .kiosk-bottom-dock.is-collapsed {
+            max-height: 42px;
+            border-radius: 12px 12px 0 0;
+          }
+
+          .dock-toggle-bar {
+            padding: 8px 12px;
+            min-height: 42px;
+            flex-shrink: 0;
+          }
+
+          .dock-toggle-title {
+            font-size: 0.70rem;
+          }
+
+          .dock-content-body {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .bottom-panel-tabs {
+            padding: 6px 6px 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+            flex-shrink: 0;
+            background: #090d16;
+            border-bottom: 1px solid #1e293b;
+          }
+
+          .panel-tab-btn {
+            border-radius: 7px;
+            padding: 6px 4px;
+            font-size: 0.65rem;
+            justify-content: center;
+            text-align: center;
+            gap: 4px;
+            min-height: 34px;
+          }
+
+          .panel-tab-btn.active {
+            border-bottom-color: #f59e0b;
+            background: #1e293b;
+          }
+
+          .studio-bottom-bar, .sales-bottom-bar {
+            border-radius: 0;
+            border: none;
+            background: transparent;
+            padding: 8px 10px;
+            max-height: none;
+            overflow-y: visible;
           }
 
           /* Left Slide-out Drawer Panel on Mobile */

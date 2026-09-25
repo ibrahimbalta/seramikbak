@@ -2560,47 +2560,42 @@ export default function StudioCanvas({
             left: 8px;
             right: 8px;
             gap: 6px;
-            align-items: flex-start;
-            flex-wrap: wrap;
-          }
-          .overlay-top-left-badges {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 3px;
-            max-width: 50%;
+            align-items: center;
+            justify-content: flex-end;
             pointer-events: none;
+            z-index: 20;
+          }
+          /* Hide repetitive debug badges on mobile completely so 3D room is pristine */
+          .overlay-top-left-badges {
+            display: none !important;
           }
           .overlay-top-right-actions {
-            max-width: 48%;
             pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
           }
           .overlay-camera-presets {
-            order: 3;
-            width: 100%;
+            order: 1;
+            width: auto;
             display: flex;
-            justify-content: space-around;
-            gap: 3px;
-            padding: 3px;
+            align-items: center;
+            gap: 2px;
+            padding: 2px 4px;
             border-radius: 8px;
-            background: rgba(15, 23, 42, 0.94);
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            pointer-events: auto;
           }
           .preset-btn {
-            font-size: 0.58rem;
+            font-size: 0.68rem;
             padding: 4px 6px;
-            gap: 3px;
-          }
-          .overlay-badge {
-            font-size: 0.58rem;
-            padding: 3px 6px;
+            gap: 2px;
             border-radius: 5px;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: #ffffff;
-            white-space: nowrap;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+          }
+          .preset-btn .btn-label {
+            display: none !important;
           }
           .overlay-action-btn {
             padding: 5px 8px;
@@ -2615,46 +2610,9 @@ export default function StudioCanvas({
             pointer-events: auto;
           }
 
-          /* Bottom Overlay Mobile */
+          /* Bottom Overlay Mobile: Hide text prompts so they don't collide with surfaces bar */
           .canvas-overlay-bottom {
-            bottom: 8px;
-            left: 8px;
-            right: 8px;
-            gap: 6px;
-            justify-content: space-between;
-            align-items: flex-end;
-          }
-          .overlay-bottom-left {
-            max-width: 48%;
-          }
-          .overlay-bottom-right {
-            max-width: 48%;
-          }
-          .overlay-instructions {
-            font-size: 0.58rem;
-            padding: 3px 6px;
-            border-radius: 5px;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(245, 158, 11, 0.35);
-            color: #fbbf24;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-          }
-          .overlay-gesture-hint {
-            font-size: 0.58rem;
-            padding: 3px 6px;
-            border-radius: 5px;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            display: none !important;
           }
           .instruction-desktop,
           .gesture-hint-desktop {
