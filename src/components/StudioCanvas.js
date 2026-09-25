@@ -68,6 +68,7 @@ export default function StudioCanvas({
   // Tracks loading state and type
   const [textureStatus, setTextureStatus] = useState('Procedural (Fallback)');
   const [isSceneReady, setIsSceneReady] = useState(false);
+  const [activeCameraPreset, setActiveCameraPreset] = useState('perspective');
 
   // Dimensions of room in meters
   const ROOM_WIDTH = 3.6; 
@@ -268,7 +269,8 @@ export default function StudioCanvas({
 
     // 1. Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#101216'); 
+    scene.background = new THREE.Color('#1c202a'); 
+    scene.fog = new THREE.FogExp2('#1c202a', 0.035);
     sceneRef.current = scene;
 
     // 2. Camera
@@ -290,7 +292,7 @@ export default function StudioCanvas({
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = isMobileDevice ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
+    renderer.toneMappingExposure = 1.35;
     
     // Clear container and append canvas
     containerRef.current.innerHTML = '';
@@ -298,26 +300,61 @@ export default function StudioCanvas({
     rendererRef.current = renderer;
 
     // 4. Lights
-    const ambientLight = new THREE.AmbientLight('#ffffff', 0.45);
+    const ambientLight = new THREE.AmbientLight('#ffffff', 0.48);
     scene.add(ambientLight);
     ambientLightRef.current = ambientLight;
 
-    const directionalLight = new THREE.DirectionalLight('#ffffff', 0.65);
-    directionalLight.position.set(4, 5, 3);
+    // Ceiling & floor bounce light for natural architectural GI look
+    const hemiLight = new THREE.HemisphereLight(0xfff6ea, 0x1f2430, 0.65);
+    hemiLight.position.set(0, ROOM_HEIGHT, 0);
+    scene.add(hemiLight);
+
+    const directionalLight = new THREE.DirectionalLight('#fffaf0', 0.95);
+    directionalLight.position.set(4, 5.2, 3.2);
     directionalLight.castShadow = true;
-    const shadowMapRes = isMobileDevice ? 512 : 1024;
+    const shadowMapRes = isMobileDevice ? 1024 : 2048;
     directionalLight.shadow.mapSize.width = shadowMapRes;
     directionalLight.shadow.mapSize.height = shadowMapRes;
     directionalLight.shadow.camera.near = 0.5;
-    directionalLight.shadow.camera.far = 15;
-    directionalLight.shadow.bias = -0.001;
+    directionalLight.shadow.camera.far = 16;
+    directionalLight.shadow.bias = -0.0005;
+    directionalLight.shadow.normalBias = 0.02;
     scene.add(directionalLight);
     directionalLightRef.current = directionalLight;
 
-    const pointLight = new THREE.PointLight('#ffdf9e', 0.25, 10);
+    const pointLight = new THREE.PointLight('#ffdf9e', 0.35, 10);
     pointLight.position.set(0, 2.2, 0); 
     scene.add(pointLight);
     pointLightRef.current = pointLight;
+
+    // 4 Architectural Recessed Ceiling Downlights (Spotlights)
+    // 1. Vanity / Sink Spotlight
+    const vanityDownlight = new THREE.SpotLight('#fff4e0', 1.25, 6.5, Math.PI / 4, 0.6, 1);
+    vanityDownlight.position.set(-ROOM_WIDTH / 2 + 0.65, ROOM_HEIGHT - 0.05, 0);
+    vanityDownlight.target.position.set(-ROOM_WIDTH / 2 + 0.35, 0.6, 0);
+    scene.add(vanityDownlight);
+    scene.add(vanityDownlight.target);
+
+    // 2. Shower Spotlight
+    const showerDownlight = new THREE.SpotLight('#f2f7ff', 1.15, 6.5, Math.PI / 4, 0.6, 1);
+    showerDownlight.position.set(-ROOM_WIDTH / 2 + 0.58, ROOM_HEIGHT - 0.05, -ROOM_DEPTH / 2 + 0.58);
+    showerDownlight.target.position.set(-ROOM_WIDTH / 2 + 0.58, 0, -ROOM_DEPTH / 2 + 0.58);
+    scene.add(showerDownlight);
+    scene.add(showerDownlight.target);
+
+    // 3. Toilet Area Spotlight
+    const toiletDownlight = new THREE.SpotLight('#fff3df', 0.95, 6.0, Math.PI / 4, 0.6, 1);
+    toiletDownlight.position.set(0.9, ROOM_HEIGHT - 0.05, -ROOM_DEPTH / 2 + 0.3);
+    toiletDownlight.target.position.set(0.9, 0, -ROOM_DEPTH / 2 + 0.3);
+    scene.add(toiletDownlight);
+    scene.add(toiletDownlight.target);
+
+    // 4. Center / Floor Specular Accent Spotlight
+    const floorDownlight = new THREE.SpotLight('#fff9ee', 1.05, 7.0, Math.PI / 3.5, 0.75, 1);
+    floorDownlight.position.set(0.5, ROOM_HEIGHT - 0.05, 0.5);
+    floorDownlight.target.position.set(0, 0, 0);
+    scene.add(floorDownlight);
+    scene.add(floorDownlight.target);
 
     // 5. Room geometry setup
     // Floor
@@ -424,6 +461,32 @@ export default function StudioCanvas({
     leftWallMesh.receiveShadow = true;
     scene.add(leftWallMesh);
     leftWallMeshRef.current = leftWallMesh;
+
+    // Architectural Perimeter Ceiling Cove LED Light Profiles
+    const coveMat = new THREE.MeshBasicMaterial({ color: '#ffeab8' });
+    const coveBack = new THREE.Mesh(new THREE.BoxGeometry(ROOM_WIDTH, 0.02, 0.025), coveMat);
+    coveBack.position.set(0, ROOM_HEIGHT - 0.02, -ROOM_DEPTH / 2 + 0.025);
+    scene.add(coveBack);
+
+    const coveLeft = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.02, ROOM_DEPTH), coveMat);
+    coveLeft.position.set(-ROOM_WIDTH / 2 + 0.025, ROOM_HEIGHT - 0.02, 0);
+    scene.add(coveLeft);
+
+    // Modern Architectural Skirting (Süpürgelik)
+    const skirtingMat = new THREE.MeshStandardMaterial({
+      color: '#1a1d24',
+      metalness: 0.3,
+      roughness: 0.5
+    });
+    const skirtBack = new THREE.Mesh(new THREE.BoxGeometry(ROOM_WIDTH, 0.08, 0.015), skirtingMat);
+    skirtBack.position.set(0, 0.04, -ROOM_DEPTH / 2 + 0.0075);
+    skirtBack.receiveShadow = true;
+    scene.add(skirtBack);
+
+    const skirtLeft = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.08, ROOM_DEPTH), skirtingMat);
+    skirtLeft.position.set(-ROOM_WIDTH / 2 + 0.0075, 0.04, 0);
+    skirtLeft.receiveShadow = true;
+    scene.add(skirtLeft);
 
     // Hanging Ceiling Light fixture
     const wireGeo = new THREE.CylinderGeometry(0.008, 0.008, 1);
@@ -783,100 +846,291 @@ export default function StudioCanvas({
     const cabWoodMat = new THREE.MeshStandardMaterial({ color: cabHex, roughness: cabinetColor === 'white' ? 0.25 : 0.6 });
     // Populate furnishings group depending on selected roomType
     if (roomType === 'bathroom') {
-      // --- 1. SINK VANITY UNIT ---
-      const cabGeo = new THREE.BoxGeometry(0.7, 0.6, 1.3);
-      const cabinet = new THREE.Mesh(cabGeo, cabWoodMat);
-      cabinet.position.set(-ROOM_WIDTH / 2 + 0.35, 0.3, 0); 
-      cabinet.castShadow = true;
-      cabinet.receiveShadow = true;
-      group.add(cabinet);
+      // --- 1. LUXURY FLOATING WALL-HUNG VANITY UNIT (ASMA BANYO DOLABI) ---
+      const vanityGroup = new THREE.Group();
+      group.add(vanityGroup);
 
-      const drawerGeo = new THREE.BoxGeometry(0.02, 0.52, 1.22);
-      const drawerPanel = new THREE.Mesh(drawerGeo, cabWoodMat);
-      drawerPanel.position.set(-ROOM_WIDTH / 2 + 0.36, 0.3, 0);
-      drawerPanel.castShadow = true;
-      group.add(drawerPanel);
+      // Main suspended cabinet body (elevated 35cm off the floor)
+      const cabBodyGeo = new THREE.BoxGeometry(0.52, 0.46, 1.35);
+      const cabinetBody = new THREE.Mesh(cabBodyGeo, cabWoodMat);
+      cabinetBody.position.set(-ROOM_WIDTH / 2 + 0.26, 0.58, 0);
+      cabinetBody.castShadow = true;
+      cabinetBody.receiveShadow = true;
+      vanityGroup.add(cabinetBody);
 
-      const basinGeo = new THREE.BoxGeometry(0.5, 0.12, 0.9);
-      const basin = new THREE.Mesh(basinGeo, porcelainMat);
-      basin.position.set(-ROOM_WIDTH / 2 + 0.35, 0.6 + 0.06, 0);
-      basin.castShadow = true;
-      group.add(basin);
+      // Under-cabinet warm architectural LED floating glow
+      const underCabLight = new THREE.PointLight('#ffe8bf', 0.8, 1.8);
+      underCabLight.position.set(-ROOM_WIDTH / 2 + 0.26, 0.32, 0);
+      vanityGroup.add(underCabLight);
 
-      const faucetBaseGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.22);
+      // Handleless Drawer Front Panels with Modern Shadow Line
+      const drawerUpperGeo = new THREE.BoxGeometry(0.015, 0.21, 1.33);
+      const drawerUpper = new THREE.Mesh(drawerUpperGeo, cabWoodMat);
+      drawerUpper.position.set(-ROOM_WIDTH / 2 + 0.525, 0.69, 0);
+      drawerUpper.castShadow = true;
+      vanityGroup.add(drawerUpper);
+
+      const drawerLowerGeo = new THREE.BoxGeometry(0.015, 0.21, 1.33);
+      const drawerLower = new THREE.Mesh(drawerLowerGeo, cabWoodMat);
+      drawerLower.position.set(-ROOM_WIDTH / 2 + 0.525, 0.46, 0);
+      drawerLower.castShadow = true;
+      vanityGroup.add(drawerLower);
+
+      // Recessed Shadow Line / Gola profile (Dark bronze/matte finish)
+      const golaGeo = new THREE.BoxGeometry(0.01, 0.025, 1.33);
+      const golaMat = new THREE.MeshStandardMaterial({ color: '#15171c', roughness: 0.8 });
+      const golaProfile = new THREE.Mesh(golaGeo, golaMat);
+      golaProfile.position.set(-ROOM_WIDTH / 2 + 0.522, 0.575, 0);
+      vanityGroup.add(golaProfile);
+
+      // Solid Surface Quartz / Marble Countertop Slab
+      const counterSlabGeo = new THREE.BoxGeometry(0.55, 0.035, 1.38);
+      const counterSlabMat = new THREE.MeshPhysicalMaterial({
+        color: '#f8fafc',
+        roughness: 0.12,
+        clearcoat: 0.8,
+        clearcoatRoughness: 0.05
+      });
+      const countertop = new THREE.Mesh(counterSlabGeo, counterSlabMat);
+      countertop.position.set(-ROOM_WIDTH / 2 + 0.275, 0.81 + 0.0175, 0);
+      countertop.castShadow = true;
+      countertop.receiveShadow = true;
+      vanityGroup.add(countertop);
+
+      // --- COUNTERTOP CURVED VESSEL SINK (ÇANAK LAVABO) ---
+      const vesselGeo = new THREE.CylinderGeometry(0.24, 0.19, 0.15, 36);
+      const vesselSink = new THREE.Mesh(vesselGeo, porcelainMat);
+      vesselSink.position.set(-ROOM_WIDTH / 2 + 0.30, 0.83 + 0.075, 0);
+      vesselSink.castShadow = true;
+      vesselSink.receiveShadow = true;
+      vanityGroup.add(vesselSink);
+
+      // Pop-up drain valve in sink
+      const drainGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.005, 16);
+      const drainMesh = new THREE.Mesh(drainGeo, activeFaucetMat);
+      drainMesh.position.set(-ROOM_WIDTH / 2 + 0.30, 0.83 + 0.145, 0);
+      vanityGroup.add(drainMesh);
+
+      // --- DESIGNER TALL GOOSENECK WATERFALL MIXER (LÜKS LAVABO BATARYASI) ---
+      const faucetBaseGeo = new THREE.CylinderGeometry(0.020, 0.020, 0.28, 20);
       const faucetBase = new THREE.Mesh(faucetBaseGeo, activeFaucetMat);
-      faucetBase.position.set(-ROOM_WIDTH / 2 + 0.16, 0.6 + 0.22, 0);
+      faucetBase.position.set(-ROOM_WIDTH / 2 + 0.12, 0.83 + 0.14, 0);
       faucetBase.castShadow = true;
-      group.add(faucetBase);
+      vanityGroup.add(faucetBase);
 
-      const spoutGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.14);
-      const spout = new THREE.Mesh(spoutGeo, activeFaucetMat);
-      spout.rotation.z = Math.PI / 2.3;
-      spout.position.set(-ROOM_WIDTH / 2 + 0.21, 0.6 + 0.31, 0);
-      spout.castShadow = true;
-      group.add(spout);
+      const faucetSpoutGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.19, 16);
+      const faucetSpout = new THREE.Mesh(faucetSpoutGeo, activeFaucetMat);
+      faucetSpout.rotation.z = Math.PI / 2.35;
+      faucetSpout.position.set(-ROOM_WIDTH / 2 + 0.19, 0.83 + 0.26, 0);
+      faucetSpout.castShadow = true;
+      vanityGroup.add(faucetSpout);
 
-      // Backlit LED Mirror
-      const mirrorFrameGeo = new THREE.BoxGeometry(0.02, 0.95, 1.15);
-      const mirrorFrame = new THREE.Mesh(mirrorFrameGeo, brassMat);
-      mirrorFrame.position.set(-ROOM_WIDTH / 2 + 0.01, 1.5, 0);
-      group.add(mirrorFrame);
+      const mixerLeverGeo = new THREE.CylinderGeometry(0.006, 0.006, 0.07, 12);
+      const mixerLever = new THREE.Mesh(mixerLeverGeo, activeFaucetMat);
+      mixerLever.rotation.x = Math.PI / 4;
+      mixerLever.position.set(-ROOM_WIDTH / 2 + 0.12, 0.83 + 0.28, 0.02);
+      mixerLever.castShadow = true;
+      vanityGroup.add(mixerLever);
 
-      const mirrorPaneGeo = new THREE.PlaneGeometry(1.1, 0.9);
-      const mirrorPaneMat = new THREE.MeshStandardMaterial({ color: '#999999', metalness: 0.98, roughness: 0.02 });
-      const mirrorPane = new THREE.Mesh(mirrorPaneGeo, mirrorPaneMat);
-      mirrorPane.rotation.y = Math.PI / 2;
-      mirrorPane.position.set(-ROOM_WIDTH / 2 + 0.021, 1.5, 0);
-      group.add(mirrorPane);
+      // --- SMART BACKLIT ROUND LED MIRROR (HALO GLOW AKILLI AYNA) ---
+      const mirrorGroup = new THREE.Group();
+      group.add(mirrorGroup);
 
-      const mirrorGlow = new THREE.PointLight('#ffe699', 0.8, 3.5);
-      mirrorGlow.position.set(-ROOM_WIDTH / 2 + 0.05, 1.5, 0);
-      group.add(mirrorGlow);
+      // Mirror Bevel & Frame Rim
+      const mirrorRimGeo = new THREE.CylinderGeometry(0.53, 0.53, 0.018, 48);
+      const mirrorRim = new THREE.Mesh(mirrorRimGeo, brassMat);
+      mirrorRim.rotation.z = Math.PI / 2;
+      mirrorRim.position.set(-ROOM_WIDTH / 2 + 0.018, 1.62, 0);
+      mirrorGroup.add(mirrorRim);
 
-      // --- 2. GLASS SHOWER CABIN ---
-      const glassCabGeo = new THREE.BoxGeometry(0.02, 2.0, 1.15);
+      // Mirror Reflective Glass Front
+      const mirrorFrontGeo = new THREE.CylinderGeometry(0.51, 0.51, 0.008, 48);
+      const mirrorGlassMat = new THREE.MeshStandardMaterial({
+        color: '#c8cbd4',
+        metalness: 0.99,
+        roughness: 0.01
+      });
+      const mirrorGlass = new THREE.Mesh(mirrorFrontGeo, mirrorGlassMat);
+      mirrorGlass.rotation.z = Math.PI / 2;
+      mirrorGlass.position.set(-ROOM_WIDTH / 2 + 0.024, 1.62, 0);
+      mirrorGroup.add(mirrorGlass);
+
+      // Halo Backlit Glow Ring behind mirror
+      const haloRingGeo = new THREE.RingGeometry(0.48, 0.56, 48);
+      const haloMat = new THREE.MeshBasicMaterial({
+        color: '#ffeab0',
+        side: THREE.DoubleSide
+      });
+      const haloMesh = new THREE.Mesh(haloRingGeo, haloMat);
+      haloMesh.rotation.y = Math.PI / 2;
+      haloMesh.position.set(-ROOM_WIDTH / 2 + 0.012, 1.62, 0);
+      mirrorGroup.add(haloMesh);
+
+      // Warm ambient halo point light bathing the back wall
+      const mirrorHaloLight = new THREE.PointLight('#ffe39c', 1.2, 2.8);
+      mirrorHaloLight.position.set(-ROOM_WIDTH / 2 + 0.06, 1.62, 0);
+      mirrorGroup.add(mirrorHaloLight);
+
+      // --- LUXURY ACCESSORIES ON VANITY COUNTERTOP ---
+      // Amber Glass Soap Dispenser
+      const dispenserGeo = new THREE.CylinderGeometry(0.034, 0.034, 0.12, 16);
+      const amberGlassMat = new THREE.MeshPhysicalMaterial({
+        color: '#8b4513',
+        roughness: 0.15,
+        transmission: 0.75,
+        thickness: 0.04
+      });
+      const dispenser = new THREE.Mesh(dispenserGeo, amberGlassMat);
+      dispenser.position.set(-ROOM_WIDTH / 2 + 0.38, 0.83 + 0.06, -0.42);
+      dispenser.castShadow = true;
+      group.add(dispenser);
+
+      const pumpGeo = new THREE.CylinderGeometry(0.008, 0.008, 0.04, 10);
+      const pump = new THREE.Mesh(pumpGeo, activeFaucetMat);
+      pump.position.set(-ROOM_WIDTH / 2 + 0.38, 0.83 + 0.13, -0.42);
+      group.add(pump);
+
+      // Potted Mini Succulent / Plant
+      const potGeo = new THREE.CylinderGeometry(0.045, 0.035, 0.07, 16);
+      const potMat = new THREE.MeshStandardMaterial({ color: '#2b2d33', roughness: 0.9 });
+      const pot = new THREE.Mesh(potGeo, potMat);
+      pot.position.set(-ROOM_WIDTH / 2 + 0.38, 0.83 + 0.035, 0.44);
+      pot.castShadow = true;
+      group.add(pot);
+
+      const plantGeo = new THREE.DodecahedronGeometry(0.045, 1);
+      const plantMat = new THREE.MeshStandardMaterial({ color: '#3f6212', roughness: 0.8 });
+      const plant = new THREE.Mesh(plantGeo, plantMat);
+      plant.position.set(-ROOM_WIDTH / 2 + 0.38, 0.83 + 0.09, 0.44);
+      group.add(plant);
+
+      // --- 2. LUXURY WALK-IN FRAMELESS GLASS SHOWER ---
+      const showerGroup = new THREE.Group();
+      group.add(showerGroup);
+
+      // Ultra-Clear Frameless Glass Screen (Minimalist modern walk-in)
+      const glassCabGeo = new THREE.BoxGeometry(0.015, 2.15, 1.25);
       const glassCab1 = new THREE.Mesh(glassCabGeo, glassMat);
-      glassCab1.position.set(-ROOM_WIDTH / 2 + 1.15, 1.0, -ROOM_DEPTH / 2 + 0.575);
-      group.add(glassCab1);
+      glassCab1.position.set(-ROOM_WIDTH / 2 + 1.20, 1.075, -ROOM_DEPTH / 2 + 0.625);
+      showerGroup.add(glassCab1);
 
-      const glassCabGeo2 = new THREE.BoxGeometry(1.15, 2.0, 0.02);
-      const glassCab2 = new THREE.Mesh(glassCabGeo2, glassMat);
-      glassCab2.position.set(-ROOM_WIDTH / 2 + 0.575, 1.0, -ROOM_DEPTH / 2 + 1.15);
-      group.add(glassCab2);
+      // Minimal Slim Floor & Wall Channel (U-Profile)
+      const uChanFloorGeo = new THREE.BoxGeometry(0.03, 0.02, 1.25);
+      const uChanFloor = new THREE.Mesh(uChanFloorGeo, activeFaucetMat);
+      uChanFloor.position.set(-ROOM_WIDTH / 2 + 1.20, 0.01, -ROOM_DEPTH / 2 + 0.625);
+      showerGroup.add(uChanFloor);
 
-      const frameGeo = new THREE.BoxGeometry(0.04, 2.0, 0.04);
-      const profileCorner = new THREE.Mesh(frameGeo, activeFaucetMat);
-      profileCorner.position.set(-ROOM_WIDTH / 2 + 1.15, 1.0, -ROOM_DEPTH / 2 + 1.15);
-      group.add(profileCorner);
+      // Top Glass Support Brace Rod (Tie Bar)
+      const braceGeo = new THREE.CylinderGeometry(0.01, 0.01, 1.20, 12);
+      const braceBar = new THREE.Mesh(braceGeo, activeFaucetMat);
+      braceBar.rotation.x = Math.PI / 2;
+      braceBar.position.set(-ROOM_WIDTH / 2 + 1.20, 2.15, -ROOM_DEPTH / 2 + 0.60);
+      showerGroup.add(braceBar);
 
-      const colGeo = new THREE.CylinderGeometry(0.012, 0.012, 1.7);
-      const column = new THREE.Mesh(colGeo, activeFaucetMat);
-      column.position.set(-ROOM_WIDTH / 2 + 0.1, 1.25, -ROOM_DEPTH / 2 + 0.1);
-      group.add(column);
+      // Ceiling Rain Shower Head (Large 25cm Luxury Disc)
+      const rainDropGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.25, 12);
+      const rainDropArm = new THREE.Mesh(rainDropGeo, activeFaucetMat);
+      rainDropArm.position.set(-ROOM_WIDTH / 2 + 0.58, ROOM_HEIGHT - 0.125, -ROOM_DEPTH / 2 + 0.58);
+      showerGroup.add(rainDropArm);
 
-      const showerHeadGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.015, 16);
-      const showerHead = new THREE.Mesh(showerHeadGeo, activeFaucetMat);
-      showerHead.rotation.x = Math.PI / 2;
-      showerHead.position.set(-ROOM_WIDTH / 2 + 0.28, 2.0, -ROOM_DEPTH / 2 + 0.1);
-      showerHead.castShadow = true;
-      group.add(showerHead);
+      const rainDiscGeo = new THREE.CylinderGeometry(0.14, 0.14, 0.014, 32);
+      const rainDisc = new THREE.Mesh(rainDiscGeo, activeFaucetMat);
+      rainDisc.position.set(-ROOM_WIDTH / 2 + 0.58, ROOM_HEIGHT - 0.25, -ROOM_DEPTH / 2 + 0.58);
+      rainDisc.castShadow = true;
+      showerGroup.add(rainDisc);
 
-      // --- 3. TOILET ---
-      const toiletGeo = new THREE.BoxGeometry(0.38, 0.42, 0.55);
-      const toilet = new THREE.Mesh(toiletGeo, porcelainMat);
-      toilet.position.set(0.9, 0.32, -ROOM_DEPTH / 2 + 0.275);
-      toilet.castShadow = true;
-      group.add(toilet);
+      // Shower Rail Column with Handheld Wand
+      const railGeo = new THREE.CylinderGeometry(0.012, 0.012, 1.1, 14);
+      const showerRail = new THREE.Mesh(railGeo, activeFaucetMat);
+      showerRail.position.set(-ROOM_WIDTH / 2 + 0.06, 1.35, -ROOM_DEPTH / 2 + 0.45);
+      showerRail.castShadow = true;
+      showerGroup.add(showerRail);
 
-      const buttonPlateGeo = new THREE.BoxGeometry(0.25, 0.16, 0.015);
-      const plate = new THREE.Mesh(buttonPlateGeo, activeFaucetMat);
-      plate.position.set(0.9, 1.05, -ROOM_DEPTH / 2 + 0.01);
-      group.add(plate);
+      const wandGeo = new THREE.CylinderGeometry(0.014, 0.014, 0.18, 12);
+      const handWand = new THREE.Mesh(wandGeo, activeFaucetMat);
+      handWand.position.set(-ROOM_WIDTH / 2 + 0.09, 1.45, -ROOM_DEPTH / 2 + 0.45);
+      handWand.castShadow = true;
+      showerGroup.add(handWand);
 
-      const vanitySpot = new THREE.SpotLight('#ffffff', 0.65, 6, Math.PI / 4, 0.5, 1);
-      vanitySpot.position.set(-ROOM_WIDTH / 2 + 0.6, ROOM_HEIGHT - 0.2, 0);
-      vanitySpot.target = cabinet;
-      group.add(vanitySpot);
+      // Thermostatic Dual Dial Mixer Controls
+      const thermoGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.05, 20);
+      const thermoDial1 = new THREE.Mesh(thermoGeo, activeFaucetMat);
+      thermoDial1.rotation.z = Math.PI / 2;
+      thermoDial1.position.set(-ROOM_WIDTH / 2 + 0.03, 1.05, -ROOM_DEPTH / 2 + 0.45);
+      showerGroup.add(thermoDial1);
+
+      // Recessed LED Shower Wall Niche (Şampuan Nişi)
+      const nicheFrameGeo = new THREE.BoxGeometry(0.55, 0.32, 0.08);
+      const nicheFrameMat = new THREE.MeshStandardMaterial({ color: '#13151a', roughness: 0.9 });
+      const nicheFrame = new THREE.Mesh(nicheFrameGeo, nicheFrameMat);
+      nicheFrame.position.set(-ROOM_WIDTH / 2 + 0.58, 1.35, -ROOM_DEPTH / 2 + 0.04);
+      showerGroup.add(nicheFrame);
+
+      const nicheLight = new THREE.PointLight('#ffe4b5', 0.6, 1.2);
+      nicheLight.position.set(-ROOM_WIDTH / 2 + 0.58, 1.45, -ROOM_DEPTH / 2 + 0.08);
+      showerGroup.add(nicheLight);
+
+      // Mini luxury toiletries inside niche
+      const bottleGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.12, 12);
+      const bottle1 = new THREE.Mesh(bottleGeo, amberGlassMat);
+      bottle1.position.set(-ROOM_WIDTH / 2 + 0.50, 1.28, -ROOM_DEPTH / 2 + 0.06);
+      showerGroup.add(bottle1);
+
+      const bottle2 = new THREE.Mesh(bottleGeo, amberGlassMat);
+      bottle2.position.set(-ROOM_WIDTH / 2 + 0.62, 1.28, -ROOM_DEPTH / 2 + 0.06);
+      showerGroup.add(bottle2);
+
+      // Linear Stainless Steel Shower Drain (Doğrusal Süzgeç Kanalı)
+      const drainGrateGeo = new THREE.BoxGeometry(0.06, 0.005, 0.90);
+      const drainGrate = new THREE.Mesh(drainGrateGeo, chromeMat);
+      drainGrate.position.set(-ROOM_WIDTH / 2 + 0.12, 0.008, -ROOM_DEPTH / 2 + 0.58);
+      drainGrate.receiveShadow = true;
+      showerGroup.add(drainGrate);
+
+      // --- 3. LUXURY WALL-HUNG RIMLESS TOILET (ASMA KLOZET) ---
+      const toiletGroup = new THREE.Group();
+      group.add(toiletGroup);
+
+      // Floating Porcelain Bowl (elevated 12cm off floor, cantilevered from wall)
+      const toiletBaseGeo = new THREE.BoxGeometry(0.36, 0.32, 0.28);
+      const toiletBase = new THREE.Mesh(toiletBaseGeo, porcelainMat);
+      toiletBase.position.set(0.9, 0.38, -ROOM_DEPTH / 2 + 0.18);
+      toiletBase.castShadow = true;
+      toiletGroup.add(toiletBase);
+
+      const toiletFrontGeo = new THREE.CylinderGeometry(0.18, 0.14, 0.32, 28);
+      const toiletFront = new THREE.Mesh(toiletFrontGeo, porcelainMat);
+      toiletFront.position.set(0.9, 0.38, -ROOM_DEPTH / 2 + 0.34);
+      toiletFront.castShadow = true;
+      toiletGroup.add(toiletFront);
+
+      // Slim Soft-Close Seat & Lid
+      const seatGeo = new THREE.BoxGeometry(0.37, 0.025, 0.46);
+      const seatMat = new THREE.MeshPhysicalMaterial({ color: '#fcfcfc', roughness: 0.1, clearcoat: 0.5 });
+      const toiletSeat = new THREE.Mesh(seatGeo, seatMat);
+      toiletSeat.position.set(0.9, 0.545, -ROOM_DEPTH / 2 + 0.27);
+      toiletSeat.castShadow = true;
+      toiletGroup.add(toiletSeat);
+
+      // Dual-Flush Actuator Wall Plate (Klozet Kumanda Butonu)
+      const plateGeo = new THREE.BoxGeometry(0.24, 0.15, 0.012);
+      const plate = new THREE.Mesh(plateGeo, activeFaucetMat);
+      plate.position.set(0.9, 1.15, -ROOM_DEPTH / 2 + 0.012);
+      plate.castShadow = true;
+      toiletGroup.add(plate);
+
+      // Flush Buttons
+      const btnGeo1 = new THREE.CylinderGeometry(0.032, 0.032, 0.005, 20);
+      const flushBtn1 = new THREE.Mesh(btnGeo1, chromeMat);
+      flushBtn1.rotation.x = Math.PI / 2;
+      flushBtn1.position.set(0.85, 1.15, -ROOM_DEPTH / 2 + 0.02);
+      toiletGroup.add(flushBtn1);
+
+      const btnGeo2 = new THREE.CylinderGeometry(0.022, 0.022, 0.005, 20);
+      const flushBtn2 = new THREE.Mesh(btnGeo2, chromeMat);
+      flushBtn2.rotation.x = Math.PI / 2;
+      flushBtn2.position.set(0.95, 1.15, -ROOM_DEPTH / 2 + 0.02);
+      toiletGroup.add(flushBtn2);
     } else if (roomType === 'livingroom') {
       // --- 1. SECTIONAL COUCH ---
       const sofaBaseGeo = new THREE.BoxGeometry(1.2, 0.12, 2.2);
@@ -1393,23 +1647,25 @@ export default function StudioCanvas({
     }
 
     // 2. Time of day base intensities
-    let ambientBase = 0.45;
-    let sunBase = 0.65;
-    let centerBase = 0.25;
+    let ambientBase = 0.50;
+    let sunBase = 0.95;
+    let centerBase = 0.35;
 
     if (timeOfDay === 'night') {
-      ambientBase = 0.12;
-      sunBase = 0.02; // sun goes down
-      centerBase = 0.65; // interior bulb glows stronger
+      ambientBase = 0.15;
+      sunBase = 0.05; // sun goes down
+      centerBase = 0.85; // interior bulb glows stronger
       if (sceneRef.current) {
-        sceneRef.current.background = new THREE.Color('#060709');
+        sceneRef.current.background = new THREE.Color('#0b0d12');
+        if (sceneRef.current.fog) sceneRef.current.fog.color.set('#0b0d12');
       }
     } else {
-      ambientBase = 0.45;
-      sunBase = 0.65;
-      centerBase = 0.25;
+      ambientBase = 0.50;
+      sunBase = 0.95;
+      centerBase = 0.35;
       if (sceneRef.current) {
-        sceneRef.current.background = new THREE.Color('#101216');
+        sceneRef.current.background = new THREE.Color('#1c202a');
+        if (sceneRef.current.fog) sceneRef.current.fog.color.set('#1c202a');
       }
     }
 
@@ -1448,6 +1704,19 @@ export default function StudioCanvas({
     if (!isSceneReady || !sceneRef.current) return;
 
     const loader = new THREE.TextureLoader();
+
+    // Helper for realistic architectural PBR reflections responding to scene spotlights & cove lights
+    const getPBRProps = (prod) => {
+      const finish = (prod?.finish || '').toLowerCase();
+      const isParlak = finish.includes('parlak');
+      const isLappato = finish.includes('lapatto') || finish.includes('lappato') || finish.includes('yarı');
+      return {
+        roughness: isParlak ? 0.09 : (isLappato ? 0.28 : 0.82),
+        metalness: isParlak ? 0.08 : (isLappato ? 0.04 : 0.0),
+        clearcoat: isParlak ? 1.0 : (isLappato ? 0.55 : 0.0),
+        clearcoatRoughness: isParlak ? 0.03 : 0.16
+      };
+    };
 
     // Instant (0-ms) procedural preview + RAM cached high-res JPG loader helper
     const loadAndApplyTexture = (product, applyCallback) => {
@@ -1497,15 +1766,14 @@ export default function StudioCanvas({
         texture.repeat.set(repeatX, repeatY);
         texture.colorSpace = THREE.SRGBColorSpace;
 
-        let roughness = floorProduct.finish === 'Parlak' ? 0.08 : (floorProduct.finish === 'Lapatto' ? 0.35 : 0.85);
-        let metalness = floorProduct.finish === 'Parlak' ? 0.15 : 0.05;
-        let clearcoat = floorProduct.finish === 'Parlak' ? 1.0 : (floorProduct.finish === 'Lapatto' ? 0.4 : 0.0);
+        const pbr = getPBRProps(floorProduct);
 
         const newMaterial = new THREE.MeshPhysicalMaterial({
           map: texture,
-          roughness,
-          metalness,
-          clearcoat
+          roughness: pbr.roughness,
+          metalness: pbr.metalness,
+          clearcoat: pbr.clearcoat,
+          clearcoatRoughness: pbr.clearcoatRoughness
         });
 
         if (floorMeshRef.current) {
@@ -1536,13 +1804,18 @@ export default function StudioCanvas({
         const texture = generateGroutOverlay(sourceImageOrCanvas, wallProduct, groutWidth, groutColor, tileRotation, layPattern);
         texture.colorSpace = THREE.SRGBColorSpace;
 
-        let roughness = wallProduct.finish === 'Parlak' ? 0.08 : 0.85;
-        let clearcoat = wallProduct.finish === 'Parlak' ? 1.0 : 0.0;
+        const pbr = getPBRProps(wallProduct);
 
         // Back Wall
         const backTexture = texture.clone();
         backTexture.repeat.set(repeatX, wallRepeatY);
-        const backWallMat = new THREE.MeshPhysicalMaterial({ map: backTexture, roughness, clearcoat });
+        const backWallMat = new THREE.MeshPhysicalMaterial({
+          map: backTexture,
+          roughness: pbr.roughness,
+          metalness: pbr.metalness,
+          clearcoat: pbr.clearcoat,
+          clearcoatRoughness: pbr.clearcoatRoughness
+        });
         if (backWallMeshRef.current) {
           if (backWallMeshRef.current.material.map) backWallMeshRef.current.material.map.dispose();
           backWallMeshRef.current.material.dispose();
@@ -1559,10 +1832,14 @@ export default function StudioCanvas({
           compTex.repeat.set(ROOM_DEPTH / compW_m, ROOM_HEIGHT / compH_m);
           compTex.colorSpace = THREE.SRGBColorSpace;
 
+          const pbrComp = getPBRProps(compTargetProduct);
+
           const leftWallMat = new THREE.MeshPhysicalMaterial({
             map: compTex,
-            roughness: compTargetProduct.finish === 'Parlak' ? 0.08 : 0.85,
-            clearcoat: compTargetProduct.finish === 'Parlak' ? 1.0 : 0.0
+            roughness: pbrComp.roughness,
+            metalness: pbrComp.metalness,
+            clearcoat: pbrComp.clearcoat,
+            clearcoatRoughness: pbrComp.clearcoatRoughness
           });
           if (leftWallMeshRef.current) {
             if (leftWallMeshRef.current.material.map) leftWallMeshRef.current.material.map.dispose();
@@ -1607,10 +1884,13 @@ export default function StudioCanvas({
         if (accentWallMeshRef.current) {
           if (accentWallMeshRef.current.material.map) accentWallMeshRef.current.material.map.dispose();
           accentWallMeshRef.current.material.dispose();
+          const pbrAccent = getPBRProps(accentProduct);
           accentWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
             map: texture,
-            roughness: accentProduct.finish === 'Parlak' ? 0.08 : 0.85,
-            clearcoat: accentProduct.finish === 'Parlak' ? 1.0 : 0.0
+            roughness: pbrAccent.roughness,
+            metalness: pbrAccent.metalness,
+            clearcoat: pbrAccent.clearcoat,
+            clearcoatRoughness: pbrAccent.clearcoatRoughness
           });
         }
       };
@@ -1630,13 +1910,16 @@ export default function StudioCanvas({
       const applyShowerTexture = (sourceImageOrCanvas) => {
         const texture = generateGroutOverlay(sourceImageOrCanvas, showerProduct, groutWidth, groutColor, tileRotation, layPattern);
         texture.colorSpace = THREE.SRGBColorSpace;
+        const pbrShower = getPBRProps(showerProduct);
 
         const backTex = texture.clone();
         backTex.repeat.set(1.15 / w_m, ROOM_HEIGHT / h_m);
         const showerBackMat = new THREE.MeshPhysicalMaterial({
           map: backTex,
-          roughness: showerProduct.finish === 'Parlak' ? 0.08 : 0.85,
-          clearcoat: showerProduct.finish === 'Parlak' ? 1.0 : 0.0
+          roughness: pbrShower.roughness,
+          metalness: pbrShower.metalness,
+          clearcoat: pbrShower.clearcoat,
+          clearcoatRoughness: pbrShower.clearcoatRoughness
         });
         if (showerBackWallMeshRef.current) {
           if (showerBackWallMeshRef.current.material.map) showerBackWallMeshRef.current.material.map.dispose();
@@ -1648,8 +1931,10 @@ export default function StudioCanvas({
         sideTex.repeat.set(1.15 / w_m, ROOM_HEIGHT / h_m);
         const showerSideMat = new THREE.MeshPhysicalMaterial({
           map: sideTex,
-          roughness: showerProduct.finish === 'Parlak' ? 0.08 : 0.85,
-          clearcoat: showerProduct.finish === 'Parlak' ? 1.0 : 0.0
+          roughness: pbrShower.roughness,
+          metalness: pbrShower.metalness,
+          clearcoat: pbrShower.clearcoat,
+          clearcoatRoughness: pbrShower.clearcoatRoughness
         });
         if (showerSideWallMeshRef.current) {
           if (showerSideWallMeshRef.current.material.map) showerSideWallMeshRef.current.material.map.dispose();
@@ -1677,10 +1962,13 @@ export default function StudioCanvas({
         if (toiletWallMeshRef.current) {
           if (toiletWallMeshRef.current.material.map) toiletWallMeshRef.current.material.map.dispose();
           toiletWallMeshRef.current.material.dispose();
+          const pbrToilet = getPBRProps(toiletWallProduct);
           toiletWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
             map: texture,
-            roughness: toiletWallProduct.finish === 'Parlak' ? 0.08 : 0.85,
-            clearcoat: toiletWallProduct.finish === 'Parlak' ? 1.0 : 0.0
+            roughness: pbrToilet.roughness,
+            metalness: pbrToilet.metalness,
+            clearcoat: pbrToilet.clearcoat,
+            clearcoatRoughness: pbrToilet.clearcoatRoughness
           });
         }
       };
@@ -1703,10 +1991,13 @@ export default function StudioCanvas({
         if (leftWallAccentMeshRef.current) {
           if (leftWallAccentMeshRef.current.material.map) leftWallAccentMeshRef.current.material.map.dispose();
           leftWallAccentMeshRef.current.material.dispose();
+          const pbrLeftAccent = getPBRProps(leftWallAccentProduct);
           leftWallAccentMeshRef.current.material = new THREE.MeshPhysicalMaterial({
             map: texture,
-            roughness: leftWallAccentProduct.finish === 'Parlak' ? 0.08 : 0.85,
-            clearcoat: leftWallAccentProduct.finish === 'Parlak' ? 1.0 : 0.0
+            roughness: pbrLeftAccent.roughness,
+            metalness: pbrLeftAccent.metalness,
+            clearcoat: pbrLeftAccent.clearcoat,
+            clearcoatRoughness: pbrLeftAccent.clearcoatRoughness
           });
         }
       };
@@ -1740,9 +2031,7 @@ export default function StudioCanvas({
       const applyStripeTexture = (sourceImageOrCanvas) => {
         const texture = generateGroutOverlay(sourceImageOrCanvas, stripeWallProduct, groutWidth, groutColor, tileRotation, layPattern);
         texture.colorSpace = THREE.SRGBColorSpace;
-
-        const roughness = stripeWallProduct.finish === 'Parlak' ? 0.08 : 0.85;
-        const clearcoat = stripeWallProduct.finish === 'Parlak' ? 1.0 : 0.0;
+        const pbrStripe = getPBRProps(stripeWallProduct);
 
         // Back Wall Stripe / Kitchen Backsplash
         if (stripeWallMeshRef.current) {
@@ -1754,8 +2043,10 @@ export default function StudioCanvas({
           stripeWallMeshRef.current.material.dispose();
           stripeWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
             map: backTex,
-            roughness,
-            clearcoat
+            roughness: pbrStripe.roughness,
+            metalness: pbrStripe.metalness,
+            clearcoat: pbrStripe.clearcoat,
+            clearcoatRoughness: pbrStripe.clearcoatRoughness
           });
         }
 
@@ -1767,8 +2058,10 @@ export default function StudioCanvas({
           leftStripeWallMeshRef.current.material.dispose();
           leftStripeWallMeshRef.current.material = new THREE.MeshPhysicalMaterial({
             map: leftTex,
-            roughness,
-            clearcoat
+            roughness: pbrStripe.roughness,
+            metalness: pbrStripe.metalness,
+            clearcoat: pbrStripe.clearcoat,
+            clearcoatRoughness: pbrStripe.clearcoatRoughness
           });
         }
       };
@@ -1794,10 +2087,13 @@ export default function StudioCanvas({
         if (showerFloorMeshRef.current) {
           if (showerFloorMeshRef.current.material.map) showerFloorMeshRef.current.material.map.dispose();
           showerFloorMeshRef.current.material.dispose();
+          const pbrShowerFloor = getPBRProps(showerFloorProduct);
           showerFloorMeshRef.current.material = new THREE.MeshPhysicalMaterial({
             map: texture,
-            roughness: showerFloorProduct.finish === 'Parlak' ? 0.08 : 0.85,
-            clearcoat: showerFloorProduct.finish === 'Parlak' ? 1.0 : 0.0
+            roughness: pbrShowerFloor.roughness,
+            metalness: pbrShowerFloor.metalness,
+            clearcoat: pbrShowerFloor.clearcoat,
+            clearcoatRoughness: pbrShowerFloor.clearcoatRoughness
           });
         }
       };
@@ -1821,14 +2117,52 @@ export default function StudioCanvas({
     }
   }, [walkthroughMode, isSceneReady]);
 
+  // Camera preset positions
+  const setCameraPreset = (presetName) => {
+    if (!cameraRef.current) return;
+    setActiveCameraPreset(presetName);
+    const cam = cameraRef.current;
+    if (presetName === 'perspective') {
+      cam.position.set(4, 3.2, 5);
+      cam.lookAt(0, ROOM_HEIGHT / 3, 0);
+    } else if (presetName === 'vanity') {
+      cam.position.set(-0.25, 1.45, 2.3);
+      cam.lookAt(-ROOM_WIDTH / 2 + 0.35, 1.35, 0);
+    } else if (presetName === 'shower') {
+      cam.position.set(2.2, 2.1, 1.8);
+      cam.lookAt(-ROOM_WIDTH / 2 + 0.58, 0.9, -ROOM_DEPTH / 2 + 0.58);
+    } else if (presetName === 'topdown') {
+      cam.position.set(0.01, 6.2, 0.01);
+      cam.lookAt(0, 0, 0);
+    }
+  };
+
   const downloadSnapshot = () => {
     if (!rendererRef.current || !sceneRef.current || !cameraRef.current) return;
-    // Force a render pass to clear standard render buffers
-    rendererRef.current.render(sceneRef.current, cameraRef.current);
-    const dataUrl = rendererRef.current.domElement.toDataURL('image/jpeg', 0.95);
-    
+    const renderer = rendererRef.current;
+    const scene = sceneRef.current;
+    const camera = cameraRef.current;
+
+    // Save previous pixel ratio & size
+    const currentPixelRatio = renderer.getPixelRatio();
+    const currentSize = new THREE.Vector2();
+    renderer.getSize(currentSize);
+
+    // Upscale for ultra-crisp super-sampled architectural render
+    const superRatio = Math.max(2.4, currentPixelRatio * 1.5);
+    renderer.setPixelRatio(superRatio);
+    renderer.render(scene, camera);
+
+    const dataUrl = renderer.domElement.toDataURL('image/jpeg', 0.98);
+
+    // Restore standard viewport pixel ratio
+    renderer.setPixelRatio(currentPixelRatio);
+    renderer.setSize(currentSize.x, currentSize.y);
+    renderer.render(scene, camera);
+
     const link = document.createElement('a');
-    link.download = `seramikbak-tasarim-${activeProduct?.name || 'sanal-studyo'}.jpg`;
+    const prodSlug = (activeProduct?.name || 'sanal-studyo').replace(/[^a-zA-Z0-9_-]/g, '_');
+    link.download = `seramikbak-3d-${prodSlug}-hd.jpg`;
     link.href = dataUrl;
     link.click();
   };
@@ -1909,6 +2243,38 @@ export default function StudioCanvas({
           )}
         </div>
         
+        {/* Camera Quick Presets Center Bar */}
+        <div className="overlay-camera-presets">
+          <button 
+            onClick={() => setCameraPreset('perspective')}
+            className={`preset-btn ${activeCameraPreset === 'perspective' ? 'active' : ''}`}
+            title="Genel Perspektif Açısı"
+          >
+            👁️ <span className="btn-label">Perspektif</span>
+          </button>
+          <button 
+            onClick={() => setCameraPreset('vanity')}
+            className={`preset-btn ${activeCameraPreset === 'vanity' ? 'active' : ''}`}
+            title="Lavabo ve Ayna Odaklı Görünüm"
+          >
+            🪞 <span className="btn-label">Lavabo</span>
+          </button>
+          <button 
+            onClick={() => setCameraPreset('shower')}
+            className={`preset-btn ${activeCameraPreset === 'shower' ? 'active' : ''}`}
+            title="Duş ve Zemin Odaklı Görünüm"
+          >
+            🚿 <span className="btn-label">Duş & Zemin</span>
+          </button>
+          <button 
+            onClick={() => setCameraPreset('topdown')}
+            className={`preset-btn ${activeCameraPreset === 'topdown' ? 'active' : ''}`}
+            title="Plan / Kuşbakışı Görünüm"
+          >
+            📐 <span className="btn-label">Kuşbakışı</span>
+          </button>
+        </div>
+
         <div className="overlay-top-right-actions">
           <button onClick={downloadSnapshot} className="overlay-action-btn" title="Yüksek Çözünürlüklü Görüntüyü İndir">
             📷 HD Fotoğraf İndir
@@ -1999,6 +2365,47 @@ export default function StudioCanvas({
           box-shadow: 0 8px 20px rgba(179, 142, 71, 0.45);
         }
 
+        /* Camera Quick Presets Toolbar */
+        .overlay-camera-presets {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          background: rgba(15, 23, 42, 0.88);
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          padding: 4px;
+          border-radius: 10px;
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+          pointer-events: auto;
+        }
+        .preset-btn {
+          background: transparent;
+          border: none;
+          color: rgba(255, 255, 255, 0.8);
+          padding: 6px 12px;
+          border-radius: 7px;
+          font-size: 0.70rem;
+          font-family: var(--font-body);
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          white-space: nowrap;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+        }
+        .preset-btn:hover {
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.1);
+        }
+        .preset-btn.active {
+          background: linear-gradient(135deg, var(--accent-gold) 0%, #d4af37 100%);
+          color: #0f172a;
+          font-weight: 700;
+          box-shadow: 0 2px 8px rgba(179, 142, 71, 0.4);
+        }
+
         /* Bottom Overlay (Click Guide at Left, Gesture Hint at Right) */
         .canvas-overlay-bottom {
           position: absolute;
@@ -2063,14 +2470,34 @@ export default function StudioCanvas({
             right: 8px;
             gap: 6px;
             align-items: flex-start;
+            flex-wrap: wrap;
           }
           .overlay-top-left-badges {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             gap: 3px;
-            max-width: 60%;
+            max-width: 50%;
             pointer-events: none;
+          }
+          .overlay-top-right-actions {
+            max-width: 48%;
+            pointer-events: auto;
+          }
+          .overlay-camera-presets {
+            order: 3;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            gap: 3px;
+            padding: 3px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.94);
+          }
+          .preset-btn {
+            font-size: 0.58rem;
+            padding: 4px 6px;
+            gap: 3px;
           }
           .overlay-badge {
             font-size: 0.58rem;
@@ -2083,10 +2510,6 @@ export default function StudioCanvas({
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-          }
-          .overlay-top-right-actions {
-            max-width: 40%;
-            pointer-events: auto;
           }
           .overlay-action-btn {
             padding: 5px 8px;
