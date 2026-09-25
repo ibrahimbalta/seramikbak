@@ -1305,40 +1305,33 @@ export default function ShowroomKioskPage() {
         <div className="header-left">
           <Link 
             href="/bayi" 
-            className="btn-exit-kiosk" 
+            className="kiosk-nav-btn btn-nav-bayi" 
             title="Bayi Paneline Dön"
-            style={{ 
-              display: 'inline-flex', 
-              flexDirection: 'row', 
-              alignItems: 'center', 
-              gap: '6px', 
-              whiteSpace: 'nowrap', 
-              flexShrink: 0,
-              background: 'rgba(212, 175, 55, 0.15)',
-              borderColor: 'rgba(212, 175, 55, 0.4)',
-              color: '#f3d375'
-            }}
           >
-            <Building2 size={16} style={{ flexShrink: 0 }} />
-            <span style={{ whiteSpace: 'nowrap', display: 'inline-block' }}>Bayi Paneli</span>
+            <Building2 size={15} style={{ flexShrink: 0 }} />
+            <span className="btn-label-desktop">Bayi Paneli</span>
+            <span className="btn-label-mobile">Bayi</span>
           </Link>
           <Link 
             href="/" 
-            className="btn-exit-kiosk" 
+            className="kiosk-nav-btn btn-nav-exit" 
             title="Ana Sayfaya Dön (Çıkış)"
-            style={{ display: 'inline-flex', flexDirection: 'row', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0 }}
           >
-            <LogOut size={16} style={{ flexShrink: 0 }} />
-            <span style={{ whiteSpace: 'nowrap', display: 'inline-block' }}>Çıkış</span>
+            <LogOut size={15} style={{ flexShrink: 0 }} />
+            <span className="btn-label-desktop">Çıkış</span>
           </Link>
-          <div>
-            <div className="brand-title-row">
-              <h1 className="brand-title">{selectedDealer?.name ? selectedDealer.name : <>Seramik<span className="gold-accent">Bak</span></>}</h1>
-              <span className="kiosk-pill">{selectedDealer?.name ? 'Yetkili Showroom' : 'Yetkili Bayi Kiosk'}</span>
+        </div>
+
+        {/* Center: Symmetrical Dealer Showroom Capsule */}
+        <div className="header-center">
+          <div className="header-showroom-pill">
+            <Crown size={14} className="showroom-crown-icon" />
+            <div className="showroom-text-wrap">
+              <span className="showroom-brand-name">
+                {selectedDealer?.name || 'SeramikBak'}
+              </span>
+              <span className="showroom-tag-badge">Showroom</span>
             </div>
-            <p className="dealer-sub-text">
-              {selectedDealer ? `${selectedDealer.name} Showroom Teşhir Portalı` : 'Showroom Satış Asistanı'}
-            </p>
           </div>
         </div>
 
@@ -1709,6 +1702,61 @@ export default function ShowroomKioskPage() {
               cabinetColor={cabinetColor}
               showerGlass={showerGlass}
               onShowerGlassChange={setShowerGlass}
+              extraTopLeft={
+                <div className="kiosk-extra-top-left">
+                  <button 
+                    onClick={() => setIsMobileMenuOpen(true)} 
+                    className="canvas-mobile-floating-menu-btn"
+                    title="Kaplama & Seramik Menüsünü Aç"
+                    type="button"
+                  >
+                    <Palette size={13} />
+                    <span>Katalog</span>
+                  </button>
+
+                  {!isPresentationMode && (
+                    <div className="canvas-active-target-pill">
+                      <span className="pill-target-name">
+                        {activeTargetSurface === 'floor' && (applyFloor ? `Zemin` : 'Zemin: Pasif')}
+                        {activeTargetSurface === 'walls' && (applyWalls ? `Duvar` : 'Duvar: Pasif')}
+                        {activeTargetSurface === 'shower' && (applyShower ? 'Duş' : 'Duş: Pasif')}
+                        {activeTargetSurface === 'showerFloor' && (applyShowerFloor ? 'Duş Tab.' : 'Duş Tab.: Pasif')}
+                        {activeTargetSurface === 'toilet' && (applyToiletWall ? 'Klozet' : 'Klozet: Pasif')}
+                        {activeTargetSurface === 'accent' && (applyAccent ? 'Vurgu' : 'Vurgu: Pasif')}
+                        {activeTargetSurface === 'stripe' && (applyStripeWall ? 'Bordür' : 'Bordür: Pasif')}
+                      </span>
+                      {(activeTargetSurface === 'floor' && applyFloor) && (
+                        <button onClick={() => handleToggleTargetFromCanvas('floor')} className="pill-remove-btn" title="Zemin kaplamasını kaldır" type="button">✕</button>
+                      )}
+                      {(activeTargetSurface === 'walls' && applyWalls) && (
+                        <button onClick={() => handleToggleTargetFromCanvas('walls')} className="pill-remove-btn" title="Duvar kaplamasını kaldır" type="button">✕</button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              }
+              extraTopRight={
+                <div className="kiosk-extra-top-right">
+                  <button
+                    onClick={() => setIsBottomDockCollapsed(!isBottomDockCollapsed)}
+                    className={`canvas-focus-toggle-btn ${isBottomDockCollapsed ? 'active-gold' : ''}`}
+                    title={isBottomDockCollapsed ? 'Tasarım Menüsünü Aç' : '3D Tam Görünüm (Menüyü Gizle)'}
+                    type="button"
+                  >
+                    {isBottomDockCollapsed ? <Sliders size={13} /> : <Eye size={13} />}
+                    <span>{isBottomDockCollapsed ? 'Menü' : '3D Odak'}</span>
+                  </button>
+
+                  <button 
+                    onClick={toggleFullscreen} 
+                    className="canvas-expand-touch-btn"
+                    title="3D Stüdyo Tam Ekran Modu"
+                    type="button"
+                  >
+                    {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+                  </button>
+                </div>
+              }
             />
 
             {/* Touch Toast Notification Popup on 3D Canvas */}
@@ -1718,62 +1766,6 @@ export default function ShowroomKioskPage() {
                 <span>{touchToastMsg}</span>
               </div>
             )}
-
-            {/* Canvas Unified Top Bar (Floating non-intrusive toolbar) */}
-            <div className="canvas-top-bar">
-              <div className="canvas-top-left-group">
-                <button 
-                  onClick={() => setIsMobileMenuOpen(true)} 
-                  className="canvas-mobile-floating-menu-btn"
-                  title="Kaplama & Seramik Menüsünü Aç"
-                >
-                  <Palette size={15} />
-                  <span>Katalog & Seramikler</span>
-                </button>
-
-                {/* Compact Active Surface Pill */}
-                {!isPresentationMode && (
-                  <div className="canvas-active-target-pill">
-                    <span className="pill-target-name">
-                      {activeTargetSurface === 'floor' && (applyFloor ? `Zemin (${floorProduct?.name?.split(' ')[0] || 'Karo'})` : 'Zemin: Pasif')}
-                      {activeTargetSurface === 'walls' && (applyWalls ? `Duvar (${wallProduct?.name?.split(' ')[0] || 'Karo'})` : 'Duvar: Pasif')}
-                      {activeTargetSurface === 'shower' && (applyShower ? 'Duş: Kaplı' : 'Duş: Pasif')}
-                      {activeTargetSurface === 'showerFloor' && (applyShowerFloor ? 'Duş Tabanı: Kaplı' : 'Duş Tabanı: Pasif')}
-                      {activeTargetSurface === 'toilet' && (applyToiletWall ? 'Klozet: Kaplı' : 'Klozet: Pasif')}
-                      {activeTargetSurface === 'accent' && (applyAccent ? 'Vurgu: Kaplı' : 'Vurgu: Pasif')}
-                      {activeTargetSurface === 'stripe' && (applyStripeWall ? 'Bordür: Kaplı' : 'Bordür: Pasif')}
-                    </span>
-                    {(activeTargetSurface === 'floor' && applyFloor) && (
-                      <button onClick={() => handleToggleTargetFromCanvas('floor')} className="pill-remove-btn" title="Zemin kaplamasını kaldır">✕</button>
-                    )}
-                    {(activeTargetSurface === 'walls' && applyWalls) && (
-                      <button onClick={() => handleToggleTargetFromCanvas('walls')} className="pill-remove-btn" title="Duvar kaplamasını kaldır">✕</button>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="canvas-top-right-group">
-                {/* 3D Odak / Tam Görünüm Modu Butonu (Alttaki Menüyü Gizler / Açar) */}
-                <button
-                  onClick={() => setIsBottomDockCollapsed(!isBottomDockCollapsed)}
-                  className={`canvas-focus-toggle-btn ${isBottomDockCollapsed ? 'active-gold' : ''}`}
-                  title={isBottomDockCollapsed ? 'Tasarım Menüsünü Aç' : '3D Tam Görünüm (Menüyü Gizle)'}
-                >
-                  {isBottomDockCollapsed ? <Sliders size={13} /> : <Eye size={13} />}
-                  <span>{isBottomDockCollapsed ? 'Menü' : '3D Odak'}</span>
-                </button>
-
-                {/* Fullscreen Expand Button */}
-                <button 
-                  onClick={toggleFullscreen} 
-                  className="canvas-expand-touch-btn"
-                  title="3D Stüdyo Tam Ekran Modu"
-                >
-                  {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
-                </button>
-              </div>
-            </div>
 
             {/* Müşteri Sunum Modu Floating Top Banner */}
             {isPresentationMode && (
@@ -2519,62 +2511,129 @@ export default function ShowroomKioskPage() {
         }
 
         .kiosk-header {
-          height: 56px;
+          height: 52px;
           flex-shrink: 0;
           background: rgba(15, 23, 42, 0.95);
           backdrop-filter: blur(12px);
           border-bottom: 1px solid #1e293b;
-          padding: 8px 18px;
+          padding: 6px 18px;
           display: flex;
           align-items: center;
           justify-content: space-between;
+          gap: 12px;
           z-index: 20;
         }
 
         .header-left {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 8px;
+          flex-shrink: 0;
         }
 
-        .btn-exit-kiosk {
+        .kiosk-nav-btn {
           display: inline-flex !important;
-          flex-direction: row !important;
           align-items: center !important;
           justify-content: center !important;
           gap: 6px !important;
           padding: 0 12px !important;
           height: 36px !important;
-          border-radius: 10px !important;
-          background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.08) 100%) !important;
-          border: 1px solid rgba(239, 68, 68, 0.35) !important;
-          color: #fca5a5 !important;
+          border-radius: 9px !important;
           font-weight: 800 !important;
-          font-size: 0.82rem !important;
+          font-size: 0.78rem !important;
           text-decoration: none !important;
           white-space: nowrap !important;
           flex-shrink: 0 !important;
           backdrop-filter: blur(12px) !important;
-          -webkit-backdrop-filter: blur(12px) !important;
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+          transition: all 0.2s ease !important;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
         }
 
-        .btn-exit-kiosk span {
-          white-space: nowrap !important;
-          display: inline-block !important;
+        .btn-nav-bayi {
+          background: rgba(212, 175, 55, 0.15) !important;
+          border: 1px solid rgba(212, 175, 55, 0.4) !important;
+          color: #f3d375 !important;
         }
 
-        .btn-exit-kiosk:hover {
-          background: #ef4444;
-          border-color: #ef4444;
+        .btn-nav-bayi:hover {
+          background: #f59e0b !important;
+          color: #0f172a !important;
+          transform: translateY(-1px);
+        }
+
+        .btn-nav-exit {
+          background: rgba(239, 68, 68, 0.15) !important;
+          border: 1px solid rgba(239, 68, 68, 0.35) !important;
+          color: #fca5a5 !important;
+        }
+
+        .btn-nav-exit:hover {
+          background: #ef4444 !important;
+          color: #ffffff !important;
+          transform: translateY(-1px);
+        }
+
+        .btn-label-desktop {
+          display: inline;
+        }
+
+        .btn-label-mobile {
+          display: none;
+        }
+
+        /* Center Symmetrical Capsule */
+        .header-center {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: 1;
+          min-width: 0;
+        }
+
+        .header-showroom-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(15, 23, 42, 0.85);
+          border: 1px solid rgba(245, 158, 11, 0.35);
+          padding: 5px 14px;
+          border-radius: 20px;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+          max-width: 100%;
+        }
+
+        .showroom-crown-icon {
+          color: #fbbf24;
+          flex-shrink: 0;
+        }
+
+        .showroom-text-wrap {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        .showroom-brand-name {
+          font-weight: 900;
+          font-size: 0.92rem;
           color: #ffffff;
-          transform: translateY(-1px) scale(1.03);
-          box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
-        .btn-exit-kiosk:active {
-          transform: translateY(0) scale(0.95);
+        .showroom-tag-badge {
+          background: rgba(245, 158, 11, 0.2);
+          border: 1px solid rgba(245, 158, 11, 0.4);
+          color: #fbbf24;
+          font-size: 0.62rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          padding: 2px 7px;
+          border-radius: 12px;
+          flex-shrink: 0;
         }
 
         .brand-badge {
@@ -3128,40 +3187,27 @@ export default function ShowroomKioskPage() {
           position: relative;
         }
 
-        /* Canvas Unified Top Bar */
-        .canvas-top-bar {
-          position: absolute;
-          top: 12px;
-          left: 12px;
-          right: 12px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          pointer-events: none;
-          z-index: 25;
-        }
-
-        .canvas-top-left-group, .canvas-top-right-group {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          pointer-events: auto;
-        }
-
-        .canvas-mobile-floating-menu-btn {
+        /* Kiosk Extra Canvas Floating Controls */
+        .kiosk-extra-top-left, .kiosk-extra-top-right {
           display: flex;
           align-items: center;
           gap: 6px;
+        }
+
+        .canvas-mobile-floating-menu-btn {
+          display: none;
+          align-items: center;
+          gap: 5px;
           background: rgba(15, 23, 42, 0.92);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
           border: 1px solid #f59e0b;
           color: #fbbf24;
           font-weight: 800;
-          font-size: 0.74rem;
-          padding: 6px 12px;
-          border-radius: 20px;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+          font-size: 0.72rem;
+          padding: 5px 10px;
+          border-radius: 8px;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
           cursor: pointer;
           transition: all 0.2s ease;
         }
@@ -3173,7 +3219,7 @@ export default function ShowroomKioskPage() {
         }
 
         .canvas-active-target-pill {
-          display: flex;
+          display: inline-flex;
           align-items: center;
           gap: 6px;
           background: rgba(15, 23, 42, 0.90);
@@ -3181,7 +3227,7 @@ export default function ShowroomKioskPage() {
           -webkit-backdrop-filter: blur(10px);
           border: 1px solid rgba(245, 158, 11, 0.35);
           padding: 4px 10px;
-          border-radius: 14px;
+          border-radius: 8px;
           font-size: 0.72rem;
           color: #f8fafc;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -3215,7 +3261,7 @@ export default function ShowroomKioskPage() {
         }
 
         .canvas-focus-toggle-btn {
-          display: flex;
+          display: inline-flex;
           align-items: center;
           gap: 5px;
           background: rgba(15, 23, 42, 0.90);
@@ -3223,8 +3269,8 @@ export default function ShowroomKioskPage() {
           -webkit-backdrop-filter: blur(10px);
           border: 1px solid rgba(56, 189, 248, 0.4);
           color: #38bdf8;
-          padding: 6px 12px;
-          border-radius: 20px;
+          padding: 5px 11px;
+          border-radius: 8px;
           font-size: 0.72rem;
           font-weight: 800;
           cursor: pointer;
@@ -3252,8 +3298,8 @@ export default function ShowroomKioskPage() {
           color: #94a3b8;
           width: 32px;
           height: 32px;
-          border-radius: 50%;
-          display: flex;
+          border-radius: 8px;
+          display: inline-flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
@@ -4037,52 +4083,93 @@ export default function ShowroomKioskPage() {
           }
 
           .kiosk-header {
-            height: 48px;
+            height: 46px;
             padding: 4px 8px;
             flex-wrap: nowrap;
-            gap: 4px;
+            gap: 6px;
+            justify-content: space-between;
             z-index: 20;
           }
 
           .header-left {
-            gap: 6px;
+            gap: 4px;
             flex-shrink: 0;
           }
 
-          .brand-title {
-            font-size: 0.95rem;
+          .kiosk-nav-btn {
+            height: 32px !important;
+            padding: 0 8px !important;
+            font-size: 0.70rem !important;
+            border-radius: 7px !important;
+            gap: 4px !important;
           }
 
-          .header-right {
-            overflow-x: auto;
+          .btn-label-desktop {
+            display: none !important;
+          }
+
+          .btn-label-mobile {
+            display: inline !important;
+          }
+
+          /* Center Symmetrical Capsule */
+          .header-center {
+            padding: 0 2px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+          }
+
+          .header-showroom-pill {
+            padding: 3px 8px;
+            gap: 5px;
+            border-radius: 14px;
             max-width: 100%;
-            justify-content: flex-end;
-            gap: 4px;
-            -webkit-overflow-scrolling: touch;
           }
 
-          .btn-mode-kiosk span,
-          .btn-secondary-kiosk span {
+          .showroom-crown-icon {
+            width: 12px;
+            height: 12px;
+          }
+
+          .showroom-brand-name {
+            font-size: 0.74rem;
+            max-width: 80px;
+          }
+
+          .showroom-tag-badge {
             display: none;
           }
 
-          .btn-primary-gold-kiosk span {
-            font-size: 0.65rem;
+          .header-right {
+            overflow: visible;
+            max-width: none;
+            justify-content: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
           }
 
           .btn-mode-kiosk,
-          .btn-secondary-kiosk,
+          .btn-secondary-kiosk {
+            display: none !important;
+          }
+
           .btn-primary-gold-kiosk {
-            flex-shrink: 0;
-            padding: 5px 8px;
-            font-size: 0.68rem;
+            height: 32px !important;
+            padding: 0 10px !important;
+            font-size: 0.70rem !important;
+            border-radius: 7px !important;
             min-height: 32px;
+          }
+
+          .btn-primary-gold-kiosk span {
+            font-size: 0.68rem;
           }
 
           .kiosk-workspace-grid {
             display: block;
             position: relative;
-            height: calc(100vh - 48px);
+            height: calc(100vh - 46px);
             overflow: hidden;
           }
 
@@ -4144,50 +4231,54 @@ export default function ShowroomKioskPage() {
             }
           }
 
-          /* Canvas Top Bar on Mobile */
-          .canvas-top-bar {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            right: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            pointer-events: none;
-            z-index: 25;
-          }
-
-          .canvas-top-left-group, .canvas-top-right-group {
+          /* Kiosk Extra Top Controls on Mobile */
+          .kiosk-extra-top-left, .kiosk-extra-top-right {
             display: flex;
             align-items: center;
-            gap: 4px;
-            pointer-events: auto;
+            gap: 3px;
           }
 
           .canvas-mobile-floating-menu-btn {
-            padding: 5px 8px;
-            font-size: 0.66rem;
-            border-radius: 14px;
+            display: inline-flex !important;
+            height: 28px;
+            padding: 0 7px;
+            font-size: 0.64rem;
+            border-radius: 6px;
+            align-items: center;
+            gap: 3px;
           }
 
           .canvas-active-target-pill {
-            padding: 3px 6px;
+            height: 28px;
+            padding: 0 6px;
             font-size: 0.62rem;
-            max-width: 130px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            max-width: 80px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
           }
 
           .canvas-focus-toggle-btn {
-            padding: 5px 8px;
-            font-size: 0.66rem;
-            border-radius: 14px;
+            height: 28px;
+            padding: 0 7px;
+            font-size: 0.64rem;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
           }
 
           .canvas-expand-touch-btn {
             width: 28px;
             height: 28px;
+            border-radius: 6px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
           }
 
           /* Mobile Bottom Quick Surface Chips Bar */

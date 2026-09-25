@@ -36,7 +36,9 @@ export default function StudioCanvas({
   cabinetColor = '#5c4033',
   faucetColor = 'chrome',
   showerGlass = 'clear',
-  onShowerGlassChange
+  onShowerGlassChange,
+  extraTopLeft = null,
+  extraTopRight = null
 }) {
   const containerRef = useRef(null);
   const rendererRef = useRef(null);
@@ -2291,47 +2293,50 @@ export default function StudioCanvas({
       {/* 3D Viewport Overlays (Top & Bottom Symmetrical Edges) */}
       <div className="canvas-overlay-top">
         <div className="overlay-top-left-badges">
-          <div className="overlay-badge">
-            <span>Oda Türü: </span>
-            <strong style={{ textTransform: 'capitalize', color: 'var(--accent-gold)' }}>
-              {roomType === 'bathroom' ? 'Lüks Banyo' : 
-               roomType === 'livingroom' ? 'Modern Salon' : 
-               roomType === 'kitchen' ? 'İndüstriyel Mutfak' :
-               roomType === 'hallway' ? 'Modern Antre' : 
-               roomType === 'bedroom' ? 'Yatak Odası' : 'Açık Teras'}
-            </strong>
-          </div>
-          <div className="overlay-badge">
-            <span>Kaplama: </span>
-            <strong style={{ textTransform: 'capitalize', color: '#38bdf8' }}>
-              {applyAccent ? 'Zemin, Duvar & Vurgu' : applyFloor && applyWalls ? 'Zemin & Duvar' : applyFloor ? 'Sadece Zemin' : 'Döşenmemiş'}
-            </strong>
-          </div>
-          <div className="overlay-badge">
-            <span>Doku: </span>
-            <strong style={{ color: textureStatus.includes('Real') ? 'var(--accent-green)' : 'var(--accent-gold)' }}>
-              {textureStatus}
-            </strong>
-          </div>
-          {layPattern !== 'flat' && (
-            <div className="overlay-badge" style={{ borderColor: 'var(--accent-gold)' }}>
-              <span>Desen: </span>
-              <strong style={{ textTransform: 'uppercase', color: 'var(--accent-gold)' }}>
-                {layPattern}
+          <div className="desktop-badges-group">
+            <div className="overlay-badge">
+              <span>Oda Türü: </span>
+              <strong style={{ textTransform: 'capitalize', color: 'var(--accent-gold)' }}>
+                {roomType === 'bathroom' ? 'Lüks Banyo' : 
+                 roomType === 'livingroom' ? 'Modern Salon' : 
+                 roomType === 'kitchen' ? 'İndüstriyel Mutfak' :
+                 roomType === 'hallway' ? 'Modern Antre' : 
+                 roomType === 'bedroom' ? 'Yatak Odası' : 'Açık Teras'}
               </strong>
             </div>
-          )}
-          {roomType === 'bathroom' && (
-            <div className="overlay-badge" style={{ borderColor: 'rgba(56, 189, 248, 0.4)' }}>
-              <span>Cam: </span>
-              <strong style={{ color: '#38bdf8' }}>
-                {activeGlass === 'clear' ? 'Şeffaf Kristal' :
-                 activeGlass === 'smoke' ? 'Füme Duman' :
-                 activeGlass === 'bronze' ? 'Lüks Bronz' :
-                 activeGlass === 'frosted' ? 'Buzlu Opak' : 'Siyah Grid'}
+            <div className="overlay-badge">
+              <span>Kaplama: </span>
+              <strong style={{ textTransform: 'capitalize', color: '#38bdf8' }}>
+                {applyAccent ? 'Zemin, Duvar & Vurgu' : applyFloor && applyWalls ? 'Zemin & Duvar' : applyFloor ? 'Sadece Zemin' : 'Döşenmemiş'}
               </strong>
             </div>
-          )}
+            <div className="overlay-badge">
+              <span>Doku: </span>
+              <strong style={{ color: textureStatus.includes('Real') ? 'var(--accent-green)' : 'var(--accent-gold)' }}>
+                {textureStatus}
+              </strong>
+            </div>
+            {layPattern !== 'flat' && (
+              <div className="overlay-badge" style={{ borderColor: 'var(--accent-gold)' }}>
+                <span>Desen: </span>
+                <strong style={{ textTransform: 'uppercase', color: 'var(--accent-gold)' }}>
+                  {layPattern}
+                </strong>
+              </div>
+            )}
+            {roomType === 'bathroom' && (
+              <div className="overlay-badge" style={{ borderColor: 'rgba(56, 189, 248, 0.4)' }}>
+                <span>Cam: </span>
+                <strong style={{ color: '#38bdf8' }}>
+                  {activeGlass === 'clear' ? 'Şeffaf Kristal' :
+                   activeGlass === 'smoke' ? 'Füme Duman' :
+                   activeGlass === 'bronze' ? 'Lüks Bronz' :
+                   activeGlass === 'frosted' ? 'Buzlu Opak' : 'Siyah Grid'}
+                </strong>
+              </div>
+            )}
+          </div>
+          {extraTopLeft}
         </div>
         
         {/* Camera Quick Presets Center Bar */}
@@ -2340,6 +2345,7 @@ export default function StudioCanvas({
             onClick={() => setCameraPreset('perspective')}
             className={`preset-btn ${activeCameraPreset === 'perspective' ? 'active' : ''}`}
             title="Genel Perspektif Açısı"
+            type="button"
           >
             👁️ <span className="btn-label">Perspektif</span>
           </button>
@@ -2347,6 +2353,7 @@ export default function StudioCanvas({
             onClick={() => setCameraPreset('vanity')}
             className={`preset-btn ${activeCameraPreset === 'vanity' ? 'active' : ''}`}
             title="Lavabo ve Ayna Odaklı Görünüm"
+            type="button"
           >
             🪞 <span className="btn-label">Lavabo</span>
           </button>
@@ -2354,6 +2361,7 @@ export default function StudioCanvas({
             onClick={() => setCameraPreset('shower')}
             className={`preset-btn ${activeCameraPreset === 'shower' ? 'active' : ''}`}
             title="Duş ve Zemin Odaklı Görünüm"
+            type="button"
           >
             🚿 <span className="btn-label">Duş & Zemin</span>
           </button>
@@ -2361,15 +2369,19 @@ export default function StudioCanvas({
             onClick={() => setCameraPreset('topdown')}
             className={`preset-btn ${activeCameraPreset === 'topdown' ? 'active' : ''}`}
             title="Plan / Kuşbakışı Görünüm"
+            type="button"
           >
             📐 <span className="btn-label">Kuşbakışı</span>
           </button>
         </div>
 
         <div className="overlay-top-right-actions">
-          <button onClick={downloadSnapshot} className="overlay-action-btn" title="Yüksek Çözünürlüklü Görüntüyü İndir">
-            📷 HD Fotoğraf İndir
+          <button onClick={downloadSnapshot} className="overlay-action-btn" title="Yüksek Çözünürlüklü Görüntüyü İndir" type="button">
+            <span className="snapshot-icon">📷</span>
+            <span className="snapshot-label">HD Fotoğraf</span>
+            <span className="snapshot-label-mob">HD</span>
           </button>
+          {extraTopRight}
         </div>
       </div>
 
@@ -2397,18 +2409,22 @@ export default function StudioCanvas({
           right: 14px;
           display: flex;
           justify-content: space-between;
-          align-items: flex-start;
+          align-items: center;
           pointer-events: none;
           gap: 12px;
           z-index: 25;
         }
         .overlay-top-left-badges {
           display: flex;
-          flex-wrap: wrap;
           align-items: center;
           gap: 8px;
           pointer-events: auto;
-          max-width: 75%;
+        }
+        .desktop-badges-group {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-wrap: wrap;
         }
         .overlay-top-right-actions {
           display: flex;
@@ -2441,7 +2457,7 @@ export default function StudioCanvas({
           border-radius: 8px;
           font-size: 0.72rem;
           font-family: var(--font-title);
-          font-weight: 700;
+          font-weight: 800;
           cursor: pointer;
           pointer-events: auto;
           box-shadow: 0 4px 12px rgba(179, 142, 71, 0.35);
@@ -2450,6 +2466,12 @@ export default function StudioCanvas({
           display: inline-flex;
           align-items: center;
           gap: 6px;
+        }
+        .snapshot-label-mob {
+          display: none;
+        }
+        .snapshot-label {
+          display: inline;
         }
         .overlay-action-btn:hover {
           transform: translateY(-2px);
@@ -2556,17 +2578,50 @@ export default function StudioCanvas({
         @media (max-width: 768px) {
           /* Top Overlay Mobile */
           .canvas-overlay-top {
-            top: 8px;
-            left: 8px;
-            right: 8px;
-            gap: 6px;
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            gap: 4px;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: space-between;
             pointer-events: none;
-            z-index: 20;
+            z-index: 25;
           }
           /* Hide repetitive debug badges on mobile completely so 3D room is pristine */
+          .desktop-badges-group {
+            display: none !important;
+          }
           .overlay-top-left-badges {
+            display: flex !important;
+            align-items: center;
+            gap: 4px;
+            pointer-events: auto;
+            flex-shrink: 0;
+            max-width: 38%;
+          }
+          .overlay-camera-presets {
+            order: 0;
+            width: auto;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 2px 3px;
+            border-radius: 7px;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            pointer-events: auto;
+            flex-shrink: 0;
+          }
+          .preset-btn {
+            font-size: 0.68rem;
+            padding: 3px 5px;
+            height: 28px;
+            min-height: 28px;
+            gap: 2px;
+            border-radius: 5px;
+          }
+          .preset-btn .btn-label {
             display: none !important;
           }
           .overlay-top-right-actions {
@@ -2576,38 +2631,27 @@ export default function StudioCanvas({
             gap: 4px;
             flex-shrink: 0;
           }
-          .overlay-camera-presets {
-            order: 1;
-            width: auto;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            padding: 2px 4px;
-            border-radius: 8px;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            pointer-events: auto;
-          }
-          .preset-btn {
-            font-size: 0.68rem;
-            padding: 4px 6px;
-            gap: 2px;
-            border-radius: 5px;
-          }
-          .preset-btn .btn-label {
-            display: none !important;
-          }
           .overlay-action-btn {
-            padding: 5px 8px;
-            font-size: 0.60rem;
+            padding: 0 7px;
+            height: 28px;
+            font-size: 0.62rem;
             font-weight: 800;
             border-radius: 6px;
             white-space: nowrap;
             background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             color: #0f172a;
-            box-shadow: 0 3px 10px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
             cursor: pointer;
             pointer-events: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+          }
+          .snapshot-label {
+            display: none !important;
+          }
+          .snapshot-label-mob {
+            display: inline !important;
           }
 
           /* Bottom Overlay Mobile: Hide text prompts so they don't collide with surfaces bar */
