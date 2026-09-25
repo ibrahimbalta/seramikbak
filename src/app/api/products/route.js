@@ -7,38 +7,46 @@ export async function GET(request) {
     const search = searchParams.get('search') || '';
     const brandId = searchParams.get('brandId') || '';
     const style = searchParams.get('style') || '';
+    const finish = searchParams.get('finish') || '';
     const rawLimit = parseInt(searchParams.get('limit') || '24', 10);
-    const limit = Math.max(1, Math.min(isNaN(rawLimit) ? 24 : rawLimit, 100)); // Clamp between 1 and 100
+    const limit = Math.max(1, Math.min(isNaN(rawLimit) ? 24 : rawLimit, 150)); // Clamp between 1 and 150
     const rawPage = parseInt(searchParams.get('page') || '1', 10);
     const page = Math.max(1, isNaN(rawPage) ? 1 : rawPage);
     const skip = (page - 1) * limit;
 
-    const where = {};
+    const conditions = [];
 
     if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { code: { contains: search, mode: 'insensitive' } },
-        { style: { contains: search, mode: 'insensitive' } }
-      ];
+      conditions.push({
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { code: { contains: search, mode: 'insensitive' } },
+          { style: { contains: search, mode: 'insensitive' } }
+        ]
+      });
     }
 
     if (brandId && brandId !== 'all') {
-      where.OR = [
-        { brandId: brandId },
-        { brand: { id: brandId } },
-        { brand: { name: { equals: brandId, mode: 'insensitive' } } },
-        { brand: { name: { contains: brandId, mode: 'insensitive' } } }
-      ];
+      conditions.push({
+        OR: [
+          { brandId: brandId },
+          { brand: { id: brandId } },
+          { brand: { name: { equals: brandId, mode: 'insensitive' } } },
+          { brand: { name: { contains: brandId, mode: 'insensitive' } } },
+          { brand: { slug: { equals: brandId, mode: 'insensitive' } } }
+        ]
+      });
     }
 
     if (style && style !== 'all') {
-      where.style = { contains: style, mode: 'insensitive' };
+      conditions.push({ style: { contains: style, mode: 'insensitive' } });
     }
 
     if (finish && finish !== 'all') {
-      where.finish = { contains: finish, mode: 'insensitive' };
+      conditions.push({ finish: { contains: finish, mode: 'insensitive' } });
     }
+
+    const where = conditions.length > 0 ? { AND: conditions } : {};
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
@@ -55,12 +63,15 @@ export async function GET(request) {
       prisma.product.count({ where })
     ]);
 
+    const totalPages = Math.ceil(total / limit);
+
     return NextResponse.json({
       success: true,
       products,
       total,
       page,
-      totalPages: Math.ceil(total / limit)
+      totalPages,
+      hasMore: page < totalPages
     });
   } catch (error) {
     console.error('[Public Products API Error]', error);

@@ -242,6 +242,10 @@ export default function ShowroomKioskPage() {
   const [selectedBrandId, setSelectedBrandId] = useState('all');
   const [selectedDealer, setSelectedDealer] = useState(null);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [productPage, setProductPage] = useState(1);
+  const [hasMoreProducts, setHasMoreProducts] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [totalBrandProducts, setTotalBrandProducts] = useState(0);
 
   // Kiosk Subscription & Yetkilendirme Durumu
   const [authChecking, setAuthChecking] = useState(true);
@@ -536,20 +540,32 @@ export default function ShowroomKioskPage() {
     loadMetaDataAndAuth();
   }, []);
 
-  // Seçilen Markaya (veya Tüm Markalara) Göre Veritabanından Ürünleri Canlı Yükle
+  // Seçilen Markaya, Stile ve Aramaya Göre Veritabanından Ürünleri Sayfalı Canlı Yükle
   useEffect(() => {
     if (!isAuthorized) return;
     let isSubscribed = true;
     async function loadProductsForBrand() {
       setIsLoadingProducts(true);
+      setProductPage(1);
+      setHasMoreProducts(true);
       try {
-        const url = selectedBrandId !== 'all' 
-          ? `/api/products?brandId=${encodeURIComponent(selectedBrandId)}&limit=150`
-          : `/api/products?limit=150`;
+        const params = new URLSearchParams({
+          page: '1',
+          limit: '48'
+        });
+        if (selectedBrandId && selectedBrandId !== 'all') {
+          params.set('brandId', selectedBrandId);
+        }
+        if (selectedStyle && selectedStyle !== 'all') {
+          params.set('style', selectedStyle);
+        }
+        if (searchTerm && searchTerm.trim()) {
+          params.set('search', searchTerm.trim());
+        }
 
-        const prodRes = await fetch(url).then(r => r.json()).catch(() => null);
+        const prodRes = await fetch(`/api/products?${params.toString()}`).then(r => r.json()).catch(() => null);
 
-        if (isSubscribed && prodRes && prodRes.products && prodRes.products.length > 0) {
+        if (isSubscribed && prodRes && prodRes.success && Array.isArray(prodRes.products)) {
           const sanitizedProducts = prodRes.products.map((p, idx) => {
             let img = p.imageUrl || p.textureUrl;
             let tex = p.textureUrl || p.imageUrl;
@@ -557,9 +573,7 @@ export default function ShowroomKioskPage() {
               const fallbackIdx = idx % BRAND_CATALOG.length;
               tex = BRAND_CATALOG[fallbackIdx].textureUrl;
             }
-            if (!img) {
-              img = tex;
-            }
+            if (!img) img = tex;
             return {
               ...p,
               imageUrl: img,
@@ -598,12 +612,10 @@ export default function ShowroomKioskPage() {
             }
           }
 
-          setProducts(prev => {
-            if (selectedProduct && !sanitizedProducts.some(p => p.id === selectedProduct.id || (p.code && p.code === selectedProduct.code))) {
-              return [selectedProduct, ...sanitizedProducts];
-            }
-            return sanitizedProducts;
-          });
+          setProducts(sanitizedProducts);
+          setProductPage(1);
+          setHasMoreProducts(prodRes.hasMore ?? (1 < prodRes.totalPages));
+          setTotalBrandProducts(prodRes.total || sanitizedProducts.length);
         }
       } catch (err) {
         console.error('Kiosk brand products fetch error:', err);
@@ -611,9 +623,83 @@ export default function ShowroomKioskPage() {
         if (isSubscribed) setIsLoadingProducts(false);
       }
     }
-    loadProductsForBrand();
-    return () => { isSubscribed = false; };
-  }, [selectedBrandId, isAuthorized]);
+
+    const timer = setTimeout(() => {
+      loadProductsForBrand();
+    }, searchTerm ? 350 : 0);
+
+    return () => {
+      isSubscribed = false;
+      clearTimeout(timer);
+    };
+  }, [selectedBrandId, selectedStyle, searchTerm, isAuthorized]);
+
+  // Kullanıcı Aşağı Kaydırdıkça Markanın Diğer Ürünlerini Canlı Yükle (Infinite Scroll)
+  const loadMoreProducts = async () => {
+    if (isLoadingMore || !hasMoreProducts || isLoadingProducts) return;
+    setIsLoadingMore(true);
+    try {
+      const nextPage = productPage + 1;
+      const params = new URLSearchParams({
+        page: String(nextPage),
+        limit: '48'
+      });
+      if (selectedBrandId && selectedBrandId !== 'all') {
+        params.set('brandId', selectedBrandId);
+      }
+      if (selectedStyle && selectedStyle !== 'all') {
+        params.set('style', selectedStyle);
+      }
+      if (searchTerm && searchTerm.trim()) {
+        params.set('search', searchTerm.trim());
+      }
+
+      const res = await fetch(`/api/products?${params.toString()}`).then(r => r.json()).catch(() => null);
+      if (res && res.success && Array.isArray(res.products) && res.products.length > 0) {
+        const sanitized = res.products.map((p, idx) => {
+          let img = p.imageUrl || p.textureUrl;
+          let tex = p.textureUrl || p.imageUrl;
+          if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
+            const fallbackIdx = idx % BRAND_CATALOG.length;
+            tex = BRAND_CATALOG[fallbackIdx].textureUrl;
+          }
+          if (!img) img = tex;
+          return {
+            ...p,
+            imageUrl: img,
+            textureUrl: tex,
+            unitPrice: p.unitPrice || Math.round((p.width || 60) * (p.height || 120) * 0.08 + (p.finish === 'Parlak' ? 120 : 0) + 380)
+          };
+        });
+
+        setProducts(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const uniqueNew = sanitized.filter(p => !existingIds.has(p.id));
+          return [...prev, ...uniqueNew];
+        });
+
+        setProductPage(nextPage);
+        setHasMoreProducts(res.hasMore ?? (nextPage < res.totalPages));
+        if (res.total) setTotalBrandProducts(res.total);
+      } else {
+        setHasMoreProducts(false);
+      }
+    } catch (err) {
+      console.error('Kiosk load more products error:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  // Liste Aşağı Kaydırıldığında Otomatik Tetikleme
+  const handleProductsScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop - clientHeight < 280) {
+      if (hasMoreProducts && !isLoadingMore && !isLoadingProducts) {
+        loadMoreProducts();
+      }
+    }
+  };
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -930,29 +1016,19 @@ export default function ShowroomKioskPage() {
     return brandMatch && styleMatch && searchMatch;
   });
 
-  let displayProducts = filteredProducts;
-  if (displayProducts.length === 0 && !isLoadingProducts) {
+  let displayProducts = products;
+  if (selectedStyle !== 'all' || searchTerm) {
+    displayProducts = filteredProducts;
+  }
+  if (displayProducts.length === 0 && !isLoadingProducts && !searchTerm && selectedStyle === 'all') {
     if (selectedBrandId !== 'all') {
       const bName = selectedBrandName || selectedBrandId;
-      
       const brandMatchCatalog = BRAND_CATALOG.filter(p => 
         p.brand?.name?.toLowerCase().includes(bName.toLowerCase()) || 
         bName.toLowerCase().includes(p.brand?.name?.toLowerCase())
       );
-
       if (brandMatchCatalog.length > 0) {
         displayProducts = brandMatchCatalog;
-      } else {
-        displayProducts = [
-          { id: `${selectedBrandId}-1`, name: `${bName} Calacatta Gold Porselen`, code: 'CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Rektifiye', color: 'Beyaz / Altın', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg', unitPrice: 540 },
-          { id: `${selectedBrandId}-2`, name: `${bName} Albatros Antrasit Mermer`, code: 'ALB-60120', width: 60, height: 120, style: 'Mermer', finish: 'Lüks Parlak', color: 'Antrasit Damarlı', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg', unitPrice: 560 },
-          { id: `${selectedBrandId}-3`, name: `${bName} Urban Gri Beton Karo`, code: 'BET-6060', width: 60, height: 60, style: 'Beton', finish: 'Mat Endüstriyel', color: 'Gri', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg', unitPrice: 410 },
-          { id: `${selectedBrandId}-4`, name: `${bName} Loft Antrasit Beton`, code: 'BET-8080', width: 80, height: 80, style: 'Beton', finish: 'Lapatto', color: 'Koyu Antrasit', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/loft_beton.jpg', textureUrl: '/textures/loft_beton.jpg', unitPrice: 450 },
-          { id: `${selectedBrandId}-5`, name: `${bName} Natural Meşe Ahşap Porselen`, code: 'OAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Ahşap', color: 'Doğal Meşe', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg', unitPrice: 480 },
-          { id: `${selectedBrandId}-6`, name: `${bName} Travertino Classico Taş`, code: 'TRAV-60120', width: 60, height: 120, style: 'Taş', finish: 'Rölyef Mat', color: 'Bej Traverten', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg', unitPrice: 510 },
-          { id: `${selectedBrandId}-7`, name: `${bName} Vista Bej Doğal Taş`, code: 'VIS-60120', width: 60, height: 120, style: 'Taş', finish: 'Mat Rektifiye', color: 'Vizon Bej', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/vista_bej.jpg', textureUrl: '/textures/vista_bej.jpg', unitPrice: 490 },
-          { id: `${selectedBrandId}-8`, name: `${bName} Teak Koyu Meşe Ahşap`, code: 'TEAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Derzli', color: 'Koyu Meşe', brand: { id: selectedBrandId, name: bName }, imageUrl: '/textures/teak_ahsap.jpg', textureUrl: '/textures/teak_ahsap.jpg', unitPrice: 440 }
-        ];
       }
     } else {
       displayProducts = BRAND_CATALOG;
@@ -1507,63 +1583,92 @@ export default function ShowroomKioskPage() {
           </div>
 
           {/* Products List Grid (Sadece Ürün Listesi İçeride Scroll Eder, Sayfa Bozulmaz!) */}
-          <div className="products-scroll-grid">
+          <div 
+            className="products-scroll-grid"
+            onScroll={handleProductsScroll}
+          >
             {isLoadingProducts ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '220px', color: '#94a3b8', width: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '220px', color: '#94a3b8', width: '100%', gridColumn: 'span 2' }}>
                 <div className="kiosk-spin-loader" />
-                <span style={{ marginTop: '12px', fontSize: '0.85rem', fontWeight: '500' }}>Marka Ürünleri Çekiliyor...</span>
+                <span style={{ marginTop: '12px', fontSize: '0.85rem', fontWeight: '600', color: '#fbbf24' }}>Marka Ürünleri Canlı Yükleniyor...</span>
               </div>
             ) : displayProducts.length === 0 ? (
-              <div style={{ padding: '30px 15px', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
+              <div style={{ padding: '30px 15px', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem', gridColumn: 'span 2' }}>
                 Seçilen filtreye uygun ürün bulunamadı.
               </div>
             ) : (
-              displayProducts.map(product => {
-                const isFloorSelected = floorProduct?.id === product.id;
-                const isWallSelected = wallProduct?.id === product.id;
-                const isShowerSelected = showerProduct?.id === product.id;
-                const isToiletSelected = toiletWallProduct?.id === product.id;
+              <>
+                {displayProducts.map(product => {
+                  const isFloorSelected = floorProduct?.id === product.id;
+                  const isWallSelected = wallProduct?.id === product.id;
+                  const isShowerSelected = showerProduct?.id === product.id;
+                  const isToiletSelected = toiletWallProduct?.id === product.id;
 
-                const isCurrentTarget = 
-                  (activeTargetSurface === 'floor' && isFloorSelected) ||
-                  (activeTargetSurface === 'walls' && isWallSelected) ||
-                  (activeTargetSurface === 'shower' && isShowerSelected) ||
-                  (activeTargetSurface === 'toilet' && isToiletSelected);
+                  const isCurrentTarget = 
+                    (activeTargetSurface === 'floor' && isFloorSelected) ||
+                    (activeTargetSurface === 'walls' && isWallSelected) ||
+                    (activeTargetSurface === 'shower' && isShowerSelected) ||
+                    (activeTargetSurface === 'toilet' && isToiletSelected);
 
-                return (
-                  <div
-                    key={product.id}
-                    onClick={() => handleSelectProductForTarget(product)}
-                    className={`product-touch-card ${isCurrentTarget ? 'active' : ''}`}
-                  >
-                    <div className="card-thumb-wrapper">
-                      <img
-                        src={product.imageUrl || product.textureUrl || '/textures/calacatta_gold.jpg'}
-                        alt={product.name}
-                        className="card-thumb-img"
-                        loading="lazy"
-                        decoding="async"
-                        onError={(e) => {
-                          e.target.src = '/textures/calacatta_gold.jpg';
-                        }}
-                      />
-                      <div className="tag-badges">
-                        {isFloorSelected && <span className="tag-floor">ZEMİN</span>}
-                        {isWallSelected && <span className="tag-wall">DUVAR</span>}
-                        {isShowerSelected && <span className="tag-shower">DUŞ</span>}
+                  return (
+                    <div
+                      key={product.id}
+                      onClick={() => handleSelectProductForTarget(product)}
+                      className={`product-touch-card ${isCurrentTarget ? 'active' : ''}`}
+                    >
+                      <div className="card-thumb-wrapper">
+                        <img
+                          src={product.imageUrl || product.textureUrl || '/textures/calacatta_gold.jpg'}
+                          alt={product.name}
+                          className="card-thumb-img"
+                          loading="lazy"
+                          decoding="async"
+                          onError={(e) => {
+                            e.target.src = '/textures/calacatta_gold.jpg';
+                          }}
+                        />
+                        <div className="tag-badges">
+                          {isFloorSelected && <span className="tag-floor">ZEMİN</span>}
+                          {isWallSelected && <span className="tag-wall">DUVAR</span>}
+                          {isShowerSelected && <span className="tag-shower">DUŞ</span>}
+                        </div>
+                      </div>
+
+                      <div className="card-info">
+                        <span className="brand-name-pill">{product.brand?.name || 'Seramik Markası'}</span>
+                        <h3 className="product-title">{product.name}</h3>
+                        <p className="product-specs">
+                          {product.width}x{product.height} cm • {product.style || 'Seramik'} • {product.finish || 'Mat'}
+                        </p>
                       </div>
                     </div>
+                  );
+                })}
 
-                    <div className="card-info">
-                      <span className="brand-name-pill">{product.brand?.name || 'Seramik Markası'}</span>
-                      <h3 className="product-title">{product.name}</h3>
-                      <p className="product-specs">
-                        {product.width}x{product.height} cm • {product.style || 'Seramik'} • {product.finish || 'Mat'}
-                      </p>
-                    </div>
+                {/* Infinite Scroll Indicator & Loading More */}
+                {isLoadingMore && (
+                  <div className="kiosk-infinite-loading-pill">
+                    <div className="kiosk-spin-loader-sm" />
+                    <span>Daha fazla model yükleniyor...</span>
                   </div>
-                );
-              })
+                )}
+
+                {hasMoreProducts && !isLoadingMore && (
+                  <button 
+                    onClick={loadMoreProducts} 
+                    className="kiosk-load-more-btn"
+                    type="button"
+                  >
+                    <span>Daha Fazla Göster ({displayProducts.length} / {totalBrandProducts})</span>
+                  </button>
+                )}
+
+                {!hasMoreProducts && displayProducts.length > 0 && (
+                  <div className="kiosk-infinite-end-pill">
+                    <span>✓ Markanın tüm modelleri listelendi ({displayProducts.length} Model)</span>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -2820,6 +2925,70 @@ export default function ShowroomKioskPage() {
           gap: 8px;
           overflow-y: auto;
           padding-right: 2px;
+          align-content: start;
+        }
+
+        .kiosk-spin-loader-sm {
+          width: 16px;
+          height: 16px;
+          border: 2px solid #f59e0b;
+          border-top-color: transparent;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+
+        .kiosk-infinite-loading-pill {
+          grid-column: span 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 8px 12px;
+          background: rgba(15, 23, 42, 0.9);
+          border: 1px solid rgba(245, 158, 11, 0.35);
+          border-radius: 20px;
+          color: #fbbf24;
+          font-size: 0.74rem;
+          font-weight: 700;
+          margin: 6px 0;
+        }
+
+        .kiosk-load-more-btn {
+          grid-column: span 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 8px 14px;
+          background: #1e293b;
+          border: 1px solid #334155;
+          border-radius: 8px;
+          color: #94a3b8;
+          font-size: 0.72rem;
+          font-weight: 800;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          margin: 6px 0;
+        }
+
+        .kiosk-load-more-btn:hover {
+          background: #f59e0b;
+          color: #0f172a;
+          border-color: #f59e0b;
+        }
+
+        .kiosk-infinite-end-pill {
+          grid-column: span 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 8px 12px;
+          background: rgba(34, 197, 94, 0.1);
+          border: 1px solid rgba(34, 197, 94, 0.3);
+          border-radius: 8px;
+          color: #4ade80;
+          font-size: 0.70rem;
+          font-weight: 700;
+          margin: 6px 0;
         }
 
         .product-touch-card {
