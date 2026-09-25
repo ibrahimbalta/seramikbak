@@ -1124,6 +1124,7 @@ export default function Home() {
   const [studioTimeOfDay, setStudioTimeOfDay] = useState('day'); // sunrise, day, sunset, night
   const [studioCabinetColor, setStudioCabinetColor] = useState('#5c4033'); // oak, white, anthracite, walnut
   const [studioFaucetColor, setStudioFaucetColor] = useState('chrome'); // chrome, black, gold, rosegold
+  const [studioShowerGlass, setStudioShowerGlass] = useState('clear'); // clear, smoke, bronze, frosted, grid
   const [studioToast, setStudioToast] = useState(null);
   const [studioTileCategory, setStudioTileCategory] = useState('all'); // all, marble, wood, concrete, glossy, matte
   const [studioSettingsTab, setStudioSettingsTab] = useState('pattern'); // pattern, light, fixtures
@@ -5773,6 +5774,8 @@ export default function Home() {
                       timeOfDay={studioTimeOfDay}
                       cabinetColor={studioCabinetColor}
                       faucetColor={studioFaucetColor}
+                      showerGlass={studioShowerGlass}
+                      onShowerGlassChange={setStudioShowerGlass}
                     />
                   ) : (
                     <div className="canvas-placeholder">
@@ -6177,6 +6180,34 @@ export default function Home() {
                           ))}
                         </div>
                       </div>
+
+                      {studioRoomType === 'bathroom' && (
+                        <div className="setting-box">
+                          <label className="setting-box-label">🚿 Duşakabin Camı Rengi & Tasarımı</label>
+                          <div className="setting-pills-row">
+                            {[
+                              { id: 'clear', icon: '💎', label: 'Şeffaf Kristal' },
+                              { id: 'smoke', icon: '🌫️', label: 'Füme Duman' },
+                              { id: 'bronze', icon: '✨', label: 'Lüks Bronz' },
+                              { id: 'frosted', icon: '❄️', label: 'Buzlu Opak' },
+                              { id: 'grid', icon: '🏁', label: 'Siyah Çıtalı (Grid)' }
+                            ].map(g => (
+                              <button
+                                key={g.id}
+                                type="button"
+                                className={`pill-option-btn ${studioShowerGlass === g.id ? 'active' : ''}`}
+                                onClick={() => {
+                                  setStudioShowerGlass(g.id);
+                                  showStudioToast(`Duşakabin: ${g.label} uygulandı`);
+                                }}
+                              >
+                                <span>{g.icon}</span>
+                                <span>{g.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

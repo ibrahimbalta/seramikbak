@@ -34,7 +34,9 @@ export default function StudioCanvas({
   layPattern = 'flat',
   timeOfDay = 'day',
   cabinetColor = '#5c4033',
-  faucetColor = 'chrome'
+  faucetColor = 'chrome',
+  showerGlass = 'clear',
+  onShowerGlassChange
 }) {
   const containerRef = useRef(null);
   const rendererRef = useRef(null);
@@ -69,6 +71,11 @@ export default function StudioCanvas({
   const [textureStatus, setTextureStatus] = useState('Procedural (Fallback)');
   const [isSceneReady, setIsSceneReady] = useState(false);
   const [activeCameraPreset, setActiveCameraPreset] = useState('perspective');
+  const [activeGlass, setActiveGlass] = useState(showerGlass || 'clear');
+
+  useEffect(() => {
+    if (showerGlass) setActiveGlass(showerGlass);
+  }, [showerGlass]);
 
   // Dimensions of room in meters
   const ROOM_WIDTH = 3.6; 
@@ -472,22 +479,6 @@ export default function StudioCanvas({
     coveLeft.position.set(-ROOM_WIDTH / 2 + 0.025, ROOM_HEIGHT - 0.02, 0);
     scene.add(coveLeft);
 
-    // Modern Architectural Skirting (Süpürgelik)
-    const skirtingMat = new THREE.MeshStandardMaterial({
-      color: '#1a1d24',
-      metalness: 0.3,
-      roughness: 0.5
-    });
-    const skirtBack = new THREE.Mesh(new THREE.BoxGeometry(ROOM_WIDTH, 0.08, 0.015), skirtingMat);
-    skirtBack.position.set(0, 0.04, -ROOM_DEPTH / 2 + 0.0075);
-    skirtBack.receiveShadow = true;
-    scene.add(skirtBack);
-
-    const skirtLeft = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.08, ROOM_DEPTH), skirtingMat);
-    skirtLeft.position.set(-ROOM_WIDTH / 2 + 0.0075, 0.04, 0);
-    skirtLeft.receiveShadow = true;
-    scene.add(skirtLeft);
-
     // Hanging Ceiling Light fixture
     const wireGeo = new THREE.CylinderGeometry(0.008, 0.008, 1);
     const wireMat = new THREE.MeshBasicMaterial({ color: '#111111' });
@@ -802,16 +793,69 @@ export default function StudioCanvas({
       clearcoatRoughness: 0.02
     });
 
-    const glassMat = new THREE.MeshPhysicalMaterial({
-      color: '#e2f1f6',
-      transparent: true,
-      opacity: 0.18,
-      roughness: 0.05,
-      transmission: 0.95,
-      ior: 1.5,
-      thickness: 0.02,
-      side: THREE.DoubleSide
-    });
+    const resolveShowerGlassMat = (type) => {
+      if (type === 'smoke') {
+        // Füme / Duman Gri
+        return new THREE.MeshPhysicalMaterial({
+          color: '#28303a',
+          transparent: true,
+          opacity: 0.65,
+          roughness: 0.06,
+          metalness: 0.12,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.02,
+          side: THREE.DoubleSide
+        });
+      } else if (type === 'bronze') {
+        // Lüks Sıcak Bronz
+        return new THREE.MeshPhysicalMaterial({
+          color: '#6e4c2f',
+          transparent: true,
+          opacity: 0.60,
+          roughness: 0.06,
+          metalness: 0.18,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.02,
+          side: THREE.DoubleSide
+        });
+      } else if (type === 'frosted') {
+        // Buzlu / Asitli Mat
+        return new THREE.MeshStandardMaterial({
+          color: '#e8edf3',
+          transparent: true,
+          opacity: 0.85,
+          roughness: 0.65,
+          metalness: 0.02,
+          side: THREE.DoubleSide
+        });
+      } else if (type === 'grid') {
+        // Siyah Çıtalı / Crittall Glass
+        return new THREE.MeshPhysicalMaterial({
+          color: '#e2f0f8',
+          transparent: true,
+          opacity: 0.38,
+          roughness: 0.04,
+          metalness: 0.1,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.02,
+          side: THREE.DoubleSide
+        });
+      }
+      // Varsayılan: Şeffaf Kristal (Clear)
+      return new THREE.MeshPhysicalMaterial({
+        color: '#d6ecf7',
+        transparent: true,
+        opacity: 0.40,
+        roughness: 0.04,
+        metalness: 0.1,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.02,
+        side: THREE.DoubleSide
+      });
+    };
+
+    const activeShowerGlassMat = resolveShowerGlassMat(activeGlass);
+    const glassMat = activeShowerGlassMat;
 
     const darkCabMat = new THREE.MeshStandardMaterial({
       color: '#1a1c22',
@@ -943,12 +987,15 @@ export default function StudioCanvas({
       mirrorRim.position.set(-ROOM_WIDTH / 2 + 0.018, 1.62, 0);
       mirrorGroup.add(mirrorRim);
 
-      // Mirror Reflective Glass Front
+      // Mirror Reflective Glass Front (Bright luxury silvered mirror surface)
       const mirrorFrontGeo = new THREE.CylinderGeometry(0.51, 0.51, 0.008, 48);
-      const mirrorGlassMat = new THREE.MeshStandardMaterial({
-        color: '#c8cbd4',
-        metalness: 0.99,
-        roughness: 0.01
+      const mirrorGlassMat = new THREE.MeshPhysicalMaterial({
+        color: '#f0f4f8',
+        roughness: 0.05,
+        metalness: 0.20,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.02,
+        reflectivity: 0.95
       });
       const mirrorGlass = new THREE.Mesh(mirrorFrontGeo, mirrorGlassMat);
       mirrorGlass.rotation.z = Math.PI / 2;
@@ -1008,17 +1055,45 @@ export default function StudioCanvas({
       const showerGroup = new THREE.Group();
       group.add(showerGroup);
 
-      // Ultra-Clear Frameless Glass Screen (Minimalist modern walk-in)
+      // Frameless Luxury Glass Screen (Color & Style customizable)
       const glassCabGeo = new THREE.BoxGeometry(0.015, 2.15, 1.25);
       const glassCab1 = new THREE.Mesh(glassCabGeo, glassMat);
       glassCab1.position.set(-ROOM_WIDTH / 2 + 1.20, 1.075, -ROOM_DEPTH / 2 + 0.625);
       showerGroup.add(glassCab1);
 
-      // Minimal Slim Floor & Wall Channel (U-Profile)
-      const uChanFloorGeo = new THREE.BoxGeometry(0.03, 0.02, 1.25);
-      const uChanFloor = new THREE.Mesh(uChanFloorGeo, activeFaucetMat);
-      uChanFloor.position.set(-ROOM_WIDTH / 2 + 1.20, 0.01, -ROOM_DEPTH / 2 + 0.625);
-      showerGroup.add(uChanFloor);
+      // Discrete Minimalist Glass Floor Clamps (No heavy floor channel!)
+      const clampGeo = new THREE.BoxGeometry(0.02, 0.025, 0.04);
+      const clamp1 = new THREE.Mesh(clampGeo, activeFaucetMat);
+      clamp1.position.set(-ROOM_WIDTH / 2 + 1.20, 0.0125, -ROOM_DEPTH / 2 + 0.25);
+      showerGroup.add(clamp1);
+
+      const clamp2 = new THREE.Mesh(clampGeo, activeFaucetMat);
+      clamp2.position.set(-ROOM_WIDTH / 2 + 1.20, 0.0125, -ROOM_DEPTH / 2 + 1.10);
+      showerGroup.add(clamp2);
+
+      // Optional Crittall Black Grid Bars for 'grid' style
+      if (activeGlass === 'grid') {
+        const gridMat = new THREE.MeshStandardMaterial({ color: '#1a1d24', roughness: 0.8 });
+        // Frame Top & Edge
+        const frameTop = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 1.25), gridMat);
+        frameTop.position.set(-ROOM_WIDTH / 2 + 1.20, 2.15, -ROOM_DEPTH / 2 + 0.625);
+        showerGroup.add(frameTop);
+
+        const frameEdge = new THREE.Mesh(new THREE.BoxGeometry(0.02, 2.15, 0.02), gridMat);
+        frameEdge.position.set(-ROOM_WIDTH / 2 + 1.20, 1.075, -ROOM_DEPTH / 2 + 1.24);
+        showerGroup.add(frameEdge);
+
+        // Horizontal grid bars
+        for (let yPos of [0.55, 1.10, 1.65]) {
+          const barH = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.015, 1.23), gridMat);
+          barH.position.set(-ROOM_WIDTH / 2 + 1.20, yPos, -ROOM_DEPTH / 2 + 0.625);
+          showerGroup.add(barH);
+        }
+        // Vertical grid bar
+        const barV = new THREE.Mesh(new THREE.BoxGeometry(0.018, 2.13, 0.015), gridMat);
+        barV.position.set(-ROOM_WIDTH / 2 + 1.20, 1.075, -ROOM_DEPTH / 2 + 0.625);
+        showerGroup.add(barV);
+      }
 
       // Top Glass Support Brace Rod (Tie Bar)
       const braceGeo = new THREE.CylinderGeometry(0.01, 0.01, 1.20, 12);
@@ -1080,10 +1155,15 @@ export default function StudioCanvas({
       bottle2.position.set(-ROOM_WIDTH / 2 + 0.62, 1.28, -ROOM_DEPTH / 2 + 0.06);
       showerGroup.add(bottle2);
 
-      // Linear Stainless Steel Shower Drain (Doğrusal Süzgeç Kanalı)
-      const drainGrateGeo = new THREE.BoxGeometry(0.06, 0.005, 0.90);
-      const drainGrate = new THREE.Mesh(drainGrateGeo, chromeMat);
-      drainGrate.position.set(-ROOM_WIDTH / 2 + 0.12, 0.008, -ROOM_DEPTH / 2 + 0.58);
+      // Sleek Linear Brushed Stainless Steel Shower Drain (Duvar Dibi İnce Doğrusal Süzgeç)
+      const drainGrateGeo = new THREE.BoxGeometry(0.80, 0.002, 0.06);
+      const drainGrateMat = new THREE.MeshStandardMaterial({
+        color: '#d0d5dd',
+        metalness: 0.85,
+        roughness: 0.25
+      });
+      const drainGrate = new THREE.Mesh(drainGrateGeo, drainGrateMat);
+      drainGrate.position.set(-ROOM_WIDTH / 2 + 0.60, 0.002, -ROOM_DEPTH / 2 + 0.06);
       drainGrate.receiveShadow = true;
       showerGroup.add(drainGrate);
 
@@ -1623,7 +1703,7 @@ export default function StudioCanvas({
       group.add(doorTrim);
     }
 
-  }, [roomType, isSceneReady, cabinetColor, faucetColor]);
+  }, [roomType, isSceneReady, cabinetColor, faucetColor, activeGlass]);
 
   // Update lighting configurations reactively when controls change
   useEffect(() => {
@@ -2238,6 +2318,17 @@ export default function StudioCanvas({
               <span>Desen: </span>
               <strong style={{ textTransform: 'uppercase', color: 'var(--accent-gold)' }}>
                 {layPattern}
+              </strong>
+            </div>
+          )}
+          {roomType === 'bathroom' && (
+            <div className="overlay-badge" style={{ borderColor: 'rgba(56, 189, 248, 0.4)' }}>
+              <span>Cam: </span>
+              <strong style={{ color: '#38bdf8' }}>
+                {activeGlass === 'clear' ? 'Şeffaf Kristal' :
+                 activeGlass === 'smoke' ? 'Füme Duman' :
+                 activeGlass === 'bronze' ? 'Lüks Bronz' :
+                 activeGlass === 'frosted' ? 'Buzlu Opak' : 'Siyah Grid'}
               </strong>
             </div>
           )}
