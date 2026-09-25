@@ -132,6 +132,9 @@ function enrichProductData(p) {
 }
 
 function getProductBadge(product, idx) {
+  if (product.similarityScore) {
+    return { text: `%${product.similarityScore} Uyum`, className: "gold" };
+  }
   if (product.isPremium) return { text: "Premium", className: "gold" };
   const val = product.name.charCodeAt(0) + product.name.charCodeAt(product.name.length - 1) + idx;
   if (val % 3 === 0) return { text: "Çok Satan", className: "red" };
@@ -1081,6 +1084,8 @@ export default function Home() {
   // Visual Search Upload Simulation
   const [visualSearchLoading, setVisualSearchLoading] = useState(false);
   const [uploadedImagePreview, setUploadedImagePreview] = useState(null);
+  const [uploadedImageFile, setUploadedImageFile] = useState(null);
+  const [detectedColorInfo, setDetectedColorInfo] = useState(null);
   const [visualSearchMatches, setVisualSearchMatches] = useState(null);
 
   // WebAR Camera Modal State
@@ -2229,8 +2234,18 @@ export default function Home() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    setUploadedImagePreview(null);
-    setVisualSearchMatches(null);
+    if (uploadedImagePreview) {
+      // If user uploaded an image and clicks 'Ara', perform or focus visual search results!
+      if (uploadedImageFile && (!products || products.length === 0 || !products.some(p => p.similarityScore))) {
+        triggerVisualSearch(uploadedImageFile);
+      } else {
+        setTimeout(() => {
+          catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
+      }
+      return;
+    }
+    // Normal text search submit
     setPage(1);
     fetchProducts('', 1, false);
     setTimeout(() => {
@@ -2241,6 +2256,8 @@ export default function Home() {
   const handleTagClick = (tagQuery, filterType = '', filterVal = '') => {
     setSearchQuery(tagQuery);
     setUploadedImagePreview(null);
+    setUploadedImageFile(null);
+    setDetectedColorInfo(null);
     setVisualSearchMatches(null);
     
     if (filterType === 'style') {
@@ -2258,12 +2275,14 @@ export default function Home() {
   const handleClearSearch = () => {
     setSearchQuery('');
     setUploadedImagePreview(null);
+    setUploadedImageFile(null);
+    setDetectedColorInfo(null);
     setVisualSearchMatches(null);
     setPage(1);
     fetchProducts('', 1, false);
   };
 
-  const detectImageColor = (file) => {
+  const detectImageColorAdvanced = (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -2271,132 +2290,155 @@ export default function Home() {
         img.onload = () => {
           try {
             const canvas = document.createElement('canvas');
-            canvas.width = 10;
-            canvas.height = 10;
+            const size = 64;
+            canvas.width = size;
+            canvas.height = size;
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, 10, 10);
-            const data = ctx.getImageData(0, 0, 10, 10).data;
+            ctx.drawImage(img, 0, 0, size, size);
+            const data = ctx.getImageData(0, 0, size, size).data;
             
-            let r = 0, g = 0, b = 0;
+            let totalR = 0, totalG = 0, totalB = 0;
+            let sampleCount = 0;
+            
             for (let i = 0; i < data.length; i += 4) {
-              r += data[i];
-              g += data[i+1];
-              b += data[i+2];
+              const a = data[i+3];
+              if (a < 128) continue; // ignore transparent
+              totalR += data[i];
+              totalG += data[i+1];
+              totalB += data[i+2];
+              sampleCount++;
             }
-            r = Math.round(r / 100);
-            g = Math.round(g / 100);
-            b = Math.round(b / 100);
             
-            const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+            if (sampleCount === 0) sampleCount = 1;
+            const r = Math.round(totalR / sampleCount);
+            const g = Math.round(totalG / sampleCount);
+            const b = Math.round(totalB / sampleCount);
             
-            if (brightness < 85) {
-              resolve('Gri'); // Dark colors default to Gray/Anthracite in db
-            } else if (brightness > 200) {
-              resolve('Beyaz');
-            } else {
-              const max = Math.max(r, g, b);
-              const min = Math.min(r, g, b);
-              const saturation = max === 0 ? 0 : (max - min) / max;
-              
-              if (saturation < 0.15) {
-                resolve('Gri');
-              } else {
-                if (r > b) {
-                  if (g > b) {
-                    resolve('Bej'); // Also covers Krem
-                  } else {
-                    resolve('Kahve'); // Covers wood/brown tones
-                  }
-                } else {
-                  resolve('Gri');
-                }
+            // RGB to HSL
+            const rNorm = r / 255, gNorm = g / 255, bNorm = b / 255;
+            const max = Math.max(rNorm, gNorm, bNorm);
+            const min = Math.min(rNorm, gNorm, bNorm);
+            let h = 0, s = 0, l = (max + min) / 2;
+            
+            if (max !== min) {
+              const d = max - min;
+              s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+              switch (max) {
+                case rNorm: h = (gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0); break;
+                case gNorm: h = (bNorm - rNorm) / d + 2; break;
+                case bNorm: h = (rNorm - gNorm) / d + 4; break;
               }
+              h *= 60;
             }
+            
+            h = Math.round(h);
+            s = Math.round(s * 100);
+            l = Math.round(l * 100);
+            
+            let primaryColor = 'Gri';
+            let compatibleColors = ['Gri', 'Açık Gri', 'Koyu Gri', 'Antrasit'];
+            
+            // Ceramic taxonomy mapping
+            if (l >= 88 && s <= 22) {
+              primaryColor = 'Beyaz';
+              compatibleColors = ['Beyaz', 'Krem', 'Fildişi', 'Açık Gri'];
+            } else if (l <= 14) {
+              primaryColor = 'Siyah';
+              compatibleColors = ['Siyah', 'Antrasit', 'Koyu Gri'];
+            } else if (l <= 28 && s <= 25) {
+              primaryColor = 'Antrasit';
+              compatibleColors = ['Antrasit', 'Siyah', 'Koyu Gri', 'Füme'];
+            } else if (l <= 46 && s <= 20) {
+              primaryColor = 'Koyu Gri';
+              compatibleColors = ['Koyu Gri', 'Gri', 'Antrasit', 'Siyah'];
+            } else if (l >= 74 && l < 88 && s <= 16) {
+              primaryColor = 'Açık Gri';
+              compatibleColors = ['Açık Gri', 'Gri', 'Beyaz', 'Gümüş Gri'];
+            } else if (s <= 15) {
+              primaryColor = 'Gri';
+              compatibleColors = ['Gri', 'Açık Gri', 'Koyu Gri', 'Antrasit'];
+            } else if (h >= 18 && h <= 55) {
+              if (l >= 80 && s <= 60) {
+                primaryColor = 'Krem';
+                compatibleColors = ['Krem', 'Fildişi', 'Bej', 'Beyaz', 'Bone'];
+              } else if (l >= 55) {
+                primaryColor = 'Bej';
+                compatibleColors = ['Bej', 'Krem', 'Fildişi', 'Sand', 'Traverten', 'Vizon'];
+              } else {
+                primaryColor = 'Kahverengi';
+                compatibleColors = ['Kahverengi', 'Kahve', 'Ceviz', 'Ahşap', 'Meşe'];
+              }
+            } else if (h > 55 && h <= 165) {
+              primaryColor = 'Yeşil';
+              compatibleColors = ['Yeşil', 'Yosun', 'Zümrüt', 'Sage'];
+            } else if (h > 165 && h <= 260) {
+              primaryColor = 'Mavi';
+              compatibleColors = ['Mavi', 'Okyanus', 'Sky', 'Blue'];
+            } else if ((h > 340 || h < 18) && s >= 20) {
+              primaryColor = 'Terracotta';
+              compatibleColors = ['Terracotta', 'Cotto', 'Kiremit', 'Kahverengi'];
+            } else {
+              primaryColor = 'Gri';
+              compatibleColors = ['Gri', 'Açık Gri', 'Bej'];
+            }
+            
+            resolve({
+              primaryColor,
+              compatibleColors,
+              rgb: { r, g, b },
+              hsl: { h, s, l },
+              hex: `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
+            });
           } catch (e) {
-            resolve('Gri');
+            resolve({
+              primaryColor: 'Gri',
+              compatibleColors: ['Gri', 'Açık Gri', 'Koyu Gri'],
+              rgb: { r: 140, g: 140, b: 140 }
+            });
           }
         };
-        img.onerror = () => resolve('Gri');
+        img.onerror = () => resolve({ primaryColor: 'Gri', compatibleColors: ['Gri'], rgb: { r: 140, g: 140, b: 140 } });
         img.src = event.target.result;
       };
-      reader.onerror = () => resolve('Gri');
+      reader.onerror = () => resolve({ primaryColor: 'Gri', compatibleColors: ['Gri'], rgb: { r: 140, g: 140, b: 140 } });
       reader.readAsDataURL(file);
     });
   };
 
-  const extractImageSignature = (file) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          try {
-            const canvas = document.createElement('canvas');
-            canvas.width = 4;
-            canvas.height = 4;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, 4, 4);
-            const data = ctx.getImageData(0, 0, 4, 4).data;
-            const sig = [];
-            for (let i = 0; i < data.length; i += 4) {
-              sig.push(data[i], data[i+1], data[i+2]);
-            }
-            resolve(sig);
-          } catch (e) {
-            resolve(null);
-          }
-        };
-        img.onerror = () => resolve(null);
-        img.src = event.target.result;
-      };
-      reader.onerror = () => resolve(null);
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleVisualSearch = async (e) => {
-    const file = e.target.files?.[0];
+  const triggerVisualSearch = async (file) => {
     if (!file) return;
 
     setUploadedImagePreview(URL.createObjectURL(file));
+    setUploadedImageFile(file);
     setVisualSearchLoading(true);
     setVisualSearchMatches(null);
 
-    // Reset file input target value so selecting the same image fires onChange next time
-    e.target.value = '';
-
     // Scroll smoothly to results header
     setTimeout(() => {
-      const el = document.querySelector('.results-header-row-new');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 200);
+      catalogSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
 
-    // Detect color of the uploaded image
-    let detectedColor = 'Gri';
+    // Extract advanced ceramic color metrics
+    let colorInfo = null;
     try {
-      detectedColor = await detectImageColor(file);
+      colorInfo = await detectImageColorAdvanced(file);
+      setDetectedColorInfo(colorInfo);
     } catch (colorErr) {
-      console.warn("Client color extraction failed, defaulting to 'Gri'", colorErr);
-    }
-
-    // Extract 4x4 visual signature
-    let signature = null;
-    try {
-      signature = await extractImageSignature(file);
-    } catch (sigErr) {
-      console.warn("Client signature extraction failed", sigErr);
+      console.warn("Client color extraction failed, fallback to Gri", colorErr);
+      colorInfo = { primaryColor: 'Gri', compatibleColors: ['Gri', 'Açık Gri'], rgb: { r: 140, g: 140, b: 140 } };
+      setDetectedColorInfo(colorInfo);
     }
 
     const formData = new FormData();
     formData.append('file', file);
-    if (signature) {
-      formData.append('signature', JSON.stringify(signature));
+    formData.append('detectedColor', colorInfo.primaryColor);
+    formData.append('colorFamilies', JSON.stringify(colorInfo.compatibleColors));
+    if (colorInfo.rgb) {
+      formData.append('rgb', JSON.stringify(colorInfo.rgb));
     }
 
     try {
-      const res = await fetch(`/api/ai/visual-search?fallbackColor=${encodeURIComponent(detectedColor)}`, {
+      const res = await fetch(`/api/ai/visual-search?fallbackColor=${encodeURIComponent(colorInfo.primaryColor)}`, {
         method: 'POST',
         body: formData
       });
@@ -2416,15 +2458,11 @@ export default function Home() {
             productName: p.name,
             productCode: p.code,
             score: p.similarityScore,
-            isFallback: p.isFallback
+            isFallback: false
           }));
           setVisualSearchMatches(matches);
         } else {
           console.error('Invalid visual search response format:', data);
-        }
-        
-        if (data && data.warning) {
-          console.warn(data.warning);
         }
       } else {
         throw new Error('Görsel arama API hatası');
@@ -2434,6 +2472,16 @@ export default function Home() {
     } finally {
       setVisualSearchLoading(false);
     }
+  };
+
+  const handleVisualSearch = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Reset file input target value so selecting the same image fires onChange next time
+    e.target.value = '';
+
+    await triggerVisualSearch(file);
   };
 
   async function fetchNearestDealers(brandId, lat, lng) {
@@ -4358,7 +4406,7 @@ export default function Home() {
                     )}
                     <input 
                       type="text" 
-                      placeholder={uploadedImagePreview ? "Görsel yüklendi." : "Seramik, mermer, model veya marka ara..."}
+                      placeholder={uploadedImagePreview ? (detectedColorInfo?.primaryColor ? `Görsel: ${detectedColorInfo.primaryColor} tonları algılandı` : "Görsel yüklendi...") : "Seramik, mermer, model veya marka ara..."}
                       value={searchQuery}
                       onChange={handleSearchChange}
                       onFocus={() => { if (searchQuery.trim().length > 1) setShowSuggestions(true); }}
@@ -5418,18 +5466,36 @@ export default function Home() {
                 <div className="results-header-row-new" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px', marginBottom: '20px' }}>
                   <div className="results-header-text-new">
                     {uploadedImagePreview ? (
-                      <div>
-                        <h3>
-                          Görsel Arama Sonuçları{" "}
-                          <span className="results-new-badge gold">
-                            {products.some(p => p.isFallback) ? 'Renk & Doku Analizi' : 'AI Eşleşme'}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', margin: 0 }}>
+                            Görsel Renk Arama Sonuçları
+                          </h3>
+                          <span className="results-new-badge gold" style={{ padding: '3px 8px', fontSize: '0.78rem', borderRadius: '6px' }}>
+                            {detectedColorInfo?.primaryColor ? `🎯 ${detectedColorInfo.primaryColor} Tonları` : 'Renk Eşleşmesi'}
                           </span>
-                        </h3>
-                        {products.some(p => p.isFallback) && (
-                          <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px', fontWeight: '500' }}>
-                            ⚠️ AI CLIP Sunucusu çevrimdışı; tarayıcı tabanlı renk ve ton eşleştirme algoritması devrede.
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '2px', flexWrap: 'wrap' }}>
+                          <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, fontWeight: '500' }}>
+                            Yüklenen görselin renk tonuna en benzer seramik modelleri sıralandı ({products.length} model bulundu).
                           </p>
-                        )}
+                          <button 
+                            type="button" 
+                            onClick={handleClearSearch} 
+                            style={{ 
+                              background: '#fee2e2', 
+                              color: '#ef4444', 
+                              border: '1px solid #fecaca', 
+                              borderRadius: '6px', 
+                              fontSize: '0.72rem', 
+                              padding: '2px 8px', 
+                              cursor: 'pointer',
+                              fontWeight: '600'
+                            }}
+                          >
+                            ✕ Görseli Temizle
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
