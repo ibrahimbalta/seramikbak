@@ -4,11 +4,12 @@ import React, { useState } from 'react';
 import { 
   Globe, Send, Download, CheckCircle2, ShieldCheck, 
   MapPin, Calendar, FileText, Check, DollarSign, Calculator,
-  ExternalLink, Building2, Package, Clock
+  ExternalLink, Building2, Package, Clock, Truck, ArrowRight,
+  TrendingUp, Sparkles, X, ChevronRight
 } from 'lucide-react';
 
 export default function ExportRfqTab({ brandInfo }) {
-  const brandName = brandInfo?.name || 'VitrA';
+  const brandName = brandInfo?.name || 'Güral Seramik';
 
   // Sample real-world international B2B RFQ inquiries
   const [rfqList, setRfqList] = useState([
@@ -27,7 +28,7 @@ export default function ExportRfqTab({ brandInfo }) {
       deliveryPort: 'Hamburg Limanı (FOB/CIF)',
       date: 'Bugün',
       status: 'TEKLİF_BEKLİYOR',
-      estimatedBudgetUsd: 14500 * 18.5
+      estimatedBudgetEur: 14500 * 16.5
     },
     {
       id: 'RFQ-US-2026-044',
@@ -38,13 +39,13 @@ export default function ExportRfqTab({ brandInfo }) {
       company: 'Coastal Luxury Interiors LLC',
       projectType: 'Lüks Sahil Villaları & Teras Zeminleri',
       requestedM2: 8200,
-      requestedFormat: '120x240 cm Slab & 80x80 cm',
+      requestedFormat: '120x240 cm Dev Slab & 80x80 cm',
       surface: 'Parlak Calacatta & Mat Traverten',
       certRequired: 'ASTM C373 Su Emme < %0.5, DCOF > 0.42',
       deliveryPort: 'Miami Port (CIF)',
       date: 'Dün',
       status: 'TEKLİF_BEKLİYOR',
-      estimatedBudgetUsd: 8200 * 24.0
+      estimatedBudgetEur: 8200 * 22.0
     },
     {
       id: 'RFQ-SA-2026-102',
@@ -61,7 +62,7 @@ export default function ExportRfqTab({ brandInfo }) {
       deliveryPort: 'Jeddah Islamic Port (FOB Mersin/İzmir)',
       date: '3 gün önce',
       status: 'İNCELENİYOR',
-      estimatedBudgetUsd: 28000 * 16.0
+      estimatedBudgetEur: 28000 * 14.5
     },
     {
       id: 'RFQ-GB-2026-029',
@@ -78,15 +79,16 @@ export default function ExportRfqTab({ brandInfo }) {
       deliveryPort: 'Felixstowe Port (CIF)',
       date: '5 gün önce',
       status: 'TEKLİF_VERİLDİ',
-      estimatedBudgetUsd: 4500 * 22.0
+      estimatedBudgetEur: 4500 * 19.5
     }
   ]);
 
   // Selected RFQ for proposal builder modal
   const [selectedRfq, setSelectedRfq] = useState(null);
-  const [fobPricePerM2, setFobPricePerM2] = useState('16.50');
+  const [fobPricePerM2, setFobPricePerM2] = useState('15.50');
   const [freightPerContainer, setFreightPerContainer] = useState('2200');
   const [productionDays, setProductionDays] = useState('25 gün');
+  const [currency, setCurrency] = useState('EUR'); // 'EUR' | 'USD'
   const [offerSubmitted, setOfferSubmitted] = useState(false);
 
   // Calculations for Proforma
@@ -97,6 +99,9 @@ export default function ExportRfqTab({ brandInfo }) {
   const totalFreight = containersNeeded * parseFloat(freightPerContainer || 0);
   const totalCifAmount = totalFobAmount + totalFreight;
 
+  const totalDemandM2 = rfqList.reduce((sum, item) => sum + item.requestedM2, 0);
+  const totalPotentialEur = rfqList.reduce((sum, item) => sum + item.estimatedBudgetEur, 0);
+
   const handleOpenOfferModal = (rfq) => {
     setSelectedRfq(rfq);
     setOfferSubmitted(false);
@@ -106,104 +111,339 @@ export default function ExportRfqTab({ brandInfo }) {
     e.preventDefault();
     setOfferSubmitted(true);
     setTimeout(() => {
-      // Update local state status
       setRfqList(prev => prev.map(item => 
         item.id === selectedRfq.id ? { ...item, status: 'TEKLİF_VERİLDİ' } : item
       ));
-    }, 1000);
+      setSelectedRfq(null);
+    }, 1500);
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Top Value Banner */}
-      <div className="rounded-2xl p-6 md:p-8 bg-gradient-to-r from-slate-900 via-slate-900 to-sky-950/40 border border-sky-500/20 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 text-sky-400 text-xs font-semibold mb-3">
-            <Globe className="w-3.5 h-3.5" />
-            <span>Global Export Matchmaker • 7 Dilde Doğrudan İhale Havuzu</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+      
+      {/* -------------------- 1. EXECUTIVE HERO BANNER -------------------- */}
+      <div style={{
+        background: 'linear-gradient(135deg, #090d16 0%, #111827 50%, #1e293b 100%)',
+        borderRadius: '20px',
+        padding: '28px 32px',
+        color: '#ffffff',
+        border: '1px solid rgba(56, 189, 248, 0.25)',
+        boxShadow: '0 12px 40px -10px rgba(0, 0, 0, 0.35)',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '24px',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Subtle background glow */}
+        <div style={{
+          position: 'absolute',
+          top: '-40px',
+          right: '-40px',
+          width: '260px',
+          height: '260px',
+          background: 'radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%)',
+          pointerEvents: 'none'
+        }} />
+
+        <div style={{ maxWidth: '780px', position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 12px',
+              borderRadius: '20px',
+              background: 'rgba(56, 189, 248, 0.15)',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              color: '#38bdf8',
+              fontSize: '0.75rem',
+              fontWeight: '800',
+              letterSpacing: '0.5px'
+            }}>
+              <Globe size={13} />
+              Global Export Matchmaker • 7 Dilde Uluslararası İhale Havuzu
+            </span>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '4px 10px',
+              borderRadius: '20px',
+              background: 'rgba(16, 185, 129, 0.12)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              color: '#34d399',
+              fontSize: '0.72rem',
+              fontWeight: '700'
+            }}>
+              <CheckCircle2 size={12} />
+              Doğrulanmış B2B İthalatçılar
+            </span>
           </div>
-          <h2 className="text-2xl font-extrabold text-white">
+
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: '900',
+            margin: '0 0 8px 0',
+            color: '#ffffff',
+            letterSpacing: '-0.3px',
+            fontFamily: 'var(--font-title, "Outfit", sans-serif)'
+          }}>
             Uluslararası İhracat Talepleri & Toptan Alım Masası
           </h2>
-          <p className="text-sm text-slate-300 mt-2 max-w-2xl leading-relaxed">
+          <p style={{
+            fontSize: '0.85rem',
+            color: '#94a3b8',
+            margin: 0,
+            lineHeight: '1.6'
+          }}>
             Almanya, ABD, Körfez ülkeleri ve Birleşik Krallık'taki toptancı ve müteahhitlerin SeramikBak üzerinden açtığı yüksek metrajlı porselen seramik talepleri. Tek tıkla fabrikanız adına doğrudan FOB veya CIF proforma teklif verin.
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-center shrink-0">
-          <div className="text-xs text-slate-400">Aktif Küresel Talep Hacmi</div>
-          <div className="text-2xl font-black text-sky-400 mt-1">55.200 m²</div>
-          <div className="text-[11px] text-emerald-400 mt-1">~ $1.050.000 İhracat Potansiyeli</div>
+        {/* Global Summary Badge */}
+        <div style={{
+          background: 'rgba(15, 23, 42, 0.85)',
+          borderRadius: '14px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          padding: '16px 20px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          zIndex: 1,
+          minWidth: '200px'
+        }}>
+          <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: '700' }}>
+            Aktif Küresel Talep
+          </span>
+          <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#38bdf8', marginTop: '2px' }}>
+            {totalDemandM2.toLocaleString('tr-TR')} m²
+          </span>
+          <span style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: '800', marginTop: '2px' }}>
+            ~ €{totalPotentialEur.toLocaleString('tr-TR')} İhracat Hacmi
+          </span>
         </div>
       </div>
 
-      {/* RFQ List Table */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <FileText className="w-4 h-4 text-sky-500" />
-            <span>Bekleyen İhracat İhaleleri & Sipariş Fırsatları</span>
-          </h3>
-          <span className="text-xs px-2.5 py-1 rounded-md bg-sky-100 text-sky-800 font-bold">
-            {rfqList.length} Aktif Talep
+      {/* -------------------- 2. TOP METRIC STRIP -------------------- */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: '20px'
+      }}>
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          padding: '20px',
+          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.04)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>Toplam Talep Hacmi</span>
+            <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(56, 189, 248, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0284c7' }}>
+              <Globe size={16} />
+            </div>
+          </div>
+          <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#0f172a', marginTop: '10px' }}>
+            {totalDemandM2.toLocaleString('tr-TR')} m²
+          </div>
+          <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px' }}>
+            4 ülkeden gelen toptan porselen karo ihaleleri
+          </div>
+        </div>
+
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          padding: '20px',
+          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.04)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>Konteyner Eşdeğeri</span>
+            <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(212, 175, 55, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b45309' }}>
+              <Truck size={16} />
+            </div>
+          </div>
+          <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#b45309', marginTop: '10px' }}>
+            ~{Math.ceil(totalDemandM2 / 1300)} Konteyner
+          </div>
+          <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px' }}>
+            Standart 20ft (yaklaşık 25 ton/konteyner yükü)
+          </div>
+        </div>
+
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          padding: '20px',
+          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.04)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' }}>Ortalama İhale Metrajı</span>
+            <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
+              <TrendingUp size={16} />
+            </div>
+          </div>
+          <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#059669', marginTop: '10px' }}>
+            13.800 m²
+          </div>
+          <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px' }}>
+            Proje başına ortalama talep büyüklüğü
+          </div>
+        </div>
+      </div>
+
+      {/* -------------------- 3. INTERNATIONAL RFQ TABLE / BOARD -------------------- */}
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '18px',
+        border: '1px solid #e2e8f0',
+        padding: '24px',
+        boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.04)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '18px'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+          <div>
+            <h3 style={{ fontSize: '1rem', fontWeight: '850', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FileText size={18} style={{ color: '#0284c7' }} />
+              <span>Bekleyen Uluslararası İhracat İhaleleri</span>
+            </h3>
+            <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+              Doğrudan fabrikanızdan teklif bekleyen global toptancı talepleri
+            </span>
+          </div>
+          <span style={{ fontSize: '0.72rem', padding: '4px 10px', borderRadius: '20px', background: '#f0f9ff', color: '#0369a1', fontWeight: '800', border: '1px solid #bae6fd' }}>
+            {rfqList.length} Aktif İhale Fırsatı
           </span>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-200">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-600 uppercase tracking-wider text-[11px] border-b border-slate-200">
-              <tr>
-                <th className="p-3.5 font-bold">Ülke / Firma</th>
-                <th className="p-3.5 font-bold">Proje Detayı</th>
-                <th className="p-3.5 font-bold">Talep Edilen Ebat & Yüzey</th>
-                <th className="p-3.5 font-bold">Miktar (m²)</th>
-                <th className="p-3.5 font-bold">Teslim Limanı</th>
-                <th className="p-3.5 font-bold">Durum</th>
-                <th className="p-3.5 font-bold text-right">İşlem</th>
+        {/* Table Container */}
+        <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.78rem' }}>
+            <thead>
+              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <th style={{ padding: '14px 16px' }}>Ülke & Firma</th>
+                <th style={{ padding: '14px 16px' }}>Proje & Lokasyon</th>
+                <th style={{ padding: '14px 16px' }}>Talep Edilen Ebat & Yüzey</th>
+                <th style={{ padding: '14px 16px' }}>Miktar (m²)</th>
+                <th style={{ padding: '14px 16px' }}>Teslim Şartı / Liman</th>
+                <th style={{ padding: '14px 16px' }}>Durum</th>
+                <th style={{ padding: '14px 16px', textAlign: 'right' }}>İşlem</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              {rfqList.map(rfq => (
-                <tr key={rfq.id} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="p-3.5">
-                    <div className="flex items-center gap-2 font-bold text-slate-900">
-                      <span className="text-base">{rfq.flag}</span>
-                      <span>{rfq.country}</span>
+            <tbody>
+              {rfqList.map((rfq, idx) => (
+                <tr
+                  key={rfq.id}
+                  style={{
+                    borderBottom: idx < rfqList.length - 1 ? '1px solid #f1f5f9' : 'none',
+                    transition: 'background 0.15s ease'
+                  }}
+                >
+                  {/* Country & Company */}
+                  <td style={{ padding: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '1.2rem' }}>{rfq.flag}</span>
+                      <div>
+                        <div style={{ fontWeight: '800', color: '#0f172a' }}>{rfq.country}</div>
+                        <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{rfq.company}</div>
+                      </div>
                     </div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">{rfq.company}</div>
                   </td>
-                  <td className="p-3.5">
-                    <div className="font-semibold text-slate-800">{rfq.projectType}</div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">{rfq.city}</div>
+
+                  {/* Project Type */}
+                  <td style={{ padding: '16px' }}>
+                    <div style={{ fontWeight: '700', color: '#1e293b' }}>{rfq.projectType}</div>
+                    <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                      <MapPin size={11} /> {rfq.city}
+                    </div>
                   </td>
-                  <td className="p-3.5">
-                    <div className="font-semibold text-slate-800">{rfq.requestedFormat}</div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">{rfq.surface}</div>
+
+                  {/* Format & Surface */}
+                  <td style={{ padding: '16px' }}>
+                    <div style={{ fontWeight: '800', color: '#0f172a' }}>{rfq.requestedFormat}</div>
+                    <div style={{ fontSize: '0.7rem', color: '#b45309', fontWeight: '600' }}>{rfq.surface}</div>
+                    <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '2px' }}>{rfq.certRequired}</div>
                   </td>
-                  <td className="p-3.5">
-                    <span className="font-black text-slate-900 text-sm">{rfq.requestedM2.toLocaleString('tr-TR')} m²</span>
+
+                  {/* Quantity */}
+                  <td style={{ padding: '16px' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: '900', color: '#0f172a' }}>
+                      {rfq.requestedM2.toLocaleString('tr-TR')} m²
+                    </div>
+                    <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
+                      ~{Math.ceil(rfq.requestedM2 / 1300)}x 20ft Konteyner
+                    </div>
                   </td>
-                  <td className="p-3.5 text-slate-600">
-                    <div>{rfq.deliveryPort}</div>
-                  </td>
-                  <td className="p-3.5">
-                    <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${
-                      rfq.status === 'TEKLİF_BEKLİYOR'
-                        ? 'bg-amber-100 text-amber-800'
-                        : rfq.status === 'TEKLİF_VERİLDİ'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-slate-100 text-slate-700'
-                    }`}>
-                      {rfq.status === 'TEKLİF_BEKLİYOR' ? 'Teklif Bekliyor' : rfq.status === 'TEKLİF_VERİLDİ' ? 'Teklif İletildi ✓' : 'İnceleniyor'}
+
+                  {/* Port */}
+                  <td style={{ padding: '16px' }}>
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      background: '#f1f5f9',
+                      color: '#334155',
+                      fontSize: '0.72rem',
+                      fontWeight: '700'
+                    }}>
+                      <Truck size={12} /> {rfq.deliveryPort}
                     </span>
                   </td>
-                  <td className="p-3.5 text-right">
+
+                  {/* Status */}
+                  <td style={{ padding: '16px' }}>
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '4px 10px',
+                      borderRadius: '20px',
+                      fontSize: '0.7rem',
+                      fontWeight: '800',
+                      background: rfq.status === 'TEKLİF_BEKLİYOR' ? '#fffbeb' : rfq.status === 'TEKLİF_VERİLDİ' ? '#ecfdf5' : '#f8fafc',
+                      color: rfq.status === 'TEKLİF_BEKLİYOR' ? '#b45309' : rfq.status === 'TEKLİF_VERİLDİ' ? '#065f46' : '#475569',
+                      border: rfq.status === 'TEKLİF_BEKLİYOR' ? '1px solid #fde68a' : rfq.status === 'TEKLİF_VERİLDİ' ? '1px solid #a7f3d0' : '1px solid #e2e8f0'
+                    }}>
+                      {rfq.status === 'TEKLİF_BEKLİYOR' && '⏳ Teklif Bekliyor'}
+                      {rfq.status === 'TEKLİF_VERİLDİ' && '✓ Teklif İletildi'}
+                      {rfq.status === 'İNCELENİYOR' && '🔍 İnceleniyor'}
+                    </span>
+                  </td>
+
+                  {/* Actions */}
+                  <td style={{ padding: '16px', textAlign: 'right' }}>
                     <button
                       type="button"
                       onClick={() => handleOpenOfferModal(rfq)}
-                      className="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition-colors shadow-sm"
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: '8px',
+                        background: '#0f172a',
+                        color: '#ffffff',
+                        fontSize: '0.75rem',
+                        fontWeight: '800',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                      }}
                     >
-                      Proforma Teklif Ver
+                      <Send size={12} style={{ color: '#38bdf8' }} />
+                      <span>{rfq.status === 'TEKLİF_VERİLDİ' ? 'Teklifi Güncelle' : 'Proforma Teklif Ver'}</span>
                     </button>
                   </td>
                 </tr>
@@ -213,134 +453,207 @@ export default function ExportRfqTab({ brandInfo }) {
         </div>
       </div>
 
-      {/* Proforma Proposal Modal */}
+      {/* -------------------- 4. PROFORMA PROPOSAL MODAL -------------------- */}
       {selectedRfq && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 bg-slate-900 text-white flex items-center justify-between">
-              <div>
-                <span className="text-xs text-sky-400 font-semibold">{selectedRfq.id}</span>
-                <h3 className="text-lg font-bold mt-0.5">
-                  {selectedRfq.flag} {selectedRfq.country} — {selectedRfq.company} İçin İhracat Teklifi
-                </h3>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(15, 23, 42, 0.7)',
+          backdropFilter: 'blur(5px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '16px'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '20px',
+            border: '1px solid #e2e8f0',
+            maxWidth: '680px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: '28px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
+          }}>
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(56, 189, 248, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0284c7' }}>
+                  <Globe size={22} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: '900', color: '#0f172a', margin: 0 }}>
+                    İhracat Proforma Teklifi Oluştur
+                  </h3>
+                  <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                    {selectedRfq.flag} {selectedRfq.country} • {selectedRfq.company}
+                  </span>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedRfq(null)}
-                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm transition-colors"
+                style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
               >
-                ✕
+                <X size={20} />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto space-y-6">
-              {offerSubmitted ? (
-                <div className="text-center py-8 space-y-4">
-                  <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="w-8 h-8" />
+            {offerSubmitted ? (
+              <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+                <CheckCircle2 size={48} style={{ color: '#10b981', margin: '0 auto 16px auto' }} />
+                <h4 style={{ fontSize: '1.1rem', fontWeight: '900', color: '#0f172a', margin: '0 0 6px 0' }}>Proforma Teklifiniz İletildi!</h4>
+                <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0 }}>
+                  Teklif dokümanınız {selectedRfq.company} satın alma direktörüne iletildi. Durum takip ediliyor.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmitOffer} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Inquiry Summary Box */}
+                <div style={{ background: '#f8fafc', padding: '14px 18px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
+                    <div>
+                      <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: '700' }}>TALEP EDİLEN METRAJ</span>
+                      <div style={{ fontSize: '0.9rem', fontWeight: '900', color: '#0f172a' }}>{selectedRfq.requestedM2.toLocaleString('tr-TR')} m²</div>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: '700' }}>FORMAT & DOKU</span>
+                      <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>{selectedRfq.requestedFormat}</div>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: '700' }}>TESLİM LİMANI</span>
+                      <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>{selectedRfq.deliveryPort}</div>
+                    </div>
                   </div>
-                  <h4 className="text-xl font-bold text-slate-900">Proforma Teklif Başarıyla Gönderildi!</h4>
-                  <p className="text-xs text-slate-500 max-w-md mx-auto">
-                    Teklifiniz {selectedRfq.company} satın alma yetkilisine İngilizce formatta iletildi. Görüşmeler platformumuz üzerinden takip edilecektir.
-                  </p>
+                </div>
+
+                {/* Form Inputs Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '800', color: '#334155', marginBottom: '6px' }}>
+                      Fabrika Çıkış FOB Birim Fiyat (€ / m²)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      required
+                      value={fobPricePerM2}
+                      onChange={(e) => setFobPricePerM2(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
+                        border: '1.5px solid #cbd5e1',
+                        fontSize: '0.85rem',
+                        fontWeight: '800',
+                        color: '#0f172a',
+                        outline: 'none'
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: '800', color: '#334155', marginBottom: '6px' }}>
+                      Konteyner Başına Tahmini Navlun (€)
+                    </label>
+                    <input
+                      type="number"
+                      step="50"
+                      required
+                      value={freightPerContainer}
+                      onChange={(e) => setFreightPerContainer(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        borderRadius: '8px',
+                        border: '1.5px solid #cbd5e1',
+                        fontSize: '0.85rem',
+                        fontWeight: '800',
+                        color: '#0f172a',
+                        outline: 'none'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Live Proforma Calculation Breakdown */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #090d16 0%, #111827 100%)',
+                  borderRadius: '12px',
+                  padding: '16px 20px',
+                  color: '#ffffff'
+                }}>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase', marginBottom: '8px' }}>
+                    Otomatik Proforma Hesabı
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', marginBottom: '6px' }}>
+                    <span style={{ color: '#cbd5e1' }}>Toplam Malzeme Bedeli (FOB):</span>
+                    <strong style={{ color: '#ffffff' }}>€{totalFobAmount.toLocaleString('tr-TR')}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', marginBottom: '10px' }}>
+                    <span style={{ color: '#cbd5e1' }}>Denizyolu Navlunu ({containersNeeded} Konteyner):</span>
+                    <strong style={{ color: '#38bdf8' }}>€{totalFreight.toLocaleString('tr-TR')}</strong>
+                  </div>
+                  <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.1)', marginBottom: '8px' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '1rem', fontWeight: '900' }}>
+                    <span style={{ color: '#d4af37' }}>TOPLAM CIF BEDEL:</span>
+                    <span style={{ color: '#34d399' }}>€{totalCifAmount.toLocaleString('tr-TR')}</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '6px' }}>
                   <button
                     type="button"
                     onClick={() => setSelectedRfq(null)}
-                    className="px-6 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold"
+                    style={{
+                      padding: '10px 18px',
+                      borderRadius: '10px',
+                      border: '1px solid #cbd5e1',
+                      background: '#ffffff',
+                      color: '#475569',
+                      fontSize: '0.8rem',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
                   >
-                    Kapat
+                    Vazgeç
+                  </button>
+                  <button
+                    type="submit"
+                    style={{
+                      padding: '10px 24px',
+                      borderRadius: '10px',
+                      border: 'none',
+                      background: '#0f172a',
+                      color: '#ffffff',
+                      fontSize: '0.8rem',
+                      fontWeight: '800',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                    }}
+                  >
+                    <Send size={14} style={{ color: '#38bdf8' }} />
+                    <span>Resmi Proforma Gönder</span>
                   </button>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmitOffer} className="space-y-6">
-                  {/* Summary Banner */}
-                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 grid grid-cols-3 gap-3 text-center">
-                    <div>
-                      <div className="text-[11px] text-slate-500">Talep Metrajı</div>
-                      <div className="text-sm font-extrabold text-slate-900">{selectedRfq.requestedM2.toLocaleString('tr-TR')} m²</div>
-                    </div>
-                    <div>
-                      <div className="text-[11px] text-slate-500">Konteyner Sayısı</div>
-                      <div className="text-sm font-extrabold text-sky-600">~{containersNeeded} x 20ft</div>
-                    </div>
-                    <div>
-                      <div className="text-[11px] text-slate-500">Varış Limanı</div>
-                      <div className="text-sm font-extrabold text-slate-900">{selectedRfq.deliveryPort}</div>
-                    </div>
-                  </div>
-
-                  {/* Form Inputs */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        FOB m² Teklif Fiyatı (USD):
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-2.5 text-slate-400 font-bold">$</span>
-                        <input
-                          type="number"
-                          step="0.10"
-                          value={fobPricePerM2}
-                          onChange={(e) => setFobPricePerM2(e.target.value)}
-                          className="w-full pl-8 pr-4 py-2 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:border-sky-500"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        Konteyner Başı Tahmini Navlun (USD):
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-2.5 text-slate-400 font-bold">$</span>
-                        <input
-                          type="number"
-                          value={freightPerContainer}
-                          onChange={(e) => setFreightPerContainer(e.target.value)}
-                          className="w-full pl-8 pr-4 py-2 border border-slate-300 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:border-sky-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Calculation Overview */}
-                  <div className="p-4 rounded-2xl bg-sky-50/60 border border-sky-200/80 space-y-2 text-xs">
-                    <div className="flex justify-between text-slate-600">
-                      <span>FOB Fabrika Tutarı:</span>
-                      <span className="font-bold text-slate-900">${totalFobAmount.toLocaleString('en-US')}</span>
-                    </div>
-                    <div className="flex justify-between text-slate-600">
-                      <span>Tahmini Deniz Navlunu ({containersNeeded} Konteyner):</span>
-                      <span className="font-bold text-slate-900">${totalFreight.toLocaleString('en-US')}</span>
-                    </div>
-                    <div className="flex justify-between text-sm font-black text-sky-900 pt-2 border-t border-sky-200">
-                      <span>Toplam CIF Teklif Tutarı:</span>
-                      <span>${totalCifAmount.toLocaleString('en-US')}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedRfq(null)}
-                      className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition-colors"
-                    >
-                      Vazgeç
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-sky-600/20 transition-all"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>İhracat Proforma Teklifini İlet</span>
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
+              </form>
+            )}
           </div>
         </div>
       )}
+
     </div>
   );
 }

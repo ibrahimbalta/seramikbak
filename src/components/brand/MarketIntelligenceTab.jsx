@@ -3,198 +3,416 @@
 import React, { useState } from 'react';
 import { 
   TrendingUp, BarChart3, PieChart, Sparkles, MapPin, 
-  Compass, Award, ArrowUpRight, ArrowDownRight, Layers, Lightbulb
+  Compass, Award, ArrowUpRight, ArrowDownRight, Layers, Lightbulb,
+  Zap, CheckCircle2, ShieldCheck, Flame, ArrowRight
 } from 'lucide-react';
 
 export default function MarketIntelligenceTab({ brandInfo }) {
-  const brandName = brandInfo?.name || 'VitrA';
+  const brandName = brandInfo?.name || 'Güral Seramik';
 
   const dimensionTrends = [
-    { size: '60x120 cm Porselen Karo', share: 48, growth: '+28%', popularUsage: 'Tüm Zemin & Banyo Duvar', status: 'YÜKSELİŞTE' },
-    { size: '80x80 cm Kare Karo', share: 22, growth: '+4%', popularUsage: 'Geniş Salon & Antre', status: 'DENGELİ' },
-    { size: '120x240 cm Dev Slab Plaka', share: 14, growth: '+62%', popularUsage: 'Mutfak Adası & Lüks Banyo', status: 'HIZLI YÜKSELİŞ' },
-    { size: '20x120 cm Ahşap Desen', share: 10, growth: '+8%', popularUsage: 'Yatak Odası & Islak Hacim', status: 'DENGELİ' },
-    { size: '60x60 cm Standart Karo', share: 6, growth: '-14%', popularUsage: 'Balkon & Servis Alanları', status: 'DÜŞÜŞTE' }
+    { size: '60x120 cm Porselen Karo', share: 48, growth: '+28%', popularUsage: 'Tüm Zemin & Banyo Duvar', status: 'YÜKSELİŞTE', color: '#3b82f6' },
+    { size: '80x80 cm Kare Karo', share: 22, growth: '+4%', popularUsage: 'Geniş Salon & Antre Zemin', status: 'DENGELİ', color: '#10b981' },
+    { size: '120x240 cm Dev Slab Plaka', share: 14, growth: '+62%', popularUsage: 'Mutfak Adası & Lüks Banyo', status: 'HIZLI YÜKSELİŞ', color: '#8b5cf6' },
+    { size: '20x120 cm Ahşap Desen', share: 10, growth: '+8%', popularUsage: 'Yatak Odası & Islak Hacim', status: 'DENGELİ', color: '#f59e0b' },
+    { size: '60x60 cm Standart Karo', share: 6, growth: '-14%', popularUsage: 'Balkon & Servis Alanları', status: 'DÜŞÜŞTE', color: '#ef4444' }
   ];
 
   const textureTrends = [
-    { name: 'Pietra Traverten & Sıcak Bej', share: 36, growth: '+45%', color: '#d97706' },
-    { name: 'Brüt Beton & Antrasit Loft', share: 28, growth: '+12%', color: '#64748b' },
-    { name: 'Calacatta Gold / Statuario', share: 22, growth: '+6%', color: '#3b82f6' },
-    { name: 'Doğal Meşe Ahşap Dokusu', share: 14, growth: '+15%', color: '#84cc16' }
+    { name: 'Pietra Traverten & Sıcak Bej', share: 36, growth: '+45%', color: '#d97706', swatch: '#d4b996', desc: 'Doğal taş ve sıcak Akdeniz esintisi' },
+    { name: 'Brüt Beton & Antrasit Loft', share: 28, growth: '+12%', color: '#475569', swatch: '#64748b', desc: 'Minimalist mimari ve ticari projeler' },
+    { name: 'Calacatta Gold / Statuario', share: 22, growth: '+6%', color: '#2563eb', swatch: '#e2e8f0', desc: 'Lüks banyo ve otel lobisi klasiği' },
+    { name: 'Doğal Meşe Ahşap Dokusu', share: 14, growth: '+15%', color: '#16a34a', swatch: '#854d0e', desc: 'Sıcak konut ve yatak odası zeminleri' }
   ];
 
   const surfacePreferences = [
-    { finish: 'Mat / Hafif Dokulu (R10)', percent: 62, desc: 'Banyo ve salon zeminlerinde 1 numara' },
-    { finish: 'Full Parlak / Cilalı (Polished)', percent: 28, desc: 'Banyo duvarları ve lobi zeminleri' },
-    { finish: 'Lapatto (Yarı Parlak)', percent: 10, desc: 'Ticari mağazalar ve butik ofisler' }
+    { finish: 'Mat / Dokulu (R10 / R11)', percent: 62, desc: 'Banyo ve salon zeminlerinde mutlak lider', color: '#059669' },
+    { finish: 'Full Parlak / Cilalı (Polished)', percent: 28, desc: 'Banyo duvarları ve lobi zeminleri', color: '#2563eb' },
+    { finish: 'Lapatto (Yarı Parlak)', percent: 10, desc: 'Ticari mağazalar ve butik ofisler', color: '#d97706' }
   ];
 
   const regionalDemands = [
-    { region: 'Marmara (İstanbul, Kocaeli, Bursa)', share: '%42', topNeed: '60x120 Mermer & Beton', index: 'Çok Yüksek' },
-    { region: 'Ege (İzmir, Muğla, Aydın)', share: '%24', topNeed: 'Teras Dona Dayanıklı R11 & Traverten', index: 'Yüksek (Yaz Sezonu)' },
-    { region: 'Akdeniz (Antalya, Adana, Mersin)', share: '%18', topNeed: 'Otel Lobisi 120x240 Slab & Havuz Çevresi', index: 'Yüksek' },
-    { region: 'İç Anadolu (Ankara, Konya, Kayseri)', share: '%16', topNeed: 'Yerden Isıtmaya Uygun 80x80 Porselen', index: 'Dengeli' }
+    { region: 'Marmara (İstanbul, Bursa, Kocaeli)', share: '%42', topNeed: '60x120 Mermer & Brüt Beton', index: 'Çok Yüksek', badgeBg: '#fef2f2', badgeColor: '#991b1b' },
+    { region: 'Ege (İzmir, Muğla, Aydın)', share: '%24', topNeed: 'Teras Dona Dayanıklı R11 & Traverten', index: 'Yüksek (Yaz Sezonu)', badgeBg: '#fffbeb', badgeColor: '#92400e' },
+    { region: 'Akdeniz (Antalya, Adana, Mersin)', share: '%18', topNeed: 'Otel Lobisi 120x240 Slab Plaka', index: 'Yüksek', badgeBg: '#eff6ff', badgeColor: '#1e40af' },
+    { region: 'İç Anadolu (Ankara, Konya, Kayseri)', share: '%16', topNeed: 'Yerden Isıtmaya Uygun 80x80 Porselen', index: 'Dengeli', badgeBg: '#f0fdf4', badgeColor: '#166534' }
   ];
 
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Top Value Banner */}
-      <div className="rounded-2xl p-6 md:p-8 bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/40 border border-emerald-500/20 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold mb-3">
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>Gerçek Zamanlı Pazar Algoritmaları • 120.000+ Aylık Arama Verisi</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+      
+      {/* -------------------- 1. EXECUTIVE HERO BANNER -------------------- */}
+      <div style={{
+        background: 'linear-gradient(135deg, #090d16 0%, #111827 50%, #1e293b 100%)',
+        borderRadius: '20px',
+        padding: '28px 32px',
+        color: '#ffffff',
+        border: '1px solid rgba(16, 185, 129, 0.25)',
+        boxShadow: '0 12px 40px -10px rgba(0, 0, 0, 0.35)',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '24px',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Subtle background glow */}
+        <div style={{
+          position: 'absolute',
+          top: '-40px',
+          right: '-40px',
+          width: '260px',
+          height: '260px',
+          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%)',
+          pointerEvents: 'none'
+        }} />
+
+        <div style={{ maxWidth: '780px', position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 12px',
+              borderRadius: '20px',
+              background: 'rgba(16, 185, 129, 0.15)',
+              border: '1px solid rgba(16, 185, 129, 0.35)',
+              color: '#34d399',
+              fontSize: '0.75rem',
+              fontWeight: '800',
+              letterSpacing: '0.5px'
+            }}>
+              <TrendingUp size={13} />
+              Gerçek Zamanlı Pazar Algoritmaları • 120.000+ Aylık Arama Verisi
+            </span>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              padding: '4px 10px',
+              borderRadius: '20px',
+              background: 'rgba(212, 175, 55, 0.12)',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              color: '#d4af37',
+              fontSize: '0.72rem',
+              fontWeight: '700'
+            }}>
+              <Flame size={12} />
+              2026 Q3 Trend Verisi
+            </span>
           </div>
-          <h2 className="text-2xl font-extrabold text-white">
+
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: '900',
+            margin: '0 0 8px 0',
+            color: '#ffffff',
+            letterSpacing: '-0.3px',
+            fontFamily: 'var(--font-title, "Outfit", sans-serif)'
+          }}>
             Canlı Pazar İstihbaratı & AR-GE Trend Radarı
           </h2>
-          <p className="text-sm text-slate-300 mt-2 max-w-2xl leading-relaxed">
+          <p style={{
+            fontSize: '0.85rem',
+            color: '#94a3b8',
+            margin: 0,
+            lineHeight: '1.6'
+          }}>
             Türkiye ve Avrupa genelindeki tüketici ve mimar aramalarından derlenen büyük veri. Fabrikanızın üretim bantlarını en çok aranan ebatlara, renklere ve yüzey dokularına kaydırarak stok riskini sıfırlayın.
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 text-center shrink-0">
-          <div className="text-xs text-slate-400">Son 30 Günlük Veri Seti</div>
-          <div className="text-2xl font-black text-emerald-400 mt-1">128.400+</div>
-          <div className="text-[11px] text-slate-400 mt-1">Arama & 3D Giydirme İşlemi</div>
+        {/* Real-time Ticker Badge */}
+        <div style={{
+          background: 'rgba(15, 23, 42, 0.85)',
+          borderRadius: '14px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          padding: '16px 20px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          zIndex: 1,
+          minWidth: '200px'
+        }}>
+          <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: '700' }}>
+            Son 30 Günlük Veri Seti
+          </span>
+          <span style={{ fontSize: '1.6rem', fontWeight: '900', color: '#34d399', marginTop: '2px' }}>
+            128.400+
+          </span>
+          <span style={{ fontSize: '0.72rem', color: '#cbd5e1', fontWeight: '600', marginTop: '2px' }}>
+            Arama & 3D Mekan Giydirme
+          </span>
         </div>
       </div>
 
-      {/* R&D Recommendation Box */}
-      <div className="p-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-4">
-        <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold shrink-0">
-          <Lightbulb className="w-5 h-5" />
+      {/* -------------------- 2. PRESTIGIOUS AI R&D ADVISORY CONSOLE (DARK HIGH-CONTRAST) -------------------- */}
+      <div style={{
+        background: 'linear-gradient(135deg, #090d16 0%, #0f172a 60%, #1e1b4b 100%)',
+        borderRadius: '18px',
+        border: '1px solid rgba(212, 175, 55, 0.35)',
+        padding: '24px 28px',
+        boxShadow: '0 8px 30px -6px rgba(0, 0, 0, 0.3)',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '20px'
+      }}>
+        <div style={{
+          width: '46px',
+          height: '46px',
+          borderRadius: '12px',
+          background: 'linear-gradient(135deg, #d4af37 0%, #b45309 100%)',
+          color: '#090d16',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          boxShadow: '0 4px 15px rgba(212, 175, 55, 0.3)'
+        }}>
+          <Lightbulb size={24} />
         </div>
         <div>
-          <h3 className="text-sm font-extrabold text-amber-300">
-            {brandName} İçin Yapay Zeka AR-GE & Üretim Planlama Tavsiyesi (2026 Q3)
-          </h3>
-          <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
-            Pazar verilerimize göre <strong>60x120 cm Mat Traverten ve Bal Rengi Oniks</strong> dokulu porselen karolarda %42 arz açığı bulunmaktadır. Soğuk gri mermer aramaları son 6 ayda %18 gerilerken, sıcak toprak ve bej tonlarına yönelim hızla artmaktadır. Fabrikanızın yeni koleksiyon lansmanlarında bu format ve dokuya ağırlık vermesi tavsiye edilir.
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+            <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '4px', background: 'rgba(212, 175, 55, 0.2)', color: '#d4af37', fontWeight: '800' }}>
+              YAPAY ZEKA TAVSİYESİ
+            </span>
+            <h3 style={{ fontSize: '1rem', fontWeight: '900', color: '#ffffff', margin: 0 }}>
+              {brandName} İçin Yapay Zeka AR-GE & Üretim Planlama Raporu (2026 Q3)
+            </h3>
+          </div>
+          <p style={{ fontSize: '0.82rem', color: '#e2e8f0', margin: 0, lineHeight: '1.65' }}>
+            Pazar verilerimize göre <strong>60x120 cm Mat Traverten ve Bal Rengi Oniks</strong> dokulu porselen karolarda <strong style={{ color: '#34d399' }}>%42 arz açığı</strong> bulunmaktadır. Soğuk gri mermer aramaları son 6 ayda %18 gerilerken, sıcak toprak ve bej tonlarına yönelim hızla artmaktadır. Fabrikanızın yeni koleksiyon lansmanlarında bu format ve dokuya ağırlık vermesi tavsiye edilir.
           </p>
         </div>
       </div>
 
-      {/* Dimension Trends & Texture Trends */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left: Dimension Trends */}
-        <div className="lg:col-span-7 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+      {/* -------------------- 3. DIMENSION & TEXTURE TRENDS GRID -------------------- */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+        gap: '24px'
+      }}>
+        
+        {/* LEFT: DIMENSION DEMAND DISTRIBUTION */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '18px',
+          border: '1px solid #e2e8f0',
+          padding: '24px',
+          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.04)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '18px'
+        }}>
           <div>
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Compass className="w-4 h-4 text-emerald-600" />
-              <span>Ebat Talep Dağılımı ve Büyüme Hızları</span>
-            </h3>
-            <p className="text-xs text-slate-500 mt-1">
-              Kullanıcıların ve mimarların en çok aradığı ve filtrelediği karo boyutları.
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: '850', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Compass size={18} style={{ color: '#059669' }} />
+                <span>Ebat Talep Dağılımı ve Büyüme Hızları</span>
+              </h3>
+              <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '700' }}>Son 30 Gün</span>
+            </div>
+            <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '4px 0 0 0' }}>
+              Kullanıcıların ve mimarların en çok aradığı ve 3D stüdyoda denediği karo boyutları
             </p>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-200">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-600 uppercase tracking-wider text-[11px] border-b border-slate-200">
-                <tr>
-                  <th className="p-3.5 font-bold">Ebat / Format</th>
-                  <th className="p-3.5 font-bold">Pazar Payı</th>
-                  <th className="p-3.5 font-bold">Aylık Değişim</th>
-                  <th className="p-3.5 font-bold">Trend Durumu</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700">
-                {dimensionTrends.map(item => (
-                  <tr key={item.size} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="p-3.5">
-                      <div className="font-bold text-slate-900">{item.size}</div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">{item.popularUsage}</div>
-                    </td>
-                    <td className="p-3.5 font-black text-slate-900 text-sm">%{item.share}</td>
-                    <td className="p-3.5 font-bold text-emerald-600">{item.growth}</td>
-                    <td className="p-3.5">
-                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                        item.status.includes('YÜKSELİŞ') ? 'bg-emerald-100 text-emerald-800' :
-                        item.status === 'DENGELİ' ? 'bg-slate-100 text-slate-700' :
-                        'bg-rose-100 text-rose-800'
-                      }`}>
-                        {item.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {dimensionTrends.map(item => (
+              <div key={item.size} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>{item.size}</span>
+                    <span style={{ fontSize: '0.68rem', color: '#94a3b8', marginLeft: '6px' }}>({item.popularUsage})</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: '900', color: '#0f172a' }}>%{item.share}</span>
+                    <span style={{
+                      fontSize: '0.68rem',
+                      fontWeight: '800',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      background: item.growth.startsWith('+') ? '#ecfdf5' : '#fef2f2',
+                      color: item.growth.startsWith('+') ? '#059669' : '#dc2626'
+                    }}>
+                      {item.growth}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                <div style={{ height: '7px', width: '100%', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${item.share}%`,
+                    background: item.color,
+                    borderRadius: '4px',
+                    transition: 'width 0.5s ease'
+                  }} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Right: Texture & Color Demand */}
-        <div className="lg:col-span-5 p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-5">
+        {/* RIGHT: TEXTURE & PATTERN TRENDS */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '18px',
+          border: '1px solid #e2e8f0',
+          padding: '24px',
+          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.04)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '18px'
+        }}>
           <div>
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <PieChart className="w-4 h-4 text-amber-600" />
-              <span>Yükselen Doku ve Renk Tercihleri</span>
-            </h3>
-            <p className="text-xs text-slate-500 mt-1">
-              3D Stüdyo giydirmelerinde en çok seçilen doku aileleri.
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: '850', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Layers size={18} style={{ color: '#b45309' }} />
+                <span>Yükselen Doku ve Renk Tercihleri</span>
+              </h3>
+              <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '700' }}>Pazar Payı</span>
+            </div>
+            <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '4px 0 0 0' }}>
+              3D Stüdyo giydirmelerinde mimar ve son kullanıcıların en çok seçtiği doku aileleri
             </p>
           </div>
 
-          <div className="space-y-4">
-            {textureTrends.map(t => (
-              <div key={t.name} className="space-y-1.5">
-                <div className="flex justify-between text-xs font-bold">
-                  <span className="text-slate-800">{t.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-emerald-600 text-[11px]">{t.growth}</span>
-                    <span className="text-slate-900 font-black">%{t.share}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {textureTrends.map(item => (
+              <div
+                key={item.name}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 14px',
+                  borderRadius: '12px',
+                  border: '1px solid #f1f5f9',
+                  background: '#f8fafc',
+                  gap: '12px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    background: item.swatch,
+                    border: '1.5px solid #cbd5e1',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                    flexShrink: 0
+                  }} />
+                  <div>
+                    <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>{item.name}</div>
+                    <div style={{ fontSize: '0.68rem', color: '#64748b' }}>{item.desc}</div>
                   </div>
                 </div>
-                <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden">
-                  <div 
-                    className="h-full rounded-full transition-all duration-1000"
-                    style={{ width: `${t.share}%`, backgroundColor: t.color }}
-                  ></div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: '900', color: '#0f172a' }}>%{item.share}</span>
+                  <span style={{
+                    fontSize: '0.68rem',
+                    fontWeight: '800',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    background: '#ecfdf5',
+                    color: '#059669'
+                  }}>
+                    {item.growth}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Surface Finishes */}
-          <div className="pt-4 border-t border-slate-100 space-y-3">
-            <h4 className="text-xs font-bold text-slate-800">Yüzey Tercihleri (Mat vs Parlak):</h4>
-            <div className="grid grid-cols-3 gap-2 text-center">
+          {/* Surface Finish Segment */}
+          <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '14px' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: '800', color: '#334155', marginBottom: '8px' }}>
+              Yüzey Bitişi Tercihleri (Mat vs Parlak vs Lapatto):
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', textAlign: 'center' }}>
               {surfacePreferences.map(s => (
-                <div key={s.finish} className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                  <div className="text-lg font-black text-slate-900">%{s.percent}</div>
-                  <div className="text-[11px] font-bold text-slate-700 mt-0.5 line-clamp-1">{s.finish}</div>
+                <div key={s.finish} style={{ background: '#f8fafc', borderRadius: '10px', padding: '10px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '900', color: s.color }}>%{s.percent}</div>
+                  <div style={{ fontSize: '0.72rem', fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>{s.finish}</div>
+                  <div style={{ fontSize: '0.62rem', color: '#64748b', marginTop: '2px' }}>{s.desc}</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
+
       </div>
 
-      {/* Regional Demand Heatmap Table */}
-      <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
-        <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-sky-600" />
-          <span>Bölgesel Talep Yoğunluğu & İhtiyaç Haritası</span>
-        </h3>
+      {/* -------------------- 4. REGIONAL DEMAND MATRIX -------------------- */}
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '18px',
+        border: '1px solid #e2e8f0',
+        padding: '24px',
+        boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.04)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px'
+      }}>
+        <div>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: '850', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <MapPin size={18} style={{ color: '#0284c7' }} />
+            <span>Bölgesel Talep Yoğunluğu & İhtiyaç Haritası</span>
+          </h3>
+          <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
+            Türkiye ve Avrupa ihracat pazarlarında bölgelere göre en çok talep gören formatlar
+          </span>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
           {regionalDemands.map(reg => (
-            <div key={reg.region} className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
-              <div>
-                <span className="text-[11px] font-bold text-sky-700 uppercase tracking-wider">{reg.index}</span>
-                <h4 className="text-sm font-extrabold text-slate-900 mt-1">{reg.region}</h4>
-                <p className="text-xs text-slate-500 mt-2">Öne Çıkan: <strong className="text-slate-800">{reg.topNeed}</strong></p>
+            <div
+              key={reg.region}
+              style={{
+                background: '#f8fafc',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                gap: '8px'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{
+                  fontSize: '0.68rem',
+                  fontWeight: '800',
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  background: reg.badgeBg,
+                  color: reg.badgeColor
+                }}>
+                  {reg.index}
+                </span>
+                <span style={{ fontSize: '0.85rem', fontWeight: '900', color: '#0f172a' }}>
+                  {reg.share}
+                </span>
               </div>
-              <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-xs">
-                <span className="text-slate-500">Pazar Payı:</span>
-                <span className="font-black text-slate-900 text-sm">{reg.share}</span>
+
+              <div>
+                <div style={{ fontSize: '0.82rem', fontWeight: '800', color: '#0f172a' }}>{reg.region}</div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>
+                  Öne Çıkan: <strong style={{ color: '#0f172a' }}>{reg.topNeed}</strong>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </div>
+
     </div>
   );
 }
