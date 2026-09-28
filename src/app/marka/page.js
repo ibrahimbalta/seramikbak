@@ -590,16 +590,21 @@ export default function BrandPortalPage() {
     }
   };
 
-  const fetchDealers = async () => {
-    if (!brandInfo) return;
+  const fetchDealers = async (bId) => {
+    const targetBrandId = bId || brandInfo?.id;
+    if (!targetBrandId) return;
     setDealersLoading(true);
     try {
-      const res = await fetch('/api/admin/dealers');
+      const res = await fetch(`/api/brands/dealers?brandId=${encodeURIComponent(targetBrandId)}`);
       if (res.ok) {
-        const allDealers = await res.json();
-        // Filter dealers belonging to this brand
-        const brandDealers = allDealers.filter(d => d.brandId === brandInfo.id);
-        setDealers(brandDealers);
+        const brandDealers = await res.json();
+        setDealers(Array.isArray(brandDealers) ? brandDealers : []);
+      } else {
+        const adminRes = await fetch(`/api/admin/dealers?brandId=${encodeURIComponent(targetBrandId)}`);
+        if (adminRes.ok) {
+          const allDealers = await adminRes.json();
+          setDealers(Array.isArray(allDealers) ? allDealers.filter(d => d.brandId === targetBrandId) : []);
+        }
       }
     } catch (err) {
       console.error('Failed to fetch dealers:', err);
@@ -739,17 +744,26 @@ export default function BrandPortalPage() {
 
   const handleUpdateDealerStatus = async (dealerId, newStatus) => {
     try {
-      const res = await fetch('/api/admin/dealers', {
+      const targetBrandId = brandInfo?.id;
+      const res = await fetch('/api/brands/dealers', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: dealerId, status: newStatus })
+        body: JSON.stringify({ id: dealerId, status: newStatus, brandId: targetBrandId })
       });
       if (res.ok) {
-        // Refresh dealer network
-        fetchDealers();
+        fetchDealers(targetBrandId);
       } else {
-        const errData = await res.json();
-        alert('Bayi durumu güncellenemedi: ' + (errData.error || 'Bilinmeyen hata'));
+        const fallbackRes = await fetch('/api/admin/dealers', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: dealerId, status: newStatus })
+        });
+        if (fallbackRes.ok) {
+          fetchDealers(targetBrandId);
+        } else {
+          const errData = await fallbackRes.json().catch(() => ({}));
+          alert('Bayi durumu güncellenemedi: ' + (errData.error || 'Bilinmeyen hata'));
+        }
       }
     } catch (err) {
       console.error('Failed to update dealer status:', err);
@@ -762,12 +776,13 @@ export default function BrandPortalPage() {
     setAddDealerLoading(true);
 
     try {
-      const res = await fetch('/api/admin/dealers', {
+      const targetBrandId = brandInfo?.id;
+      const res = await fetch('/api/brands/dealers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...newDealerData,
-          brandId: brandInfo.id
+          brandId: targetBrandId
         })
       });
       const data = await res.json();
@@ -783,9 +798,33 @@ export default function BrandPortalPage() {
           lat: '40.9901',
           lng: '29.0278'
         });
-        fetchDealers();
+        fetchDealers(targetBrandId);
       } else {
-        setAddDealerError(data.error || 'Bayi eklenemedi.');
+        // Fallback to /api/admin/dealers
+        const fallbackRes = await fetch('/api/admin/dealers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...newDealerData,
+            brandId: targetBrandId
+          })
+        });
+        const fallbackData = await fallbackRes.json();
+        if (fallbackRes.ok && fallbackData.success) {
+          setShowAddDealerModal(false);
+          setNewDealerData({
+            name: '',
+            phone: '',
+            address: '',
+            city: '',
+            district: '',
+            lat: '40.9901',
+            lng: '29.0278'
+          });
+          fetchDealers(targetBrandId);
+        } else {
+          setAddDealerError(fallbackData.error || data.error || 'Bayi eklenemedi.');
+        }
       }
     } catch (err) {
       setAddDealerError('Bağlantı hatası.');
@@ -2924,7 +2963,7 @@ export default function BrandPortalPage() {
                         Yetkili Bayi Ağı Yönetimi
                       </h2>
                       <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
-                        Markanıza bağlı çalışan fiziki mağazaların (bayiler) listesi, konumları, satış ve aktivasyon onay süreçleri.
+                        Bayi portalı (/bayi) üzerinden markanızı yetkili üretici olarak seçerek sisteme kayıt olan ve onay bekleyen tüm fiziki mağazalar.
                       </p>
                     </div>
 
@@ -2950,6 +2989,53 @@ export default function BrandPortalPage() {
                     </button>
                   </div>
 
+                  {/* Dealer KPI Quick Summary Strip */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '12px'
+                  }}>
+                    <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(5, 150, 105, 0.1)', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Building2 size={20} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700' }}>TOPLAM BAYİ</div>
+                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{dealers.length} Mağaza</div>
+                      </div>
+                    </div>
+
+                    <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <CheckCircle size={20} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700' }}>AKTİF SHOWROOM</div>
+                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{dealers.filter(d => d.status === 'APPROVED').length} Aktif</div>
+                      </div>
+                    </div>
+
+                    <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(245, 158, 11, 0.12)', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Clock size={20} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700' }}>PORTAL KAYITLARI</div>
+                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#d97706' }}>{dealers.filter(d => d.status === 'PENDING_APPROVAL').length} Onay Bekliyor</div>
+                      </div>
+                    </div>
+
+                    <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(147, 51, 234, 0.1)', color: '#9333ea', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <MapPin size={20} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700' }}>KAPSAMA AĞI</div>
+                        <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{new Set(dealers.map(d => d.city).filter(Boolean)).size} Şehir</div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Dealers List */}
                   <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
                     {dealersLoading ? (
@@ -2958,8 +3044,14 @@ export default function BrandPortalPage() {
                         <span>Bayi listesi güncelleniyor...</span>
                       </div>
                     ) : dealers.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '36px', color: '#94a3b8', fontStyle: 'italic' }}>
-                        Markanıza tanımlanmış hiçbir fiziki bayi bulunamadı. Sağ üstten yeni bir bayi tanımlayabilirsiniz.
+                      <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b' }}>
+                        <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto', color: '#94a3b8' }}>
+                          <Users size={28} />
+                        </div>
+                        <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#0f172a', margin: '0 0 6px 0' }}>Markanıza Tanımlı Bayi Henüz Bulunamadı</h3>
+                        <p style={{ fontSize: '0.84rem', color: '#64748b', maxWidth: '520px', margin: '0 auto 16px auto', lineHeight: '1.5' }}>
+                          Bayi portalı (/bayi) üzerinden markanızı yetkili üretici olarak seçip kayıt olan tüm mağazalar otomatik olarak bu ekrana düşer. Dilerseniz hemen yukarıdaki butondan doğrudan yetkili bayi de tanımlayabilirsiniz.
+                        </p>
                       </div>
                     ) : isMobile ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>

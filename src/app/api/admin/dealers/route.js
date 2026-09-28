@@ -5,17 +5,29 @@ import { verifyAuth } from '@/lib/auth-check';
 
 export async function GET(request) {
   try {
-    const auth = await verifyAuth(request, 'admin');
-    if (!auth) {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'admin' && auth.role !== 'brand')) {
       return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
     }
+
+    const { searchParams } = new URL(request.url);
+    const queryBrandId = searchParams.get('brandId');
+
+    const whereClause = {};
+    if (auth.role === 'brand') {
+      whereClause.brandId = auth.id;
+    } else if (queryBrandId) {
+      whereClause.brandId = queryBrandId;
+    }
+
     const dealers = await prisma.dealer.findMany({
+      where: whereClause,
       include: {
         brand: {
           select: { name: true }
         }
       },
-      orderBy: { name: 'asc' }
+      orderBy: { createdAt: 'desc' }
     });
     return NextResponse.json(dealers);
   } catch (error) {
@@ -26,12 +38,13 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const auth = await verifyAuth(request, 'admin');
-    if (!auth) {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'admin' && auth.role !== 'brand')) {
       return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
     }
     const body = await request.json();
-    const { name, brandId, phone, email, password, address, city, district, lat, lng } = body;
+    const { name, phone, email, password, address, city, district, lat, lng } = body;
+    const brandId = auth.role === 'brand' ? auth.id : body.brandId;
 
     if (!name || !brandId || !phone || !address || !city || !district) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -143,14 +156,22 @@ export async function PUT(request) {
 
     const isAdmin = auth.role === 'admin';
     const isSelfDealer = auth.role === 'dealer' && auth.id === id;
+    let isBrandOwner = false;
+    if (auth.role === 'brand') {
+      const existing = await prisma.dealer.findUnique({
+        where: { id },
+        select: { brandId: true }
+      });
+      isBrandOwner = existing && existing.brandId === auth.id;
+    }
 
-    if (!isAdmin && !isSelfDealer) {
+    if (!isAdmin && !isSelfDealer && !isBrandOwner) {
       return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 403 });
     }
 
     const updateData = {};
-    if (isAdmin && name !== undefined) updateData.name = name;
-    if (isAdmin && status !== undefined) updateData.status = status;
+    if ((isAdmin || isBrandOwner) && name !== undefined) updateData.name = name;
+    if ((isAdmin || isBrandOwner) && status !== undefined) updateData.status = status;
     if (phone !== undefined) updateData.phone = phone;
     if (email !== undefined) updateData.email = email || null;
     if (address !== undefined) updateData.address = address;
