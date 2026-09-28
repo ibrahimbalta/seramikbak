@@ -459,12 +459,17 @@ export default function ShowroomKioskPage() {
         // 1. Determine dealer ID from URL search params or localStorage
         let targetDealerId = null;
         let savedDealerObj = null;
+        let targetBrand = null;
 
         if (typeof window !== 'undefined') {
           const urlParams = new URLSearchParams(window.location.search);
           const queryDealerId = urlParams.get('dealerId');
           if (queryDealerId) {
             targetDealerId = queryDealerId;
+          }
+          const queryBrand = urlParams.get('brand') || urlParams.get('brandSlug') || urlParams.get('brandId');
+          if (queryBrand) {
+            targetBrand = queryBrand;
           }
 
           try {
@@ -481,8 +486,11 @@ export default function ShowroomKioskPage() {
         }
 
         // 2. Fetch brands and auth status concurrently
-        const authUrl = targetDealerId 
-          ? `/api/dealers/kiosk-auth?dealerId=${encodeURIComponent(targetDealerId)}`
+        const params = new URLSearchParams();
+        if (targetDealerId) params.append('dealerId', targetDealerId);
+        if (targetBrand) params.append('brand', targetBrand);
+        const authUrl = params.toString()
+          ? `/api/dealers/kiosk-auth?${params.toString()}`
           : '/api/dealers/kiosk-auth';
 
         const [brandRes, authRes] = await Promise.all([
@@ -500,7 +508,18 @@ export default function ShowroomKioskPage() {
         if (authRes?.data?.authorized) {
           setIsAuthorized(true);
           setAuthError(null);
-          if (authRes.data.dealer) {
+          if (authRes.data.isBrandKiosk && authRes.data.brand) {
+            setSelectedBrandId(authRes.data.brand.id);
+            setSelectedDealer({
+              id: authRes.data.brand.id,
+              name: authRes.data.brand.name,
+              brandId: authRes.data.brand.id,
+              isBrand: true,
+              logoUrl: authRes.data.brand.logoUrl,
+              city: 'Genel Merkez',
+              district: 'Üretici Marka'
+            });
+          } else if (authRes.data.dealer) {
             setSelectedDealer(authRes.data.dealer);
             if (authRes.data.dealer.brandId) {
               setSelectedBrandId(authRes.data.dealer.brandId);
@@ -513,11 +532,23 @@ export default function ShowroomKioskPage() {
           }
         } else {
           setIsAuthorized(false);
+          const isBrand = Boolean(authRes?.data?.isBrandKiosk || targetBrand);
           setAuthError({
-            reason: authRes?.data?.reason || 'NO_SUBSCRIPTION',
-            message: authRes?.data?.message || 'Kiosk Teşhir Modu yalnızca aktif paket aboneliği olan bayilerimize özeldir.'
+            isBrandKiosk: isBrand,
+            reason: authRes?.data?.reason || (isBrand ? 'NO_BRAND_SUBSCRIPTION' : 'NO_SUBSCRIPTION'),
+            message: authRes?.data?.message || (isBrand 
+              ? 'Kiosk Teşhir Modu, PRO veya ENTERPRISE paket aboneliği olan üretici markalarımıza özeldir.' 
+              : 'Kiosk Teşhir Modu yalnızca aktif paket aboneliği olan bayilerimize özeldir.')
           });
-          if (authRes?.data?.dealer) {
+          if (authRes?.data?.brand) {
+            setSelectedDealer({
+              id: authRes.data.brand.id,
+              name: authRes.data.brand.name,
+              brandId: authRes.data.brand.id,
+              isBrand: true,
+              logoUrl: authRes.data.brand.logoUrl
+            });
+          } else if (authRes?.data?.dealer) {
             setSelectedDealer(authRes.data.dealer);
           } else if (savedDealerObj) {
             setSelectedDealer(savedDealerObj);
@@ -1156,9 +1187,9 @@ export default function ShowroomKioskPage() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              background: 'rgba(245, 158, 11, 0.12)',
-              border: '1px solid rgba(245, 158, 11, 0.3)',
-              color: '#fbbf24',
+              background: authError?.isBrandKiosk ? 'rgba(212, 175, 55, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+              border: authError?.isBrandKiosk ? '1px solid rgba(212, 175, 55, 0.3)' : '1px solid rgba(245, 158, 11, 0.3)',
+              color: authError?.isBrandKiosk ? '#d4af37' : '#fbbf24',
               padding: '4px 12px',
               borderRadius: '20px',
               fontSize: '0.72rem',
@@ -1167,7 +1198,7 @@ export default function ShowroomKioskPage() {
               letterSpacing: '0.04em'
             }}>
               <Crown size={12} />
-              <span>BAYİ PAKET ABONELİĞİ GEREKİR</span>
+              <span>{authError?.isBrandKiosk ? 'MARKA PRO & ENTERPRISE PAKETİ GEREKİR' : 'BAYİ PAKET ABONELİĞİ GEREKİR'}</span>
             </div>
             <h1 style={{
               fontSize: '1.5rem',
@@ -1176,7 +1207,7 @@ export default function ShowroomKioskPage() {
               color: '#ffffff',
               letterSpacing: '-0.02em'
             }}>
-              Kiosk Teşhir Modu Kilitli
+              {authError?.isBrandKiosk ? 'Marka Kiosk Teşhir Modu Kilitli' : 'Kiosk Teşhir Modu Kilitli'}
             </h1>
             <p style={{
               fontSize: '0.88rem',
@@ -1184,7 +1215,9 @@ export default function ShowroomKioskPage() {
               lineHeight: 1.6,
               margin: 0
             }}>
-              {authError?.message || 'Kiosk Teşhir Modu, yalnızca aktif paket aboneliği (Lite, Standart veya Premium) bulunan SeramikBak yetkili bayileri tarafından kullanılabilir.'}
+              {authError?.message || (authError?.isBrandKiosk 
+                ? 'Kiosk Teşhir Modu, PRO veya ENTERPRISE lisansı bulunan SeramikBak üretici markaları tarafından kullanılabilir.'
+                : 'Kiosk Teşhir Modu, yalnızca aktif paket aboneliği (Lite, Standart veya Premium) bulunan SeramikBak yetkili bayileri tarafından kullanılabilir.')}
             </p>
           </div>
 
@@ -1200,7 +1233,9 @@ export default function ShowroomKioskPage() {
               boxSizing: 'border-box'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <span style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '700' }}>TANIMLI SHOWROOM:</span>
+                <span style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: '700' }}>
+                  {authError?.isBrandKiosk || selectedDealer?.isBrand ? 'TANIMLI ÜRETİCİ MARKA:' : 'TANIMLI SHOWROOM:'}
+                </span>
                 <span style={{
                   fontSize: '0.68rem',
                   fontWeight: '800',
@@ -1209,7 +1244,13 @@ export default function ShowroomKioskPage() {
                   padding: '2px 8px',
                   borderRadius: '6px'
                 }}>
-                  {authError?.reason === 'PENDING_APPROVAL' ? 'Onay Bekliyor' : authError?.reason === 'EXPIRED' ? 'Süresi Doldu' : 'Paket Yok'}
+                  {authError?.reason === 'PENDING_APPROVAL' 
+                    ? 'Onay Bekliyor' 
+                    : authError?.reason === 'EXPIRED' 
+                    ? 'Süresi Doldu' 
+                    : authError?.reason === 'PLAN_UPGRADE_REQUIRED'
+                    ? 'Paket Yükseltme Gerekir'
+                    : 'Paket Yok'}
                 </span>
               </div>
               <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#f8fafc' }}>
@@ -1225,29 +1266,55 @@ export default function ShowroomKioskPage() {
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', marginTop: '6px' }}>
-            <Link
-              href="/bayi"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                width: '100%',
-                padding: '14px 20px',
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                color: '#ffffff',
-                textDecoration: 'none',
-                borderRadius: '12px',
-                fontWeight: '800',
-                fontSize: '0.9rem',
-                boxShadow: '0 4px 16px rgba(245, 158, 11, 0.35)',
-                boxSizing: 'border-box',
-                transition: 'all 0.2s'
-              }}
-            >
-              <span>{selectedDealer ? 'Bayi Paneline Dön & Paket Seç' : 'Bayi Girişi Yap'}</span>
-              <ArrowRight size={16} />
-            </Link>
+            {authError?.isBrandKiosk ? (
+              <Link
+                href="/marka"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  width: '100%',
+                  padding: '14px 20px',
+                  background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
+                  color: '#000000',
+                  textDecoration: 'none',
+                  borderRadius: '12px',
+                  fontWeight: '800',
+                  fontSize: '0.9rem',
+                  boxShadow: '0 4px 16px rgba(212, 175, 55, 0.35)',
+                  boxSizing: 'border-box',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <span>Marka Paneline Dön & Paketi Yükselt</span>
+                <ArrowRight size={16} />
+              </Link>
+            ) : (
+              <Link
+                href="/bayi"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  width: '100%',
+                  padding: '14px 20px',
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                  color: '#ffffff',
+                  textDecoration: 'none',
+                  borderRadius: '12px',
+                  fontWeight: '800',
+                  fontSize: '0.9rem',
+                  boxShadow: '0 4px 16px rgba(245, 158, 11, 0.35)',
+                  boxSizing: 'border-box',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <span>{selectedDealer ? 'Bayi Paneline Dön & Paket Seç' : 'Bayi Girişi Yap'}</span>
+                <ArrowRight size={16} />
+              </Link>
+            )}
 
             <Link
               href="/"
@@ -1304,13 +1371,13 @@ export default function ShowroomKioskPage() {
       <header className="kiosk-header">
         <div className="header-left">
           <Link 
-            href="/bayi" 
+            href={selectedDealer?.isBrand ? "/marka" : "/bayi"} 
             className="kiosk-nav-btn btn-nav-bayi" 
-            title="Bayi Paneline Dön"
+            title={selectedDealer?.isBrand ? "Marka Paneline Dön" : "Bayi Paneline Dön"}
           >
             <Building2 size={15} style={{ flexShrink: 0 }} />
-            <span className="btn-label-desktop">Bayi Paneli</span>
-            <span className="btn-label-mobile">Bayi</span>
+            <span className="btn-label-desktop">{selectedDealer?.isBrand ? "Marka Paneli" : "Bayi Paneli"}</span>
+            <span className="btn-label-mobile">{selectedDealer?.isBrand ? "Marka" : "Bayi"}</span>
           </Link>
           <Link 
             href="/" 
@@ -1330,7 +1397,7 @@ export default function ShowroomKioskPage() {
               <span className="showroom-brand-name">
                 {selectedDealer?.name || 'SeramikBak'}
               </span>
-              <span className="showroom-tag-badge">Showroom</span>
+              <span className="showroom-tag-badge">{selectedDealer?.isBrand ? "Kurumsal Kiosk" : "Showroom"}</span>
             </div>
           </div>
         </div>

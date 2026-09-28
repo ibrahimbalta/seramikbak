@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyAuth } from '@/lib/auth-check';
-import { checkKioskSubscriptionAccess } from '@/lib/kioskAuth';
+import { checkKioskSubscriptionAccess, checkBrandKioskSubscriptionAccess } from '@/lib/kioskAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +10,85 @@ export async function GET(request) {
     const session = await verifyAuth(request);
     const { searchParams } = new URL(request.url);
     const queryDealerId = searchParams.get('dealerId');
+    const queryBrand = searchParams.get('brand') || searchParams.get('brandSlug') || searchParams.get('brandId');
 
+    // -------------------------------------------------------------
+    // 1. BRAND ENTERPRISE / PRO KIOSK ACCESS CHECK
+    // If opened with ?brand=... or as a logged-in brand user, grant
+    // direct kiosk access if the brand has an active PRO or ENTERPRISE plan.
+    // -------------------------------------------------------------
+    const brandTarget = queryBrand || (session && session.role === 'brand' ? session.id : null);
+
+    if (brandTarget) {
+      const brand = await prisma.brand.findFirst({
+        where: {
+          OR: [
+            { id: brandTarget },
+            { slug: brandTarget },
+            { username: brandTarget }
+          ]
+        },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          logoUrl: true
+        }
+      });
+
+      if (brand) {
+        const brandSaas = await prisma.saaSConfig.findFirst({
+          where: { brandId: brand.id },
+          orderBy: { expiresAt: 'desc' }
+        });
+
+        const brandCheck = checkBrandKioskSubscriptionAccess(brandSaas);
+
+        if (brandCheck.authorized) {
+          return NextResponse.json({
+            authorized: true,
+            isBrandKiosk: true,
+            reason: brandCheck.reason,
+            message: brandCheck.message,
+            brand: {
+              id: brand.id,
+              name: brand.name,
+              slug: brand.slug,
+              logoUrl: brand.logoUrl
+            },
+            subscription: {
+              type: 'BRAND',
+              plan: brandSaas?.plan || 'ENTERPRISE',
+              status: brandSaas?.status || 'ACTIVE',
+              expiresAt: brandSaas?.expiresAt
+            }
+          });
+        } else {
+          return NextResponse.json({
+            authorized: false,
+            isBrandKiosk: true,
+            reason: brandCheck.reason,
+            message: brandCheck.message,
+            brand: {
+              id: brand.id,
+              name: brand.name,
+              slug: brand.slug,
+              logoUrl: brand.logoUrl
+            },
+            subscription: brandSaas ? {
+              type: 'BRAND',
+              plan: brandSaas.plan,
+              status: brandSaas.status,
+              expiresAt: brandSaas.expiresAt
+            } : null
+          }, { status: 403 });
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 2. DEALER KIOSK ACCESS CHECK
+    // -------------------------------------------------------------
     let dealerId = null;
 
     if (session && session.role === 'dealer') {
@@ -24,6 +102,7 @@ export async function GET(request) {
     if (!dealerId) {
       return NextResponse.json({
         authorized: false,
+        isBrandKiosk: !!queryBrand,
         reason: 'NO_DEALER_SESSION',
         message: 'Kiosk Teşhir Modunu başlatmak için bayi girişi yapılmalıdır.'
       }, { status: 401 });
