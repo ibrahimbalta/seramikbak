@@ -21,8 +21,8 @@ import {
   Maximize2
 } from 'lucide-react';
 
-// Kiosk'ta odanın ve dokunun doğru eşleşmesi için yardımcı fonksiyonlar
-function getKioskProduct(item) {
+// 3D Tasarım stüdyosunda odanın ve dokunun doğru eşleşmesi için yardımcı fonksiyonlar
+function getStudioProduct(item) {
   const style = item.style || 'Mermer';
   const name = item.tileRecommendation || item.title;
   let code = `SB-ILH-${item.id}`;
@@ -84,6 +84,7 @@ function getKioskProduct(item) {
     color: item.colorNames?.[0] || 'Doğal Ton',
     imageUrl: item.img || textureUrl,
     textureUrl: textureUrl,
+    room: getMappedRoom(item.room),
     unitPrice: 520,
     brand: { id: 'seramikbak', name: 'Seçkin Mimari Koleksiyon' }
   };
@@ -145,22 +146,22 @@ export default function InspirationGalleryPage() {
     });
   };
 
-  // 3D Kiosk Sayfasını Açma ve Seramik Modelini Seçili Olarak Aktarma
-  const openInKiosk = (item, e) => {
+  // 3D Tasarım Sayfasını Açma ve Seramik Modelini Seçili Olarak Aktarma
+  const openInStudio = (item, e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    const kioskProd = getKioskProduct(item);
+    const studioProd = getStudioProduct(item);
     const room = getMappedRoom(item.room);
+    studioProd.room = room;
     try {
-      sessionStorage.setItem('kiosk_selected_product', JSON.stringify(kioskProd));
-      localStorage.setItem('kiosk_selected_product', JSON.stringify(kioskProd));
+      localStorage.setItem('seramikbak_preselected_product', JSON.stringify(studioProd));
+      sessionStorage.setItem('seramikbak_preselected_product', JSON.stringify(studioProd));
     } catch (err) {}
 
-    const searchParam = encodeURIComponent(kioskProd.name);
-    const styleParam = encodeURIComponent(kioskProd.style ? kioskProd.style.toLowerCase() : 'all');
-    window.location.href = `/kiosk?productId=${encodeURIComponent(kioskProd.id)}&code=${encodeURIComponent(kioskProd.code)}&room=${room}&style=${styleParam}&search=${searchParam}`;
+    const searchParam = encodeURIComponent(studioProd.code || studioProd.name || studioProd.id);
+    window.location.href = `/?tab=studio&product=${searchParam}&room=${room}#studio`;
   };
 
   // Hesaplayıcı Formülü
@@ -699,7 +700,7 @@ export default function InspirationGalleryPage() {
             </button>
 
             <Link
-              href="/kiosk"
+              href="/?tab=studio#studio"
               style={{
                 background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
                 color: '#d4af37',
@@ -716,7 +717,7 @@ export default function InspirationGalleryPage() {
               }}
             >
               <Sparkles size={15} />
-              <span>3D Kiosk Stüdyo</span>
+              <span>3D Tasarım</span>
             </Link>
           </div>
         </div>
@@ -747,7 +748,7 @@ export default function InspirationGalleryPage() {
           marginBottom: '14px'
         }}>
           <Sparkles size={13} />
-          <span>Mimari Tasarım Galerisi & 3D Kiosk Deneyimi</span>
+          <span>Mimari Tasarım Galerisi & 3D Tasarım Deneyimi</span>
         </div>
 
         <h1 style={{
@@ -768,7 +769,7 @@ export default function InspirationGalleryPage() {
           margin: '0 auto 24px auto',
           lineHeight: '1.55'
         }}>
-          Banyo, mutfak ve salonlar için 28+ seçkin mimari projeyi inceleyin; beğendiğiniz seramik modellerini 3D Kiosk stüdyoda kendi odanızda canlı deneyin.
+          Banyo, mutfak ve salonlar için 28+ seçkin mimari projeyi inceleyin; beğendiğiniz seramik modellerini 3D Tasarım stüdyosunda kendi odanızda canlı deneyin.
         </p>
 
         {/* Minimalist Segmented Tabs */}
@@ -1039,7 +1040,7 @@ export default function InspirationGalleryPage() {
 
                   <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' }}>
                     <button
-                      onClick={(e) => openInKiosk(galleryItems[0], e)}
+                      onClick={(e) => openInStudio(galleryItems[0], e)}
                       style={{
                         background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
                         color: '#090d16',
@@ -1056,7 +1057,7 @@ export default function InspirationGalleryPage() {
                       }}
                     >
                       <Sparkles size={15} />
-                      <span>3D Kioskta Canlı Gör</span>
+                      <span>3D Tasarım</span>
                     </button>
 
                     <Link
@@ -1235,10 +1236,10 @@ export default function InspirationGalleryPage() {
                         marginTop: '4px',
                         borderTop: '1px solid #f1f5f9'
                       }}>
-                        {/* 3D Kiosk'ta Aç Butonu */}
+                        {/* 3D Tasarımda Aç Butonu */}
                         <button
                           type="button"
-                          onClick={(e) => openInKiosk(item, e)}
+                          onClick={(e) => openInStudio(item, e)}
                           style={{
                             background: '#0f172a',
                             color: '#ffffff',
@@ -1255,7 +1256,7 @@ export default function InspirationGalleryPage() {
                           }}
                         >
                           <Sparkles size={13} style={{ color: '#d4af37' }} />
-                          <span>3D Kioskta Gör</span>
+                          <span>3D Tasarım</span>
                         </button>
 
                         <Link
@@ -1412,7 +1413,7 @@ export default function InspirationGalleryPage() {
                     <div style={{ fontWeight: '850', color: '#0f172a' }}>30 Yıllık Banyonun Calacatta Dönüşümü</div>
                     <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '4px 0 10px 0' }}>Eski sararmış 20x20 fayanslar yerine kesintisiz 60x120 Calacatta Lappato uygulandı.</p>
                     <button
-                      onClick={(e) => openInKiosk(galleryItems[0], e)}
+                      onClick={(e) => openInStudio(galleryItems[0], e)}
                       style={{
                         padding: '6px 12px',
                         borderRadius: '6px',
@@ -1428,7 +1429,7 @@ export default function InspirationGalleryPage() {
                       }}
                     >
                       <Sparkles size={12} />
-                      <span>3D Kioskta Canlı Gör</span>
+                      <span>3D Tasarım</span>
                     </button>
                   </div>
                 </div>
@@ -1439,7 +1440,7 @@ export default function InspirationGalleryPage() {
                     <div style={{ fontWeight: '850', color: '#0f172a' }}>Karanlık Mutfaktan İskandinav Ferahlığına</div>
                     <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '4px 0 10px 0' }}>Suya dayanıksız laminat parke yerine 20x120 Meşe Porselen Parke kaplandı.</p>
                     <button
-                      onClick={(e) => openInKiosk(galleryItems[6], e)}
+                      onClick={(e) => openInStudio(galleryItems[6], e)}
                       style={{
                         padding: '6px 12px',
                         borderRadius: '6px',
@@ -1455,7 +1456,7 @@ export default function InspirationGalleryPage() {
                       }}
                     >
                       <Sparkles size={12} />
-                      <span>3D Kioskta Canlı Gör</span>
+                      <span>3D Tasarım</span>
                     </button>
                   </div>
                 </div>
@@ -1694,12 +1695,12 @@ export default function InspirationGalleryPage() {
               </div>
 
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                {/* 3D Kioskta Aç */}
+                {/* 3D Tasarımda Aç */}
                 <button
                   type="button"
                   onClick={(e) => {
                     setPreviewItem(null);
-                    openInKiosk(previewItem, e);
+                    openInStudio(previewItem, e);
                   }}
                   style={{
                     flex: 1,
@@ -1719,7 +1720,7 @@ export default function InspirationGalleryPage() {
                   }}
                 >
                   <Sparkles size={16} />
-                  <span>Bu Modeli 3D Kioskta Canlı İncele</span>
+                  <span>Bu Modeli 3D Tasarımda İncele</span>
                 </button>
 
                 <Link
@@ -1808,7 +1809,7 @@ export default function InspirationGalleryPage() {
                       <button
                         onClick={(e) => {
                           setShowMoodboardModal(false);
-                          openInKiosk(item, e);
+                          openInStudio(item, e);
                         }}
                         style={{
                           marginTop: '6px',
@@ -1823,7 +1824,7 @@ export default function InspirationGalleryPage() {
                           cursor: 'pointer'
                         }}
                       >
-                        3D Kioskta Aç
+                        3D Tasarımda Aç
                       </button>
                     </div>
                   </div>

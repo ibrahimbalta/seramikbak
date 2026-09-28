@@ -1800,6 +1800,7 @@ export default function Home() {
       // Check for direct product code, slug, or showroom QR scans
       const targetProductParam = params.get('product') || params.get('slug') || params.get('productId') || params.get('code');
       const tabParam = params.get('tab');
+      const roomParam = params.get('room');
       const hashStudio = typeof window !== 'undefined' && window.location.hash === '#studio';
 
       // 1. Load preselected product from localStorage (instant 0ms retrieval)
@@ -1820,7 +1821,8 @@ export default function Home() {
             setStudioApplyToiletWall(false);
             setStudioApplyLeftWallAccent(false);
             setStudioApplyStripeWall(false);
-            setStudioRoomType('bathroom');
+            const targetRoom = roomParam || prod.room || 'bathroom';
+            setStudioRoomType(targetRoom);
             setActiveTab('studio');
             showStudioToast(`✨ ${prod.name || 'Seçilen ürün'} 3D mekana giydirildi`);
           }
@@ -1835,7 +1837,8 @@ export default function Home() {
         if (tabParam === 'studio' || hashStudio || !preselected) {
           isProductPreselectedRef.current = true;
           setActiveTab('studio');
-          setStudioRoomType('bathroom');
+          const targetRoom = roomParam || 'bathroom';
+          setStudioRoomType(targetRoom);
           fetch(`/api/search?q=${encodeURIComponent(targetProductParam)}&fullDetail=true`)
             .then(res => res.json())
             .then(data => {
@@ -1856,7 +1859,7 @@ export default function Home() {
                 setStudioApplyToiletWall(false);
                 setStudioApplyLeftWallAccent(false);
                 setStudioApplyStripeWall(false);
-                setStudioRoomType('bathroom');
+                setStudioRoomType(targetRoom);
                 setActiveTab('studio');
                 showStudioToast(`✨ ${enriched.name} 3D mekana giydirildi`);
               }
