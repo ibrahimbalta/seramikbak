@@ -4,7 +4,7 @@ import { CATEGORY_DEFINITIONS } from '@/lib/categories';
 
 export default async function sitemap() {
   const baseUrl = 'https://www.seramikbak.com';
-  const supportedLangs = ['tr', 'en', 'de', 'ar', 'ru'];
+  const supportedLangs = ['tr', 'en', 'de', 'fr', 'es', 'ar', 'ru'];
 
   // Top 16 Turkish Ceramic Brands
   const TOP_BRANDS = [
@@ -189,5 +189,50 @@ export default async function sitemap() {
     });
   });
 
-  return [...staticRoutes, ...categoryRoutes, ...cityBrandRoutes, ...productRoutes, ...dealerRoutes, ...brandRoutes];
+  // 7. Programmatic SEO Permutations (/kesfet/{brand}-{size/room/color})
+  let matrixRoutes = [];
+  const matrixSizes = ['60x120', '80x80', '60x60', '20x120'];
+  const matrixRooms = ['banyo-seramikleri', 'mutfak-seramikleri', 'salon-seramikleri', 'teras-seramikleri'];
+  const matrixColors = ['bej', 'antrasit', 'beyaz', 'gri'];
+
+  TOP_BRANDS.slice(0, 10).forEach(brand => {
+    const bSlug = slugify(brand);
+    // Brand + Size
+    matrixSizes.forEach(s => {
+      matrixRoutes.push({
+        url: `${baseUrl}/kesfet/${bSlug}-${s}-seramik`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.92
+      });
+    });
+    // Brand + Room
+    matrixRooms.forEach(r => {
+      matrixRoutes.push({
+        url: `${baseUrl}/kesfet/${bSlug}-${r}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.90
+      });
+    });
+    // Brand + Color
+    matrixColors.forEach(c => {
+      matrixRoutes.push({
+        url: `${baseUrl}/kesfet/${bSlug}-${c}-seramik`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.88
+      });
+    });
+  });
+
+  return [
+    ...staticRoutes, 
+    ...categoryRoutes, 
+    ...cityBrandRoutes, 
+    ...matrixRoutes, 
+    ...productRoutes, 
+    ...dealerRoutes, 
+    ...brandRoutes
+  ];
 }

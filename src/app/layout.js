@@ -64,6 +64,8 @@ export const metadata = {
       "tr-TR": "https://www.seramikbak.com",
       "en-US": "https://www.seramikbak.com?lang=en",
       "de-DE": "https://www.seramikbak.com?lang=de",
+      "fr-FR": "https://www.seramikbak.com?lang=fr",
+      "es-ES": "https://www.seramikbak.com?lang=es",
       "ar-SA": "https://www.seramikbak.com?lang=ar",
       "ru-RU": "https://www.seramikbak.com?lang=ru",
       "x-default": "https://www.seramikbak.com"
@@ -75,7 +77,7 @@ export const metadata = {
     url: "https://www.seramikbak.com",
     siteName: "SeramikBak Global",
     locale: "tr_TR",
-    alternateLocale: ["en_US", "de_DE", "ar_SA", "ru_RU"],
+    alternateLocale: ["en_US", "de_DE", "fr_FR", "es_ES", "ar_SA", "ru_RU"],
     type: "website",
     images: [
       {
@@ -131,7 +133,7 @@ const websiteJsonLd = {
   "name": "SeramikBak Global",
   "alternateName": ["Seramik Bak", "SeramikBak International"],
   "url": "https://www.seramikbak.com",
-  "inLanguage": ["tr-TR", "en-US", "de-DE", "ar-SA", "ru-RU"],
+  "inLanguage": ["tr-TR", "en-US", "de-DE", "fr-FR", "es-ES", "ar-SA", "ru-RU"],
   "potentialAction": {
     "@type": "SearchAction",
     "target": {

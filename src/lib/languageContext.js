@@ -37,6 +37,8 @@ export function LanguageProvider({ children }) {
           if (code === 'de' || code === 'at' || code === 'ch') { detected = 'de'; break; }
           if (code === 'ar' || code === 'sa' || code === 'ae' || code === 'qa' || code === 'eg' || code === 'kw') { detected = 'ar'; break; }
           if (code === 'ru' || code === 'by' || code === 'kz') { detected = 'ru'; break; }
+          if (code === 'fr' || code === 'be' || code === 'ma' || code === 'dz' || code === 'tn') { detected = 'fr'; break; }
+          if (code === 'es' || code === 'mx' || code === 'ar' || code === 'co') { detected = 'es'; break; }
           if (code === 'en' || code === 'gb' || code === 'us' || code === 'ca' || code === 'au') { detected = 'en'; break; }
           if (code === 'tr') { detected = 'tr'; break; }
         }

@@ -2,6 +2,8 @@ import prisma from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { slugify } from '@/lib/slugify';
 import ProductDetailClient from './ProductDetailClient';
+import { generateProductSchema, generateBreadcrumbSchema, generateFaqSchema, generateImageObjectSchema } from '@/lib/seo/schemaGenerator';
+import { generateImageAltText } from '@/lib/seo/imageSeo';
 
 // Helper to find a product by slug, code or ID (O(1) indexed database query)
 async function getProductBySlugOrId(slug) {
@@ -108,6 +110,16 @@ export async function generateMetadata({ params }) {
       ],
       alternates: {
         canonical: canonicalUrl,
+        languages: {
+          'tr-TR': canonicalUrl,
+          'en-US': `${canonicalUrl}?lang=en`,
+          'de-DE': `${canonicalUrl}?lang=de`,
+          'fr-FR': `${canonicalUrl}?lang=fr`,
+          'es-ES': `${canonicalUrl}?lang=es`,
+          'ar-SA': `${canonicalUrl}?lang=ar`,
+          'ru-RU': `${canonicalUrl}?lang=ru`,
+          'x-default': canonicalUrl
+        }
       },
       openGraph: {
         title,
@@ -191,66 +203,44 @@ export default async function ProductDetailPage({ params }) {
     console.warn('Could not fetch related products or dealers:', e.message);
   }
 
-  // Schema.org Product & BreadcrumbList JSON-LD Microdata
-  const productSchema = {
-    "@context": "https://schema.org/",
-    "@type": "Product",
-    "name": `${brandName} ${product.name}`,
-    "image": [product.imageUrl, product.textureUrl].filter(Boolean),
-    "description": `${brandName} ${product.name} ${product.width}x${product.height} cm seramik karosu. ${product.finish} yüzey, ${product.style} dokusu.`,
-    "sku": product.code,
-    "brand": {
-      "@type": "Brand",
-      "name": brandName
-    },
-    "offers": {
-      "@type": "AggregateOffer",
-      "priceCurrency": "TRY",
-      "lowPrice": product.trendyolPrice || product.hepsiburadaPrice || 350,
-      "offerCount": "1",
-      "availability": "https://schema.org/InStock",
-      "seller": {
-        "@type": "Organization",
-        "name": "SeramikBak Yetkili Bayi Ağı"
-      }
-    }
-  };
+  // Schema.org Product, Breadcrumbs, ImageObject, and FAQ
+  const productSchema = generateProductSchema(product, brandName);
 
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Anasayfa",
-        "item": "https://www.seramikbak.com"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": brandName,
-        "item": `https://www.seramikbak.com/marka/${slugify(brandName)}`
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": product.name,
-        "item": canonicalUrl
-      }
-    ]
-  };
+  const breadcrumbs = [
+    { name: 'Anasayfa', url: '/' },
+    { name: brandName, url: `/marka/${slugify(brandName)}` },
+    { name: product.name, url: `/urun/${productSlug}` }
+  ];
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
+
+  const imageAlt = generateImageAltText(product, brandName);
+  const imageSchema = generateImageObjectSchema({
+    url: product.imageUrl,
+    title: `${brandName} ${product.name} ${product.width}x${product.height} cm Seramik Karo`,
+    caption: imageAlt,
+    author: brandName
+  });
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
+      {productSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        />
+      )}
+      {breadcrumbSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+      )}
+      {imageSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(imageSchema) }}
+        />
+      )}
       <ProductDetailClient
         product={product}
         relatedProducts={relatedProducts}

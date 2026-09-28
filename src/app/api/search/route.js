@@ -1,5 +1,6 @@
 import { NextResponse, after } from 'next/server';
 import prisma from '@/lib/prisma';
+import { parseSemanticQuery } from '@/lib/seo/semanticSearchParser';
 
 // In-memory buffer for analytics logs to prevent DB write-lock contention under load
 let logBuffer = global.analyticsLogBuffer;
@@ -151,9 +152,44 @@ export async function GET(request) {
 
     if (query) {
       const trimmedQuery = query.trim();
-      const tokens = trimmedQuery.split(/\s+/).filter(Boolean);
-      if (tokens.length > 0) {
-        tokens.forEach(token => {
+      const parsedSemantic = parseSemanticQuery(trimmedQuery);
+
+      // Apply semantic entity filters if not already passed explicitly
+      if (!color && parsedSemantic.extracted.color) {
+        andConditions.push({ color: { contains: parsedSemantic.extracted.color, mode: 'insensitive' } });
+      }
+      if (!style && parsedSemantic.extracted.style) {
+        andConditions.push({ style: { contains: parsedSemantic.extracted.style, mode: 'insensitive' } });
+      }
+      if (!finish && parsedSemantic.extracted.finish) {
+        andConditions.push({ finish: { contains: parsedSemantic.extracted.finish, mode: 'insensitive' } });
+      }
+      if (!area && parsedSemantic.extracted.area) {
+        andConditions.push({ area: { contains: parsedSemantic.extracted.area, mode: 'insensitive' } });
+      }
+      if (!size && parsedSemantic.extracted.width && parsedSemantic.extracted.height) {
+        andConditions.push({
+          OR: [
+            { width: parsedSemantic.extracted.width, height: parsedSemantic.extracted.height },
+            { width: parsedSemantic.extracted.height, height: parsedSemantic.extracted.width }
+          ]
+        });
+      }
+      if (!brandId && parsedSemantic.extracted.brand) {
+        andConditions.push({
+          brand: {
+            name: { contains: parsedSemantic.extracted.brand, mode: 'insensitive' }
+          }
+        });
+      }
+
+      // If semantic entities were extracted, prioritize remaining tokens for text search
+      const tokensToSearch = (parsedSemantic.isSemanticMatch && parsedSemantic.remainingTokens.length > 0)
+        ? parsedSemantic.remainingTokens
+        : trimmedQuery.split(/\s+/).filter(Boolean);
+
+      if (tokensToSearch.length > 0 && !parsedSemantic.isSemanticMatch) {
+        tokensToSearch.forEach(token => {
           andConditions.push({
             OR: [
               { name: { contains: token } },
