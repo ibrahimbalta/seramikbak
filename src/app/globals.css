@@ -36,6 +36,8 @@
   --glass-backdrop: blur(12px);
   
   /* Fonts */
+  --font-outfit: 'Outfit', sans-serif;
+  --font-plus-jakarta: 'Plus Jakarta Sans', sans-serif;
   --font-title: var(--font-outfit, 'Outfit'), -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: var(--font-plus-jakarta, 'Plus Jakarta Sans'), -apple-system, BlinkMacSystemFont, sans-serif;
 }

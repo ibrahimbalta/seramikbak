@@ -1,19 +1,4 @@
 import "./globals.css";
-import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-outfit",
-  display: "swap",
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-plus-jakarta",
-  display: "swap",
-});
 
 export const metadata = {
   metadataBase: new URL("https://www.seramikbak.com"),
@@ -209,7 +194,7 @@ import Script from "next/script";
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="tr" className={`${outfit.variable} ${plusJakarta.variable}`}>
+    <html lang="tr">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
@@ -222,8 +207,12 @@ export default function RootLayout({ children }) {
         <meta name="geo.region" content="TR" />
         <meta name="geo.placename" content="Türkiye" />
         <meta name="content-language" content="tr" />
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
         <script
           type="application/ld+json"
