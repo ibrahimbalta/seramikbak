@@ -42,9 +42,17 @@ import {
   Clock,
   RefreshCw,
   UploadCloud,
-  FileText
+  FileText,
+  Box,
+  Send,
+  Award
 } from 'lucide-react';
 import Link from 'next/link';
+import EmbedStudioTab from '@/components/brand/EmbedStudioTab';
+import ExportRfqTab from '@/components/brand/ExportRfqTab';
+import BrandHealthTab from '@/components/brand/BrandHealthTab';
+import SpecInRadarTab from '@/components/brand/SpecInRadarTab';
+import MarketIntelligenceTab from '@/components/brand/MarketIntelligenceTab';
 
 const TURKEY_CITIES = [
   "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin",
@@ -1707,9 +1715,13 @@ export default function BrandPortalPage() {
             {[
               { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={17} /> },
               { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={17} /> },
+              { id: 'embed-studio', label: '3D Kiosk & Embed SDK', icon: <Box size={17} /> },
+              { id: 'spec-in-radar', label: 'BIM Şartname Radarı', icon: <FileText size={17} /> },
+              { id: 'export-rfq', label: 'Global İhracat & RFQ', icon: <Send size={17} /> },
+              { id: 'market-intel', label: 'Pazar Trend Radarı', icon: <BarChart3 size={17} /> },
+              { id: 'brand-health', label: 'Marka Sağlığı & SEO', icon: <Award size={17} /> },
               { id: 'bulk-import', label: 'Toplu Ürün & ERP', icon: <UploadCloud size={17} /> },
               { id: 'b2b-projects', label: 'B2B Proje Talepleri', icon: <Building2 size={17} /> },
-              { id: 'spec-in-radar', label: 'BIM Şartname Radarı', icon: <FileText size={17} /> },
               { id: 'country-analytics', label: 'Küresel Ülke Analitiği', icon: <Globe size={17} /> },
               { id: 'trends', label: 'Bölgesel Trendler', icon: <TrendingUp size={17} /> },
               { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={17} /> },
@@ -1839,9 +1851,13 @@ export default function BrandPortalPage() {
                     <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700' }}>
                       {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
                       {activePortalTab === 'products' && 'Ürün Kataloğu'}
+                      {activePortalTab === 'embed-studio' && '3D Kiosk & Embed SDK'}
+                      {activePortalTab === 'spec-in-radar' && 'BIM Şartname Radarı'}
+                      {activePortalTab === 'export-rfq' && 'Global İhracat & RFQ'}
+                      {activePortalTab === 'market-intel' && 'Pazar Trend Radarı'}
+                      {activePortalTab === 'brand-health' && 'Marka Sağlığı & SEO'}
                       {activePortalTab === 'bulk-import' && 'Toplu Ürün & ERP'}
                       {activePortalTab === 'b2b-projects' && 'B2B Talepleri'}
-                      {activePortalTab === 'spec-in-radar' && 'BIM Şartname Radarı'}
                       {activePortalTab === 'country-analytics' && 'Ülke Analitiği'}
                       {activePortalTab === 'trends' && 'Pazar Trendleri'}
                       {activePortalTab === 'dealers' && 'Bayi Ağı'}
@@ -1877,12 +1893,16 @@ export default function BrandPortalPage() {
               }} className="no-scrollbar">
                 {[
                   { id: 'dashboard', label: 'Panel', icon: <Activity size={13} /> },
-                  { id: 'outlet', label: 'Seri Sonu / Outlet', icon: <Tag size={13} /> },
                   { id: 'products', label: 'Ürünler', icon: <Layers size={13} /> },
+                  { id: 'embed-studio', label: '3D Kiosk & SDK', icon: <Box size={13} /> },
+                  { id: 'spec-in-radar', label: 'BIM Şartname', icon: <FileText size={13} /> },
+                  { id: 'export-rfq', label: 'Global RFQ', icon: <Send size={13} /> },
+                  { id: 'market-intel', label: 'Pazar Trendi', icon: <BarChart3 size={13} /> },
+                  { id: 'brand-health', label: 'SEO & İtibar', icon: <Award size={13} /> },
+                  { id: 'outlet', label: 'Seri Sonu / Outlet', icon: <Tag size={13} /> },
                   { id: 'b2b-projects', label: 'B2B İhale', icon: <Building2 size={13} /> },
                   { id: 'dealers', label: 'Bayiler', icon: <Users size={13} /> },
                   { id: 'campaigns', label: 'Reklam', icon: <Megaphone size={13} /> },
-                  { id: 'spec-in-radar', label: 'BIM Şartname', icon: <FileText size={13} /> },
                   { id: 'bulk-import', label: 'ERP & Toplu', icon: <UploadCloud size={13} /> },
                   { id: 'country-analytics', label: 'Ülke Analizi', icon: <Globe size={13} /> },
                   { id: 'trends', label: 'Trendler', icon: <TrendingUp size={13} /> },
@@ -1925,9 +1945,13 @@ export default function BrandPortalPage() {
                 <h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
                   {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
                   {activePortalTab === 'products' && 'Ürün Kataloğumuz'}
+                  {activePortalTab === 'embed-studio' && '🎮 White-Label 3D Visualizer & Mağaza Kiosk SDK'}
+                  {activePortalTab === 'spec-in-radar' && '📐 Mimarlar İçin BIM & CAD Şartname Radarı (Spec-In)'}
+                  {activePortalTab === 'export-rfq' && '🌍 Global İhracat B2B Teklif & RFQ Masası'}
+                  {activePortalTab === 'market-intel' && '📊 Canlı Pazar İstihbaratı & Trend Radarı'}
+                  {activePortalTab === 'brand-health' && '🏆 Dijital Marka Sağlığı & Google SERP Görünürlüğü'}
                   {activePortalTab === 'bulk-import' && '⚡ Toplu Ürün & ERP Aktarım Sihirbazı'}
                   {activePortalTab === 'b2b-projects' && 'B2B Proje ve Toptan Talepler'}
-                  {activePortalTab === 'spec-in-radar' && '📐 Mimarlar İçin BIM & CAD Şartname Radarı (Spec-In)'}
                   {activePortalTab === 'country-analytics' && 'Küresel Ülke Analitiği & İhracat Trafiği'}
                   {activePortalTab === 'trends' && 'Bölgesel Pazar Trendleri'}
                   {activePortalTab === 'dealers' && 'Yetkili Bayi Ağı Kontrolü'}
@@ -5669,355 +5693,27 @@ export default function BrandPortalPage() {
 
               {/* -------------------- TAB: SPEC-IN & BIM RADAR -------------------- */}
               {activePortalTab === 'spec-in-radar' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-                    <div>
-                      <h2 style={{ fontSize: '1.2rem', fontWeight: '850', margin: '0 0 4px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <FileText size={24} style={{ color: '#d4af37' }} />
-                        Mimarlık Ofisleri BIM & Şartname Radarı (Spec-In Tracker)
-                      </h2>
-                      <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0 }}>
-                        Projelerinde {brandInfo?.name || 'Marka'} seramiklerini şartnameye ekleyen mimarlık ofisleri ve indirilen 4K Revit/CAD talepleri.
-                      </p>
-                    </div>
+                <SpecInRadarTab brandInfo={brandInfo} initialLeads={specInLeads} />
+              )}
 
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button
-                        onClick={() => {
-                          if (specInLeads.length === 0) {
-                            alert('İndirilecek şartname kaydı bulunamadı.');
-                            return;
-                          }
-                          const csvRows = [
-                            "Tarih,Mimarlık Ofisi,Yetkili Mimar,Telefon,E-posta,Şehir,Proje Türü,Proje Adı,Seramik Kodu,Seramik Adı,Dosya Formatı,Durum",
-                            ...specInLeads.map(l => 
-                              `"${new Date(l.createdAt).toLocaleDateString('tr-TR')}","${l.officeName}","${l.architectName}","${l.phone}","${l.email}","${l.city}","${l.projectType || ''}","${l.projectName || ''}","${l.product?.code || ''}","${l.product?.name || ''}","${l.fileType}","${l.status}"`
-                            )
-                          ].join('\r\n');
-                          const blob = new Blob([csvRows], { type: 'text/csv;charset=utf-8' });
-                          const url = URL.createObjectURL(blob);
-                          const a = document.createElement('a');
-                          a.href = url;
-                          a.download = `${brandInfo?.name || 'Marka'}_Mimari_Sartname_Talepleri.csv`;
-                          document.body.appendChild(a);
-                          a.click();
-                          document.body.removeChild(a);
-                          URL.revokeObjectURL(url);
-                        }}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          background: '#f8fafc',
-                          border: '1px solid #cbd5e1',
-                          borderRadius: '10px',
-                          padding: '8px 14px',
-                          fontSize: '0.78rem',
-                          fontWeight: '700',
-                          color: '#0f172a',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Download size={14} style={{ color: '#d4af37' }} />
-                        <span>CRM İçin CSV İndir</span>
-                      </button>
+              {/* -------------------- TAB: WHITE-LABEL 3D EMBED STUDIO & KIOSK SDK -------------------- */}
+              {activePortalTab === 'embed-studio' && (
+                <EmbedStudioTab brandInfo={brandInfo} />
+              )}
 
-                      <button
-                        onClick={() => fetchSpecInLeads(brandInfo?.id, specInStatusFilter)}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          background: '#090d16',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: '10px',
-                          padding: '8px 14px',
-                          fontSize: '0.78rem',
-                          fontWeight: '700',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <RefreshCw size={13} className={specInLoading ? 'animate-spin' : ''} />
-                        <span>Yenile</span>
-                      </button>
-                    </div>
-                  </div>
+              {/* -------------------- TAB: GLOBAL EXPORT & RFQ HUB -------------------- */}
+              {activePortalTab === 'export-rfq' && (
+                <ExportRfqTab brandInfo={brandInfo} />
+              )}
 
-                  {/* Summary KPI Cards */}
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(auto-fit, minmax(210px, 1fr))',
-                    gap: isMobile ? '10px' : '16px'
-                  }}>
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: isMobile ? '14px' : '16px', padding: isMobile ? '14px 12px' : '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                      <h4 style={{ fontSize: isMobile ? '0.66rem' : '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', margin: '0 0 6px 0' }}>BIM / CAD İndirme</h4>
-                      <div style={{ fontSize: isMobile ? '1.3rem' : '1.8rem', fontWeight: '900', color: '#0f172a' }}>
-                        {specInSummary?.totalDownloads ?? specInLeads.length}
-                      </div>
-                      <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: '600' }}>Revit & DWG</span>
-                    </div>
+              {/* -------------------- TAB: LIVE MARKET INTELLIGENCE & TREND RADAR -------------------- */}
+              {activePortalTab === 'market-intel' && (
+                <MarketIntelligenceTab brandInfo={brandInfo} />
+              )}
 
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: isMobile ? '14px' : '16px', padding: isMobile ? '14px 12px' : '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                      <h4 style={{ fontSize: isMobile ? '0.66rem' : '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', margin: '0 0 6px 0' }}>Mimarlık Ofisi</h4>
-                      <div style={{ fontSize: isMobile ? '1.3rem' : '1.8rem', fontWeight: '900', color: '#2563eb' }}>
-                        {specInSummary?.uniqueOffices ?? 0}
-                      </div>
-                      <span style={{ fontSize: '0.65rem', color: '#64748b' }}>Farklı Büro</span>
-                    </div>
-
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: isMobile ? '14px' : '16px', padding: isMobile ? '14px 12px' : '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                      <h4 style={{ fontSize: isMobile ? '0.66rem' : '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', margin: '0 0 6px 0' }}>Sıcak Şartname</h4>
-                      <div style={{ fontSize: isMobile ? '1.3rem' : '1.8rem', fontWeight: '900', color: '#d4af37' }}>
-                        {specInSummary?.hotLeads ?? 0}
-                      </div>
-                      <span style={{ fontSize: '0.65rem', color: '#ca8a04', fontWeight: '600' }}>Bekliyor</span>
-                    </div>
-
-                    <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: isMobile ? '14px' : '16px', padding: isMobile ? '14px 12px' : '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                      <h4 style={{ fontSize: isMobile ? '0.66rem' : '0.72rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', margin: '0 0 6px 0' }}>Sözleşmeye Dönen</h4>
-                      <div style={{ fontSize: isMobile ? '1.3rem' : '1.8rem', fontWeight: '900', color: '#059669' }}>
-                        {specInSummary?.wonLeads ?? 0}
-                      </div>
-                      <span style={{ fontSize: '0.65rem', color: '#059669', fontWeight: '600' }}>Şantiyeye Satılan</span>
-                    </div>
-                  </div>
-
-                  {/* Filter & Search Bar */}
-                  <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: isMobile ? '12px' : '14px 18px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'center', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, width: '100%' }}>
-                      <Search size={16} style={{ color: '#94a3b8' }} />
-                      <input
-                        type="text"
-                        placeholder="Mimarlık ofisi veya şehir ara..."
-                        value={specInSearchQuery}
-                        onChange={(e) => setSpecInSearchQuery(e.target.value)}
-                        style={{ border: 'none', outline: 'none', fontSize: '0.82rem', width: '100%' }}
-                      />
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflowX: 'auto', flexWrap: isMobile ? 'nowrap' : 'wrap', width: isMobile ? '100%' : 'auto', paddingBottom: isMobile ? '4px' : '0' }} className="no-scrollbar">
-                      <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: '700', flexShrink: 0 }}>Durum:</span>
-                      {[
-                        { id: 'ALL', label: 'Tümü' },
-                        { id: 'NEW', label: 'Yeni İndirme' },
-                        { id: 'SPEC_IN', label: 'Şartnamede' },
-                        { id: 'CONTACTED', label: 'Görüşüldü' },
-                        { id: 'OFFER_SENT', label: 'Teklif İletildi' },
-                        { id: 'WON', label: 'Anlaşıldı' }
-                      ].map(pill => (
-                        <button
-                          key={pill.id}
-                          onClick={() => {
-                            setSpecInStatusFilter(pill.id);
-                            fetchSpecInLeads(brandInfo?.id, pill.id);
-                          }}
-                          style={{
-                            padding: '4px 10px',
-                            borderRadius: '16px',
-                            border: specInStatusFilter === pill.id ? '1px solid #090d16' : '1px solid #e2e8f0',
-                            background: specInStatusFilter === pill.id ? '#090d16' : '#f8fafc',
-                            color: specInStatusFilter === pill.id ? '#fff' : '#475569',
-                            fontSize: '0.72rem',
-                            fontWeight: '700',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {pill.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {specInSuccessMsg && (
-                    <div style={{ background: '#ecfdf5', border: '1px solid #10b981', color: '#065f46', padding: '10px 16px', borderRadius: '10px', fontSize: '0.8rem', fontWeight: '600' }}>
-                      {specInSuccessMsg}
-                    </div>
-                  )}
-
-                  {/* Leads Table */}
-                  <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                    <div style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
-                        <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          <tr>
-                            <th style={{ padding: '14px 18px' }}>Tarih & Format</th>
-                            <th style={{ padding: '14px 18px' }}>Mimarlık Ofisi & Şehir</th>
-                            <th style={{ padding: '14px 18px' }}>Yetkili Mimar & İletişim</th>
-                            <th style={{ padding: '14px 18px' }}>İlgilenilen Koleksiyon</th>
-                            <th style={{ padding: '14px 18px' }}>Proje Türü</th>
-                            <th style={{ padding: '14px 18px' }}>Şartname Durumu</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {specInLoading ? (
-                            <tr>
-                              <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
-                                <Loader2 className="animate-spin" style={{ margin: '0 auto 8px auto' }} />
-                                <span>Şartname kayıtları yükleniyor...</span>
-                              </td>
-                            </tr>
-                          ) : specInLeads.filter(l => {
-                            if (!specInSearchQuery.trim()) return true;
-                            const q = specInSearchQuery.toLowerCase();
-                            return (
-                              l.officeName.toLowerCase().includes(q) ||
-                              l.architectName.toLowerCase().includes(q) ||
-                              l.city.toLowerCase().includes(q) ||
-                              (l.product?.name || '').toLowerCase().includes(q)
-                            );
-                          }).length === 0 ? (
-                            <tr>
-                              <td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
-                                <FileText size={32} style={{ color: '#cbd5e1', margin: '0 auto 8px auto' }} />
-                                <div>Henüz şartnameye eklenen veya indirilen BIM talebi bulunmuyor.</div>
-                                <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Mimarlar siteden Revit veya CAD dokularınızı indirdikçe burada listelenecektir.</span>
-                              </td>
-                            </tr>
-                          ) : (
-                            specInLeads.filter(l => {
-                              if (!specInSearchQuery.trim()) return true;
-                              const q = specInSearchQuery.toLowerCase();
-                              return (
-                                l.officeName.toLowerCase().includes(q) ||
-                                l.architectName.toLowerCase().includes(q) ||
-                                l.city.toLowerCase().includes(q) ||
-                                (l.product?.name || '').toLowerCase().includes(q)
-                              );
-                            }).map(lead => {
-                              const formatBadge = lead.fileType === 'REVIT_BIM' ? { label: 'Revit .RFA', color: '#2563eb', bg: '#eff6ff' } :
-                                                 lead.fileType === 'AUTOCAD_DWG' ? { label: 'AutoCAD .DWG', color: '#dc2626', bg: '#fef2f2' } :
-                                                 { label: '4K PBR Texture', color: '#7c3aed', bg: '#f5f3ff' };
-
-                              return (
-                                <tr key={lead.id} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.15s' }}>
-                                  <td style={{ padding: '14px 18px', verticalAlign: 'top' }}>
-                                    <div style={{ fontWeight: '700', color: '#0f172a', fontSize: '0.78rem' }}>
-                                      {new Date(lead.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                    </div>
-                                    <span style={{
-                                      display: 'inline-block',
-                                      marginTop: '4px',
-                                      fontSize: '0.65rem',
-                                      fontWeight: '800',
-                                      background: formatBadge.bg,
-                                      color: formatBadge.color,
-                                      padding: '2px 8px',
-                                      borderRadius: '6px'
-                                    }}>
-                                      {formatBadge.label}
-                                    </span>
-                                  </td>
-
-                                  <td style={{ padding: '14px 18px', verticalAlign: 'top' }}>
-                                    <div style={{ fontWeight: '800', color: '#0f172a' }}>{lead.officeName}</div>
-                                    <div style={{ fontSize: '0.72rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                                      <MapPin size={11} style={{ color: '#d4af37' }} />
-                                      <span>{lead.city}</span>
-                                    </div>
-                                  </td>
-
-                                  <td style={{ padding: '14px 18px', verticalAlign: 'top' }}>
-                                    <div style={{ fontWeight: '700', color: '#334155' }}>{lead.architectName}</div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '4px', fontSize: '0.72rem', color: '#64748b' }}>
-                                      <a href={`tel:${lead.phone}`} style={{ color: '#2563eb', textDecoration: 'none', fontWeight: '600' }}>
-                                        📞 {lead.phone}
-                                      </a>
-                                      {lead.email && (
-                                        <a href={`mailto:${lead.email}`} style={{ color: '#64748b', textDecoration: 'none' }}>
-                                          ✉️ {lead.email}
-                                        </a>
-                                      )}
-                                    </div>
-                                  </td>
-
-                                  <td style={{ padding: '14px 18px', verticalAlign: 'top' }}>
-                                    <div style={{ fontWeight: '800', color: '#0f172a' }}>{lead.product?.name || 'Genel Katalog'}</div>
-                                    <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontFamily: 'monospace' }}>{lead.product?.code || 'GENEL'}</div>
-                                    {(() => {
-                                      let m2Val = null;
-                                      if (lead.notes) {
-                                        const m = lead.notes.match(/(?:\[İHTİYAÇ:\s*|İhtiyaç:\s*|METRAJ:\s*|Metraj:\s*)(\d+[\d.,]*)\s*m[²2]/i) ||
-                                                  lead.notes.match(/(\d+[\d.,]*)\s*m[²2]/i);
-                                        if (m && m[1]) m2Val = m[1];
-                                      }
-                                      if (!m2Val && lead.projectName) {
-                                        const m = lead.projectName.match(/(\d+[\d.,]*)\s*m[²2]/i);
-                                        if (m && m[1]) m2Val = m[1];
-                                      }
-                                      if (m2Val) {
-                                        return (
-                                          <div style={{ marginTop: '5px' }}>
-                                            <span style={{
-                                              display: 'inline-flex',
-                                              alignItems: 'center',
-                                              gap: '3px',
-                                              background: 'rgba(212, 175, 55, 0.14)',
-                                              color: '#b45309',
-                                              border: '1px solid rgba(212, 175, 55, 0.35)',
-                                              padding: '2px 8px',
-                                              borderRadius: '6px',
-                                              fontSize: '0.73rem',
-                                              fontWeight: '800'
-                                            }}>
-                                              📐 İhtiyaç: {m2Val} m²
-                                            </span>
-                                          </div>
-                                        );
-                                      }
-                                      return null;
-                                    })()}
-                                  </td>
-
-                                  <td style={{ padding: '14px 18px', verticalAlign: 'top' }}>
-                                    <span style={{ background: '#f1f5f9', color: '#334155', padding: '3px 8px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '600' }}>
-                                      {lead.projectType || 'Proje'}
-                                    </span>
-                                    {lead.projectName && (
-                                      <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px' }}>
-                                        {lead.projectName}
-                                      </div>
-                                    )}
-                                  </td>
-
-                                  <td style={{ padding: '14px 18px', verticalAlign: 'top' }}>
-                                    <select
-                                      value={lead.status}
-                                      disabled={updatingSpecLeadId === lead.id}
-                                      onChange={(e) => handleUpdateSpecInStatus(lead.id, e.target.value)}
-                                      style={{
-                                        padding: '6px 10px',
-                                        borderRadius: '8px',
-                                        fontSize: '0.75rem',
-                                        fontWeight: '700',
-                                        border: '1px solid #cbd5e1',
-                                        background: lead.status === 'WON' ? '#ecfdf5' :
-                                                    lead.status === 'SPEC_IN' ? '#eff6ff' :
-                                                    lead.status === 'NEW' ? '#fefce8' : '#fff',
-                                        color: lead.status === 'WON' ? '#065f46' :
-                                               lead.status === 'SPEC_IN' ? '#1e40af' :
-                                               lead.status === 'NEW' ? '#854d0e' : '#334155',
-                                        cursor: 'pointer'
-                                      }}
-                                    >
-                                      <option value="NEW">🟡 Yeni İndirme</option>
-                                      <option value="SPEC_IN">🔵 Şartnameye Eklendi</option>
-                                      <option value="CONTACTED">📞 Ofisle Görüşüldü</option>
-                                      <option value="OFFER_SENT">📋 Teklif İletildi</option>
-                                      <option value="WON">🟢 Anlaşıldı / Satış</option>
-                                      <option value="CLOSED">⚪ Kapatıldı</option>
-                                    </select>
-                                  </td>
-                                </tr>
-                              );
-                            })
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                </div>
+              {/* -------------------- TAB: DIGITAL BRAND HEALTH & SERP VISIBILITY -------------------- */}
+              {activePortalTab === 'brand-health' && (
+                <BrandHealthTab brandInfo={brandInfo} />
               )}
 
             </>
@@ -6994,9 +6690,13 @@ export default function BrandPortalPage() {
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
                 { id: 'products', label: 'Ürün Kataloğu', icon: <Layers size={18} /> },
+                { id: 'embed-studio', label: '3D Kiosk & Embed SDK', icon: <Box size={18} /> },
+                { id: 'spec-in-radar', label: 'BIM Şartname Radarı', icon: <FileText size={18} /> },
+                { id: 'export-rfq', label: 'Global İhracat & RFQ', icon: <Send size={18} /> },
+                { id: 'market-intel', label: 'Pazar Trend Radarı', icon: <BarChart3 size={18} /> },
+                { id: 'brand-health', label: 'Marka Sağlığı & SEO', icon: <Award size={18} /> },
                 { id: 'bulk-import', label: 'Toplu Ürün & ERP', icon: <UploadCloud size={18} /> },
                 { id: 'b2b-projects', label: 'B2B Talepleri', icon: <Building2 size={18} /> },
-                { id: 'spec-in-radar', label: 'BIM Şartname Radarı', icon: <FileText size={18} /> },
                 { id: 'country-analytics', label: 'Ülke Analitiği', icon: <Globe size={18} /> },
                 { id: 'trends', label: 'Pazar Trendleri', icon: <TrendingUp size={18} /> },
                 { id: 'dealers', label: 'Bayi Ağı Yönetimi', icon: <Users size={18} /> },
