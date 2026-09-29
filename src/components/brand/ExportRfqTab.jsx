@@ -5,7 +5,7 @@ import {
   Globe, Send, Download, CheckCircle2, ShieldCheck, 
   MapPin, Calendar, FileText, Check, DollarSign, Calculator,
   ExternalLink, Building2, Package, Clock, Truck, ArrowRight,
-  TrendingUp, Sparkles, X, ChevronRight
+  TrendingUp, Sparkles, X, ChevronRight, Info, ShieldAlert
 } from 'lucide-react';
 
 export default function ExportRfqTab({ brandInfo }) {
@@ -90,6 +90,7 @@ export default function ExportRfqTab({ brandInfo }) {
   const [productionDays, setProductionDays] = useState('25 gün');
   const [currency, setCurrency] = useState('EUR'); // 'EUR' | 'USD'
   const [offerSubmitted, setOfferSubmitted] = useState(false);
+  const [legalConsent, setLegalConsent] = useState(true);
 
   // Calculations for Proforma
   const m2 = selectedRfq ? selectedRfq.requestedM2 : 0;
@@ -453,6 +454,86 @@ export default function ExportRfqTab({ brandInfo }) {
         </div>
       </div>
 
+      {/* -------------------- 3.1 GÜVEN, DOĞRULAMA & HUKUKİ ÇEKİNCE MERKEZİ -------------------- */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '18px'
+      }}>
+        {/* Kutu 1: Doğrulama Protokolü */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          padding: '20px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
+              <ShieldCheck size={18} />
+            </div>
+            <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: '850', color: '#0f172a' }}>
+              B2B Doğrulama Standartları (KYB)
+            </h4>
+          </div>
+          <p style={{ fontSize: '0.74rem', color: '#64748b', lineHeight: '1.5', margin: '0 0 10px 0' }}>
+            Talepler havuza düşmeden önce 3 aşamalı kurumsal güvenlik filtresinden geçirilir:
+          </p>
+          <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.72rem', color: '#334155', lineHeight: '1.7' }}>
+            <li><strong>Vergi & VIES Kaydı:</strong> AB (VIES), ABD (EIN) ve yerel ticaret sicil numarası teyidi.</li>
+            <li><strong>Kurumsal E-posta:</strong> @gmail, @hotmail engellenir; yalnızca kurumsal şirket domaini kabul edilir.</li>
+            <li><strong>Satın Alma Yetkilisi:</strong> Kurumsal unvan ve telefon doğrulaması.</li>
+          </ul>
+        </div>
+
+        {/* Kutu 2: Talepler Nereden Geliyor? */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          padding: '20px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(56, 189, 248, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0284c7' }}>
+              <Globe size={18} />
+            </div>
+            <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: '850', color: '#0f172a' }}>
+              Talepler Nereden Geliyor?
+            </h4>
+          </div>
+          <p style={{ fontSize: '0.74rem', color: '#64748b', lineHeight: '1.5', margin: '0 0 10px 0' }}>
+            Talepler doğrudan SeramikBak'ın global alıcı kanallarından toplanır:
+          </p>
+          <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.72rem', color: '#334155', lineHeight: '1.7' }}>
+            <li><strong>/proje-talep Portalı:</strong> Müteahhit ve mimarlık ofislerinin açtığı metrajlı projeler.</li>
+            <li><strong>/global-tanitim Hub'ı:</strong> Uluslararası ihracat alıcılarının doğrudan girdiği ihaleler.</li>
+            <li><strong>Mimari Spec-In:</strong> Proje şartnamelerine seramik yazdıran kurumsal satın almacılar.</li>
+          </ul>
+        </div>
+
+        {/* Kutu 3: Hukuki Sorumluluk Reddi (Disclaimer) */}
+        <div style={{
+          background: '#f8fafc',
+          borderRadius: '16px',
+          border: '1px solid #cbd5e1',
+          padding: '20px',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(234, 88, 12, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c2410c' }}>
+              <ShieldAlert size={18} />
+            </div>
+            <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: '850', color: '#0f172a' }}>
+              Hukuki Çekince & Yasal Bilgilendirme
+            </h4>
+          </div>
+          <p style={{ fontSize: '0.7rem', color: '#64748b', lineHeight: '1.5', margin: 0 }}>
+            <strong>6563 S.K. Uyarınca Aracı Hizmet Sağlayıcı:</strong> SeramikBak, alıcı ile üretici fabrikayı bir araya getiren bağımsız teknoloji platformudur. Taraflar arasındaki nihai akreditif (L/C), ödeme koşulları, gümrükleme, nakliye sigortası ve teslimat (Incoterms 2020) taahhütleri münhasıran alıcı ve fabrikanın kendi hukuki sorumluluğundadır. SeramikBak mali kefalet veya tahsilat garantisi vermez.
+          </p>
+        </div>
+      </div>
+
       {/* -------------------- 4. PROFORMA PROPOSAL MODAL -------------------- */}
       {selectedRfq && (
         <div style={{
@@ -608,6 +689,32 @@ export default function ExportRfqTab({ brandInfo }) {
                     <span style={{ color: '#34d399' }}>€{totalCifAmount.toLocaleString('tr-TR')}</span>
                   </div>
                 </div>
+
+                {/* Legal Consent Checkbox */}
+                <label style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '10px',
+                  padding: '12px 14px',
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '0.72rem',
+                  color: '#475569',
+                  lineHeight: '1.4'
+                }}>
+                  <input
+                    type="checkbox"
+                    required
+                    checked={legalConsent}
+                    onChange={(e) => setLegalConsent(e.target.checked)}
+                    style={{ marginTop: '2px', accentColor: '#0f172a' }}
+                  />
+                  <span>
+                    <strong>Hukuki Beyan:</strong> 6563 S.K. uyarınca SeramikBak'ın aracı platform olduğunu, akreditif (L/C), ödeme tahsilatı, gümrük ve teslimat şartlarının münhasıran alıcı firma ile fabrikamız arasındaki ikili sözleşmeye tabi olduğunu kabul ediyorum.
+                  </span>
+                </label>
 
                 {/* Actions */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '6px' }}>
