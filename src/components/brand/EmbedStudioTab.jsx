@@ -170,7 +170,7 @@ Showroom kiosk bilgisayarınızda (Windows / Android / Linux) Google Chrome veya
       display: flex;
       gap: 16px;
       justify-content: center;
-      margin-bottom: 30px;
+      margin-bottom: 24px;
       flex-wrap: wrap;
     }
     .sdk-button {
@@ -183,12 +183,28 @@ Showroom kiosk bilgisayarınızda (Windows / Android / Linux) Google Chrome veya
       border: none;
       cursor: pointer;
       box-shadow: 0 6px 20px ${themeColor}40;
-      transition: transform 0.2s;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
     .sdk-button:hover {
       transform: translateY(-2px);
+      box-shadow: 0 8px 25px ${themeColor}60;
+    }
+    .direct-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: none;
+    }
+    .direct-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
     }
     .container {
+      position: relative;
       max-width: 1280px;
       width: 100%;
       background: #0b0f19;
@@ -217,10 +233,15 @@ Showroom kiosk bilgisayarınızda (Windows / Android / Linux) Google Chrome veya
       <button id="open-${brandSlug}-visualizer" class="sdk-button">
         ✨ Pop-up Modal ile 3D Stüdyoyu Aç (JS SDK)
       </button>
+
+      <!-- 2. Yeni Sekmede Tam Ekran Aç Butonu -->
+      <a href="${embedUrl}" target="_blank" rel="noopener noreferrer" class="sdk-button direct-btn">
+        🚀 Yeni Sekmede Tam Ekran Aç
+      </a>
     </div>
   </div>
 
-  <!-- 2. Iframe Doğrudan Gömülü Gösterim -->
+  <!-- 3. Iframe Doğrudan Gömülü Gösterim -->
   <div class="container">
     <iframe 
       src="${embedUrl}" 

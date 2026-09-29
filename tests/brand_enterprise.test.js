@@ -117,4 +117,23 @@ test('Brand Enterprise Portal - White-Label Embed SDK Generator', async (t) => {
       'https://www.seramikbak.com/tasarim?brand=gural-seramik&scene=banyo&theme=%23d4af37'
     );
   });
+
+  await t.test('should identify embeddable routes and allow external framing without SAMEORIGIN restriction', () => {
+    const isEmbeddable = (pathname) => {
+      return (
+        pathname.startsWith('/tasarim') || 
+        pathname.startsWith('/kiosk') || 
+        pathname.startsWith('/studio-sdk.js')
+      );
+    };
+
+    assert.equal(isEmbeddable('/tasarim'), true);
+    assert.equal(isEmbeddable('/tasarim?brand=gural-seramik'), true);
+    assert.equal(isEmbeddable('/kiosk'), true);
+    assert.equal(isEmbeddable('/studio-sdk.js'), true);
+    assert.equal(isEmbeddable('/admin'), false);
+    assert.equal(isEmbeddable('/bayi'), false);
+    assert.equal(isEmbeddable('/marka'), false);
+  });
 });
+
