@@ -35,31 +35,44 @@ export default function EmbedStudioTab({ brandInfo }) {
     { id: 'teras', label: 'Açık Teras & Havuz Kenarı', tag: '20mm Kalın', icon: '☀️', desc: '60x60 Dona Dayanıklı R11 kaydırmaz' }
   ];
 
-  // Dynamic URLs
-  const baseUrl = 'https://www.seramikbak.com';
-  const embedUrl = `${baseUrl}/ilham?brand=${encodeURIComponent(brandSlug)}&scene=${encodeURIComponent(defaultScene)}&embed=true&color=${encodeURIComponent(themeColor)}`;
+  // Dynamic URLs and Origin Detection
+  const [baseUrl, setBaseUrl] = useState('https://www.seramikbak.com');
+  const [livePreviewActive, setLivePreviewActive] = useState(false);
+  const [downloaded, setDownloaded] = useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.origin) {
+      setBaseUrl(window.location.origin);
+    }
+  }, []);
+
+  const embedUrl = `${baseUrl}/kiosk?brand=${encodeURIComponent(brandSlug)}&embed=true&scene=${encodeURIComponent(defaultScene)}&theme=${encodeURIComponent(themeColor)}`;
   const kioskUrl = `${baseUrl}/kiosk?brand=${encodeURIComponent(brandSlug)}&theme=${encodeURIComponent(themeColor)}`;
 
   // Code snippets
-  const iframeSnippet = `<!-- SeramikBak 3D Room Visualizer Iframe Embed for ${brandName} -->
-<iframe 
-  src="${embedUrl}" 
-  width="100%" 
-  height="780" 
-  style="border: none; border-radius: 16px; box-shadow: 0 12px 36px rgba(0,0,0,0.08);"
-  allow="camera; accelerometer; gyroscope; fullscreen"
-  loading="lazy"
-></iframe>`;
+  const iframeSnippet = `<!-- SeramikBak White-Label 3D Visualizer Iframe Embed for ${brandName} -->
+<div style="position: relative; width: 100%; height: 780px; max-width: 1440px; margin: 0 auto; border-radius: 16px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.18);">
+  <iframe 
+    src="${embedUrl}" 
+    width="100%" 
+    height="100%" 
+    style="border: none; width: 100%; height: 100%; display: block;"
+    allow="camera; accelerometer; gyroscope; fullscreen"
+    loading="lazy"
+    title="${brandName} 3D Seramik Stüdyosu"
+  ></iframe>
+</div>`;
 
   const reactSnippet = `// React / Next.js Component for ${brandName}
+'use client';
 import React from 'react';
 
 export default function BrandTileVisualizer() {
   return (
-    <div className="w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-200 aspect-[16/10]">
+    <div className="w-full h-[780px] max-w-7xl mx-auto rounded-2xl overflow-hidden shadow-2xl border border-slate-800 bg-slate-950">
       <iframe
         src="${embedUrl}"
-        className="w-full h-full border-0"
+        className="w-full h-full border-0 block"
         allow="camera; accelerometer; gyroscope; fullscreen"
         loading="lazy"
         title="${brandName} 3D Seramik Stüdyosu"
@@ -68,18 +81,29 @@ export default function BrandTileVisualizer() {
   );
 }`;
 
-  const sdkSnippet = `<!-- SeramikBak 3D Visualizer JavaScript SDK Modal -->
-<button id="open-${brandSlug}-visualizer" style="background:${themeColor}; color:#fff; padding:12px 24px; border-radius:10px; font-weight:700; border:none; cursor:pointer;">
-  🏠 ${brandName} Karolarını Mekanında Canlı Gör (3D)
+  const sdkSnippet = `<!-- 1. Tetikleyici Buton (Web sitenizde dilediğiniz yere yerleştirin) -->
+<button 
+  id="open-${brandSlug}-visualizer" 
+  style="background: linear-gradient(135deg, ${themeColor} 0%, #aa8c2c 100%); color: #0b0f19; padding: 14px 28px; border-radius: 12px; font-weight: 800; font-size: 15px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 6px 20px ${themeColor}40;"
+>
+  ✨ ${brandName} 3D Mekanında Gör
 </button>
 
-<script src="${baseUrl}/studio-sdk.js" data-brand="${brandSlug}" data-theme="${themeColor}" data-scene="${defaultScene}" async></script>`;
+<!-- 2. SeramikBak 3D Studio SDK (Sayfanın </body> etiketinden hemen önce ekleyin) -->
+<script 
+  src="${baseUrl}/studio-sdk.js" 
+  data-brand="${brandSlug}" 
+  data-theme="${themeColor}" 
+  data-scene="${defaultScene}" 
+  data-button-id="open-${brandSlug}-visualizer" 
+  async
+></script>`;
 
-  const kioskSnippet = `<!-- Showroom Dikey / Yatay Dokunmatik Kiosk Doğrudan Başlatıcı -->
-Doğrudan Kiosk Tarayıcı URL:
+  const kioskSnippet = `Showroom Kiosk URL (Dokunmatik Ekranlar & Mağaza İçi TV):
 ${kioskUrl}
 
-Tavsiye: Showroom kiosk bilgisayarınızda Chrome/Edge tarayıcısını F11 (Kiosk Mode) ile açarak ana sayfa olarak bu linki tanımlayın.`;
+Kurulum Tavsiyesi:
+Showroom kiosk bilgisayarınızda (Windows / Android / Linux) Google Chrome veya Microsoft Edge tarayıcısını F11 (Kiosk Mode) ile başlatıp bu adresi ana sayfa yapınız.`;
 
   const currentSnippet = activeCodeType === 'iframe' 
     ? iframeSnippet 
@@ -93,6 +117,168 @@ Tavsiye: Showroom kiosk bilgisayarınızda Chrome/Edge tarayıcısını F11 (Kio
     navigator.clipboard.writeText(currentSnippet);
     setCopied(true);
     setTimeout(() => setCopied(false), 2200);
+  };
+
+  const handleDownloadTestHtml = () => {
+    const htmlContent = `<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${brandName} - 3D Seramik Visualizer Entegrasyon Testi</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      margin: 0;
+      padding: 32px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    .header {
+      max-width: 1200px;
+      width: 100%;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: #d4af37;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+    }
+    p {
+      color: #94a3b8;
+      margin: 0 0 24px 0;
+      font-size: 15px;
+    }
+    .demo-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+    .sdk-button {
+      background: linear-gradient(135deg, ${themeColor} 0%, #aa8c2c 100%);
+      color: #0b0f19;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 20px ${themeColor}40;
+      transition: transform 0.2s;
+    }
+    .sdk-button:hover {
+      transform: translateY(-2px);
+    }
+    .container {
+      max-width: 1280px;
+      width: 100%;
+      background: #0b0f19;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      height: 760px;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="badge">SERAMİKBAK WHITE-LABEL 3D ENTEGRASYON</div>
+    <h1>${brandName} 3D Mekan Görselleştirici Test Sayfası</h1>
+    <p>Bu dosya web sitenizde ${brandName} 3D görselleştiricisinin nasıl görüneceğini test etmek için üretilmiştir.</p>
+    
+    <div class="demo-actions">
+      <!-- 1. JS SDK Pop-up Modal Test Butonu -->
+      <button id="open-${brandSlug}-visualizer" class="sdk-button">
+        ✨ Pop-up Modal ile 3D Stüdyoyu Aç (JS SDK)
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. Iframe Doğrudan Gömülü Gösterim -->
+  <div class="container">
+    <iframe 
+      src="${embedUrl}" 
+      allow="camera; accelerometer; gyroscope; fullscreen"
+      loading="lazy"
+      title="${brandName} 3D Sanal Stüdyo"
+    ></iframe>
+  </div>
+
+  <!-- SeramikBak Studio JavaScript SDK -->
+  <script src="${baseUrl}/studio-sdk.js" 
+    data-brand="${brandSlug}" 
+    data-theme="${themeColor}" 
+    data-scene="${defaultScene}" 
+    data-button-id="open-${brandSlug}-visualizer" 
+    async>
+  </script>
+</body>
+</html>`;
+
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${brandSlug}-3d-visualizer-test.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setDownloaded(true);
+    setTimeout(() => setDownloaded(false), 3000);
+  };
+
+  const handleTestModalInPage = () => {
+    if (typeof window !== 'undefined') {
+      if (window.SeramikBakStudio && window.SeramikBakStudio.open) {
+        window.SeramikBakStudio.open({
+          brand: brandSlug,
+          theme: themeColor,
+          scene: defaultScene,
+          baseUrl: baseUrl
+        });
+      } else {
+        const script = document.createElement('script');
+        script.src = `${baseUrl}/studio-sdk.js`;
+        script.onload = () => {
+          if (window.SeramikBakStudio) {
+            window.SeramikBakStudio.open({
+              brand: brandSlug,
+              theme: themeColor,
+              scene: defaultScene,
+              baseUrl: baseUrl
+            });
+          }
+        };
+        document.body.appendChild(script);
+      }
+    }
   };
 
   return (
@@ -453,160 +639,230 @@ Tavsiye: Showroom kiosk bilgisayarınızda Chrome/Edge tarayıcısını F11 (Kio
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '4px', background: '#f1f5f9', padding: '3px', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', gap: '4px', background: '#f1f5f9', padding: '3px', borderRadius: '8px', flexWrap: 'wrap' }}>
               <button
                 type="button"
-                onClick={() => setDeviceView('tablet')}
+                onClick={() => setLivePreviewActive(false)}
                 style={{
-                  padding: '4px 8px',
+                  padding: '4px 10px',
                   borderRadius: '6px',
                   border: 'none',
-                  background: deviceView === 'tablet' ? '#ffffff' : 'transparent',
-                  color: deviceView === 'tablet' ? '#0f172a' : '#64748b',
+                  background: !livePreviewActive ? '#0f172a' : 'transparent',
+                  color: !livePreviewActive ? '#ffffff' : '#64748b',
                   fontSize: '0.7rem',
                   fontWeight: '700',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '4px',
-                  boxShadow: deviceView === 'tablet' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                  gap: '4px'
                 }}
               >
-                <Monitor size={13} /> Tablet
+                <Monitor size={13} /> Simülatör
               </button>
               <button
                 type="button"
-                onClick={() => setDeviceView('kiosk')}
+                onClick={() => setLivePreviewActive(true)}
                 style={{
-                  padding: '4px 8px',
+                  padding: '4px 10px',
                   borderRadius: '6px',
                   border: 'none',
-                  background: deviceView === 'kiosk' ? '#ffffff' : 'transparent',
-                  color: deviceView === 'kiosk' ? '#0f172a' : '#64748b',
+                  background: livePreviewActive ? '#10b981' : 'transparent',
+                  color: livePreviewActive ? '#ffffff' : '#64748b',
                   fontSize: '0.7rem',
                   fontWeight: '700',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '4px',
-                  boxShadow: deviceView === 'kiosk' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                  gap: '4px'
                 }}
               >
-                <Smartphone size={13} /> Dikey Kiosk
+                <Sparkles size={13} /> Canlı 3D Stüdyo
               </button>
             </div>
           </div>
 
-          {/* SIMULATED DEVICE FRAME */}
-          <div style={{
-            background: '#090d16',
-            borderRadius: '16px',
-            padding: deviceView === 'tablet' ? '12px' : '16px 36px',
-            border: '2px solid #1e293b',
-            boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.4)',
-            position: 'relative'
-          }}>
-            {/* Screen Inner Frame */}
+          {/* SIMULATED DEVICE FRAME OR LIVE 3D IFRAME */}
+          {livePreviewActive ? (
             <div style={{
-              background: '#111827',
-              borderRadius: '10px',
+              background: '#090d16',
+              borderRadius: '16px',
               overflow: 'hidden',
-              height: '280px',
-              display: 'flex',
-              flexDirection: 'column',
+              height: '360px',
+              border: '2px solid rgba(212, 175, 55, 0.4)',
+              boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.5)',
               position: 'relative'
             }}>
-              {/* Virtual App Header */}
+              <iframe
+                src={embedUrl}
+                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+                allow="camera; accelerometer; gyroscope; fullscreen"
+                loading="lazy"
+                title={`${brandName} Canlı Önizleme`}
+              />
+            </div>
+          ) : (
+            <div style={{
+              background: '#090d16',
+              borderRadius: '16px',
+              padding: deviceView === 'tablet' ? '12px' : '16px 36px',
+              border: '2px solid #1e293b',
+              boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.4)',
+              position: 'relative'
+            }}>
+              {/* Screen Inner Frame */}
               <div style={{
-                background: 'rgba(15, 23, 42, 0.95)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                padding: '8px 14px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                color: '#fff',
-                fontSize: '0.72rem'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: themeColor }} />
-                  <span style={{ fontWeight: '800', letterSpacing: '0.5px' }}>{brandName} 3D STÜDYO</span>
-                </div>
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.62rem', background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', color: '#94a3b8' }}>
-                    {defaultScene.toUpperCase()} SAHNESİ
-                  </span>
-                  <span style={{ fontSize: '0.62rem', background: themeColor, color: '#090d16', padding: '2px 6px', borderRadius: '4px', fontWeight: '800' }}>
-                    CANLI AR
-                  </span>
-                </div>
-              </div>
-
-              {/* Virtual 3D Room Render View */}
-              <div style={{
-                flex: 1,
-                background: defaultScene === 'banyo' 
-                  ? 'radial-gradient(circle at center, #1e293b 0%, #0f172a 100%)'
-                  : defaultScene === 'mutfak'
-                    ? 'radial-gradient(circle at center, #334155 0%, #0f172a 100%)'
-                    : 'radial-gradient(circle at center, #182030 0%, #090d16 100%)',
+                background: '#111827',
+                borderRadius: '10px',
+                overflow: 'hidden',
+                height: '280px',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ffffff',
-                padding: '16px',
-                textAlign: 'center',
                 position: 'relative'
               }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
-                  {defaultScene === 'banyo' ? '🛁' : defaultScene === 'mutfak' ? '🍳' : defaultScene === 'salon' ? '🛋️' : '☀️'}
-                </div>
-                <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#ffffff' }}>
-                  {brandName} 3D Sanal Mekan Motoru
-                </div>
-                <div style={{ fontSize: '0.7rem', color: '#94a3b8', maxWidth: '280px', marginTop: '4px' }}>
-                  Seçilen Vurgu Rengi: <strong style={{ color: themeColor }}>{themeColor}</strong> • Yalnızca {brandName} Karoları Yüklendi
+                {/* Virtual App Header */}
+                <div style={{
+                  background: 'rgba(15, 23, 42, 0.95)',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                  padding: '8px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  color: '#fff',
+                  fontSize: '0.72rem'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: themeColor }} />
+                    <span style={{ fontWeight: '800', letterSpacing: '0.5px' }}>{brandName} 3D STÜDYO</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.62rem', background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', color: '#94a3b8' }}>
+                      {defaultScene.toUpperCase()} SAHNESİ
+                    </span>
+                    <span style={{ fontSize: '0.62rem', background: themeColor, color: '#090d16', padding: '2px 6px', borderRadius: '4px', fontWeight: '800' }}>
+                      WHITE-LABEL
+                    </span>
+                  </div>
                 </div>
 
-                {/* Floating Tile Swatches Bar inside Simulator */}
+                {/* Virtual 3D Room Render View */}
                 <div style={{
-                  position: 'absolute',
-                  bottom: '12px',
+                  flex: 1,
+                  background: defaultScene === 'banyo' 
+                    ? 'radial-gradient(circle at center, #1e293b 0%, #0f172a 100%)'
+                    : defaultScene === 'mutfak'
+                      ? 'radial-gradient(circle at center, #334155 0%, #0f172a 100%)'
+                      : 'radial-gradient(circle at center, #182030 0%, #090d16 100%)',
                   display: 'flex',
-                  gap: '8px',
-                  background: 'rgba(15, 23, 42, 0.85)',
-                  backdropFilter: 'blur(8px)',
-                  padding: '6px 12px',
-                  borderRadius: '20px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#ffffff',
+                  padding: '16px',
+                  textAlign: 'center',
+                  position: 'relative'
                 }}>
-                  {['Calacatta 60x120', 'Traverten Mat', 'Beton Antrasit'].map((tile, i) => (
-                    <span key={tile} style={{
-                      fontSize: '0.62rem',
-                      padding: '2px 8px',
-                      borderRadius: '10px',
-                      background: i === 0 ? themeColor : 'rgba(255, 255, 255, 0.08)',
-                      color: i === 0 ? '#090d16' : '#cbd5e1',
-                      fontWeight: i === 0 ? '800' : '600'
-                    }}>
-                      {tile}
-                    </span>
-                  ))}
+                  <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
+                    {defaultScene === 'banyo' ? '🛁' : defaultScene === 'mutfak' ? '🍳' : defaultScene === 'salon' ? '🛋️' : '☀️'}
+                  </div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#ffffff' }}>
+                    {brandName} 3D Sanal Mekan Motoru
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: '#94a3b8', maxWidth: '300px', marginTop: '4px' }}>
+                    Seçilen Vurgu Rengi: <strong style={{ color: themeColor }}>{themeColor}</strong> • Yalnızca {brandName} Karoları Yüklendi
+                  </div>
+
+                  {/* Floating Action within Simulator */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '12px',
+                    display: 'flex',
+                    gap: '8px'
+                  }}>
+                    <button
+                      type="button"
+                      onClick={() => setLivePreviewActive(true)}
+                      style={{
+                        fontSize: '0.68rem',
+                        padding: '5px 12px',
+                        borderRadius: '20px',
+                        background: themeColor,
+                        color: '#090d16',
+                        fontWeight: '800',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <Sparkles size={11} /> Canlı 3D Stüdyoyu Aç
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '4px' }}>
-            <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
-              💡 Önizleme iframe & WebGL donanım ivmeli çalışır.
-            </span>
+          {/* Test & Action Toolbar */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '8px',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingTop: '6px',
+            borderTop: '1px solid #f1f5f9'
+          }}>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={handleDownloadTestHtml}
+                style={{
+                  fontSize: '0.74rem',
+                  color: '#065f46',
+                  background: '#ecfdf5',
+                  border: '1px solid #a7f3d0',
+                  fontWeight: '800',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}
+              >
+                {downloaded ? <Check size={13} /> : <Zap size={13} />}
+                <span>{downloaded ? 'İndirildi!' : '📥 Test HTML Dosyasını İndir'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleTestModalInPage}
+                style={{
+                  fontSize: '0.74rem',
+                  color: '#1e293b',
+                  background: '#f8fafc',
+                  border: '1px solid #cbd5e1',
+                  fontWeight: '800',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}
+              >
+                <Sparkles size={13} color="#d4af37" />
+                <span>Modalı Test Et</span>
+              </button>
+            </div>
+
             <a
               href={embedUrl}
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                fontSize: '0.75rem',
+                fontSize: '0.74rem',
                 color: '#0284c7',
                 fontWeight: '700',
                 display: 'inline-flex',
@@ -615,7 +871,7 @@ Tavsiye: Showroom kiosk bilgisayarınızda Chrome/Edge tarayıcısını F11 (Kio
                 textDecoration: 'none'
               }}
             >
-              Tam Ekranda Test Et <ArrowRight size={13} />
+              Yeni Sekmede Aç <ExternalLink size={13} />
             </a>
           </div>
         </div>

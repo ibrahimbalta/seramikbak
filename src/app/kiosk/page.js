@@ -321,6 +321,8 @@ export default function ShowroomKioskPage() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSurfaceMenuOpen, setIsSurfaceMenuOpen] = useState(false);
+  const [isEmbed, setIsEmbed] = useState(false);
+  const [embedThemeColor, setEmbedThemeColor] = useState('#d4af37');
 
   // Showroom'dan seçilip gelinen seramiği zemin ve duvara uygula + Online/Offline Dinleyici
   useEffect(() => {
@@ -361,13 +363,38 @@ export default function ShowroomKioskPage() {
       console.error('Kiosk storage read error:', e);
     }
 
-    // 2. URL searchParams kontrolü (?productId=... &code=... &room=... &style=... &q=...)
+    // 2. URL searchParams kontrolü (?productId=... &code=... &room=... &style=... &q=... &embed=true &theme=...)
     const urlParams = new URLSearchParams(window.location.search);
     const paramProductId = urlParams.get('productId') || urlParams.get('product') || urlParams.get('id');
     const paramCode = urlParams.get('code');
-    const paramRoom = urlParams.get('room');
+    const paramRoom = urlParams.get('room') || urlParams.get('scene');
     const paramStyle = urlParams.get('style');
     const paramSearch = urlParams.get('search') || urlParams.get('q');
+    const paramEmbed = urlParams.get('embed') === 'true' || urlParams.get('embed') === '1' || urlParams.get('mode') === 'embed';
+    const paramTheme = urlParams.get('theme') || urlParams.get('color') || urlParams.get('primary');
+    const paramBrand = urlParams.get('brand') || urlParams.get('brandSlug') || urlParams.get('brandId');
+
+    if (paramEmbed) {
+      setIsEmbed(true);
+    }
+    if (paramTheme) {
+      setEmbedThemeColor(paramTheme.startsWith('#') ? paramTheme : `#${paramTheme}`);
+    }
+    if (paramBrand) {
+      setSelectedBrandId(paramBrand);
+      if (!targetProduct) {
+        const bLower = paramBrand.toLowerCase();
+        const brandMatch = BRAND_CATALOG.find(p => 
+          p.brand?.id?.toLowerCase() === bLower ||
+          p.brand?.id?.toLowerCase().includes(bLower) ||
+          p.brand?.name?.toLowerCase().includes(bLower) ||
+          bLower.includes(p.brand?.id?.toLowerCase())
+        );
+        if (brandMatch) {
+          targetProduct = brandMatch;
+        }
+      }
+    }
 
     if (paramSearch) {
       setSearchTerm(paramSearch);
@@ -1048,7 +1075,7 @@ export default function ShowroomKioskPage() {
   });
 
   let displayProducts = products;
-  if (selectedStyle !== 'all' || searchTerm) {
+  if (selectedStyle !== 'all' || searchTerm || selectedBrandId !== 'all' || isEmbed) {
     displayProducts = filteredProducts;
   }
   if (displayProducts.length === 0 && !isLoadingProducts && !searchTerm && selectedStyle === 'all') {
@@ -1367,78 +1394,214 @@ export default function ShowroomKioskPage() {
         fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
       }}
     >
-      {/* Top Touch Kiosk Header */}
-      <header className="kiosk-header">
-        <div className="header-left">
-          <Link 
-            href={selectedDealer?.isBrand ? "/marka" : "/bayi"} 
-            className="kiosk-nav-btn btn-nav-bayi" 
-            title={selectedDealer?.isBrand ? "Marka Paneline Dön" : "Bayi Paneline Dön"}
-          >
-            <Building2 size={15} style={{ flexShrink: 0 }} />
-            <span className="btn-label-desktop">{selectedDealer?.isBrand ? "Marka Paneli" : "Bayi Paneli"}</span>
-            <span className="btn-label-mobile">{selectedDealer?.isBrand ? "Marka" : "Bayi"}</span>
-          </Link>
-          <Link 
-            href="/" 
-            className="kiosk-nav-btn btn-nav-exit" 
-            title="Ana Sayfaya Dön (Çıkış)"
-          >
-            <LogOut size={15} style={{ flexShrink: 0 }} />
-            <span className="btn-label-desktop">Çıkış</span>
-          </Link>
-        </div>
-
-        {/* Center: Symmetrical Dealer Showroom Capsule */}
-        <div className="header-center">
-          <div className="header-showroom-pill">
-            <Crown size={14} className="showroom-crown-icon" />
-            <div className="showroom-text-wrap">
-              <span className="showroom-brand-name">
-                {selectedDealer?.name || 'SeramikBak'}
+      {/* Top Touch Kiosk Header or White-Label Embed Toolbar */}
+      {isEmbed ? (
+        <header 
+          className="kiosk-embed-header"
+          style={{
+            height: '52px',
+            background: 'linear-gradient(180deg, rgba(15,23,42,0.96) 0%, rgba(11,15,25,0.92) 100%)',
+            backdropFilter: 'blur(16px)',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 16px',
+            position: 'relative',
+            zIndex: 30
+          }}
+        >
+          {/* Left: Brand Identity */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              background: `linear-gradient(135deg, ${embedThemeColor} 0%, rgba(15,23,42,0.8) 100%)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: `0 2px 10px ${embedThemeColor}40`,
+              overflow: 'hidden'
+            }}>
+              {selectedDealer?.logoUrl ? (
+                <img src={selectedDealer.logoUrl} alt={selectedDealer.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              ) : (
+                <Sparkles size={16} color="#ffffff" />
+              )}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '0.88rem', fontWeight: '800', color: '#f8fafc', lineHeight: 1.2, letterSpacing: '-0.01em' }}>
+                {selectedDealer?.name || selectedBrandName || '3D Sanal Stüdyo'}
               </span>
-              <span className="showroom-tag-badge">{selectedDealer?.isBrand ? "Kurumsal Kiosk" : "Showroom"}</span>
+              <span style={{ fontSize: '0.66rem', color: embedThemeColor, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                White-Label 3D Visualizer
+              </span>
             </div>
           </div>
-        </div>
 
-        {/* Top Header Actions */}
-        <div className="header-right">
-          {isOffline && (
-            <span className="kiosk-offline-pill-badge">
-              ⚡ Çevrimdışı Mod (Yerel 3D Aktif)
-            </span>
-          )}
+          {/* Center: Room Scene Switcher */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
+            {[
+              { id: 'bathroom', label: 'Banyo', icon: '🛁' },
+              { id: 'kitchen', label: 'Mutfak', icon: '🍳' },
+              { id: 'livingroom', label: 'Salon', icon: '🛋️' },
+              { id: 'terrace', label: 'Teras', icon: '☀️' }
+            ].map(r => (
+              <button
+                key={r.id}
+                onClick={() => {
+                  setRoomType(r.id);
+                  if (r.id === 'kitchen') {
+                    setApplyWalls(false);
+                    setApplyStripeWall(true);
+                    setActiveTargetSurface('stripe');
+                  } else if (r.id === 'livingroom' || r.id === 'terrace') {
+                    setApplyWalls(false);
+                    setApplyStripeWall(false);
+                  } else {
+                    setApplyWalls(true);
+                  }
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '5px 10px',
+                  borderRadius: '7px',
+                  border: 'none',
+                  fontSize: '0.76rem',
+                  fontWeight: roomType === r.id ? '800' : '600',
+                  color: roomType === r.id ? '#0b0f19' : '#94a3b8',
+                  background: roomType === r.id ? embedThemeColor : 'transparent',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <span>{r.icon}</span>
+                <span>{r.label}</span>
+              </button>
+            ))}
+          </div>
 
-          <button 
-            onClick={() => setIsPresentationMode(!isPresentationMode)}
-            className={`btn-mode-kiosk ${isPresentationMode ? 'active-purple' : ''}`}
-            title="Müşteri Sunum Modu (Sol menüyü gizler, tam ekran 3D sunum yapar)"
-          >
-            <Eye size={16} />
-            <span>{isPresentationMode ? 'Düzenleme Modu' : 'Müşteri Sunumu'}</span>
-          </button>
+          {/* Right: Actions (Full Screen, Snapshot, Settings) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={() => setIsBottomDockCollapsed(!isBottomDockCollapsed)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#e2e8f0',
+                fontSize: '0.76rem',
+                fontWeight: '700',
+                cursor: 'pointer'
+              }}
+              title="Ayar Menüsünü Gizle / Göster"
+            >
+              <Palette size={13} />
+              <span className="btn-label-desktop">Ayarlar</span>
+            </button>
 
-          <button 
-            onClick={() => setBottomTab(bottomTab === 'quote' ? 'design' : 'quote')}
-            className={`btn-mode-kiosk ${bottomTab === 'quote' ? 'active-gold' : ''}`}
-          >
-            <Calculator size={16} />
-            <span>Metraj & Fiyat Paneli</span>
-          </button>
+            <button
+              onClick={toggleFullscreen}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                background: `linear-gradient(135deg, ${embedThemeColor} 0%, #b89628 100%)`,
+                border: 'none',
+                color: '#0b0f19',
+                fontSize: '0.76rem',
+                fontWeight: '800',
+                cursor: 'pointer',
+                boxShadow: `0 2px 10px ${embedThemeColor}30`
+              }}
+              title="Tam Ekran Aç / Kapat"
+            >
+              {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+              <span className="btn-label-desktop">{isFullscreen ? 'Küçült' : 'Tam Ekran'}</span>
+            </button>
+          </div>
+        </header>
+      ) : (
+        <header className="kiosk-header">
+          <div className="header-left">
+            <Link 
+              href={selectedDealer?.isBrand ? "/marka" : "/bayi"} 
+              className="kiosk-nav-btn btn-nav-bayi" 
+              title={selectedDealer?.isBrand ? "Marka Paneline Dön" : "Bayi Paneline Dön"}
+            >
+              <Building2 size={15} style={{ flexShrink: 0 }} />
+              <span className="btn-label-desktop">{selectedDealer?.isBrand ? "Marka Paneli" : "Bayi Paneli"}</span>
+              <span className="btn-label-mobile">{selectedDealer?.isBrand ? "Marka" : "Bayi"}</span>
+            </Link>
+            <Link 
+              href="/" 
+              className="kiosk-nav-btn btn-nav-exit" 
+              title="Ana Sayfaya Dön (Çıkış)"
+            >
+              <LogOut size={15} style={{ flexShrink: 0 }} />
+              <span className="btn-label-desktop">Çıkış</span>
+            </Link>
+          </div>
 
+          {/* Center: Symmetrical Dealer Showroom Capsule */}
+          <div className="header-center">
+            <div className="header-showroom-pill">
+              <Crown size={14} className="showroom-crown-icon" />
+              <div className="showroom-text-wrap">
+                <span className="showroom-brand-name">
+                  {selectedDealer?.name || 'SeramikBak'}
+                </span>
+                <span className="showroom-tag-badge">{selectedDealer?.isBrand ? "Kurumsal Kiosk" : "Showroom"}</span>
+              </div>
+            </div>
+          </div>
 
-          <button onClick={() => setShowQrModal(true)} className="btn-secondary-kiosk">
-            <QrCode size={16} />
-            <span>QR ile İndir</span>
-          </button>
+          {/* Top Header Actions */}
+          <div className="header-right">
+            {isOffline && (
+              <span className="kiosk-offline-pill-badge">
+                ⚡ Çevrimdışı Mod (Yerel 3D Aktif)
+              </span>
+            )}
 
-          <button onClick={handleOpenQuoteModal} className="btn-primary-gold-kiosk">
-            <FileText size={16} />
-            <span>PDF Teklif Oluştur</span>
-          </button>
-        </div>
-      </header>
+            <button 
+              onClick={() => setIsPresentationMode(!isPresentationMode)}
+              className={`btn-mode-kiosk ${isPresentationMode ? 'active-purple' : ''}`}
+              title="Müşteri Sunum Modu (Sol menüyü gizler, tam ekran 3D sunum yapar)"
+            >
+              <Eye size={16} />
+              <span>{isPresentationMode ? 'Düzenleme Modu' : 'Müşteri Sunumu'}</span>
+            </button>
+
+            <button 
+              onClick={() => setBottomTab(bottomTab === 'quote' ? 'design' : 'quote')}
+              className={`btn-mode-kiosk ${bottomTab === 'quote' ? 'active-gold' : ''}`}
+            >
+              <Calculator size={16} />
+              <span>Metraj & Fiyat Paneli</span>
+            </button>
+
+            <button onClick={() => setShowQrModal(true)} className="btn-secondary-kiosk">
+              <QrCode size={16} />
+              <span>QR ile İndir</span>
+            </button>
+
+            <button onClick={handleOpenQuoteModal} className="btn-primary-gold-kiosk">
+              <FileText size={16} />
+              <span>PDF Teklif Oluştur</span>
+            </button>
+          </div>
+        </header>
+      )}
 
       {/* Mobile Drawer Dark Backdrop Overlay */}
       {isMobileMenuOpen && (
@@ -1590,25 +1753,39 @@ export default function ShowroomKioskPage() {
               </div>
             )}
 
-            {/* Marka Seçimi Dropdown (Tüm Markalar) */}
-            <div className="brand-select-wrapper">
-              <div className="section-label-header">
-                <Building2 size={14} className="icon-gold" />
-                <span>2. Marka Filtresi:</span>
+            {/* Marka Seçimi: Embed modda marka kilitli gösterilir, Kiosk modda tüm markalar listelenir */}
+            {isEmbed ? (
+              <div className="brand-select-wrapper" style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.04)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Crown size={14} color={embedThemeColor} />
+                  <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#f8fafc' }}>
+                    {selectedDealer?.name || selectedBrandName || 'Marka Koleksiyonu'}
+                  </span>
+                  <span style={{ marginLeft: 'auto', fontSize: '0.66rem', color: embedThemeColor, fontWeight: '700', background: `${embedThemeColor}18`, padding: '2px 8px', borderRadius: '6px' }}>
+                    Özel Katalog
+                  </span>
+                </div>
               </div>
-              <select
-                value={selectedBrandId}
-                onChange={(e) => handleBrandChange(e.target.value)}
-                className="kiosk-brand-dropdown"
-              >
-                <option value="all">🏢 Tüm Markalar ({totalProductCountInDb} Model)</option>
-                {uniqueBrandList.map(b => (
-                  <option key={b.id} value={b.id}>
-                    {b.name} {b._count?.products ? `(${b._count.products} Model)` : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
+            ) : (
+              <div className="brand-select-wrapper">
+                <div className="section-label-header">
+                  <Building2 size={14} className="icon-gold" />
+                  <span>2. Marka Filtresi:</span>
+                </div>
+                <select
+                  value={selectedBrandId}
+                  onChange={(e) => handleBrandChange(e.target.value)}
+                  className="kiosk-brand-dropdown"
+                >
+                  <option value="all">🏢 Tüm Markalar ({totalProductCountInDb} Model)</option>
+                  {uniqueBrandList.map(b => (
+                    <option key={b.id} value={b.id}>
+                      {b.name} {b._count?.products ? `(${b._count.products} Model)` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Search Input Box */}
             <div className="search-box-wrapper">

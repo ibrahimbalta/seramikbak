@@ -25,7 +25,10 @@ export async function GET(request) {
           OR: [
             { id: brandTarget },
             { slug: brandTarget },
-            { username: brandTarget }
+            { slug: { startsWith: brandTarget } },
+            { username: brandTarget },
+            { name: { equals: brandTarget, mode: 'insensitive' } },
+            { name: { contains: brandTarget, mode: 'insensitive' } }
           ]
         },
         select: {
