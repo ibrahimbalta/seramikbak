@@ -429,12 +429,13 @@ export default function BrandConsumerStudioPage() {
       height: '100vh',
       overflow: 'hidden',
       position: 'relative',
-      background: '#080c16',
-      color: '#f8fafc',
+      background: panelBg,
+      color: textColor,
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       userSelect: 'none',
       display: 'flex',
-      flexDirection: 'row'
+      flexDirection: 'row',
+      transition: 'background 0.3s ease, color 0.2s ease'
     }}>
 
       {/* -------------------- 1. LEFT SIDEBAR: ALL BRAND CERAMIC PRODUCTS -------------------- */}
@@ -497,7 +498,7 @@ export default function BrandConsumerStudioPage() {
                 fontWeight: '700',
                 transition: 'all 0.15s ease'
               }}
-              title="Panel Arka Plan Rengini Değiştir"
+              title="Tüm Stüdyo & Panel Temasını Değiştir"
             >
               <Palette size={13} />
               <span>Tema</span>
@@ -524,7 +525,7 @@ export default function BrandConsumerStudioPage() {
           </div>
         </div>
 
-        {/* Panel Background Color Palette Bar */}
+        {/* Studio & Panel Background Color Palette Bar */}
         {showBgPicker && (
           <div style={{
             padding: '10px 16px',
@@ -537,7 +538,7 @@ export default function BrandConsumerStudioPage() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.66rem', fontWeight: '800', color: textMuted, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Panel Arka Plan Rengi
+                Genel Stüdyo & Panel Teması
               </span>
               <span style={{ fontSize: '0.68rem', fontFamily: 'monospace', color: themeColor, fontWeight: '800' }}>
                 {panelBg}
@@ -968,17 +969,18 @@ export default function BrandConsumerStudioPage() {
           right: '16px',
           zIndex: 50,
           height: '56px',
-          background: 'rgba(11, 15, 25, 0.88)',
+          background: isLight ? 'rgba(255, 255, 255, 0.94)' : 'rgba(11, 15, 25, 0.88)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderRadius: '16px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
+          border: `1px solid ${panelBorder}`,
+          boxShadow: isLight ? '0 10px 30px rgba(0, 0, 0, 0.08)' : '0 10px 30px rgba(0, 0, 0, 0.4)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0 16px',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          transition: 'all 0.3s ease'
         }}>
           {/* Left: Re-open Sidebar Button + Brand Identity */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -986,10 +988,10 @@ export default function BrandConsumerStudioPage() {
               <button
                 onClick={() => setIsSidebarOpen(true)}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  background: isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.08)',
+                  border: `1px solid ${panelBorder}`,
                   borderRadius: '10px',
-                  color: '#f8fafc',
+                  color: textColor,
                   padding: '6px 12px',
                   display: 'flex',
                   alignItems: 'center',
@@ -1024,7 +1026,7 @@ export default function BrandConsumerStudioPage() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '0.88rem', fontWeight: '800', color: '#f8fafc', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+              <span style={{ fontSize: '0.88rem', fontWeight: '800', color: textColor, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
                 {brandInfo.name}
               </span>
               <span style={{ fontSize: '0.64rem', color: themeColor, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -1038,10 +1040,10 @@ export default function BrandConsumerStudioPage() {
             display: 'flex',
             alignItems: 'center',
             gap: '3px',
-            background: 'rgba(255, 255, 255, 0.05)',
+            background: isLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.05)',
             padding: '3px',
             borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.08)'
+            border: `1px solid ${panelBorder}`
           }}>
             {[
               { id: 'bathroom', label: 'Banyo', icon: '🛁' },
@@ -1074,7 +1076,7 @@ export default function BrandConsumerStudioPage() {
                     border: 'none',
                     fontSize: '0.76rem',
                     fontWeight: isSelected ? '800' : '600',
-                    color: isSelected ? '#0b0f19' : '#94a3b8',
+                    color: isSelected ? '#0b0f19' : textMuted,
                     background: isSelected ? themeColor : 'transparent',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease'
@@ -1089,6 +1091,32 @@ export default function BrandConsumerStudioPage() {
 
           {/* Right: Actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Quick General Theme Switcher Button */}
+            <button
+              onClick={() => {
+                if (!isSidebarOpen) setIsSidebarOpen(true);
+                setShowBgPicker(prev => !prev);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '7px 12px',
+                borderRadius: '9px',
+                background: showBgPicker ? `${themeColor}25` : (isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.07)'),
+                border: `1px solid ${showBgPicker ? themeColor : panelBorder}`,
+                color: showBgPicker ? themeColor : textColor,
+                fontSize: '0.76rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              title="Tüm Sayfanın ve 3D Stüdyonun Temasını Değiştir"
+            >
+              <Palette size={14} color={showBgPicker ? themeColor : (isLight ? '#334155' : '#cbd5e1')} />
+              <span className="btn-label-desktop">Tema</span>
+            </button>
+
             <button
               onClick={handleDownloadSnapshot}
               style={{
@@ -1097,9 +1125,9 @@ export default function BrandConsumerStudioPage() {
                 gap: '5px',
                 padding: '7px 12px',
                 borderRadius: '9px',
-                background: 'rgba(255, 255, 255, 0.07)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                color: '#f8fafc',
+                background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.07)',
+                border: `1px solid ${panelBorder}`,
+                color: textColor,
                 fontSize: '0.76rem',
                 fontWeight: '700',
                 cursor: 'pointer'
@@ -1118,9 +1146,9 @@ export default function BrandConsumerStudioPage() {
                 gap: '5px',
                 padding: '7px 12px',
                 borderRadius: '9px',
-                background: 'rgba(255, 255, 255, 0.07)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                color: '#f8fafc',
+                background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.07)',
+                border: `1px solid ${panelBorder}`,
+                color: textColor,
                 fontSize: '0.76rem',
                 fontWeight: '700',
                 cursor: 'pointer'
@@ -1159,9 +1187,9 @@ export default function BrandConsumerStudioPage() {
                 width: '34px',
                 height: '34px',
                 borderRadius: '9px',
-                background: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: '#94a3b8',
+                background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.06)',
+                border: `1px solid ${panelBorder}`,
+                color: textMuted,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1175,7 +1203,7 @@ export default function BrandConsumerStudioPage() {
         </header>
 
         {/* 3D Canvas Container */}
-        <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
+        <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0, background: panelBg }}>
           {mounted && (
             <StudioCanvas
               activeProduct={selectedProduct}
@@ -1189,6 +1217,7 @@ export default function BrandConsumerStudioPage() {
               timeOfDay={timeOfDay}
               layPattern={layPattern}
               lightIntensity={1.05}
+              backgroundColor={panelBg}
             />
           )}
         </div>
@@ -1205,10 +1234,11 @@ export default function BrandConsumerStudioPage() {
         }}>
           {/* Day / Sunset / Night Lighting Controls */}
           <div style={{
-            background: 'rgba(11, 15, 25, 0.85)',
+            background: isLight ? 'rgba(255, 255, 255, 0.94)' : 'rgba(11, 15, 25, 0.85)',
             backdropFilter: 'blur(16px)',
             borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: `1px solid ${panelBorder}`,
+            boxShadow: isLight ? '0 4px 15px rgba(0, 0, 0, 0.06)' : '0 4px 15px rgba(0, 0, 0, 0.3)',
             padding: '3px',
             display: 'flex',
             gap: '3px'
@@ -1230,15 +1260,15 @@ export default function BrandConsumerStudioPage() {
                     border: 'none',
                     fontSize: '0.7rem',
                     fontWeight: isSelected ? '800' : '600',
-                    background: isSelected ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
-                    color: isSelected ? '#f8fafc' : '#94a3b8',
+                    background: isSelected ? (isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.15)') : 'transparent',
+                    color: isSelected ? textColor : textMuted,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '4px'
                   }}
                 >
-                  <Icon size={12} color={isSelected ? themeColor : '#94a3b8'} />
+                  <Icon size={12} color={isSelected ? themeColor : textMuted} />
                   <span>{m.label}</span>
                 </button>
               );
@@ -1247,10 +1277,11 @@ export default function BrandConsumerStudioPage() {
 
           {/* Lay Pattern Selector (Düz / Çapraz / Balıksırtı) */}
           <div style={{
-            background: 'rgba(11, 15, 25, 0.85)',
+            background: isLight ? 'rgba(255, 255, 255, 0.94)' : 'rgba(11, 15, 25, 0.85)',
             backdropFilter: 'blur(16px)',
             borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: `1px solid ${panelBorder}`,
+            boxShadow: isLight ? '0 4px 15px rgba(0, 0, 0, 0.06)' : '0 4px 15px rgba(0, 0, 0, 0.3)',
             padding: '3px',
             display: 'flex',
             gap: '3px'
@@ -1270,7 +1301,7 @@ export default function BrandConsumerStudioPage() {
                   fontSize: '0.68rem',
                   fontWeight: layPattern === p.id ? '800' : '600',
                   background: layPattern === p.id ? themeColor : 'transparent',
-                  color: layPattern === p.id ? '#0b0f19' : '#94a3b8',
+                  color: layPattern === p.id ? '#0b0f19' : textMuted,
                   cursor: 'pointer'
                 }}
               >
@@ -1286,27 +1317,27 @@ export default function BrandConsumerStudioPage() {
           bottom: '16px',
           right: '16px',
           zIndex: 40,
-          background: 'rgba(11, 15, 25, 0.88)',
+          background: isLight ? 'rgba(255, 255, 255, 0.94)' : 'rgba(11, 15, 25, 0.88)',
           backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: `1px solid ${panelBorder}`,
           borderRadius: '12px',
           padding: '8px 14px',
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
-          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
+          boxShadow: isLight ? '0 8px 24px rgba(0, 0, 0, 0.08)' : '0 8px 24px rgba(0, 0, 0, 0.4)'
         }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: '0.62rem', color: '#94a3b8', fontWeight: '600' }}>Aktif Zemin Karosu</span>
-            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#f8fafc' }}>
+            <span style={{ fontSize: '0.62rem', color: textMuted, fontWeight: '600' }}>Aktif Zemin Karosu</span>
+            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: textColor }}>
               {floorProduct?.name?.length > 22 ? floorProduct.name.slice(0, 22) + '...' : floorProduct?.name}
             </span>
           </div>
 
-          <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.1)' }} />
+          <div style={{ width: '1px', height: '24px', background: panelBorder }} />
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: '0.62rem', color: '#94a3b8', fontWeight: '600' }}>Aktif Duvar Karosu</span>
+            <span style={{ fontSize: '0.62rem', color: textMuted, fontWeight: '600' }}>Aktif Duvar Karosu</span>
             <span style={{ fontSize: '0.74rem', fontWeight: '800', color: themeColor }}>
               {wallProduct?.name?.length > 22 ? wallProduct.name.slice(0, 22) + '...' : wallProduct?.name}
             </span>

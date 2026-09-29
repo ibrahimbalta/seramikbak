@@ -38,7 +38,8 @@ export default function StudioCanvas({
   showerGlass = 'clear',
   onShowerGlassChange,
   extraTopLeft = null,
-  extraTopRight = null
+  extraTopRight = null,
+  backgroundColor = '#1c202a'
 }) {
   const containerRef = useRef(null);
   const rendererRef = useRef(null);
@@ -78,6 +79,17 @@ export default function StudioCanvas({
   useEffect(() => {
     if (showerGlass) setActiveGlass(showerGlass);
   }, [showerGlass]);
+
+  useEffect(() => {
+    if (sceneRef.current && backgroundColor) {
+      try {
+        sceneRef.current.background = new THREE.Color(backgroundColor);
+        sceneRef.current.fog = new THREE.FogExp2(backgroundColor, 0.032);
+      } catch (err) {
+        // Safe fallback in case of invalid color string
+      }
+    }
+  }, [backgroundColor]);
 
   // Dimensions of room in meters
   const ROOM_WIDTH = 3.6; 
@@ -278,8 +290,9 @@ export default function StudioCanvas({
 
     // 1. Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#1c202a'); 
-    scene.fog = new THREE.FogExp2('#1c202a', 0.035);
+    const initialBg = backgroundColor || '#1c202a';
+    scene.background = new THREE.Color(initialBg); 
+    scene.fog = new THREE.FogExp2(initialBg, 0.032);
     sceneRef.current = scene;
 
     // 2. Camera

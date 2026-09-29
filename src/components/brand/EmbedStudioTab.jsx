@@ -522,10 +522,10 @@ Web sitenizin ana menüsüne "3D Mekan Tasarla" linki olarak ekleyebilir veya sh
             </div>
           </div>
 
-          {/* Panel Background Color Picker */}
+          {/* General Studio & UI Theme Color Picker */}
           <div>
             <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#334155', marginBottom: '8px' }}>
-              Tasarım Paneli Arka Plan Rengi
+              Genel 3D Stüdyo & Arayüz Tema Rengi
             </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
               <input
@@ -544,7 +544,7 @@ Web sitenizin ana menüsüne "3D Mekan Tasarla" linki olarak ekleyebilir veya sh
               />
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <span style={{ fontSize: '0.85rem', fontWeight: '800', fontFamily: 'monospace', color: '#0f172a' }}>{panelBg}</span>
-                <span style={{ fontSize: '0.7rem', color: '#64748b' }}>Sol seramik seçim panelinin zemin rengi</span>
+                <span style={{ fontSize: '0.7rem', color: '#64748b' }}>Tüm 3D mekan, katalog paneli ve kontrol çubuklarının arka plan rengi</span>
               </div>
             </div>
 
