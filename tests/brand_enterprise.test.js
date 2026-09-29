@@ -105,16 +105,16 @@ test('Brand Enterprise Portal - White-Label Embed SDK Generator', async (t) => {
     assert.ok(content.includes('buildVisualizerUrl'), 'studio-sdk.js must support visualizer URL construction');
   });
 
-  await t.test('should construct valid kiosk embed url with brand isolation and theme', () => {
+  await t.test('should construct valid consumer 3D studio url (/tasarim) with brand isolation and theme', () => {
     const baseUrl = 'https://www.seramikbak.com';
     const brandSlug = 'gural-seramik';
     const scene = 'banyo';
     const theme = '#d4af37';
-    const embedUrl = `${baseUrl}/kiosk?brand=${encodeURIComponent(brandSlug)}&embed=true&scene=${encodeURIComponent(scene)}&theme=${encodeURIComponent(theme)}`;
+    const tasarimUrl = `${baseUrl}/tasarim?brand=${encodeURIComponent(brandSlug)}&scene=${encodeURIComponent(scene)}&theme=${encodeURIComponent(theme)}`;
 
     assert.strictEqual(
-      embedUrl,
-      'https://www.seramikbak.com/kiosk?brand=gural-seramik&embed=true&scene=banyo&theme=%23d4af37'
+      tasarimUrl,
+      'https://www.seramikbak.com/tasarim?brand=gural-seramik&scene=banyo&theme=%23d4af37'
     );
   });
 });

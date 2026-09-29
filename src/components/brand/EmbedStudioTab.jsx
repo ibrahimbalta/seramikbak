@@ -46,7 +46,7 @@ export default function EmbedStudioTab({ brandInfo }) {
     }
   }, []);
 
-  const embedUrl = `${baseUrl}/kiosk?brand=${encodeURIComponent(brandSlug)}&embed=true&scene=${encodeURIComponent(defaultScene)}&theme=${encodeURIComponent(themeColor)}`;
+  const embedUrl = `${baseUrl}/tasarim?brand=${encodeURIComponent(brandSlug)}&scene=${encodeURIComponent(defaultScene)}&theme=${encodeURIComponent(themeColor)}`;
   const kioskUrl = `${baseUrl}/kiosk?brand=${encodeURIComponent(brandSlug)}&theme=${encodeURIComponent(themeColor)}`;
 
   // Code snippets

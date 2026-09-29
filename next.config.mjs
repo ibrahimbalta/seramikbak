@@ -80,8 +80,8 @@ const nextConfig = {
   async headers() {
     return [
       {
-        // Embeddable routes: Kiosk 3D Visualizer & Studio JavaScript SDK
-        source: '/(kiosk|studio-sdk.js)(.*)',
+        // Embeddable routes: Kiosk 3D Visualizer, Brand 3D Studio & JavaScript SDK
+        source: '/(kiosk|tasarim|studio-sdk.js)(.*)',
         headers: [
           {
             key: 'X-Content-Type-Options',
@@ -115,7 +115,7 @@ const nextConfig = {
       },
       {
         // Non-embeddable routes: strict SAMEORIGIN protection for Admin, Bayi, Marka and portal dashboards
-        source: '/((?!kiosk|studio-sdk\\.js).*)',
+        source: '/((?!kiosk|tasarim|studio-sdk\\.js).*)',
         headers: [
           {
             key: 'X-Content-Type-Options',

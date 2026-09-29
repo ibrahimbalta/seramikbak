@@ -258,8 +258,7 @@
     var productId = opts.productId || '';
     var code = opts.code || '';
 
-    var url = base + '/kiosk?brand=' + encodeURIComponent(brand) + 
-      '&embed=true' +
+    var url = base + '/tasarim?brand=' + encodeURIComponent(brand) + 
       '&scene=' + encodeURIComponent(scene) + 
       '&theme=' + encodeURIComponent(theme);
 
