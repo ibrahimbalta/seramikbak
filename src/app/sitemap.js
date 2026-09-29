@@ -38,6 +38,7 @@ export default async function sitemap() {
   // 1. Static Core Routes with 5-Language Variants
   const staticPaths = [
     { path: '', priority: 1.0, changeFrequency: 'daily' },
+    { path: '/yapay-zeka', priority: 0.98, changeFrequency: 'daily' },
     { path: '/global-tanitim', priority: 0.95, changeFrequency: 'weekly' },
     { path: '/marka', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/bayi', priority: 0.9, changeFrequency: 'daily' },

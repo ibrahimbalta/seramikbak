@@ -14,6 +14,8 @@ export const metadata = {
     "graniser", "güral seramik", "hitit seramik", "seranit", "termal seramik", "uşak seramik",
     
     // Turkish Core SEO Keywords
+    "seramik sektöründe yapay zeka", "yapay zeka banyo tasarımı", "fotoğraftan seramik bulma", "görsel seramik arama",
+    "akıllı seramik showroom", "AI ceramic visualizer", "tile visual search AI",
     "seramik", "fayans", "karo", "zemin kaplama", "duvar karosu", "seramik modelleri", "seramik fiyatları",
     "banyo seramik", "mutfak fayans", "3d sanal stüdyo", "seramik bak", "seramik bayi", "istanbul seramik bayi",
     "ankara seramik bayi", "izmir seramik bayi", "bursa seramik bayi", "antalya seramik bayi", "konya seramik bayi",
@@ -140,7 +142,15 @@ const orgJsonLd = {
     "width": 512,
     "height": 512
   },
-  "description": "Türkiye'nin ve dünyanın önde gelen seramik markalarını buluşturan, 3D Sanal Stüdyo ve AR desteği sunan uluslararası B2B2C seramik platformu.",
+  "description": "Türkiye'nin ve dünyanın önde gelen seramik markalarını buluşturan, yapay zeka destekli görsel arama, 3D Sanal Stüdyo ve AR desteği sunan uluslararası B2B2C seramik ekosistemi.",
+  "knowsAbout": [
+    "Artificial Intelligence in Ceramics",
+    "Yapay Zeka Destekli Seramik Arama",
+    "Fotoğraftan Karo Eşleştirme (Visual Tile Search)",
+    "Web 3D Ceramic Room Visualizer",
+    "Smart Tile Metraj & Waste Optimization",
+    "Digital Ceramic Showroom Kiosk"
+  ],
   "sameAs": [
     "https://www.instagram.com/seramikbak",
     "https://www.facebook.com/seramikbak",

@@ -150,3 +150,13 @@ test('Image SEO Alt Text Generator', () => {
   assert.ok(alt.includes('Mermer Görünümlü'));
   assert.ok(alt.includes('Banyo'));
 });
+
+test('AI in Ceramics - Metadata & Landing Hub Structure', async () => {
+  const { metadata } = await import('../src/app/yapay-zeka/layout.js');
+  assert.ok(metadata.title.includes('Seramik Sektöründe Yapay Zeka'));
+  assert.ok(metadata.description.includes('Türkiye\'nin ilk seramik yapay zekası'));
+  assert.ok(metadata.keywords.includes('seramik sektöründe yapay zeka'));
+  assert.ok(metadata.keywords.includes('fotoğraftan seramik bulma'));
+  assert.strictEqual(metadata.alternates.canonical, 'https://www.seramikbak.com/yapay-zeka');
+});
+
