@@ -47,7 +47,7 @@ export default function EmbedStudioTab({ brandInfo }) {
   }, []);
 
   const embedUrl = `${baseUrl}/tasarim?brand=${encodeURIComponent(brandSlug)}&scene=${encodeURIComponent(defaultScene)}&theme=${encodeURIComponent(themeColor)}`;
-  const kioskUrl = `${baseUrl}/kiosk?brand=${encodeURIComponent(brandSlug)}&theme=${encodeURIComponent(themeColor)}`;
+  const kioskUrl = embedUrl;
 
   // Code snippets
   const iframeSnippet = `<!-- SeramikBak White-Label 3D Visualizer Iframe Embed for ${brandName} -->
@@ -99,11 +99,11 @@ export default function BrandTileVisualizer() {
   async
 ></script>`;
 
-  const kioskSnippet = `Showroom Kiosk URL (Dokunmatik Ekranlar & Mağaza İçi TV):
+  const kioskSnippet = `3D Tasarım Stüdyosu Doğrudan Bağlantı URL'si:
 ${kioskUrl}
 
-Kurulum Tavsiyesi:
-Showroom kiosk bilgisayarınızda (Windows / Android / Linux) Google Chrome veya Microsoft Edge tarayıcısını F11 (Kiosk Mode) ile başlatıp bu adresi ana sayfa yapınız.`;
+Kullanım / Kurulum Tavsiyesi:
+Web sitenizin ana menüsüne "3D Mekan Tasarla" linki olarak ekleyebilir veya showroom kiosk ekranlarınızda F11 (Tam Ekran) ile doğrudan bu stüdyoyu açabilirsiniz.`;
 
   const currentSnippet = activeCodeType === 'iframe' 
     ? iframeSnippet 
@@ -424,12 +424,12 @@ Showroom kiosk bilgisayarınızda (Windows / Android / Linux) Google Chrome veya
               transition: 'transform 0.15s ease'
             }}
           >
-            <Monitor size={16} />
-            <span>Kiosk Modunu Canlı Başlat</span>
+            <Sparkles size={16} />
+            <span>3D Tasarım Alanını Canlı Başlat</span>
             <ExternalLink size={14} />
           </a>
-          <span style={{ fontSize: '0.7rem', color: '#64748b', textAlign: 'center' }}>
-            Yetkili bayiler & showroomlar için sınırsız
+          <span style={{ fontSize: '0.7rem', color: '#94a3b8', textAlign: 'center' }}>
+            Markanıza özel sade 3D tasarım alanı
           </span>
         </div>
       </div>
@@ -609,7 +609,7 @@ Showroom kiosk bilgisayarınızda (Windows / Android / Linux) Google Chrome veya
                 { id: 'iframe', label: 'Iframe' },
                 { id: 'react', label: 'React / Next' },
                 { id: 'sdk', label: 'JS SDK' },
-                { id: 'kiosk', label: 'Kiosk Link' }
+                { id: 'kiosk', label: 'Direkt 3D Link' }
               ].map(tab => {
                 const isActive = activeCodeType === tab.id;
                 return (
@@ -917,10 +917,10 @@ Showroom kiosk bilgisayarınızda (Windows / Android / Linux) Google Chrome veya
                 {activeCodeType === 'iframe' && 'Iframe Entegrasyon Kodu'}
                 {activeCodeType === 'react' && 'React / Next.js Component Kodu'}
                 {activeCodeType === 'sdk' && 'JavaScript Pop-up SDK Kodu'}
-                {activeCodeType === 'kiosk' && 'Showroom Kiosk Ekran Başlatıcı'}
+                {activeCodeType === 'kiosk' && '3D Tasarım Stüdyosu Doğrudan Web Bağlantısı'}
               </h3>
               <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
-                Kopyalayıp web sitenize veya kiosk tarayıcısına doğrudan yapıştırın
+                Kopyalayıp web sitenizde menüye veya butonlara doğrudan bağlantı verin
               </span>
             </div>
           </div>
