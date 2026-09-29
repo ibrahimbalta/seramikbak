@@ -134,6 +134,7 @@ export default function BrandConsumerStudioPage() {
   // Filters & Left Sidebar State
   const [selectedStyle, setSelectedStyle] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [visibleCount, setVisibleCount] = useState(16);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -403,6 +404,24 @@ export default function BrandConsumerStudioPage() {
     }
     return styleMatch && searchMatch;
   });
+
+  // Reset pagination on filter or search change
+  useEffect(() => {
+    setVisibleCount(16);
+  }, [searchTerm, selectedStyle]);
+
+  // Lazy progressive slice (loads 16 initially, more as user scrolls)
+  const displayedProducts = filteredProducts.slice(0, visibleCount);
+
+  // Smooth scroll handler to auto-load next batch before reaching the bottom
+  const handleGridScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop - clientHeight < 280) {
+      if (visibleCount < filteredProducts.length) {
+        setVisibleCount(prev => Math.min(prev + 12, filteredProducts.length));
+      }
+    }
+  };
 
   return (
     <div style={{
@@ -702,17 +721,22 @@ export default function BrandConsumerStudioPage() {
           </div>
         </div>
 
-        {/* Scrollable 2-Column Product Grid */}
-        <div style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '6px 12px 24px 12px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          gap: '10px',
-          alignContent: 'start',
-          scrollbarWidth: 'thin'
-        }}>
+        {/* Scrollable 2-Column Product Grid with Lazy Progressive Loading */}
+        <div 
+          onScroll={handleGridScroll}
+          style={{
+            flex: '1 1 0%',
+            minHeight: 0,
+            overflowY: 'auto',
+            padding: '8px 14px 28px 14px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+            gridAutoRows: 'max-content',
+            gap: '12px',
+            alignContent: 'start',
+            scrollbarWidth: 'thin'
+          }}
+        >
           {isLoadingProducts ? (
             <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '40px 0', color: textMuted, fontSize: '0.8rem' }}>
               <div style={{
@@ -731,7 +755,7 @@ export default function BrandConsumerStudioPage() {
               Aramanıza uygun seramik bulunamadı.
             </div>
           ) : (
-            filteredProducts.map(tile => {
+            displayedProducts.map(tile => {
               const isSelected = selectedProduct?.id === tile.id;
               return (
                 <div
@@ -742,8 +766,8 @@ export default function BrandConsumerStudioPage() {
                       ? (isLight ? `${themeColor}18` : 'rgba(255, 255, 255, 0.08)') 
                       : cardBg,
                     border: isSelected ? `2px solid ${themeColor}` : `1px solid ${cardBorder}`,
-                    borderRadius: '12px',
-                    padding: '8px',
+                    borderRadius: '14px',
+                    padding: '9px',
                     cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
@@ -751,35 +775,45 @@ export default function BrandConsumerStudioPage() {
                     boxSizing: 'border-box',
                     boxShadow: cardShadow,
                     minWidth: 0,
-                    overflow: 'hidden',
+                    minHeight: '215px',
+                    height: 'auto',
+                    flexShrink: 0,
                     transition: 'all 0.18s ease'
                   }}
                 >
-                  {/* Tile Image Swatch */}
+                  {/* Tile Image Swatch - High Quality, Prominent Texture View */}
                   <div style={{
                     width: '100%',
-                    height: '92px',
-                    borderRadius: '8px',
+                    height: '115px',
+                    minHeight: '115px',
+                    maxHeight: '115px',
+                    borderRadius: '10px',
                     overflow: 'hidden',
-                    background: isLight ? '#e2e8f0' : '#1e293b',
+                    background: isLight ? '#f1f5f9' : '#1e293b',
                     position: 'relative',
                     flexShrink: 0
                   }}>
                     <img 
                       src={tile.textureUrl || tile.imageUrl} 
                       alt={tile.name}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'cover', 
+                        display: 'block' 
+                      }}
                       loading="lazy"
                     />
                     <span style={{
                       position: 'absolute',
-                      top: '5px',
-                      left: '5px',
-                      fontSize: '0.58rem',
+                      top: '6px',
+                      left: '6px',
+                      fontSize: '0.6rem',
                       fontWeight: '800',
-                      padding: '2px 5px',
-                      borderRadius: '4px',
-                      background: 'rgba(15, 23, 42, 0.85)',
+                      padding: '2px 6px',
+                      borderRadius: '5px',
+                      background: 'rgba(15, 23, 42, 0.88)',
+                      backdropFilter: 'blur(4px)',
                       color: '#cbd5e1'
                     }}>
                       {tile.width || 60}x{tile.height || 120}
@@ -787,32 +821,33 @@ export default function BrandConsumerStudioPage() {
                     {isSelected && (
                       <span style={{
                         position: 'absolute',
-                        top: '5px',
-                        right: '5px',
-                        width: '18px',
-                        height: '18px',
+                        top: '6px',
+                        right: '6px',
+                        width: '20px',
+                        height: '20px',
                         borderRadius: '50%',
                         background: themeColor,
                         color: '#0b0f19',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
                       }}>
-                        <Check size={11} strokeWidth={3} />
+                        <Check size={12} strokeWidth={3} />
                       </span>
                     )}
                   </div>
 
                   {/* Tile Name & Finish */}
-                  <div style={{ minWidth: 0 }}>
+                  <div style={{ minWidth: 0, marginTop: '2px' }}>
                     <div style={{
-                      fontSize: '0.72rem',
+                      fontSize: '0.74rem',
                       fontWeight: '700',
                       color: textColor,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      lineHeight: '1.2'
+                      lineHeight: '1.25'
                     }} title={tile.name}>
                       {tile.name}
                     </div>
@@ -824,19 +859,25 @@ export default function BrandConsumerStudioPage() {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis'
                     }}>
-                      {tile.finish || 'Porselen'}
+                      {tile.finish || 'Porselen'} • {tile.color || 'Mat'}
                     </div>
                   </div>
 
                   {/* Quick Surface Assignment Buttons */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '4px', marginTop: '2px' }}>
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', 
+                    gap: '4px', 
+                    marginTop: 'auto',
+                    paddingTop: '4px'
+                  }}>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleApplyTile(tile, 'floor');
                       }}
                       style={{
-                        padding: '4px 0',
+                        padding: '5px 0',
                         borderRadius: '6px',
                         border: 'none',
                         background: isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.08)',
@@ -848,7 +889,8 @@ export default function BrandConsumerStudioPage() {
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        minWidth: 0
+                        minWidth: 0,
+                        transition: 'background 0.15s ease'
                       }}
                     >
                       Zemin
@@ -859,7 +901,7 @@ export default function BrandConsumerStudioPage() {
                         handleApplyTile(tile, 'walls');
                       }}
                       style={{
-                        padding: '4px 0',
+                        padding: '5px 0',
                         borderRadius: '6px',
                         border: 'none',
                         background: isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.08)',
@@ -871,7 +913,8 @@ export default function BrandConsumerStudioPage() {
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        minWidth: 0
+                        minWidth: 0,
+                        transition: 'background 0.15s ease'
                       }}
                     >
                       Duvar
@@ -880,6 +923,32 @@ export default function BrandConsumerStudioPage() {
                 </div>
               );
             })
+          )}
+
+          {/* Lazy Load More Sentinel & Button */}
+          {visibleCount < filteredProducts.length && (
+            <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '14px 0 8px 0' }}>
+              <button
+                onClick={() => setVisibleCount(prev => Math.min(prev + 16, filteredProducts.length))}
+                style={{
+                  background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.06)',
+                  border: `1px solid ${panelBorder}`,
+                  borderRadius: '10px',
+                  color: textMuted,
+                  padding: '9px 16px',
+                  fontSize: '0.72rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  width: '100%',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                Daha Fazla Ürün Yükle (+{Math.min(16, filteredProducts.length - visibleCount)})
+                <span style={{ display: 'block', fontSize: '0.64rem', opacity: 0.7, marginTop: '2px' }}>
+                  ({filteredProducts.length} modelden {displayedProducts.length} tanesi gösteriliyor - kaydırarak da yüklenir)
+                </span>
+              </button>
+            </div>
           )}
         </div>
       </aside>
