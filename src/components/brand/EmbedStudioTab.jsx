@@ -13,6 +13,7 @@ export default function EmbedStudioTab({ brandInfo }) {
   const brandSlug = brandInfo?.slug || slugify(brandName);
 
   const [themeColor, setThemeColor] = useState('#d4af37');
+  const [panelBg, setPanelBg] = useState('#0b1120');
   const [defaultScene, setDefaultScene] = useState('banyo');
   const [deviceView, setDeviceView] = useState('tablet'); // 'tablet' | 'kiosk'
   const [activeCodeType, setActiveCodeType] = useState('iframe'); // 'iframe' | 'react' | 'sdk' | 'kiosk'
@@ -46,7 +47,7 @@ export default function EmbedStudioTab({ brandInfo }) {
     }
   }, []);
 
-  const embedUrl = `${baseUrl}/tasarim?brand=${encodeURIComponent(brandSlug)}&scene=${encodeURIComponent(defaultScene)}&theme=${encodeURIComponent(themeColor)}`;
+  const embedUrl = `${baseUrl}/tasarim?brand=${encodeURIComponent(brandSlug)}&scene=${encodeURIComponent(defaultScene)}&theme=${encodeURIComponent(themeColor)}${panelBg && panelBg !== '#0b1120' ? `&bg=${encodeURIComponent(panelBg.replace('#', ''))}` : ''}`;
   const kioskUrl = embedUrl;
 
   // Code snippets
@@ -515,6 +516,67 @@ Web sitenizin ana menüsüne "3D Mekan Tasarla" linki olarak ekleyebilir veya sh
                   }}
                 >
                   <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: preset.hex, display: 'inline-block' }} />
+                  <span>{preset.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Panel Background Color Picker */}
+          <div>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#334155', marginBottom: '8px' }}>
+              Tasarım Paneli Arka Plan Rengi
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <input
+                type="color"
+                value={panelBg}
+                onChange={(e) => setPanelBg(e.target.value)}
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '10px',
+                  border: '2px solid #e2e8f0',
+                  cursor: 'pointer',
+                  padding: '2px',
+                  background: 'none'
+                }}
+              />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: '800', fontFamily: 'monospace', color: '#0f172a' }}>{panelBg}</span>
+                <span style={{ fontSize: '0.7rem', color: '#64748b' }}>Sol seramik seçim panelinin zemin rengi</span>
+              </div>
+            </div>
+
+            {/* Panel Bg Presets */}
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {[
+                { label: 'Gece Mavisi', hex: '#0b1120' },
+                { label: 'Derin Siyah', hex: '#050505' },
+                { label: 'Kömür Antrasit', hex: '#18181b' },
+                { label: 'Sıcak Taş', hex: '#1c1917' },
+                { label: 'Açık Gri', hex: '#f8fafc' },
+                { label: 'Saf Beyaz', hex: '#ffffff' }
+              ].map(preset => (
+                <button
+                  key={preset.hex}
+                  type="button"
+                  onClick={() => setPanelBg(preset.hex)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '4px 10px',
+                    borderRadius: '8px',
+                    border: panelBg.toLowerCase() === preset.hex.toLowerCase() ? '1.5px solid #0f172a' : '1px solid #e2e8f0',
+                    background: panelBg.toLowerCase() === preset.hex.toLowerCase() ? '#f8fafc' : '#ffffff',
+                    fontSize: '0.72rem',
+                    fontWeight: panelBg.toLowerCase() === preset.hex.toLowerCase() ? '800' : '600',
+                    color: '#334155',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: preset.hex, display: 'inline-block', border: '1px solid rgba(0,0,0,0.1)' }} />
                   <span>{preset.label}</span>
                 </button>
               ))}

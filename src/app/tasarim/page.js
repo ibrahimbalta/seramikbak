@@ -22,7 +22,8 @@ import {
   ExternalLink,
   Phone,
   Grid,
-  ChevronDown
+  ChevronDown,
+  Palette
 } from 'lucide-react';
 
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
@@ -68,6 +69,16 @@ const DEFAULT_BRAND_CATALOG = [
   { id: 'bie-1', name: 'Bien Nordic Meşe Ahşap Karo', code: 'BIE-OAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Ahşap', color: 'Doğal Meşe', brand: { id: 'bien', name: 'Bien Seramik' }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg' }
 ];
 
+const PANEL_BG_PRESETS = [
+  { id: 'obsidian', label: 'Gece Mavisi', color: '#0b1120' },
+  { id: 'oled', label: 'Derin Siyah', color: '#050505' },
+  { id: 'graphite', label: 'Kömür Antrasit', color: '#18181b' },
+  { id: 'stone', label: 'Sıcak Taş', color: '#1c1917' },
+  { id: 'navy', label: 'Derin Lacivert', color: '#09152e' },
+  { id: 'light', label: 'Açık Gri Stüdyo', color: '#f8fafc' },
+  { id: 'white', label: 'Saf Beyaz', color: '#ffffff' }
+];
+
 export default function BrandConsumerStudioPage() {
   const [mounted, setMounted] = useState(false);
   const [brandInfo, setBrandInfo] = useState({
@@ -77,6 +88,31 @@ export default function BrandConsumerStudioPage() {
     logoUrl: '/logos/gural.png'
   });
   const [themeColor, setThemeColor] = useState('#d4af37');
+  const [panelBg, setPanelBg] = useState('#0b1120');
+  const [showBgPicker, setShowBgPicker] = useState(false);
+
+  // Dynamic Contrast & Theme Helpers
+  const isLight = React.useMemo(() => {
+    if (!panelBg || typeof panelBg !== 'string') return false;
+    let c = panelBg.replace('#', '');
+    if (c.length === 3) c = c.split('').map(x => x + x).join('');
+    if (c.length !== 6) return false;
+    const num = parseInt(c, 16);
+    if (isNaN(num)) return false;
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return (r * 299 + g * 587 + b * 114) / 1000 > 155;
+  }, [panelBg]);
+
+  const textColor = isLight ? '#0f172a' : '#f8fafc';
+  const textMuted = isLight ? '#64748b' : '#94a3b8';
+  const panelBorder = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.08)';
+  const cardBg = isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.035)';
+  const cardBorder = isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.07)';
+  const cardShadow = isLight ? '0 2px 10px rgba(0, 0, 0, 0.06)' : 'none';
+  const inputBg = isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.05)';
+  const inputBorder = isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.1)';
 
   // 3D Scene Controls
   const [roomType, setRoomType] = useState('bathroom'); // 'bathroom' | 'kitchen' | 'livingroom' | 'terrace'
@@ -123,11 +159,16 @@ export default function BrandConsumerStudioPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const queryBrand = urlParams.get('brand') || urlParams.get('brandSlug') || urlParams.get('brandId');
     const queryTheme = urlParams.get('theme') || urlParams.get('color') || urlParams.get('primary');
+    const queryBg = urlParams.get('bg') || urlParams.get('panelBg');
     const queryScene = urlParams.get('scene') || urlParams.get('room');
     const queryProduct = urlParams.get('product') || urlParams.get('productId') || urlParams.get('code');
 
     if (queryTheme) {
       setThemeColor(queryTheme.startsWith('#') ? queryTheme : `#${queryTheme}`);
+    }
+
+    if (queryBg) {
+      setPanelBg(queryBg.startsWith('#') ? queryBg : `#${queryBg}`);
     }
 
     if (queryScene) {
@@ -379,28 +420,26 @@ export default function BrandConsumerStudioPage() {
 
       {/* -------------------- 1. LEFT SIDEBAR: ALL BRAND CERAMIC PRODUCTS -------------------- */}
       <aside style={{
-        width: isSidebarOpen ? '360px' : '0px',
-        minWidth: isSidebarOpen ? '320px' : '0px',
-        maxWidth: '380px',
+        width: isSidebarOpen ? '420px' : '0px',
+        minWidth: isSidebarOpen ? '390px' : '0px',
+        maxWidth: '440px',
         height: '100%',
-        background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(8, 12, 22, 0.99) 100%)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        borderRight: isSidebarOpen ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+        background: panelBg,
+        borderRight: isSidebarOpen ? `1px solid ${panelBorder}` : 'none',
         display: 'flex',
         flexDirection: 'column',
         zIndex: 60,
         position: 'relative',
-        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        transition: 'width 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease',
         overflow: 'hidden',
-        boxShadow: isSidebarOpen ? '10px 0 35px rgba(0, 0, 0, 0.5)' : 'none',
+        boxShadow: isSidebarOpen ? (isLight ? '10px 0 35px rgba(0, 0, 0, 0.08)' : '10px 0 35px rgba(0, 0, 0, 0.45)') : 'none',
         flexShrink: 0
       }}>
         {/* Sidebar Header */}
         <div style={{
-          padding: '16px 18px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'rgba(255, 255, 255, 0.02)',
+          padding: '14px 16px',
+          borderBottom: `1px solid ${panelBorder}`,
+          background: isLight ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.02)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -411,7 +450,7 @@ export default function BrandConsumerStudioPage() {
               <Grid size={15} />
             </div>
             <div>
-              <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#f8fafc' }}>
+              <div style={{ fontSize: '0.85rem', fontWeight: '800', color: textColor }}>
                 Koleksiyon Kataloğu
               </div>
               <div style={{ fontSize: '0.66rem', color: themeColor, fontWeight: '700' }}>
@@ -420,30 +459,139 @@ export default function BrandConsumerStudioPage() {
             </div>
           </div>
 
-          <button
-            onClick={() => setIsSidebarOpen(false)}
-            style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '8px',
-              color: '#94a3b8',
-              width: '28px',
-              height: '28px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer'
-            }}
-            title="Koleksiyon Panelini Kapat (Tam Ekran 3D)"
-          >
-            <ChevronLeft size={16} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {/* Panel Background Color Switcher Trigger */}
+            <button
+              onClick={() => setShowBgPicker(!showBgPicker)}
+              style={{
+                background: showBgPicker ? `${themeColor}25` : (isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.06)'),
+                border: `1px solid ${showBgPicker ? themeColor : panelBorder}`,
+                borderRadius: '8px',
+                color: showBgPicker ? themeColor : textMuted,
+                height: '28px',
+                padding: '0 8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                cursor: 'pointer',
+                fontSize: '0.68rem',
+                fontWeight: '700',
+                transition: 'all 0.15s ease'
+              }}
+              title="Panel Arka Plan Rengini Değiştir"
+            >
+              <Palette size={13} />
+              <span>Tema</span>
+            </button>
+
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              style={{
+                background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.06)',
+                border: `1px solid ${panelBorder}`,
+                borderRadius: '8px',
+                color: textMuted,
+                width: '28px',
+                height: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+              title="Koleksiyon Panelini Gizle"
+            >
+              <ChevronLeft size={16} />
+            </button>
+          </div>
         </div>
 
+        {/* Panel Background Color Palette Bar */}
+        {showBgPicker && (
+          <div style={{
+            padding: '10px 16px',
+            background: isLight ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.03)',
+            borderBottom: `1px solid ${panelBorder}`,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            flexShrink: 0
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.66rem', fontWeight: '800', color: textMuted, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Panel Arka Plan Rengi
+              </span>
+              <span style={{ fontSize: '0.68rem', fontFamily: 'monospace', color: themeColor, fontWeight: '800' }}>
+                {panelBg}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              {PANEL_BG_PRESETS.map((p) => {
+                const isCurrent = panelBg.toLowerCase() === p.color.toLowerCase();
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setPanelBg(p.color)}
+                    title={p.label}
+                    style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '50%',
+                      background: p.color,
+                      border: isCurrent ? `2px solid ${themeColor}` : (isLight ? '1px solid #cbd5e1' : '1px solid rgba(255, 255, 255, 0.2)'),
+                      boxShadow: isCurrent ? `0 0 0 2px ${themeColor}50` : 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: 0,
+                      transform: isCurrent ? 'scale(1.15)' : 'scale(1)',
+                      transition: 'transform 0.15s ease'
+                    }}
+                  >
+                    {isCurrent && <Check size={11} color={p.id === 'light' || p.id === 'white' ? '#0f172a' : '#ffffff'} strokeWidth={3} />}
+                  </button>
+                );
+              })}
+
+              <label style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '2px 8px',
+                borderRadius: '6px',
+                background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.06)',
+                border: `1px solid ${panelBorder}`,
+                fontSize: '0.66rem',
+                fontWeight: '700',
+                color: textColor,
+                cursor: 'pointer'
+              }}>
+                <span>Özel:</span>
+                <input
+                  type="color"
+                  value={panelBg.startsWith('#') ? panelBg : '#0b1120'}
+                  onChange={(e) => setPanelBg(e.target.value)}
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    padding: 0,
+                    background: 'transparent'
+                  }}
+                />
+              </label>
+            </div>
+          </div>
+        )}
+
         {/* Search Bar */}
-        <div style={{ padding: '12px 18px 8px 18px', flexShrink: 0 }}>
+        <div style={{ padding: '12px 16px 8px 16px', flexShrink: 0 }}>
           <div style={{ position: 'relative', width: '100%' }}>
-            <Search size={13} color="#64748b" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+            <Search size={13} color={textMuted} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
             <input
               type="text"
               placeholder={`${brandInfo.name} modellerinde ara...`}
@@ -452,11 +600,11 @@ export default function BrandConsumerStudioPage() {
               style={{
                 width: '100%',
                 height: '36px',
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                background: inputBg,
+                border: `1px solid ${inputBorder}`,
                 borderRadius: '10px',
                 padding: '0 30px 0 32px',
-                color: '#f8fafc',
+                color: textColor,
                 fontSize: '0.76rem',
                 outline: 'none',
                 boxSizing: 'border-box'
@@ -465,7 +613,7 @@ export default function BrandConsumerStudioPage() {
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '2px' }}
+                style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: textMuted, cursor: 'pointer', padding: '2px' }}
               >
                 <X size={13} />
               </button>
@@ -475,7 +623,7 @@ export default function BrandConsumerStudioPage() {
 
         {/* Style Category Filter Pills */}
         <div style={{
-          padding: '4px 18px 10px 18px',
+          padding: '4px 16px 10px 16px',
           display: 'flex',
           gap: '6px',
           overflowX: 'auto',
@@ -497,9 +645,9 @@ export default function BrandConsumerStudioPage() {
                 style={{
                   padding: '5px 11px',
                   borderRadius: '8px',
-                  border: isSelected ? `1px solid ${themeColor}` : '1px solid rgba(255, 255, 255, 0.08)',
-                  background: isSelected ? `${themeColor}22` : 'rgba(255, 255, 255, 0.04)',
-                  color: isSelected ? '#ffffff' : '#94a3b8',
+                  border: isSelected ? `1px solid ${themeColor}` : `1px solid ${panelBorder}`,
+                  background: isSelected ? `${themeColor}22` : (isLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.04)'),
+                  color: isSelected ? (isLight ? '#0f172a' : '#ffffff') : textMuted,
                   fontSize: '0.7rem',
                   fontWeight: isSelected ? '800' : '600',
                   cursor: 'pointer',
@@ -515,16 +663,16 @@ export default function BrandConsumerStudioPage() {
 
         {/* Target Surface Selector (Zemin / Duvar / Tüm Mekan) */}
         <div style={{
-          padding: '0 18px 10px 18px',
+          padding: '0 16px 10px 16px',
           flexShrink: 0
         }}>
           <div style={{
-            background: 'rgba(255, 255, 255, 0.04)',
+            background: isLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.04)',
             borderRadius: '10px',
             padding: '3px',
             display: 'flex',
             gap: '3px',
-            border: '1px solid rgba(255, 255, 255, 0.06)'
+            border: `1px solid ${panelBorder}`
           }}>
             {[
               { id: 'both', label: 'Tüm Mekan' },
@@ -542,7 +690,7 @@ export default function BrandConsumerStudioPage() {
                   fontSize: '0.7rem',
                   fontWeight: activeTargetSurface === t.id ? '800' : '600',
                   background: activeTargetSurface === t.id ? themeColor : 'transparent',
-                  color: activeTargetSurface === t.id ? '#0b0f19' : '#94a3b8',
+                  color: activeTargetSurface === t.id ? '#0b0f19' : textMuted,
                   cursor: 'pointer',
                   textAlign: 'center',
                   transition: 'all 0.15s'
@@ -558,14 +706,15 @@ export default function BrandConsumerStudioPage() {
         <div style={{
           flex: 1,
           overflowY: 'auto',
-          padding: '6px 18px 24px 18px',
+          padding: '6px 12px 24px 12px',
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
           gap: '10px',
-          alignContent: 'start'
+          alignContent: 'start',
+          scrollbarWidth: 'thin'
         }}>
           {isLoadingProducts ? (
-            <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '40px 0', color: '#94a3b8', fontSize: '0.8rem' }}>
+            <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '40px 0', color: textMuted, fontSize: '0.8rem' }}>
               <div style={{
                 width: '28px',
                 height: '28px',
@@ -578,7 +727,7 @@ export default function BrandConsumerStudioPage() {
               <span>{brandInfo.name} seramik koleksiyonu yükleniyor...</span>
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '40px 0', color: '#64748b', fontSize: '0.78rem' }}>
+            <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '40px 0', color: textMuted, fontSize: '0.78rem' }}>
               Aramanıza uygun seramik bulunamadı.
             </div>
           ) : (
@@ -589,8 +738,10 @@ export default function BrandConsumerStudioPage() {
                   key={tile.id}
                   onClick={() => handleApplyTile(tile)}
                   style={{
-                    background: isSelected ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
-                    border: isSelected ? `2px solid ${themeColor}` : '1px solid rgba(255, 255, 255, 0.07)',
+                    background: isSelected 
+                      ? (isLight ? `${themeColor}18` : 'rgba(255, 255, 255, 0.08)') 
+                      : cardBg,
+                    border: isSelected ? `2px solid ${themeColor}` : `1px solid ${cardBorder}`,
                     borderRadius: '12px',
                     padding: '8px',
                     cursor: 'pointer',
@@ -598,22 +749,26 @@ export default function BrandConsumerStudioPage() {
                     flexDirection: 'column',
                     gap: '6px',
                     boxSizing: 'border-box',
+                    boxShadow: cardShadow,
+                    minWidth: 0,
+                    overflow: 'hidden',
                     transition: 'all 0.18s ease'
                   }}
                 >
                   {/* Tile Image Swatch */}
                   <div style={{
                     width: '100%',
-                    height: '86px',
+                    height: '92px',
                     borderRadius: '8px',
                     overflow: 'hidden',
-                    background: '#1e293b',
-                    position: 'relative'
+                    background: isLight ? '#e2e8f0' : '#1e293b',
+                    position: 'relative',
+                    flexShrink: 0
                   }}>
                     <img 
                       src={tile.textureUrl || tile.imageUrl} 
                       alt={tile.name}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                       loading="lazy"
                     />
                     <span style={{
@@ -649,11 +804,11 @@ export default function BrandConsumerStudioPage() {
                   </div>
 
                   {/* Tile Name & Finish */}
-                  <div>
+                  <div style={{ minWidth: 0 }}>
                     <div style={{
                       fontSize: '0.72rem',
                       fontWeight: '700',
-                      color: '#f8fafc',
+                      color: textColor,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -661,27 +816,39 @@ export default function BrandConsumerStudioPage() {
                     }} title={tile.name}>
                       {tile.name}
                     </div>
-                    <div style={{ fontSize: '0.62rem', color: '#94a3b8', marginTop: '2px' }}>
+                    <div style={{ 
+                      fontSize: '0.62rem', 
+                      color: textMuted, 
+                      marginTop: '2px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
                       {tile.finish || 'Porselen'}
                     </div>
                   </div>
 
                   {/* Quick Surface Assignment Buttons */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px', marginTop: '2px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '4px', marginTop: '2px' }}>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleApplyTile(tile, 'floor');
                       }}
                       style={{
-                        padding: '3px 0',
-                        borderRadius: '5px',
+                        padding: '4px 0',
+                        borderRadius: '6px',
                         border: 'none',
-                        background: 'rgba(255, 255, 255, 0.08)',
-                        color: '#cbd5e1',
-                        fontSize: '0.6rem',
+                        background: isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.08)',
+                        color: isLight ? '#334155' : '#cbd5e1',
+                        fontSize: '0.64rem',
                         fontWeight: '700',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        minWidth: 0
                       }}
                     >
                       Zemin
@@ -692,14 +859,19 @@ export default function BrandConsumerStudioPage() {
                         handleApplyTile(tile, 'walls');
                       }}
                       style={{
-                        padding: '3px 0',
-                        borderRadius: '5px',
+                        padding: '4px 0',
+                        borderRadius: '6px',
                         border: 'none',
-                        background: 'rgba(255, 255, 255, 0.08)',
-                        color: '#cbd5e1',
-                        fontSize: '0.6rem',
+                        background: isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.08)',
+                        color: isLight ? '#334155' : '#cbd5e1',
+                        fontSize: '0.64rem',
                         fontWeight: '700',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        minWidth: 0
                       }}
                     >
                       Duvar
