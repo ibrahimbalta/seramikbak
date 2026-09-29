@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { 
   Sparkles, 
   Layers, 
   RotateCcw, 
-  Building2, 
   X, 
   Search,
   Maximize2,
@@ -17,14 +16,13 @@ import {
   Sun,
   Sunset,
   Moon,
-  ChevronUp,
-  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Check,
   ExternalLink,
   Phone,
-  Sliders,
-  Share2,
-  Grid
+  Grid,
+  ChevronDown
 } from 'lucide-react';
 
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
@@ -58,23 +56,22 @@ const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), {
   )
 });
 
-// Built-in Luxury Brand Catalogs Fallback
+// Built-in Brand Catalogs Fallback
 const DEFAULT_BRAND_CATALOG = [
-  { id: 'gur-1', name: 'White Silver Full Lappato', code: 'GUR-SILV-60120', width: 60, height: 120, style: 'Mermer', finish: 'Full Lappato', color: 'Beyaz / Gümüş', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg' },
-  { id: 'gur-2', name: 'West Wood Mat Teak', code: 'GUR-WOOD-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat', color: 'Teak', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/teak_ahsap.jpg', textureUrl: '/textures/teak_ahsap.jpg' },
-  { id: 'gur-3', name: 'West Wood Mat Kayın', code: 'GUR-KAYIN-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat', color: 'Doğal Meşe', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg' },
-  { id: 'kal-1', name: 'Calacatta Gold Porselen', code: 'KAL-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Rektifiye', color: 'Beyaz / Altın', brand: { id: 'kalebodur', name: 'Kalebodur' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg' },
-  { id: 'kal-2', name: 'Nero Marquina Damarlı Siyah', code: 'KAL-NERO-60120', width: 60, height: 120, style: 'Mermer', finish: 'Lüks Parlak', color: 'Siyah', brand: { id: 'kalebodur', name: 'Kalebodur' }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg' },
-  { id: 'vit-1', name: 'Marbleous Calacatta Porselen', code: 'VIT-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Mat Rektifiye', color: 'Beyaz / Gold', brand: { id: 'vitra', name: 'VitrA' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg' },
-  { id: 'vit-2', name: 'Cementmix Gri Beton Karo', code: 'VIT-CEM-6060', width: 60, height: 60, style: 'Beton', finish: 'Lapatto', color: 'Açık Gri', brand: { id: 'vitra', name: 'VitrA' }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg' },
-  { id: 'bie-1', name: 'Nordic Meşe Ahşap Karo', code: 'BIE-OAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Ahşap', color: 'Doğal Meşe', brand: { id: 'bien', name: 'Bien Seramik' }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg' },
-  { id: 'ege-1', name: 'Loft Antrasit Beton Porselen', code: 'EGE-LOFT-8080', width: 80, height: 80, style: 'Beton', finish: 'Lapatto', color: 'Antrasit', brand: { id: 'ege', name: 'Ege Seramik' }, imageUrl: '/textures/loft_beton.jpg', textureUrl: '/textures/loft_beton.jpg' },
-  { id: 'gra-4', name: 'Travertino Bej Taş Karo', code: 'GRA-TRAV-60120', width: 60, height: 120, style: 'Taş', finish: 'Rölyef Mat', color: 'Sıcak Bej', brand: { id: 'graniser', name: 'Graniser' }, imageUrl: '/textures/travertino_classico.jpg', textureUrl: '/textures/travertino_classico.jpg' }
+  { id: 'gur-1', name: 'Güral White Silver Full Lappato', code: 'GUR-SILV-60120', width: 60, height: 120, style: 'Mermer', finish: 'Full Lappato', color: 'Beyaz / Gümüş', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg' },
+  { id: 'gur-2', name: 'Güral West Wood Mat Teak', code: 'GUR-WOOD-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat', color: 'Teak', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/teak_ahsap.jpg', textureUrl: '/textures/teak_ahsap.jpg' },
+  { id: 'gur-3', name: 'Güral West Wood Mat Kayın', code: 'GUR-KAYIN-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat', color: 'Doğal Meşe', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg' },
+  { id: 'kal-1', name: 'Kalebodur Calacatta Gold Porselen', code: 'KAL-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Rektifiye', color: 'Beyaz / Altın', brand: { id: 'kalebodur', name: 'Kalebodur' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg' },
+  { id: 'kal-2', name: 'Kalebodur Nero Marquina Siyah', code: 'KAL-NERO-60120', width: 60, height: 120, style: 'Mermer', finish: 'Lüks Parlak', color: 'Siyah', brand: { id: 'kalebodur', name: 'Kalebodur' }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg' },
+  { id: 'vit-1', name: 'VitrA Marbleous Calacatta Porselen', code: 'VIT-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Mat Rektifiye', color: 'Beyaz / Gold', brand: { id: 'vitra', name: 'VitrA' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg' },
+  { id: 'vit-2', name: 'VitrA Cementmix Gri Beton Karo', code: 'VIT-CEM-6060', width: 60, height: 60, style: 'Beton', finish: 'Lapatto', color: 'Açık Gri', brand: { id: 'vitra', name: 'VitrA' }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg' },
+  { id: 'bie-1', name: 'Bien Nordic Meşe Ahşap Karo', code: 'BIE-OAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Ahşap', color: 'Doğal Meşe', brand: { id: 'bien', name: 'Bien Seramik' }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg' }
 ];
 
 export default function BrandConsumerStudioPage() {
   const [mounted, setMounted] = useState(false);
   const [brandInfo, setBrandInfo] = useState({
+    id: '',
     name: 'Güral Seramik',
     slug: 'gural-seramik',
     logoUrl: '/logos/gural.png'
@@ -96,11 +93,12 @@ export default function BrandConsumerStudioPage() {
   const [applyFloor, setApplyFloor] = useState(true);
   const [applyWalls, setApplyWalls] = useState(true);
   const [applyStripeWall, setApplyStripeWall] = useState(false);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
 
-  // Filters & Drawer State
+  // Filters & Left Sidebar State
   const [selectedStyle, setSelectedStyle] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [isDrawerCollapsed, setIsDrawerCollapsed] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Modals & Feedback
@@ -117,7 +115,7 @@ export default function BrandConsumerStudioPage() {
     setTimeout(() => setToastMessage(null), 2800);
   };
 
-  // URL Query Parameters Parsing
+  // URL Query Parameters Parsing & Real Catalog Fetching
   useEffect(() => {
     setMounted(true);
     if (typeof window === 'undefined') return;
@@ -152,48 +150,98 @@ export default function BrandConsumerStudioPage() {
       }
     }
 
-    // Load Brand Metadata and Isolated Catalog
+    // Load Brand Metadata and ALL Products from DB (e.g. 320+ products for Güral)
     async function initBrandData() {
+      setIsLoadingProducts(true);
       const targetBrandSlug = queryBrand || 'gural-seramik';
 
       try {
-        const brandRes = await fetch('/api/brands').then(r => r.json()).catch(() => null);
-        if (Array.isArray(brandRes)) {
-          const matched = brandRes.find(b => 
-            b.slug === targetBrandSlug ||
-            b.id === targetBrandSlug ||
-            b.name?.toLowerCase().includes(targetBrandSlug.toLowerCase()) ||
-            targetBrandSlug.toLowerCase().includes(b.slug)
-          );
-          if (matched) {
-            setBrandInfo({
-              id: matched.id,
-              name: matched.name,
-              slug: matched.slug,
-              logoUrl: matched.logoUrl
-            });
+        // Parallel fetch for brand profile and products
+        const [brandRes, prodRes] = await Promise.all([
+          fetch('/api/brands').then(r => r.json()).catch(() => null),
+          fetch(`/api/products?brandId=${encodeURIComponent(targetBrandSlug)}&limit=450`).then(r => r.json()).catch(() => null)
+        ]);
 
-            // Fetch products specifically for this brand
-            const prodRes = await fetch(`/api/products?brandId=${matched.id}&limit=80`).then(r => r.json()).catch(() => null);
-            if (prodRes && prodRes.products && prodRes.products.length > 0) {
-              const cleaned = prodRes.products.map(p => ({
-                ...p,
-                imageUrl: p.imageUrl || p.textureUrl || '/textures/calacatta_gold.jpg',
-                textureUrl: p.textureUrl || p.imageUrl || '/textures/calacatta_gold.jpg'
-              }));
-              setProducts(cleaned);
-              setSelectedProduct(cleaned[0]);
-              setFloorProduct(cleaned[0]);
-              setWallProduct(cleaned[0]);
-              return;
-            }
+        let matchedBrand = null;
+        if (Array.isArray(brandRes)) {
+          const normTarget = targetBrandSlug.toLowerCase().replace(/[-_\s]/g, '');
+          matchedBrand = brandRes.find(b => {
+            const normSlug = (b.slug || '').toLowerCase().replace(/[-_\s]/g, '');
+            const normName = (b.name || '').toLowerCase().replace(/[-_\s]/g, '');
+            const trClean = normName.replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ğ/g, 'g');
+            return (
+              b.id === targetBrandSlug ||
+              b.slug === targetBrandSlug ||
+              normSlug === normTarget ||
+              normSlug.startsWith(normTarget) ||
+              normName.includes(normTarget) ||
+              trClean.includes(normTarget) ||
+              normTarget.includes(normSlug)
+            );
+          });
+
+          if (matchedBrand) {
+            setBrandInfo({
+              id: matchedBrand.id,
+              name: matchedBrand.name,
+              slug: matchedBrand.slug || targetBrandSlug,
+              logoUrl: matchedBrand.logoUrl || ''
+            });
           }
         }
+
+        let loadedProducts = [];
+
+        // Check first API response
+        if (prodRes && prodRes.products && prodRes.products.length > 0) {
+          loadedProducts = prodRes.products;
+        } else if (matchedBrand?.id) {
+          // Retry with matched brand ID if slug query returned empty
+          const retryRes = await fetch(`/api/products?brandId=${matchedBrand.id}&limit=450`).then(r => r.json()).catch(() => null);
+          if (retryRes && retryRes.products && retryRes.products.length > 0) {
+            loadedProducts = retryRes.products;
+          }
+        }
+
+        if (loadedProducts.length > 0) {
+          const sanitized = loadedProducts.map((p, idx) => {
+            let tex = p.textureUrl || p.imageUrl;
+            let img = p.imageUrl || tex;
+            if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
+              tex = DEFAULT_BRAND_CATALOG[idx % DEFAULT_BRAND_CATALOG.length].textureUrl;
+            }
+            if (!img) img = tex;
+            return {
+              ...p,
+              imageUrl: img,
+              textureUrl: tex
+            };
+          });
+
+          setProducts(sanitized);
+
+          // Find target or initial product
+          let initial = sanitized[0];
+          if (queryProduct) {
+            const match = sanitized.find(p => 
+              String(p.id) === queryProduct || 
+              p.code?.toLowerCase() === queryProduct.toLowerCase() ||
+              p.name?.toLowerCase().includes(queryProduct.toLowerCase())
+            );
+            if (match) initial = match;
+          }
+
+          setSelectedProduct(initial);
+          setFloorProduct(initial);
+          setWallProduct(initial);
+          setIsLoadingProducts(false);
+          return;
+        }
       } catch (e) {
-        console.warn('Brand metadata fetch error:', e);
+        console.warn('Brand metadata & products fetch error:', e);
       }
 
-      // Fallback matching in local catalog
+      // Fallback matching in local catalog if API returns nothing
       const bLower = targetBrandSlug.toLowerCase();
       const localMatches = DEFAULT_BRAND_CATALOG.filter(p =>
         p.brand?.id?.toLowerCase().includes(bLower) ||
@@ -205,12 +253,8 @@ export default function BrandConsumerStudioPage() {
         setSelectedProduct(localMatches[0]);
         setFloorProduct(localMatches[0]);
         setWallProduct(localMatches[0]);
-        setBrandInfo({
-          name: localMatches[0].brand.name,
-          slug: localMatches[0].brand.id,
-          logoUrl: ''
-        });
       }
+      setIsLoadingProducts(false);
     }
 
     initBrandData();
@@ -226,7 +270,6 @@ export default function BrandConsumerStudioPage() {
       if (Array.isArray(res) && res.length > 0) {
         setDealers(res);
       } else {
-        // Fallback demo dealers for the brand
         setDealers([
           { id: 'd1', name: `${brandInfo.name} Merkez Showroom`, city: 'İstanbul', district: 'Kadıköy', phone: '0216 444 00 00', address: 'Bağdat Caddesi No: 120' },
           { id: 'd2', name: `${brandInfo.name} Konsept Mağaza`, city: 'Ankara', district: 'Çankaya', phone: '0312 444 00 00', address: 'Turan Güneş Bulvarı No: 45' },
@@ -329,457 +372,239 @@ export default function BrandConsumerStudioPage() {
       background: '#080c16',
       color: '#f8fafc',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      userSelect: 'none'
+      userSelect: 'none',
+      display: 'flex',
+      flexDirection: 'row'
     }}>
 
-      {/* -------------------- 1. TOP FLOATING BRAND HEADER BAR -------------------- */}
-      <header style={{
-        position: 'absolute',
-        top: '16px',
-        left: '16px',
-        right: '16px',
-        zIndex: 50,
-        height: '56px',
-        background: 'rgba(11, 15, 25, 0.88)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderRadius: '16px',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
+      {/* -------------------- 1. LEFT SIDEBAR: ALL BRAND CERAMIC PRODUCTS -------------------- */}
+      <aside style={{
+        width: isSidebarOpen ? '360px' : '0px',
+        minWidth: isSidebarOpen ? '320px' : '0px',
+        maxWidth: '380px',
+        height: '100%',
+        background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(8, 12, 22, 0.99) 100%)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderRight: isSidebarOpen ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 18px',
-        boxSizing: 'border-box'
+        flexDirection: 'column',
+        zIndex: 60,
+        position: 'relative',
+        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        overflow: 'hidden',
+        boxShadow: isSidebarOpen ? '10px 0 35px rgba(0, 0, 0, 0.5)' : 'none',
+        flexShrink: 0
       }}>
-        {/* Left: Brand Identity */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
-            background: `linear-gradient(135deg, ${themeColor} 0%, #111827 100%)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: `0 2px 10px ${themeColor}35`,
-            overflow: 'hidden',
-            flexShrink: 0
-          }}>
-            {brandInfo.logoUrl ? (
-              <img src={brandInfo.logoUrl} alt={brandInfo.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-            ) : (
-              <Sparkles size={18} color="#ffffff" />
-            )}
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: '0.92rem', fontWeight: '800', color: '#f8fafc', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
-              {brandInfo.name}
-            </span>
-            <span style={{ fontSize: '0.66rem', color: themeColor, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              3D Mekan Tasarım Stüdyosu
-            </span>
-          </div>
-        </div>
-
-        {/* Center: Room Scene Switcher */}
+        {/* Sidebar Header */}
         <div style={{
+          padding: '16px 18px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'rgba(255, 255, 255, 0.02)',
           display: 'flex',
           alignItems: 'center',
-          gap: '4px',
-          background: 'rgba(255, 255, 255, 0.05)',
-          padding: '4px',
-          borderRadius: '12px',
-          border: '1px solid rgba(255, 255, 255, 0.08)'
+          justifyContent: 'space-between',
+          flexShrink: 0
         }}>
-          {[
-            { id: 'bathroom', label: 'Banyo', icon: '🛁' },
-            { id: 'kitchen', label: 'Mutfak', icon: '🍳' },
-            { id: 'livingroom', label: 'Salon', icon: '🛋️' },
-            { id: 'terrace', label: 'Teras', icon: '☀️' }
-          ].map(r => {
-            const isSelected = roomType === r.id;
-            return (
-              <button
-                key={r.id}
-                onClick={() => {
-                  setRoomType(r.id);
-                  if (r.id === 'kitchen') {
-                    setApplyWalls(false);
-                    setApplyStripeWall(true);
-                  } else if (r.id === 'livingroom' || r.id === 'terrace') {
-                    setApplyWalls(false);
-                    setApplyStripeWall(false);
-                  } else {
-                    setApplyWalls(true);
-                  }
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 14px',
-                  borderRadius: '9px',
-                  border: 'none',
-                  fontSize: '0.78rem',
-                  fontWeight: isSelected ? '800' : '600',
-                  color: isSelected ? '#0b0f19' : '#94a3b8',
-                  background: isSelected ? themeColor : 'transparent',
-                  cursor: 'pointer',
-                  transition: 'all 0.18s ease'
-                }}
-              >
-                <span>{r.icon}</span>
-                <span>{r.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Right: Consumer Action CTAs */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button
-            onClick={handleDownloadSnapshot}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 14px',
-              borderRadius: '10px',
-              background: 'rgba(255, 255, 255, 0.07)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              color: '#f8fafc',
-              fontSize: '0.78rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              transition: 'background 0.15s'
-            }}
-            title="Tasarladığın mekanı yüksek çözünürlüklü fotoğraf olarak kaydet"
-          >
-            <Camera size={14} color={themeColor} />
-            <span className="btn-label-desktop">Fotoğrafı İndir</span>
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: `${themeColor}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: themeColor }}>
+              <Grid size={15} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#f8fafc' }}>
+                Koleksiyon Kataloğu
+              </div>
+              <div style={{ fontSize: '0.66rem', color: themeColor, fontWeight: '700' }}>
+                {brandInfo.name} ({filteredProducts.length} Model)
+              </div>
+            </div>
+          </div>
 
           <button
-            onClick={handleOpenDealersModal}
+            onClick={() => setIsSidebarOpen(false)}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 14px',
-              borderRadius: '10px',
-              background: 'rgba(255, 255, 255, 0.07)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              color: '#f8fafc',
-              fontSize: '0.78rem',
-              fontWeight: '700',
-              cursor: 'pointer'
-            }}
-            title="Bu seramikleri yerinde görmek için yetkili bayileri bulun"
-          >
-            <MapPin size={14} color="#38bdf8" />
-            <span className="btn-label-desktop">En Yakın Bayi</span>
-          </button>
-
-          <button
-            onClick={() => setShowSampleModal(true)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 14px',
-              borderRadius: '10px',
-              background: `linear-gradient(135deg, ${themeColor} 0%, #b89628 100%)`,
-              border: 'none',
-              color: '#0b0f19',
-              fontSize: '0.78rem',
-              fontWeight: '800',
-              cursor: 'pointer',
-              boxShadow: `0 2px 12px ${themeColor}35`
-            }}
-            title="Seçtiğin seramik için ücretsiz numune veya fiyat teklifi iste"
-          >
-            <MessageCircle size={14} />
-            <span>Numune Talep Et</span>
-          </button>
-
-          <button
-            onClick={toggleFullscreen}
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
               background: 'rgba(255, 255, 255, 0.06)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '8px',
               color: '#94a3b8',
+              width: '28px',
+              height: '28px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer'
             }}
-            title={isFullscreen ? 'Tam Ekrandan Çık' : 'Tam Ekran'}
+            title="Koleksiyon Panelini Kapat (Tam Ekran 3D)"
           >
-            {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+            <ChevronLeft size={16} />
           </button>
         </div>
-      </header>
 
-      {/* -------------------- 2. FULL VIEWPORT 3D CANVAS -------------------- */}
-      <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
-        {mounted && (
-          <StudioCanvas
-            activeProduct={selectedProduct}
-            floorProduct={floorProduct}
-            wallProduct={wallProduct}
-            stripeWallProduct={stripeWallProduct}
-            applyFloor={applyFloor}
-            applyWalls={applyWalls}
-            applyStripeWall={applyStripeWall}
-            roomType={roomType}
-            timeOfDay={timeOfDay}
-            layPattern={layPattern}
-            lightIntensity={1.05}
-          />
-        )}
-      </div>
-
-      {/* -------------------- 3. FLOATING QUICK MOOD & PATTERN PILLS -------------------- */}
-      <div style={{
-        position: 'absolute',
-        top: '84px',
-        right: '16px',
-        zIndex: 40,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '8px'
-      }}>
-        {/* Surface Target Selector */}
-        <div style={{
-          background: 'rgba(11, 15, 25, 0.85)',
-          backdropFilter: 'blur(16px)',
-          borderRadius: '12px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          padding: '4px',
-          display: 'flex',
-          gap: '3px'
-        }}>
-          {[
-            { id: 'both', label: 'Tüm Mekan' },
-            { id: 'floor', label: 'Zemin' },
-            { id: 'walls', label: 'Duvar' }
-          ].map(t => (
-            <button
-              key={t.id}
-              onClick={() => setActiveTargetSurface(t.id)}
+        {/* Search Bar */}
+        <div style={{ padding: '12px 18px 8px 18px', flexShrink: 0 }}>
+          <div style={{ position: 'relative', width: '100%' }}>
+            <Search size={13} color="#64748b" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+            <input
+              type="text"
+              placeholder={`${brandInfo.name} modellerinde ara...`}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               style={{
-                padding: '5px 10px',
-                borderRadius: '8px',
-                border: 'none',
-                fontSize: '0.72rem',
-                fontWeight: activeTargetSurface === t.id ? '800' : '600',
-                background: activeTargetSurface === t.id ? themeColor : 'transparent',
-                color: activeTargetSurface === t.id ? '#0b0f19' : '#94a3b8',
-                cursor: 'pointer'
+                width: '100%',
+                height: '36px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '10px',
+                padding: '0 30px 0 32px',
+                color: '#f8fafc',
+                fontSize: '0.76rem',
+                outline: 'none',
+                boxSizing: 'border-box'
               }}
-            >
-              {t.label}
-            </button>
-          ))}
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '2px' }}
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Day / Sunset / Night Lighting Controls */}
+        {/* Style Category Filter Pills */}
         <div style={{
-          background: 'rgba(11, 15, 25, 0.85)',
-          backdropFilter: 'blur(16px)',
-          borderRadius: '12px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          padding: '4px',
+          padding: '4px 18px 10px 18px',
           display: 'flex',
-          gap: '3px'
+          gap: '6px',
+          overflowX: 'auto',
+          flexShrink: 0,
+          scrollbarWidth: 'none'
         }}>
           {[
-            { id: 'day', label: 'Gündüz', icon: Sun },
-            { id: 'sunset', label: 'Gün Batımı', icon: Sunset },
-            { id: 'night', label: 'Gece', icon: Moon }
-          ].map(m => {
-            const Icon = m.icon;
-            const isSelected = timeOfDay === m.id;
+            { id: 'all', label: 'Tümü' },
+            { id: 'mermer', label: 'Mermer' },
+            { id: 'ahsap', label: 'Ahşap' },
+            { id: 'beton', label: 'Beton' },
+            { id: 'tas', label: 'Taş' }
+          ].map(s => {
+            const isSelected = selectedStyle === s.id;
             return (
               <button
-                key={m.id}
-                onClick={() => setTimeOfDay(m.id)}
+                key={s.id}
+                onClick={() => setSelectedStyle(s.id)}
                 style={{
-                  padding: '5px 8px',
+                  padding: '5px 11px',
                   borderRadius: '8px',
-                  border: 'none',
-                  fontSize: '0.72rem',
+                  border: isSelected ? `1px solid ${themeColor}` : '1px solid rgba(255, 255, 255, 0.08)',
+                  background: isSelected ? `${themeColor}22` : 'rgba(255, 255, 255, 0.04)',
+                  color: isSelected ? '#ffffff' : '#94a3b8',
+                  fontSize: '0.7rem',
                   fontWeight: isSelected ? '800' : '600',
-                  background: isSelected ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
-                  color: isSelected ? '#f8fafc' : '#94a3b8',
                   cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.15s'
                 }}
               >
-                <Icon size={12} color={isSelected ? themeColor : '#94a3b8'} />
-                <span>{m.label}</span>
+                {s.label}
               </button>
             );
           })}
         </div>
-      </div>
 
-      {/* -------------------- 4. LUXURY BOTTOM CERAMIC CATALOG SHELF -------------------- */}
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-        transform: isDrawerCollapsed ? 'translateY(calc(100% - 38px))' : 'translateY(0)'
-      }}>
-        {/* Drawer Toggle Handle */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '-1px' }}>
-          <button
-            onClick={() => setIsDrawerCollapsed(!isDrawerCollapsed)}
-            style={{
-              background: 'rgba(11, 15, 25, 0.94)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderBottom: 'none',
-              padding: '6px 20px',
-              borderRadius: '12px 12px 0 0',
-              color: '#cbd5e1',
-              fontSize: '0.74rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 -4px 15px rgba(0,0,0,0.2)'
-            }}
-          >
-            <Layers size={13} color={themeColor} />
-            <span>{brandInfo.name} Seramik Koleksiyonu ({filteredProducts.length} Model)</span>
-            {isDrawerCollapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          </button>
+        {/* Target Surface Selector (Zemin / Duvar / Tüm Mekan) */}
+        <div style={{
+          padding: '0 18px 10px 18px',
+          flexShrink: 0
+        }}>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.04)',
+            borderRadius: '10px',
+            padding: '3px',
+            display: 'flex',
+            gap: '3px',
+            border: '1px solid rgba(255, 255, 255, 0.06)'
+          }}>
+            {[
+              { id: 'both', label: 'Tüm Mekan' },
+              { id: 'floor', label: 'Zemin' },
+              { id: 'walls', label: 'Duvar' }
+            ].map(t => (
+              <button
+                key={t.id}
+                onClick={() => setActiveTargetSurface(t.id)}
+                style={{
+                  flex: 1,
+                  padding: '5px 0',
+                  borderRadius: '7px',
+                  border: 'none',
+                  fontSize: '0.7rem',
+                  fontWeight: activeTargetSurface === t.id ? '800' : '600',
+                  background: activeTargetSurface === t.id ? themeColor : 'transparent',
+                  color: activeTargetSurface === t.id ? '#0b0f19' : '#94a3b8',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  transition: 'all 0.15s'
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Shelf Body */}
+        {/* Scrollable 2-Column Product Grid */}
         <div style={{
-          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(8, 12, 22, 0.98) 100%)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-          padding: '14px 20px 20px 20px',
-          boxShadow: '0 -15px 40px rgba(0, 0, 0, 0.6)'
+          flex: 1,
+          overflowY: 'auto',
+          padding: '6px 18px 24px 18px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '10px',
+          alignContent: 'start'
         }}>
-          {/* Top Filter Bar */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px',
-            marginBottom: '14px',
-            flexWrap: 'wrap'
-          }}>
-            {/* Style Filters */}
-            <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
-              {[
-                { id: 'all', label: 'Tüm Koleksiyon' },
-                { id: 'mermer', label: 'Mermer Doku' },
-                { id: 'ahsap', label: 'Doğal Ahşap' },
-                { id: 'beton', label: 'Modern Beton' },
-                { id: 'tas', label: 'Doğal Taş' }
-              ].map(s => {
-                const isSelected = selectedStyle === s.id;
-                return (
-                  <button
-                    key={s.id}
-                    onClick={() => setSelectedStyle(s.id)}
-                    style={{
-                      padding: '5px 12px',
-                      borderRadius: '8px',
-                      border: isSelected ? `1px solid ${themeColor}` : '1px solid rgba(255, 255, 255, 0.08)',
-                      background: isSelected ? `${themeColor}20` : 'rgba(255, 255, 255, 0.04)',
-                      color: isSelected ? '#ffffff' : '#94a3b8',
-                      fontSize: '0.74rem',
-                      fontWeight: isSelected ? '800' : '600',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                      transition: 'all 0.15s ease'
-                    }}
-                  >
-                    {s.label}
-                  </button>
-                );
-              })}
+          {isLoadingProducts ? (
+            <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '40px 0', color: '#94a3b8', fontSize: '0.8rem' }}>
+              <div style={{
+                width: '28px',
+                height: '28px',
+                border: '2px solid rgba(212,175,55,0.2)',
+                borderTopColor: themeColor,
+                borderRadius: '50%',
+                animation: 'sb-spin 0.8s linear infinite',
+                margin: '0 auto 10px auto'
+              }} />
+              <span>{brandInfo.name} seramik koleksiyonu yükleniyor...</span>
             </div>
-
-            {/* Search Input */}
-            <div style={{
-              position: 'relative',
-              width: '240px',
-              maxWidth: '100%'
-            }}>
-              <Search size={13} color="#64748b" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
-              <input
-                type="text"
-                placeholder="Model adı veya kod ara..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{
-                  width: '100%',
-                  height: '32px',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '8px',
-                  padding: '0 10px 0 30px',
-                  color: '#f8fafc',
-                  fontSize: '0.74rem',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-              />
+          ) : filteredProducts.length === 0 ? (
+            <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '40px 0', color: '#64748b', fontSize: '0.78rem' }}>
+              Aramanıza uygun seramik bulunamadı.
             </div>
-          </div>
-
-          {/* Horizontal Tile Swatches Carousel */}
-          <div style={{
-            display: 'flex',
-            gap: '12px',
-            overflowX: 'auto',
-            paddingBottom: '6px',
-            scrollSnapType: 'x mandatory'
-          }}>
-            {filteredProducts.map((tile) => {
+          ) : (
+            filteredProducts.map(tile => {
               const isSelected = selectedProduct?.id === tile.id;
               return (
                 <div
                   key={tile.id}
                   onClick={() => handleApplyTile(tile)}
                   style={{
-                    flexShrink: 0,
-                    width: '180px',
                     background: isSelected ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
-                    border: isSelected ? `2px solid ${themeColor}` : '1px solid rgba(255, 255, 255, 0.08)',
+                    border: isSelected ? `2px solid ${themeColor}` : '1px solid rgba(255, 255, 255, 0.07)',
                     borderRadius: '12px',
                     padding: '8px',
                     cursor: 'pointer',
-                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '6px',
-                    scrollSnapAlign: 'start',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    transition: 'all 0.18s ease'
                   }}
                 >
-                  {/* Swatch Image */}
+                  {/* Tile Image Swatch */}
                   <div style={{
                     width: '100%',
-                    height: '84px',
+                    height: '86px',
                     borderRadius: '8px',
                     overflow: 'hidden',
                     background: '#1e293b',
@@ -789,25 +614,26 @@ export default function BrandConsumerStudioPage() {
                       src={tile.textureUrl || tile.imageUrl} 
                       alt={tile.name}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      loading="lazy"
                     />
                     <span style={{
                       position: 'absolute',
-                      top: '6px',
-                      left: '6px',
-                      fontSize: '0.62rem',
+                      top: '5px',
+                      left: '5px',
+                      fontSize: '0.58rem',
                       fontWeight: '800',
-                      padding: '2px 6px',
+                      padding: '2px 5px',
                       borderRadius: '4px',
                       background: 'rgba(15, 23, 42, 0.85)',
                       color: '#cbd5e1'
                     }}>
-                      {tile.width || 60}x{tile.height || 120} cm
+                      {tile.width || 60}x{tile.height || 120}
                     </span>
                     {isSelected && (
                       <span style={{
                         position: 'absolute',
-                        top: '6px',
-                        right: '6px',
+                        top: '5px',
+                        right: '5px',
                         width: '18px',
                         height: '18px',
                         borderRadius: '50%',
@@ -822,37 +648,38 @@ export default function BrandConsumerStudioPage() {
                     )}
                   </div>
 
-                  {/* Tile Info */}
+                  {/* Tile Name & Finish */}
                   <div>
                     <div style={{
-                      fontSize: '0.74rem',
+                      fontSize: '0.72rem',
                       fontWeight: '700',
                       color: '#f8fafc',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}>
+                      textOverflow: 'ellipsis',
+                      lineHeight: '1.2'
+                    }} title={tile.name}>
                       {tile.name}
                     </div>
-                    <div style={{ fontSize: '0.64rem', color: '#94a3b8', marginTop: '2px' }}>
-                      {tile.finish || 'Mat Rektifiye'}
+                    <div style={{ fontSize: '0.62rem', color: '#94a3b8', marginTop: '2px' }}>
+                      {tile.finish || 'Porselen'}
                     </div>
                   </div>
 
-                  {/* Quick Action Buttons */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', marginTop: '2px' }}>
+                  {/* Quick Surface Assignment Buttons */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px', marginTop: '2px' }}>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleApplyTile(tile, 'floor');
                       }}
                       style={{
-                        padding: '4px',
-                        borderRadius: '6px',
+                        padding: '3px 0',
+                        borderRadius: '5px',
                         border: 'none',
                         background: 'rgba(255, 255, 255, 0.08)',
                         color: '#cbd5e1',
-                        fontSize: '0.62rem',
+                        fontSize: '0.6rem',
                         fontWeight: '700',
                         cursor: 'pointer'
                       }}
@@ -865,12 +692,12 @@ export default function BrandConsumerStudioPage() {
                         handleApplyTile(tile, 'walls');
                       }}
                       style={{
-                        padding: '4px',
-                        borderRadius: '6px',
+                        padding: '3px 0',
+                        borderRadius: '5px',
                         border: 'none',
                         background: 'rgba(255, 255, 255, 0.08)',
                         color: '#cbd5e1',
-                        fontSize: '0.62rem',
+                        fontSize: '0.6rem',
                         fontWeight: '700',
                         cursor: 'pointer'
                       }}
@@ -880,10 +707,371 @@ export default function BrandConsumerStudioPage() {
                   </div>
                 </div>
               );
+            })
+          )}
+        </div>
+      </aside>
+
+      {/* -------------------- 2. MAIN 3D VIEWPORT (HUGE UNBLOCKED CANVAS) -------------------- */}
+      <main style={{
+        flex: 1,
+        height: '100%',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Floating Top Brand Header */}
+        <header style={{
+          position: 'absolute',
+          top: '16px',
+          left: '16px',
+          right: '16px',
+          zIndex: 50,
+          height: '56px',
+          background: 'rgba(11, 15, 25, 0.88)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderRadius: '16px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 16px',
+          boxSizing: 'border-box'
+        }}>
+          {/* Left: Re-open Sidebar Button + Brand Identity */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {!isSidebarOpen && (
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '10px',
+                  color: '#f8fafc',
+                  padding: '6px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '0.75rem',
+                  fontWeight: '700',
+                  cursor: 'pointer'
+                }}
+              >
+                <Grid size={13} color={themeColor} />
+                <span>Koleksiyonu Aç</span>
+              </button>
+            )}
+
+            <div style={{
+              width: '34px',
+              height: '34px',
+              borderRadius: '9px',
+              background: `linear-gradient(135deg, ${themeColor} 0%, #111827 100%)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: `0 2px 10px ${themeColor}35`,
+              overflow: 'hidden',
+              flexShrink: 0
+            }}>
+              {brandInfo.logoUrl ? (
+                <img src={brandInfo.logoUrl} alt={brandInfo.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              ) : (
+                <Sparkles size={16} color="#ffffff" />
+              )}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '0.88rem', fontWeight: '800', color: '#f8fafc', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+                {brandInfo.name}
+              </span>
+              <span style={{ fontSize: '0.64rem', color: themeColor, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                3D Mekan Tasarımı
+              </span>
+            </div>
+          </div>
+
+          {/* Center: Room Scene Switcher */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '3px',
+            background: 'rgba(255, 255, 255, 0.05)',
+            padding: '3px',
+            borderRadius: '12px',
+            border: '1px solid rgba(255, 255, 255, 0.08)'
+          }}>
+            {[
+              { id: 'bathroom', label: 'Banyo', icon: '🛁' },
+              { id: 'kitchen', label: 'Mutfak', icon: '🍳' },
+              { id: 'livingroom', label: 'Salon', icon: '🛋️' },
+              { id: 'terrace', label: 'Teras', icon: '☀️' }
+            ].map(r => {
+              const isSelected = roomType === r.id;
+              return (
+                <button
+                  key={r.id}
+                  onClick={() => {
+                    setRoomType(r.id);
+                    if (r.id === 'kitchen') {
+                      setApplyWalls(false);
+                      setApplyStripeWall(true);
+                    } else if (r.id === 'livingroom' || r.id === 'terrace') {
+                      setApplyWalls(false);
+                      setApplyStripeWall(false);
+                    } else {
+                      setApplyWalls(true);
+                    }
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    fontSize: '0.76rem',
+                    fontWeight: isSelected ? '800' : '600',
+                    color: isSelected ? '#0b0f19' : '#94a3b8',
+                    background: isSelected ? themeColor : 'transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <span>{r.icon}</span>
+                  <span className="btn-label-desktop">{r.label}</span>
+                </button>
+              );
             })}
           </div>
+
+          {/* Right: Actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={handleDownloadSnapshot}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '7px 12px',
+                borderRadius: '9px',
+                background: 'rgba(255, 255, 255, 0.07)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                color: '#f8fafc',
+                fontSize: '0.76rem',
+                fontWeight: '700',
+                cursor: 'pointer'
+              }}
+              title="Tasarladığın mekanı yüksek çözünürlüklü fotoğraf olarak kaydet"
+            >
+              <Camera size={14} color={themeColor} />
+              <span className="btn-label-desktop">Fotoğrafı İndir</span>
+            </button>
+
+            <button
+              onClick={handleOpenDealersModal}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '7px 12px',
+                borderRadius: '9px',
+                background: 'rgba(255, 255, 255, 0.07)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                color: '#f8fafc',
+                fontSize: '0.76rem',
+                fontWeight: '700',
+                cursor: 'pointer'
+              }}
+              title="Bu seramikleri yerinde görmek için yetkili bayileri bulun"
+            >
+              <MapPin size={14} color="#38bdf8" />
+              <span className="btn-label-desktop">En Yakın Bayi</span>
+            </button>
+
+            <button
+              onClick={() => setShowSampleModal(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '7px 14px',
+                borderRadius: '9px',
+                background: `linear-gradient(135deg, ${themeColor} 0%, #b89628 100%)`,
+                border: 'none',
+                color: '#0b0f19',
+                fontSize: '0.76rem',
+                fontWeight: '800',
+                cursor: 'pointer',
+                boxShadow: `0 2px 10px ${themeColor}30`
+              }}
+              title="Seçtiğin seramik için ücretsiz numune veya fiyat teklifi iste"
+            >
+              <MessageCircle size={14} />
+              <span>Numune İste</span>
+            </button>
+
+            <button
+              onClick={toggleFullscreen}
+              style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: '9px',
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: '#94a3b8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+              title={isFullscreen ? 'Tam Ekrandan Çık' : 'Tam Ekran'}
+            >
+              {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+            </button>
+          </div>
+        </header>
+
+        {/* 3D Canvas Container */}
+        <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
+          {mounted && (
+            <StudioCanvas
+              activeProduct={selectedProduct}
+              floorProduct={floorProduct}
+              wallProduct={wallProduct}
+              stripeWallProduct={stripeWallProduct}
+              applyFloor={applyFloor}
+              applyWalls={applyWalls}
+              applyStripeWall={applyStripeWall}
+              roomType={roomType}
+              timeOfDay={timeOfDay}
+              layPattern={layPattern}
+              lightIntensity={1.05}
+            />
+          )}
         </div>
-      </div>
+
+        {/* Floating Quick Lighting & Pattern Pill (Top Right) */}
+        <div style={{
+          position: 'absolute',
+          top: '84px',
+          right: '16px',
+          zIndex: 40,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          {/* Day / Sunset / Night Lighting Controls */}
+          <div style={{
+            background: 'rgba(11, 15, 25, 0.85)',
+            backdropFilter: 'blur(16px)',
+            borderRadius: '12px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            padding: '3px',
+            display: 'flex',
+            gap: '3px'
+          }}>
+            {[
+              { id: 'day', label: 'Gündüz', icon: Sun },
+              { id: 'sunset', label: 'Gün Batımı', icon: Sunset },
+              { id: 'night', label: 'Gece', icon: Moon }
+            ].map(m => {
+              const Icon = m.icon;
+              const isSelected = timeOfDay === m.id;
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => setTimeOfDay(m.id)}
+                  style={{
+                    padding: '5px 8px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    fontSize: '0.7rem',
+                    fontWeight: isSelected ? '800' : '600',
+                    background: isSelected ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
+                    color: isSelected ? '#f8fafc' : '#94a3b8',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <Icon size={12} color={isSelected ? themeColor : '#94a3b8'} />
+                  <span>{m.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Lay Pattern Selector (Düz / Çapraz / Balıksırtı) */}
+          <div style={{
+            background: 'rgba(11, 15, 25, 0.85)',
+            backdropFilter: 'blur(16px)',
+            borderRadius: '12px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            padding: '3px',
+            display: 'flex',
+            gap: '3px'
+          }}>
+            {[
+              { id: 'flat', label: 'Düz' },
+              { id: 'diagonal', label: 'Çapraz' },
+              { id: 'herringbone', label: 'Balıksırtı' }
+            ].map(p => (
+              <button
+                key={p.id}
+                onClick={() => setLayPattern(p.id)}
+                style={{
+                  padding: '4px 8px',
+                  borderRadius: '7px',
+                  border: 'none',
+                  fontSize: '0.68rem',
+                  fontWeight: layPattern === p.id ? '800' : '600',
+                  background: layPattern === p.id ? themeColor : 'transparent',
+                  color: layPattern === p.id ? '#0b0f19' : '#94a3b8',
+                  cursor: 'pointer'
+                }}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Floating Applied Tile Status Badge (Bottom Right) */}
+        <div style={{
+          position: 'absolute',
+          bottom: '16px',
+          right: '16px',
+          zIndex: 40,
+          background: 'rgba(11, 15, 25, 0.88)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '12px',
+          padding: '8px 14px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: '0.62rem', color: '#94a3b8', fontWeight: '600' }}>Aktif Zemin Karosu</span>
+            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: '#f8fafc' }}>
+              {floorProduct?.name?.length > 22 ? floorProduct.name.slice(0, 22) + '...' : floorProduct?.name}
+            </span>
+          </div>
+
+          <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.1)' }} />
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: '0.62rem', color: '#94a3b8', fontWeight: '600' }}>Aktif Duvar Karosu</span>
+            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: themeColor }}>
+              {wallProduct?.name?.length > 22 ? wallProduct.name.slice(0, 22) + '...' : wallProduct?.name}
+            </span>
+          </div>
+        </div>
+      </main>
 
       {/* -------------------- TOAST FEEDBACK NOTIFICATION -------------------- */}
       {toastMessage && (
@@ -901,14 +1089,13 @@ export default function BrandConsumerStudioPage() {
           color: '#ffffff',
           fontSize: '0.82rem',
           fontWeight: '700',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
-          animation: 'sb-fade-in 0.2s ease'
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)'
         }}>
           {toastMessage}
         </div>
       )}
 
-      {/* -------------------- 5. DEALERS MODAL (EN YAKIN BAYİLER) -------------------- */}
+      {/* -------------------- 3. DEALERS MODAL (EN YAKIN BAYİLER) -------------------- */}
       {showDealersModal && (
         <div style={{
           position: 'fixed',
@@ -1050,7 +1237,7 @@ export default function BrandConsumerStudioPage() {
         </div>
       )}
 
-      {/* -------------------- 6. SAMPLE & INQUIRY MODAL (NUMUNE TALEBİ) -------------------- */}
+      {/* -------------------- 4. SAMPLE & INQUIRY MODAL (NUMUNE TALEBİ) -------------------- */}
       {showSampleModal && (
         <div style={{
           position: 'fixed',
@@ -1239,7 +1426,7 @@ export default function BrandConsumerStudioPage() {
         </div>
       )}
 
-      {/* Global CSS for Responsive Mobile View */}
+      {/* Global Responsive CSS */}
       <style>{`
         @media (max-width: 768px) {
           .btn-label-desktop {

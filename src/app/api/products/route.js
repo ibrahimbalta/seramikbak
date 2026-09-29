@@ -9,7 +9,7 @@ export async function GET(request) {
     const style = searchParams.get('style') || '';
     const finish = searchParams.get('finish') || '';
     const rawLimit = parseInt(searchParams.get('limit') || '24', 10);
-    const limit = Math.max(1, Math.min(isNaN(rawLimit) ? 24 : rawLimit, 150)); // Clamp between 1 and 150
+    const limit = Math.max(1, Math.min(isNaN(rawLimit) ? 24 : rawLimit, 500)); // Clamp between 1 and 500 for full brand showrooms
     const rawPage = parseInt(searchParams.get('page') || '1', 10);
     const page = Math.max(1, isNaN(rawPage) ? 1 : rawPage);
     const skip = (page - 1) * limit;
@@ -33,7 +33,8 @@ export async function GET(request) {
           { brand: { id: brandId } },
           { brand: { name: { equals: brandId, mode: 'insensitive' } } },
           { brand: { name: { contains: brandId, mode: 'insensitive' } } },
-          { brand: { slug: { equals: brandId, mode: 'insensitive' } } }
+          { brand: { slug: { equals: brandId, mode: 'insensitive' } } },
+          { brand: { slug: { startsWith: brandId, mode: 'insensitive' } } }
         ]
       });
     }
