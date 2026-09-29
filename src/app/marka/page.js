@@ -49,9 +49,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import EmbedStudioTab from '@/components/brand/EmbedStudioTab';
-import ExportRfqTab from '@/components/brand/ExportRfqTab';
 import BrandHealthTab from '@/components/brand/BrandHealthTab';
-import SpecInRadarTab from '@/components/brand/SpecInRadarTab';
 import MarketIntelligenceTab from '@/components/brand/MarketIntelligenceTab';
 
 const TURKEY_CITIES = [
@@ -109,14 +107,6 @@ export default function BrandPortalPage() {
   const [importResult, setImportResult] = useState(null);
   const [importParsedPreview, setImportParsedPreview] = useState([]);
 
-  // Spec-In Radar States
-  const [specInLeads, setSpecInLeads] = useState([]);
-  const [specInSummary, setSpecInSummary] = useState(null);
-  const [specInLoading, setSpecInLoading] = useState(false);
-  const [specInStatusFilter, setSpecInStatusFilter] = useState('ALL');
-  const [specInSearchQuery, setSpecInSearchQuery] = useState('');
-  const [updatingSpecLeadId, setUpdatingSpecLeadId] = useState(null);
-  const [specInSuccessMsg, setSpecInSuccessMsg] = useState('');
 
   useEffect(() => {
     const handleResize = () => {
@@ -381,7 +371,6 @@ export default function BrandPortalPage() {
       fetchCountryAnalytics(brandInfo.id, countryPeriod);
       fetchPodiumAuctionInfo(brandInfo.id);
       fetchBrandOutletListings(brandInfo.id);
-      fetchSpecInLeads(brandInfo.id);
     }
   }, [isLoggedIn, brandInfo]);
 
@@ -610,46 +599,6 @@ export default function BrandPortalPage() {
       console.error('Failed to fetch dealers:', err);
     } finally {
       setDealersLoading(false);
-    }
-  };
-
-  // Spec-In Leads & BIM Radar Handlers
-  const fetchSpecInLeads = async (bId, status = 'ALL') => {
-    const targetBrandId = bId || brandInfo?.id;
-    if (!targetBrandId) return;
-    setSpecInLoading(true);
-    try {
-      const url = `/api/bim/spec-in-lead?brandId=${targetBrandId}${status !== 'ALL' ? `&status=${status}` : ''}`;
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        setSpecInLeads(data.leads || []);
-        setSpecInSummary(data.summary || null);
-      }
-    } catch (err) {
-      console.error('Failed to fetch SpecIn leads:', err);
-    } finally {
-      setSpecInLoading(false);
-    }
-  };
-
-  const handleUpdateSpecInStatus = async (leadId, newStatus, newNotes) => {
-    setUpdatingSpecLeadId(leadId);
-    try {
-      const res = await fetch('/api/bim/spec-in-lead', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ leadId, status: newStatus, notes: newNotes })
-      });
-      if (res.ok) {
-        setSpecInSuccessMsg('Şartname durumu başarıyla güncellendi.');
-        setTimeout(() => setSpecInSuccessMsg(''), 3000);
-        fetchSpecInLeads(brandInfo.id, specInStatusFilter);
-      }
-    } catch (err) {
-      console.error('Failed to update SpecIn lead:', err);
-    } finally {
-      setUpdatingSpecLeadId(null);
     }
   };
 
@@ -1755,8 +1704,6 @@ export default function BrandPortalPage() {
               { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={17} /> },
               { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={17} /> },
               { id: 'embed-studio', label: '3D Kiosk & Embed SDK', icon: <Box size={17} /> },
-              { id: 'spec-in-radar', label: 'BIM Şartname Radarı', icon: <FileText size={17} /> },
-              { id: 'export-rfq', label: 'Global İhracat & RFQ', icon: <Send size={17} /> },
               { id: 'market-intel', label: 'Pazar Trend Radarı', icon: <BarChart3 size={17} /> },
               { id: 'brand-health', label: 'Marka Sağlığı & SEO', icon: <Award size={17} /> },
               { id: 'bulk-import', label: 'Toplu Ürün & ERP', icon: <UploadCloud size={17} /> },
@@ -1891,8 +1838,6 @@ export default function BrandPortalPage() {
                       {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
                       {activePortalTab === 'products' && 'Ürün Kataloğu'}
                       {activePortalTab === 'embed-studio' && '3D Kiosk & Embed SDK'}
-                      {activePortalTab === 'spec-in-radar' && 'BIM Şartname Radarı'}
-                      {activePortalTab === 'export-rfq' && 'Global İhracat & RFQ'}
                       {activePortalTab === 'market-intel' && 'Pazar Trend Radarı'}
                       {activePortalTab === 'brand-health' && 'Marka Sağlığı & SEO'}
                       {activePortalTab === 'bulk-import' && 'Toplu Ürün & ERP'}
@@ -1934,8 +1879,6 @@ export default function BrandPortalPage() {
                   { id: 'dashboard', label: 'Panel', icon: <Activity size={13} /> },
                   { id: 'products', label: 'Ürünler', icon: <Layers size={13} /> },
                   { id: 'embed-studio', label: '3D Kiosk & SDK', icon: <Box size={13} /> },
-                  { id: 'spec-in-radar', label: 'BIM Şartname', icon: <FileText size={13} /> },
-                  { id: 'export-rfq', label: 'Global RFQ', icon: <Send size={13} /> },
                   { id: 'market-intel', label: 'Pazar Trendi', icon: <BarChart3 size={13} /> },
                   { id: 'brand-health', label: 'SEO & İtibar', icon: <Award size={13} /> },
                   { id: 'outlet', label: 'Seri Sonu / Outlet', icon: <Tag size={13} /> },
@@ -1985,8 +1928,6 @@ export default function BrandPortalPage() {
                   {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
                   {activePortalTab === 'products' && 'Ürün Kataloğumuz'}
                   {activePortalTab === 'embed-studio' && '🎮 White-Label 3D Visualizer & Mağaza Kiosk SDK'}
-                  {activePortalTab === 'spec-in-radar' && '📐 Mimarlar İçin BIM & CAD Şartname Radarı (Spec-In)'}
-                  {activePortalTab === 'export-rfq' && '🌍 Global İhracat B2B Teklif & RFQ Masası'}
                   {activePortalTab === 'market-intel' && '📊 Canlı Pazar İstihbaratı & Trend Radarı'}
                   {activePortalTab === 'brand-health' && '🏆 Dijital Marka Sağlığı & Google SERP Görünürlüğü'}
                   {activePortalTab === 'bulk-import' && '⚡ Toplu Ürün & ERP Aktarım Sihirbazı'}
@@ -5783,19 +5724,9 @@ export default function BrandPortalPage() {
                 </div>
               )}
 
-              {/* -------------------- TAB: SPEC-IN & BIM RADAR -------------------- */}
-              {activePortalTab === 'spec-in-radar' && (
-                <SpecInRadarTab brandInfo={brandInfo} initialLeads={specInLeads} />
-              )}
-
               {/* -------------------- TAB: WHITE-LABEL 3D EMBED STUDIO & KIOSK SDK -------------------- */}
               {activePortalTab === 'embed-studio' && (
                 <EmbedStudioTab brandInfo={brandInfo} />
-              )}
-
-              {/* -------------------- TAB: GLOBAL EXPORT & RFQ HUB -------------------- */}
-              {activePortalTab === 'export-rfq' && (
-                <ExportRfqTab brandInfo={brandInfo} />
               )}
 
               {/* -------------------- TAB: LIVE MARKET INTELLIGENCE & TREND RADAR -------------------- */}
@@ -6783,8 +6714,6 @@ export default function BrandPortalPage() {
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
                 { id: 'products', label: 'Ürün Kataloğu', icon: <Layers size={18} /> },
                 { id: 'embed-studio', label: '3D Kiosk & Embed SDK', icon: <Box size={18} /> },
-                { id: 'spec-in-radar', label: 'BIM Şartname Radarı', icon: <FileText size={18} /> },
-                { id: 'export-rfq', label: 'Global İhracat & RFQ', icon: <Send size={18} /> },
                 { id: 'market-intel', label: 'Pazar Trend Radarı', icon: <BarChart3 size={18} /> },
                 { id: 'brand-health', label: 'Marka Sağlığı & SEO', icon: <Award size={18} /> },
                 { id: 'bulk-import', label: 'Toplu Ürün & ERP', icon: <UploadCloud size={18} /> },

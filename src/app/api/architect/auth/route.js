@@ -12,22 +12,22 @@ export async function POST(request) {
     // 1. DEMO ARCHITECT LOGIN (Quick Test)
     if (action === 'demo' || isDemo) {
       let demoArchitect = await prisma.architect.findFirst({
-        where: { email: 'demo.mimar@tabanlioglu.com' }
+        where: { email: 'demo.mimar@seramikbak.com' }
       });
 
       if (!demoArchitect) {
         demoArchitect = await prisma.architect.create({
           data: {
-            officeName: 'Tabanlıoğlu Mimarlık & Tasarım',
-            name: 'Murat Tabanlıoğlu',
-            title: 'Yüksek Mimar',
-            email: 'demo.mimar@tabanlioglu.com',
-            phone: '0212 251 34 50',
+            officeName: 'Örnek Mimarlık & Tasarım Ofisi',
+            name: 'Örnek Mimar',
+            title: 'Mimar / Tasarımcı',
+            email: 'demo.mimar@seramikbak.com',
+            phone: '0850 300 00 00',
             password: hashPassword('Demo1234!'),
             city: 'İstanbul',
-            address: 'Levent Mah. Cömert Sk. No:1 Beşiktaş / İstanbul',
-            chamberNo: 'TMMOB-34821',
-            website: 'https://tabanlioglu.com',
+            address: 'Merkez Mah. Tasarım Cad. No:1 İstanbul',
+            chamberNo: 'TMMOB-00000',
+            website: 'https://www.seramikbak.com',
             status: 'APPROVED'
           }
         });

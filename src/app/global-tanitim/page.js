@@ -707,7 +707,7 @@ export default function GlobalPromotionPage() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.86rem', color: '#334155', fontWeight: '700' }}>
                   <CheckCircle2 size={18} style={{ color: '#10b981', flexShrink: 0 }} />
-                  <span>Doğrulanmış B2B İhracat Proje Talepleri Paneli (`/marka`)</span>
+                  <span>Fabrikalara Özel 3D Tasarım Stüdyosu & White-Label SDK (`/marka`)</span>
                 </div>
               </div>
             </div>
