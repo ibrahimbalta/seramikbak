@@ -137,6 +137,8 @@ export default function BrandConsumerStudioPage() {
   const [visibleCount, setVisibleCount] = useState(16);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileTab, setMobileTab] = useState('split'); // 'split' | '3d' | 'catalog'
 
   // Modals & Feedback
   const [showDealersModal, setShowDealersModal] = useState(false);
@@ -156,6 +158,12 @@ export default function BrandConsumerStudioPage() {
   useEffect(() => {
     setMounted(true);
     if (typeof window === 'undefined') return;
+
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
 
     const urlParams = new URLSearchParams(window.location.search);
     const queryBrand = urlParams.get('brand') || urlParams.get('brandSlug') || urlParams.get('brandId');
@@ -300,6 +308,10 @@ export default function BrandConsumerStudioPage() {
     }
 
     initBrandData();
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
   // Fetch Dealers when modal opens
@@ -427,6 +439,7 @@ export default function BrandConsumerStudioPage() {
     <div style={{
       width: '100vw',
       height: '100vh',
+      maxHeight: '100dvh',
       overflow: 'hidden',
       position: 'relative',
       background: panelBg,
@@ -434,26 +447,29 @@ export default function BrandConsumerStudioPage() {
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       userSelect: 'none',
       display: 'flex',
-      flexDirection: 'row',
+      flexDirection: isMobile ? 'column' : 'row',
       transition: 'background 0.3s ease, color 0.2s ease'
     }}>
 
       {/* -------------------- 1. LEFT SIDEBAR: ALL BRAND CERAMIC PRODUCTS -------------------- */}
       <aside style={{
-        width: isSidebarOpen ? '420px' : '0px',
-        minWidth: isSidebarOpen ? '390px' : '0px',
-        maxWidth: '440px',
-        height: '100%',
+        width: isMobile ? '100%' : (isSidebarOpen ? '420px' : '0px'),
+        minWidth: isMobile ? '100%' : (isSidebarOpen ? '390px' : '0px'),
+        maxWidth: isMobile ? '100%' : '440px',
+        height: isMobile ? (mobileTab === '3d' ? '0px' : (mobileTab === 'catalog' ? '100%' : '58vh')) : '100%',
         background: panelBg,
-        borderRight: isSidebarOpen ? `1px solid ${panelBorder}` : 'none',
-        display: 'flex',
+        borderRight: !isMobile && isSidebarOpen ? `1px solid ${panelBorder}` : 'none',
+        borderTop: isMobile && mobileTab === 'split' ? `1px solid ${panelBorder}` : 'none',
+        display: isMobile && mobileTab === '3d' ? 'none' : 'flex',
         flexDirection: 'column',
-        zIndex: 60,
+        zIndex: isMobile ? 30 : 60,
         position: 'relative',
-        transition: 'width 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease',
+        transition: isMobile ? 'none' : 'width 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease',
         overflow: 'hidden',
-        boxShadow: isSidebarOpen ? (isLight ? '10px 0 35px rgba(0, 0, 0, 0.08)' : '10px 0 35px rgba(0, 0, 0, 0.45)') : 'none',
-        flexShrink: 0
+        boxShadow: !isMobile && isSidebarOpen ? (isLight ? '10px 0 35px rgba(0, 0, 0, 0.08)' : '10px 0 35px rgba(0, 0, 0, 0.45)') : 'none',
+        flexShrink: isMobile ? 1 : 0,
+        flex: isMobile && mobileTab !== '3d' ? '1 1 0%' : 'none',
+        order: isMobile ? 2 : 1
       }}>
         {/* Sidebar Header */}
         <div style={{
@@ -504,24 +520,48 @@ export default function BrandConsumerStudioPage() {
               <span>Tema</span>
             </button>
 
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              style={{
-                background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.06)',
-                border: `1px solid ${panelBorder}`,
-                borderRadius: '8px',
-                color: textMuted,
-                width: '28px',
-                height: '28px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer'
-              }}
-              title="Koleksiyon Panelini Gizle"
-            >
-              <ChevronLeft size={16} />
-            </button>
+            {isMobile ? (
+              <button
+                onClick={() => setMobileTab('3d')}
+                style={{
+                  background: `${themeColor}20`,
+                  border: `1px solid ${themeColor}40`,
+                  borderRadius: '8px',
+                  color: themeColor,
+                  height: '28px',
+                  padding: '0 8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.68rem',
+                  fontWeight: '800'
+                }}
+                title="3D Mekanı Büyüt"
+              >
+                <Maximize2 size={12} />
+                <span>3D Büyüt</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsSidebarOpen(false)}
+                style={{
+                  background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.06)',
+                  border: `1px solid ${panelBorder}`,
+                  borderRadius: '8px',
+                  color: textMuted,
+                  width: '28px',
+                  height: '28px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}
+                title="Koleksiyon Panelini Gizle"
+              >
+                <ChevronLeft size={16} />
+              </button>
+            )}
           </div>
         </div>
 
@@ -956,35 +996,41 @@ export default function BrandConsumerStudioPage() {
 
       {/* -------------------- 2. MAIN 3D VIEWPORT (HUGE UNBLOCKED CANVAS) -------------------- */}
       <main style={{
-        flex: 1,
-        height: '100%',
+        flex: isMobile ? (mobileTab === '3d' ? 1 : 'none') : 1,
+        width: isMobile ? '100%' : 'auto',
+        height: isMobile ? (mobileTab === 'catalog' ? '0px' : (mobileTab === '3d' ? '100%' : '42vh')) : '100%',
+        minHeight: isMobile ? (mobileTab === 'catalog' ? '0px' : (mobileTab === '3d' ? '100%' : '42vh')) : 'auto',
+        maxHeight: isMobile ? (mobileTab === 'split' ? '42vh' : 'none') : 'none',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        display: isMobile && mobileTab === 'catalog' ? 'none' : 'block',
+        order: isMobile ? 1 : 2,
+        flexShrink: 0
       }}>
         {/* Floating Top Brand Header */}
         <header style={{
           position: 'absolute',
-          top: '16px',
-          left: '16px',
-          right: '16px',
+          top: isMobile ? '8px' : '16px',
+          left: isMobile ? '8px' : '16px',
+          right: isMobile ? '8px' : '16px',
           zIndex: 50,
-          height: '56px',
+          height: isMobile ? '44px' : '56px',
           background: isLight ? 'rgba(255, 255, 255, 0.94)' : 'rgba(11, 15, 25, 0.88)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderRadius: '16px',
+          borderRadius: isMobile ? '12px' : '16px',
           border: `1px solid ${panelBorder}`,
           boxShadow: isLight ? '0 10px 30px rgba(0, 0, 0, 0.08)' : '0 10px 30px rgba(0, 0, 0, 0.4)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 16px',
+          padding: isMobile ? '0 8px' : '0 16px',
           boxSizing: 'border-box',
           transition: 'all 0.3s ease'
         }}>
-          {/* Left: Re-open Sidebar Button + Brand Identity */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {!isSidebarOpen && (
+          {/* Left: Re-open Sidebar Button / Mobile View Switcher + Brand Identity */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '10px' }}>
+            {!isMobile && !isSidebarOpen && (
               <button
                 onClick={() => setIsSidebarOpen(true)}
                 style={{
@@ -1006,10 +1052,33 @@ export default function BrandConsumerStudioPage() {
               </button>
             )}
 
+            {isMobile && mobileTab === '3d' && (
+              <button
+                onClick={() => setMobileTab('split')}
+                style={{
+                  background: `${themeColor}22`,
+                  border: `1px solid ${themeColor}40`,
+                  borderRadius: '8px',
+                  color: themeColor,
+                  padding: '5px 8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '0.68rem',
+                  fontWeight: '800',
+                  cursor: 'pointer'
+                }}
+                title="Seramik Kataloğunu Aç"
+              >
+                <Grid size={12} />
+                <span>Katalog</span>
+              </button>
+            )}
+
             <div style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '9px',
+              width: isMobile ? '28px' : '34px',
+              height: isMobile ? '28px' : '34px',
+              borderRadius: isMobile ? '7px' : '9px',
               background: `linear-gradient(135deg, ${themeColor} 0%, #111827 100%)`,
               display: 'flex',
               alignItems: 'center',
@@ -1021,15 +1090,15 @@ export default function BrandConsumerStudioPage() {
               {brandInfo.logoUrl ? (
                 <img src={brandInfo.logoUrl} alt={brandInfo.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               ) : (
-                <Sparkles size={16} color="#ffffff" />
+                <Sparkles size={isMobile ? 14 : 16} color="#ffffff" />
               )}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '0.88rem', fontWeight: '800', color: textColor, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+              <span style={{ fontSize: isMobile ? '0.78rem' : '0.88rem', fontWeight: '800', color: textColor, letterSpacing: '-0.01em', lineHeight: 1.2 }}>
                 {brandInfo.name}
               </span>
-              <span style={{ fontSize: '0.64rem', color: themeColor, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <span style={{ fontSize: isMobile ? '0.56rem' : '0.64rem', color: themeColor, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 3D Mekan Tasarımı
               </span>
             </div>
@@ -1039,10 +1108,10 @@ export default function BrandConsumerStudioPage() {
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '3px',
+            gap: isMobile ? '2px' : '3px',
             background: isLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.05)',
             padding: '3px',
-            borderRadius: '12px',
+            borderRadius: isMobile ? '10px' : '12px',
             border: `1px solid ${panelBorder}`
           }}>
             {[
@@ -1070,11 +1139,11 @@ export default function BrandConsumerStudioPage() {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '5px',
-                    padding: '6px 12px',
+                    gap: '4px',
+                    padding: isMobile ? '5px 7px' : '6px 12px',
                     borderRadius: '8px',
                     border: 'none',
-                    fontSize: '0.76rem',
+                    fontSize: '0.74rem',
                     fontWeight: isSelected ? '800' : '600',
                     color: isSelected ? '#0b0f19' : textMuted,
                     background: isSelected ? themeColor : 'transparent',
@@ -1090,10 +1159,13 @@ export default function BrandConsumerStudioPage() {
           </div>
 
           {/* Right: Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '8px' }}>
             {/* Quick General Theme Switcher Button */}
             <button
               onClick={() => {
+                if (isMobile && mobileTab === '3d') {
+                  setMobileTab('split');
+                }
                 if (!isSidebarOpen) setIsSidebarOpen(true);
                 setShowBgPicker(prev => !prev);
               }}
@@ -1101,7 +1173,7 @@ export default function BrandConsumerStudioPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
-                padding: '7px 12px',
+                padding: isMobile ? '6px 8px' : '7px 12px',
                 borderRadius: '9px',
                 background: showBgPicker ? `${themeColor}25` : (isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.07)'),
                 border: `1px solid ${showBgPicker ? themeColor : panelBorder}`,
@@ -1123,7 +1195,7 @@ export default function BrandConsumerStudioPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
-                padding: '7px 12px',
+                padding: isMobile ? '6px 8px' : '7px 12px',
                 borderRadius: '9px',
                 background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.07)',
                 border: `1px solid ${panelBorder}`,
@@ -1138,67 +1210,93 @@ export default function BrandConsumerStudioPage() {
               <span className="btn-label-desktop">Fotoğrafı İndir</span>
             </button>
 
-            <button
-              onClick={handleOpenDealersModal}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                padding: '7px 12px',
-                borderRadius: '9px',
-                background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.07)',
-                border: `1px solid ${panelBorder}`,
-                color: textColor,
-                fontSize: '0.76rem',
-                fontWeight: '700',
-                cursor: 'pointer'
-              }}
-              title="Bu seramikleri yerinde görmek için yetkili bayileri bulun"
-            >
-              <MapPin size={14} color="#38bdf8" />
-              <span className="btn-label-desktop">En Yakın Bayi</span>
-            </button>
+            {/* Mobile View Toggle Button (3D Full vs Split) */}
+            {isMobile ? (
+              <button
+                onClick={() => setMobileTab(mobileTab === '3d' ? 'split' : '3d')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '6px 9px',
+                  borderRadius: '8px',
+                  background: mobileTab === '3d' ? themeColor : (isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.08)'),
+                  border: `1px solid ${panelBorder}`,
+                  color: mobileTab === '3d' ? '#0b0f19' : textColor,
+                  fontSize: '0.68rem',
+                  fontWeight: '800',
+                  cursor: 'pointer'
+                }}
+                title={mobileTab === '3d' ? 'Bölünmüş Görünüme Dön' : '3D Tam Ekran'}
+              >
+                {mobileTab === '3d' ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+                <span>{mobileTab === '3d' ? 'Böl' : '3D'}</span>
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={handleOpenDealersModal}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '7px 12px',
+                    borderRadius: '9px',
+                    background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.07)',
+                    border: `1px solid ${panelBorder}`,
+                    color: textColor,
+                    fontSize: '0.76rem',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                  title="Bu seramikleri yerinde görmek için yetkili bayileri bulun"
+                >
+                  <MapPin size={14} color="#38bdf8" />
+                  <span className="btn-label-desktop">En Yakın Bayi</span>
+                </button>
 
-            <button
-              onClick={() => setShowSampleModal(true)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                padding: '7px 14px',
-                borderRadius: '9px',
-                background: `linear-gradient(135deg, ${themeColor} 0%, #b89628 100%)`,
-                border: 'none',
-                color: '#0b0f19',
-                fontSize: '0.76rem',
-                fontWeight: '800',
-                cursor: 'pointer',
-                boxShadow: `0 2px 10px ${themeColor}30`
-              }}
-              title="Seçtiğin seramik için ücretsiz numune veya fiyat teklifi iste"
-            >
-              <MessageCircle size={14} />
-              <span>Numune İste</span>
-            </button>
+                <button
+                  onClick={() => setShowSampleModal(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '7px 14px',
+                    borderRadius: '9px',
+                    background: `linear-gradient(135deg, ${themeColor} 0%, #b89628 100%)`,
+                    border: 'none',
+                    color: '#0b0f19',
+                    fontSize: '0.76rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    boxShadow: `0 2px 10px ${themeColor}30`
+                  }}
+                  title="Seçtiğin seramik için ücretsiz numune veya fiyat teklifi iste"
+                >
+                  <MessageCircle size={14} />
+                  <span>Numune İste</span>
+                </button>
 
-            <button
-              onClick={toggleFullscreen}
-              style={{
-                width: '34px',
-                height: '34px',
-                borderRadius: '9px',
-                background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.06)',
-                border: `1px solid ${panelBorder}`,
-                color: textMuted,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer'
-              }}
-              title={isFullscreen ? 'Tam Ekrandan Çık' : 'Tam Ekran'}
-            >
-              {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-            </button>
+                <button
+                  onClick={toggleFullscreen}
+                  style={{
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '9px',
+                    background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.06)',
+                    border: `1px solid ${panelBorder}`,
+                    color: textMuted,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer'
+                  }}
+                  title={isFullscreen ? 'Tam Ekrandan Çık' : 'Tam Ekran'}
+                >
+                  {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                </button>
+              </>
+            )}
           </div>
         </header>
 
@@ -1225,23 +1323,24 @@ export default function BrandConsumerStudioPage() {
         {/* Floating Quick Lighting & Pattern Pill (Top Right) */}
         <div style={{
           position: 'absolute',
-          top: '84px',
-          right: '16px',
+          top: isMobile ? '56px' : '84px',
+          right: isMobile ? '8px' : '16px',
           zIndex: 40,
           display: 'flex',
-          flexDirection: 'column',
-          gap: '8px'
+          flexDirection: isMobile ? 'row' : 'column',
+          alignItems: 'flex-end',
+          gap: isMobile ? '4px' : '8px'
         }}>
           {/* Day / Sunset / Night Lighting Controls */}
           <div style={{
             background: isLight ? 'rgba(255, 255, 255, 0.94)' : 'rgba(11, 15, 25, 0.85)',
             backdropFilter: 'blur(16px)',
-            borderRadius: '12px',
+            borderRadius: isMobile ? '8px' : '12px',
             border: `1px solid ${panelBorder}`,
             boxShadow: isLight ? '0 4px 15px rgba(0, 0, 0, 0.06)' : '0 4px 15px rgba(0, 0, 0, 0.3)',
-            padding: '3px',
+            padding: '2px',
             display: 'flex',
-            gap: '3px'
+            gap: '2px'
           }}>
             {[
               { id: 'day', label: 'Gündüz', icon: Sun },
@@ -1255,21 +1354,22 @@ export default function BrandConsumerStudioPage() {
                   key={m.id}
                   onClick={() => setTimeOfDay(m.id)}
                   style={{
-                    padding: '5px 8px',
-                    borderRadius: '8px',
+                    padding: isMobile ? '4px 6px' : '5px 8px',
+                    borderRadius: '6px',
                     border: 'none',
-                    fontSize: '0.7rem',
+                    fontSize: isMobile ? '0.64rem' : '0.7rem',
                     fontWeight: isSelected ? '800' : '600',
                     background: isSelected ? (isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.15)') : 'transparent',
                     color: isSelected ? textColor : textMuted,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '4px'
+                    gap: '3px'
                   }}
+                  title={m.label}
                 >
-                  <Icon size={12} color={isSelected ? themeColor : textMuted} />
-                  <span>{m.label}</span>
+                  <Icon size={isMobile ? 11 : 12} color={isSelected ? themeColor : textMuted} />
+                  <span className="btn-label-desktop">{m.label}</span>
                 </button>
               );
             })}
@@ -1279,12 +1379,12 @@ export default function BrandConsumerStudioPage() {
           <div style={{
             background: isLight ? 'rgba(255, 255, 255, 0.94)' : 'rgba(11, 15, 25, 0.85)',
             backdropFilter: 'blur(16px)',
-            borderRadius: '12px',
+            borderRadius: isMobile ? '8px' : '12px',
             border: `1px solid ${panelBorder}`,
             boxShadow: isLight ? '0 4px 15px rgba(0, 0, 0, 0.06)' : '0 4px 15px rgba(0, 0, 0, 0.3)',
-            padding: '3px',
+            padding: '2px',
             display: 'flex',
-            gap: '3px'
+            gap: '2px'
           }}>
             {[
               { id: 'flat', label: 'Düz' },
@@ -1295,10 +1395,10 @@ export default function BrandConsumerStudioPage() {
                 key={p.id}
                 onClick={() => setLayPattern(p.id)}
                 style={{
-                  padding: '4px 8px',
-                  borderRadius: '7px',
+                  padding: isMobile ? '4px 6px' : '4px 8px',
+                  borderRadius: '6px',
                   border: 'none',
-                  fontSize: '0.68rem',
+                  fontSize: isMobile ? '0.62rem' : '0.68rem',
                   fontWeight: layPattern === p.id ? '800' : '600',
                   background: layPattern === p.id ? themeColor : 'transparent',
                   color: layPattern === p.id ? '#0b0f19' : textMuted,
@@ -1311,20 +1411,50 @@ export default function BrandConsumerStudioPage() {
           </div>
         </div>
 
+        {/* Floating Bottom Catalog Opener on Mobile Full 3D Mode */}
+        {isMobile && mobileTab === '3d' && (
+          <button
+            onClick={() => setMobileTab('split')}
+            style={{
+              position: 'absolute',
+              bottom: '22px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 60,
+              background: `linear-gradient(135deg, ${themeColor} 0%, #aa8c2c 100%)`,
+              color: '#0b0f19',
+              border: 'none',
+              borderRadius: '30px',
+              padding: '11px 24px',
+              fontWeight: '800',
+              fontSize: '0.82rem',
+              boxShadow: `0 8px 25px ${themeColor}60`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <Grid size={16} />
+            <span>Koleksiyonu Aç ({filteredProducts.length} Model)</span>
+          </button>
+        )}
+
         {/* Floating Applied Tile Status Badge (Bottom Right) */}
         <div style={{
           position: 'absolute',
-          bottom: '16px',
-          right: '16px',
+          bottom: isMobile ? '8px' : '16px',
+          right: isMobile ? '8px' : '16px',
           zIndex: 40,
           background: isLight ? 'rgba(255, 255, 255, 0.94)' : 'rgba(11, 15, 25, 0.88)',
           backdropFilter: 'blur(16px)',
           border: `1px solid ${panelBorder}`,
-          borderRadius: '12px',
-          padding: '8px 14px',
-          display: 'flex',
+          borderRadius: isMobile ? '8px' : '12px',
+          padding: isMobile ? '4px 8px' : '8px 14px',
+          display: isMobile && mobileTab === 'split' ? 'none' : 'flex',
           alignItems: 'center',
-          gap: '12px',
+          gap: isMobile ? '6px' : '12px',
           boxShadow: isLight ? '0 8px 24px rgba(0, 0, 0, 0.08)' : '0 8px 24px rgba(0, 0, 0, 0.4)'
         }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
