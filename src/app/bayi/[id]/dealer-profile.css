@@ -2152,6 +2152,810 @@
 }
 
 /* --------------------------------------------------------------------------
+   SECTION: SAYFA BAŞI LUXURY BANNER ALANI (Flagship Header Hero Banner)
+   -------------------------------------------------------------------------- */
+.showroom-top-banner-hero {
+  position: relative;
+  width: 100%;
+  min-height: 380px;
+  background: #0b1120;
+  color: #ffffff;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.top-banner-bg-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.top-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: brightness(0.62) saturate(1.1);
+}
+
+.top-banner-overlay-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.78) 55%, rgba(107, 29, 47, 0.65) 100%);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.top-banner-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 44px 24px;
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 36px;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.top-banner-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.top-banner-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.top-banner-logo-badge {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.top-banner-logo-img {
+  max-width: 85%;
+  max-height: 85%;
+  object-fit: contain;
+}
+
+.monogram-badge {
+  background: linear-gradient(135deg, var(--sr-burgundy) 0%, #3e0c18 100%);
+  color: var(--sr-gold);
+}
+
+.monogram-icon {
+  color: var(--sr-gold);
+}
+
+.top-banner-partner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(8px);
+}
+
+.badge-shield-gold {
+  color: var(--sr-gold);
+}
+
+.top-banner-main-title {
+  font-size: 2.35rem;
+  font-weight: 900;
+  line-height: 1.15;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.top-banner-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.banner-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.banner-meta-pill.open-badge {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #6ee7b7;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.top-banner-concepts-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.concepts-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--sr-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.concept-chip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 2px 9px;
+  border-radius: 6px;
+}
+
+.top-banner-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.banner-stat-box {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(6px);
+}
+
+.banner-stat-box .stat-num {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.banner-stat-box .stat-lbl {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* Banner Right Quick Action Card */
+.top-banner-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.top-banner-cta-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--sr-text-dark);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cta-card-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--sr-burgundy);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.cta-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--sr-text-dark);
+  margin: 0;
+}
+
+.cta-card-desc {
+  font-size: 0.8rem;
+  color: var(--sr-text-sub);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.banner-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.banner-btn-wa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  background: #10b981;
+  color: #ffffff;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.banner-btn-wa:hover {
+  background: #059669;
+}
+
+.banner-btn-map {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  background: #f1f5f9;
+  color: var(--sr-text-dark);
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.banner-btn-map:hover {
+  background: #e2e8f0;
+}
+
+.banner-btn-pdf {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  background: var(--sr-burgundy-light);
+  color: var(--sr-burgundy);
+  border: 1px dashed var(--sr-burgundy);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.banner-btn-pdf:hover {
+  background: #ebd2d7;
+}
+
+.banner-btn-tour {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #ffffff;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.banner-socials-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 10px;
+  margin-top: 2px;
+}
+
+.socials-hint {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--sr-text-muted);
+}
+
+.social-pill {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--sr-text-sub);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.social-pill:hover {
+  background: var(--sr-burgundy);
+  color: #ffffff;
+  border-color: var(--sr-burgundy);
+}
+
+/* --------------------------------------------------------------------------
+   SECTION: SHOWROOM ÖNE ÇIKANLAR (SADECE BAYİ SEÇİMİ)
+   -------------------------------------------------------------------------- */
+.showroom-featured-showcase-section {
+  max-width: 1320px;
+  margin: 0 auto 48px auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.featured-showcase-header {
+  margin-bottom: 20px;
+}
+
+.featured-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--sr-burgundy-light);
+  border: 1px solid rgba(107, 29, 47, 0.2);
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--sr-burgundy);
+  letter-spacing: 0.4px;
+  margin-bottom: 8px;
+}
+
+.featured-section-title {
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: var(--sr-text-dark);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.featured-section-subtitle {
+  font-size: 0.88rem;
+  color: var(--sr-text-muted);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   SECTION: ŞUBE HİZMETLERİ & MÜŞTERİ AYRICALIKLARI
+   -------------------------------------------------------------------------- */
+.showroom-services-section {
+  max-width: 1320px;
+  margin: 0 auto 56px auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.section-header-centered {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 32px auto;
+}
+
+.section-badge-gold {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--sr-gold);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.section-title-bold {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: var(--sr-text-dark);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.3px;
+}
+
+.section-desc-muted {
+  font-size: 0.88rem;
+  color: var(--sr-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.services-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.service-feature-card {
+  background: #ffffff;
+  border: 1px solid var(--sr-border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.service-feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.service-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--sr-burgundy-light);
+  color: var(--sr-burgundy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--sr-text-dark);
+  margin: 0;
+}
+
+.service-desc {
+  font-size: 0.8rem;
+  color: var(--sr-text-sub);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   SECTION: SHOWROOM GÖRSELLERİ GALERİSİ
+   -------------------------------------------------------------------------- */
+.showroom-gallery-section {
+  max-width: 1320px;
+  margin: 0 auto 56px auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.showroom-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.showroom-gallery-item {
+  position: relative;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--sr-border);
+  background: #f8fafc;
+}
+
+.gallery-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.showroom-gallery-item:hover .gallery-img {
+  transform: scale(1.04);
+}
+
+/* --------------------------------------------------------------------------
+   SECTION: 360 SANAL TUR & HAKKIMIZDA & REFERANSLAR & FAQ
+   -------------------------------------------------------------------------- */
+.showroom-virtual-tour-section {
+  max-width: 1320px;
+  margin: 0 auto 56px auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.virtual-tour-card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 36px 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.2);
+}
+
+.virtual-tour-info {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tour-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--sr-gold);
+  letter-spacing: 0.8px;
+}
+
+.tour-title {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.tour-desc {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+  margin: 0 0 8px 0;
+}
+
+.tour-action-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--sr-burgundy);
+  color: #ffffff;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.tour-action-btn:hover {
+  background: var(--sr-burgundy-hover);
+}
+
+.showroom-about-section {
+  max-width: 1320px;
+  margin: 0 auto 56px auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.about-card-container {
+  background: #ffffff;
+  border: 1px solid var(--sr-border);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+}
+
+.about-header-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.about-icon {
+  color: var(--sr-burgundy);
+}
+
+.about-sub {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--sr-gold);
+  letter-spacing: 0.6px;
+  display: block;
+}
+
+.about-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--sr-text-dark);
+  margin: 2px 0 0 0;
+}
+
+.about-text-content {
+  font-size: 0.9rem;
+  color: var(--sr-text-sub);
+  line-height: 1.7;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.showroom-projects-section {
+  max-width: 1320px;
+  margin: 0 auto 56px auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.projects-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.project-portfolio-card {
+  background: #ffffff;
+  border: 1px solid var(--sr-border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-img-box {
+  width: 100%;
+  height: 200px;
+  background: #f1f5f9;
+}
+
+.project-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.project-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.project-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--sr-text-dark);
+  margin: 0;
+}
+
+.project-desc {
+  font-size: 0.8rem;
+  color: var(--sr-text-sub);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.showroom-faq-section {
+  max-width: 1320px;
+  margin: 0 auto 56px auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+}
+
+.faq-accordion-list {
+  max-width: 840px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.faq-accordion-item {
+  background: #ffffff;
+  border: 1px solid var(--sr-border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.faq-question-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--sr-text-dark);
+  cursor: pointer;
+  text-align: left;
+  gap: 12px;
+}
+
+.faq-chevron {
+  color: var(--sr-text-muted);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.faq-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+.faq-answer-box {
+  padding: 0 20px 16px 20px;
+  font-size: 0.85rem;
+  color: var(--sr-text-sub);
+  line-height: 1.55;
+}
+
+.faq-answer-box p {
+  margin: 0;
+}
+
+.sidebar-pdf-card {
+  margin-top: 16px;
+  background: #fdf2f4;
+  border: 1px dashed rgba(107, 29, 47, 0.4);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.sidebar-pdf-card .pdf-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--sr-burgundy);
+  margin-bottom: 4px;
+}
+
+.sidebar-pdf-card .pdf-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--sr-text-dark);
+  margin: 0 0 6px 0;
+}
+
+.sidebar-pdf-card .pdf-download-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: var(--sr-burgundy);
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
    RESPONSIVE DESIGN: TABLET & MOBILE APP LOOK (Ergonomic & Symmetrical)
    -------------------------------------------------------------------------- */
 @media (max-width: 1200px) {
@@ -2676,6 +3480,145 @@
 
   .location-visual-col {
     min-height: 220px;
+  }
+
+  /* Top Hero Banner on Mobile (Strict Zero Overflow) */
+  .showroom-top-banner-hero {
+    min-height: auto;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .top-banner-container {
+    grid-template-columns: 1fr;
+    padding: 24px 14px;
+    gap: 20px;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .top-banner-main-title {
+    font-size: 1.65rem;
+    line-height: 1.2;
+  }
+
+  .top-banner-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .banner-stat-box {
+    padding: 8px 6px;
+    text-align: center;
+  }
+
+  .banner-stat-box .stat-num {
+    font-size: 0.95rem;
+  }
+
+  .banner-stat-box .stat-lbl {
+    font-size: 0.62rem;
+  }
+
+  .top-banner-cta-card {
+    padding: 18px 14px;
+    border-radius: 12px;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .banner-actions-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .banner-btn-wa,
+  .banner-btn-map,
+  .banner-btn-pdf,
+  .banner-btn-tour {
+    height: 38px;
+    font-size: 0.76rem;
+  }
+
+  /* Featured Showcase on Mobile */
+  .showroom-featured-showcase-section {
+    padding: 0 10px;
+    margin-bottom: 32px;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .featured-section-title {
+    font-size: 1.3rem;
+  }
+
+  .featured-products-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Services on Mobile */
+  .showroom-services-section {
+    padding: 0 14px;
+    margin-bottom: 36px;
+  }
+
+  .services-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Gallery on Mobile */
+  .showroom-gallery-section {
+    padding: 0 14px;
+    margin-bottom: 36px;
+  }
+
+  .showroom-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .showroom-gallery-item {
+    height: 135px;
+  }
+
+  /* Virtual Tour & About & Projects & FAQ on Mobile */
+  .showroom-virtual-tour-section,
+  .showroom-about-section,
+  .showroom-projects-section,
+  .showroom-faq-section {
+    padding: 0 14px;
+    margin-bottom: 36px;
+  }
+
+  .virtual-tour-card {
+    padding: 22px 18px;
+    border-radius: 12px;
+  }
+
+  .tour-title {
+    font-size: 1.35rem;
+  }
+
+  .tour-action-btn {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .about-card-container {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .projects-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   /* Bottom App Action Bar on Mobile */

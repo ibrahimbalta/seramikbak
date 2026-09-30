@@ -32,8 +32,17 @@ import {
   FileText,
   Navigation,
   ExternalLink,
-  ChevronDown,
-  Filter
+  Filter,
+  Download,
+  Globe,
+  Truck,
+  CreditCard,
+  Wrench,
+  HelpCircle,
+  Briefcase,
+  Award,
+  Camera,
+  Store
 } from 'lucide-react';
 import './dealer-profile.css';
 
@@ -138,20 +147,79 @@ export default function DealerProfileClient({ dealer, products }) {
   const whatsappGreeting = sc.whatsappGreeting || (`Merhaba, ${dealer?.name || 'Showroom'} sayfanızdan ulaşıyorum. Ürünler ve fiyatlar hakkında bilgi alabilir miyim?`);
   const customMapsUrl = sc.customMapsUrl || (dealer?.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((dealer.name || '') + ' ' + dealer.address)}` : '');
 
-  // Featured product IDs configured by dealer in portal
-  const rawFeatured = safeParseJSON(dealer?.featuredProducts, []);
-  const featuredIdsNormalized = Array.isArray(rawFeatured)
-    ? rawFeatured.map(item => (typeof item === 'object' && item !== null ? item.id : item))
-    : [];
+  // 7. Branch Settings & Features from Dealer Profile
+  const dealerSpecialConcepts = useMemo(() => {
+    return (dealer?.specialConcepts || '').split(',').map(s => s.trim()).filter(Boolean);
+  }, [dealer?.specialConcepts]);
 
-  // Master catalog products: merge base products + dealer inventories with NO arbitrary 4-item cap
+  const dealerLogisticsList = useMemo(() => {
+    const raw = dealer?.logisticsServices || 'shipping,showroom_stock,credit_card,install_support';
+    return raw.split(',').map(s => s.trim()).filter(Boolean);
+  }, [dealer?.logisticsServices]);
+
+  const dealerShowroomImages = useMemo(() => {
+    return (dealer?.showroomImages || '').split(',').map(s => s.trim()).filter(Boolean);
+  }, [dealer?.showroomImages]);
+
+  const dealerRefProjects = useMemo(() => {
+    return safeParseJSON(dealer?.referenceProjects, []);
+  }, [dealer?.referenceProjects]);
+
+  const dealerFaqsList = useMemo(() => {
+    return safeParseJSON(dealer?.dealerFaqs, []);
+  }, [dealer?.dealerFaqs]);
+
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
+
+  const serviceDescriptions = {
+    shipping: {
+      title: 'Hızlı & Sigortalı Sevkiyat',
+      desc: 'Anlaşmalı lojistik filomuz ile şantiye ve adresinize güvenli, hasarsız teslimat sağlıyoruz.',
+      icon: <Truck size={22} />
+    },
+    showroom_stock: {
+      title: 'Zengin Showroom & Stok',
+      desc: 'Yüzlerce güncel karo serisini ve özel dokuları showroomumuzda canlı deneyimleyin.',
+      icon: <Store size={22} />
+    },
+    credit_card: {
+      title: 'Avantajlı Ödeme & Taksit',
+      desc: 'Tüm kurumsal ve bireysel kredi kartlarına vade farksız taksit ve proje bazlı esnek ödeme.',
+      icon: <CreditCard size={22} />
+    },
+    install_support: {
+      title: 'Uygulama & Usta Desteği',
+      desc: 'Sertifikalı seramik uygulama ekipleri ve şantiye teknik danışmanlığı sunuyoruz.',
+      icon: <Wrench size={22} />
+    },
+    architect_service: {
+      title: 'Mimari Danışmanlık & 3D',
+      desc: 'Mekanınıza özel planlama, metraj hesaplama ve 3 boyutlu banyo yerleşim çizimleri.',
+      icon: <Sparkles size={22} />
+    },
+    custom_cut: {
+      title: 'Hassas Kesim & Pah Hizmeti',
+      desc: 'Süpürgelik, basamak ve gönyeli köşe birleşimleri için profesyonel ebatlama servisi.',
+      icon: <Award size={22} />
+    }
+  };
+
+  // Featured product IDs configured strictly by dealer in portal
+  const rawFeatured = safeParseJSON(dealer?.featuredProducts, []);
+  const featuredIdsNormalized = useMemo(() => {
+    if (!Array.isArray(rawFeatured)) return [];
+    return rawFeatured.map(item => (typeof item === 'object' && item !== null ? item.id : item)).filter(Boolean);
+  }, [rawFeatured]);
+
+  // Master catalog products: ONLY dealer-selected IDs are marked as isFeatured!
   const allCatalogProducts = useMemo(() => {
     const map = new Map();
     (products || []).forEach(p => {
       if (p && p.id) {
+        const isDealerChosen = featuredIdsNormalized.length > 0 && featuredIdsNormalized.includes(p.id);
         map.set(p.id, {
           ...p,
-          isFeatured: featuredIdsNormalized.includes(p.id) || !!p.isFeatured,
+          isFeatured: isDealerChosen,
           displayPrice: p.price || null,
           categoryName: p.category || p.style || 'Porselen Karo',
           dimensionText: p.dimensions || p.size || '60x120 cm',
@@ -166,9 +234,10 @@ export default function DealerProfileClient({ dealer, products }) {
         if (inv.product && inv.product.id) {
           const pid = inv.product.id;
           const prev = map.get(pid);
+          const isDealerChosen = featuredIdsNormalized.length > 0 && featuredIdsNormalized.includes(pid);
           map.set(pid, {
             ...(prev || inv.product),
-            isFeatured: featuredIdsNormalized.includes(pid) || (prev ? prev.isFeatured : false),
+            isFeatured: isDealerChosen,
             displayPrice: inv.price || (prev ? prev.displayPrice : inv.product.price) || null,
             stockStatus: inv.stockStatus || 'IN_STOCK',
             stockQuantity: inv.quantity ?? 100,
@@ -187,6 +256,14 @@ export default function DealerProfileClient({ dealer, products }) {
       return a.isFeatured ? -1 : 1;
     });
   }, [products, dealer, featuredIdsNormalized]);
+
+  // Strictly Dealer Selected Featured Products list
+  const dealerFeaturedProducts = useMemo(() => {
+    if (featuredIdsNormalized.length === 0) return [];
+    return featuredIdsNormalized
+      .map(fId => allCatalogProducts.find(p => p.id === fId))
+      .filter(Boolean);
+  }, [allCatalogProducts, featuredIdsNormalized]);
 
   // Filters State
   const [searchTerm, setSearchTerm] = useState('');
@@ -356,8 +433,12 @@ export default function DealerProfileClient({ dealer, products }) {
         if (!matchesName && !matchesCat && !matchesDim) return false;
       }
       // Category
-      if (selectedCategory !== 'all' && p.categoryName !== selectedCategory) {
-        return false;
+      if (selectedCategory !== 'all') {
+        if (selectedCategory === 'featured') {
+          if (!p.isFeatured) return false;
+        } else if (p.categoryName !== selectedCategory) {
+          return false;
+        }
       }
       // Dimension
       if (selectedDimension !== 'all' && p.dimensionText !== selectedDimension) {
@@ -512,6 +593,169 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </header>
 
+      {/* Top Banner Hero (Dealer Banner, Logo, Badges, Stats & Quick Actions) */}
+      <section className="showroom-top-banner-hero">
+        <div className="top-banner-bg-wrapper">
+          <img 
+            src={dealer?.bannerUrl || heroImage} 
+            alt={dealer?.name || 'Showroom Banner'} 
+            className="top-banner-img"
+          />
+          <div className="top-banner-overlay-gradient" />
+        </div>
+
+        <div className="top-banner-container">
+          {/* Left: Brand Identity, Concepts & Highlights */}
+          <div className="top-banner-left">
+            <div className="top-banner-logo-row">
+              <div className={`top-banner-logo-badge ${!dealer?.logoUrl ? 'monogram-badge' : ''}`}>
+                {dealer?.logoUrl ? (
+                  <img src={dealer.logoUrl} alt={dealer.name} className="top-banner-logo-img" />
+                ) : (
+                  <Building2 size={28} className="monogram-icon" />
+                )}
+              </div>
+              <div className="top-banner-partner-badge">
+                <ShieldCheck size={14} className="badge-shield-gold" />
+                <span>{heroBadge}</span>
+              </div>
+            </div>
+
+            <h1 className="top-banner-main-title">{dealer?.name || 'Yetkili Showroom'}</h1>
+
+            <div className="top-banner-meta-row">
+              <div className="banner-meta-pill open-badge">
+                <span className="live-dot" />
+                <span>Şu an Açık • {workingDays}: {workingHours}</span>
+              </div>
+              {dealer?.city && (
+                <div className="banner-meta-pill">
+                  <MapPin size={14} />
+                  <span>{dealer.city}{dealer.district ? ` / ${dealer.district}` : ''}</span>
+                </div>
+              )}
+              {dealer?.phone && (
+                <a href={`tel:${dealer.phone}`} className="banner-meta-pill">
+                  <Phone size={14} />
+                  <span>{dealer.phone}</span>
+                </a>
+              )}
+            </div>
+
+            {dealerSpecialConcepts.length > 0 && (
+              <div className="top-banner-concepts-row">
+                <span className="concepts-label">Özel Konseptler:</span>
+                {dealerSpecialConcepts.map((concept, idx) => (
+                  <span key={idx} className="concept-chip">{concept}</span>
+                ))}
+              </div>
+            )}
+
+            <div className="top-banner-stats-grid">
+              <div className="banner-stat-box">
+                <span className="stat-num">{allCatalogProducts.length}+</span>
+                <span className="stat-lbl">Teşhir Ürünü</span>
+              </div>
+              <div className="banner-stat-box">
+                <span className="stat-num">{dealerStatsObj?.customerSatisfaction || '99%'}</span>
+                <span className="stat-lbl">Müşteri Memnuniyeti</span>
+              </div>
+              <div className="banner-stat-box">
+                <span className="stat-num">{dealerStatsObj?.yearsExperience || '15+'} Yıl</span>
+                <span className="stat-lbl">Sektör Deneyimi</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Quick Action Card */}
+          <div className="top-banner-right">
+            <div className="top-banner-cta-card">
+              <span className="cta-card-badge">HIZLI İLETİŞİM & PROJE</span>
+              <h3 className="cta-card-title">{dealer?.name || 'Yetkili Showroom'}</h3>
+              <p className="cta-card-desc">
+                Mimari projeniz için özel metraj fiyatı, proforma teklif veya showroom randevusu alın.
+              </p>
+
+              <div className="banner-actions-grid">
+                <a 
+                  href={`https://wa.me/${dealerWhatsAppPhone}?text=${encodeURIComponent(whatsappGreeting)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="banner-btn-wa"
+                >
+                  <MessageSquare size={16} />
+                  <span>WhatsApp</span>
+                </a>
+
+                {customMapsUrl ? (
+                  <a 
+                    href={customMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="banner-btn-map"
+                  >
+                    <Navigation size={16} />
+                    <span>Yol Tarifi</span>
+                  </a>
+                ) : (
+                  <button 
+                    onClick={() => setShowApptModal(true)}
+                    className="banner-btn-map"
+                  >
+                    <Calendar size={16} />
+                    <span>Randevu Al</span>
+                  </button>
+                )}
+
+                {dealer?.pdfCatalogUrl && (
+                  <a 
+                    href={dealer.pdfCatalogUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    className="banner-btn-pdf"
+                  >
+                    <Download size={15} />
+                    <span>{dealer.pdfCatalogName || 'PDF Katalog'}</span>
+                  </a>
+                )}
+
+                {dealer?.virtualTourUrl && (
+                  <a 
+                    href="#sanal-tur"
+                    className="banner-btn-tour"
+                  >
+                    <Eye size={15} />
+                    <span>360° Sanal Tur</span>
+                  </a>
+                )}
+              </div>
+
+              {(dealer?.socialInstagram || dealer?.socialFacebook || dealer?.socialLinkedin || dealer?.socialYoutube || dealer?.socialWebsite) && (
+                <div className="banner-socials-row">
+                  <span className="socials-hint">Sosyal:</span>
+                  {dealer?.socialInstagram && (
+                    <a href={dealer.socialInstagram} target="_blank" rel="noopener noreferrer" className="social-pill">Instagram</a>
+                  )}
+                  {dealer?.socialFacebook && (
+                    <a href={dealer.socialFacebook} target="_blank" rel="noopener noreferrer" className="social-pill">Facebook</a>
+                  )}
+                  {dealer?.socialLinkedin && (
+                    <a href={dealer.socialLinkedin} target="_blank" rel="noopener noreferrer" className="social-pill">LinkedIn</a>
+                  )}
+                  {dealer?.socialYoutube && (
+                    <a href={dealer.socialYoutube} target="_blank" rel="noopener noreferrer" className="social-pill">YouTube</a>
+                  )}
+                  {dealer?.socialWebsite && (
+                    <a href={dealer.socialWebsite} target="_blank" rel="noopener noreferrer" className="social-pill">Web</a>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Section 1: Hero Section (Dynamic & Symmetrical) */}
       <section className="showroom-hero-section">
         <div className="showroom-hero-container">
@@ -597,6 +841,93 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </section>
 
+      {/* Section: Strictly Dealer Selected Featured Products Showcase */}
+      {dealerFeaturedProducts.length > 0 && (
+        <section className="showroom-featured-showcase-section">
+          <div className="featured-showcase-header">
+            <div className="featured-badge-pill">
+              <Sparkles size={13} />
+              <span>SHOWROOM ÖZEL SEÇİMİ ({dealerFeaturedProducts.length} Ürün)</span>
+            </div>
+            <h2 className="featured-section-title">Showroom Öne Çıkan Ürünler</h2>
+            <p className="featured-section-subtitle">
+              {dealer?.name} tarafından bizzat seçilen ve showroomda öne çıkarılan özel karo koleksiyonu.
+            </p>
+          </div>
+
+          <div className="featured-products-grid">
+            {dealerFeaturedProducts.map(product => {
+              const isFav = favorites.includes(product.id);
+              return (
+                <div key={`featured-${product.id}`} className="catalog-product-card">
+                  <div className="product-card-media">
+                    <div className="card-top-badges">
+                      <span className="badge-featured">★ Öne Çıkan</span>
+                    </div>
+                    <button 
+                      onClick={(e) => toggleFavorite(product.id, e)} 
+                      className={`card-fav-btn ${isFav ? 'active' : ''}`}
+                      title="Favorilere Ekle"
+                    >
+                      <Heart size={15} fill={isFav ? '#e11d48' : 'none'} stroke={isFav ? '#e11d48' : '#64748b'} />
+                    </button>
+                    <img 
+                      src={product.imageUrl} 
+                      alt={product.name} 
+                      className="product-card-img"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="product-card-body">
+                    <div className="product-meta-sub">
+                      <span className="product-category-text">{product.categoryName}</span>
+                      <span className="product-dim-text">{product.dimensionText}</span>
+                    </div>
+                    <h3 className="product-card-name" title={product.name}>
+                      {product.name}
+                    </h3>
+                    <div className="product-chips-row">
+                      <span className="spec-chip">{product.finishText}</span>
+                      <span className="spec-chip chip-quality">1. Kalite</span>
+                    </div>
+                    <div className="product-price-row">
+                      {product.displayPrice ? (
+                        <div className="price-box">
+                          <span className="price-currency">₺</span>
+                          <span className="price-val">{Number(product.displayPrice).toLocaleString('tr-TR')}</span>
+                          <span className="price-unit">/m²</span>
+                        </div>
+                      ) : (
+                        <span className="price-ask">Fiyat Teklifi Alınız</span>
+                      )}
+                    </div>
+                    <div className="product-card-actions">
+                      <Link 
+                        href={`/?tab=studio&product=${encodeURIComponent(product.slug || product.code || product.name || product.id)}#studio`}
+                        onClick={(e) => handleOpen3DStudio(product, e)}
+                        className="card-action-btn-3d"
+                        title="3D Sanal Stüdyoda Canlı Gör"
+                      >
+                        <Sparkles size={13} />
+                        <span>3D Gör</span>
+                      </Link>
+                      <button 
+                        onClick={(e) => addToQuoteCart(product, e)}
+                        className="card-action-btn-quote"
+                        title="Teklif Listeme Ekle"
+                      >
+                        <Plus size={13} />
+                        <span>Teklif</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* Section 3: Catalog (Mobile App Controls + Desktop Sidebar + Symmetrical Grid) */}
       <section id="katalog" className="showroom-catalog-section">
         <div className="catalog-layout-container">
@@ -627,6 +958,14 @@ export default function DealerProfileClient({ dealer, products }) {
               >
                 Tümü ({allCatalogProducts.length})
               </button>
+              {dealerFeaturedProducts.length > 0 && (
+                <button 
+                  onClick={() => setSelectedCategory('featured')}
+                  className={`mobile-cat-pill ${selectedCategory === 'featured' ? 'active' : ''}`}
+                >
+                  ★ Öne Çıkanlar ({dealerFeaturedProducts.length})
+                </button>
+              )}
               {Object.keys(categoryCounts).filter(k => k !== 'all').map(cat => (
                 <button 
                   key={cat}
@@ -709,6 +1048,15 @@ export default function DealerProfileClient({ dealer, products }) {
                   <span className="option-label">Tüm Kategoriler</span>
                   <span className="option-count">{allCatalogProducts.length}</span>
                 </button>
+                {dealerFeaturedProducts.length > 0 && (
+                  <button 
+                    onClick={() => setSelectedCategory('featured')}
+                    className={`filter-option-btn ${selectedCategory === 'featured' ? 'active' : ''}`}
+                  >
+                    <span className="option-label">★ Öne Çıkanlar</span>
+                    <span className="option-count">{dealerFeaturedProducts.length}</span>
+                  </button>
+                )}
                 {Object.keys(categoryCounts).filter(k => k !== 'all').map(cat => (
                   <button 
                     key={cat}
@@ -783,6 +1131,24 @@ export default function DealerProfileClient({ dealer, products }) {
                 <span>Showroom Randevusu</span>
               </button>
             </div>
+
+            {/* Downloadable PDF Catalog Card */}
+            {dealer?.pdfCatalogUrl && (
+              <div className="sidebar-pdf-card">
+                <div className="pdf-badge">KATALOG & BROŞÜR</div>
+                <h5 className="pdf-title">{dealer.pdfCatalogName || 'Dijital Ürün Kataloğu'}</h5>
+                <a 
+                  href={dealer.pdfCatalogUrl} 
+                  download 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="pdf-download-btn"
+                >
+                  <Download size={14} />
+                  <span>PDF İndir</span>
+                </a>
+              </div>
+            )}
           </aside>
 
           {/* Right Product Grid Area */}
@@ -1010,6 +1376,170 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
         </div>
       </section>
+
+      {/* Section: Şube Hizmetleri & Müşteri Ayrıcalıkları */}
+      {dealerLogisticsList.length > 0 && (
+        <section className="showroom-services-section">
+          <div className="section-header-centered">
+            <span className="section-badge-gold">KURUMSAL AYRICALIKLAR</span>
+            <h2 className="section-title-bold">Şube Hizmetleri & Avantajlar</h2>
+            <p className="section-desc-muted">
+              {dealer?.name} müşterilerine özel lojistik, mimari ve ödeme çözümleri.
+            </p>
+          </div>
+
+          <div className="services-cards-grid">
+            {dealerLogisticsList.map((serviceKey, idx) => {
+              const info = serviceDescriptions[serviceKey] || {
+                title: serviceKey.replace(/_/g, ' ').toUpperCase(),
+                desc: 'Bu şubemizde sunulan özel müşteri hizmeti ve danışmanlık.',
+                icon: <ShieldCheck size={22} />
+              };
+              return (
+                <div key={idx} className="service-feature-card">
+                  <div className="service-icon-box">
+                    {info.icon}
+                  </div>
+                  <h3 className="service-title">{info.title}</h3>
+                  <p className="service-desc">{info.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Section: Showroom Görselleri Galerisi */}
+      {dealerShowroomImages.length > 0 && (
+        <section className="showroom-gallery-section">
+          <div className="section-header-centered">
+            <span className="section-badge-gold">FİZİKİ DENEYİM</span>
+            <h2 className="section-title-bold">Showroomumuzdan Kareler</h2>
+            <p className="section-desc-muted">
+              Canlı karo stantlarımızı, banyo ve zemin konsept teşhirlerimizi yakından inceleyin.
+            </p>
+          </div>
+
+          <div className="showroom-gallery-grid">
+            {dealerShowroomImages.map((imgUrl, idx) => (
+              <div key={idx} className="showroom-gallery-item">
+                <img 
+                  src={imgUrl} 
+                  alt={`${dealer?.name} Showroom ${idx + 1}`} 
+                  className="gallery-img" 
+                  loading="lazy" 
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Section: 360° Showroom Sanal Tur */}
+      {dealer?.virtualTourUrl && (
+        <section id="sanal-tur" className="showroom-virtual-tour-section">
+          <div className="virtual-tour-card">
+            <div className="virtual-tour-info">
+              <span className="tour-badge">İNTERAKTİF DENEYİM</span>
+              <h2 className="tour-title">360° Showroom Sanal Turu</h2>
+              <p className="tour-desc">
+                Showroomumuza gelmeden önce teşhir stantlarımızı 3 boyutlu sanal tur ile 360 derece gezin, ürünleri mekan ortamında inceleyin.
+              </p>
+              <a 
+                href={dealer.virtualTourUrl} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="tour-action-btn"
+              >
+                <Eye size={17} />
+                <span>Sanal Turu Başlat</span>
+                <ExternalLink size={15} />
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Section: Bayi Hakkında / Kurumsal Profil */}
+      {dealer?.aboutText && (
+        <section className="showroom-about-section">
+          <div className="about-card-container">
+            <div className="about-header-row">
+              <Building2 size={26} className="about-icon" />
+              <div>
+                <span className="about-sub">KURUMSAL PROFİL</span>
+                <h2 className="about-title">{dealer.name} Hakkında</h2>
+              </div>
+            </div>
+            <p className="about-text-content">{dealer.aboutText}</p>
+          </div>
+        </section>
+      )}
+
+      {/* Section: Referans Projeler Portföyü */}
+      {dealerRefProjects.length > 0 && (
+        <section className="showroom-projects-section">
+          <div className="section-header-centered">
+            <span className="section-badge-gold">MİMARİ PORTFÖY</span>
+            <h2 className="section-title-bold">Tamamlanan Referans Projeler</h2>
+            <p className="section-desc-muted">
+              {dealer?.name} imzası taşıyan seçkin konut, villa, otel ve ticari alan uygulamaları.
+            </p>
+          </div>
+
+          <div className="projects-cards-grid">
+            {dealerRefProjects.map((proj, idx) => (
+              <div key={idx} className="project-portfolio-card">
+                {proj.image && (
+                  <div className="project-img-box">
+                    <img src={proj.image} alt={proj.title || 'Referans Proje'} className="project-img" loading="lazy" />
+                  </div>
+                )}
+                <div className="project-body">
+                  <h3 className="project-title">{proj.title || `Referans Proje #${idx + 1}`}</h3>
+                  {proj.desc && <p className="project-desc">{proj.desc}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Section: Sıkça Sorulan Sorular (Accordion) */}
+      {dealerFaqsList.length > 0 && (
+        <section className="showroom-faq-section">
+          <div className="section-header-centered">
+            <span className="section-badge-gold">MERAK EDİLENLER</span>
+            <h2 className="section-title-bold">Sıkça Sorulan Sorular</h2>
+            <p className="section-desc-muted">
+              Sipariş, numune temini, sevkiyat ve mimari destek süreçleri hakkında bilgiler.
+            </p>
+          </div>
+
+          <div className="faq-accordion-list">
+            {dealerFaqsList.map((faq, idx) => {
+              const isOpen = openFaqIndex === idx;
+              return (
+                <div key={idx} className="faq-accordion-item">
+                  <button 
+                    type="button" 
+                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)} 
+                    className="faq-question-btn"
+                  >
+                    <span>{faq.q || faq.question}</span>
+                    <ChevronLeft size={18} className={`faq-chevron ${isOpen ? 'rotated' : ''}`} />
+                  </button>
+                  {isOpen && (
+                    <div className="faq-answer-box animate-fade-in">
+                      <p>{faq.a || faq.answer}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Section 6: Showroom Location & Virtual Tour */}
       <section className="showroom-location-section">

@@ -133,11 +133,39 @@ export default async function Page({ params }) {
       dealer = allDealers.find(d => slugify(d.name) === id);
     }
 
-    if (dealer && dealer.brandId) {
-      products = await prisma.product.findMany({
-        where: { brandId: dealer.brandId },
-        take: 100
-      });
+    if (dealer) {
+      let rawFeatured = [];
+      try {
+        rawFeatured = dealer.featuredProducts ? JSON.parse(dealer.featuredProducts) : [];
+      } catch (e) {
+        rawFeatured = [];
+      }
+      const featuredIds = Array.isArray(rawFeatured)
+        ? rawFeatured.map(item => (typeof item === 'object' && item !== null ? item.id : item)).filter(Boolean)
+        : [];
+
+      if (dealer.brandId) {
+        products = await prisma.product.findMany({
+          where: { brandId: dealer.brandId },
+          take: 250
+        });
+      } else {
+        products = await prisma.product.findMany({
+          take: 100
+        });
+      }
+
+      // If dealer selected featured products not in the first batch, fetch them explicitly
+      if (featuredIds.length > 0) {
+        const loadedIds = new Set(products.map(p => p.id));
+        const missingIds = featuredIds.filter(fId => !loadedIds.has(fId));
+        if (missingIds.length > 0) {
+          const extraFeatured = await prisma.product.findMany({
+            where: { id: { in: missingIds } }
+          });
+          products = [...extraFeatured, ...products];
+        }
+      }
     }
   } catch (error) {
     console.error('Dealer Page DB Error:', error);
