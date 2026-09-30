@@ -116,7 +116,7 @@ export default function DealerProfileClient({ dealer, products }) {
   const featurePillars = (sc.featurePillars && sc.featurePillars.length === 4) ? sc.featurePillars : defaultPillars;
 
   // 3. Catalog Section
-  const catalogTitle = sc.catalogTitle || 'Showroom Ürünleri';
+  const catalogTitle = (sc.catalogTitle && sc.catalogTitle !== 'Showroom Ürünleri') ? sc.catalogTitle : 'Dijital Katalog';
   const consultationTitle = sc.consultationTitle || 'Banyonuz İçin Birlikte Çizelim';
   const consultationDesc = sc.consultationDesc || 'Showroom uzmanımızla randevu alarak projenize özel karo seçimi yapın.';
 
@@ -825,10 +825,18 @@ export default function DealerProfileClient({ dealer, products }) {
                 <span>Fiyat Teklifi Al</span>
               </button>
 
-              {/* Katalog / Ürünler Butonu */}
+              {/* Showroom Ürünleri Butonu */}
+              {dealerFeaturedProducts.length > 0 && (
+                <a href="#showroom-urunleri" className="flagship-btn-featured">
+                  <Store size={17} />
+                  <span>Showroom Ürünleri ({dealerFeaturedProducts.length})</span>
+                </a>
+              )}
+
+              {/* Dijital Katalog Butonu */}
               <a href="#katalog" className="flagship-btn-catalog">
-                <span>Ürün Kataloğu</span>
-                <ArrowRight size={16} />
+                <Package size={17} />
+                <span>Dijital Katalog</span>
               </a>
 
               {dealer?.pdfCatalogUrl && (
@@ -874,90 +882,98 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </section>
 
-      {/* Section: Strictly Dealer Selected Featured Products Showcase */}
+      {/* Section: Strictly Dealer Selected Showroom Products Showcase */}
       {dealerFeaturedProducts.length > 0 && (
-        <section className="showroom-featured-showcase-section">
+        <section id="showroom-urunleri" className="showroom-featured-showcase-section">
           <div className="featured-showcase-header">
             <div className="featured-badge-pill">
               <Sparkles size={13} />
-              <span>SHOWROOM ÖZEL SEÇİMİ ({dealerFeaturedProducts.length} Ürün)</span>
+              <span>SHOWROOM ÜRÜNLERİ & MAĞAZA STOĞU ({dealerFeaturedProducts.length} Ürün)</span>
             </div>
-            <h2 className="featured-section-title">Showroom Öne Çıkan Ürünler</h2>
+            <h2 className="featured-section-title">Showroom Ürünleri</h2>
             <p className="featured-section-subtitle">
-              {dealer?.name} tarafından bizzat seçilen ve showroomda öne çıkarılan özel karo koleksiyonu.
+              {dealer?.name} mağazamızda fiziki olarak teşhir edilen ve stoğumuzda hemen teslime hazır ürün koleksiyonu.
             </p>
           </div>
 
-          <div className="featured-products-grid">
-            {dealerFeaturedProducts.map(product => {
-              const isFav = favorites.includes(product.id);
-              return (
-                <div key={`featured-${product.id}`} className="catalog-product-card">
-                  <div className="product-card-media">
-                    <div className="card-top-badges">
-                      <span className="badge-featured">★ Öne Çıkan</span>
-                    </div>
-                    <button 
-                      onClick={(e) => toggleFavorite(product.id, e)} 
-                      className={`card-fav-btn ${isFav ? 'active' : ''}`}
-                      title="Favorilere Ekle"
-                    >
-                      <Heart size={15} fill={isFav ? '#e11d48' : 'none'} stroke={isFav ? '#e11d48' : '#64748b'} />
-                    </button>
-                    <img 
-                      src={product.imageUrl} 
-                      alt={product.name} 
-                      className="product-card-img"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="product-card-body">
-                    <div className="product-meta-sub">
-                      <span className="product-category-text">{product.categoryName}</span>
-                      <span className="product-dim-text">{product.dimensionText}</span>
-                    </div>
-                    <h3 className="product-card-name" title={product.name}>
-                      {product.name}
-                    </h3>
-                    <div className="product-chips-row">
-                      <span className="spec-chip">{product.finishText}</span>
-                      <span className="spec-chip chip-quality">1. Kalite</span>
-                    </div>
-                    <div className="product-price-row">
-                      {product.displayPrice ? (
-                        <div className="price-box">
-                          <span className="price-currency">₺</span>
-                          <span className="price-val">{Number(product.displayPrice).toLocaleString('tr-TR')}</span>
-                          <span className="price-unit">/m²</span>
-                        </div>
-                      ) : (
-                        <span className="price-ask">Fiyat Teklifi Alınız</span>
-                      )}
-                    </div>
-                    <div className="product-card-actions">
-                      <Link 
-                        href={`/?tab=studio&product=${encodeURIComponent(product.slug || product.code || product.name || product.id)}#studio`}
-                        onClick={(e) => handleOpen3DStudio(product, e)}
-                        className="card-action-btn-3d"
-                        title="3D Sanal Stüdyoda Canlı Gör"
-                      >
-                        <Sparkles size={13} />
-                        <span>3D Gör</span>
-                      </Link>
+          <div className={dealerFeaturedProducts.length > 8 ? "featured-scroll-viewport catalog-scroll-viewport" : ""}>
+            <div className="featured-products-grid catalog-products-grid">
+              {dealerFeaturedProducts.map(product => {
+                const isFav = favorites.includes(product.id);
+                return (
+                  <div key={`featured-${product.id}`} className="catalog-product-card">
+                    <div className="product-card-media">
+                      <div className="card-top-badges">
+                        <span className="badge-featured">★ Showroom</span>
+                      </div>
                       <button 
-                        onClick={(e) => addToQuoteCart(product, e)}
-                        className="card-action-btn-quote"
-                        title="Teklif Listeme Ekle"
+                        onClick={(e) => toggleFavorite(product.id, e)} 
+                        className={`card-fav-btn ${isFav ? 'active' : ''}`}
+                        title="Favorilere Ekle"
                       >
-                        <Plus size={13} />
-                        <span>Teklif</span>
+                        <Heart size={15} fill={isFav ? '#e11d48' : 'none'} stroke={isFav ? '#e11d48' : '#64748b'} />
                       </button>
+                      <img 
+                        src={product.imageUrl} 
+                        alt={product.name} 
+                        className="product-card-img"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="product-card-body">
+                      <div className="product-meta-sub">
+                        <span className="product-category-text">{product.categoryName}</span>
+                        <span className="product-dim-text">{product.dimensionText}</span>
+                      </div>
+                      <h3 className="product-card-name" title={product.name}>
+                        {product.name}
+                      </h3>
+                      <div className="product-chips-row">
+                        <span className="spec-chip">{product.finishText}</span>
+                        <span className="spec-chip chip-quality">1. Kalite</span>
+                      </div>
+                      <div className="product-price-row">
+                        {product.displayPrice ? (
+                          <div className="price-box">
+                            <span className="price-currency">₺</span>
+                            <span className="price-val">{Number(product.displayPrice).toLocaleString('tr-TR')}</span>
+                            <span className="price-unit">/m²</span>
+                          </div>
+                        ) : (
+                          <span className="price-ask">Fiyat Teklifi Alınız</span>
+                        )}
+                      </div>
+                      <div className="product-card-actions">
+                        <Link 
+                          href={`/?tab=studio&product=${encodeURIComponent(product.slug || product.code || product.name || product.id)}#studio`}
+                          onClick={(e) => handleOpen3DStudio(product, e)}
+                          className="card-action-btn-3d"
+                          title="3D Sanal Stüdyoda Canlı Gör"
+                        >
+                          <Sparkles size={13} />
+                          <span>3D Gör</span>
+                        </Link>
+                        <button 
+                          onClick={(e) => addToQuoteCart(product, e)}
+                          className="card-action-btn-quote"
+                          title="Teklif Listeme Ekle"
+                        >
+                          <Plus size={13} />
+                          <span>Teklif</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
+
+          {dealerFeaturedProducts.length > 8 && (
+            <div className="catalog-scroll-hint-bar">
+              <span className="scroll-hint-text">↕ Showroom ürünleri arasında aşağı/yukarı kaydırabilirsiniz ({dealerFeaturedProducts.length} ürün)</span>
+            </div>
+          )}
         </section>
       )}
 
@@ -966,6 +982,12 @@ export default function DealerProfileClient({ dealer, products }) {
         <div className="catalog-layout-container">
           {/* MOBILE APP-LIKE CONTROLS (Rendered above grid on mobile screens) */}
           <div className="mobile-app-catalog-controls">
+            <div className="mobile-catalog-header-title">
+              <span className="mobile-catalog-badge">DİJİTAL KATALOG</span>
+              <h2 className="mobile-catalog-main-title">{catalogTitle}</h2>
+              <p className="mobile-catalog-sub-text">Tüm seramik ve porselen serileri ({allCatalogProducts.length} model)</p>
+            </div>
+
             {/* Search Input */}
             <div className="mobile-search-box">
               <Search size={16} className="search-input-icon" />
@@ -1188,6 +1210,7 @@ export default function DealerProfileClient({ dealer, products }) {
           <main className="catalog-main-content">
             <div className="catalog-header-bar desktop-only-header">
               <div className="catalog-title-meta">
+                <span className="catalog-badge-pill">DİJİTAL KATALOG</span>
                 <h2 className="catalog-section-title">{catalogTitle}</h2>
                 <span className="catalog-count-pill">
                   {filteredProducts.length} Ürün Listeleniyor
@@ -1220,7 +1243,9 @@ export default function DealerProfileClient({ dealer, products }) {
                 </button>
               </div>
             ) : (
-              <div className="catalog-products-grid">
+              <>
+                <div className="catalog-scroll-viewport">
+                  <div className="catalog-products-grid">
                 {filteredProducts.map(product => {
                   const isFav = favorites.includes(product.id);
                   const isFeaturedItem = product.isFeatured;
@@ -1307,7 +1332,15 @@ export default function DealerProfileClient({ dealer, products }) {
                   );
                 })}
               </div>
+            </div>
+
+            {filteredProducts.length > 8 && (
+              <div className="catalog-scroll-hint-bar">
+                <span className="scroll-hint-text">↕ Dijital katalogda aşağı/yukarı kaydırarak diğer seramik modellerini inceleyebilirsiniz ({filteredProducts.length} ürün)</span>
+              </div>
             )}
+          </>
+        )}
           </main>
         </div>
       </section>
