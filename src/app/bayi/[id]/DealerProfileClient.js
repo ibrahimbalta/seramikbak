@@ -48,6 +48,95 @@ export default function DealerProfileClient({ dealer, products }) {
     }
   };
 
+  // Dynamic Showroom Config from dealerStats
+  const dealerStatsObj = safeParseJSON(dealer?.dealerStats, {});
+  const sc = dealerStatsObj?.showroomConfig || {};
+
+  // 1. Hero Dynamic Fields
+  const heroBadge = sc.heroBadge || 'YETKİLİ SHOWROOM & PROJE MERKEZİ';
+  const heroTitle = sc.heroTitle || dealer?.name || 'Prestij Seramik Showroom';
+  const heroDescription = sc.heroDescription || dealer?.description || 'En seçkin porselen ve seramik karo koleksiyonları, mimari projelendirme desteği ve kişiselleştirilmiş 3D mekan tasarımlarıyla hayalinizdeki mekanlara zarafet katıyoruz.';
+  const heroPrimaryBtnText = sc.heroPrimaryBtnText || 'Showroomu İncele';
+  const heroSecondaryBtnText = sc.heroSecondaryBtnText || 'Teklif Al';
+  const heroCursiveQuote = sc.heroCursiveQuote || '“Hayalinizdeki mekan burada başlıyor...”';
+  const heroCursiveSub = sc.heroCursiveSub || (dealer?.name ? `${dealer.name} Koleksiyonu` : 'Showroom Koleksiyonu');
+  const workingHours = sc.workingHours || '09:00 - 19:00';
+  const workingDays = sc.workingDays || 'Pazartesi - Cumartesi';
+  const heroImage = sc.heroBannerUrl || dealer?.bannerUrl || '/hero/luxury_bathroom.png';
+
+  // 2. Feature Pillars (4 items)
+  const defaultPillars = [
+    { title: '100+ Teşhir Ürünü', desc: 'En güncel geniş ebat porselen serileri' },
+    { title: '3D Mekan Görüntüleme', desc: 'Karoları kendi mekanınızda canlı görün' },
+    { title: 'Gerçek Numune', desc: 'Mimari projeler için yerinde doku kontrolü' },
+    { title: 'Hızlı Teklif', desc: 'Dakikalar içinde net metraj ve fiyatlandırma' }
+  ];
+  const featurePillars = (sc.featurePillars && sc.featurePillars.length === 4) ? sc.featurePillars : defaultPillars;
+
+  // 3. Catalog Section
+  const catalogTitle = sc.catalogTitle || 'Showroom Ürünleri';
+  const consultationTitle = sc.consultationTitle || 'Banyonuz İçin Birlikte Çizelim';
+  const consultationDesc = sc.consultationDesc || 'Showroom uzmanımızla randevu alarak projenize özel karo seçimi yapın.';
+
+  // 4. AI Designer Banner
+  const aiBadge = sc.aiBadge || 'YAPAY ZEKA DESTEKLİ';
+  const aiTitle = sc.aiTitle || 'Mekanını Tasarla';
+  const aiDesc = sc.aiDesc || 'Kendi banyonuzun veya salonunuzun fotoğrafını yükleyin; seramiklerimizin evinizde nasıl duracağını yapay zeka ile saniyeler içinde fotogerçekçi görün.';
+  const aiBtnText = sc.aiBtnText || 'Fotoğraf Yükle & Tasarla';
+  const defaultAiBullets = [
+    { title: 'Saniyeler İçinde 3D Çıktı', desc: 'Karmaşık mimari çizim programlarına gerek kalmadan anında sonuç alın.' },
+    { title: 'Gerçek Işık & Yansıma Uyumu', desc: 'Seramik yüzey dokuları odanızın gerçek gün ışığına göre birebir render edilir.' },
+    { title: 'Doğrudan Bayiden Sipariş', desc: 'Oluşturduğunuz tasarımın metrajını tek tıkla WhatsApp üzerinden bayimize iletin.' }
+  ];
+  const aiBullets = (sc.aiBullets && sc.aiBullets.length === 3) ? sc.aiBullets : defaultAiBullets;
+
+  // 5. Campaigns
+  const rawCampaigns = safeParseJSON(dealer?.dealerCampaigns, []);
+  const defaultCampaigns = [
+    {
+      tag: 'MİMARLARA ÖZEL',
+      percent: '%25 İskonto',
+      title: 'Toplu Alım ve Mimari Proje Desteği',
+      desc: 'Konut ve ticari projeleriniz için özel toptan fiyatlandırma ve esnek ödeme planları sunuyoruz.',
+      expiry: 'Yıl Boyu Geçerli',
+      isHighlight: false,
+      action: 'quote'
+    },
+    {
+      tag: 'ÜCRETSİZ HİZMET',
+      percent: '3D Banyo',
+      title: 'Ücretsiz Mimari 3D Modelleme',
+      desc: 'Showroomumuzu ziyaret eden veya planını gönderen müşterilerimize banyo yerleşim çizimi hediye.',
+      expiry: 'Randevu ile',
+      isHighlight: true,
+      action: 'appt'
+    },
+    {
+      tag: 'LOJİSTİK',
+      percent: 'Hızlı Sevk',
+      title: 'Stoktan Aynı Gün Depo Teslimatı',
+      desc: 'Seçili 60x120 ve 30x90 porselen serilerinde beklemeden doğrudan depodan adrese hızlı teslimat.',
+      expiry: 'Seçili Ürünlerde',
+      isHighlight: false,
+      action: 'katalog'
+    }
+  ];
+  const campaignsList = (rawCampaigns && rawCampaigns.length > 0) 
+    ? rawCampaigns.map((c, i) => ({
+        tag: c.tag || (i === 0 ? 'MİMARLARA ÖZEL' : i === 1 ? 'ÜCRETSİZ HİZMET' : 'KAMPANYA'),
+        percent: c.percent || (i === 0 ? '%25 İskonto' : i === 1 ? '3D Proje' : 'Fırsat'),
+        title: c.title || 'Özel Showroom Fırsatı',
+        desc: c.desc || 'Detaylı bilgi ve avantajlı fiyatlar için showroomumuzu ziyaret edebilirsiniz.',
+        expiry: c.expiresAt || c.expiry || 'Sınırlı Süre',
+        isHighlight: i === 1,
+        action: i === 1 ? 'appt' : 'quote'
+      }))
+    : defaultCampaigns;
+
+  // 6. Action Bar & WhatsApp
+  const whatsappGreeting = sc.whatsappGreeting || (`Merhaba, ${dealer?.name || 'Showroom'} sayfanızdan ulaşıyorum. Ürünler ve fiyatlar hakkında bilgi alabilir miyim?`);
+  const customMapsUrl = sc.customMapsUrl || (dealer?.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((dealer.name || '') + ' ' + dealer.address)}` : '');
+
   // Featured product IDs configured by dealer in portal
   const rawFeatured = safeParseJSON(dealer?.featuredProducts, []);
   const featuredIdsNormalized = Array.isArray(rawFeatured)
@@ -92,12 +181,11 @@ export default function DealerProfileClient({ dealer, products }) {
     }
 
     const list = Array.from(map.values());
-    // Place featured items at the beginning
     return list.sort((a, b) => {
       if (a.isFeatured === b.isFeatured) return 0;
       return a.isFeatured ? -1 : 1;
     });
-  }, [products, dealer]);
+  }, [products, dealer, featuredIdsNormalized]);
 
   // Filters State
   const [searchTerm, setSearchTerm] = useState('');
@@ -312,7 +400,7 @@ export default function DealerProfileClient({ dealer, products }) {
       showToast('Teklif talebiniz bayiye başarıyla iletildi!');
     } catch (err) {
       console.error(err);
-      setLeadSuccess(true); // fallback graceful
+      setLeadSuccess(true);
     } finally {
       setLeadLoading(false);
     }
@@ -327,9 +415,6 @@ export default function DealerProfileClient({ dealer, products }) {
       setApptSuccess(false);
     }, 2500);
   };
-
-  // Banner image resolution
-  const heroImage = dealer?.bannerUrl || '/hero/luxury_bathroom.png';
 
   return (
     <div className="corporate-showroom-page">
@@ -390,26 +475,23 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </header>
 
-      {/* Section 1: Hero Section (Matching media_1790774130284.jpg) */}
+      {/* Section 1: Hero Section (Dynamic & Configurable) */}
       <section className="showroom-hero-section">
         <div className="showroom-hero-container">
           {/* Left Column: Dealer Information */}
           <div className="hero-left-column">
             <div className="hero-dealer-badge">
               <ShieldCheck size={16} className="badge-shield-icon" />
-              <span>YETKİLİ SHOWROOM & PROJE MERKEZİ</span>
+              <span>{heroBadge}</span>
             </div>
 
-            <h1 className="hero-dealer-title">{dealer?.name || 'Prestij Seramik Showroom'}</h1>
+            <h1 className="hero-dealer-title">{heroTitle}</h1>
 
-            <p className="hero-dealer-description">
-              {dealer?.description || 
-                'En seçkin porselen ve seramik karo koleksiyonları, mimari projelendirme desteği ve kişiselleştirilmiş 3D mekan tasarımlarıyla hayalinizdeki mekanlara zarafet katıyoruz.'}
-            </p>
+            <p className="hero-dealer-description">{heroDescription}</p>
 
             <div className="hero-cta-group">
               <a href="#katalog" className="hero-btn-primary">
-                <span>Showroomu İncele</span>
+                <span>{heroPrimaryBtnText}</span>
                 <ArrowRight size={18} />
               </a>
               <button 
@@ -419,7 +501,7 @@ export default function DealerProfileClient({ dealer, products }) {
                 }} 
                 className="hero-btn-secondary"
               >
-                <span>Teklif Al</span>
+                <span>{heroSecondaryBtnText}</span>
               </button>
             </div>
 
@@ -431,7 +513,7 @@ export default function DealerProfileClient({ dealer, products }) {
               <div className="hero-meta-item">
                 <Clock size={16} className="meta-clock-icon" />
                 <span className="status-open-pill">Açık</span>
-                <span>09:00 - 19:00</span>
+                <span>{workingDays} • {workingHours}</span>
               </div>
             </div>
           </div>
@@ -445,56 +527,36 @@ export default function DealerProfileClient({ dealer, products }) {
                 className="hero-main-card-img"
               />
               <div className="hero-cursive-quote-badge">
-                <p className="cursive-quote-text">“Hayalinizdeki mekan burada başlıyor...”</p>
-                <span className="cursive-quote-sub">{dealer?.name} Koleksiyonu</span>
+                <p className="cursive-quote-text">{heroCursiveQuote}</p>
+                <span className="cursive-quote-sub">{heroCursiveSub}</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Section 2: 4 Feature Pillars Bar */}
+      {/* Section 2: 4 Feature Pillars Bar (Dynamic) */}
       <section className="feature-pillars-bar">
         <div className="feature-pillars-container">
-          <div className="feature-pillar-card">
-            <div className="pillar-icon-box">
-              <Package size={22} />
-            </div>
-            <div className="pillar-text-group">
-              <h3 className="pillar-title">100+ Teşhir Ürünü</h3>
-              <p className="pillar-desc">En güncel geniş ebat porselen serileri</p>
-            </div>
-          </div>
-
-          <div className="feature-pillar-card">
-            <div className="pillar-icon-box">
-              <Sparkles size={22} />
-            </div>
-            <div className="pillar-text-group">
-              <h3 className="pillar-title">3D Mekan Görüntüleme</h3>
-              <p className="pillar-desc">Karoları kendi mekanınızda canlı görün</p>
-            </div>
-          </div>
-
-          <div className="feature-pillar-card">
-            <div className="pillar-icon-box">
-              <Layers size={22} />
-            </div>
-            <div className="pillar-text-group">
-              <h3 className="pillar-title">Gerçek Numune</h3>
-              <p className="pillar-desc">Mimari projeler için yerinde doku kontrolü</p>
-            </div>
-          </div>
-
-          <div className="feature-pillar-card">
-            <div className="pillar-icon-box">
-              <CheckCircle2 size={22} />
-            </div>
-            <div className="pillar-text-group">
-              <h3 className="pillar-title">Hızlı Teklif</h3>
-              <p className="pillar-desc">Dakikalar içinde net metraj ve fiyatlandırma</p>
-            </div>
-          </div>
+          {featurePillars.map((pillar, idx) => {
+            const icons = [
+              <Package key="1" size={22} />,
+              <Sparkles key="2" size={22} />,
+              <Layers key="3" size={22} />,
+              <CheckCircle2 key="4" size={22} />
+            ];
+            return (
+              <div key={idx} className="feature-pillar-card">
+                <div className="pillar-icon-box">
+                  {icons[idx] || <CheckCircle2 size={22} />}
+                </div>
+                <div className="pillar-text-group">
+                  <h3 className="pillar-title">{pillar.title}</h3>
+                  <p className="pillar-desc">{pillar.desc}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -604,11 +666,11 @@ export default function DealerProfileClient({ dealer, products }) {
               </div>
             </div>
 
-            {/* Architect & Consultation Card */}
+            {/* Architect & Consultation Card (Dynamic) */}
             <div className="sidebar-consultation-card">
               <div className="consult-badge">MİMARİ DESTEK</div>
-              <h5 className="consult-title">Banyonuz İçin Birlikte Çizelim</h5>
-              <p className="consult-desc">Showroom uzmanımızla randevu alarak projenize özel karo seçimi yapın.</p>
+              <h5 className="consult-title">{consultationTitle}</h5>
+              <p className="consult-desc">{consultationDesc}</p>
               <button 
                 onClick={() => setShowApptModal(true)} 
                 className="consult-action-btn"
@@ -623,7 +685,7 @@ export default function DealerProfileClient({ dealer, products }) {
           <main className="catalog-main-content">
             <div className="catalog-header-bar">
               <div className="catalog-title-meta">
-                <h2 className="catalog-section-title">Showroom Ürünleri</h2>
+                <h2 className="catalog-section-title">{catalogTitle}</h2>
                 <span className="catalog-count-pill">
                   {filteredProducts.length} Ürün Listeleniyor
                 </span>
@@ -745,24 +807,22 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </section>
 
-      {/* Section 4: AI "Mekanını Tasarla" Promo Banner */}
+      {/* Section 4: AI "Mekanını Tasarla" Promo Banner (Dynamic) */}
       <section className="ai-designer-banner-section">
         <div className="ai-designer-banner-card">
           {/* Left: Tag + Headline + CTA */}
           <div className="ai-banner-content-col">
             <div className="ai-banner-pill">
               <Sparkles size={14} className="sparkle-gold" />
-              <span>YAPAY ZEKA DESTEKLİ</span>
+              <span>{aiBadge}</span>
             </div>
 
-            <h2 className="ai-banner-headline">Mekanını Tasarla</h2>
+            <h2 className="ai-banner-headline">{aiTitle}</h2>
 
-            <p className="ai-banner-subtext">
-              Kendi banyonuzun veya salonunuzun fotoğrafını yükleyin; seramiklerimizin evinizde nasıl duracağını yapay zeka ile saniyeler içinde fotogerçekçi görün.
-            </p>
+            <p className="ai-banner-subtext">{aiDesc}</p>
 
             <Link href="/tasarim" className="ai-banner-cta-btn">
-              <span>Fotoğraf Yükle & Tasarla</span>
+              <span>{aiBtnText}</span>
               <ArrowRight size={16} />
             </Link>
           </div>
@@ -786,109 +846,61 @@ export default function DealerProfileClient({ dealer, products }) {
 
           {/* Right: Feature Bullet Points */}
           <div className="ai-banner-features-col">
-            <div className="ai-bullet-item">
-              <div className="bullet-check-circle">
-                <Check size={14} />
+            {aiBullets.map((bullet, idx) => (
+              <div key={idx} className="ai-bullet-item">
+                <div className="bullet-check-circle">
+                  <Check size={14} />
+                </div>
+                <div className="bullet-text">
+                  <strong>{bullet.title}</strong>
+                  <p>{bullet.desc}</p>
+                </div>
               </div>
-              <div className="bullet-text">
-                <strong>Saniyeler İçinde 3D Çıktı</strong>
-                <p>Karmaşık mimari çizim programlarına gerek kalmadan anında sonuç alın.</p>
-              </div>
-            </div>
-
-            <div className="ai-bullet-item">
-              <div className="bullet-check-circle">
-                <Check size={14} />
-              </div>
-              <div className="bullet-text">
-                <strong>Gerçek Işık & Yansıma Uyumu</strong>
-                <p>Seramik yüzey dokuları odanızın gerçek gün ışığına göre birebir render edilir.</p>
-              </div>
-            </div>
-
-            <div className="ai-bullet-item">
-              <div className="bullet-check-circle">
-                <Check size={14} />
-              </div>
-              <div className="bullet-text">
-                <strong>Doğrudan Bayiden Sipariş</strong>
-                <p>Oluşturduğunuz tasarımın metrajını tek tıkla WhatsApp üzerinden bayimize iletin.</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Section 5: Active Campaigns Strip */}
+      {/* Section 5: Active Campaigns Strip (Dynamic from dealerCampaigns) */}
       <section className="showroom-campaigns-strip">
         <div className="campaigns-strip-container">
           <div className="campaign-row-header">
             <div>
               <span className="campaign-mini-tag">ÖZEL AYRICALIKLAR</span>
-              <h3 className="campaign-main-title">Aktif Showroom Kampanyaları</h3>
+              <h3 className="campaign-main-title">{sc.campaignsTitle || 'Aktif Showroom Kampanyaları'}</h3>
             </div>
             <p className="campaign-desc-lead">
-              {dealer?.name} bünyesinde projelerinize değer katan kurumsal avantajlar.
+              {sc.campaignsSubtitle || `${dealer?.name || 'Showroomumuz'} bünyesinde projelerinize değer katan kurumsal avantajlar.`}
             </p>
           </div>
 
           <div className="campaign-cards-grid">
-            <div className="campaign-modern-card">
-              <div className="campaign-card-header">
-                <span className="campaign-tag-badge">MİMARLARA ÖZEL</span>
-                <span className="campaign-percent-badge">%25 İskonto</span>
+            {campaignsList.map((camp, idx) => (
+              <div key={idx} className={`campaign-modern-card ${camp.isHighlight ? 'highlight-card' : ''}`}>
+                <div className="campaign-card-header">
+                  <span className={`campaign-tag-badge ${camp.isHighlight ? 'highlight-tag' : ''}`}>{camp.tag}</span>
+                  <span className={`campaign-percent-badge ${camp.isHighlight ? 'highlight-pill' : ''}`}>{camp.percent}</span>
+                </div>
+                <h4 className="campaign-card-title">{camp.title}</h4>
+                <p className="campaign-card-p">{camp.desc}</p>
+                <div className="campaign-card-footer">
+                  <span className="campaign-expiry">{camp.expiry}</span>
+                  {camp.action === 'appt' ? (
+                    <button onClick={() => setShowApptModal(true)} className="campaign-btn-link">
+                      Randevu Al →
+                    </button>
+                  ) : camp.action === 'katalog' ? (
+                    <a href="#katalog" className="campaign-btn-link">
+                      Ürünleri Gör →
+                    </a>
+                  ) : (
+                    <button onClick={() => setShowLeadModal(true)} className="campaign-btn-link">
+                      Teklif İste →
+                    </button>
+                  )}
+                </div>
               </div>
-              <h4 className="campaign-card-title">Toplu Alım ve Mimari Proje Desteği</h4>
-              <p className="campaign-card-p">
-                Konut ve ticari projeleriniz için özel toptan fiyatlandırma ve esnek ödeme planları sunuyoruz.
-              </p>
-              <div className="campaign-card-footer">
-                <span className="campaign-expiry">Yıl Boyu Geçerli</span>
-                <button 
-                  onClick={() => setShowLeadModal(true)} 
-                  className="campaign-btn-link"
-                >
-                  Teklif İste →
-                </button>
-              </div>
-            </div>
-
-            <div className="campaign-modern-card highlight-card">
-              <div className="campaign-card-header">
-                <span className="campaign-tag-badge highlight-tag">ÜCRETSİZ HİZMET</span>
-                <span className="campaign-percent-badge highlight-pill">3D Banyo</span>
-              </div>
-              <h4 className="campaign-card-title">Ücretsiz Mimari 3D Modelleme</h4>
-              <p className="campaign-card-p">
-                Showroomumuzu ziyaret eden veya planını gönderen müşterilerimize banyo yerleşim çizimi hediye.
-              </p>
-              <div className="campaign-card-footer">
-                <span className="campaign-expiry">Randevu ile</span>
-                <button 
-                  onClick={() => setShowApptModal(true)} 
-                  className="campaign-btn-link"
-                >
-                  Randevu Al →
-                </button>
-              </div>
-            </div>
-
-            <div className="campaign-modern-card">
-              <div className="campaign-card-header">
-                <span className="campaign-tag-badge">LOJİSTİK</span>
-                <span className="campaign-percent-badge">Hızlı Sevk</span>
-              </div>
-              <h4 className="campaign-card-title">Stoktan Aynı Gün Depo Teslimatı</h4>
-              <p className="campaign-card-p">
-                Seçili 60x120 ve 30x90 porselen serilerinde beklemeden doğrudan depodan adrese hızlı teslimat.
-              </p>
-              <div className="campaign-card-footer">
-                <span className="campaign-expiry">Seçili Ürünlerde</span>
-                <a href="#katalog" className="campaign-btn-link">
-                  Ürünleri Gör →
-                </a>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -933,15 +945,15 @@ export default function DealerProfileClient({ dealer, products }) {
                 <Clock size={20} className="loc-icon" />
                 <div>
                   <strong>Çalışma Saatleri</strong>
-                  <p>Pazartesi - Cumartesi: 09:00 - 19:00 | Pazar: 11:00 - 17:00</p>
+                  <p>{workingDays}: {workingHours}</p>
                 </div>
               </div>
             </div>
 
             <div className="loc-actions-row">
-              {dealer?.address && (
+              {customMapsUrl && (
                 <a 
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dealer.name + ' ' + dealer.address)}`}
+                  href={customMapsUrl}
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="loc-maps-btn"
@@ -991,7 +1003,7 @@ export default function DealerProfileClient({ dealer, products }) {
       <div className="showroom-bottom-action-bar">
         <div className="bottom-bar-inner">
           <a 
-            href={`https://wa.me/${dealerWhatsAppPhone}?text=${encodeURIComponent('Merhaba, ' + dealer?.name + ' showroom sayfanızdan ulaşıyorum. Ürünler ve fiyatlar hakkında bilgi alabilir miyim?')}`}
+            href={`https://wa.me/${dealerWhatsAppPhone}?text=${encodeURIComponent(whatsappGreeting)}`}
             target="_blank" 
             rel="noopener noreferrer"
             className="bottom-action-btn btn-whatsapp"
@@ -1000,9 +1012,9 @@ export default function DealerProfileClient({ dealer, products }) {
             <span>WhatsApp ile İletişime Geçin</span>
           </a>
 
-          {dealer?.address ? (
+          {customMapsUrl ? (
             <a 
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dealer.name + ' ' + dealer.address)}`}
+              href={customMapsUrl}
               target="_blank" 
               rel="noopener noreferrer"
               className="bottom-action-btn btn-directions"
@@ -1321,7 +1333,6 @@ export default function DealerProfileClient({ dealer, products }) {
 
             <div className="qr-modal-body">
               <div className="qr-box-inner">
-                {/* Embedded Clean QR representation */}
                 <div className="qr-display-frame">
                   <QrCode size={180} className="qr-icon-large" />
                 </div>

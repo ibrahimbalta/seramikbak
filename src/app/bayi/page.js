@@ -1536,6 +1536,69 @@ Yetkili Satış & Showroom Departmanı`;
     setProfileDealerFaqs(profileDealerFaqs.filter((_, i) => i !== index));
   };
 
+
+  // Showroom Bespoke Content Management Helpers
+  const updateShowroomConfigField = (field, value) => {
+    setProfileDealerStats(prev => {
+      const statsObj = typeof prev === 'object' && prev !== null ? prev : {};
+      const sc = statsObj.showroomConfig || {};
+      return {
+        ...statsObj,
+        showroomConfig: {
+          ...sc,
+          [field]: value
+        }
+      };
+    });
+  };
+
+  const updatePillarField = (idx, field, value) => {
+    setProfileDealerStats(prev => {
+      const statsObj = typeof prev === 'object' && prev !== null ? prev : {};
+      const sc = statsObj.showroomConfig || {};
+      const defaultPillars = [
+        { title: '100+ Teşhir Ürünü', desc: 'En güncel geniş ebat porselen serileri' },
+        { title: '3D Mekan Görüntüleme', desc: 'Karoları kendi mekanınızda canlı görün' },
+        { title: 'Gerçek Numune', desc: 'Mimari projeler için yerinde doku kontrolü' },
+        { title: 'Hızlı Teklif', desc: 'Dakikalar içinde net metraj ve fiyatlandırma' }
+      ];
+      const currentPillars = Array.isArray(sc.featurePillars) && sc.featurePillars.length === 4
+        ? [...sc.featurePillars]
+        : defaultPillars;
+      currentPillars[idx] = { ...currentPillars[idx], [field]: value };
+      return {
+        ...statsObj,
+        showroomConfig: {
+          ...sc,
+          featurePillars: currentPillars
+        }
+      };
+    });
+  };
+
+  const updateAiBulletField = (idx, field, value) => {
+    setProfileDealerStats(prev => {
+      const statsObj = typeof prev === 'object' && prev !== null ? prev : {};
+      const sc = statsObj.showroomConfig || {};
+      const defaultBullets = [
+        { title: 'Saniyeler İçinde 3D Çıktı', desc: 'Karmaşık mimari çizim programlarına gerek kalmadan anında sonuç alın.' },
+        { title: 'Gerçek Işık & Yansıma Uyumu', desc: 'Seramik yüzey dokuları odanızın gerçek gün ışığına göre birebir render edilir.' },
+        { title: 'Doğrudan Bayiden Sipariş', desc: 'Oluşturduğunuz tasarımın metrajını tek tıkla WhatsApp üzerinden bayimize iletin.' }
+      ];
+      const currentBullets = Array.isArray(sc.aiBullets) && sc.aiBullets.length === 3
+        ? [...sc.aiBullets]
+        : defaultBullets;
+      currentBullets[idx] = { ...currentBullets[idx], [field]: value };
+      return {
+        ...statsObj,
+        showroomConfig: {
+          ...sc,
+          aiBullets: currentBullets
+        }
+      };
+    });
+  };
+
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     if (!dealerInfo) return;
@@ -4806,6 +4869,357 @@ Yetkili Satış & Showroom Departmanı`;
                       className="portal-input"
                     />
                   </div>
+                </div>
+
+
+                {/* ========================================================================== */}
+                {/* SECTION: SHOWROOM VİTRİN & İÇERİK YÖNETİMİ (KURUMSAL AMİRAL GEMİSİ) */}
+                {/* ========================================================================== */}
+                <div className="settings-section" style={{ background: '#ffffff', border: '1.5px solid #6b1d2f', borderRadius: '16px', padding: '28px', boxShadow: '0 8px 24px rgba(107, 29, 47, 0.04)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', borderBottom: '1.5px solid #f1f5f9', paddingBottom: '16px', marginBottom: '24px' }}>
+                    <div>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#fdf2f4', color: '#6b1d2f', padding: '4px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: '800', letterSpacing: '0.5px', marginBottom: '6px' }}>
+                        ★ AMİRAL GEMİSİ SHOWROOM SAYFASI
+                      </div>
+                      <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        🏛️ Canlı Showroom Sayfası İçerik & Vitrin Yönetimi
+                      </h3>
+                      <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '4px 0 0 0' }}>
+                        Müşterilerinize gösterilen kurumsal showroom sayfanızdaki (Hero, 4 Değer Kartı, AI Paneli, Çalışma Saatleri ve WhatsApp mesajları) tüm içerikleri buradan anında güncelleyebilirsiniz.
+                      </p>
+                    </div>
+
+                    {dealerInfo?.id && (
+                      <Link 
+                        href={`/bayi/${dealerInfo.id}`} 
+                        target="_blank"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#6b1d2f', color: '#ffffff', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '700', textDecoration: 'none' }}
+                      >
+                        <ExternalLink size={14} />
+                        <span>Canlı Showroomu Görüntüle</span>
+                      </Link>
+                    )}
+                  </div>
+
+                  {(() => {
+                    const sc = (typeof profileDealerStats === 'object' && profileDealerStats !== null ? profileDealerStats.showroomConfig : {}) || {};
+                    const defaultPillars = [
+                      { title: '100+ Teşhir Ürünü', desc: 'En güncel geniş ebat porselen serileri' },
+                      { title: '3D Mekan Görüntüleme', desc: 'Karoları kendi mekanınızda canlı görün' },
+                      { title: 'Gerçek Numune', desc: 'Mimari projeler için yerinde doku kontrolü' },
+                      { title: 'Hızlı Teklif', desc: 'Dakikalar içinde net metraj ve fiyatlandırma' }
+                    ];
+                    const pillars = Array.isArray(sc.featurePillars) && sc.featurePillars.length === 4 ? sc.featurePillars : defaultPillars;
+
+                    const defaultBullets = [
+                      { title: 'Saniyeler İçinde 3D Çıktı', desc: 'Karmaşık mimari çizim programlarına gerek kalmadan anında sonuç alın.' },
+                      { title: 'Gerçek Işık & Yansıma Uyumu', desc: 'Seramik yüzey dokuları odanızın gerçek gün ışığına göre birebir render edilir.' },
+                      { title: 'Doğrudan Bayiden Sipariş', desc: 'Oluşturduğunuz tasarımın metrajını tek tıkla WhatsApp üzerinden bayimize iletin.' }
+                    ];
+                    const bullets = Array.isArray(sc.aiBullets) && sc.aiBullets.length === 3 ? sc.aiBullets : defaultBullets;
+
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+                        {/* 1. HERO BÖLÜMÜ YÖNETİMİ */}
+                        <div style={{ background: '#fdfbf7', border: '1px solid #ebd9c8', borderRadius: '12px', padding: '20px' }}>
+                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#6b1d2f', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span>1.</span> Hero (Giriş) Vitrini & Karşılama Metinleri
+                          </h4>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Hero Üst Rozet Metni</label>
+                              <input 
+                                type="text"
+                                value={sc.heroBadge || ''}
+                                onChange={(e) => updateShowroomConfigField('heroBadge', e.target.value)}
+                                placeholder="Örn: YETKİLİ SHOWROOM & PROJE MERKEZİ"
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Özel Hero Başlığı (Boşsa Bayi Adı Görünür)</label>
+                              <input 
+                                type="text"
+                                value={sc.heroTitle || ''}
+                                onChange={(e) => updateShowroomConfigField('heroTitle', e.target.value)}
+                                placeholder={dealerInfo?.name || 'Showroom Başlığı'}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '14px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Showroom Tanıtım Açıklaması</label>
+                            <textarea 
+                              rows={3}
+                              value={sc.heroDescription || ''}
+                              onChange={(e) => updateShowroomConfigField('heroDescription', e.target.value)}
+                              placeholder="En seçkin porselen ve seramik karo koleksiyonları, mimari projelendirme desteği..."
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff', resize: 'vertical' }}
+                            />
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Birincil Buton Metni (Bordo)</label>
+                              <input 
+                                type="text"
+                                value={sc.heroPrimaryBtnText || ''}
+                                onChange={(e) => updateShowroomConfigField('heroPrimaryBtnText', e.target.value)}
+                                placeholder="Showroomu İncele"
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>İkincil Buton Metni (Beyaz)</label>
+                              <input 
+                                type="text"
+                                value={sc.heroSecondaryBtnText || ''}
+                                onChange={(e) => updateShowroomConfigField('heroSecondaryBtnText', e.target.value)}
+                                placeholder="Teklif Al"
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Görsel Altı El Yazısı İmzası (İtalik Not)</label>
+                              <input 
+                                type="text"
+                                value={sc.heroCursiveQuote || ''}
+                                onChange={(e) => updateShowroomConfigField('heroCursiveQuote', e.target.value)}
+                                placeholder="“Hayalinizdeki mekan burada başlıyor...”"
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>El Yazısı Alt Koleksiyon Başlığı</label>
+                              <input 
+                                type="text"
+                                value={sc.heroCursiveSub || ''}
+                                onChange={(e) => updateShowroomConfigField('heroCursiveSub', e.target.value)}
+                                placeholder={dealerInfo?.name ? `${dealerInfo.name} Koleksiyonu` : 'Showroom Koleksiyonu'}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Çalışma Günleri</label>
+                              <input 
+                                type="text"
+                                value={sc.workingDays || ''}
+                                onChange={(e) => updateShowroomConfigField('workingDays', e.target.value)}
+                                placeholder="Pazartesi - Cumartesi"
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Çalışma Saatleri</label>
+                              <input 
+                                type="text"
+                                value={sc.workingHours || ''}
+                                onChange={(e) => updateShowroomConfigField('workingHours', e.target.value)}
+                                placeholder="09:00 - 19:00"
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 2. DÖRTLÜ DEĞER ÖNERİSİ BARI */}
+                        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px' }}>
+                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span>2.</span> Dörtlü Değer Önerisi Barı (Hero Altı Kartlar)
+                          </h4>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '14px' }}>
+                            {pillars.map((pil, idx) => (
+                              <div key={idx} style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#6b1d2f' }}>KART #{idx + 1}</span>
+                                <input 
+                                  type="text"
+                                  value={pil.title}
+                                  onChange={(e) => updatePillarField(idx, 'title', e.target.value)}
+                                  placeholder="Kart Başlığı"
+                                  style={{ padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.8rem', fontWeight: '700' }}
+                                />
+                                <input 
+                                  type="text"
+                                  value={pil.desc}
+                                  onChange={(e) => updatePillarField(idx, 'desc', e.target.value)}
+                                  placeholder="Kart Açıklaması"
+                                  style={{ padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.76rem', color: '#64748b' }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 3. KATALOG & DANIŞMANLIK KARTI */}
+                        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px' }}>
+                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span>3.</span> Showroom Kataloğu & Mimari Danışmanlık Kartı
+                          </h4>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', marginBottom: '12px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Katalog Bölüm Başlığı</label>
+                              <input 
+                                type="text"
+                                value={sc.catalogTitle || ''}
+                                onChange={(e) => updateShowroomConfigField('catalogTitle', e.target.value)}
+                                placeholder="Showroom Ürünleri"
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Sidebar Mimari Danışmanlık Başlığı</label>
+                              <input 
+                                type="text"
+                                value={sc.consultationTitle || ''}
+                                onChange={(e) => updateShowroomConfigField('consultationTitle', e.target.value)}
+                                placeholder="Banyonuz İçin Birlikte Çizelim"
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Sidebar Danışmanlık Açıklaması</label>
+                            <input 
+                              type="text"
+                              value={sc.consultationDesc || ''}
+                              onChange={(e) => updateShowroomConfigField('consultationDesc', e.target.value)}
+                              placeholder="Showroom uzmanımızla randevu alarak projenize özel karo seçimi yapın."
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* 4. YAPAY ZEKA "MEKANINI TASARLA" PANELİ */}
+                        <div style={{ background: '#fdf8f4', border: '1px solid #f3d8c2', borderRadius: '12px', padding: '20px' }}>
+                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#b45309', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span>4.</span> Yapay Zeka Destekli "Mekanını Tasarla" Paneli
+                          </h4>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>AI Rozet Metni</label>
+                              <input 
+                                type="text"
+                                value={sc.aiBadge || ''}
+                                onChange={(e) => updateShowroomConfigField('aiBadge', e.target.value)}
+                                placeholder="YAPAY ZEKA DESTEKLİ"
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>AI Başlığı</label>
+                              <input 
+                                type="text"
+                                value={sc.aiTitle || ''}
+                                onChange={(e) => updateShowroomConfigField('aiTitle', e.target.value)}
+                                placeholder="Mekanını Tasarla"
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>AI Buton Metni</label>
+                              <input 
+                                type="text"
+                                value={sc.aiBtnText || ''}
+                                onChange={(e) => updateShowroomConfigField('aiBtnText', e.target.value)}
+                                placeholder="Fotoğraf Yükle & Tasarla"
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>AI Açıklama Metni</label>
+                            <textarea 
+                              rows={2}
+                              value={sc.aiDesc || ''}
+                              onChange={(e) => updateShowroomConfigField('aiDesc', e.target.value)}
+                              placeholder="Kendi banyonuzun veya salonunuzun fotoğrafını yükleyin..."
+                              style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff', resize: 'vertical' }}
+                            />
+                          </div>
+
+                          <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '8px' }}>
+                            3 Avantaj Maddesi (Tik İşaretli)
+                          </label>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+                            {bullets.map((b, idx) => (
+                              <div key={idx} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#b45309' }}>MADDE #{idx + 1}</span>
+                                <input 
+                                  type="text"
+                                  value={b.title}
+                                  onChange={(e) => updateAiBulletField(idx, 'title', e.target.value)}
+                                  placeholder="Madde Başlığı"
+                                  style={{ padding: '7px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', fontWeight: '700' }}
+                                />
+                                <input 
+                                  type="text"
+                                  value={b.desc}
+                                  onChange={(e) => updateAiBulletField(idx, 'desc', e.target.value)}
+                                  placeholder="Madde Açıklaması"
+                                  style={{ padding: '7px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem', color: '#64748b' }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 5. İLETİŞİM & WHATSAPP ŞABLONU */}
+                        <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '20px' }}>
+                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#15803d', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span>5.</span> WhatsApp Mesaj Şablonu & Harita Linki
+                          </h4>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>
+                                WhatsApp'tan "İletişime Geçin" Butonuna Basıldığında Otomatik Açılacak Karşılama Mesajı
+                              </label>
+                              <input 
+                                type="text"
+                                value={sc.whatsappGreeting || ''}
+                                onChange={(e) => updateShowroomConfigField('whatsappGreeting', e.target.value)}
+                                placeholder={`Merhaba, ${dealerInfo?.name || 'Showroom'} sayfanızdan ulaşıyorum. Ürünler ve fiyatlar hakkında bilgi alabilir miyim?`}
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>
+                                Google Haritalar Özel Konum Linki (Boş bırakılırsa adresinizle otomatik aranır)
+                              </label>
+                              <input 
+                                type="text"
+                                value={sc.customMapsUrl || ''}
+                                onChange={(e) => updateShowroomConfigField('customMapsUrl', e.target.value)}
+                                placeholder="https://maps.google.com/?q=..."
+                                style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* SECTION: SHOWROOM İSTATİSTİKLERİ */}
