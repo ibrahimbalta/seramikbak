@@ -593,188 +593,67 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </header>
 
-      {/* Top Banner Hero (Dealer Banner, Logo, Badges, Stats & Quick Actions) */}
-      <section className="showroom-top-banner-hero">
-        <div className="top-banner-bg-wrapper">
+      {/* Unified Luxury Showroom Hero Banner */}
+      <section className="showroom-unified-hero">
+        <div className="hero-backdrop-media">
           <img 
             src={dealer?.bannerUrl || heroImage} 
             alt={dealer?.name || 'Showroom Banner'} 
-            className="top-banner-img"
+            className="hero-backdrop-img"
           />
-          <div className="top-banner-overlay-gradient" />
+          <div className="hero-backdrop-overlay" />
         </div>
 
-        <div className="top-banner-container">
-          {/* Left: Brand Identity, Concepts & Highlights */}
-          <div className="top-banner-left">
-            <div className="top-banner-logo-row">
-              <div className={`top-banner-logo-badge ${!dealer?.logoUrl ? 'monogram-badge' : ''}`}>
-                {dealer?.logoUrl ? (
-                  <img src={dealer.logoUrl} alt={dealer.name} className="top-banner-logo-img" />
-                ) : (
-                  <Building2 size={28} className="monogram-icon" />
-                )}
-              </div>
-              <div className="top-banner-partner-badge">
+        <div className="hero-unified-container">
+          {/* Main Identity & CTAs Column */}
+          <div className="hero-content-col">
+            <div className="hero-brand-header">
+              {dealer?.logoUrl ? (
+                <div className="hero-logo-box">
+                  <img src={dealer.logoUrl} alt={dealer.name} className="hero-logo-img" />
+                </div>
+              ) : (
+                <div className="hero-logo-box monogram-box">
+                  <Building2 size={24} className="monogram-icon" />
+                </div>
+              )}
+              <div className="hero-badge-pill">
                 <ShieldCheck size={14} className="badge-shield-gold" />
                 <span>{heroBadge}</span>
               </div>
             </div>
 
-            <h1 className="top-banner-main-title">{dealer?.name || 'Yetkili Showroom'}</h1>
+            <h1 className="hero-title-main">{heroTitle}</h1>
 
-            <div className="top-banner-meta-row">
-              <div className="banner-meta-pill open-badge">
+            <p className="hero-desc-lead">{heroDescription}</p>
+
+            {/* Compact, Symmetrical Info Bar */}
+            <div className="hero-info-chips-bar">
+              <div className="hero-info-chip status-open">
                 <span className="live-dot" />
-                <span>Şu an Açık • {workingDays}: {workingHours}</span>
+                <span>Açık • {workingDays}: {workingHours}</span>
               </div>
               {dealer?.city && (
-                <div className="banner-meta-pill">
-                  <MapPin size={14} />
+                <div className="hero-info-chip">
+                  <MapPin size={13} className="chip-icon" />
                   <span>{dealer.city}{dealer.district ? ` / ${dealer.district}` : ''}</span>
                 </div>
               )}
               {dealer?.phone && (
-                <a href={`tel:${dealer.phone}`} className="banner-meta-pill">
-                  <Phone size={14} />
+                <a href={`tel:${dealer.phone}`} className="hero-info-chip tel-chip">
+                  <Phone size={13} className="chip-icon" />
                   <span>{dealer.phone}</span>
                 </a>
               )}
             </div>
 
-            {dealerSpecialConcepts.length > 0 && (
-              <div className="top-banner-concepts-row">
-                <span className="concepts-label">Özel Konseptler:</span>
-                {dealerSpecialConcepts.map((concept, idx) => (
-                  <span key={idx} className="concept-chip">{concept}</span>
-                ))}
-              </div>
-            )}
-
-            <div className="top-banner-stats-grid">
-              <div className="banner-stat-box">
-                <span className="stat-num">{allCatalogProducts.length}+</span>
-                <span className="stat-lbl">Teşhir Ürünü</span>
-              </div>
-              <div className="banner-stat-box">
-                <span className="stat-num">{dealerStatsObj?.customerSatisfaction || '99%'}</span>
-                <span className="stat-lbl">Müşteri Memnuniyeti</span>
-              </div>
-              <div className="banner-stat-box">
-                <span className="stat-num">{dealerStatsObj?.yearsExperience || '15+'} Yıl</span>
-                <span className="stat-lbl">Sektör Deneyimi</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: Quick Action Card */}
-          <div className="top-banner-right">
-            <div className="top-banner-cta-card">
-              <span className="cta-card-badge">HIZLI İLETİŞİM & PROJE</span>
-              <h3 className="cta-card-title">{dealer?.name || 'Yetkili Showroom'}</h3>
-              <p className="cta-card-desc">
-                Mimari projeniz için özel metraj fiyatı, proforma teklif veya showroom randevusu alın.
-              </p>
-
-              <div className="banner-actions-grid">
-                <a 
-                  href={`https://wa.me/${dealerWhatsAppPhone}?text=${encodeURIComponent(whatsappGreeting)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="banner-btn-wa"
-                >
-                  <MessageSquare size={16} />
-                  <span>WhatsApp</span>
-                </a>
-
-                {customMapsUrl ? (
-                  <a 
-                    href={customMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="banner-btn-map"
-                  >
-                    <Navigation size={16} />
-                    <span>Yol Tarifi</span>
-                  </a>
-                ) : (
-                  <button 
-                    onClick={() => setShowApptModal(true)}
-                    className="banner-btn-map"
-                  >
-                    <Calendar size={16} />
-                    <span>Randevu Al</span>
-                  </button>
-                )}
-
-                {dealer?.pdfCatalogUrl && (
-                  <a 
-                    href={dealer.pdfCatalogUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download
-                    className="banner-btn-pdf"
-                  >
-                    <Download size={15} />
-                    <span>{dealer.pdfCatalogName || 'PDF Katalog'}</span>
-                  </a>
-                )}
-
-                {dealer?.virtualTourUrl && (
-                  <a 
-                    href="#sanal-tur"
-                    className="banner-btn-tour"
-                  >
-                    <Eye size={15} />
-                    <span>360° Sanal Tur</span>
-                  </a>
-                )}
-              </div>
-
-              {(dealer?.socialInstagram || dealer?.socialFacebook || dealer?.socialLinkedin || dealer?.socialYoutube || dealer?.socialWebsite) && (
-                <div className="banner-socials-row">
-                  <span className="socials-hint">Sosyal:</span>
-                  {dealer?.socialInstagram && (
-                    <a href={dealer.socialInstagram} target="_blank" rel="noopener noreferrer" className="social-pill">Instagram</a>
-                  )}
-                  {dealer?.socialFacebook && (
-                    <a href={dealer.socialFacebook} target="_blank" rel="noopener noreferrer" className="social-pill">Facebook</a>
-                  )}
-                  {dealer?.socialLinkedin && (
-                    <a href={dealer.socialLinkedin} target="_blank" rel="noopener noreferrer" className="social-pill">LinkedIn</a>
-                  )}
-                  {dealer?.socialYoutube && (
-                    <a href={dealer.socialYoutube} target="_blank" rel="noopener noreferrer" className="social-pill">YouTube</a>
-                  )}
-                  {dealer?.socialWebsite && (
-                    <a href={dealer.socialWebsite} target="_blank" rel="noopener noreferrer" className="social-pill">Web</a>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 1: Hero Section (Dynamic & Symmetrical) */}
-      <section className="showroom-hero-section">
-        <div className="showroom-hero-container">
-          {/* Left Column: Dealer Information */}
-          <div className="hero-left-column">
-            <div className="hero-dealer-badge">
-              <ShieldCheck size={15} className="badge-shield-icon" />
-              <span>{heroBadge}</span>
-            </div>
-
-            <h1 className="hero-dealer-title">{heroTitle}</h1>
-
-            <p className="hero-dealer-description">{heroDescription}</p>
-
-            <div className="hero-cta-group">
+            {/* Clean, Prominent Action Buttons */}
+            <div className="hero-actions-row">
               <a href="#katalog" className="hero-btn-primary">
-                <span>{heroPrimaryBtnText}</span>
-                <ArrowRight size={17} />
+                <span>{heroPrimaryBtnText || 'Koleksiyonu İncele'}</span>
+                <ArrowRight size={16} />
               </a>
+
               <button 
                 onClick={() => {
                   setSelectedProductForLead(null);
@@ -782,34 +661,36 @@ export default function DealerProfileClient({ dealer, products }) {
                 }} 
                 className="hero-btn-secondary"
               >
-                <span>{heroSecondaryBtnText}</span>
+                <span>{heroSecondaryBtnText || 'Fiyat Teklifi Al'}</span>
               </button>
-            </div>
 
-            <div className="hero-meta-badges">
-              <div className="hero-meta-item">
-                <MapPin size={15} className="meta-pin-icon" />
-                <span>{dealer?.address ? `${dealer.name} • ${dealer.city || 'Merkez'}` : `${dealer.name} • ${dealer.city || 'Merkez Showroom'}`}</span>
-              </div>
-              <div className="hero-meta-item">
-                <Clock size={15} className="meta-clock-icon" />
-                <span className="status-open-pill">Açık</span>
-                <span>{workingDays} • {workingHours}</span>
-              </div>
+              {dealer?.pdfCatalogUrl && (
+                <a 
+                  href={dealer.pdfCatalogUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  download 
+                  className="hero-btn-pdf"
+                  title="PDF Katalog İndir"
+                >
+                  <Download size={15} />
+                  <span>PDF Katalog</span>
+                </a>
+              )}
             </div>
           </div>
 
-          {/* Right Column: Hero Visual Card with Cursive Signature */}
-          <div className="hero-right-column">
-            <div className="hero-card-visual-wrapper">
+          {/* Desktop Right Column: Curated Showroom Visual Card */}
+          <div className="hero-card-col">
+            <div className="hero-visual-card">
               <img 
                 src={heroImage} 
                 alt={dealer?.name || 'Showroom Banyo'} 
-                className="hero-main-card-img"
+                className="visual-card-img" 
               />
-              <div className="hero-cursive-quote-badge">
-                <p className="cursive-quote-text">{heroCursiveQuote}</p>
-                <span className="cursive-quote-sub">{heroCursiveSub}</span>
+              <div className="visual-card-overlay">
+                <p className="visual-cursive-text">{heroCursiveQuote}</p>
+                <span className="visual-cursive-sub">{heroCursiveSub}</span>
               </div>
             </div>
           </div>
@@ -1406,6 +1287,20 @@ export default function DealerProfileClient({ dealer, products }) {
               );
             })}
           </div>
+
+          {dealerSpecialConcepts.length > 0 && (
+            <div className="showroom-concepts-wrapper">
+              <span className="concepts-header-label">Uzmanlık & Özel Konsept Alanları</span>
+              <div className="concepts-chips-grid">
+                {dealerSpecialConcepts.map((concept, idx) => (
+                  <span key={idx} className="concept-tag-chip">
+                    <Check size={13} className="concept-check" />
+                    <span>{concept}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
       )}
 
@@ -1431,31 +1326,6 @@ export default function DealerProfileClient({ dealer, products }) {
                 />
               </div>
             ))}
-          </div>
-        </section>
-      )}
-
-      {/* Section: 360° Showroom Sanal Tur */}
-      {dealer?.virtualTourUrl && (
-        <section id="sanal-tur" className="showroom-virtual-tour-section">
-          <div className="virtual-tour-card">
-            <div className="virtual-tour-info">
-              <span className="tour-badge">İNTERAKTİF DENEYİM</span>
-              <h2 className="tour-title">360° Showroom Sanal Turu</h2>
-              <p className="tour-desc">
-                Showroomumuza gelmeden önce teşhir stantlarımızı 3 boyutlu sanal tur ile 360 derece gezin, ürünleri mekan ortamında inceleyin.
-              </p>
-              <a 
-                href={dealer.virtualTourUrl} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="tour-action-btn"
-              >
-                <Eye size={17} />
-                <span>Sanal Turu Başlat</span>
-                <ExternalLink size={15} />
-              </a>
-            </div>
           </div>
         </section>
       )}
@@ -1542,7 +1412,7 @@ export default function DealerProfileClient({ dealer, products }) {
       )}
 
       {/* Section 6: Showroom Location & Virtual Tour */}
-      <section className="showroom-location-section">
+      <section id="lokasyon" className="showroom-location-section">
         <div className="showroom-location-container">
           <div className="location-info-col">
             <span className="location-pill-tag">BİZİ ZİYARET EDİN</span>
