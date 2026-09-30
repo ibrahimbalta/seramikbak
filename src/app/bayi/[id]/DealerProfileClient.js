@@ -156,7 +156,7 @@ export default function DealerProfileClient({ dealer, products }) {
       id: 'marble',
       name: 'İtalyan Mermer Zarafeti',
       subtitle: 'Calacatta & Damarlı Beyazlar',
-      icon: '🏛️',
+      icon: <Sparkles size={20} strokeWidth={1.75} />,
       styleKey: 'Mermer',
       tag: 'Zamansız Lüks',
       bgGradient: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%)',
@@ -167,9 +167,9 @@ export default function DealerProfileClient({ dealer, products }) {
       id: 'concrete',
       name: 'Modern Loft & Brüt Beton',
       subtitle: 'Minimalist Çizgiler & Gri Tonlar',
-      icon: '🏢',
+      icon: <Building2 size={20} strokeWidth={1.75} />,
       styleKey: 'Beton',
-      tag: 'Endüstriyel Chic',
+      tag: 'Endüstriyel Mimari',
       bgGradient: 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(203, 213, 225, 0.9) 100%)',
       accentColor: '#64748b',
       desc: 'Sakin, dingin ve modern rezidans mimarisine uygun geniş ebat gri ve füme yüzeyler.'
@@ -178,9 +178,9 @@ export default function DealerProfileClient({ dealer, products }) {
       id: 'wood',
       name: 'Doğal İskandinav Ahşap',
       subtitle: 'Meşe & Teak Parke Karolar',
-      icon: '🌿',
+      icon: <Compass size={20} strokeWidth={1.75} />,
       styleKey: 'Ahşap',
-      tag: 'Doğal & Dingin',
+      tag: 'Doğal Doku',
       bgGradient: 'linear-gradient(135deg, rgba(254, 243, 199, 0.9) 0%, rgba(253, 230, 138, 0.8) 100%)',
       accentColor: '#d97706',
       desc: 'Ahşabın sıcaklığını porselenin çizilmez ve su geçirmez dayanıklılığıyla buluşturun.'
@@ -189,7 +189,7 @@ export default function DealerProfileClient({ dealer, products }) {
       id: 'dark',
       name: 'Monokrom & Lüks Spa',
       subtitle: 'Antrasit, Mat Siyah & Karizma',
-      icon: '🖤',
+      icon: <Layers size={20} strokeWidth={1.75} />,
       styleKey: 'Antrasit',
       tag: 'Boutique Hotel & Spa',
       bgGradient: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%)',
@@ -200,7 +200,7 @@ export default function DealerProfileClient({ dealer, products }) {
       id: 'stone',
       name: 'Akdeniz Traverten & Bej',
       subtitle: 'Doğal Taş Dokusu & Rustik Esinti',
-      icon: '🌊',
+      icon: <Palette size={20} strokeWidth={1.75} />,
       styleKey: 'Taş',
       tag: 'Akdeniz Esintisi',
       bgGradient: 'linear-gradient(135deg, rgba(254, 242, 242, 0.9) 0%, rgba(254, 226, 226, 0.8) 100%)',
@@ -733,25 +733,26 @@ export default function DealerProfileClient({ dealer, products }) {
           <div className="ai-hero-live-bar">
             <div className={`ai-status-pill ${isOpenNow ? 'status-open' : 'status-closed'}`}>
               <span className={`live-dot-pulse ${isOpenNow ? 'pulse-green' : 'pulse-amber'}`}></span>
-              <span>{isOpenNow ? '🟢 Şu An Açık • Ziyarete Hazır (09:00 - 19:00)' : '🌙 Şu An Kapalı • Yarın 09:00\'da Açılıyor'}</span>
+              <span>{isOpenNow ? 'Açık • Ziyarete Hazır (09:00 - 19:00)' : 'Kapalı • Yarın 09:00\'da Açılıyor'}</span>
             </div>
             <button 
               type="button"
               onClick={() => setShowAppointmentModal(true)}
               className="ai-badge-pill clickable-pill"
             >
-              <Coffee size={12} style={{ color: 'var(--accent-gold)' }} />
-              <span>Kahvemizi İçin & Mimar Randevusu</span>
+              <Coffee size={13} style={{ color: 'var(--accent-gold)' }} />
+              <span>Showroom & Mimar Randevusu</span>
             </button>
             <div className="ai-stock-pill">
-              <span>📦 {dealer.inventories?.length || 0}+ Seri Stokta</span>
+              <Package size={13} style={{ color: '#0f172a' }} />
+              <span>{dealer.inventories?.length || 0}+ Seri Teşhirde</span>
             </div>
             <button
               type="button"
               onClick={() => setShowQrModal(true)}
               className="ai-badge-pill clickable-pill hide-mobile"
             >
-              <QrCode size={12} />
+              <QrCode size={13} />
               <span>Masa Standı QR</span>
             </button>
           </div>
@@ -783,17 +784,19 @@ export default function DealerProfileClient({ dealer, products }) {
                 <div className="header-services-badges">
                   {servicesList.map(s => {
                     const labelMap = {
-                      studio_3d: '✨ 3D Mimar Destek',
-                      shipping: '🚚 Nakliye Desteği',
-                      install_support: '🛠️ Usta Desteği',
-                      sample_box: '📦 Numune Kargo',
-                      credit_card: '💳 Kart Taksiti',
-                      b2b_discount: '🏢 Proje İskontosu',
-                      showroom_stock: '🏬 Hazır Stok'
+                      studio_3d: { text: '3D Mimar Desteği', icon: <Sparkles size={12} /> },
+                      shipping: { text: 'Şantiye Nakliyesi', icon: <Truck size={12} /> },
+                      install_support: { text: 'Usta & Uygulama', icon: <Wrench size={12} /> },
+                      sample_box: { text: 'Numune Kargo', icon: <Package size={12} /> },
+                      credit_card: { text: 'Kart Taksiti', icon: <CreditCard size={12} /> },
+                      b2b_discount: { text: 'Proje İskontosu', icon: <Building2 size={12} /> },
+                      showroom_stock: { text: 'Hazır Showroom Stoğu', icon: <Layers size={12} /> }
                     };
-                    return labelMap[s] ? (
-                      <span key={s} className="service-badge">
-                        {labelMap[s]}
+                    const item = labelMap[s];
+                    return item ? (
+                      <span key={s} className="service-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                        {item.icon}
+                        <span>{item.text}</span>
                       </span>
                     ) : null;
                   })}
@@ -994,7 +997,14 @@ export default function DealerProfileClient({ dealer, products }) {
                     <span className="moodboard-sub">{board.subtitle}</span>
                     <p className="moodboard-p">{board.desc}</p>
                     <div className="moodboard-footer-action">
-                      <span>{isActive ? '✓ Aktif Konsept' : 'Bu Konsepti İncele'}</span>
+                      {isActive ? (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                          <Check size={13} />
+                          <span>Aktif Konsept</span>
+                        </span>
+                      ) : (
+                        <span>Konsepti İncele</span>
+                      )}
                       <ArrowRight size={13} />
                     </div>
                   </div>
@@ -1085,16 +1095,20 @@ export default function DealerProfileClient({ dealer, products }) {
                 <div className="showcase-specs-column">
                   <div className="specs-pills-wrap">
                     <span className="spec-badge-pill">
-                      💎 {selectedShowcaseTile.finish || 'Full Lappato'}
+                      <Sparkles size={13} style={{ color: 'var(--accent-gold)' }} />
+                      <span>{selectedShowcaseTile.finish || 'Full Lappato Parlak'}</span>
                     </span>
                     <span className="spec-badge-pill">
-                      📐 Rektifiye Sıfır Derz
+                      <Layers size={13} style={{ color: '#0f172a' }} />
+                      <span>Rektifiye Sıfır Derz</span>
                     </span>
                     <span className="spec-badge-pill">
-                      🛡️ Porselen E &lt; %0.5 Su Emme
+                      <ShieldCheck size={13} style={{ color: '#059669' }} />
+                      <span>Porselen Düşük Su Emme (E &lt; %0.5)</span>
                     </span>
                     <span className="spec-badge-pill">
-                      👣 Donma & Çizilmeye Dayanıklı
+                      <Award size={13} style={{ color: '#b45309' }} />
+                      <span>Donma & Çizilmeye Dayanıklı</span>
                     </span>
                   </div>
 
@@ -1447,7 +1461,8 @@ export default function DealerProfileClient({ dealer, products }) {
                       key={idx}
                       className="concept-badge"
                     >
-                      ✨ {concept.trim()}
+                      <Sparkles size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle', color: 'var(--accent-gold)' }} />
+                      <span>{concept.trim()}</span>
                     </span>
                   ))}
                 </div>
@@ -1595,8 +1610,9 @@ export default function DealerProfileClient({ dealer, products }) {
                 )}
 
                 {errorMsg && (
-                  <div className="alert-box error">
-                    <span>⚠️ {errorMsg}</span>
+                  <div className="alert-box error" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <X size={16} style={{ color: '#ef4444', flexShrink: 0 }} />
+                    <span>{errorMsg}</span>
                   </div>
                 )}
 
@@ -1654,30 +1670,34 @@ export default function DealerProfileClient({ dealer, products }) {
 
                 <div className="input-group">
                   <label className="input-label">Hızlı Talep Konusu (Tek Tıkla Seçin)</label>
-                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
                     {[
-                      '📐 3D Sanal Banyo Tasarımı İstiyorum',
-                      '🚚 Nakliye & Şantiye Teslimat Bilgisi',
-                      '💰 Toptan Palet Fiyat İskontosu',
-                      '📦 Gerçek Numune Karo Talebi'
+                      { label: '3D Sanal Banyo Tasarımı Talebi', icon: <Sparkles size={12} /> },
+                      { label: 'Nakliye & Şantiye Teslimat Bilgisi', icon: <Truck size={12} /> },
+                      { label: 'Toptan Palet Fiyat İskontosu', icon: <Building2 size={12} /> },
+                      { label: 'Gerçek Numune Karo Talebi', icon: <Package size={12} /> }
                     ].map((preset, pIdx) => (
                       <button
                         key={pIdx}
                         type="button"
-                        onClick={() => setNotes(prev => prev ? `${prev} • ${preset}` : preset)}
+                        onClick={() => setNotes(prev => prev ? `${prev} • ${preset.label}` : preset.label)}
                         style={{
-                          fontSize: '0.72rem',
+                          fontSize: '0.74rem',
                           fontWeight: '700',
-                          padding: '4px 10px',
-                          borderRadius: '16px',
-                          background: 'rgba(212, 175, 55, 0.12)',
+                          padding: '6px 12px',
+                          borderRadius: '12px',
+                          background: 'rgba(212, 175, 55, 0.08)',
                           color: 'var(--accent-gold, #b38e47)',
-                          border: '1px solid rgba(212, 175, 55, 0.3)',
+                          border: '1px solid rgba(212, 175, 55, 0.25)',
                           cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
                           transition: 'all 0.15s ease'
                         }}
                       >
-                        {preset}
+                        {preset.icon}
+                        <span>{preset.label}</span>
                       </button>
                     ))}
                   </div>
@@ -1735,10 +1755,10 @@ export default function DealerProfileClient({ dealer, products }) {
                   {/* STYLE SELECTOR PILLS */}
                   <div className="curated-style-pills">
                     {[
-                      { id: 'marble', label: '🏛️ Mermer & Zarafet' },
-                      { id: 'concrete', label: '🏢 Beton & Loft' },
-                      { id: 'wood', label: '🌿 Doğal Ahşap' },
-                      { id: 'dark', label: '🖤 Spa & Antrasit' }
+                      { id: 'marble', label: 'Mermer & Zarafet', icon: <Sparkles size={13} /> },
+                      { id: 'concrete', label: 'Beton & Loft', icon: <Building2 size={13} /> },
+                      { id: 'wood', label: 'Doğal Ahşap', icon: <Compass size={13} /> },
+                      { id: 'dark', label: 'Spa & Antrasit', icon: <Layers size={13} /> }
                     ].map(s => (
                       <button
                         key={s.id}
@@ -1746,7 +1766,8 @@ export default function DealerProfileClient({ dealer, products }) {
                         onClick={() => setConciergeStyle(s.id)}
                         className={`curated-pill ${conciergeStyle === s.id ? 'active' : ''}`}
                       >
-                        {s.label}
+                        {s.icon}
+                        <span>{s.label}</span>
                       </button>
                     ))}
                   </div>
@@ -1971,8 +1992,9 @@ export default function DealerProfileClient({ dealer, products }) {
                   <Sparkles size={14} />
                   BAYİDEN OUTLET & PROJE FAZLASI BORSASI
                 </div>
-                <h2 style={{ fontSize: '1.75rem', fontWeight: '900', color: '#ffffff', margin: '0 0 8px 0' }}>
-                  🔥 Outlet & Proje Fazlası Fırsat Paletleri
+                <h2 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#ffffff', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                  <Flame size={24} style={{ color: '#f59e0b' }} />
+                  <span>Outlet & Proje Fazlası Fırsat Serileri</span>
                 </h2>
                 <p style={{ fontSize: '0.88rem', color: '#94a3b8', maxWidth: '680px', margin: '0 auto', lineHeight: '1.6' }}>
                   Bayimizin deposunda kalan son 30-50 m² şantiye fazlası, seri sonu ve 2. kalite paletler uygun fiyata satışta! Kiralık daire yenileyecekler ve ufak tadilat yapacaklar için büyük fırsat.
@@ -2047,9 +2069,13 @@ export default function DealerProfileClient({ dealer, products }) {
                             padding: '3px 8px',
                             borderRadius: '10px',
                             border: '1px solid rgba(255, 255, 255, 0.15)',
-                            backdropFilter: 'blur(4px)'
+                            backdropFilter: 'blur(4px)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
                           }}>
-                            🏷️ {categoryLabelMap[item.category] || item.category}
+                            <Tag size={10} />
+                            <span>{categoryLabelMap[item.category] || item.category}</span>
                           </span>
                         </div>
 
@@ -2074,14 +2100,18 @@ export default function DealerProfileClient({ dealer, products }) {
                         {/* Quantity Bottom Left */}
                         <div style={{ position: 'absolute', bottom: '12px', left: '12px' }}>
                           <span style={{
-                            background: 'rgba(212, 175, 55, 0.9)',
-                            color: '#000000',
-                            fontWeight: '900',
+                            background: 'rgba(212, 175, 55, 0.95)',
+                            color: '#0f172a',
+                            fontWeight: '800',
                             fontSize: '0.72rem',
                             padding: '4px 10px',
-                            borderRadius: '10px'
+                            borderRadius: '10px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px'
                           }}>
-                            📦 Mevcut Stok: {item.quantityM2} m²
+                            <Package size={12} />
+                            <span>Mevcut Stok: {item.quantityM2} m²</span>
                           </span>
                         </div>
                       </div>
@@ -2094,8 +2124,18 @@ export default function DealerProfileClient({ dealer, products }) {
 
                         {(item.dimensions || item.colorFinish) && (
                           <div style={{ display: 'flex', gap: '12px', fontSize: '0.75rem', color: '#cbd5e1' }}>
-                            {item.dimensions && <span>📏 {item.dimensions}</span>}
-                            {item.colorFinish && <span>🎨 {item.colorFinish}</span>}
+                            {item.dimensions && (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                <Layers size={11} />
+                                <span>{item.dimensions}</span>
+                              </span>
+                            )}
+                            {item.colorFinish && (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                <Palette size={11} />
+                                <span>{item.colorFinish}</span>
+                              </span>
+                            )}
                           </div>
                         )}
 
@@ -2210,8 +2250,9 @@ export default function DealerProfileClient({ dealer, products }) {
                   <h3 className="campaign-card-title">{camp.title}</h3>
                   <p className="campaign-card-desc">{camp.desc}</p>
                   {camp.expiresAt && (
-                    <div className="campaign-card-footer">
-                      🕒 Son Geçerlilik: {camp.expiresAt}
+                    <div className="campaign-card-footer" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Clock size={13} style={{ color: 'var(--accent-gold)' }} />
+                      <span>Son Geçerlilik: {camp.expiresAt}</span>
                     </div>
                   )}
                 </div>
@@ -2276,7 +2317,9 @@ export default function DealerProfileClient({ dealer, products }) {
                     style={{ border: 'none', outline: 'none', background: 'transparent', width: '100%', fontSize: '0.84rem', color: '#0f172a' }}
                   />
                   {inventorySearchTerm && (
-                    <button type="button" onClick={() => setInventorySearchTerm('')} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 'bold' }}>✕</button>
+                    <button type="button" onClick={() => setInventorySearchTerm('')} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#94a3b8', display: 'flex', alignItems: 'center', padding: '4px' }} title="Aramayı Temizle">
+                      <X size={14} />
+                    </button>
                   )}
                 </div>
 
@@ -2413,7 +2456,7 @@ export default function DealerProfileClient({ dealer, products }) {
                             ) : (
                               <>
                                 <Plus size={12} />
-                                <span>+ Teklife Ekle</span>
+                                <span>Teklife Ekle</span>
                               </>
                             )}
                           </button>
@@ -2500,7 +2543,7 @@ export default function DealerProfileClient({ dealer, products }) {
                       ) : (
                         <>
                           <Plus size={12} />
-                          <span>+ Teklife Ekle</span>
+                          <span>Teklife Ekle</span>
                         </>
                       )}
                     </button>
@@ -2723,8 +2766,9 @@ export default function DealerProfileClient({ dealer, products }) {
                 type="button" 
                 onClick={() => setShowCartDrawer(false)}
                 className="cart-drawer-close-btn"
+                title="Kapat"
               >
-                ✕
+                <X size={18} />
               </button>
             </div>
 
@@ -2904,8 +2948,9 @@ export default function DealerProfileClient({ dealer, products }) {
                 type="button" 
                 onClick={() => setShowAppointmentModal(false)}
                 className="appointment-close-btn"
+                title="Kapat"
               >
-                ✕
+                <X size={18} />
               </button>
             </div>
 
@@ -3022,8 +3067,8 @@ export default function DealerProfileClient({ dealer, products }) {
                   Showroom Masası QR Standı & Dijital Kartvizit
                 </h3>
               </div>
-              <button type="button" onClick={() => setShowQrModal(false)} className="qr-close-btn">
-                ✕
+              <button type="button" onClick={() => setShowQrModal(false)} className="qr-close-btn" title="Kapat">
+                <X size={18} />
               </button>
             </div>
 
@@ -3046,7 +3091,10 @@ export default function DealerProfileClient({ dealer, products }) {
                 </div>
 
                 <div className="qr-stand-instructions">
-                  <h4>📱 Telefonunuzla Okutun</h4>
+                  <h4 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                    <QrCode size={16} />
+                    <span>Telefonunuzla Okutun</span>
+                  </h4>
                   <p>
                     Showroom'daki tüm seramik serilerini, depo stoklarımızı ve 
                     <strong> 3D Banyo Tasarım Stüdyosu'nu</strong> cep telefonunuzda açın!
@@ -3054,8 +3102,14 @@ export default function DealerProfileClient({ dealer, products }) {
                 </div>
 
                 <div className="qr-stand-footer">
-                  <span>📍 {dealer.district}, {dealer.city}</span>
-                  <span>📞 {dealer.phone}</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <MapPin size={12} />
+                    <span>{dealer.district}, {dealer.city}</span>
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Phone size={12} />
+                    <span>{dealer.phone}</span>
+                  </span>
                 </div>
               </div>
 
@@ -3066,7 +3120,7 @@ export default function DealerProfileClient({ dealer, products }) {
                   className="btn-print-qr-stand"
                 >
                   <Printer size={16} />
-                  <span>🖨️ Masa Standını Yazdır (A5 / A6)</span>
+                  <span>Masa Standını Yazdır (A5 / A6)</span>
                 </button>
                 <button
                   type="button"
@@ -3105,8 +3159,8 @@ export default function DealerProfileClient({ dealer, products }) {
                   </span>
                 </div>
               </div>
-              <button type="button" onClick={() => setShowCalculatorModal(false)} className="calculator-modal-close-btn">
-                ✕
+              <button type="button" onClick={() => setShowCalculatorModal(false)} className="calculator-modal-close-btn" title="Kapat">
+                <X size={18} />
               </button>
             </div>
 
