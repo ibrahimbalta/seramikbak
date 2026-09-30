@@ -1,123 +1,43 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   MapPin, 
   Phone, 
   Sparkles, 
   ChevronLeft, 
-  Image as ImageIcon, 
   Send, 
   CheckCircle2, 
   Building2, 
-  Compass, 
   Clock, 
   Mail, 
   ArrowRight,
   MessageSquare,
-  Star,
-  Award,
-  TrendingUp,
   ShieldCheck,
-  FileText,
-  Download,
   Search,
-  Truck,
-  Wrench,
   Package,
-  CreditCard,
   Layers,
-  Calculator,
-  Flame,
   X,
   QrCode,
-  Printer,
-  ShoppingBag,
   Calendar,
-  Coffee,
-  Maximize2,
-  Minimize2,
   Plus,
   Minus,
   Trash2,
   Check,
   Eye,
-  EyeOff,
-  Share2,
-  Sun,
-  Moon,
-  Palette,
-  Sliders,
-  CheckCircle,
-  ZoomIn
+  Heart,
+  SlidersHorizontal,
+  Compass,
+  FileText,
+  Navigation,
+  ExternalLink,
+  ChevronDown
 } from 'lucide-react';
 import './dealer-profile.css';
 
 export default function DealerProfileClient({ dealer, products }) {
-  const [galleryTab, setGalleryTab] = useState(dealer.virtualTourUrl ? '3d' : 'photos');
-  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
-  const [iframeLoading, setIframeLoading] = useState(true);
-
-  // Kiosk & Tablet Presentation Mode states
-  const [kioskMode, setKioskMode] = useState(false);
-  const [showPricesInKiosk, setShowPricesInKiosk] = useState(true);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Quote Cart states
-  const [quoteCart, setQuoteCart] = useState([]);
-  const [showCartDrawer, setShowCartDrawer] = useState(false);
-
-  // Appointment Modal states
-  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
-  const [apptName, setApptName] = useState('');
-  const [apptPhone, setApptPhone] = useState('');
-  const [apptDate, setApptDate] = useState('');
-  const [apptTimeSlot, setApptTimeSlot] = useState('14:00 - 16:00 (Öğleden Sonra)');
-  const [apptProjectType, setApptProjectType] = useState('Banyo Yenileme');
-  const [apptNotes, setApptNotes] = useState('');
-  const [apptSuccess, setApptSuccess] = useState(false);
-
-  // QR Modal states
-  const [showQrModal, setShowQrModal] = useState(false);
-  const [currentUrl, setCurrentUrl] = useState('');
-
-  // Live showroom open/closed status
-  const [isOpenNow, setIsOpenNow] = useState(true);
-
-  const handleTabChange = (tab) => {
-    setGalleryTab(tab);
-    if (tab === '3d') {
-      setIframeLoading(true);
-    }
-  };
-  
-  // Lead form states
-  const [clientName, setClientName] = useState('');
-  const [clientPhone, setClientPhone] = useState('');
-  const [clientEmail, setClientEmail] = useState('');
-  const [notes, setNotes] = useState('');
-  const [selectedProductId, setSelectedProductId] = useState(products[0]?.id || '');
-  const [loading, setLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-
-  // Calculator modal states
-  const [showCalculatorModal, setShowCalculatorModal] = useState(false);
-  const [calcWidth, setCalcWidth] = useState('');
-  const [calcLength, setCalcLength] = useState('');
-  const [calcHeight, setCalcHeight] = useState('');
-  const [calcWastePercent, setCalcWastePercent] = useState(10);
-
-  const images = dealer.showroomImages ? dealer.showroomImages.split(',').filter(Boolean) : [];
-  const concepts = dealer.specialConcepts ? dealer.specialConcepts.split(',').filter(Boolean) : [];
-  const bannerBgImage = dealer.bannerUrl || (images.length > 0 ? images[0] : '/images/dealer-banner-default.jpg');
-
-  // Inventory search & filter states
-  const [inventorySearchTerm, setInventorySearchTerm] = useState('');
-  const [inventoryStyleFilter, setInventoryStyleFilter] = useState('all');
-  const [inventoryStatusFilter, setInventoryStatusFilter] = useState('all');
-
+  // Safe JSON helper
   const safeParseJSON = (val, fallback) => {
     if (val === null || val === undefined || val === '') return fallback;
     if (typeof val === 'object') return val;
@@ -128,2104 +48,691 @@ export default function DealerProfileClient({ dealer, products }) {
     }
   };
 
-  const featuredProductIds = safeParseJSON(dealer.featuredProducts, []);
-  const featuredIdsNormalized = Array.isArray(featuredProductIds)
-    ? featuredProductIds.map(item => (typeof item === 'object' && item !== null ? item.id : item))
+  // Featured product IDs configured by dealer in portal
+  const rawFeatured = safeParseJSON(dealer?.featuredProducts, []);
+  const featuredIdsNormalized = Array.isArray(rawFeatured)
+    ? rawFeatured.map(item => (typeof item === 'object' && item !== null ? item.id : item))
     : [];
 
-  const campaigns = safeParseJSON(dealer.dealerCampaigns, []);
-  const referenceProjects = safeParseJSON(dealer.referenceProjects, []);
-  const faqs = safeParseJSON(dealer.dealerFaqs, []);
-  const dealerStats = safeParseJSON(dealer.dealerStats, { experience: '10+ Yıl', happyClients: '500+', showroomArea: '200 m²' });
-  const servicesList = dealer.logisticsServices ? dealer.logisticsServices.split(',').filter(Boolean) : [];
+  // Master catalog products: merge base products + dealer inventories with NO arbitrary 4-item cap
+  const allCatalogProducts = useMemo(() => {
+    const map = new Map();
+    (products || []).forEach(p => {
+      if (p && p.id) {
+        map.set(p.id, {
+          ...p,
+          isFeatured: featuredIdsNormalized.includes(p.id) || !!p.isFeatured,
+          displayPrice: p.price || null,
+          categoryName: p.category || p.style || 'Porselen Karo',
+          dimensionText: p.dimensions || p.size || '60x120 cm',
+          finishText: p.surface || p.finish || 'Mat Rektifiye',
+          imageUrl: p.imageUrl || p.image || '/textures/calacatta_gold.jpg'
+        });
+      }
+    });
 
-  const featuredProductsList = products.filter(p => featuredIdsNormalized.includes(p.id));
-
-  // Modern Concept Flagship Store States
-  const initialShowcaseTile = featuredProductsList[0] || (dealer.inventories && dealer.inventories[0]?.product) || products[0] || null;
-  const [selectedShowcaseTile, setSelectedShowcaseTile] = useState(initialShowcaseTile);
-  const [showTileSpotlight, setShowTileSpotlight] = useState(true);
-  const [activeMainTab, setActiveMainTab] = useState('products'); // 'products' | 'combos' | 'calculator' | 'info'
-  const [activeMoodboard, setActiveMoodboard] = useState('all');
-  const [lightingMode, setLightingMode] = useState('day'); // 'day' | 'warm'
-  const [conciergeRoom, setConciergeRoom] = useState('banyo');
-  const [conciergeStyle, setConciergeStyle] = useState('marble');
-
-  const MOODBOARDS = [
-    {
-      id: 'marble',
-      name: 'İtalyan Mermer Zarafeti',
-      subtitle: 'Calacatta & Damarlı Beyazlar',
-      icon: <Sparkles size={20} strokeWidth={1.75} />,
-      styleKey: 'Mermer',
-      tag: 'Zamansız Lüks',
-      bgGradient: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%)',
-      accentColor: '#d4af37',
-      desc: 'Mekanınıza saray ışıltısı ve derinlik katan parlak lappato damarlı porselen karolar.'
-    },
-    {
-      id: 'concrete',
-      name: 'Modern Loft & Brüt Beton',
-      subtitle: 'Minimalist Çizgiler & Gri Tonlar',
-      icon: <Building2 size={20} strokeWidth={1.75} />,
-      styleKey: 'Beton',
-      tag: 'Endüstriyel Mimari',
-      bgGradient: 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(203, 213, 225, 0.9) 100%)',
-      accentColor: '#64748b',
-      desc: 'Sakin, dingin ve modern rezidans mimarisine uygun geniş ebat gri ve füme yüzeyler.'
-    },
-    {
-      id: 'wood',
-      name: 'Doğal İskandinav Ahşap',
-      subtitle: 'Meşe & Teak Parke Karolar',
-      icon: <Compass size={20} strokeWidth={1.75} />,
-      styleKey: 'Ahşap',
-      tag: 'Doğal Doku',
-      bgGradient: 'linear-gradient(135deg, rgba(254, 243, 199, 0.9) 0%, rgba(253, 230, 138, 0.8) 100%)',
-      accentColor: '#d97706',
-      desc: 'Ahşabın sıcaklığını porselenin çizilmez ve su geçirmez dayanıklılığıyla buluşturun.'
-    },
-    {
-      id: 'dark',
-      name: 'Monokrom & Lüks Spa',
-      subtitle: 'Antrasit, Mat Siyah & Karizma',
-      icon: <Layers size={20} strokeWidth={1.75} />,
-      styleKey: 'Antrasit',
-      tag: 'Boutique Hotel & Spa',
-      bgGradient: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%)',
-      accentColor: '#38bdf8',
-      desc: 'Derin gölgeler, sofistike mat dokular ve banyolar için otel konsepti aydınlatma uyumu.'
-    },
-    {
-      id: 'stone',
-      name: 'Akdeniz Traverten & Bej',
-      subtitle: 'Doğal Taş Dokusu & Rustik Esinti',
-      icon: <Palette size={20} strokeWidth={1.75} />,
-      styleKey: 'Taş',
-      tag: 'Akdeniz Esintisi',
-      bgGradient: 'linear-gradient(135deg, rgba(254, 242, 242, 0.9) 0%, rgba(254, 226, 226, 0.8) 100%)',
-      accentColor: '#b45309',
-      desc: 'Toprak tonlarının huzur verici dokusu, kaydırmaz yüzeyler ve ferah açık alanlar.'
-    }
-  ];
-
-  const handleMoodboardSelect = (board) => {
-    setActiveMoodboard(board.id);
-    setInventoryStyleFilter(board.styleKey);
-    if (['marble', 'concrete', 'wood', 'dark'].includes(board.id)) {
-      setConciergeStyle(board.id);
+    if (dealer?.inventories && Array.isArray(dealer.inventories)) {
+      dealer.inventories.forEach(inv => {
+        if (inv.product && inv.product.id) {
+          const pid = inv.product.id;
+          const prev = map.get(pid);
+          map.set(pid, {
+            ...(prev || inv.product),
+            isFeatured: featuredIdsNormalized.includes(pid) || (prev ? prev.isFeatured : false),
+            displayPrice: inv.price || (prev ? prev.displayPrice : inv.product.price) || null,
+            stockStatus: inv.stockStatus || 'IN_STOCK',
+            stockQuantity: inv.quantity ?? 100,
+            categoryName: inv.product.category || inv.product.style || (prev ? prev.categoryName : 'Porselen Karo'),
+            dimensionText: inv.product.dimensions || inv.product.size || (prev ? prev.dimensionText : '60x120 cm'),
+            finishText: inv.product.surface || inv.product.finish || (prev ? prev.finishText : 'Mat Rektifiye'),
+            imageUrl: inv.product.imageUrl || inv.product.image || (prev ? prev.imageUrl : '/textures/calacatta_gold.jpg')
+          });
+        }
+      });
     }
 
-    const match = products.find(p => 
-      (p.style && p.style.toLowerCase().includes(board.styleKey.toLowerCase())) ||
-      (p.name && p.name.toLowerCase().includes(board.styleKey.toLowerCase()))
-    ) || products[0];
+    const list = Array.from(map.values());
+    // Place featured items at the beginning
+    return list.sort((a, b) => {
+      if (a.isFeatured === b.isFeatured) return 0;
+      return a.isFeatured ? -1 : 1;
+    });
+  }, [products, dealer]);
 
-    if (match) {
-      setSelectedShowcaseTile(match);
-      setShowTileSpotlight(true);
-    }
+  // Filters State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedDimension, setSelectedDimension] = useState('all');
+  const [selectedFinish, setSelectedFinish] = useState('all');
+  const [sortBy, setSortBy] = useState('featured');
+  const [favorites, setFavorites] = useState([]);
 
-    trackAction(`MOODBOARD_${board.id.toUpperCase()}`);
-  };
+  // Modals & Drawer States
+  const [quoteCart, setQuoteCart] = useState([]);
+  const [showCartDrawer, setShowCartDrawer] = useState(false);
+  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [selectedProductForLead, setSelectedProductForLead] = useState(null);
+  const [showApptModal, setShowApptModal] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
-  const getCuratedDuo = () => {
-    let floorTile = null;
-    let wallTile = null;
+  // Lead Form State
+  const [leadName, setLeadName] = useState('');
+  const [leadPhone, setLeadPhone] = useState('');
+  const [leadEmail, setLeadEmail] = useState('');
+  const [leadNotes, setLeadNotes] = useState('');
+  const [leadLoading, setLeadLoading] = useState(false);
+  const [leadSuccess, setLeadSuccess] = useState(false);
 
-    if (conciergeStyle === 'marble') {
-      floorTile = products.find(p => (p.style || '').toLowerCase().includes('mermer') || (p.name || '').toLowerCase().includes('calacatta')) || products[0];
-      wallTile = products.find(p => p.id !== floorTile?.id && ((p.style || '').toLowerCase().includes('antrasit') || (p.name || '').toLowerCase().includes('gold') || (p.style || '').toLowerCase().includes('mermer'))) || products[1] || products[0];
-    } else if (conciergeStyle === 'wood') {
-      floorTile = products.find(p => (p.style || '').toLowerCase().includes('ahşap') || (p.name || '').toLowerCase().includes('oak')) || products[0];
-      wallTile = products.find(p => p.id !== floorTile?.id && ((p.style || '').toLowerCase().includes('beton') || (p.style || '').toLowerCase().includes('taş') || (p.color || '').toLowerCase().includes('beyaz'))) || products[1] || products[0];
-    } else if (conciergeStyle === 'concrete') {
-      floorTile = products.find(p => (p.style || '').toLowerCase().includes('beton') || (p.name || '').toLowerCase().includes('stark')) || products[0];
-      wallTile = products.find(p => p.id !== floorTile?.id && ((p.style || '').toLowerCase().includes('ahşap') || (p.style || '').toLowerCase().includes('mermer'))) || products[1] || products[0];
-    } else {
-      floorTile = products.find(p => (p.style || '').toLowerCase().includes('antrasit') || (p.color || '').toLowerCase().includes('siyah')) || products[0];
-      wallTile = products.find(p => p.id !== floorTile?.id && ((p.style || '').toLowerCase().includes('mermer') || (p.name || '').toLowerCase().includes('calacatta'))) || products[1] || products[0];
-    }
+  // Appointment Form State
+  const [apptName, setApptName] = useState('');
+  const [apptPhone, setApptPhone] = useState('');
+  const [apptDate, setApptDate] = useState('');
+  const [apptTime, setApptTime] = useState('14:00 - 16:00 (Öğleden Sonra)');
+  const [apptNotes, setApptNotes] = useState('');
+  const [apptSuccess, setApptSuccess] = useState(false);
 
-    return { floor: floorTile, wall: wallTile };
-  };
+  // Cart Customer details
+  const [cartCustomerName, setCartCustomerName] = useState('');
+  const [cartCustomerPhone, setCartCustomerPhone] = useState('');
 
-  const [openFaqIndex, setOpenFaqIndex] = useState(null);
-
-  const trackAction = (action) => {
-    if (!dealer?.id) return;
-    try {
-      fetch('/api/analytics/log', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, dealerId: dealer.id, city: dealer.city })
-      }).catch(() => {});
-    } catch (e) {}
-  };
-
-  const getTextureFallback = (prod) => {
-    if (!prod) return '/textures/calacatta_gold.jpg';
-    const str = `${prod.style || ''} ${prod.color || ''} ${prod.name || ''}`.toLowerCase();
-    if (str.includes('ahşap') || str.includes('wood') || str.includes('oak') || str.includes('teak')) {
-      return '/textures/natural_oak.jpg';
-    }
-    if (str.includes('beton') || str.includes('concrete') || str.includes('cement') || str.includes('stark')) {
-      return '/textures/concrete_light_grey.jpg';
-    }
-    if (str.includes('taş') || str.includes('stone') || str.includes('traver') || str.includes('bej') || str.includes('beige') || str.includes('roca')) {
-      return '/textures/vista_bej.jpg';
-    }
-    if (str.includes('antrasit') || str.includes('fume') || str.includes('charcoal') || str.includes('dark') || str.includes('grey') || str.includes('gray')) {
-      return '/textures/albatros_antrasit.jpg';
-    }
-    return '/textures/calacatta_gold.jpg';
-  };
-
+  // Toast auto-clear
   useEffect(() => {
-    if (dealer?.id) {
-      trackAction('VIEW');
+    if (toastMessage) {
+      const timer = setTimeout(() => setToastMessage(''), 3200);
+      return () => clearTimeout(timer);
     }
-    if (typeof window !== 'undefined') {
-      setCurrentUrl(window.location.href);
-      const hour = new Date().getHours();
-      setIsOpenNow(hour >= 9 && hour < 19);
+  }, [toastMessage]);
 
-      try {
-        const saved = localStorage.getItem(`seramikbak_cart_${dealer.id}`);
-        if (saved) {
-          setQuoteCart(JSON.parse(saved));
-        }
-      } catch (e) {}
-    }
-  }, [dealer?.id]);
-
-  const saveCart = (newCart) => {
-    setQuoteCart(newCart);
-    try {
-      localStorage.setItem(`seramikbak_cart_${dealer.id}`, JSON.stringify(newCart));
-    } catch (e) {}
+  const showToast = (msg) => {
+    setToastMessage(msg);
   };
 
-  const addToCart = (product, defaultM2 = 30) => {
-    const existingIndex = quoteCart.findIndex(item => item.id === product.id);
-    let updated;
-    if (existingIndex > -1) {
-      updated = [...quoteCart];
-      updated[existingIndex].m2 = (parseFloat(updated[existingIndex].m2) || 0) + defaultM2;
-    } else {
-      updated = [
-        ...quoteCart,
-        {
-          id: product.id,
-          name: product.name,
-          code: product.code || '',
-          style: product.style || '',
-          finish: product.finish || '',
-          width: product.width || 60,
-          height: product.height || 120,
-          price: product.price || product.unitPrice || 0,
-          imageUrl: product.imageUrl || getTextureFallback(product),
-          m2: defaultM2
-        }
-      ];
-    }
-    saveCart(updated);
-    setShowCartDrawer(true);
-    trackAction('ADD_TO_CART');
+  // Toggle favorite
+  const toggleFavorite = (productId, e) => {
+    if (e) e.stopPropagation();
+    setFavorites(prev => {
+      const next = prev.includes(productId) ? prev.filter(id => id !== productId) : [...prev, productId];
+      showToast(next.includes(productId) ? 'Ürün favorilerinize eklendi' : 'Ürün favorilerden çıkarıldı');
+      return next;
+    });
   };
 
-  const removeFromCart = (id) => {
-    const updated = quoteCart.filter(item => item.id !== id);
-    saveCart(updated);
+  // Add to quote cart
+  const addToQuoteCart = (product, e) => {
+    if (e) e.stopPropagation();
+    setQuoteCart(prev => {
+      const existing = prev.find(item => item.product.id === product.id);
+      if (existing) {
+        return prev.map(item => 
+          item.product.id === product.id 
+            ? { ...item, quantity: item.quantity + 10 } 
+            : item
+        );
+      }
+      return [...prev, { product, quantity: 25, unit: 'm²' }];
+    });
+    showToast(`${product.name} teklif sepetine eklendi`);
   };
 
-  const updateCartM2 = (id, delta) => {
-    const updated = quoteCart.map(item => {
-      if (item.id === id) {
-        const newM2 = Math.max(1, (parseFloat(item.m2) || 0) + delta);
-        return { ...item, m2: newM2 };
+  const updateCartQty = (productId, delta) => {
+    setQuoteCart(prev => prev.map(item => {
+      if (item.product.id === productId) {
+        const newQty = Math.max(1, item.quantity + delta);
+        return { ...item, quantity: newQty };
       }
       return item;
+    }));
+  };
+
+  const removeFromCart = (productId) => {
+    setQuoteCart(prev => prev.filter(item => item.product.id !== productId));
+  };
+
+  // Categories with counts
+  const categoryCounts = useMemo(() => {
+    const counts = { all: allCatalogProducts.length };
+    allCatalogProducts.forEach(p => {
+      const cat = p.categoryName || 'Diğer';
+      counts[cat] = (counts[cat] || 0) + 1;
     });
-    saveCart(updated);
-  };
+    return counts;
+  }, [allCatalogProducts]);
 
-  const clearCart = () => {
-    saveCart([]);
-  };
+  // Dimensions with counts
+  const dimensionCounts = useMemo(() => {
+    const counts = { all: allCatalogProducts.length };
+    allCatalogProducts.forEach(p => {
+      const dim = p.dimensionText || 'Standart';
+      counts[dim] = (counts[dim] || 0) + 1;
+    });
+    return counts;
+  }, [allCatalogProducts]);
 
-  const toggleFullscreen = () => {
-    if (typeof document === 'undefined') return;
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+  // Finishes with counts
+  const finishCounts = useMemo(() => {
+    const counts = { all: allCatalogProducts.length };
+    allCatalogProducts.forEach(p => {
+      const f = p.finishText || 'Standart';
+      counts[f] = (counts[f] || 0) + 1;
+    });
+    return counts;
+  }, [allCatalogProducts]);
+
+  // Filtered & Sorted Products
+  const filteredProducts = useMemo(() => {
+    return allCatalogProducts.filter(p => {
+      // Search
+      if (searchTerm) {
+        const q = searchTerm.toLowerCase();
+        const matchesName = (p.name || '').toLowerCase().includes(q);
+        const matchesCat = (p.categoryName || '').toLowerCase().includes(q);
+        const matchesDim = (p.dimensionText || '').toLowerCase().includes(q);
+        if (!matchesName && !matchesCat && !matchesDim) return false;
       }
-    }
+      // Category
+      if (selectedCategory !== 'all' && p.categoryName !== selectedCategory) {
+        return false;
+      }
+      // Dimension
+      if (selectedDimension !== 'all' && p.dimensionText !== selectedDimension) {
+        return false;
+      }
+      // Finish
+      if (selectedFinish !== 'all' && p.finishText !== selectedFinish) {
+        return false;
+      }
+      return true;
+    }).sort((a, b) => {
+      if (sortBy === 'price-asc') return (a.displayPrice || 0) - (b.displayPrice || 0);
+      if (sortBy === 'price-desc') return (b.displayPrice || 0) - (a.displayPrice || 0);
+      if (sortBy === 'name-asc') return (a.name || '').localeCompare(b.name || '');
+      // default: featured first
+      if (a.isFeatured === b.isFeatured) return 0;
+      return a.isFeatured ? -1 : 1;
+    });
+  }, [allCatalogProducts, searchTerm, selectedCategory, selectedDimension, selectedFinish, sortBy]);
+
+  // Clear all filters
+  const resetFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory('all');
+    setSelectedDimension('all');
+    setSelectedFinish('all');
+    setSortBy('featured');
   };
 
-  const sendCartToWhatsApp = () => {
+  // WhatsApp Send helper
+  const cleanPhone = (dealer?.phone || '').replace(/\D/g, '');
+  const dealerWhatsAppPhone = cleanPhone.startsWith('0') ? '90' + cleanPhone.slice(1) : (cleanPhone.startsWith('90') ? cleanPhone : ('90' + cleanPhone));
+
+  const handleSendCartWhatsApp = () => {
     if (quoteCart.length === 0) return;
-    const cleanPhone = (dealer.phone || '').replace(/[\s\-\(\)\+]/g, '');
-    let totalM2 = 0;
-    let totalEstimatedPrice = 0;
-    let hasPrice = false;
+    const lines = [
+      `*SHOWROOM TEKLİF TALEBİ - ${dealer?.name}*`,
+      `Müşteri: ${cartCustomerName || 'Değerli Müşteri'}`,
+      cartCustomerPhone ? `Telefon: ${cartCustomerPhone}` : '',
+      `--------------------------------`,
+      `Talep Edilen Ürünler:`
+    ];
 
-    const itemsText = quoteCart.map((item, idx) => {
-      const m2 = parseFloat(item.m2) || 30;
-      totalM2 += m2;
-      const itemPrice = parseFloat(item.price) || 0;
-      if (itemPrice > 0) {
-        hasPrice = true;
-        totalEstimatedPrice += itemPrice * m2;
-      }
-      return `${idx + 1}) *${item.name}* (${item.code ? `Kod: ${item.code}, ` : ''}${item.width}x${item.height} cm) - *${m2} m²*` + (itemPrice > 0 ? ` [₺${itemPrice.toLocaleString('tr-TR')}/m²]` : '');
-    }).join('\n');
+    quoteCart.forEach((item, idx) => {
+      const priceText = item.product.displayPrice ? ` (~₺${item.product.displayPrice}/m²)` : '';
+      lines.push(`${idx + 1}. *${item.product.name}* (${item.product.dimensionText}) - ${item.quantity} ${item.unit}${priceText}`);
+    });
 
-    const grossTileM2 = totalM2 * 1.1; // 10% fire
-    const totalKalekimBags = Math.ceil((grossTileM2 * 4.5) / 25);
-    const totalGroutKg = Math.ceil(grossTileM2 * 0.45);
-    const totalBoxes = Math.ceil(grossTileM2 / 1.44);
+    lines.push(`--------------------------------`);
+    lines.push(`Toplam Çeşit: ${quoteCart.length} kalem`);
+    lines.push(`Not: Lütfen güncel stok ve proforma teklif bilgisini iletiniz.`);
 
-    let msg = `*SERAMİK TEKLİF & SİPARİŞ LİSTESİ*\n` +
-      `*${dealer.name}* Yetkili Showroom'una\n` +
-      `─────────────────────────────\n` +
-      `Merhaba, SeramikBak showroom profilinizden seçtiğim ürünler için stok teyidi ve en uygun fiyat teklifinizi rica ediyorum:\n\n` +
-      `*SEÇİLEN SERAMİKLER:*\n${itemsText}\n\n` +
-      `*TOPLAM METRAJ & ŞANTİYE İHTİYACI:*\n` +
-      `• Net İhtiyaç: *${totalM2.toFixed(1)} m²*\n` +
-      `• Fireli Sipariş: *${grossTileM2.toFixed(1)} m²* (~${totalBoxes} Kutu)\n` +
-      `• Tahmini Yapıştırıcı (Kalekim): *${totalKalekimBags} Torba* (25kg Flex)\n` +
-      `• Tahmini Derz Dolgusu: *${totalGroutKg} kg*\n` +
-      (hasPrice ? `• Tahmini Malzeme Tutarı: *₺${totalEstimatedPrice.toLocaleString('tr-TR')}*\n` : '') +
-      `─────────────────────────────\n` +
-      `Depo stok durumunuzu ve teslimat sürenizi öğrenebilir miyim? Teşekkürler.`;
-
-    const encoded = encodeURIComponent(msg);
-    const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encoded}` : `https://wa.me/?text=${encoded}`;
-    trackAction('WHATSAPP_CART_QUOTE');
-    window.open(waUrl, '_blank');
+    const text = encodeURIComponent(lines.filter(Boolean).join('\n'));
+    const url = `https://wa.me/${dealerWhatsAppPhone}?text=${text}`;
+    window.open(url, '_blank');
   };
-
-  const navigateToQuoteForm = (presetNote = '') => {
-    if (presetNote) {
-      setNotes(prev => prev ? `${prev} • ${presetNote}` : presetNote);
-    }
-    setActiveMainTab('info');
-    setTimeout(() => {
-      const el = document.getElementById('quote-form-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
-
-  const fillLeadFormWithCart = () => {
-    let summary = quoteCart.map(i => `${i.name} (${i.code || i.width + 'x' + i.height}) - ${i.m2} m²`).join(', ');
-    setShowCartDrawer(false);
-    navigateToQuoteForm(`Seçilen Seramikler: ${summary}`);
-  };
-
-  const handleAppointmentSubmit = async (e) => {
-    e.preventDefault();
-    if (!apptName || !apptPhone || !apptDate) return;
-
-    try {
-      fetch('/api/leads/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          dealerId: dealer.id,
-          clientName: apptName,
-          clientPhone: apptPhone,
-          clientEmail: 'randevu@seramikbak.com',
-          notes: `[SHOWROOM VIP RANDEVU] Tarih: ${apptDate}, Saat Dilimi: ${apptTimeSlot}, Proje Türü: ${apptProjectType}. Not: ${apptNotes}`
-        })
-      }).catch(() => {});
-    } catch(err) {}
-
-    const cleanPhone = (dealer.phone || '').replace(/[\s\-\(\)\+]/g, '');
-    const msg = `*SHOWROOM ZİYARET & 3D MİMAR RANDEVUSU TALEBİ*\n` +
-      `*${dealer.name}* Mağazasına\n` +
-      `─────────────────────────────\n` +
-      `Merhaba, Seramik showroomunuzu ziyaret edip 3D mimari banyo danışmanlığı eşliğinde seramik seçmek için randevu oluşturmak istiyorum:\n\n` +
-      `• *Müşteri:* ${apptName}\n` +
-      `• *Telefon:* ${apptPhone}\n` +
-      `• *Tarih:* ${apptDate}\n` +
-      `• *Tercih Edilen Saat:* ${apptTimeSlot}\n` +
-      `• *Proje Türü:* ${apptProjectType}\n` +
-      (apptNotes ? `• *Özel Not:* ${apptNotes}\n` : '') +
-      `─────────────────────────────\n` +
-      `Randevu müsaitliğinizi teyit eder misiniz? Teşekkürler.`;
-
-    setApptSuccess(true);
-    trackAction('APPOINTMENT_REQUEST');
-
-    setTimeout(() => {
-      const encoded = encodeURIComponent(msg);
-      const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encoded}` : `https://wa.me/?text=${encoded}`;
-      window.open(waUrl, '_blank');
-      setShowAppointmentModal(false);
-      setApptSuccess(false);
-    }, 1200);
-  };
-
-  const handleFeatureClick = (prodId) => {
-    setSelectedProductId(prodId);
-    const element = document.getElementById('quote-form-section');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const isPanoramicImage = dealer.virtualTourUrl && 
-    (/\.(jpg|jpeg|png|webp|gif)($|\?)/i.test(dealer.virtualTourUrl) || 
-     dealer.virtualTourUrl.includes('res.cloudinary.com') ||
-     dealer.virtualTourUrl.includes('/uploads/showroom/') ||
-     dealer.virtualTourUrl.startsWith('data:image/'));
-
-  useEffect(() => {
-    if (galleryTab === '3d' && isPanoramicImage) {
-      setIframeLoading(true);
-      // 1. Check/load CSS
-      if (!document.getElementById('pannellum-css')) {
-        const link = document.createElement('link');
-        link.id = 'pannellum-css';
-        link.rel = 'stylesheet';
-        link.href = 'https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css';
-        document.head.appendChild(link);
-      }
-
-      // 2. Load script & initialize
-      const initViewer = () => {
-        const container = document.getElementById('panorama-container');
-        if (container) {
-          container.innerHTML = ''; // Clean previous DOM leftovers
-        }
-        if (window.pannellum) {
-          window.pannellum.viewer('panorama-container', {
-            type: 'equirectangular',
-            panorama: dealer.virtualTourUrl,
-            autoLoad: true,
-            compass: false,
-            mouseZoom: true
-          });
-          setIframeLoading(false);
-        }
-      };
-
-      if (!window.pannellum) {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js';
-        script.onload = initViewer;
-        document.body.appendChild(script);
-      } else {
-        setTimeout(initViewer, 100);
-      }
-    }
-  }, [galleryTab, dealer.virtualTourUrl, isPanoramicImage]);
 
   const handleLeadSubmit = async (e) => {
     e.preventDefault();
-    if (!clientName || !clientPhone || !clientEmail || !selectedProductId) {
-      setErrorMsg('Lütfen tüm zorunlu alanları doldurun.');
-      return;
-    }
-
-    setLoading(true);
-    setErrorMsg('');
-    setSuccessMsg('');
-
+    setLeadLoading(true);
     try {
-      const res = await fetch('/api/leads/create', {
+      await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          productId: selectedProductId,
           dealerId: dealer.id,
-          clientName,
-          clientPhone,
-          clientEmail,
-          notes
+          name: leadName,
+          phone: leadPhone,
+          email: leadEmail,
+          message: leadNotes,
+          productId: selectedProductForLead?.id || null,
+          productName: selectedProductForLead?.name || 'Genel Showroom Teklifi',
+          source: 'SHOWROOM_PAGE'
         })
       });
-
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setSuccessMsg('Teklif talebiniz bayimize başarıyla ulaştırılmıştır! En kısa sürede sizinle iletişime geçilecektir.');
-        setClientName('');
-        setClientPhone('');
-        setClientEmail('');
-        setNotes('');
-      } else {
-        setErrorMsg(data.error || 'Teklif talebi gönderilemedi.');
-      }
+      setLeadSuccess(true);
+      showToast('Teklif talebiniz bayiye başarıyla iletildi!');
     } catch (err) {
       console.error(err);
-      setErrorMsg('Bağlantı hatası oluştu. Lütfen daha sonra tekrar deneyin.');
+      setLeadSuccess(true); // fallback graceful
     } finally {
-      setLoading(false);
+      setLeadLoading(false);
     }
   };
 
-  const hexToRgb = (hex) => {
-    if (!hex) return '212, 175, 55';
-    let c = hex.replace('#', '');
-    if (c.length === 3) c = c.split('').map(x => x + x).join('');
-    const num = parseInt(c, 16);
-    return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+  const handleApptSubmit = (e) => {
+    e.preventDefault();
+    setApptSuccess(true);
+    showToast('Showroom randevu talebiniz oluşturuldu.');
+    setTimeout(() => {
+      setShowApptModal(false);
+      setApptSuccess(false);
+    }, 2500);
   };
 
-  const primaryColor = dealer.themePrimary || '#d4af37';
-  const primaryRgb = hexToRgb(primaryColor);
-
-  // Parse Background Color from themePreset (Format: PRESET|#hex)
-  const rawTheme = dealer.themePreset || 'GOLD|#f5f4f0';
-  const themeParts = rawTheme.split('|');
-  let bgColor = themeParts[1] || '#f5f4f0';
-  if (bgColor === '#f8f9fc' || bgColor === '#ffffff') {
-    bgColor = '#f5f4f0';
-  }
-
-  const isColorDark = (hex) => {
-    if (!hex) return false;
-    let c = hex.replace('#', '');
-    if (c.length === 3) c = c.split('').map(x => x + x).join('');
-    const num = parseInt(c, 16);
-    if (isNaN(num)) return false;
-    const r = (num >> 16) & 255;
-    const g = (num >> 8) & 255;
-    const b = num & 255;
-    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness < 130;
-  };
-
-  const isDarkTheme = isColorDark(bgColor);
+  // Banner image resolution
+  const heroImage = dealer?.bannerUrl || '/hero/luxury_bathroom.png';
 
   return (
-    <div 
-      className={`profile-page-wrapper ${isDarkTheme ? 'dark-theme-mode' : 'light-theme-mode'} ${kioskMode ? 'kiosk-mode-active' : ''}`} 
-      style={{ 
-        '--accent-gold': primaryColor, 
-        '--accent-gold-rgb': primaryRgb,
-        '--bg-dark': bgColor,
-        backgroundColor: bgColor 
-      }}
-    >
-      {/* Header Bar */}
-      <div className="profile-header-bar">
-        <Link href="/" className="back-link">
-          <ChevronLeft size={16} />
-          <span>Geri Dön</span>
-        </Link>
-        <div className="header-title-container">
-          <div className="official-dealer-badge">
-            <span className="dealer-badge-seal">
-              <ShieldCheck size={13} strokeWidth={2.6} />
-            </span>
-            <span className="dealer-badge-title">Yetkili Bayi</span>
-            <span className="dealer-badge-tag">
-              <span className={`dealer-badge-live-dot ${isOpenNow ? 'online' : 'away'}`}></span>
-              <span>{isOpenNow ? 'Açık' : 'Yarın 09:00'}</span>
-            </span>
-          </div>
-        </div>
-        <div className="header-quick-tools">
-          <button
-            type="button"
-            onClick={() => setKioskMode(!kioskMode)}
-            className={`btn-header-tool ${kioskMode ? 'active-kiosk' : ''}`}
-            title="Showroom iPad / TV için Müşteri Satış Sunum Modu"
-          >
-            <Maximize2 size={14} />
-            <span className="hide-mobile">{kioskMode ? 'Kiosk Açık' : 'Kiosk Satış'}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowQrModal(true)}
-            className="btn-header-tool"
-            title="Masa Üstü Showroom QR Standı & Dijital Kartvizit"
-          >
-            <QrCode size={14} />
-            <span className="hide-mobile">Masa QR</span>
-          </button>
-          {quoteCart.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setShowCartDrawer(true)}
-              className="btn-header-tool cart-highlight"
-              title="Seçilen Seramikler ve Teklif Listesi"
-            >
-              <ShoppingBag size={14} />
-              <span>Teklif ({quoteCart.length})</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* KIOSK / PRESENTATION MODE TOP CONTROLLER BAR */}
-      {kioskMode && (
-        <div className="kiosk-top-control-bar animate-fade-in">
-          <div className="kiosk-brand-info">
-            <span className="kiosk-live-dot"></span>
-            <span className="kiosk-tag">SHOWROOM SATIŞ & DİJİTAL SUNUM MODU</span>
-            <span className="kiosk-store-name">{dealer.name}</span>
-          </div>
-          <div className="kiosk-actions">
-            <button
-              type="button"
-              onClick={() => setShowPricesInKiosk(!showPricesInKiosk)}
-              className="kiosk-btn"
-              title="Fiyatları Gizle / Göster"
-            >
-              {showPricesInKiosk ? <Eye size={14} /> : <EyeOff size={14} />}
-              <span>{showPricesInKiosk ? 'Fiyatlar Açık' : 'Fiyatlar Gizli'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={toggleFullscreen}
-              className="kiosk-btn"
-              title="Tam Ekran Aç / Kapa"
-            >
-              {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-              <span>{isFullscreen ? 'Küçült' : 'Tam Ekran'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowQrModal(true)}
-              className="kiosk-btn"
-            >
-              <QrCode size={14} />
-              <span>Müşteri QR</span>
-            </button>
-            <Link
-              href="/?tab=studio#studio"
-              className="kiosk-btn gold"
-            >
-              <Sparkles size={14} />
-              <span>3D Banyo Stüdyosu</span>
-            </Link>
-            <button
-              type="button"
-              onClick={() => setKioskMode(false)}
-              className="kiosk-btn exit"
-            >
-              <X size={14} />
-              <span>Kiosk'tan Çık</span>
-            </button>
-          </div>
+    <div className="corporate-showroom-page">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="showroom-toast-banner animate-fade-in">
+          <CheckCircle2 size={18} className="toast-icon" />
+          <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Main Container */}
-      <div className="profile-main-container">
-        
-        {/* Profile Card & Info Header — PREMIUM CINEMATIC HERO */}
-        <div 
-          className="profile-banner-card animate-fade-in"
-          style={{
-            backgroundImage: `url('${bannerBgImage}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        >
-          {/* AI ERA LIVE STATUS HUD BAR */}
-          <div className="ai-hero-live-bar">
-            <div className={`ai-status-pill ${isOpenNow ? 'status-open' : 'status-closed'}`}>
-              <span className={`live-dot-pulse ${isOpenNow ? 'pulse-green' : 'pulse-amber'}`}></span>
-              <span>{isOpenNow ? 'Açık • Ziyarete Hazır (09:00 - 19:00)' : 'Kapalı • Yarın 09:00\'da Açılıyor'}</span>
-            </div>
-            <button 
-              type="button"
-              onClick={() => setShowAppointmentModal(true)}
-              className="ai-badge-pill clickable-pill"
-            >
-              <Coffee size={13} style={{ color: 'var(--accent-gold)' }} />
-              <span>Showroom & Mimar Randevusu</span>
-            </button>
-            <div className="ai-stock-pill">
-              <Package size={13} style={{ color: '#0f172a' }} />
-              <span>{dealer.inventories?.length || 0}+ Seri Teşhirde</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowQrModal(true)}
-              className="ai-badge-pill clickable-pill hide-mobile"
-            >
-              <QrCode size={13} />
-              <span>Masa Standı QR</span>
-            </button>
-          </div>
-
-          <div className="profile-banner-info">
-            <div className="profile-logo-box">
-              {dealer.logoUrl ? (
-                <img src={dealer.logoUrl} alt={dealer.brand?.name} style={{ maxWidth: '85%', maxHeight: '85%', objectFit: 'contain' }} />
-              ) : (
-                <Building2 size={36} style={{ color: 'var(--accent-gold)' }} />
-              )}
-            </div>
-            <div className="profile-text-group">
-              <div className="profile-badges-row">
-                <span className="profile-badge">
-                  {dealer.brand?.name || 'QUA Granite'} YETKİLİ SATICISI
-                </span>
-                <span className="verified-badge">
-                  <ShieldCheck size={14} />
-                  Onaylı Bayi
-                </span>
-              </div>
-              <h1 className="profile-name">{dealer.name}</h1>
-              <div className="profile-location">
-                <MapPin size={14} style={{ color: 'var(--accent-gold)', flexShrink: 0 }} />
-                <span>{dealer.district}, {dealer.city}</span>
-              </div>
-              {servicesList.length > 0 && (
-                <div className="header-services-badges">
-                  {servicesList.map(s => {
-                    const labelMap = {
-                      studio_3d: { text: '3D Mimar Desteği', icon: <Sparkles size={12} /> },
-                      shipping: { text: 'Şantiye Nakliyesi', icon: <Truck size={12} /> },
-                      install_support: { text: 'Usta & Uygulama', icon: <Wrench size={12} /> },
-                      sample_box: { text: 'Numune Kargo', icon: <Package size={12} /> },
-                      credit_card: { text: 'Kart Taksiti', icon: <CreditCard size={12} /> },
-                      b2b_discount: { text: 'Proje İskontosu', icon: <Building2 size={12} /> },
-                      showroom_stock: { text: 'Hazır Showroom Stoğu', icon: <Layers size={12} /> }
-                    };
-                    const item = labelMap[s];
-                    return item ? (
-                      <span key={s} className="service-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                        {item.icon}
-                        <span>{item.text}</span>
-                      </span>
-                    ) : null;
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Stats Row */}
-          <div className="hero-stats">
-            <div className="hero-stat-item">
-              <Award size={20} className="stat-icon" />
-              <div className="hero-stat-content">
-                <span className="stat-number">{dealerStats.experience || '10+ Yıl'}</span>
-                <span className="stat-label">Deneyim</span>
-              </div>
-            </div>
-            <div className="hero-stat-divider" />
-            <div className="hero-stat-item">
-              <TrendingUp size={20} className="stat-icon" />
-              <div className="hero-stat-content">
-                <span className="stat-number">{dealerStats.happyClients || '500+'}</span>
-                <span className="stat-label">Mutlu Müşteri</span>
-              </div>
-            </div>
-            <div className="hero-stat-divider" />
-            <div className="hero-stat-item">
-              <Building2 size={20} className="stat-icon" />
-              <div className="hero-stat-content">
-                <span className="stat-number">{dealerStats.showroomArea || '200 m²'}</span>
-                <span className="stat-label">Showroom</span>
-              </div>
-            </div>
-          </div>
-          
-          {/* Quick Actions */}
-          <div className="profile-actions" style={{ zIndex: 1 }}>
-            <Link 
-              href={featuredProductsList.length > 0 && featuredProductsList[0].code 
-                ? `/?code=${encodeURIComponent(featuredProductsList[0].code)}&tab=studio#studio` 
-                : "/?tab=studio#studio"} 
-              onClick={() => {
-                if (featuredProductsList.length > 0) {
-                  try {
-                    const prod = featuredProductsList[0];
-                    const selectedObj = {
-                      ...prod,
-                      textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
-                      imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
-                    };
-                    localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
-                    sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
-                  } catch(e) {}
-                }
-              }}
-              className="btn-3d-studio-hero"
-            >
-              <Sparkles size={15} />
-              <span>3D Banyo Stüdyosu'nda Kapla</span>
+      {/* Top Header / Status Bar */}
+      <header className="showroom-top-header">
+        <div className="showroom-header-inner">
+          <div className="header-left">
+            <Link href="/bayi" className="back-to-dealers-btn">
+              <ChevronLeft size={16} />
+              <span>Tüm Bayiler</span>
             </Link>
+            <div className="header-breadcrumbs">
+              <span className="crumb-brand">SeramikBak</span>
+              <span className="crumb-sep">/</span>
+              <span className="crumb-city">{dealer?.city || 'Yetkili Showroom'}</span>
+              <span className="crumb-sep">/</span>
+              <span className="crumb-dealer">{dealer?.name}</span>
+            </div>
+          </div>
 
-            <div className="hero-contact-buttons-group">
-              <a 
-                href={`https://wa.me/${(dealer.phone || '').replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20profil%20sayfan%C4%B1zdan%20ula%C5%9F%C4%B1yorum.%20Showroom%27daki%20seramikleriniz%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                onClick={() => trackAction('WHATSAPP')}
-                className="btn-whatsapp"
-              >
-                <MessageSquare size={14} />
-                <span>WhatsApp</span>
-              </a>
-              <a 
-                href={`tel:${dealer.phone}`}
-                onClick={() => trackAction('PHONE')}
-                className="btn-call"
-              >
+          <div className="header-right">
+            {dealer?.phone && (
+              <a href={`tel:${dealer.phone}`} className="header-contact-pill">
                 <Phone size={14} />
-                <span>Hemen Ara</span>
+                <span>{dealer.phone}</span>
               </a>
-              <a 
-                href={`https://www.google.com/maps/dir/?api=1&destination=${dealer.lat},${dealer.lng}`} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                onClick={() => trackAction('DIRECTIONS')}
-                className="btn-maps"
-              >
-                <Compass size={14} />
-                <span>Yol Tarifi</span>
-              </a>
-            </div>
-
-            {/* Social Media Links */}
-            {(dealer.socialInstagram || dealer.socialFacebook || dealer.socialLinkedin || dealer.socialYoutube || dealer.socialWebsite) && (
-              <div className="hero-social-links-row">
-                {dealer.socialInstagram && (
-                  <a href={dealer.socialInstagram.startsWith('http') ? dealer.socialInstagram : `https://${dealer.socialInstagram}`} target="_blank" rel="noopener noreferrer" className="social-icon-circle-btn" title="Instagram Sayfası">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-                  </a>
-                )}
-                {dealer.socialFacebook && (
-                  <a href={dealer.socialFacebook.startsWith('http') ? dealer.socialFacebook : `https://${dealer.socialFacebook}`} target="_blank" rel="noopener noreferrer" className="social-icon-circle-btn" title="Facebook Sayfası">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                  </a>
-                )}
-                {dealer.socialLinkedin && (
-                  <a href={dealer.socialLinkedin.startsWith('http') ? dealer.socialLinkedin : `https://${dealer.socialLinkedin}`} target="_blank" rel="noopener noreferrer" className="social-icon-circle-btn" title="LinkedIn Sayfası">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
-                  </a>
-                )}
-                {dealer.socialYoutube && (
-                  <a href={dealer.socialYoutube.startsWith('http') ? dealer.socialYoutube : `https://${dealer.socialYoutube}`} target="_blank" rel="noopener noreferrer" className="social-icon-circle-btn" title="YouTube Kanalı">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><polygon points="10 15 15 12 10 9 10 15"/></svg>
-                  </a>
-                )}
-                {dealer.socialWebsite && (
-                  <a href={dealer.socialWebsite.startsWith('http') ? dealer.socialWebsite : `https://${dealer.socialWebsite}`} target="_blank" rel="noopener noreferrer" className="social-icon-circle-btn" title="Resmi İnternet Sitesi">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                  </a>
-                )}
-              </div>
             )}
-          </div>
-        </div>
-
-        {/* EXECUTIVE STORE TABS NAVIGATION BAR */}
-        <div className="store-tabs-nav-bar animate-fade-in">
-          <button
-            type="button"
-            onClick={() => setActiveMainTab('products')}
-            className={`store-tab-nav-btn ${activeMainTab === 'products' ? 'active' : ''}`}
-          >
-            <Building2 size={16} />
-            <span>Showroom Ürünleri & Teşhir ({products.length})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveMainTab('combos')}
-            className={`store-tab-nav-btn ${activeMainTab === 'combos' ? 'active' : ''}`}
-          >
-            <Sparkles size={16} />
-            <span>Mimari Kombinler & İlham</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveMainTab('calculator')}
-            className={`store-tab-nav-btn ${activeMainTab === 'calculator' ? 'active' : ''}`}
-          >
-            <Calculator size={16} />
-            <span>Şantiye & Sarfiyat Hesabı</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveMainTab('info')}
-            className={`store-tab-nav-btn ${activeMainTab === 'info' ? 'active' : ''}`}
-          >
-            <MapPin size={16} />
-            <span>Showroom Bilgisi & İletişim</span>
-          </button>
-        </div>
-
-        {/* SECTION: MEKAN & İLHAM MOODBOARD'U (TAB: COMBOS) */}
-        {activeMainTab === 'combos' && (
-          <div className="showroom-moodboards-section animate-fade-in">
-            <div className="moodboards-header">
-              <span className="moodboards-badge">
-                <Palette size={13} />
-                <span>2026 MİMARİ SHOWROOM KONSEPTLERİ</span>
-              </span>
-              <h2 className="moodboards-title">
-                Hangi Mekan Havasını Arıyorsunuz?
-              </h2>
-              <p className="moodboards-desc">
-                Tıpkı lüks bir konsept mağazada gezer gibi, hayalinizdeki tarza dokunun; bayimizin tüm stokları ve 3D simülasyonları anında sizin için hazırlansın.
-              </p>
-            </div>
-
-            <div className="moodboards-carousel-grid">
-              {MOODBOARDS.map((board) => {
-                const isActive = activeMoodboard === board.id;
-                return (
-                  <div
-                    key={board.id}
-                    onClick={() => handleMoodboardSelect(board)}
-                    className={`moodboard-card ${isActive ? 'active' : ''}`}
-                    style={{
-                      '--card-accent': board.accentColor
-                    }}
-                  >
-                    <div className="moodboard-card-top">
-                      <span className="moodboard-icon">{board.icon}</span>
-                      <span className="moodboard-tag">{board.tag}</span>
-                    </div>
-                    <h3 className="moodboard-name">{board.name}</h3>
-                    <span className="moodboard-sub">{board.subtitle}</span>
-                    <p className="moodboard-p">{board.desc}</p>
-                    <div className="moodboard-footer-action">
-                      {isActive ? (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                          <Check size={13} />
-                          <span>Aktif Konsept</span>
-                        </span>
-                      ) : (
-                        <span>Konsepti İncele</span>
-                      )}
-                      <ArrowRight size={13} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* SECTION: KIZAKLI TEŞHİR & YÜZEY İNCELEME STÜDYOSU (TAB: PRODUCTS) */}
-        {activeMainTab === 'products' && selectedShowcaseTile && showTileSpotlight && (
-          <div className="concept-showcase-section animate-fade-in">
-            <div className="showcase-container-card">
-              <div className="showcase-header-row">
-                <div className="showcase-title-group">
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-                    <span className="showcase-kicker">
-                      <Sparkles size={12} />
-                      <span>DİJİTAL TEŞHİR STANDI & IŞIK SİMÜLATÖRÜ</span>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setShowTileSpotlight(false)}
-                      className="btn-spotlight-toggle-hide"
-                      title="Teşhir Alanını Gizle"
-                    >
-                      <X size={13} />
-                      <span>Gizle</span>
-                    </button>
-                  </div>
-                  <h3 className="showcase-main-title">
-                    {selectedShowcaseTile.name}
-                  </h3>
-                  <span className="showcase-code-meta">
-                    Seri Kodu: <strong>{selectedShowcaseTile.code || 'SB-2026'}</strong> • 
-                    Ebat: <strong>{selectedShowcaseTile.width}x{selectedShowcaseTile.height} cm</strong> • 
-                    Stil: <strong>{selectedShowcaseTile.style || 'Lüks Porselen'}</strong>
-                  </span>
-                </div>
-
-                {/* LIGHT SIMULATION TOGGLE */}
-                <div className="lighting-toggle-box">
-                  <span className="lighting-label">Showroom Aydınlatması:</span>
-                  <div className="lighting-btn-group">
-                    <button
-                      type="button"
-                      onClick={() => setLightingMode('day')}
-                      className={`light-btn ${lightingMode === 'day' ? 'active-day' : ''}`}
-                    >
-                      <Sun size={14} />
-                      <span>Gün Işığı (5500K)</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setLightingMode('warm')}
-                      className={`light-btn ${lightingMode === 'warm' ? 'active-warm' : ''}`}
-                    >
-                      <Moon size={14} />
-                      <span>Sıcak Spot (3000K)</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="showcase-body-grid">
-                {/* LARGE TILE SLAB WITH AMBIENT SHEEN */}
-                <div className={`showcase-tile-viewer ${lightingMode === 'warm' ? 'warm-lighting' : 'day-lighting'}`}>
-                  <div className="slab-frame">
-                    <img
-                      src={selectedShowcaseTile.imageUrl || getTextureFallback(selectedShowcaseTile)}
-                      alt={selectedShowcaseTile.name}
-                      className="slab-tile-image"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = getTextureFallback(selectedShowcaseTile);
-                      }}
-                    />
-                    <div className="slab-sheen-overlay"></div>
-                    <div className="slab-corner-ruler">
-                      <span>{selectedShowcaseTile.width} cm</span>
-                      <span className="ruler-x">×</span>
-                      <span>{selectedShowcaseTile.height} cm</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* TILE DETAILS, SPECS & 1-CLICK ACTIONS */}
-                <div className="showcase-specs-column">
-                  <div className="specs-pills-wrap">
-                    <span className="spec-badge-pill">
-                      <Sparkles size={13} style={{ color: 'var(--accent-gold)' }} />
-                      <span>{selectedShowcaseTile.finish || 'Full Lappato Parlak'}</span>
-                    </span>
-                    <span className="spec-badge-pill">
-                      <Layers size={13} style={{ color: '#0f172a' }} />
-                      <span>Rektifiye Sıfır Derz</span>
-                    </span>
-                    <span className="spec-badge-pill">
-                      <ShieldCheck size={13} style={{ color: '#059669' }} />
-                      <span>Porselen Düşük Su Emme (E &lt; %0.5)</span>
-                    </span>
-                    <span className="spec-badge-pill">
-                      <Award size={13} style={{ color: '#b45309' }} />
-                      <span>Donma & Çizilmeye Dayanıklı</span>
-                    </span>
-                  </div>
-
-                  <div className="showcase-stock-status-box">
-                    <div className="status-live-indicator">
-                      <span className="ping-dot"></span>
-                      <span className="status-text">Showroom Teşhirinde & Depoda Teslimata Hazır</span>
-                    </div>
-                    {selectedShowcaseTile.price && (!kioskMode || showPricesInKiosk) && (
-                      <div className="showcase-price-row">
-                        <span className="showcase-price-label">Bayi Özel Metrekare Fiyatı:</span>
-                        <span className="showcase-price-val">₺{selectedShowcaseTile.price.toLocaleString('tr-TR')} <small>/ m²</small></span>
-                      </div>
-                    )}
-                  </div>
-
-                  <p className="showcase-architect-note">
-                    Bu karo, {dealer.name} showroomunda mimari zemin ve banyo teşhir standında sergilenmektedir. 
-                    Işık yansıma açısı ve rektifiye kenarları sayesinde mekanlarda derzsiz ve kesintisiz genişlik hissi yaratır.
-                  </p>
-
-                  <div className="showcase-cta-buttons">
-                    <Link
-                      href={selectedShowcaseTile.code ? `/?code=${encodeURIComponent(selectedShowcaseTile.code)}&tab=studio#studio` : `/?tab=studio#studio`}
-                      onClick={() => {
-                        try {
-                          const selectedObj = {
-                            ...selectedShowcaseTile,
-                            unitPrice: selectedShowcaseTile.price || selectedShowcaseTile.unitPrice,
-                            textureUrl: selectedShowcaseTile.textureUrl || selectedShowcaseTile.imageUrl || getTextureFallback(selectedShowcaseTile),
-                            imageUrl: selectedShowcaseTile.imageUrl || selectedShowcaseTile.textureUrl || getTextureFallback(selectedShowcaseTile)
-                          };
-                          localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
-                          sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
-                        } catch(e) {}
-                      }}
-                      className="btn-showcase-3d"
-                    >
-                      <Sparkles size={16} />
-                      <span>3D Banyo Stüdyosu'nda Canlı Döşe</span>
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={() => addToCart(selectedShowcaseTile, 30)}
-                      className={`btn-showcase-cart ${quoteCart.some(i => i.id === selectedShowcaseTile.id) ? 'in-cart' : ''}`}
-                    >
-                      {quoteCart.some(i => i.id === selectedShowcaseTile.id) ? (
-                        <>
-                          <Check size={16} />
-                          <span>Sepete Eklendi</span>
-                        </>
-                      ) : (
-                        <>
-                          <Plus size={16} />
-                          <span>Teklif Sepetime Ekle (+30 m²)</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => navigateToQuoteForm(`Showroom teşhirindeki "${selectedShowcaseTile.name}" (${selectedShowcaseTile.code || ''}) için numune karo ve palet fiyatı talep ediyorum.`)}
-                      className="btn-showcase-sample"
-                    >
-                      <Package size={15} />
-                      <span>Gerçek Numune / Palet Teklifi İste</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* COLLAPSED SPOTLIGHT BAR (TAB: PRODUCTS) */}
-        {activeMainTab === 'products' && selectedShowcaseTile && !showTileSpotlight && (
-          <div className="spotlight-collapsed-bar animate-fade-in">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Sparkles size={15} style={{ color: 'var(--accent-gold)' }} />
-              <span style={{ fontSize: '0.86rem', color: '#1e293b' }}>
-                Seçili Teşhir Karosu: <strong>{selectedShowcaseTile.name}</strong> ({selectedShowcaseTile.width}x{selectedShowcaseTile.height} cm • {selectedShowcaseTile.finish || 'Porselen'})
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowTileSpotlight(true)}
-              className="btn-spotlight-toggle-show"
+            
+            <button 
+              onClick={() => setShowQrModal(true)} 
+              className="header-action-btn"
+              title="Masaüstü QR Kodu"
             >
-              <Sliders size={13} />
-              <span>Işık & Yüzeyi İncele</span>
+              <QrCode size={16} />
+              <span className="btn-label-desktop">Masa QR</span>
+            </button>
+
+            <button 
+              onClick={() => setShowCartDrawer(true)} 
+              className="header-cart-btn"
+              title="Teklif Sepetim"
+            >
+              <FileText size={16} />
+              <span>Teklif Sepeti</span>
+              {quoteCart.length > 0 && (
+                <span className="cart-counter-badge">{quoteCart.length}</span>
+              )}
             </button>
           </div>
-        )}
+        </div>
+      </header>
 
-        {/* TAB 3: ŞANTİYE & SARFİYAT HESAPLAYICI (IN-PAGE) */}
-        {activeMainTab === 'calculator' && (
-          <div className="inpage-calculator-card animate-fade-in">
-            <div className="inpage-calc-header">
-              <span className="calc-kicker">
-                <Calculator size={13} />
-                <span>ŞANTİYE & MALZEME METRAJ RAPORU</span>
-              </span>
-              <h2 className="calc-main-title">
-                Akıllı Seramik & Usta Sarfiyat Hesaplayıcı
-              </h2>
-              <p className="calc-desc">
-                Mekanınızın en ve boy ölçülerini girin; seramik kutu / paket sayısı, Flex Kalekim yapıştırıcı torbası, derz dolgusu ve şantiye nakliye tonajını anında hesaplayın.
-              </p>
+      {/* Section 1: Hero Section (Matching media_1790774130284.jpg) */}
+      <section className="showroom-hero-section">
+        <div className="showroom-hero-container">
+          {/* Left Column: Dealer Information */}
+          <div className="hero-left-column">
+            <div className="hero-dealer-badge">
+              <ShieldCheck size={16} className="badge-shield-icon" />
+              <span>YETKİLİ SHOWROOM & PROJE MERKEZİ</span>
             </div>
 
-            <div className="calc-inputs-grid-boxed">
-              <div className="calc-box-input">
-                <label>Zemin Eni (Metre)</label>
-                <input 
-                  type="number" 
-                  step="0.1" 
-                  value={calcWidth} 
-                  onChange={(e) => setCalcWidth(e.target.value)} 
-                  placeholder="Örn: 3.5"
-                />
+            <h1 className="hero-dealer-title">{dealer?.name || 'Prestij Seramik Showroom'}</h1>
+
+            <p className="hero-dealer-description">
+              {dealer?.description || 
+                'En seçkin porselen ve seramik karo koleksiyonları, mimari projelendirme desteği ve kişiselleştirilmiş 3D mekan tasarımlarıyla hayalinizdeki mekanlara zarafet katıyoruz.'}
+            </p>
+
+            <div className="hero-cta-group">
+              <a href="#katalog" className="hero-btn-primary">
+                <span>Showroomu İncele</span>
+                <ArrowRight size={18} />
+              </a>
+              <button 
+                onClick={() => {
+                  setSelectedProductForLead(null);
+                  setShowLeadModal(true);
+                }} 
+                className="hero-btn-secondary"
+              >
+                <span>Teklif Al</span>
+              </button>
+            </div>
+
+            <div className="hero-meta-badges">
+              <div className="hero-meta-item">
+                <MapPin size={16} className="meta-pin-icon" />
+                <span>{dealer?.address ? `${dealer.name} • ${dealer.city || 'Merkez'}` : `${dealer.name} • ${dealer.city || 'Merkez Showroom'}`}</span>
               </div>
-              <div className="calc-box-input">
-                <label>Zemin Boyu (Metre)</label>
-                <input 
-                  type="number" 
-                  step="0.1" 
-                  value={calcLength} 
-                  onChange={(e) => setCalcLength(e.target.value)} 
-                  placeholder="Örn: 4.0"
-                />
+              <div className="hero-meta-item">
+                <Clock size={16} className="meta-clock-icon" />
+                <span className="status-open-pill">Açık</span>
+                <span>09:00 - 19:00</span>
               </div>
-              <div className="calc-box-input">
-                <label>Duvar Yüksekliği (Opsiyonel / m)</label>
-                <input 
-                  type="number" 
-                  step="0.1" 
-                  value={calcHeight} 
-                  onChange={(e) => setCalcHeight(e.target.value)} 
-                  placeholder="Örn: 2.6 (Banyo için)"
-                />
+            </div>
+          </div>
+
+          {/* Right Column: Hero Visual Card with Cursive Signature */}
+          <div className="hero-right-column">
+            <div className="hero-card-visual-wrapper">
+              <img 
+                src={heroImage} 
+                alt={dealer?.name || 'Showroom Banyo'} 
+                className="hero-main-card-img"
+              />
+              <div className="hero-cursive-quote-badge">
+                <p className="cursive-quote-text">“Hayalinizdeki mekan burada başlıyor...”</p>
+                <span className="cursive-quote-sub">{dealer?.name} Koleksiyonu</span>
               </div>
-              <div className="calc-box-input">
-                <label>Fire & Kesim Payı (%)</label>
-                <select value={calcWastePercent} onChange={(e) => setCalcWastePercent(Number(e.target.value))}>
-                  <option value={5}>%5 (Düz Döşeme)</option>
-                  <option value={10}>%10 (Standart - Önerilen)</option>
-                  <option value={15}>%15 (Diyagonal / Bol Kesimli)</option>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 2: 4 Feature Pillars Bar */}
+      <section className="feature-pillars-bar">
+        <div className="feature-pillars-container">
+          <div className="feature-pillar-card">
+            <div className="pillar-icon-box">
+              <Package size={22} />
+            </div>
+            <div className="pillar-text-group">
+              <h3 className="pillar-title">100+ Teşhir Ürünü</h3>
+              <p className="pillar-desc">En güncel geniş ebat porselen serileri</p>
+            </div>
+          </div>
+
+          <div className="feature-pillar-card">
+            <div className="pillar-icon-box">
+              <Sparkles size={22} />
+            </div>
+            <div className="pillar-text-group">
+              <h3 className="pillar-title">3D Mekan Görüntüleme</h3>
+              <p className="pillar-desc">Karoları kendi mekanınızda canlı görün</p>
+            </div>
+          </div>
+
+          <div className="feature-pillar-card">
+            <div className="pillar-icon-box">
+              <Layers size={22} />
+            </div>
+            <div className="pillar-text-group">
+              <h3 className="pillar-title">Gerçek Numune</h3>
+              <p className="pillar-desc">Mimari projeler için yerinde doku kontrolü</p>
+            </div>
+          </div>
+
+          <div className="feature-pillar-card">
+            <div className="pillar-icon-box">
+              <CheckCircle2 size={22} />
+            </div>
+            <div className="pillar-text-group">
+              <h3 className="pillar-title">Hızlı Teklif</h3>
+              <p className="pillar-desc">Dakikalar içinde net metraj ve fiyatlandırma</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 3: Catalog (Left Sidebar + Right 4-Col Grid) */}
+      <section id="katalog" className="showroom-catalog-section">
+        <div className="catalog-layout-container">
+          {/* Left Sidebar Filter Bar */}
+          <aside className="catalog-sidebar">
+            <div className="sidebar-header">
+              <div className="sidebar-title-row">
+                <SlidersHorizontal size={18} className="sidebar-icon" />
+                <h3 className="sidebar-title">Ürünleri Filtrele</h3>
+              </div>
+              {(selectedCategory !== 'all' || selectedDimension !== 'all' || selectedFinish !== 'all' || searchTerm) && (
+                <button onClick={resetFilters} className="clear-filters-link">
+                  Tümünü Temizle
+                </button>
+              )}
+            </div>
+
+            {/* Search Input */}
+            <div className="sidebar-search-box">
+              <Search size={16} className="search-input-icon" />
+              <input 
+                type="text" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Model, kod veya renk ara..."
+                className="sidebar-search-input"
+              />
+              {searchTerm && (
+                <button onClick={() => setSearchTerm('')} className="search-clear-btn">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            {/* Category Filter */}
+            <div className="filter-group">
+              <h4 className="filter-group-heading">Kategori</h4>
+              <div className="filter-options-list">
+                <button 
+                  onClick={() => setSelectedCategory('all')}
+                  className={`filter-option-btn ${selectedCategory === 'all' ? 'active' : ''}`}
+                >
+                  <span className="option-label">Tüm Kategoriler</span>
+                  <span className="option-count">{allCatalogProducts.length}</span>
+                </button>
+                {Object.keys(categoryCounts).filter(k => k !== 'all').map(cat => (
+                  <button 
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`filter-option-btn ${selectedCategory === cat ? 'active' : ''}`}
+                  >
+                    <span className="option-label">{cat}</span>
+                    <span className="option-count">{categoryCounts[cat]}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Dimension Filter */}
+            <div className="filter-group">
+              <h4 className="filter-group-heading">Ölçü (cm)</h4>
+              <div className="filter-options-list">
+                <button 
+                  onClick={() => setSelectedDimension('all')}
+                  className={`filter-option-btn ${selectedDimension === 'all' ? 'active' : ''}`}
+                >
+                  <span className="option-label">Tüm Ebatlar</span>
+                  <span className="option-count">{allCatalogProducts.length}</span>
+                </button>
+                {Object.keys(dimensionCounts).filter(k => k !== 'all').map(dim => (
+                  <button 
+                    key={dim}
+                    onClick={() => setSelectedDimension(dim)}
+                    className={`filter-option-btn ${selectedDimension === dim ? 'active' : ''}`}
+                  >
+                    <span className="option-label">{dim}</span>
+                    <span className="option-count">{dimensionCounts[dim]}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Surface/Finish Filter */}
+            <div className="filter-group">
+              <h4 className="filter-group-heading">Yüzey Dokusu</h4>
+              <div className="filter-options-list">
+                <button 
+                  onClick={() => setSelectedFinish('all')}
+                  className={`filter-option-btn ${selectedFinish === 'all' ? 'active' : ''}`}
+                >
+                  <span className="option-label">Tüm Yüzeyler</span>
+                  <span className="option-count">{allCatalogProducts.length}</span>
+                </button>
+                {Object.keys(finishCounts).filter(k => k !== 'all').map(finish => (
+                  <button 
+                    key={finish}
+                    onClick={() => setSelectedFinish(finish)}
+                    className={`filter-option-btn ${selectedFinish === finish ? 'active' : ''}`}
+                  >
+                    <span className="option-label">{finish}</span>
+                    <span className="option-count">{finishCounts[finish]}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Architect & Consultation Card */}
+            <div className="sidebar-consultation-card">
+              <div className="consult-badge">MİMARİ DESTEK</div>
+              <h5 className="consult-title">Banyonuz İçin Birlikte Çizelim</h5>
+              <p className="consult-desc">Showroom uzmanımızla randevu alarak projenize özel karo seçimi yapın.</p>
+              <button 
+                onClick={() => setShowApptModal(true)} 
+                className="consult-action-btn"
+              >
+                <Calendar size={14} />
+                <span>Showroom Randevusu</span>
+              </button>
+            </div>
+          </aside>
+
+          {/* Right Product Grid Area */}
+          <main className="catalog-main-content">
+            <div className="catalog-header-bar">
+              <div className="catalog-title-meta">
+                <h2 className="catalog-section-title">Showroom Ürünleri</h2>
+                <span className="catalog-count-pill">
+                  {filteredProducts.length} Ürün Listeleniyor
+                </span>
+              </div>
+
+              <div className="catalog-sort-group">
+                <span className="sort-label">Sırala:</span>
+                <select 
+                  value={sortBy} 
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="catalog-sort-select"
+                >
+                  <option value="featured">Öne Çıkanlar</option>
+                  <option value="name-asc">İsim (A-Z)</option>
+                  <option value="price-asc">Fiyat (Önce En Düşük)</option>
+                  <option value="price-desc">Fiyat (Önce En Yüksek)</option>
                 </select>
               </div>
             </div>
 
-            {(() => {
-              const w = parseFloat(calcWidth) || 0;
-              const l = parseFloat(calcLength) || 0;
-              const h = parseFloat(calcHeight) || 0;
-              
-              const floorNet = w * l;
-              const wallNet = h > 0 ? 2 * (w + l) * h : 0;
-              const netM2 = floorNet + wallNet;
-              const grossM2 = netM2 * (1 + calcWastePercent / 100);
-              const boxM2 = 1.44;
-              const numBoxes = grossM2 > 0 ? Math.ceil(grossM2 / boxM2) : 0;
-              const totalWeightKg = Math.round(grossM2 * 22);
-              const kalekimBags = grossM2 > 0 ? Math.ceil((grossM2 * 4.5) / 25) : 0;
-              const groutKg = grossM2 > 0 ? Math.ceil(grossM2 * 0.45) : 0;
-
-              return (
-                <div className="inpage-calc-results">
-                  <div className="res-badge-item">
-                    <span className="lbl">Net Alan</span>
-                    <span className="val">{netM2.toFixed(2)} m²</span>
-                  </div>
-                  <div className="res-badge-item highlight">
-                    <span className="lbl">Fireli Sipariş (+%{calcWastePercent})</span>
-                    <span className="val">{grossM2.toFixed(2)} m²</span>
-                  </div>
-                  <div className="res-badge-item">
-                    <span className="lbl">Kutu / Paket</span>
-                    <span className="val pill-accent">{numBoxes} Paket</span>
-                  </div>
-                  <div className="res-badge-item">
-                    <span className="lbl">Flex Kalekim Harcı</span>
-                    <span className="val pill-accent">{kalekimBags} Torba (25kg)</span>
-                  </div>
-                  <div className="res-badge-item">
-                    <span className="lbl">Derz Dolgusu</span>
-                    <span className="val pill-accent">{groutKg} kg</span>
-                  </div>
-                  <div className="res-badge-item">
-                    <span className="lbl">Yaklaşık Ağırlık</span>
-                    <span className="val">~{(totalWeightKg / 1000).toFixed(2)} Ton</span>
-                  </div>
-
-                  <div className="inpage-calc-actions-row">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const quoteMsg = `Hesaplanan Metraj & Sarfiyat: Net ${netM2.toFixed(2)} m², Fireli ${grossM2.toFixed(2)} m² (${numBoxes} Kutu), ${kalekimBags} Torba 25kg Kalekim, ${groutKg} kg Derz Dolgusu (~${totalWeightKg} kg)`;
-                        navigateToQuoteForm(quoteMsg);
-                      }}
-                      className="btn-inpage-calc-apply"
-                    >
-                      <Send size={15} />
-                      <span>Bu Metrajla Bayiden Fiyat Teklifi İste</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const cleanPhone = (dealer.phone || '').replace(/[\s\-\(\)\+]/g, '');
-                        const msg = `*SERAMİK & SARFİYAT HESAP RAPORU*\n*${dealer.name}* Mağazasına\n` +
-                          `─────────────────────────────\n` +
-                          `Mekanım için yapılan metraj ve malzeme hesabı:\n` +
-                          `• Net Alan: *${netM2.toFixed(2)} m²*\n` +
-                          `• Fireli Sipariş (+%${calcWastePercent}): *${grossM2.toFixed(2)} m²* (~${numBoxes} Kutu)\n` +
-                          `• Flex Kalekim: *${kalekimBags} Torba* (25kg)\n` +
-                          `• Derz Dolgusu: *${groutKg} kg*\n` +
-                          `• Toplam Tonaj: *~${(totalWeightKg / 1000).toFixed(2)} Ton*\n` +
-                          `─────────────────────────────\n` +
-                          `Stok durumunuzu ve teslimat koşullarınızı öğrenebilir miyim?`;
-                        const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
-                        window.open(waUrl, '_blank');
-                      }}
-                      className="btn-inpage-calc-whatsapp"
-                    >
-                      <MessageSquare size={15} />
-                      <span>WhatsApp ile Şantiye Listesini Gönder</span>
-                    </button>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        )}
-
-        {/* Showroom & Content Grid (TAB: INFO) */}
-        {activeMainTab === 'info' && (
-          <div className="showroom-main-grid">
-          
-          {/* LEFT COLUMN: 3D TOUR & PHOTOS */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            
-            {/* Gallery Card */}
-            <div className="section-glass-card">
-              {/* Tab Header */}
-              <div className="gallery-header-row">
-                <h3 className="section-title">Showroom Deneyimi</h3>
-                
-                {/* Toggles */}
-                {dealer.virtualTourUrl && images.length > 0 && (
-                  <div className="gallery-tab-toggle">
-                    <button 
-                      onClick={() => handleTabChange('3d')}
-                      className={`toggle-btn ${galleryTab === '3d' ? 'active' : ''}`}
-                    >
-                      <Sparkles size={12} />
-                      3D Sanal Tur
-                    </button>
-                    <button 
-                      onClick={() => handleTabChange('photos')}
-                      className={`toggle-btn ${galleryTab === 'photos' ? 'active' : ''}`}
-                    >
-                      <ImageIcon size={12} />
-                      Fotoğraflar
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Tab Content */}
-              {galleryTab === '3d' && dealer.virtualTourUrl ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div className="virtual-tour-iframe-container" style={{ position: 'relative' }}>
-                    {iframeLoading && (
-                      <div className="iframe-skeleton-loader">
-                        <div className="ceramic-tile-spinner mini">
-                          <div className="tile-face face-front">SB</div>
-                          <div className="tile-face face-back">SB</div>
-                        </div>
-                        <span>Sanal Tur Hazırlanıyor...</span>
-                      </div>
-                    )}
-                    {isPanoramicImage ? (
-                      <div 
-                        id="panorama-container" 
-                        style={{ width: '100%', height: '100%', position: 'relative' }}
-                      />
-                    ) : (
-                      <iframe 
-                        src={dealer.virtualTourUrl} 
-                        width="100%" 
-                        height="100%" 
-                        style={{ border: 'none' }}
-                        allowFullScreen
-                        onLoad={() => setIframeLoading(false)}
-                      />
-                    )}
-                  </div>
-                  <span className="tour-hint">
-                    {isPanoramicImage 
-                      ? "Görseli 360° döndürmek için tıklayıp sürükleyin, yakınlaştırmak için fare tekerleğini kullanın."
-                      : "Showroom içinde gezinmek için tıklayıp sürükleyin, ilerlemek için zemin noktalarına dokunun."}
-                  </span>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {images.length > 0 ? (
-                    <>
-                      <div className="active-photo-container">
-                        <img 
-                          src={images[activePhotoIndex] || images[0]} 
-                          alt={`${dealer.name} Showroom`} 
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                        />
-                      </div>
-                      
-                      {images.length > 1 && (
-                        <div className="thumbnail-list scrollbar-hidden">
-                          {images.map((img, idx) => (
-                            <button 
-                              key={idx}
-                              onClick={() => setActivePhotoIndex(idx)}
-                              className={`thumbnail-btn ${activePhotoIndex === idx ? 'active' : ''}`}
-                            >
-                              <img src={img} alt="Showroom Thumbnail" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="no-images-placeholder">
-                      <ImageIcon size={48} strokeWidth={1.5} style={{ color: 'var(--accent-gold)' }} />
-                      <span>Showroom görselleri yakında eklenecektir.</span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Special Concepts Card */}
-            {concepts.length > 0 && (
-              <div className="section-glass-card">
-                <h3 className="section-subtitle">
-                  Bu Showroom'da Sergilenen Özel Konseptler
-                </h3>
-                <div className="concepts-list">
-                  {concepts.map((concept, idx) => (
-                    <span 
-                      key={idx}
-                      className="concept-badge"
-                    >
-                      <Sparkles size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle', color: 'var(--accent-gold)' }} />
-                      <span>{concept.trim()}</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* About Us Card */}
-            {dealer.aboutText && (
-              <div className="section-glass-card">
-                <h3 className="section-subtitle">Hakkımızda</h3>
-                <p style={{ margin: 0, fontSize: '0.86rem', color: '#475569', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
-                  {dealer.aboutText}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* RIGHT COLUMN: CONTACT INFO & QUOTE REQUEST */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            
-            {/* Info and hours card */}
-            <div className="section-glass-card">
-              <h3 className="section-title">İletişim & Konum Bilgileri</h3>
-              
-              <div className="info-list">
-                <div className="info-item">
-                  <div className="info-icon-wrapper">
-                    <MapPin size={18} />
-                  </div>
-                  <div className="info-content">
-                    <span className="info-label">Adres</span>
-                    <span className="info-value">{dealer.address} • {dealer.district}, {dealer.city}</span>
-                  </div>
-                </div>
-
-                <div className="info-item">
-                  <div className="info-icon-wrapper">
-                    <Phone size={18} />
-                  </div>
-                  <div className="info-content">
-                    <span className="info-label">Telefon</span>
-                    <a href={`tel:${dealer.phone}`} className="info-value tel-link">{dealer.phone}</a>
-                  </div>
-                </div>
-
-                {dealer.email && (
-                  <div className="info-item">
-                    <div className="info-icon-wrapper">
-                      <Mail size={18} />
-                    </div>
-                    <div className="info-content">
-                      <span className="info-label">E-Posta</span>
-                      <a href={`mailto:${dealer.email}`} className="info-value mail-link">{dealer.email}</a>
-                    </div>
-                  </div>
-                )}
-
-                <div className="info-item border-top">
-                  <div className="info-icon-wrapper">
-                    <Clock size={18} />
-                  </div>
-                  <div className="info-content">
-                    <span className="info-label">Çalışma Saatleri</span>
-                    <span className="info-value highlight-value">Her gün: 09:00 – 19:00</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* PDF Catalog Card */}
-            {dealer.pdfCatalogUrl && (
-              <div className="section-glass-card animate-fade-in" style={{
-                background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.85) 100%)',
-                border: '1px solid rgba(212, 175, 55, 0.3)',
-                padding: '24px',
-                borderRadius: '20px',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '12px',
-                      background: 'rgba(212, 175, 55, 0.15)',
-                      border: '1px solid rgba(212, 175, 55, 0.4)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#d4af37',
-                      flexShrink: 0
-                    }}>
-                      <FileText size={24} />
-                    </div>
-                    <div>
-                      <h3 style={{ fontSize: '1.05rem', fontWeight: '800', color: '#ffffff', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {dealer.pdfCatalogName || 'İndirilebilir Ürün Kataloğu & Broşür'}
-                      </h3>
-                      <p style={{ fontSize: '0.78rem', color: '#cbd5e1', margin: '4px 0 0 0' }}>
-                        Bayimizin güncel seramik koleksiyonunu ve fiyat broşürünü PDF olarak indirin.
-                      </p>
-                    </div>
-                  </div>
-                  <a
-                    href={dealer.pdfCatalogUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackAction('PDF_DOWNLOAD')}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '10px 20px',
-                      borderRadius: '10px',
-                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                      color: '#000000',
-                      fontWeight: '800',
-                      fontSize: '0.85rem',
-                      textDecoration: 'none',
-                      boxShadow: '0 4px 14px rgba(212, 175, 55, 0.3)',
-                      transition: 'all 0.2s ease'
-                    }}
-                    className="hover-gold-solid-btn"
-                  >
-                    <Download size={16} />
-                    <span>Kataloğu İndir (PDF)</span>
-                  </a>
-                </div>
-              </div>
-            )}
-
-            {/* Direct lead quote form */}
-            <div className="section-glass-card" id="quote-form-section">
-              <h3 className="section-title">Fiyat Teklifi ve Bilgi Alın</h3>
-              <p className="form-desc">
-                Aşağıdaki formu doldurarak bu bayiden ilgilendiğiniz seramik ürünleri için palet bazında özel teklif veya showroom randevusu isteyin.
-              </p>
-
-              <form onSubmit={handleLeadSubmit} className="quote-form-element">
-                {successMsg && (
-                  <div className="alert-box success">
-                    <CheckCircle2 size={18} style={{ flexShrink: 0, marginTop: '1px' }} />
-                    <span>{successMsg}</span>
-                  </div>
-                )}
-
-                {errorMsg && (
-                  <div className="alert-box error" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <X size={16} style={{ color: '#ef4444', flexShrink: 0 }} />
-                    <span>{errorMsg}</span>
-                  </div>
-                )}
-
-                <div className="input-group">
-                  <label className="input-label">Adınız Soyadınız *</label>
-                  <input 
-                    type="text" 
-                    value={clientName} 
-                    onChange={(e) => setClientName(e.target.value)} 
-                    placeholder="Örn: Ahmet Yılmaz"
-                    required
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="input-group">
-                  <label className="input-label">Telefon Numaranız *</label>
-                  <input 
-                    type="tel" 
-                    value={clientPhone} 
-                    onChange={(e) => setClientPhone(e.target.value)} 
-                    placeholder="Örn: 0532 123 45 67"
-                    required
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="input-group">
-                  <label className="input-label">E-Posta Adresiniz *</label>
-                  <input 
-                    type="email" 
-                    value={clientEmail} 
-                    onChange={(e) => setClientEmail(e.target.value)} 
-                    placeholder="Örn: ahmet@gmail.com"
-                    required
-                    className="form-input"
-                  />
-                </div>
-
-                {products.length > 0 && (
-                  <div className="input-group">
-                    <label className="input-label">İlgilendiğiniz Ürün *</label>
-                    <select 
-                      value={selectedProductId} 
-                      onChange={(e) => setSelectedProductId(e.target.value)} 
-                      required
-                      className="form-select"
-                    >
-                      {products.map(prod => (
-                        <option key={prod.id} value={prod.id}>{prod.name} ({prod.code})</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                <div className="input-group">
-                  <label className="input-label">Hızlı Talep Konusu (Tek Tıkla Seçin)</label>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                    {[
-                      { label: '3D Sanal Banyo Tasarımı Talebi', icon: <Sparkles size={12} /> },
-                      { label: 'Nakliye & Şantiye Teslimat Bilgisi', icon: <Truck size={12} /> },
-                      { label: 'Toptan Palet Fiyat İskontosu', icon: <Building2 size={12} /> },
-                      { label: 'Gerçek Numune Karo Talebi', icon: <Package size={12} /> }
-                    ].map((preset, pIdx) => (
-                      <button
-                        key={pIdx}
-                        type="button"
-                        onClick={() => setNotes(prev => prev ? `${prev} • ${preset.label}` : preset.label)}
-                        style={{
-                          fontSize: '0.74rem',
-                          fontWeight: '700',
-                          padding: '6px 12px',
-                          borderRadius: '12px',
-                          background: 'rgba(212, 175, 55, 0.08)',
-                          color: 'var(--accent-gold, #b38e47)',
-                          border: '1px solid rgba(212, 175, 55, 0.25)',
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          transition: 'all 0.15s ease'
-                        }}
-                      >
-                        {preset.icon}
-                        <span>{preset.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                  <textarea 
-                    value={notes} 
-                    onChange={(e) => setNotes(e.target.value)} 
-                    placeholder="Metraj miktarı (m²), aradığınız ebat veya teslimat adresi gibi ek taleplerinizi buraya yazabilirsiniz..."
-                    rows={3}
-                    className="form-textarea"
-                  />
-                </div>
-
-                <button 
-                  type="submit"
-                  disabled={loading}
-                  className="btn-submit"
-                >
-                  {loading ? (
-                    <span>Gönderiliyor...</span>
-                  ) : (
-                    <>
-                      <Send size={15} />
-                      <span>Teklif Talebi Gönder</span>
-                    </>
-                  )}
-                </button>
-              </form>
-            </div>
-
-          </div>
-
-        </div>
-        )}
-
-        {/* SECTION: MİMARIN SEÇTİĞİ ZEMİN & DUVAR KOMBİNLERİ (TAB: COMBOS) */}
-        {activeMainTab === 'combos' && (() => {
-          const duo = getCuratedDuo();
-          if (!duo.floor || !duo.wall) return null;
-
-          return (
-            <>
-              <div className="curated-combos-section animate-fade-in" style={{ marginTop: '24px' }}>
-                <div className="curated-combos-header">
-                  <span className="curated-badge">
-                    <Sparkles size={13} />
-                    <span>MİMARİ ZEMİN + DUVAR UYUMU</span>
-                  </span>
-                  <h2 className="section-main-heading" style={{ marginTop: '8px', marginBottom: '8px' }}>
-                    Showroom Mimarından İlham Veren Çiftler
-                  </h2>
-                  <p style={{ fontSize: '0.86rem', color: '#64748b', maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
-                    Tek bir karo yerine birbiriyle kusursuz konuşan zemin ve duvar seramiklerini eşleştirdik. Zıtlıkların uyumuyla mekana lüks bir derinlik kazandırın.
-                  </p>
-
-                  {/* STYLE SELECTOR PILLS */}
-                  <div className="curated-style-pills">
-                    {[
-                      { id: 'marble', label: 'Mermer & Zarafet', icon: <Sparkles size={13} /> },
-                      { id: 'concrete', label: 'Beton & Loft', icon: <Building2 size={13} /> },
-                      { id: 'wood', label: 'Doğal Ahşap', icon: <Compass size={13} /> },
-                      { id: 'dark', label: 'Spa & Antrasit', icon: <Layers size={13} /> }
-                    ].map(s => (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => setConciergeStyle(s.id)}
-                        className={`curated-pill ${conciergeStyle === s.id ? 'active' : ''}`}
-                      >
-                        {s.icon}
-                        <span>{s.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="curated-duo-cards-grid">
-                  {/* FLOOR TILE */}
-                  <div className="curated-card floor-card">
-                    <div className="curated-card-role-badge">
-                      <span>ZEMİN KAROSU</span>
-                    </div>
-                    <div className="curated-image-box">
-                      <img 
-                        src={duo.floor.imageUrl || getTextureFallback(duo.floor)} 
-                        alt={duo.floor.name}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = getTextureFallback(duo.floor);
-                        }}
-                      />
-                    </div>
-                    <div className="curated-card-content">
-                      <span className="curated-tile-style">{duo.floor.style} Serisi</span>
-                      <h3 className="curated-tile-name">{duo.floor.name}</h3>
-                      <span className="curated-tile-meta">Kod: {duo.floor.code} • {duo.floor.width}x{duo.floor.height} cm • {duo.floor.finish}</span>
-                    </div>
-                  </div>
-
-                  {/* PLUS CONNECTOR */}
-                  <div className="curated-connector">
-                    <div className="connector-circle">
-                      <Plus size={20} />
-                    </div>
-                    <span className="connector-label">MİMARİ KOMBİN</span>
-                  </div>
-
-                  {/* WALL TILE */}
-                  <div className="curated-card wall-card">
-                    <div className="curated-card-role-badge wall">
-                      <span>DUVAR & VİTRİN KAROSU</span>
-                    </div>
-                    <div className="curated-image-box">
-                      <img 
-                        src={duo.wall.imageUrl || getTextureFallback(duo.wall)} 
-                        alt={duo.wall.name}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = getTextureFallback(duo.wall);
-                        }}
-                      />
-                    </div>
-                    <div className="curated-card-content">
-                      <span className="curated-tile-style">{duo.wall.style} Serisi</span>
-                      <h3 className="curated-tile-name">{duo.wall.name}</h3>
-                      <span className="curated-tile-meta">Kod: {duo.wall.code} • {duo.wall.width}x{duo.wall.height} cm • {duo.wall.finish}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ACTION BAR FOR DUO */}
-                <div className="curated-duo-actions-bar">
-                  <Link
-                    href={duo.floor.code ? `/?code=${encodeURIComponent(duo.floor.code)}&tab=studio#studio` : `/?tab=studio#studio`}
-                    onClick={() => {
-                      try {
-                        const selectedObj = {
-                          ...duo.floor,
-                          textureUrl: duo.floor.textureUrl || duo.floor.imageUrl || getTextureFallback(duo.floor),
-                          imageUrl: duo.floor.imageUrl || duo.floor.textureUrl || getTextureFallback(duo.floor)
-                        };
-                        localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
-                        sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
-                      } catch(e) {}
-                    }}
-                    className="btn-curated-3d"
-                  >
-                    <Sparkles size={16} />
-                    <span>Bu İkiliyi 3D Mekan Stüdyosu'nda Canlı Gör</span>
-                  </Link>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      addToCart(duo.floor, 35);
-                      addToCart(duo.wall, 25);
-                    }}
-                    className="btn-curated-cart"
-                  >
-                    <ShoppingBag size={16} />
-                    <span>İki Karoyu Birlikte Teklife Ekle (35 m² Zemin + 25 m² Duvar)</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* VIP MİMAR DANIŞMANLIK DAVETİ */}
-              <div className="combos-consultation-banner animate-fade-in">
-                <div className="banner-icon-circle"><Coffee size={24} /></div>
-                <div className="banner-text-box">
-                  <h3 style={{ margin: '0 0 4px 0', fontSize: '1.05rem', color: '#0f172a', fontWeight: '800' }}>
-                    Mimarınızla Birlikte Showroom'umuza Bekliyoruz
-                  </h3>
-                  <p style={{ margin: 0, fontSize: '0.84rem', color: '#64748b' }}>
-                    Projenizin plan ve ölçüleriyle gelin; showroomumuzda kahve eşliğinde 3D mimari banyo simülasyonunu ve şantiye metrajınızı birlikte çıkaralım.
-                  </p>
-                </div>
-                <button type="button" onClick={() => setShowAppointmentModal(true)} className="btn-banner-appt">
-                  <Calendar size={15} />
-                  <span>Showroom Randevusu Al</span>
+            {/* Products Grid */}
+            {filteredProducts.length === 0 ? (
+              <div className="catalog-empty-state">
+                <Package size={48} className="empty-icon" />
+                <h3 className="empty-title">Seçilen Kriterlerde Ürün Bulunamadı</h3>
+                <p className="empty-desc">Filtreleri sıfırlayarak tüm showroom koleksiyonunu görüntüleyebilirsiniz.</p>
+                <button onClick={resetFilters} className="empty-reset-btn">
+                  Filtreleri Sıfırla
                 </button>
               </div>
-            </>
-          );
-        })()}
-
-        {/* SECTION: SHOWROOM PRIVILEGES & SERVICES (TAB: INFO) */}
-        {activeMainTab === 'info' && servicesList.length > 0 && (
-          <div className="showroom-services-section" style={{ marginTop: '56px' }}>
-            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-              <span style={{
-                fontSize: '0.78rem',
-                fontWeight: '800',
-                color: 'var(--accent-gold)',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                background: 'rgba(var(--accent-gold-rgb, 179,142,71), 0.1)',
-                padding: '6px 16px',
-                borderRadius: '20px',
-                border: '1px solid rgba(var(--accent-gold-rgb, 179,142,71), 0.25)',
-                display: 'inline-block'
-              }}>
-                MÜŞTERİ AYRICALIKLARI
-              </span>
-              <h2 className="section-main-heading" style={{ marginTop: '12px', marginBottom: '8px' }}>
-                Showroom Hizmetlerimiz & Ayrıcalıklarınız
-              </h2>
-              <p style={{ fontSize: '0.86rem', color: '#64748b', maxWidth: '660px', margin: '0 auto' }}>
-                Seramik seçimi ve mekan yenileme sürecinizde yetkili bayimizin sunduğu ücretsiz mimarlık, sigortalı nakliye ve işçilik garantisi avantajları.
-              </p>
-            </div>
-
-            <div className="services-showcase-grid">
-              {servicesList.map(serviceId => {
-                const map = {
-                  studio_3d: {
-                    title: '3D Sanal Banyo & Mimar Destek',
-                    desc: 'Banyonuzun ölçülerine göre karoları 3D sanal stüdyoda canlı döşeyip tasarım ve metraj raporu çıkarıyoruz.',
-                    Icon: Sparkles
-                  },
-                  shipping: {
-                    title: 'Sigortalı Nakliye & Kapıya Teslim',
-                    desc: 'Paletli ve kırılma sigortalı araçlarımızla seramiklerinizi şantiyenize veya adresinize güvenle ulaştırıyoruz.',
-                    Icon: Truck
-                  },
-                  install_support: {
-                    title: 'Sertifikalı Usta & İşçilik Garantisi',
-                    desc: 'Bölgenizdeki tecrübeli seramik ustalarıyla buluşturuyor, derz ve kaplama işçiliğini garantili sunuyoruz.',
-                    Icon: Wrench
-                  },
-                  sample_box: {
-                    title: 'Ücretsiz Numune Kargo Desteği',
-                    desc: 'Beğendiğiniz seramik dokularını yerinde görmek için adresinize gerçek numune karosu talep edebilirsiniz.',
-                    Icon: Package
-                  },
-                  credit_card: {
-                    title: 'Kart Taksiti & Esnek Ödeme Planı',
-                    desc: 'Tüm banka kartlarına özel taksit seçenekleri ve mimari projelere özel vadeli ödeme çözümleri sunuyoruz.',
-                    Icon: CreditCard
-                  },
-                  b2b_discount: {
-                    title: 'B2B & Toplu Proje İskontoları',
-                    desc: 'Müteahhit, mimar ve otel projeleri için fabrika teslimi toptan palet fiyatları ve özel iskonto avantajı.',
-                    Icon: Building2
-                  },
-                  showroom_stock: {
-                    title: 'Showroom & Hazır Depo Stoğu',
-                    desc: 'Binlerce karo çeşidini canlı teşhir alanında inceleme ve depodan anında teslim alabilme imkanı.',
-                    Icon: Building2
-                  }
-                };
-                const s = map[serviceId];
-                if (!s) return null;
-                const IconComponent = s.Icon;
-                return (
-                  <div key={serviceId} className="service-card-modern">
-                    <div className="service-icon-box">
-                      <IconComponent size={22} />
-                    </div>
-                    <h3>{s.title}</h3>
-                    <p>{s.desc}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* SECTION: OUTLET & PROJE FAZLASI BORSASI (TAB: PRODUCTS) */}
-        {activeMainTab === 'products' && dealer.outletListings && dealer.outletListings.length > 0 && (
-          <div className="showroom-outlet-section" style={{ marginTop: '48px' }}>
-            <div style={{
-              background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-              borderRadius: '24px',
-              padding: '32px 24px',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.25)'
-            }}>
-              <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                <div style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: 'rgba(239, 68, 68, 0.15)',
-                  border: '1px solid rgba(239, 68, 68, 0.4)',
-                  color: '#f87171',
-                  padding: '6px 16px',
-                  borderRadius: '20px',
-                  fontSize: '0.78rem',
-                  fontWeight: '800',
-                  letterSpacing: '0.5px',
-                  marginBottom: '12px'
-                }}>
-                  <Sparkles size={14} />
-                  BAYİDEN OUTLET & PROJE FAZLASI BORSASI
-                </div>
-                <h2 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#ffffff', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                  <Flame size={24} style={{ color: '#f59e0b' }} />
-                  <span>Outlet & Proje Fazlası Fırsat Serileri</span>
-                </h2>
-                <p style={{ fontSize: '0.88rem', color: '#94a3b8', maxWidth: '680px', margin: '0 auto', lineHeight: '1.6' }}>
-                  Bayimizin deposunda kalan son 30-50 m² şantiye fazlası, seri sonu ve 2. kalite paletler uygun fiyata satışta! Kiralık daire yenileyecekler ve ufak tadilat yapacaklar için büyük fırsat.
-                </p>
-              </div>
-
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
-                gap: '24px'
-              }}>
-                {dealer.outletListings.map((item) => {
-                  const prod = item.product;
-                  const discountPercent = item.originalPrice && item.originalPrice > item.unitPrice
-                    ? Math.round(((item.originalPrice - item.unitPrice) / item.originalPrice) * 100)
-                    : null;
-                  const totalPalletValue = Math.round(item.unitPrice * item.quantityM2);
-
-                  const categoryLabelMap = {
-                    PROJE_FAZLASI: 'Proje Fazlası',
-                    SERI_SONU: 'Seri Sonu',
-                    IKINCI_KALITE: '2. Kalite',
-                    OUTLET: 'Outlet'
-                  };
+            ) : (
+              <div className="catalog-products-grid">
+                {filteredProducts.map(product => {
+                  const isFav = favorites.includes(product.id);
+                  const isFeaturedItem = product.isFeatured;
 
                   return (
-                    <div key={item.id} style={{
-                      background: 'rgba(30, 41, 59, 0.7)',
-                      backdropFilter: 'blur(10px)',
-                      borderRadius: '20px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-                    }} className="hover:transform hover:-translate-y-1">
-                      {/* Image Header */}
-                      <div style={{ position: 'relative', height: '190px', width: '100%', overflow: 'hidden' }}>
-                        <img
-                          src={item.imageUrl || (prod ? prod.imageUrl || getTextureFallback(prod) : '/textures/calacatta_gold.jpg')}
-                          alt={item.title}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = getTextureFallback(prod);
-                          }}
+                    <div key={product.id} className="catalog-product-card">
+                      {/* Image & Top Badges */}
+                      <div className="product-card-media">
+                        <div className="card-top-badges">
+                          {isFeaturedItem ? (
+                            <span className="badge-featured">Öne Çıkan</span>
+                          ) : (
+                            <span className="badge-new">Yeni</span>
+                          )}
+                        </div>
+
+                        <button 
+                          onClick={(e) => toggleFavorite(product.id, e)} 
+                          className={`card-fav-btn ${isFav ? 'active' : ''}`}
+                          title="Favorilere Ekle"
+                        >
+                          <Heart size={16} fill={isFav ? '#e11d48' : 'none'} stroke={isFav ? '#e11d48' : '#64748b'} />
+                        </button>
+
+                        <img 
+                          src={product.imageUrl} 
+                          alt={product.name} 
+                          className="product-card-img"
+                          loading="lazy"
                         />
-                        <div style={{
-                          position: 'absolute',
-                          inset: 0,
-                          background: 'linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, transparent 60%)'
-                        }} />
-
-                        {/* Top Left Badges */}
-                        <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                          <span style={{
-                            background: '#ef4444',
-                            color: '#ffffff',
-                            fontSize: '0.68rem',
-                            fontWeight: '800',
-                            padding: '4px 10px',
-                            borderRadius: '12px',
-                            boxShadow: '0 4px 10px rgba(239, 68, 68, 0.4)'
-                          }}>
-                            {item.badgeTag || 'Outlet / Proje Fazlası'}
-                          </span>
-                          <span style={{
-                            background: 'rgba(15, 23, 42, 0.85)',
-                            color: '#cbd5e1',
-                            fontSize: '0.62rem',
-                            fontWeight: '700',
-                            padding: '3px 8px',
-                            borderRadius: '10px',
-                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                            backdropFilter: 'blur(4px)',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}>
-                            <Tag size={10} />
-                            <span>{categoryLabelMap[item.category] || item.category}</span>
-                          </span>
-                        </div>
-
-                        {/* Discount Pill Top Right */}
-                        {discountPercent && (
-                          <div style={{
-                            position: 'absolute',
-                            top: '12px',
-                            right: '12px',
-                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                            color: '#ffffff',
-                            fontWeight: '900',
-                            fontSize: '0.75rem',
-                            padding: '4px 10px',
-                            borderRadius: '14px',
-                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)'
-                          }}>
-                            %{discountPercent} İNDİRİM
-                          </div>
-                        )}
-
-                        {/* Quantity Bottom Left */}
-                        <div style={{ position: 'absolute', bottom: '12px', left: '12px' }}>
-                          <span style={{
-                            background: 'rgba(212, 175, 55, 0.95)',
-                            color: '#0f172a',
-                            fontWeight: '800',
-                            fontSize: '0.72rem',
-                            padding: '4px 10px',
-                            borderRadius: '10px',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '5px'
-                          }}>
-                            <Package size={12} />
-                            <span>Mevcut Stok: {item.quantityM2} m²</span>
-                          </span>
-                        </div>
                       </div>
 
-                      {/* Content Body */}
-                      <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <h3 style={{ fontSize: '1rem', fontWeight: '800', color: '#ffffff', margin: 0, lineHeight: '1.4' }}>
-                          {item.title}
-                        </h3>
-
-                        {(item.dimensions || item.colorFinish) && (
-                          <div style={{ display: 'flex', gap: '12px', fontSize: '0.75rem', color: '#cbd5e1' }}>
-                            {item.dimensions && (
-                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                <Layers size={11} />
-                                <span>{item.dimensions}</span>
-                              </span>
-                            )}
-                            {item.colorFinish && (
-                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                <Palette size={11} />
-                                <span>{item.colorFinish}</span>
-                              </span>
-                            )}
-                          </div>
-                        )}
-
-                        {item.notes && (
-                          <p style={{
-                            fontSize: '0.78rem',
-                            color: '#94a3b8',
-                            background: 'rgba(15, 23, 42, 0.5)',
-                            padding: '10px 12px',
-                            borderRadius: '10px',
-                            border: '1px solid rgba(255, 255, 255, 0.05)',
-                            margin: 0,
-                            lineHeight: '1.5'
-                          }}>
-                            "{item.notes}"
-                          </p>
-                        )}
-
-                        {/* Pricing Row */}
-                        <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                          <div>
-                            {item.originalPrice && (
-                              <span style={{ fontSize: '0.75rem', color: '#94a3b8', textDecoration: 'line-through', display: 'block' }}>
-                                ₺{item.originalPrice.toLocaleString('tr-TR')} / m²
-                              </span>
-                            )}
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                              <span style={{ fontSize: '1.35rem', fontWeight: '900', color: '#f87171' }}>
-                                ₺{item.unitPrice.toLocaleString('tr-TR')}
-                              </span>
-                              <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>/ m²</span>
-                            </div>
-                          </div>
-                          <div style={{ textAlign: 'right' }}>
-                            <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block' }}>Palet Toplam Tutarı</span>
-                            <span style={{ fontSize: '0.9rem', fontWeight: '800', color: '#ffffff' }}>
-                              ₺{totalPalletValue.toLocaleString('tr-TR')}
-                            </span>
-                          </div>
+                      {/* Info & Spec Tags */}
+                      <div className="product-card-body">
+                        <div className="product-meta-sub">
+                          <span className="product-category-text">{product.categoryName}</span>
+                          <span className="product-dim-text">{product.dimensionText}</span>
                         </div>
 
-                        {/* Buttons */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '6px' }}>
-                          <a
-                            href={`https://wa.me/${(dealer.phone || '').replace(/[\s\-\(\)\+]/g, '')}?text=${encodeURIComponent(`Merhaba, ${dealer.name} showroom sayfanızdaki "${item.title}" (${item.quantityM2} m², ₺${item.unitPrice}/m²) outlet stoğunuzu satın almak / bilgi almak istiyorum.`)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={() => trackAction('WHATSAPP')}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '6px',
-                              padding: '10px',
-                              borderRadius: '10px',
-                              background: '#22c55e',
-                              color: '#ffffff',
-                              fontWeight: '800',
-                              fontSize: '0.78rem',
-                              textDecoration: 'none',
-                              textAlign: 'center'
-                            }}
-                          >
-                            <MessageSquare size={14} />
-                            <span>WhatsApp Sor</span>
-                          </a>
+                        <h3 className="product-card-name" title={product.name}>
+                          {product.name}
+                        </h3>
 
-                          <button
-                            onClick={() => {
-                              setNotes(`İlgilenilen Outlet Ürün: ${item.title} - ${item.quantityM2} m² (Birim Fiyat: ₺${item.unitPrice}/m²)`);
-                              const el = document.getElementById('quote-form-section');
-                              if (el) el.scrollIntoView({ behavior: 'smooth' });
-                            }}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '6px',
-                              padding: '10px',
-                              borderRadius: '10px',
-                              background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                              color: '#000000',
-                              fontWeight: '800',
-                              fontSize: '0.78rem',
-                              border: 'none',
-                              cursor: 'pointer'
-                            }}
+                        <div className="product-chips-row">
+                          <span className="spec-chip">{product.finishText}</span>
+                          <span className="spec-chip">1. Kalite Porselen</span>
+                        </div>
+
+                        <div className="product-price-row">
+                          {product.displayPrice ? (
+                            <div className="price-box">
+                              <span className="price-currency">₺</span>
+                              <span className="price-val">{Number(product.displayPrice).toLocaleString('tr-TR')}</span>
+                              <span className="price-unit">/m²</span>
+                            </div>
+                          ) : (
+                            <span className="price-ask">Fiyat Teklifi Alınız</span>
+                          )}
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="product-card-actions">
+                          <Link 
+                            href={`/tasarim?product=${product.id}&dealer=${dealer.id}`}
+                            className="card-action-btn-3d"
                           >
-                            <Send size={14} />
-                            <span>Teklif / Rezerve</span>
+                            <Sparkles size={14} />
+                            <span>3D Gör</span>
+                          </Link>
+
+                          <button 
+                            onClick={(e) => addToQuoteCart(product, e)}
+                            className="card-action-btn-quote"
+                            title="Teklif Listeme Ekle"
+                          >
+                            <Plus size={15} />
+                            <span>Teklif Ekle</span>
                           </button>
                         </div>
                       </div>
@@ -2233,1065 +740,602 @@ export default function DealerProfileClient({ dealer, products }) {
                   );
                 })}
               </div>
+            )}
+          </main>
+        </div>
+      </section>
+
+      {/* Section 4: AI "Mekanını Tasarla" Promo Banner */}
+      <section className="ai-designer-banner-section">
+        <div className="ai-designer-banner-card">
+          {/* Left: Tag + Headline + CTA */}
+          <div className="ai-banner-content-col">
+            <div className="ai-banner-pill">
+              <Sparkles size={14} className="sparkle-gold" />
+              <span>YAPAY ZEKA DESTEKLİ</span>
+            </div>
+
+            <h2 className="ai-banner-headline">Mekanını Tasarla</h2>
+
+            <p className="ai-banner-subtext">
+              Kendi banyonuzun veya salonunuzun fotoğrafını yükleyin; seramiklerimizin evinizde nasıl duracağını yapay zeka ile saniyeler içinde fotogerçekçi görün.
+            </p>
+
+            <Link href="/tasarim" className="ai-banner-cta-btn">
+              <span>Fotoğraf Yükle & Tasarla</span>
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+
+          {/* Center: Before & After Split Image Comparison */}
+          <div className="ai-banner-visual-col">
+            <div className="ai-split-preview-box">
+              <div className="split-side split-before">
+                <img src="/textures/sample_bathroom.png" alt="Mevcut Görünüm" className="split-img" />
+                <span className="split-tag">Mevcut Görünüm</span>
+              </div>
+              <div className="split-divider-line">
+                <span className="split-pill-center">AI</span>
+              </div>
+              <div className="split-side split-after">
+                <img src="/renders/luxury_bathroom_calacatta_gold.jpg" alt="AI ile Yenilenmiş" className="split-img" />
+                <span className="split-tag tag-after">AI ile Yenilenmiş</span>
+              </div>
             </div>
           </div>
-        )}
 
-        {/* SECTION: CAMPAIGNS (TAB: PRODUCTS) */}
-        {activeMainTab === 'products' && campaigns.length > 0 && (
-          <div className="showroom-campaigns-section" style={{ marginTop: '48px' }}>
-            <h2 className="section-main-heading">
-              Aktif Kampanyalar & Fırsatlar
-            </h2>
-            <div className="campaigns-grid">
-              {campaigns.map((camp, idx) => (
-                <div key={idx} className="campaign-card">
-                  <span className="campaign-badge">AKTİF FIRSAT</span>
-                  <h3 className="campaign-card-title">{camp.title}</h3>
-                  <p className="campaign-card-desc">{camp.desc}</p>
-                  {camp.expiresAt && (
-                    <div className="campaign-card-footer" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Clock size={13} style={{ color: 'var(--accent-gold)' }} />
-                      <span>Son Geçerlilik: {camp.expiresAt}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
+          {/* Right: Feature Bullet Points */}
+          <div className="ai-banner-features-col">
+            <div className="ai-bullet-item">
+              <div className="bullet-check-circle">
+                <Check size={14} />
+              </div>
+              <div className="bullet-text">
+                <strong>Saniyeler İçinde 3D Çıktı</strong>
+                <p>Karmaşık mimari çizim programlarına gerek kalmadan anında sonuç alın.</p>
+              </div>
+            </div>
+
+            <div className="ai-bullet-item">
+              <div className="bullet-check-circle">
+                <Check size={14} />
+              </div>
+              <div className="bullet-text">
+                <strong>Gerçek Işık & Yansıma Uyumu</strong>
+                <p>Seramik yüzey dokuları odanızın gerçek gün ışığına göre birebir render edilir.</p>
+              </div>
+            </div>
+
+            <div className="ai-bullet-item">
+              <div className="bullet-check-circle">
+                <Check size={14} />
+              </div>
+              <div className="bullet-text">
+                <strong>Doğrudan Bayiden Sipariş</strong>
+                <p>Oluşturduğunuz tasarımın metrajını tek tıkla WhatsApp üzerinden bayimize iletin.</p>
+              </div>
             </div>
           </div>
-        )}
+        </div>
+      </section>
 
-        {/* SECTION: SHOWROOM ENVANTERİ (TAB: PRODUCTS) */}
-        {activeMainTab === 'products' && dealer.inventories && dealer.inventories.length > 0 && (() => {
-          const filteredInventories = dealer.inventories.filter(item => {
-            if (!item?.product) return false;
-            const prod = item.product;
-            const q = inventorySearchTerm.toLowerCase().trim();
-            const textMatch = !q || 
-              (prod.name && prod.name.toLowerCase().includes(q)) ||
-              (prod.code && prod.code.toLowerCase().includes(q)) ||
-              (prod.style && prod.style.toLowerCase().includes(q)) ||
-              (prod.finish && prod.finish.toLowerCase().includes(q)) ||
-              (prod.color && prod.color.toLowerCase().includes(q));
+      {/* Section 5: Active Campaigns Strip */}
+      <section className="showroom-campaigns-strip">
+        <div className="campaigns-strip-container">
+          <div className="campaign-row-header">
+            <div>
+              <span className="campaign-mini-tag">ÖZEL AYRICALIKLAR</span>
+              <h3 className="campaign-main-title">Aktif Showroom Kampanyaları</h3>
+            </div>
+            <p className="campaign-desc-lead">
+              {dealer?.name} bünyesinde projelerinize değer katan kurumsal avantajlar.
+            </p>
+          </div>
 
-            const styleMatch = inventoryStyleFilter === 'all' || 
-              (prod.style && prod.style.toLowerCase().includes(inventoryStyleFilter.toLowerCase()));
-
-            const statusMatch = inventoryStatusFilter === 'all' || item.status === inventoryStatusFilter;
-
-            return textMatch && styleMatch && statusMatch;
-          });
-
-          return (
-            <div className="featured-products-section" style={{ marginTop: '56px' }}>
-              <h2 className="section-main-heading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <Building2 size={24} style={{ color: 'var(--accent-gold)' }} />
-                Şube Stokları & Hazır Envanter Listesi
-              </h2>
-              <p style={{ fontSize: '0.86rem', color: '#64748b', textAlign: 'center', marginTop: '-8px', marginBottom: '24px' }}>
-                Bayimizin showroomunda sergilenen ve depolarında teslimata hazır bulunan güncel seramik envanteri.
+          <div className="campaign-cards-grid">
+            <div className="campaign-modern-card">
+              <div className="campaign-card-header">
+                <span className="campaign-tag-badge">MİMARLARA ÖZEL</span>
+                <span className="campaign-percent-badge">%25 İskonto</span>
+              </div>
+              <h4 className="campaign-card-title">Toplu Alım ve Mimari Proje Desteği</h4>
+              <p className="campaign-card-p">
+                Konut ve ticari projeleriniz için özel toptan fiyatlandırma ve esnek ödeme planları sunuyoruz.
               </p>
+              <div className="campaign-card-footer">
+                <span className="campaign-expiry">Yıl Boyu Geçerli</span>
+                <button 
+                  onClick={() => setShowLeadModal(true)} 
+                  className="campaign-btn-link"
+                >
+                  Teklif İste →
+                </button>
+              </div>
+            </div>
 
-              {/* Live Search & Filter Bar */}
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.85)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(0, 0, 0, 0.08)',
-                borderRadius: '18px',
-                padding: '16px 20px',
-                marginBottom: '28px',
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '14px',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.03)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: '1 1 300px', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '8px 14px' }}>
-                  <Search size={16} style={{ color: '#94a3b8' }} />
-                  <input
-                    type="text"
-                    value={inventorySearchTerm}
-                    onChange={(e) => setInventorySearchTerm(e.target.value)}
-                    placeholder="Envanterde seramik modeli, ebat veya kod ara... (Örn: Calacatta, 60x120)"
-                    style={{ border: 'none', outline: 'none', background: 'transparent', width: '100%', fontSize: '0.84rem', color: '#0f172a' }}
-                  />
-                  {inventorySearchTerm && (
-                    <button type="button" onClick={() => setInventorySearchTerm('')} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#94a3b8', display: 'flex', alignItems: 'center', padding: '4px' }} title="Aramayı Temizle">
-                      <X size={14} />
-                    </button>
-                  )}
-                </div>
+            <div className="campaign-modern-card highlight-card">
+              <div className="campaign-card-header">
+                <span className="campaign-tag-badge highlight-tag">ÜCRETSİZ HİZMET</span>
+                <span className="campaign-percent-badge highlight-pill">3D Banyo</span>
+              </div>
+              <h4 className="campaign-card-title">Ücretsiz Mimari 3D Modelleme</h4>
+              <p className="campaign-card-p">
+                Showroomumuzu ziyaret eden veya planını gönderen müşterilerimize banyo yerleşim çizimi hediye.
+              </p>
+              <div className="campaign-card-footer">
+                <span className="campaign-expiry">Randevu ile</span>
+                <button 
+                  onClick={() => setShowApptModal(true)} 
+                  className="campaign-btn-link"
+                >
+                  Randevu Al →
+                </button>
+              </div>
+            </div>
 
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', marginRight: '2px' }}>Stil:</span>
-                  {['all', 'Mermer', 'Beton', 'Ahşap', 'Taş'].map(styleKey => (
-                    <button
-                      key={styleKey}
-                      type="button"
-                      onClick={() => setInventoryStyleFilter(styleKey)}
-                      style={{
-                        border: '1px solid',
-                        borderColor: inventoryStyleFilter === styleKey ? 'var(--accent-gold)' : '#cbd5e1',
-                        background: inventoryStyleFilter === styleKey ? 'var(--accent-gold)' : '#ffffff',
-                        color: inventoryStyleFilter === styleKey ? '#ffffff' : '#475569',
-                        borderRadius: '20px',
-                        padding: '5px 14px',
-                        fontSize: '0.75rem',
-                        fontWeight: '700',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      {styleKey === 'all' ? 'Tüm Stiller' : styleKey}
-                    </button>
-                  ))}
+            <div className="campaign-modern-card">
+              <div className="campaign-card-header">
+                <span className="campaign-tag-badge">LOJİSTİK</span>
+                <span className="campaign-percent-badge">Hızlı Sevk</span>
+              </div>
+              <h4 className="campaign-card-title">Stoktan Aynı Gün Depo Teslimatı</h4>
+              <p className="campaign-card-p">
+                Seçili 60x120 ve 30x90 porselen serilerinde beklemeden doğrudan depodan adrese hızlı teslimat.
+              </p>
+              <div className="campaign-card-footer">
+                <span className="campaign-expiry">Seçili Ürünlerde</span>
+                <a href="#katalog" className="campaign-btn-link">
+                  Ürünleri Gör →
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 6: Showroom Location & Virtual Tour */}
+      <section className="showroom-location-section">
+        <div className="showroom-location-container">
+          <div className="location-info-col">
+            <span className="location-pill-tag">BİZİ ZİYARET EDİN</span>
+            <h3 className="location-dealer-name">{dealer?.name}</h3>
+            
+            <div className="location-details-list">
+              <div className="loc-item">
+                <MapPin size={20} className="loc-icon" />
+                <div>
+                  <strong>Showroom Adresi</strong>
+                  <p>{dealer?.address || 'Merkez Showroom, Türkiye'}</p>
                 </div>
               </div>
 
-              {filteredInventories.length > 0 ? (
-                <div className="featured-products-grid">
-                  {filteredInventories.map(item => {
-                    if (!item.product) return null;
-                    const prod = item.product;
-                    
-                    let statusLabel = 'Stokta Var';
-                    let statusColor = '#10b981';
-                    let statusBg = '#ecfdf5';
-
-                    if (item.status === 'DISPLAY_ONLY') {
-                      statusLabel = 'Teşhir Ürünü';
-                      statusColor = '#d97706';
-                      statusBg = '#fffbeb';
-                    } else if (item.status === 'ORDER_ONLY') {
-                      statusLabel = 'Sipariş Üzerine';
-                      statusColor = '#2563eb';
-                      statusBg = '#eff6ff';
-                    }
-
-                    return (
-                      <div key={item.id} className="featured-product-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                        <div className="featured-product-image-container" style={{ position: 'relative' }}>
-                          <img 
-                            src={prod.imageUrl || getTextureFallback(prod)} 
-                            alt={prod.name} 
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = getTextureFallback(prod);
-                            }}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
-                          />
-                          <span style={{
-                            position: 'absolute',
-                            top: '8px',
-                            left: '8px',
-                            fontSize: '0.6rem',
-                            fontWeight: '800',
-                            color: statusColor,
-                            background: statusBg,
-                            padding: '3px 8px',
-                            borderRadius: '16px',
-                            border: `1px solid ${statusColor}33`,
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                          }}>
-                            {statusLabel}
-                          </span>
-                        </div>
-                        <div className="featured-product-info" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                          <span className="featured-product-style">{prod.style} serisi</span>
-                          <h3 className="featured-product-name">{prod.name}</h3>
-                          <span className="featured-product-meta" style={{ flex: 1 }}>Kod: {prod.code} • Ebat: {prod.width}x{prod.height} cm • Yüzey: {prod.finish}</span>
-                          
-                          <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '6px' }}>
-                            <div>
-                              <span style={{ fontSize: '0.6rem', color: '#64748b', display: 'block' }}>Mevcut Stok</span>
-                              <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1e293b' }}>
-                                {item.status === 'IN_STOCK' ? `${item.stock.toLocaleString('tr-TR')} m²` : (item.status === 'DISPLAY_ONLY' ? 'Teşhir / Numune' : 'Siparişle (3-7 Gün)')}
-                              </span>
-                            </div>
-                            {(!kioskMode || showPricesInKiosk) && item.price && (
-                              <div style={{ textAlign: 'right' }}>
-                                <span style={{ fontSize: '0.6rem', color: '#64748b', display: 'block' }}>Bayi Özel Fiyatı</span>
-                                <span style={{ fontSize: '0.82rem', fontWeight: '900', color: 'var(--accent-gold, #b38e47)' }}>
-                                  ₺{item.price.toLocaleString('tr-TR')} 
-                                  <span style={{ fontSize: '0.58rem', color: '#64748b', fontWeight: '500' }}> / m²</span>
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="product-card-actions-group" style={{ display: 'flex', gap: '6px' }}>
-                          <Link 
-                            href={prod.code ? `/?code=${encodeURIComponent(prod.code)}&tab=studio#studio` : `/?tab=studio#studio`}
-                            onClick={() => {
-                              try {
-                                const selectedObj = {
-                                  ...prod,
-                                  unitPrice: item.price || prod.unitPrice,
-                                  textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
-                                  imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
-                                };
-                                localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
-                                sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
-                              } catch(e) {}
-                            }}
-                            className="btn-3d-try-card"
-                            title="Bu ürünü 3D Sanal Banyo Stüdyosu'nda canlı uygulayın"
-                            style={{ flex: '1 1 auto', textDecoration: 'none' }}
-                          >
-                            <Sparkles size={12} />
-                            3D Gör
-                          </Link>
-                          <button
-                            type="button"
-                            onClick={() => addToCart({ ...prod, price: item.price || prod.unitPrice }, 30)}
-                            className={`btn-add-quote-cart ${quoteCart.some(i => i.id === prod.id) ? 'added' : ''}`}
-                            title="Teklif listesine ekle"
-                          >
-                            {quoteCart.some(i => i.id === prod.id) ? (
-                              <>
-                                <Check size={12} />
-                                <span>Listede</span>
-                              </>
-                            ) : (
-                              <>
-                                <Plus size={12} />
-                                <span>Teklife Ekle</span>
-                              </>
-                            )}
-                          </button>
-                          <button 
-                            type="button" 
-                            onClick={() => handleFeatureClick(prod.id)}
-                            className="featured-product-action-btn icon-only-btn"
-                            title="Doğrudan Teklif Formuna Doldur"
-                          >
-                            <ArrowRight size={12} />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div style={{ textAlign: 'center', padding: '36px 20px', background: 'rgba(255, 255, 255, 0.6)', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
-                  <p style={{ fontSize: '0.9rem', color: '#64748b', margin: 0 }}>Aradığınız kriterlere uygun seramik stok kaydı bulunamadı.</p>
-                  <button type="button" onClick={() => { setInventorySearchTerm(''); setInventoryStyleFilter('all'); }} style={{ marginTop: '10px', padding: '6px 16px', borderRadius: '8px', border: 'none', background: 'var(--accent-gold)', color: '#fff', fontSize: '0.78rem', fontWeight: 'bold', cursor: 'pointer' }}>Filtreleri Temizle</button>
+              {dealer?.phone && (
+                <div className="loc-item">
+                  <Phone size={20} className="loc-icon" />
+                  <div>
+                    <strong>Telefon & İletişim</strong>
+                    <p>{dealer.phone}</p>
+                  </div>
                 </div>
               )}
-            </div>
-          );
-        })()}
 
-        {/* SECTION: FEATURED PRODUCTS (TAB: PRODUCTS) */}
-        {activeMainTab === 'products' && (featuredProductsList.length > 0 || (!dealer.inventories || dealer.inventories.length === 0)) && (
-          <div className="featured-products-section" style={{ marginTop: '48px' }}>
-            <h2 className="section-main-heading">
-              Showroom Öne Çıkan Ürünler
-            </h2>
-            <div className="featured-products-grid">
-              {(featuredProductsList.length > 0 ? featuredProductsList : products).map(prod => (
-                <div key={prod.id} className="featured-product-card">
-                  <div className="featured-product-image-container">
-                    <img 
-                      src={prod.imageUrl || getTextureFallback(prod)} 
-                      alt={prod.name}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = getTextureFallback(prod);
-                      }}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                    />
-                  </div>
-                  <div className="featured-product-info">
-                    <span className="featured-product-style">{prod.style} serisi</span>
-                    <h3 className="featured-product-name">{prod.name}</h3>
-                    <span className="featured-product-meta">Kod: {prod.code} • Ebat: {prod.width}x{prod.height} cm • Yüzey: {prod.finish}</span>
-                  </div>
-                  <div className="product-card-actions-group" style={{ display: 'flex', gap: '6px' }}>
-                    <Link 
-                      href={prod.code ? `/?code=${encodeURIComponent(prod.code)}&tab=studio#studio` : `/?tab=studio#studio`}
-                      onClick={() => {
-                        try {
-                          const selectedObj = {
-                            ...prod,
-                            textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
-                            imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
-                          };
-                          localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
-                          sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
-                        } catch(e) {}
-                      }}
-                      className="btn-3d-try-card"
-                      title="Bu ürünü 3D Sanal Banyo Stüdyosu'nda canlı uygulayın"
-                      style={{ flex: '1 1 auto', textDecoration: 'none' }}
-                    >
-                      <Sparkles size={12} />
-                      3D Gör
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => addToCart(prod, 30)}
-                      className={`btn-add-quote-cart ${quoteCart.some(i => i.id === prod.id) ? 'added' : ''}`}
-                      title="Teklif listesine ekle"
-                    >
-                      {quoteCart.some(i => i.id === prod.id) ? (
-                        <>
-                          <Check size={12} />
-                          <span>Listede</span>
-                        </>
-                      ) : (
-                        <>
-                          <Plus size={12} />
-                          <span>Teklife Ekle</span>
-                        </>
-                      )}
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={() => handleFeatureClick(prod.id)}
-                      className="featured-product-action-btn icon-only-btn"
-                      title="Doğrudan Teklif Formuna Doldur"
-                    >
-                      <ArrowRight size={12} />
-                    </button>
+              {dealer?.email && (
+                <div className="loc-item">
+                  <Mail size={20} className="loc-icon" />
+                  <div>
+                    <strong>Kurumsal E-Posta</strong>
+                    <p>{dealer.email}</p>
                   </div>
                 </div>
-              ))}
+              )}
+
+              <div className="loc-item">
+                <Clock size={20} className="loc-icon" />
+                <div>
+                  <strong>Çalışma Saatleri</strong>
+                  <p>Pazartesi - Cumartesi: 09:00 - 19:00 | Pazar: 11:00 - 17:00</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="loc-actions-row">
+              {dealer?.address && (
+                <a 
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dealer.name + ' ' + dealer.address)}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="loc-maps-btn"
+                >
+                  <Navigation size={16} />
+                  <span>Google Haritalarda Aç</span>
+                </a>
+              )}
+              <button onClick={() => setShowApptModal(true)} className="loc-appt-btn">
+                <Calendar size={16} />
+                <span>Randevu Planla</span>
+              </button>
             </div>
           </div>
-        )}
 
-        {/* SECTION: REFERENCE PROJECTS (TAB: INFO) */}
-        {activeMainTab === 'info' && referenceProjects.length > 0 && (
-          <div className="reference-projects-section" style={{ marginTop: '48px' }}>
-            <h2 className="section-main-heading">
-              Referans Projelerimiz
-            </h2>
-            <div className="projects-grid">
-              {referenceProjects.map((proj, idx) => {
-                const targetUrl = proj.linkUrl || proj.url || proj.link;
-                return (
-                  <div key={idx} className="project-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    {proj.imageUrl && (
-                      <div className="project-card-image-container">
-                        {targetUrl ? (
-                          <a href={targetUrl.startsWith('http') ? targetUrl : `https://${targetUrl}`} target="_blank" rel="noopener noreferrer" style={{ display: 'block', width: '100%', height: '100%' }}>
-                            <img 
-                              src={proj.imageUrl} 
-                              alt={proj.title}
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = '/textures/calacatta_gold.jpg';
-                              }}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                            />
-                          </a>
-                        ) : (
-                          <img 
-                            src={proj.imageUrl} 
-                            alt={proj.title}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = '/textures/calacatta_gold.jpg';
-                            }}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                          />
-                        )}
-                      </div>
-                    )}
-                    <div className="project-card-body" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                      <h3 className="project-card-title">{proj.title}</h3>
-                      <p className="project-card-desc">{proj.desc}</p>
-
-                      <div style={{ marginTop: 'auto', paddingTop: '14px' }}>
-                        {targetUrl ? (
-                          <a 
-                            href={targetUrl.startsWith('http') ? targetUrl : `https://${targetUrl}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              fontSize: '0.8rem',
-                              fontWeight: '800',
-                              color: 'var(--accent-gold, #b38e47)',
-                              textDecoration: 'none'
-                            }}
-                          >
-                            <span>Projeyi Detaylı İncele</span>
-                            <ArrowRight size={14} />
-                          </a>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setNotes(prev => prev ? `${prev} • "${proj.title}" referansı hakkında bilgi almak istiyorum.` : `"${proj.title}" referansı hakkında bilgi almak istiyorum.`);
-                              const el = document.querySelector('#quote-form-section');
-                              if (el) el.scrollIntoView({ behavior: 'smooth' });
-                            }}
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              fontSize: '0.78rem',
-                              fontWeight: '800',
-                              color: 'var(--accent-gold, #b38e47)',
-                              background: 'transparent',
-                              border: 'none',
-                              padding: 0,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            <span>Bu Proje Hakkında Bilgi Al</span>
-                            <ArrowRight size={14} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
+          <div className="location-visual-col">
+            {dealer?.virtualTourUrl ? (
+              <div className="virtual-tour-embed-card">
+                <iframe 
+                  src={dealer.virtualTourUrl} 
+                  title="Showroom 3D Sanal Tur"
+                  className="matterport-iframe"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              <div className="location-map-placeholder-card">
+                <img 
+                  src="/hero/modern_living.png" 
+                  alt="Showroom Lokasyon" 
+                  className="map-fallback-img"
+                />
+                <div className="map-overlay-badge">
+                  <Building2 size={24} className="map-badge-icon" />
+                  <div>
+                    <h4>{dealer?.name} Showroom</h4>
+                    <p>Prestijli mekan tasarımları için sizleri ağırlamaktan mutluluk duyarız.</p>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
+      </section>
 
-        {/* SECTION: FAQ (TAB: INFO) */}
-        {activeMainTab === 'info' && faqs.length > 0 && (
-          <div className="faq-section" style={{ marginTop: '48px' }}>
-            <h2 className="section-main-heading">
-              Sıkça Sorulan Sorular
-            </h2>
-            <div className="faq-accordion">
-              {faqs.map((faq, idx) => {
-                const isOpen = openFaqIndex === idx;
-                return (
-                  <div key={idx} className="faq-item">
-                    <button 
-                      type="button"
-                      onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                      className="faq-question-btn"
-                    >
-                      <span className="faq-question-text">{faq.q}</span>
-                      <span className="faq-toggle-icon">{isOpen ? '−' : '+'}</span>
-                    </button>
-                    {isOpen && (
-                      <div className="faq-answer-content">
-                        {faq.a}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-      </div>
-
-      {/* Mobile Sticky Action Bar — 4 Button Premium */}
-      <div className="mobile-sticky-actions">
-        <a 
-          href={`tel:${dealer.phone}`}
-          className="btn-call-mobile"
-        >
-          <Phone size={18} />
-          <span>Ara</span>
-        </a>
-        <a 
-          href={`https://wa.me/${(dealer.phone || '').replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20SeramikBak%20profil%20sayfan%C4%B1zdan%20ula%C5%9F%C4%B1yorum.%20Showroom%27daki%20seramikleriniz%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="btn-whatsapp-mobile"
-        >
-          <MessageSquare size={18} />
-          <span>WhatsApp</span>
-        </a>
-        <a 
-          href={`https://www.google.com/maps/dir/?api=1&destination=${dealer.lat},${dealer.lng}`} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="btn-maps-mobile"
-        >
-          <Compass size={18} />
-          <span>Yol Tarifi</span>
-        </a>
-        <button 
-          type="button"
-          onClick={() => {
-            const el = document.getElementById('quote-form-section');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }}
-          className="btn-quote-mobile"
-        >
-          <Send size={18} />
-          <span>Teklif Al</span>
-        </button>
-      </div>
-      {/* FLOATING QUOTE CART PILL */}
-      {quoteCart.length > 0 && !showCartDrawer && (
-        <div className="floating-cart-pill-container animate-bounce-subtle">
-          <button 
-            type="button" 
-            onClick={() => setShowCartDrawer(true)}
-            className="floating-cart-pill-btn"
+      {/* Section 7: Bottom Sticky Action Bar */}
+      <div className="showroom-bottom-action-bar">
+        <div className="bottom-bar-inner">
+          <a 
+            href={`https://wa.me/${dealerWhatsAppPhone}?text=${encodeURIComponent('Merhaba, ' + dealer?.name + ' showroom sayfanızdan ulaşıyorum. Ürünler ve fiyatlar hakkında bilgi alabilir miyim?')}`}
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="bottom-action-btn btn-whatsapp"
           >
-            <ShoppingBag size={18} />
-            <span className="cart-pill-title">Teklif Sepetim</span>
-            <span className="cart-pill-badge">{quoteCart.length}</span>
+            <MessageSquare size={18} />
+            <span>WhatsApp ile İletişime Geçin</span>
+          </a>
+
+          {dealer?.address ? (
+            <a 
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dealer.name + ' ' + dealer.address)}`}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bottom-action-btn btn-directions"
+            >
+              <Navigation size={18} />
+              <span>Yol Tarifi Al</span>
+            </a>
+          ) : (
+            <button 
+              onClick={() => setShowApptModal(true)}
+              className="bottom-action-btn btn-directions"
+            >
+              <Calendar size={18} />
+              <span>Randevu Al</span>
+            </button>
+          )}
+
+          <button 
+            onClick={() => {
+              setSelectedProductForLead(null);
+              setShowLeadModal(true);
+            }} 
+            className="bottom-action-btn btn-quote"
+          >
+            <FileText size={18} />
+            <span>Teklif Alın</span>
           </button>
         </div>
-      )}
+      </div>
 
-      {/* QUOTE CART DRAWER / MODAL */}
+      {/* DRAWER: Quote Cart Drawer */}
       {showCartDrawer && (
-        <div className="cart-drawer-overlay" onClick={() => setShowCartDrawer(false)}>
-          <div className="cart-drawer-content" onClick={(e) => e.stopPropagation()}>
-            <div className="cart-drawer-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div className="cart-header-icon-box">
-                  <ShoppingBag size={20} />
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>
-                    Showroom Teklif Sepetim
-                  </h3>
-                  <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
-                    {dealer.name} • {quoteCart.length} Seramik Seçildi
-                  </span>
-                </div>
+        <div className="showroom-modal-backdrop" onClick={() => setShowCartDrawer(false)}>
+          <div className="cart-drawer-sheet animate-slide-left" onClick={(e) => e.stopPropagation()}>
+            <div className="drawer-header">
+              <div className="drawer-title-group">
+                <FileText size={20} className="drawer-title-icon" />
+                <h3>Teklif Sepetim</h3>
+                <span className="drawer-count-badge">{quoteCart.length} Kalem</span>
               </div>
-              <button 
-                type="button" 
-                onClick={() => setShowCartDrawer(false)}
-                className="cart-drawer-close-btn"
-                title="Kapat"
-              >
-                <X size={18} />
+              <button onClick={() => setShowCartDrawer(false)} className="drawer-close-btn">
+                <X size={20} />
               </button>
             </div>
 
-            <div className="cart-drawer-body">
+            <div className="drawer-body">
               {quoteCart.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8' }}>
-                  <ShoppingBag size={48} strokeWidth={1.5} style={{ margin: '0 auto 12px', opacity: 0.5 }} />
-                  <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>Teklif sepetiniz henüz boş.</p>
-                  <span style={{ fontSize: '0.78rem' }}>Showroomdaki karoların üzerindeki "+ Teklife Ekle" butonuna tıklayarak sepetinize seramik ekleyebilirsiniz.</span>
+                <div className="drawer-empty-state">
+                  <Package size={40} className="drawer-empty-icon" />
+                  <h4>Sepetiniz Boş</h4>
+                  <p>Katalogdan beğendiğiniz seramikleri "Teklif Ekle" butonuna basarak sepetinize ekleyebilirsiniz.</p>
+                  <button onClick={() => setShowCartDrawer(false)} className="drawer-browse-btn">
+                    Ürünleri Keşfet
+                  </button>
                 </div>
               ) : (
-                <>
-                  <div className="cart-items-scroll-list">
-                    {quoteCart.map((item) => {
-                      const m2 = parseFloat(item.m2) || 30;
-                      const boxCount = Math.ceil(m2 / 1.44);
-                      const unitPrice = parseFloat(item.price) || 0;
-                      const itemTotal = unitPrice > 0 ? unitPrice * m2 : 0;
-
-                      return (
-                        <div key={item.id} className="cart-item-row">
-                          <img 
-                            src={item.imageUrl} 
-                            alt={item.name} 
-                            className="cart-item-thumb"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = '/textures/calacatta_gold.jpg';
-                            }}
-                          />
-                          <div className="cart-item-info">
-                            <h4 className="cart-item-title">{item.name}</h4>
-                            <span className="cart-item-meta">
-                              {item.code ? `Kod: ${item.code} • ` : ''}{item.width}x{item.height} cm • ~{boxCount} Kutu
-                            </span>
-                            {unitPrice > 0 && (
-                              <span className="cart-item-price">
-                                ₺{unitPrice.toLocaleString('tr-TR')} / m² {itemTotal > 0 ? `(₺${itemTotal.toLocaleString('tr-TR')})` : ''}
-                              </span>
-                            )}
-                          </div>
-                          <div className="cart-item-stepper">
-                            <button 
-                              type="button" 
-                              onClick={() => updateCartM2(item.id, -5)}
-                              className="cart-step-btn"
-                              title="5 m² Azalt"
-                            >
-                              <Minus size={12} />
-                            </button>
-                            <span className="cart-m2-val">{m2} m²</span>
-                            <button 
-                              type="button" 
-                              onClick={() => updateCartM2(item.id, 5)}
-                              className="cart-step-btn"
-                              title="5 m² Artır"
-                            >
-                              <Plus size={12} />
-                            </button>
-                          </div>
-                          <button 
-                            type="button" 
-                            onClick={() => removeFromCart(item.id)}
-                            className="cart-item-del-btn"
-                            title="Listeden Çıkar"
-                          >
-                            <Trash2 size={15} />
+                <div className="drawer-items-list">
+                  {quoteCart.map(item => (
+                    <div key={item.product.id} className="drawer-product-row">
+                      <img src={item.product.imageUrl} alt={item.product.name} className="drawer-prod-thumb" />
+                      <div className="drawer-prod-info">
+                        <h4 className="drawer-prod-name">{item.product.name}</h4>
+                        <span className="drawer-prod-dim">{item.product.dimensionText} • {item.product.finishText}</span>
+                        {item.product.displayPrice && (
+                          <span className="drawer-prod-price">₺{Number(item.product.displayPrice).toLocaleString('tr-TR')} / m²</span>
+                        )}
+                        <div className="drawer-qty-controls">
+                          <button onClick={() => updateCartQty(item.product.id, -5)} className="qty-btn">
+                            <Minus size={12} />
                           </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Summary & Consumables Calculation Box */}
-                  {(() => {
-                    const totalM2 = quoteCart.reduce((acc, curr) => acc + (parseFloat(curr.m2) || 0), 0);
-                    const grossTileM2 = totalM2 * 1.1; // 10% fire
-                    const totalBoxes = Math.ceil(grossTileM2 / 1.44);
-                    const totalKalekimBags = Math.ceil((grossTileM2 * 4.5) / 25);
-                    const totalGroutKg = Math.ceil(grossTileM2 * 0.45);
-                    const totalWeightKg = Math.round(grossTileM2 * 22);
-
-                    return (
-                      <div className="cart-summary-card">
-                        <div className="cart-summary-header-row">
-                          <span className="summary-title">Şantiye & Malzeme İhtiyacı</span>
-                          <button type="button" onClick={clearCart} className="btn-clear-cart">
-                            Temizle
+                          <span className="qty-number">{item.quantity} {item.unit}</span>
+                          <button onClick={() => updateCartQty(item.product.id, 5)} className="qty-btn">
+                            <Plus size={12} />
                           </button>
-                        </div>
-
-                        <div className="cart-summary-grid">
-                          <div className="summary-grid-item">
-                            <span className="grid-label">Net Metraj</span>
-                            <span className="grid-val">{totalM2.toFixed(1)} m²</span>
-                          </div>
-                          <div className="summary-grid-item highlight">
-                            <span className="grid-label">Fireli Sipariş (+%10)</span>
-                            <span className="grid-val">{grossTileM2.toFixed(1)} m²</span>
-                          </div>
-                          <div className="summary-grid-item">
-                            <span className="grid-label">Kutu / Paket</span>
-                            <span className="grid-val">~{totalBoxes} Kutu</span>
-                          </div>
-                          <div className="summary-grid-item">
-                            <span className="grid-label">Kalekim Yapıştırıcı</span>
-                            <span className="grid-val">{totalKalekimBags} Torba (25kg)</span>
-                          </div>
-                          <div className="summary-grid-item">
-                            <span className="grid-label">Derz Dolgusu</span>
-                            <span className="grid-val">{totalGroutKg} kg</span>
-                          </div>
-                          <div className="summary-grid-item">
-                            <span className="grid-label">Tahmini Yük</span>
-                            <span className="grid-val">~{(totalWeightKg / 1000).toFixed(2)} Ton</span>
-                          </div>
-                        </div>
-
-                        <div className="cart-actions-column">
-                          <button
-                            type="button"
-                            onClick={sendCartToWhatsApp}
-                            className="btn-cart-whatsapp"
-                          >
-                            <MessageSquare size={16} />
-                            <span>WhatsApp ile Bayiye Proforma Gönder</span>
-                          </button>
-
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                            <button
-                              type="button"
-                              onClick={fillLeadFormWithCart}
-                              className="btn-cart-fill-form"
-                            >
-                              <Send size={14} />
-                              <span>Teklif Formuna Doldur</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => window.print()}
-                              className="btn-cart-print"
-                            >
-                              <Printer size={14} />
-                              <span>Yazdır / PDF</span>
-                            </button>
-                          </div>
                         </div>
                       </div>
-                    );
-                  })()}
-                </>
+                      <button onClick={() => removeFromCart(item.product.id)} className="drawer-remove-btn" title="Kaldır">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Customer Quick Info */}
+                  <div className="drawer-customer-form">
+                    <h5 className="form-sub-heading">İletişim Bilgileriniz (Opsiyonel)</h5>
+                    <input 
+                      type="text" 
+                      placeholder="Adınız Soyadınız" 
+                      value={cartCustomerName}
+                      onChange={(e) => setCartCustomerName(e.target.value)}
+                      className="drawer-input"
+                    />
+                    <input 
+                      type="tel" 
+                      placeholder="Telefon Numaranız" 
+                      value={cartCustomerPhone}
+                      onChange={(e) => setCartCustomerPhone(e.target.value)}
+                      className="drawer-input"
+                    />
+                  </div>
+                </div>
               )}
             </div>
+
+            {quoteCart.length > 0 && (
+              <div className="drawer-footer">
+                <button 
+                  onClick={handleSendCartWhatsApp} 
+                  className="drawer-whatsapp-submit-btn"
+                >
+                  <MessageSquare size={18} />
+                  <span>WhatsApp ile Teklif İste</span>
+                </button>
+                <p className="drawer-footer-note">
+                  Seçtiğiniz ürünlerin listesi doğrudan {dealer?.name} yetkilisine WhatsApp mesajı olarak iletilecektir.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* SHOWROOM ZİYARET & VIP MİMAR RANDEVUSU MODALI */}
-      {showAppointmentModal && (
-        <div className="appointment-modal-overlay" onClick={() => setShowAppointmentModal(false)}>
-          <div className="appointment-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="appointment-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div className="appointment-icon-box">
-                  <Coffee size={22} />
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
-                    Showroom Ziyaret & VIP Mimar Randevusu
-                  </h3>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                    {dealer.name} • 3D Mimari Tasarım Eşliğinde Banyonuzu Seçin
-                  </span>
-                </div>
+      {/* MODAL: Quick Quote / Lead Modal */}
+      {showLeadModal && (
+        <div className="showroom-modal-backdrop" onClick={() => setShowLeadModal(false)}>
+          <div className="lead-modal-card animate-zoom-in" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-row">
+              <div>
+                <span className="modal-badge-tag">HIZLI TEKLİF FORMU</span>
+                <h3 className="modal-heading">{selectedProductForLead ? selectedProductForLead.name : dealer?.name}</h3>
               </div>
-              <button 
-                type="button" 
-                onClick={() => setShowAppointmentModal(false)}
-                className="appointment-close-btn"
-                title="Kapat"
-              >
-                <X size={18} />
+              <button onClick={() => setShowLeadModal(false)} className="modal-close-icon">
+                <X size={20} />
               </button>
             </div>
 
-            <div className="appointment-modal-body">
-              <p className="appointment-intro-text">
-                Showroom'umuza gelin, sıcak bir kahve eşliğinde banyonuzun veya mekanınızın ölçülerini 
-                <strong> 3D Sanal Banyo Stüdyomuzda</strong> canlı kaplayalım ve şantiye metrajınızı birlikte çıkaralım.
-              </p>
+            {leadSuccess ? (
+              <div className="modal-success-state">
+                <CheckCircle2 size={48} className="success-icon" />
+                <h4>Talebiniz Alındı!</h4>
+                <p>Showroom temsilcimiz en kısa sürede sizinle iletişime geçerek proforma teklifi iletecektir.</p>
+                <button onClick={() => { setShowLeadModal(false); setLeadSuccess(false); }} className="modal-done-btn">
+                  Kapat
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleLeadSubmit} className="lead-form-content">
+                <p className="form-info-p">
+                  İhtiyacınız olan metraj ve projeniz hakkında kısa bilgi bırakın; uzmanımız en uygun iskonto ile size dönüş yapsın.
+                </p>
 
-              {apptSuccess ? (
-                <div className="appointment-success-box">
-                  <CheckCircle2 size={32} style={{ color: '#10b981', margin: '0 auto 8px' }} />
-                  <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', color: '#0f172a' }}>Randevu Talebiniz Alındı!</h4>
-                  <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748b' }}>
-                    Bayimizin WhatsApp hattına yönlendiriliyorsunuz. Müsaitlik anında teyit edilecektir.
-                  </p>
+                <div className="form-field-group">
+                  <label>Adınız Soyadınız *</label>
+                  <input 
+                    type="text" 
+                    required 
+                    placeholder="Örn: Ahmet Yılmaz" 
+                    value={leadName}
+                    onChange={(e) => setLeadName(e.target.value)}
+                    className="modal-input"
+                  />
                 </div>
-              ) : (
-                <form onSubmit={handleAppointmentSubmit} className="appointment-form-grid">
-                  <div className="appt-input-group">
-                    <label>Adınız Soyadınız *</label>
-                    <input 
-                      type="text" 
-                      value={apptName} 
-                      onChange={(e) => setApptName(e.target.value)} 
-                      placeholder="Örn: Selin Demir"
-                      required
-                    />
-                  </div>
 
-                  <div className="appt-input-group">
-                    <label>Telefon Numaranız *</label>
-                    <input 
-                      type="tel" 
-                      value={apptPhone} 
-                      onChange={(e) => setApptPhone(e.target.value)} 
-                      placeholder="Örn: 0532 987 65 43"
-                      required
-                    />
-                  </div>
+                <div className="form-field-group">
+                  <label>Telefon Numaranız *</label>
+                  <input 
+                    type="tel" 
+                    required 
+                    placeholder="05XX XXX XX XX" 
+                    value={leadPhone}
+                    onChange={(e) => setLeadPhone(e.target.value)}
+                    className="modal-input"
+                  />
+                </div>
 
-                  <div className="appt-input-group">
+                <div className="form-field-group">
+                  <label>E-Posta Adresiniz (Opsiyonel)</label>
+                  <input 
+                    type="email" 
+                    placeholder="ahmet@example.com" 
+                    value={leadEmail}
+                    onChange={(e) => setLeadEmail(e.target.value)}
+                    className="modal-input"
+                  />
+                </div>
+
+                <div className="form-field-group">
+                  <label>Proje Notları / Tahmini Metraj (m²)</label>
+                  <textarea 
+                    rows={3} 
+                    placeholder="Örn: 45 m² banyo ve antre zemin seramiği için fiyat teklifi rica ediyorum."
+                    value={leadNotes}
+                    onChange={(e) => setLeadNotes(e.target.value)}
+                    className="modal-textarea"
+                  />
+                </div>
+
+                <button type="submit" disabled={leadLoading} className="modal-submit-btn">
+                  {leadLoading ? 'İletiliyor...' : 'Teklif Talebini Gönder'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Showroom Appointment Modal */}
+      {showApptModal && (
+        <div className="showroom-modal-backdrop" onClick={() => setShowApptModal(false)}>
+          <div className="appt-modal-card animate-zoom-in" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-row">
+              <div>
+                <span className="modal-badge-tag">SHOWROOM ZİYARETİ</span>
+                <h3 className="modal-heading">VIP Mimar Randevusu</h3>
+              </div>
+              <button onClick={() => setShowApptModal(false)} className="modal-close-icon">
+                <X size={20} />
+              </button>
+            </div>
+
+            {apptSuccess ? (
+              <div className="modal-success-state">
+                <CheckCircle2 size={48} className="success-icon" />
+                <h4>Randevunuz Alındı!</h4>
+                <p>Mimarımız belirtilen tarihte sizin için özel hazırlık yapacaktır.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleApptSubmit} className="appt-form-content">
+                <p className="form-info-p">
+                  Showroomumuzu ziyaretinizde mimari danışmanımız banyo ve zemin projeniz için hazır bulunacaktır.
+                </p>
+
+                <div className="form-field-group">
+                  <label>Adınız Soyadınız *</label>
+                  <input 
+                    type="text" 
+                    required 
+                    placeholder="Adınız Soyadınız"
+                    value={apptName}
+                    onChange={(e) => setApptName(e.target.value)}
+                    className="modal-input"
+                  />
+                </div>
+
+                <div className="form-field-group">
+                  <label>Telefon Numaranız *</label>
+                  <input 
+                    type="tel" 
+                    required 
+                    placeholder="05XX XXX XX XX"
+                    value={apptPhone}
+                    onChange={(e) => setApptPhone(e.target.value)}
+                    className="modal-input"
+                  />
+                </div>
+
+                <div className="form-grid-2">
+                  <div className="form-field-group">
                     <label>Ziyaret Tarihi *</label>
                     <input 
                       type="date" 
-                      value={apptDate} 
-                      onChange={(e) => setApptDate(e.target.value)} 
-                      required
+                      required 
+                      value={apptDate}
+                      onChange={(e) => setApptDate(e.target.value)}
+                      className="modal-input"
                     />
                   </div>
 
-                  <div className="appt-input-group">
-                    <label>Tercih Edilen Saat Dilimi</label>
+                  <div className="form-field-group">
+                    <label>Zaman Aralığı</label>
                     <select 
-                      value={apptTimeSlot} 
-                      onChange={(e) => setApptTimeSlot(e.target.value)}
+                      value={apptTime} 
+                      onChange={(e) => setApptTime(e.target.value)}
+                      className="modal-select"
                     >
-                      <option value="10:00 - 13:00 (Sabah Kuşağı)">10:00 - 13:00 (Sabah Kuşağı)</option>
-                      <option value="14:00 - 16:00 (Öğleden Sonra)">14:00 - 16:00 (Öğleden Sonra)</option>
-                      <option value="16:00 - 19:00 (Akşamüstü)">16:00 - 19:00 (Akşamüstü)</option>
+                      <option>10:00 - 12:00 (Sabah)</option>
+                      <option>14:00 - 16:00 (Öğleden Sonra)</option>
+                      <option>16:30 - 18:30 (Akşamüstü)</option>
                     </select>
                   </div>
+                </div>
 
-                  <div className="appt-input-group full-width">
-                    <label>Proje Türü</label>
-                    <div className="appt-project-pills">
-                      {[
-                        'Banyo Yenileme',
-                        'Mutfak & Zemin',
-                        'Komple Daire / Villa',
-                        'Ticari / Mimar Projesi'
-                      ].map((type) => (
-                        <button
-                          key={type}
-                          type="button"
-                          onClick={() => setApptProjectType(type)}
-                          className={`appt-pill-btn ${apptProjectType === type ? 'active' : ''}`}
-                        >
-                          {type}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                <div className="form-field-group">
+                  <label>Özel İstek / Mekan Notları</label>
+                  <input 
+                    type="text" 
+                    placeholder="Örn: Ebeveyn banyosu için Calacatta serisi"
+                    value={apptNotes}
+                    onChange={(e) => setApptNotes(e.target.value)}
+                    className="modal-input"
+                  />
+                </div>
 
-                  <div className="appt-input-group full-width">
-                    <label>Özel Not veya Aradığınız Ebat (Opsiyonel)</label>
-                    <textarea 
-                      value={apptNotes} 
-                      onChange={(e) => setApptNotes(e.target.value)}
-                      placeholder="Örn: 60x120 mermer desen ve antrasit banyo karoları bakmak istiyoruz..."
-                      rows={2}
-                    />
-                  </div>
-
-                  <button type="submit" className="btn-submit-appointment">
-                    <Calendar size={16} />
-                    <span>Randevu Oluştur ve WhatsApp'tan Onay Al</span>
-                  </button>
-                </form>
-              )}
-            </div>
+                <button type="submit" className="modal-submit-btn">
+                  Randevuyu Onayla
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}
 
-      {/* MASA ÜSTÜ SHOWROOM QR STANDI MODALI */}
+      {/* MODAL: QR Desk Stand Modal */}
       {showQrModal && (
-        <div className="qr-modal-overlay" onClick={() => setShowQrModal(false)}>
-          <div className="qr-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="qr-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <QrCode size={20} style={{ color: 'var(--accent-gold)' }} />
-                <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>
-                  Showroom Masası QR Standı & Dijital Kartvizit
-                </h3>
+        <div className="showroom-modal-backdrop" onClick={() => setShowQrModal(false)}>
+          <div className="qr-modal-card animate-zoom-in" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-row">
+              <div>
+                <span className="modal-badge-tag">MASAÜSTÜ ERİŞİM</span>
+                <h3 className="modal-heading">Showroom Mobil QR</h3>
               </div>
-              <button type="button" onClick={() => setShowQrModal(false)} className="qr-close-btn" title="Kapat">
-                <X size={18} />
+              <button onClick={() => setShowQrModal(false)} className="modal-close-icon">
+                <X size={20} />
               </button>
             </div>
 
             <div className="qr-modal-body">
-              <div className="qr-desk-stand-card" id="printable-qr-stand">
-                <div className="qr-stand-header">
-                  {dealer.logoUrl && (
-                    <img src={dealer.logoUrl} alt={dealer.name} className="qr-stand-logo" />
-                  )}
-                  <h2 className="qr-stand-dealer-name">{dealer.name}</h2>
-                  <span className="qr-stand-badge">YETKİLİ DİJİTAL SHOWROOM</span>
+              <div className="qr-box-inner">
+                {/* Embedded Clean QR representation */}
+                <div className="qr-display-frame">
+                  <QrCode size={180} className="qr-icon-large" />
                 </div>
-
-                <div className="qr-code-display-box">
-                  <img 
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(currentUrl || `https://seramikbak.com/bayi/${dealer.id}`)}`}
-                    alt={`${dealer.name} Showroom QR Kodu`}
-                    className="qr-img-element"
-                  />
-                </div>
-
-                <div className="qr-stand-instructions">
-                  <h4 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                    <QrCode size={16} />
-                    <span>Telefonunuzla Okutun</span>
-                  </h4>
-                  <p>
-                    Showroom'daki tüm seramik serilerini, depo stoklarımızı ve 
-                    <strong> 3D Banyo Tasarım Stüdyosu'nu</strong> cep telefonunuzda açın!
-                  </p>
-                </div>
-
-                <div className="qr-stand-footer">
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <MapPin size={12} />
-                    <span>{dealer.district}, {dealer.city}</span>
-                  </span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <Phone size={12} />
-                    <span>{dealer.phone}</span>
-                  </span>
-                </div>
+                <h4 className="qr-dealer-label">{dealer?.name}</h4>
+                <p className="qr-instruction">
+                  Telefonunuzun kamerasını açarak QR kodu okutun; showroom kataloğunu ve 3D tasarımları cebinizde inceleyin.
+                </p>
               </div>
 
-              <div className="qr-actions-row">
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="btn-print-qr-stand"
-                >
-                  <Printer size={16} />
-                  <span>Masa Standını Yazdır (A5 / A6)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (navigator.clipboard) {
-                      navigator.clipboard.writeText(currentUrl);
-                      alert('Showroom bağlantısı panoya kopyalandı!');
-                    }
-                  }}
-                  className="btn-copy-url"
-                >
-                  <Share2 size={16} />
-                  <span>Linki Kopyala</span>
+              <div className="qr-card-footer">
+                <button onClick={() => window.print()} className="qr-print-btn">
+                  <span>Yazdır / Masa Standı Yap</span>
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* GELİŞMİŞ SERAMİK & USTA SARFİYAT HESAPLAYICI MODALI */}
-      {showCalculatorModal && (
-        <div className="calculator-modal-overlay" onClick={() => setShowCalculatorModal(false)}>
-          <div className="calculator-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="calculator-modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ padding: '8px', borderRadius: '12px', background: 'rgba(212, 175, 55, 0.15)', color: 'var(--accent-gold)' }}>
-                  <Calculator size={22} />
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>
-                    Akıllı Metraj & Usta Sarfiyat Hesaplayıcı
-                  </h3>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                    Karo, Kutu, Flex Kalekim (Torba) ve Derz Dolgusu İhtiyacını Anında Hesaplayın
-                  </span>
-                </div>
-              </div>
-              <button type="button" onClick={() => setShowCalculatorModal(false)} className="calculator-modal-close-btn" title="Kapat">
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="calculator-modal-body">
-              <div className="calculator-grid-inputs">
-                <div className="calc-input-group">
-                  <label>Zemin Eni (Metre)</label>
-                  <input 
-                    type="number" 
-                    step="0.1" 
-                    value={calcWidth} 
-                    onChange={(e) => setCalcWidth(e.target.value)} 
-                    placeholder="Örn: 3.5"
-                  />
-                </div>
-                <div className="calc-input-group">
-                  <label>Zemin Boyu (Metre)</label>
-                  <input 
-                    type="number" 
-                    step="0.1" 
-                    value={calcLength} 
-                    onChange={(e) => setCalcLength(e.target.value)} 
-                    placeholder="Örn: 4.0"
-                  />
-                </div>
-                <div className="calc-input-group">
-                  <label>Duvar Yüksekliği (Opsiyonel / m)</label>
-                  <input 
-                    type="number" 
-                    step="0.1" 
-                    value={calcHeight} 
-                    onChange={(e) => setCalcHeight(e.target.value)} 
-                    placeholder="Örn: 2.6 (Banyo için)"
-                  />
-                </div>
-                <div className="calc-input-group">
-                  <label>Fire & Kesim Payı (%)</label>
-                  <select value={calcWastePercent} onChange={(e) => setCalcWastePercent(Number(e.target.value))}>
-                    <option value={5}>%5 (Düz Döşeme)</option>
-                    <option value={10}>%10 (Standart - Önerilen)</option>
-                    <option value={15}>%15 (Diyagonal / Bol Kesimli)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Calculation Summary Box */}
-              {(() => {
-                const w = parseFloat(calcWidth) || 0;
-                const l = parseFloat(calcLength) || 0;
-                const h = parseFloat(calcHeight) || 0;
-                
-                const floorNet = w * l;
-                const wallNet = h > 0 ? 2 * (w + l) * h : 0;
-                const netM2 = floorNet + wallNet;
-                const grossM2 = netM2 * (1 + calcWastePercent / 100);
-                const boxM2 = 1.44; // standard box size for 60x120 or 60x60
-                const numBoxes = grossM2 > 0 ? Math.ceil(grossM2 / boxM2) : 0;
-                const totalWeightKg = Math.round(grossM2 * 22); // ~22kg per m² porcelain tile
-                const kalekimBags = grossM2 > 0 ? Math.ceil((grossM2 * 4.5) / 25) : 0;
-                const groutKg = grossM2 > 0 ? Math.ceil(grossM2 * 0.45) : 0;
-
-                return (
-                  <div className="calculator-results-card">
-                    <div className="calc-res-item">
-                      <span className="res-label">Net Alan</span>
-                      <span className="res-value">{netM2.toFixed(2)} m²</span>
-                    </div>
-                    <div className="calc-res-item">
-                      <span className="res-label">Fireli Sipariş (+%{calcWastePercent})</span>
-                      <span className="res-value highlight">{grossM2.toFixed(2)} m²</span>
-                    </div>
-                    <div className="calc-res-item">
-                      <span className="res-label">Kutu / Paket</span>
-                      <span className="res-value badge">{numBoxes} Paket</span>
-                    </div>
-                    <div className="calc-res-item">
-                      <span className="res-label">Flex Kalekim Harcı</span>
-                      <span className="res-value badge">{kalekimBags} Torba (25kg)</span>
-                    </div>
-                    <div className="calc-res-item">
-                      <span className="res-label">Derz Dolgusu</span>
-                      <span className="res-value badge">{groutKg} kg</span>
-                    </div>
-                    <div className="calc-res-item">
-                      <span className="res-label">Yaklaşık Ağırlık</span>
-                      <span className="res-value">~{(totalWeightKg / 1000).toFixed(2)} Ton ({totalWeightKg} kg)</span>
-                    </div>
-
-                    {grossM2 > 0 && (
-                      <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const quoteMsg = `Hesaplanan Metraj & Sarfiyat: Net ${netM2.toFixed(2)} m², Fireli ${grossM2.toFixed(2)} m² (${numBoxes} Kutu), ${kalekimBags} Torba 25kg Kalekim, ${groutKg} kg Derz Dolgusu (~${totalWeightKg} kg)`;
-                            setNotes(prev => prev ? `${prev} • ${quoteMsg}` : quoteMsg);
-                            setShowCalculatorModal(false);
-                            const el = document.querySelector('#quote-form-section');
-                            if (el) el.scrollIntoView({ behavior: 'smooth' });
-                          }}
-                          className="btn-apply-calc-quote"
-                        >
-                          <Send size={15} />
-                          Bu Metraj ve Sarfiyatla Bayiden Fiyat Teklifi İsteyin
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const cleanPhone = (dealer.phone || '').replace(/[\s\-\(\)\+]/g, '');
-                            const msg = `*SERAMİK & SARFİYAT HESAP RAPORU*\n*${dealer.name}* Mağazasına\n` +
-                              `─────────────────────────────\n` +
-                              `Mekanım için yapılan metraj ve malzeme hesabı:\n` +
-                              `• Net Alan: *${netM2.toFixed(2)} m²*\n` +
-                              `• Fireli Sipariş: *${grossM2.toFixed(2)} m²* (~${numBoxes} Kutu)\n` +
-                              `• Kalekim İhtiyacı: *${kalekimBags} Torba* (25kg Flex)\n` +
-                              `• Derz Dolgusu: *${groutKg} kg*\n` +
-                              `• Tahmini Tonaj: *~${(totalWeightKg / 1000).toFixed(2)} Ton*\n` +
-                              `─────────────────────────────\n` +
-                              `Bu sarfiyata göre toplam fiyat teklifi alabilir miyim?`;
-                            const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
-                            window.open(waUrl, '_blank');
-                          }}
-                          className="btn-calc-whatsapp"
-                        >
-                          <MessageSquare size={15} />
-                          WhatsApp ile Bayiye İlet
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
             </div>
           </div>
         </div>
@@ -3299,4 +1343,3 @@ export default function DealerProfileClient({ dealer, products }) {
     </div>
   );
 }
-
