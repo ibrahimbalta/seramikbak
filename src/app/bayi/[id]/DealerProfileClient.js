@@ -862,8 +862,8 @@ export default function DealerProfileClient({ dealer, products }) {
                             className="card-action-btn-quote"
                             title="Teklif Listeme Ekle"
                           >
-                            <Plus size={14} />
-                            <span>Teklif Ekle</span>
+                            <Plus size={13} />
+                            <span>Teklif</span>
                           </button>
                         </div>
                       </div>

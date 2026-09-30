@@ -19,6 +19,9 @@
 /* Page Reset & Container */
 .corporate-showroom-page {
   min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
   background-color: var(--sr-bg-page);
   color: var(--sr-text-dark);
   font-family: var(--font-body, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
@@ -2290,19 +2293,38 @@
     font-size: 0.7rem;
   }
 
-  /* Hide Desktop Catalog Sidebar on Mobile */
+  /* Hide Desktop Catalog Sidebar and Desktop-only Header on Mobile */
   .catalog-sidebar {
     display: none;
   }
 
+  .desktop-only-header {
+    display: none !important;
+  }
+
   .showroom-catalog-section {
-    padding: 24px 0 48px 0;
+    padding: 20px 0 40px 0;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   .catalog-layout-container {
-    grid-template-columns: 1fr;
-    padding: 0 14px;
-    gap: 0;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .catalog-main-content {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
   }
 
   /* Show Mobile App-Like Catalog Controls */
@@ -2310,7 +2332,9 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .mobile-search-box {
@@ -2432,65 +2456,130 @@
     white-space: nowrap;
   }
 
-  /* Symmetrical 2-Column Product Grid on Mobile */
+  /* Symmetrical 2-Column Product Grid on Mobile (Guaranteed No Overflow) */
   .catalog-products-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .catalog-product-card {
-    border-radius: 10px;
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    border-radius: 10px !important;
   }
 
   .product-card-media {
-    height: 145px;
+    height: 135px !important;
+    width: 100% !important;
   }
 
   .product-card-body {
-    padding: 10px 8px;
+    padding: 8px 6px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
   }
 
   .product-card-name {
-    font-size: 0.82rem;
-    line-height: 1.25;
-    height: 34px;
-    -webkit-line-clamp: 2;
-    margin-bottom: 4px;
+    font-size: 0.78rem !important;
+    line-height: 1.25 !important;
+    height: 32px !important;
+    -webkit-line-clamp: 2 !important;
+    margin-bottom: 4px !important;
+    word-break: break-word !important;
+    overflow: hidden !important;
   }
 
   .product-meta-sub {
-    font-size: 0.68rem;
+    font-size: 0.65rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 4px !important;
+  }
+
+  .product-category-text {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .product-dim-text {
+    flex-shrink: 0 !important;
   }
 
   .product-chips-row {
-    gap: 4px;
-    margin-bottom: 8px;
+    display: flex !important;
+    gap: 3px !important;
+    margin-bottom: 6px !important;
+    flex-wrap: nowrap !important;
+    overflow: hidden !important;
   }
 
   .spec-chip {
-    font-size: 0.65rem;
-    padding: 1px 5px;
+    font-size: 0.62rem !important;
+    padding: 1px 4px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   .chip-quality {
-    display: none;
+    display: none !important;
+  }
+
+  .product-price-row {
+    margin-top: auto !important;
+    margin-bottom: 6px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
   }
 
   .price-val {
-    font-size: 1.02rem;
+    font-size: 0.95rem !important;
+  }
+
+  .price-ask {
+    font-size: 0.7rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
   }
 
   .product-card-actions {
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 4px !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
   .card-action-btn-3d,
   .card-action-btn-quote {
-    height: 34px;
-    padding: 0;
-    font-size: 0.74rem;
-    border-radius: 6px;
+    height: 32px !important;
+    padding: 0 2px !important;
+    font-size: 0.72rem !important;
+    border-radius: 6px !important;
+    min-width: 0 !important;
+    gap: 3px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .card-action-btn-3d span,
+  .card-action-btn-quote span {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   /* AI Banner on Mobile */
