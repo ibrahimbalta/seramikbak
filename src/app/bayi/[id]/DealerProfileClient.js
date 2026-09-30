@@ -144,6 +144,8 @@ export default function DealerProfileClient({ dealer, products }) {
   // Modern Concept Flagship Store States
   const initialShowcaseTile = featuredProductsList[0] || (dealer.inventories && dealer.inventories[0]?.product) || products[0] || null;
   const [selectedShowcaseTile, setSelectedShowcaseTile] = useState(initialShowcaseTile);
+  const [showTileSpotlight, setShowTileSpotlight] = useState(true);
+  const [activeMainTab, setActiveMainTab] = useState('products'); // 'products' | 'combos' | 'calculator' | 'info'
   const [activeMoodboard, setActiveMoodboard] = useState('all');
   const [lightingMode, setLightingMode] = useState('day'); // 'day' | 'warm'
   const [conciergeRoom, setConciergeRoom] = useState('banyo');
@@ -210,6 +212,9 @@ export default function DealerProfileClient({ dealer, products }) {
   const handleMoodboardSelect = (board) => {
     setActiveMoodboard(board.id);
     setInventoryStyleFilter(board.styleKey);
+    if (['marble', 'concrete', 'wood', 'dark'].includes(board.id)) {
+      setConciergeStyle(board.id);
+    }
 
     const match = products.find(p => 
       (p.style && p.style.toLowerCase().includes(board.styleKey.toLowerCase())) ||
@@ -218,10 +223,9 @@ export default function DealerProfileClient({ dealer, products }) {
 
     if (match) {
       setSelectedShowcaseTile(match);
+      setShowTileSpotlight(true);
     }
 
-    const el = document.querySelector('.concept-showcase-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
     trackAction(`MOODBOARD_${board.id.toUpperCase()}`);
   };
 
@@ -404,12 +408,21 @@ export default function DealerProfileClient({ dealer, products }) {
     window.open(waUrl, '_blank');
   };
 
+  const navigateToQuoteForm = (presetNote = '') => {
+    if (presetNote) {
+      setNotes(prev => prev ? `${prev} • ${presetNote}` : presetNote);
+    }
+    setActiveMainTab('info');
+    setTimeout(() => {
+      const el = document.getElementById('quote-form-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
   const fillLeadFormWithCart = () => {
     let summary = quoteCart.map(i => `${i.name} (${i.code || i.width + 'x' + i.height}) - ${i.m2} m²`).join(', ');
-    setNotes(prev => prev ? `${prev} • Sepet: ${summary}` : `Seçilen Seramikler: ${summary}`);
     setShowCartDrawer(false);
-    const el = document.getElementById('quote-form-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    navigateToQuoteForm(`Seçilen Seramikler: ${summary}`);
   };
 
   const handleAppointmentSubmit = async (e) => {
@@ -566,9 +579,12 @@ export default function DealerProfileClient({ dealer, products }) {
   const primaryRgb = hexToRgb(primaryColor);
 
   // Parse Background Color from themePreset (Format: PRESET|#hex)
-  const rawTheme = dealer.themePreset || 'GOLD|#f8f9fc';
+  const rawTheme = dealer.themePreset || 'GOLD|#f5f4f0';
   const themeParts = rawTheme.split('|');
-  const bgColor = themeParts[1] || '#f8f9fc';
+  let bgColor = themeParts[1] || '#f5f4f0';
+  if (bgColor === '#f8f9fc' || bgColor === '#ffffff') {
+    bgColor = '#f5f4f0';
+  }
 
   const isColorDark = (hex) => {
     if (!hex) return false;
@@ -903,60 +919,112 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
         </div>
 
-        {/* SECTION: MEKAN & İLHAM MOODBOARD'U (CONCEPT FLAGSHIP STORE) */}
-        <div className="showroom-moodboards-section animate-fade-in">
-          <div className="moodboards-header">
-            <span className="moodboards-badge">
-              <Palette size={13} />
-              <span>2026 MİMARİ SHOWROOM KONSEPTLERİ</span>
-            </span>
-            <h2 className="moodboards-title">
-              Hangi Mekan Havasını Arıyorsunuz?
-            </h2>
-            <p className="moodboards-desc">
-              Tıpkı lüks bir konsept mağazada gezer gibi, hayalinizdeki tarza dokunun; bayimizin tüm stokları ve 3D simülasyonları anında sizin için hazırlansın.
-            </p>
-          </div>
+        {/* EXECUTIVE STORE TABS NAVIGATION BAR */}
+        <div className="store-tabs-nav-bar animate-fade-in">
+          <button
+            type="button"
+            onClick={() => setActiveMainTab('products')}
+            className={`store-tab-nav-btn ${activeMainTab === 'products' ? 'active' : ''}`}
+          >
+            <Building2 size={16} />
+            <span>Showroom Ürünleri & Teşhir ({products.length})</span>
+          </button>
 
-          <div className="moodboards-carousel-grid">
-            {MOODBOARDS.map((board) => {
-              const isActive = activeMoodboard === board.id;
-              return (
-                <div
-                  key={board.id}
-                  onClick={() => handleMoodboardSelect(board)}
-                  className={`moodboard-card ${isActive ? 'active' : ''}`}
-                  style={{
-                    '--card-accent': board.accentColor
-                  }}
-                >
-                  <div className="moodboard-card-top">
-                    <span className="moodboard-icon">{board.icon}</span>
-                    <span className="moodboard-tag">{board.tag}</span>
-                  </div>
-                  <h3 className="moodboard-name">{board.name}</h3>
-                  <span className="moodboard-sub">{board.subtitle}</span>
-                  <p className="moodboard-p">{board.desc}</p>
-                  <div className="moodboard-footer-action">
-                    <span>{isActive ? '✓ Aktif Konsept' : 'Bu Konsepti İncele'}</span>
-                    <ArrowRight size={13} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <button
+            type="button"
+            onClick={() => setActiveMainTab('combos')}
+            className={`store-tab-nav-btn ${activeMainTab === 'combos' ? 'active' : ''}`}
+          >
+            <Sparkles size={16} />
+            <span>Mimari Kombinler & İlham</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveMainTab('calculator')}
+            className={`store-tab-nav-btn ${activeMainTab === 'calculator' ? 'active' : ''}`}
+          >
+            <Calculator size={16} />
+            <span>Şantiye & Sarfiyat Hesabı</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveMainTab('info')}
+            className={`store-tab-nav-btn ${activeMainTab === 'info' ? 'active' : ''}`}
+          >
+            <MapPin size={16} />
+            <span>Showroom Bilgisi & İletişim</span>
+          </button>
         </div>
 
-        {/* SECTION: KIZAKLI TEŞHİR & YÜZEY İNCELEME STÜDYOSU (INTERACTIVE SLIDING TILE STAND) */}
-        {selectedShowcaseTile && (
+        {/* SECTION: MEKAN & İLHAM MOODBOARD'U (TAB: COMBOS) */}
+        {activeMainTab === 'combos' && (
+          <div className="showroom-moodboards-section animate-fade-in">
+            <div className="moodboards-header">
+              <span className="moodboards-badge">
+                <Palette size={13} />
+                <span>2026 MİMARİ SHOWROOM KONSEPTLERİ</span>
+              </span>
+              <h2 className="moodboards-title">
+                Hangi Mekan Havasını Arıyorsunuz?
+              </h2>
+              <p className="moodboards-desc">
+                Tıpkı lüks bir konsept mağazada gezer gibi, hayalinizdeki tarza dokunun; bayimizin tüm stokları ve 3D simülasyonları anında sizin için hazırlansın.
+              </p>
+            </div>
+
+            <div className="moodboards-carousel-grid">
+              {MOODBOARDS.map((board) => {
+                const isActive = activeMoodboard === board.id;
+                return (
+                  <div
+                    key={board.id}
+                    onClick={() => handleMoodboardSelect(board)}
+                    className={`moodboard-card ${isActive ? 'active' : ''}`}
+                    style={{
+                      '--card-accent': board.accentColor
+                    }}
+                  >
+                    <div className="moodboard-card-top">
+                      <span className="moodboard-icon">{board.icon}</span>
+                      <span className="moodboard-tag">{board.tag}</span>
+                    </div>
+                    <h3 className="moodboard-name">{board.name}</h3>
+                    <span className="moodboard-sub">{board.subtitle}</span>
+                    <p className="moodboard-p">{board.desc}</p>
+                    <div className="moodboard-footer-action">
+                      <span>{isActive ? '✓ Aktif Konsept' : 'Bu Konsepti İncele'}</span>
+                      <ArrowRight size={13} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* SECTION: KIZAKLI TEŞHİR & YÜZEY İNCELEME STÜDYOSU (TAB: PRODUCTS) */}
+        {activeMainTab === 'products' && selectedShowcaseTile && showTileSpotlight && (
           <div className="concept-showcase-section animate-fade-in">
             <div className="showcase-container-card">
               <div className="showcase-header-row">
                 <div className="showcase-title-group">
-                  <span className="showcase-kicker">
-                    <Sparkles size={12} />
-                    <span>DİJİTAL TEŞHİR STANDI & IŞIK SİMÜLATÖRÜ</span>
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                    <span className="showcase-kicker">
+                      <Sparkles size={12} />
+                      <span>DİJİTAL TEŞHİR STANDI & IŞIK SİMÜLATÖRÜ</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowTileSpotlight(false)}
+                      className="btn-spotlight-toggle-hide"
+                      title="Teşhir Alanını Gizle"
+                    >
+                      <X size={13} />
+                      <span>Gizle</span>
+                    </button>
+                  </div>
                   <h3 className="showcase-main-title">
                     {selectedShowcaseTile.name}
                   </h3>
@@ -1089,11 +1157,7 @@ export default function DealerProfileClient({ dealer, products }) {
 
                     <button
                       type="button"
-                      onClick={() => {
-                        setNotes(`Showroom teşhirindeki "${selectedShowcaseTile.name}" (${selectedShowcaseTile.code || ''}) için numune karo ve palet fiyatı talep ediyorum.`);
-                        const el = document.getElementById('quote-form-section');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      }}
+                      onClick={() => navigateToQuoteForm(`Showroom teşhirindeki "${selectedShowcaseTile.name}" (${selectedShowcaseTile.code || ''}) için numune karo ve palet fiyatı talep ediyorum.`)}
                       className="btn-showcase-sample"
                     >
                       <Package size={15} />
@@ -1106,143 +1170,169 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
         )}
 
-        {/* QUICK STORE ACTIONS & TOOLS BAR */}
-        <div className="quick-actions-store-bar">
-          <span className="quick-actions-bar-title">⚡ Hızlı Mağaza Araçları:</span>
-          <div className="quick-actions-bar-scroll">
-            <Link 
-              href={featuredProductsList.length > 0 && featuredProductsList[0].code 
-                ? `/?code=${encodeURIComponent(featuredProductsList[0].code)}&tab=studio#studio` 
-                : "/?tab=studio#studio"}
-              className="quick-action-chip primary-chip"
-              onClick={() => {
-                if (featuredProductsList.length > 0) {
-                  try {
-                    const prod = featuredProductsList[0];
-                    const selectedObj = {
-                      ...prod,
-                      textureUrl: prod.textureUrl || prod.imageUrl || getTextureFallback(prod),
-                      imageUrl: prod.imageUrl || prod.textureUrl || getTextureFallback(prod)
-                    };
-                    localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
-                    sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
-                  } catch(e) {}
-                }
-              }}
-            >
-              <Sparkles size={14} />
-              <span>🎮 3D Banyo Stüdyosu</span>
-            </Link>
-
+        {/* COLLAPSED SPOTLIGHT BAR (TAB: PRODUCTS) */}
+        {activeMainTab === 'products' && selectedShowcaseTile && !showTileSpotlight && (
+          <div className="spotlight-collapsed-bar animate-fade-in">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Sparkles size={15} style={{ color: 'var(--accent-gold)' }} />
+              <span style={{ fontSize: '0.86rem', color: '#1e293b' }}>
+                Seçili Teşhir Karosu: <strong>{selectedShowcaseTile.name}</strong> ({selectedShowcaseTile.width}x{selectedShowcaseTile.height} cm • {selectedShowcaseTile.finish || 'Porselen'})
+              </span>
+            </div>
             <button
               type="button"
-              onClick={() => setKioskMode(!kioskMode)}
-              className={`quick-action-chip ${kioskMode ? 'gold-chip' : ''}`}
+              onClick={() => setShowTileSpotlight(true)}
+              className="btn-spotlight-toggle-show"
             >
-              <Maximize2 size={14} />
-              <span>📺 {kioskMode ? 'Kiosk Modundan Çık' : 'Kiosk Satış Modu'}</span>
+              <Sliders size={13} />
+              <span>Işık & Yüzeyi İncele</span>
             </button>
-
-            <button
-              type="button"
-              onClick={() => setShowAppointmentModal(true)}
-              className="quick-action-chip highlight-chip"
-            >
-              <Coffee size={14} style={{ color: '#d4af37' }} />
-              <span>☕ Showroom Ziyaret & Mimar Randevusu</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowQrModal(true)}
-              className="quick-action-chip"
-            >
-              <QrCode size={14} />
-              <span>📱 Masa QR Standı</span>
-            </button>
-
-            {quoteCart.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setShowCartDrawer(true)}
-                className="quick-action-chip gold-chip"
-              >
-                <ShoppingBag size={14} />
-                <span>🛒 Teklif Sepetim ({quoteCart.length} Ürün)</span>
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={() => {
-                const el = document.querySelector('.featured-products-section');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="quick-action-chip"
-            >
-              <Building2 size={14} />
-              <span>📦 Stoklu Seramik Envanteri</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                const el = document.querySelector('.showroom-outlet-section');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="quick-action-chip highlight-chip"
-            >
-              <Flame size={14} style={{ color: '#ef4444' }} />
-              <span>🔥 Outlet & Fırsat Karoları</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowCalculatorModal(true)}
-              className="quick-action-chip gold-chip"
-            >
-              <Calculator size={14} />
-              <span>📐 Metraj & Sarfiyat Hesaplayıcı</span>
-            </button>
-
-            {dealer.pdfCatalogUrl ? (
-              <a
-                href={dealer.pdfCatalogUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="quick-action-chip"
-              >
-                <FileText size={14} />
-                <span>📄 E-Katalog & Broşür</span>
-              </a>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  const el = document.querySelector('.showroom-services-section');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="quick-action-chip"
-              >
-                <FileText size={14} />
-                <span>✨ Şube Ayrıcalıkları</span>
-              </button>
-            )}
-
-            <a
-              href={`https://wa.me/${(dealer.phone || '').replace(/[\s\-\(\)\+]/g, '')}?text=Merhaba%2C%20Showroom%20sayfan%C4%B1zdaki%20seramik%20stoklar%C4%B1%20ve%20m%C2%B2%20fiyatlar%C4%B1%20hakk%C4%B1nda%20bilgi%20alabilir%20miyim%3F`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="quick-action-chip whatsapp-chip"
-            >
-              <MessageSquare size={14} />
-              <span>💬 WhatsApp Canlı Mimar</span>
-            </a>
           </div>
-        </div>
+        )}
 
-        {/* Showroom & Content Grid */}
-        <div className="showroom-main-grid">
+        {/* TAB 3: ŞANTİYE & SARFİYAT HESAPLAYICI (IN-PAGE) */}
+        {activeMainTab === 'calculator' && (
+          <div className="inpage-calculator-card animate-fade-in">
+            <div className="inpage-calc-header">
+              <span className="calc-kicker">
+                <Calculator size={13} />
+                <span>ŞANTİYE & MALZEME METRAJ RAPORU</span>
+              </span>
+              <h2 className="calc-main-title">
+                Akıllı Seramik & Usta Sarfiyat Hesaplayıcı
+              </h2>
+              <p className="calc-desc">
+                Mekanınızın en ve boy ölçülerini girin; seramik kutu / paket sayısı, Flex Kalekim yapıştırıcı torbası, derz dolgusu ve şantiye nakliye tonajını anında hesaplayın.
+              </p>
+            </div>
+
+            <div className="calc-inputs-grid-boxed">
+              <div className="calc-box-input">
+                <label>Zemin Eni (Metre)</label>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  value={calcWidth} 
+                  onChange={(e) => setCalcWidth(e.target.value)} 
+                  placeholder="Örn: 3.5"
+                />
+              </div>
+              <div className="calc-box-input">
+                <label>Zemin Boyu (Metre)</label>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  value={calcLength} 
+                  onChange={(e) => setCalcLength(e.target.value)} 
+                  placeholder="Örn: 4.0"
+                />
+              </div>
+              <div className="calc-box-input">
+                <label>Duvar Yüksekliği (Opsiyonel / m)</label>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  value={calcHeight} 
+                  onChange={(e) => setCalcHeight(e.target.value)} 
+                  placeholder="Örn: 2.6 (Banyo için)"
+                />
+              </div>
+              <div className="calc-box-input">
+                <label>Fire & Kesim Payı (%)</label>
+                <select value={calcWastePercent} onChange={(e) => setCalcWastePercent(Number(e.target.value))}>
+                  <option value={5}>%5 (Düz Döşeme)</option>
+                  <option value={10}>%10 (Standart - Önerilen)</option>
+                  <option value={15}>%15 (Diyagonal / Bol Kesimli)</option>
+                </select>
+              </div>
+            </div>
+
+            {(() => {
+              const w = parseFloat(calcWidth) || 0;
+              const l = parseFloat(calcLength) || 0;
+              const h = parseFloat(calcHeight) || 0;
+              
+              const floorNet = w * l;
+              const wallNet = h > 0 ? 2 * (w + l) * h : 0;
+              const netM2 = floorNet + wallNet;
+              const grossM2 = netM2 * (1 + calcWastePercent / 100);
+              const boxM2 = 1.44;
+              const numBoxes = grossM2 > 0 ? Math.ceil(grossM2 / boxM2) : 0;
+              const totalWeightKg = Math.round(grossM2 * 22);
+              const kalekimBags = grossM2 > 0 ? Math.ceil((grossM2 * 4.5) / 25) : 0;
+              const groutKg = grossM2 > 0 ? Math.ceil(grossM2 * 0.45) : 0;
+
+              return (
+                <div className="inpage-calc-results">
+                  <div className="res-badge-item">
+                    <span className="lbl">Net Alan</span>
+                    <span className="val">{netM2.toFixed(2)} m²</span>
+                  </div>
+                  <div className="res-badge-item highlight">
+                    <span className="lbl">Fireli Sipariş (+%{calcWastePercent})</span>
+                    <span className="val">{grossM2.toFixed(2)} m²</span>
+                  </div>
+                  <div className="res-badge-item">
+                    <span className="lbl">Kutu / Paket</span>
+                    <span className="val pill-accent">{numBoxes} Paket</span>
+                  </div>
+                  <div className="res-badge-item">
+                    <span className="lbl">Flex Kalekim Harcı</span>
+                    <span className="val pill-accent">{kalekimBags} Torba (25kg)</span>
+                  </div>
+                  <div className="res-badge-item">
+                    <span className="lbl">Derz Dolgusu</span>
+                    <span className="val pill-accent">{groutKg} kg</span>
+                  </div>
+                  <div className="res-badge-item">
+                    <span className="lbl">Yaklaşık Ağırlık</span>
+                    <span className="val">~{(totalWeightKg / 1000).toFixed(2)} Ton</span>
+                  </div>
+
+                  <div className="inpage-calc-actions-row">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const quoteMsg = `Hesaplanan Metraj & Sarfiyat: Net ${netM2.toFixed(2)} m², Fireli ${grossM2.toFixed(2)} m² (${numBoxes} Kutu), ${kalekimBags} Torba 25kg Kalekim, ${groutKg} kg Derz Dolgusu (~${totalWeightKg} kg)`;
+                        navigateToQuoteForm(quoteMsg);
+                      }}
+                      className="btn-inpage-calc-apply"
+                    >
+                      <Send size={15} />
+                      <span>Bu Metrajla Bayiden Fiyat Teklifi İste</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cleanPhone = (dealer.phone || '').replace(/[\s\-\(\)\+]/g, '');
+                        const msg = `*SERAMİK & SARFİYAT HESAP RAPORU*\n*${dealer.name}* Mağazasına\n` +
+                          `─────────────────────────────\n` +
+                          `Mekanım için yapılan metraj ve malzeme hesabı:\n` +
+                          `• Net Alan: *${netM2.toFixed(2)} m²*\n` +
+                          `• Fireli Sipariş (+%${calcWastePercent}): *${grossM2.toFixed(2)} m²* (~${numBoxes} Kutu)\n` +
+                          `• Flex Kalekim: *${kalekimBags} Torba* (25kg)\n` +
+                          `• Derz Dolgusu: *${groutKg} kg*\n` +
+                          `• Toplam Tonaj: *~${(totalWeightKg / 1000).toFixed(2)} Ton*\n` +
+                          `─────────────────────────────\n` +
+                          `Stok durumunuzu ve teslimat koşullarınızı öğrenebilir miyim?`;
+                        const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+                        window.open(waUrl, '_blank');
+                      }}
+                      className="btn-inpage-calc-whatsapp"
+                    >
+                      <MessageSquare size={15} />
+                      <span>WhatsApp ile Şantiye Listesini Gönder</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+
+        {/* Showroom & Content Grid (TAB: INFO) */}
+        {activeMainTab === 'info' && (
+          <div className="showroom-main-grid">
           
           {/* LEFT COLUMN: 3D TOUR & PHOTOS */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -1620,139 +1710,159 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
 
         </div>
+        )}
 
-        {/* SECTION: MİMARIN SEÇTİĞİ ZEMİN & DUVAR KOMBİNLERİ (CURATED TILE DUOS) */}
-        {(() => {
+        {/* SECTION: MİMARIN SEÇTİĞİ ZEMİN & DUVAR KOMBİNLERİ (TAB: COMBOS) */}
+        {activeMainTab === 'combos' && (() => {
           const duo = getCuratedDuo();
           if (!duo.floor || !duo.wall) return null;
 
           return (
-            <div className="curated-combos-section animate-fade-in" style={{ marginTop: '56px' }}>
-              <div className="curated-combos-header">
-                <span className="curated-badge">
-                  <Sparkles size={13} />
-                  <span>MİMARİ ZEMİN + DUVAR UYUMU</span>
-                </span>
-                <h2 className="section-main-heading" style={{ marginTop: '8px', marginBottom: '8px' }}>
-                  Showroom Mimarından İlham Veren Çiftler
-                </h2>
-                <p style={{ fontSize: '0.86rem', color: '#64748b', maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
-                  Tek bir karo yerine birbiriyle kusursuz konuşan zemin ve duvar seramiklerini eşleştirdik. Zıtlıkların uyumuyla mekana lüks bir derinlik kazandırın.
-                </p>
+            <>
+              <div className="curated-combos-section animate-fade-in" style={{ marginTop: '24px' }}>
+                <div className="curated-combos-header">
+                  <span className="curated-badge">
+                    <Sparkles size={13} />
+                    <span>MİMARİ ZEMİN + DUVAR UYUMU</span>
+                  </span>
+                  <h2 className="section-main-heading" style={{ marginTop: '8px', marginBottom: '8px' }}>
+                    Showroom Mimarından İlham Veren Çiftler
+                  </h2>
+                  <p style={{ fontSize: '0.86rem', color: '#64748b', maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
+                    Tek bir karo yerine birbiriyle kusursuz konuşan zemin ve duvar seramiklerini eşleştirdik. Zıtlıkların uyumuyla mekana lüks bir derinlik kazandırın.
+                  </p>
 
-                {/* STYLE SELECTOR PILLS */}
-                <div className="curated-style-pills">
-                  {[
-                    { id: 'marble', label: '🏛️ Mermer & Zarafet' },
-                    { id: 'concrete', label: '🏢 Beton & Loft' },
-                    { id: 'wood', label: '🌿 Doğal Ahşap' },
-                    { id: 'dark', label: '🖤 Spa & Antrasit' }
-                  ].map(s => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => setConciergeStyle(s.id)}
-                      className={`curated-pill ${conciergeStyle === s.id ? 'active' : ''}`}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
+                  {/* STYLE SELECTOR PILLS */}
+                  <div className="curated-style-pills">
+                    {[
+                      { id: 'marble', label: '🏛️ Mermer & Zarafet' },
+                      { id: 'concrete', label: '🏢 Beton & Loft' },
+                      { id: 'wood', label: '🌿 Doğal Ahşap' },
+                      { id: 'dark', label: '🖤 Spa & Antrasit' }
+                    ].map(s => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => setConciergeStyle(s.id)}
+                        className={`curated-pill ${conciergeStyle === s.id ? 'active' : ''}`}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="curated-duo-cards-grid">
+                  {/* FLOOR TILE */}
+                  <div className="curated-card floor-card">
+                    <div className="curated-card-role-badge">
+                      <span>ZEMİN KAROSU</span>
+                    </div>
+                    <div className="curated-image-box">
+                      <img 
+                        src={duo.floor.imageUrl || getTextureFallback(duo.floor)} 
+                        alt={duo.floor.name}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = getTextureFallback(duo.floor);
+                        }}
+                      />
+                    </div>
+                    <div className="curated-card-content">
+                      <span className="curated-tile-style">{duo.floor.style} Serisi</span>
+                      <h3 className="curated-tile-name">{duo.floor.name}</h3>
+                      <span className="curated-tile-meta">Kod: {duo.floor.code} • {duo.floor.width}x{duo.floor.height} cm • {duo.floor.finish}</span>
+                    </div>
+                  </div>
+
+                  {/* PLUS CONNECTOR */}
+                  <div className="curated-connector">
+                    <div className="connector-circle">
+                      <Plus size={20} />
+                    </div>
+                    <span className="connector-label">MİMARİ KOMBİN</span>
+                  </div>
+
+                  {/* WALL TILE */}
+                  <div className="curated-card wall-card">
+                    <div className="curated-card-role-badge wall">
+                      <span>DUVAR & VİTRİN KAROSU</span>
+                    </div>
+                    <div className="curated-image-box">
+                      <img 
+                        src={duo.wall.imageUrl || getTextureFallback(duo.wall)} 
+                        alt={duo.wall.name}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = getTextureFallback(duo.wall);
+                        }}
+                      />
+                    </div>
+                    <div className="curated-card-content">
+                      <span className="curated-tile-style">{duo.wall.style} Serisi</span>
+                      <h3 className="curated-tile-name">{duo.wall.name}</h3>
+                      <span className="curated-tile-meta">Kod: {duo.wall.code} • {duo.wall.width}x{duo.wall.height} cm • {duo.wall.finish}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ACTION BAR FOR DUO */}
+                <div className="curated-duo-actions-bar">
+                  <Link
+                    href={duo.floor.code ? `/?code=${encodeURIComponent(duo.floor.code)}&tab=studio#studio` : `/?tab=studio#studio`}
+                    onClick={() => {
+                      try {
+                        const selectedObj = {
+                          ...duo.floor,
+                          textureUrl: duo.floor.textureUrl || duo.floor.imageUrl || getTextureFallback(duo.floor),
+                          imageUrl: duo.floor.imageUrl || duo.floor.textureUrl || getTextureFallback(duo.floor)
+                        };
+                        localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
+                        sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
+                      } catch(e) {}
+                    }}
+                    className="btn-curated-3d"
+                  >
+                    <Sparkles size={16} />
+                    <span>Bu İkiliyi 3D Mekan Stüdyosu'nda Canlı Gör</span>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      addToCart(duo.floor, 35);
+                      addToCart(duo.wall, 25);
+                    }}
+                    className="btn-curated-cart"
+                  >
+                    <ShoppingBag size={16} />
+                    <span>İki Karoyu Birlikte Teklife Ekle (35 m² Zemin + 25 m² Duvar)</span>
+                  </button>
                 </div>
               </div>
 
-              <div className="curated-duo-cards-grid">
-                {/* FLOOR TILE */}
-                <div className="curated-card floor-card">
-                  <div className="curated-card-role-badge">
-                    <span>ZEMİN KAROSU</span>
-                  </div>
-                  <div className="curated-image-box">
-                    <img 
-                      src={duo.floor.imageUrl || getTextureFallback(duo.floor)} 
-                      alt={duo.floor.name}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = getTextureFallback(duo.floor);
-                      }}
-                    />
-                  </div>
-                  <div className="curated-card-content">
-                    <span className="curated-tile-style">{duo.floor.style} Serisi</span>
-                    <h3 className="curated-tile-name">{duo.floor.name}</h3>
-                    <span className="curated-tile-meta">Kod: {duo.floor.code} • {duo.floor.width}x{duo.floor.height} cm • {duo.floor.finish}</span>
-                  </div>
+              {/* VIP MİMAR DANIŞMANLIK DAVETİ */}
+              <div className="combos-consultation-banner animate-fade-in">
+                <div className="banner-icon-circle"><Coffee size={24} /></div>
+                <div className="banner-text-box">
+                  <h3 style={{ margin: '0 0 4px 0', fontSize: '1.05rem', color: '#0f172a', fontWeight: '800' }}>
+                    Mimarınızla Birlikte Showroom'umuza Bekliyoruz
+                  </h3>
+                  <p style={{ margin: 0, fontSize: '0.84rem', color: '#64748b' }}>
+                    Projenizin plan ve ölçüleriyle gelin; showroomumuzda kahve eşliğinde 3D mimari banyo simülasyonunu ve şantiye metrajınızı birlikte çıkaralım.
+                  </p>
                 </div>
-
-                {/* PLUS CONNECTOR */}
-                <div className="curated-connector">
-                  <div className="connector-circle">
-                    <Plus size={20} />
-                  </div>
-                  <span className="connector-label">MİMARİ KOMBİN</span>
-                </div>
-
-                {/* WALL TILE */}
-                <div className="curated-card wall-card">
-                  <div className="curated-card-role-badge wall">
-                    <span>DUVAR & VİTRİN KAROSU</span>
-                  </div>
-                  <div className="curated-image-box">
-                    <img 
-                      src={duo.wall.imageUrl || getTextureFallback(duo.wall)} 
-                      alt={duo.wall.name}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = getTextureFallback(duo.wall);
-                      }}
-                    />
-                  </div>
-                  <div className="curated-card-content">
-                    <span className="curated-tile-style">{duo.wall.style} Serisi</span>
-                    <h3 className="curated-tile-name">{duo.wall.name}</h3>
-                    <span className="curated-tile-meta">Kod: {duo.wall.code} • {duo.wall.width}x{duo.wall.height} cm • {duo.wall.finish}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* ACTION BAR FOR DUO */}
-              <div className="curated-duo-actions-bar">
-                <Link
-                  href={duo.floor.code ? `/?code=${encodeURIComponent(duo.floor.code)}&tab=studio#studio` : `/?tab=studio#studio`}
-                  onClick={() => {
-                    try {
-                      const selectedObj = {
-                        ...duo.floor,
-                        textureUrl: duo.floor.textureUrl || duo.floor.imageUrl || getTextureFallback(duo.floor),
-                        imageUrl: duo.floor.imageUrl || duo.floor.textureUrl || getTextureFallback(duo.floor)
-                      };
-                      localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
-                      sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
-                    } catch(e) {}
-                  }}
-                  className="btn-curated-3d"
-                >
-                  <Sparkles size={16} />
-                  <span>Bu İkiliyi 3D Mekan Stüdyosu'nda Canlı Gör</span>
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    addToCart(duo.floor, 35);
-                    addToCart(duo.wall, 25);
-                  }}
-                  className="btn-curated-cart"
-                >
-                  <ShoppingBag size={16} />
-                  <span>İki Karoyu Birlikte Teklife Ekle (35 m² Zemin + 25 m² Duvar)</span>
+                <button type="button" onClick={() => setShowAppointmentModal(true)} className="btn-banner-appt">
+                  <Calendar size={15} />
+                  <span>Showroom Randevusu Al</span>
                 </button>
               </div>
-            </div>
+            </>
           );
         })()}
 
-        {/* SECTION: SHOWROOM PRIVILEGES & SERVICES */}
-        {servicesList.length > 0 && (
+        {/* SECTION: SHOWROOM PRIVILEGES & SERVICES (TAB: INFO) */}
+        {activeMainTab === 'info' && servicesList.length > 0 && (
           <div className="showroom-services-section" style={{ marginTop: '56px' }}>
             <div style={{ textAlign: 'center', marginBottom: '28px' }}>
               <span style={{
@@ -1833,8 +1943,8 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
         )}
 
-        {/* SECTION: OUTLET & PROJE FAZLASI BORSASI */}
-        {dealer.outletListings && dealer.outletListings.length > 0 && (
+        {/* SECTION: OUTLET & PROJE FAZLASI BORSASI (TAB: PRODUCTS) */}
+        {activeMainTab === 'products' && dealer.outletListings && dealer.outletListings.length > 0 && (
           <div className="showroom-outlet-section" style={{ marginTop: '48px' }}>
             <div style={{
               background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
@@ -2087,7 +2197,8 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
         )}
 
-        {campaigns.length > 0 && (
+        {/* SECTION: CAMPAIGNS (TAB: PRODUCTS) */}
+        {activeMainTab === 'products' && campaigns.length > 0 && (
           <div className="showroom-campaigns-section" style={{ marginTop: '48px' }}>
             <h2 className="section-main-heading">
               Aktif Kampanyalar & Fırsatlar
@@ -2109,8 +2220,8 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
         )}
 
-        {/* SECTION: SHOWROOM ENVANTERİ */}
-        {dealer.inventories && dealer.inventories.length > 0 && (() => {
+        {/* SECTION: SHOWROOM ENVANTERİ (TAB: PRODUCTS) */}
+        {activeMainTab === 'products' && dealer.inventories && dealer.inventories.length > 0 && (() => {
           const filteredInventories = dealer.inventories.filter(item => {
             if (!item?.product) return false;
             const prod = item.product;
@@ -2329,14 +2440,14 @@ export default function DealerProfileClient({ dealer, products }) {
           );
         })()}
 
-        {/* SECTION: FEATURED PRODUCTS */}
-        {featuredProductsList.length > 0 && (
+        {/* SECTION: FEATURED PRODUCTS (TAB: PRODUCTS) */}
+        {activeMainTab === 'products' && (featuredProductsList.length > 0 || (!dealer.inventories || dealer.inventories.length === 0)) && (
           <div className="featured-products-section" style={{ marginTop: '48px' }}>
             <h2 className="section-main-heading">
               Showroom Öne Çıkan Ürünler
             </h2>
             <div className="featured-products-grid">
-              {featuredProductsList.map(prod => (
+              {(featuredProductsList.length > 0 ? featuredProductsList : products).map(prod => (
                 <div key={prod.id} className="featured-product-card">
                   <div className="featured-product-image-container">
                     <img 
@@ -2408,8 +2519,8 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
         )}
 
-        {/* SECTION: REFERENCE PROJECTS */}
-        {referenceProjects.length > 0 && (
+        {/* SECTION: REFERENCE PROJECTS (TAB: INFO) */}
+        {activeMainTab === 'info' && referenceProjects.length > 0 && (
           <div className="reference-projects-section" style={{ marginTop: '48px' }}>
             <h2 className="section-main-heading">
               Referans Projelerimiz
@@ -2503,8 +2614,8 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
         )}
 
-        {/* SECTION: FAQ */}
-        {faqs.length > 0 && (
+        {/* SECTION: FAQ (TAB: INFO) */}
+        {activeMainTab === 'info' && faqs.length > 0 && (
           <div className="faq-section" style={{ marginTop: '48px' }}>
             <h2 className="section-main-heading">
               Sıkça Sorulan Sorular
