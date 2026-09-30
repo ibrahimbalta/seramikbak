@@ -32,7 +32,8 @@ import {
   FileText,
   Navigation,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  Filter
 } from 'lucide-react';
 import './dealer-profile.css';
 
@@ -194,6 +195,7 @@ export default function DealerProfileClient({ dealer, products }) {
   const [selectedFinish, setSelectedFinish] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
   const [favorites, setFavorites] = useState([]);
+  const [showMobileFilterModal, setShowMobileFilterModal] = useState(false);
 
   // Modals & Drawer States
   const [quoteCart, setQuoteCart] = useState([]);
@@ -416,6 +418,8 @@ export default function DealerProfileClient({ dealer, products }) {
     }, 2500);
   };
 
+  const hasActiveFilters = selectedCategory !== 'all' || selectedDimension !== 'all' || selectedFinish !== 'all' || searchTerm;
+
   return (
     <div className="corporate-showroom-page">
       {/* Toast Notification */}
@@ -432,22 +436,20 @@ export default function DealerProfileClient({ dealer, products }) {
           <div className="header-left">
             <Link href="/bayi" className="back-to-dealers-btn">
               <ChevronLeft size={16} />
-              <span>Tüm Bayiler</span>
+              <span className="back-btn-text">Tüm Bayiler</span>
             </Link>
-            <div className="header-breadcrumbs">
+            <div className="header-brand-summary">
               <span className="crumb-brand">SeramikBak</span>
               <span className="crumb-sep">/</span>
-              <span className="crumb-city">{dealer?.city || 'Yetkili Showroom'}</span>
-              <span className="crumb-sep">/</span>
-              <span className="crumb-dealer">{dealer?.name}</span>
+              <span className="crumb-dealer" title={dealer?.name}>{dealer?.name}</span>
             </div>
           </div>
 
           <div className="header-right">
             {dealer?.phone && (
-              <a href={`tel:${dealer.phone}`} className="header-contact-pill">
+              <a href={`tel:${dealer.phone}`} className="header-contact-pill" title="Showroomu Ara">
                 <Phone size={14} />
-                <span>{dealer.phone}</span>
+                <span className="btn-label-desktop">{dealer.phone}</span>
               </a>
             )}
             
@@ -456,7 +458,7 @@ export default function DealerProfileClient({ dealer, products }) {
               className="header-action-btn"
               title="Masaüstü QR Kodu"
             >
-              <QrCode size={16} />
+              <QrCode size={15} />
               <span className="btn-label-desktop">Masa QR</span>
             </button>
 
@@ -465,8 +467,8 @@ export default function DealerProfileClient({ dealer, products }) {
               className="header-cart-btn"
               title="Teklif Sepetim"
             >
-              <FileText size={16} />
-              <span>Teklif Sepeti</span>
+              <FileText size={15} />
+              <span className="btn-label-desktop">Teklif Sepeti</span>
               {quoteCart.length > 0 && (
                 <span className="cart-counter-badge">{quoteCart.length}</span>
               )}
@@ -475,13 +477,13 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </header>
 
-      {/* Section 1: Hero Section (Dynamic & Configurable) */}
+      {/* Section 1: Hero Section (Dynamic & Symmetrical) */}
       <section className="showroom-hero-section">
         <div className="showroom-hero-container">
           {/* Left Column: Dealer Information */}
           <div className="hero-left-column">
             <div className="hero-dealer-badge">
-              <ShieldCheck size={16} className="badge-shield-icon" />
+              <ShieldCheck size={15} className="badge-shield-icon" />
               <span>{heroBadge}</span>
             </div>
 
@@ -492,7 +494,7 @@ export default function DealerProfileClient({ dealer, products }) {
             <div className="hero-cta-group">
               <a href="#katalog" className="hero-btn-primary">
                 <span>{heroPrimaryBtnText}</span>
-                <ArrowRight size={18} />
+                <ArrowRight size={17} />
               </a>
               <button 
                 onClick={() => {
@@ -507,11 +509,11 @@ export default function DealerProfileClient({ dealer, products }) {
 
             <div className="hero-meta-badges">
               <div className="hero-meta-item">
-                <MapPin size={16} className="meta-pin-icon" />
+                <MapPin size={15} className="meta-pin-icon" />
                 <span>{dealer?.address ? `${dealer.name} • ${dealer.city || 'Merkez'}` : `${dealer.name} • ${dealer.city || 'Merkez Showroom'}`}</span>
               </div>
               <div className="hero-meta-item">
-                <Clock size={16} className="meta-clock-icon" />
+                <Clock size={15} className="meta-clock-icon" />
                 <span className="status-open-pill">Açık</span>
                 <span>{workingDays} • {workingHours}</span>
               </div>
@@ -535,20 +537,20 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </section>
 
-      {/* Section 2: 4 Feature Pillars Bar (Dynamic) */}
+      {/* Section 2: 4 Feature Pillars Bar (Symmetrical 2x2 on Mobile, 4-Col Desktop) */}
       <section className="feature-pillars-bar">
         <div className="feature-pillars-container">
           {featurePillars.map((pillar, idx) => {
             const icons = [
-              <Package key="1" size={22} />,
-              <Sparkles key="2" size={22} />,
-              <Layers key="3" size={22} />,
-              <CheckCircle2 key="4" size={22} />
+              <Package key="1" size={20} />,
+              <Sparkles key="2" size={20} />,
+              <Layers key="3" size={20} />,
+              <CheckCircle2 key="4" size={20} />
             ];
             return (
               <div key={idx} className="feature-pillar-card">
                 <div className="pillar-icon-box">
-                  {icons[idx] || <CheckCircle2 size={22} />}
+                  {icons[idx] || <CheckCircle2 size={20} />}
                 </div>
                 <div className="pillar-text-group">
                   <h3 className="pillar-title">{pillar.title}</h3>
@@ -560,17 +562,84 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </section>
 
-      {/* Section 3: Catalog (Left Sidebar + Right 4-Col Grid) */}
+      {/* Section 3: Catalog (Mobile App Controls + Desktop Sidebar + Symmetrical Grid) */}
       <section id="katalog" className="showroom-catalog-section">
         <div className="catalog-layout-container">
-          {/* Left Sidebar Filter Bar */}
+          {/* MOBILE APP-LIKE CONTROLS (Rendered above grid on mobile screens) */}
+          <div className="mobile-app-catalog-controls">
+            {/* Search Input */}
+            <div className="mobile-search-box">
+              <Search size={16} className="search-input-icon" />
+              <input 
+                type="text" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Model, kod veya renk ara..."
+                className="mobile-search-input"
+              />
+              {searchTerm && (
+                <button onClick={() => setSearchTerm('')} className="search-clear-btn">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+
+            {/* Horizontal Category Scroll Bar */}
+            <div className="mobile-category-scroll-bar">
+              <button 
+                onClick={() => setSelectedCategory('all')}
+                className={`mobile-cat-pill ${selectedCategory === 'all' ? 'active' : ''}`}
+              >
+                Tümü ({allCatalogProducts.length})
+              </button>
+              {Object.keys(categoryCounts).filter(k => k !== 'all').map(cat => (
+                <button 
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`mobile-cat-pill ${selectedCategory === cat ? 'active' : ''}`}
+                >
+                  {cat} ({categoryCounts[cat]})
+                </button>
+              ))}
+            </div>
+
+            {/* Symmetrical Actions Bar (Filter Trigger + Sort + Count) */}
+            <div className="mobile-filter-sort-row">
+              <button 
+                onClick={() => setShowMobileFilterModal(true)}
+                className={`mobile-filter-trigger-btn ${(selectedDimension !== 'all' || selectedFinish !== 'all') ? 'active-filter' : ''}`}
+              >
+                <SlidersHorizontal size={15} />
+                <span>Filtreler {(selectedDimension !== 'all' || selectedFinish !== 'all') ? '•' : ''}</span>
+              </button>
+
+              <div className="mobile-sort-select-wrapper">
+                <select 
+                  value={sortBy} 
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="mobile-sort-select"
+                >
+                  <option value="featured">Öne Çıkanlar</option>
+                  <option value="name-asc">A-Z Sırala</option>
+                  <option value="price-asc">Fiyat (Düşük)</option>
+                  <option value="price-desc">Fiyat (Yüksek)</option>
+                </select>
+              </div>
+
+              <div className="mobile-product-count-badge">
+                {filteredProducts.length} Ürün
+              </div>
+            </div>
+          </div>
+
+          {/* Left Sidebar Filter Bar (Desktop) */}
           <aside className="catalog-sidebar">
             <div className="sidebar-header">
               <div className="sidebar-title-row">
                 <SlidersHorizontal size={18} className="sidebar-icon" />
                 <h3 className="sidebar-title">Ürünleri Filtrele</h3>
               </div>
-              {(selectedCategory !== 'all' || selectedDimension !== 'all' || selectedFinish !== 'all' || searchTerm) && (
+              {hasActiveFilters && (
                 <button onClick={resetFilters} className="clear-filters-link">
                   Tümünü Temizle
                 </button>
@@ -666,7 +735,7 @@ export default function DealerProfileClient({ dealer, products }) {
               </div>
             </div>
 
-            {/* Architect & Consultation Card (Dynamic) */}
+            {/* Architect & Consultation Card */}
             <div className="sidebar-consultation-card">
               <div className="consult-badge">MİMARİ DESTEK</div>
               <h5 className="consult-title">{consultationTitle}</h5>
@@ -683,7 +752,7 @@ export default function DealerProfileClient({ dealer, products }) {
 
           {/* Right Product Grid Area */}
           <main className="catalog-main-content">
-            <div className="catalog-header-bar">
+            <div className="catalog-header-bar desktop-only-header">
               <div className="catalog-title-meta">
                 <h2 className="catalog-section-title">{catalogTitle}</h2>
                 <span className="catalog-count-pill">
@@ -739,7 +808,7 @@ export default function DealerProfileClient({ dealer, products }) {
                           className={`card-fav-btn ${isFav ? 'active' : ''}`}
                           title="Favorilere Ekle"
                         >
-                          <Heart size={16} fill={isFav ? '#e11d48' : 'none'} stroke={isFav ? '#e11d48' : '#64748b'} />
+                          <Heart size={15} fill={isFav ? '#e11d48' : 'none'} stroke={isFav ? '#e11d48' : '#64748b'} />
                         </button>
 
                         <img 
@@ -763,7 +832,7 @@ export default function DealerProfileClient({ dealer, products }) {
 
                         <div className="product-chips-row">
                           <span className="spec-chip">{product.finishText}</span>
-                          <span className="spec-chip">1. Kalite Porselen</span>
+                          <span className="spec-chip chip-quality">1. Kalite</span>
                         </div>
 
                         <div className="product-price-row">
@@ -778,13 +847,13 @@ export default function DealerProfileClient({ dealer, products }) {
                           )}
                         </div>
 
-                        {/* Action Buttons */}
+                        {/* Symmetrical Action Buttons */}
                         <div className="product-card-actions">
                           <Link 
                             href={`/tasarim?product=${product.id}&dealer=${dealer.id}`}
                             className="card-action-btn-3d"
                           >
-                            <Sparkles size={14} />
+                            <Sparkles size={13} />
                             <span>3D Gör</span>
                           </Link>
 
@@ -793,7 +862,7 @@ export default function DealerProfileClient({ dealer, products }) {
                             className="card-action-btn-quote"
                             title="Teklif Listeme Ekle"
                           >
-                            <Plus size={15} />
+                            <Plus size={14} />
                             <span>Teklif Ekle</span>
                           </button>
                         </div>
@@ -807,7 +876,7 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </section>
 
-      {/* Section 4: AI "Mekanını Tasarla" Promo Banner (Dynamic) */}
+      {/* Section 4: AI "Mekanını Tasarla" Promo Banner (Mobile Responsive) */}
       <section className="ai-designer-banner-section">
         <div className="ai-designer-banner-card">
           {/* Left: Tag + Headline + CTA */}
@@ -849,7 +918,7 @@ export default function DealerProfileClient({ dealer, products }) {
             {aiBullets.map((bullet, idx) => (
               <div key={idx} className="ai-bullet-item">
                 <div className="bullet-check-circle">
-                  <Check size={14} />
+                  <Check size={13} />
                 </div>
                 <div className="bullet-text">
                   <strong>{bullet.title}</strong>
@@ -861,7 +930,7 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </section>
 
-      {/* Section 5: Active Campaigns Strip (Dynamic from dealerCampaigns) */}
+      {/* Section 5: Active Campaigns Strip */}
       <section className="showroom-campaigns-strip">
         <div className="campaigns-strip-container">
           <div className="campaign-row-header">
@@ -914,7 +983,7 @@ export default function DealerProfileClient({ dealer, products }) {
             
             <div className="location-details-list">
               <div className="loc-item">
-                <MapPin size={20} className="loc-icon" />
+                <MapPin size={18} className="loc-icon" />
                 <div>
                   <strong>Showroom Adresi</strong>
                   <p>{dealer?.address || 'Merkez Showroom, Türkiye'}</p>
@@ -923,7 +992,7 @@ export default function DealerProfileClient({ dealer, products }) {
 
               {dealer?.phone && (
                 <div className="loc-item">
-                  <Phone size={20} className="loc-icon" />
+                  <Phone size={18} className="loc-icon" />
                   <div>
                     <strong>Telefon & İletişim</strong>
                     <p>{dealer.phone}</p>
@@ -933,7 +1002,7 @@ export default function DealerProfileClient({ dealer, products }) {
 
               {dealer?.email && (
                 <div className="loc-item">
-                  <Mail size={20} className="loc-icon" />
+                  <Mail size={18} className="loc-icon" />
                   <div>
                     <strong>Kurumsal E-Posta</strong>
                     <p>{dealer.email}</p>
@@ -942,7 +1011,7 @@ export default function DealerProfileClient({ dealer, products }) {
               )}
 
               <div className="loc-item">
-                <Clock size={20} className="loc-icon" />
+                <Clock size={18} className="loc-icon" />
                 <div>
                   <strong>Çalışma Saatleri</strong>
                   <p>{workingDays}: {workingHours}</p>
@@ -958,13 +1027,13 @@ export default function DealerProfileClient({ dealer, products }) {
                   rel="noopener noreferrer"
                   className="loc-maps-btn"
                 >
-                  <Navigation size={16} />
-                  <span>Google Haritalarda Aç</span>
+                  <Navigation size={15} />
+                  <span>Haritada Aç</span>
                 </a>
               )}
               <button onClick={() => setShowApptModal(true)} className="loc-appt-btn">
-                <Calendar size={16} />
-                <span>Randevu Planla</span>
+                <Calendar size={15} />
+                <span>Randevu Al</span>
               </button>
             </div>
           </div>
@@ -987,7 +1056,7 @@ export default function DealerProfileClient({ dealer, products }) {
                   className="map-fallback-img"
                 />
                 <div className="map-overlay-badge">
-                  <Building2 size={24} className="map-badge-icon" />
+                  <Building2 size={22} className="map-badge-icon" />
                   <div>
                     <h4>{dealer?.name} Showroom</h4>
                     <p>Prestijli mekan tasarımları için sizleri ağırlamaktan mutluluk duyarız.</p>
@@ -999,7 +1068,7 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </section>
 
-      {/* Section 7: Bottom Sticky Action Bar */}
+      {/* Section 7: Mobile App Sticky Navigation Action Bar */}
       <div className="showroom-bottom-action-bar">
         <div className="bottom-bar-inner">
           <a 
@@ -1008,8 +1077,8 @@ export default function DealerProfileClient({ dealer, products }) {
             rel="noopener noreferrer"
             className="bottom-action-btn btn-whatsapp"
           >
-            <MessageSquare size={18} />
-            <span>WhatsApp ile İletişime Geçin</span>
+            <MessageSquare size={17} />
+            <span>WhatsApp</span>
           </a>
 
           {customMapsUrl ? (
@@ -1019,16 +1088,16 @@ export default function DealerProfileClient({ dealer, products }) {
               rel="noopener noreferrer"
               className="bottom-action-btn btn-directions"
             >
-              <Navigation size={18} />
-              <span>Yol Tarifi Al</span>
+              <Navigation size={17} />
+              <span>Yol Tarifi</span>
             </a>
           ) : (
             <button 
               onClick={() => setShowApptModal(true)}
               className="bottom-action-btn btn-directions"
             >
-              <Calendar size={18} />
-              <span>Randevu Al</span>
+              <Calendar size={17} />
+              <span>Randevu</span>
             </button>
           )}
 
@@ -1039,11 +1108,90 @@ export default function DealerProfileClient({ dealer, products }) {
             }} 
             className="bottom-action-btn btn-quote"
           >
-            <FileText size={18} />
-            <span>Teklif Alın</span>
+            <FileText size={17} />
+            <span>Teklif Al</span>
           </button>
         </div>
       </div>
+
+      {/* MOBILE BOTTOM SHEET MODAL: Filter Sheet */}
+      {showMobileFilterModal && (
+        <div className="showroom-modal-backdrop mobile-bottom-sheet-backdrop" onClick={() => setShowMobileFilterModal(false)}>
+          <div className="mobile-bottom-sheet animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="bottom-sheet-header">
+              <div className="sheet-title-group">
+                <SlidersHorizontal size={18} className="sheet-icon" />
+                <h4 className="sheet-title">Detaylı Filtreler</h4>
+              </div>
+              <div className="sheet-actions-right">
+                {hasActiveFilters && (
+                  <button onClick={resetFilters} className="sheet-reset-btn">
+                    Temizle
+                  </button>
+                )}
+                <button onClick={() => setShowMobileFilterModal(false)} className="sheet-close-btn">
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div className="bottom-sheet-body">
+              {/* Dimension Filter */}
+              <div className="sheet-filter-group">
+                <h5 className="sheet-group-heading">Ölçü (cm)</h5>
+                <div className="sheet-chips-grid">
+                  <button 
+                    onClick={() => setSelectedDimension('all')} 
+                    className={`sheet-chip ${selectedDimension === 'all' ? 'active' : ''}`}
+                  >
+                    Tümü ({allCatalogProducts.length})
+                  </button>
+                  {Object.keys(dimensionCounts).filter(k => k !== 'all').map(dim => (
+                    <button 
+                      key={dim}
+                      onClick={() => setSelectedDimension(dim)}
+                      className={`sheet-chip ${selectedDimension === dim ? 'active' : ''}`}
+                    >
+                      {dim} ({dimensionCounts[dim]})
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Surface Finish Filter */}
+              <div className="sheet-filter-group">
+                <h5 className="sheet-group-heading">Yüzey Dokusu</h5>
+                <div className="sheet-chips-grid">
+                  <button 
+                    onClick={() => setSelectedFinish('all')} 
+                    className={`sheet-chip ${selectedFinish === 'all' ? 'active' : ''}`}
+                  >
+                    Tümü ({allCatalogProducts.length})
+                  </button>
+                  {Object.keys(finishCounts).filter(k => k !== 'all').map(finish => (
+                    <button 
+                      key={finish}
+                      onClick={() => setSelectedFinish(finish)}
+                      className={`sheet-chip ${selectedFinish === finish ? 'active' : ''}`}
+                    >
+                      {finish} ({finishCounts[finish]})
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="bottom-sheet-footer">
+              <button 
+                onClick={() => setShowMobileFilterModal(false)}
+                className="sheet-apply-btn"
+              >
+                Sonuçları Göster ({filteredProducts.length} Ürün)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* DRAWER: Quote Cart Drawer */}
       {showCartDrawer && (
