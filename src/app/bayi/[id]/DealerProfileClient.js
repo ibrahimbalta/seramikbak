@@ -248,6 +248,41 @@ export default function DealerProfileClient({ dealer, products }) {
     });
   };
 
+  // Open in Consumer 3D Design Studio
+  const handleOpen3DStudio = (product, e) => {
+    if (typeof window !== 'undefined') {
+      try {
+        let width = Number(product.width) || 60;
+        let height = Number(product.height) || 120;
+        if ((!product.width || !product.height) && product.dimensionText) {
+          const parts = product.dimensionText.toLowerCase().replace('cm', '').split('x');
+          if (parts.length === 2) {
+            const parsedW = parseInt(parts[0].trim(), 10);
+            const parsedH = parseInt(parts[1].trim(), 10);
+            if (!isNaN(parsedW)) width = parsedW;
+            if (!isNaN(parsedH)) height = parsedH;
+          }
+        }
+
+        const enrichedForStudio = {
+          ...product,
+          width,
+          height,
+          tileWidth: width,
+          tileHeight: height,
+          finish: product.finishText || product.finish || 'Mat Rektifiye',
+          style: product.categoryName || product.style || 'Porselen Karo',
+          textureUrl: product.textureUrl || product.imageUrl || '/textures/calacatta_gold.jpg',
+          brand: product.brand || { name: dealer?.name || 'Showroom Seramik' }
+        };
+        localStorage.setItem('seramikbak_preselected_product', JSON.stringify(enrichedForStudio));
+        sessionStorage.setItem('seramikbak_preselected_product', JSON.stringify(enrichedForStudio));
+      } catch (err) {
+        console.warn('Failed to preselect product for 3D studio:', err);
+      }
+    }
+  };
+
   // Add to quote cart
   const addToQuoteCart = (product, e) => {
     if (e) e.stopPropagation();
@@ -850,8 +885,10 @@ export default function DealerProfileClient({ dealer, products }) {
                         {/* Symmetrical Action Buttons */}
                         <div className="product-card-actions">
                           <Link 
-                            href={`/tasarim?product=${product.id}&dealer=${dealer.id}`}
+                            href={`/?tab=studio&product=${encodeURIComponent(product.slug || product.code || product.name || product.id)}#studio`}
+                            onClick={(e) => handleOpen3DStudio(product, e)}
                             className="card-action-btn-3d"
+                            title="3D Sanal Stüdyoda Canlı Gör"
                           >
                             <Sparkles size={13} />
                             <span>3D Gör</span>
@@ -890,7 +927,7 @@ export default function DealerProfileClient({ dealer, products }) {
 
             <p className="ai-banner-subtext">{aiDesc}</p>
 
-            <Link href="/tasarim" className="ai-banner-cta-btn">
+            <Link href="/?tab=studio#studio" className="ai-banner-cta-btn" title="3D Sanal Tasarım Stüdyosu">
               <span>{aiBtnText}</span>
               <ArrowRight size={16} />
             </Link>
