@@ -42,9 +42,41 @@ import {
   Briefcase,
   Award,
   Camera,
-  Store
+  Store,
+  Share2,
+  Maximize2
 } from 'lucide-react';
 import './dealer-profile.css';
+
+// Brand Social Media SVGs
+const InstagramIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+  </svg>
+);
+
+const FacebookIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+  </svg>
+);
+
+const LinkedinIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+    <rect width="4" height="12" x="2" y="9"/>
+    <circle cx="4" cy="4" r="2"/>
+  </svg>
+);
+
+const YoutubeIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
+    <polygon points="10 15 15 12 10 9 10 15" fill="currentColor"/>
+  </svg>
+);
 
 export default function DealerProfileClient({ dealer, products }) {
   // Safe JSON helper
@@ -157,9 +189,72 @@ export default function DealerProfileClient({ dealer, products }) {
     return raw.split(',').map(s => s.trim()).filter(Boolean);
   }, [dealer?.logisticsServices]);
 
+  // Robust Showroom Images Parser (supports comma, semicolon, newline, JSON string, or array)
   const dealerShowroomImages = useMemo(() => {
-    return (dealer?.showroomImages || '').split(',').map(s => s.trim()).filter(Boolean);
+    const raw = dealer?.showroomImages;
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw.filter(Boolean);
+    if (typeof raw === 'string') {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed.map(item => (typeof item === 'string' ? item : item?.url || '')).filter(Boolean);
+      } catch (e) {}
+      return raw.split(/[\n,;]+/).map(s => s.trim()).filter(s => s.length > 5);
+    }
+    return [];
   }, [dealer?.showroomImages]);
+
+  // Fallback curated showroom ambiance if dealer has no photos yet
+  const displayShowroomImages = useMemo(() => {
+    if (dealerShowroomImages.length > 0) return dealerShowroomImages;
+    return [
+      '/hero/luxury_bathroom.png',
+      '/hero/modern_living.png',
+      '/textures/calacatta_gold.jpg',
+      '/hero/hero_ceramics.jpg'
+    ];
+  }, [dealerShowroomImages]);
+
+  const [selectedLightboxImage, setSelectedLightboxImage] = useState(null);
+
+  // Social Media & Web Links Parser
+  const socialLinks = useMemo(() => {
+    const cleanUrl = (url) => {
+      if (!url) return null;
+      const trimmed = url.trim();
+      if (!trimmed) return null;
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+      return `https://${trimmed}`;
+    };
+
+    return {
+      instagram: cleanUrl(dealer?.socialInstagram),
+      facebook: cleanUrl(dealer?.socialFacebook),
+      linkedin: cleanUrl(dealer?.socialLinkedin),
+      youtube: cleanUrl(dealer?.socialYoutube),
+      website: cleanUrl(dealer?.socialWebsite)
+    };
+  }, [dealer]);
+
+  const hasAnySocial = useMemo(() => {
+    return Object.values(socialLinks).some(Boolean);
+  }, [socialLinks]);
+
+  // Virtual Tour Helper
+  const virtualTourUrl = useMemo(() => {
+    const url = dealer?.virtualTourUrl?.trim();
+    if (!url) return null;
+    return url;
+  }, [dealer?.virtualTourUrl]);
+
+  const isEmbeddableTour = useMemo(() => {
+    if (!virtualTourUrl) return false;
+    return virtualTourUrl.includes('matterport.com') || 
+           virtualTourUrl.includes('kuula.co') || 
+           virtualTourUrl.includes('my.matterport') ||
+           virtualTourUrl.includes('iframe') ||
+           virtualTourUrl.includes('embed');
+  }, [virtualTourUrl]);
 
   const dealerRefProjects = useMemo(() => {
     return safeParseJSON(dealer?.referenceProjects, []);
@@ -593,76 +688,148 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </header>
 
-      {/* Unified Luxury Showroom Hero Banner */}
-      <section className="showroom-unified-hero">
-        <div className="hero-backdrop-media">
+      {/* =====================================================================
+          FLAGSHIP ARCHITECTURAL SHOWROOM BANNER (ULTRA-LUXURY DESIGN)
+          ===================================================================== */}
+      <section className="flagship-hero-banner">
+        {/* Dynamic Architectural Backdrop */}
+        <div className="flagship-backdrop">
           <img 
             src={dealer?.bannerUrl || heroImage} 
             alt={dealer?.name || 'Showroom Banner'} 
-            className="hero-backdrop-img"
+            className="flagship-bg-img"
           />
-          <div className="hero-backdrop-overlay" />
+          <div className="flagship-bg-gradient" />
+          <div className="flagship-bg-glow" />
         </div>
 
-        <div className="hero-unified-container">
-          {/* Main Identity & CTAs Column */}
-          <div className="hero-content-col">
-            <div className="hero-brand-header">
-              {dealer?.logoUrl ? (
-                <div className="hero-logo-box">
-                  <img src={dealer.logoUrl} alt={dealer.name} className="hero-logo-img" />
+        <div className="flagship-container">
+          {/* Top Row: Official Authorized Plaque + Social Media Dock */}
+          <div className="flagship-top-bar">
+            <div className="flagship-brand-plaque">
+              <div className="plaque-logo-frame">
+                {dealer?.logoUrl ? (
+                  <img src={dealer.logoUrl} alt={dealer.name} className="plaque-logo-img" />
+                ) : (
+                  <Building2 size={26} className="plaque-monogram-icon" />
+                )}
+              </div>
+              <div className="plaque-text-group">
+                <div className="plaque-badge-pill">
+                  <ShieldCheck size={14} className="plaque-shield-icon" />
+                  <span>{heroBadge}</span>
                 </div>
-              ) : (
-                <div className="hero-logo-box monogram-box">
-                  <Building2 size={24} className="monogram-icon" />
-                </div>
-              )}
-              <div className="hero-badge-pill">
-                <ShieldCheck size={14} className="badge-shield-gold" />
-                <span>{heroBadge}</span>
+                {dealer?.brand?.name && (
+                  <span className="plaque-partner-brand">{dealer.brand.name} Yetkili Bayisi</span>
+                )}
               </div>
             </div>
 
-            <h1 className="hero-title-main">{heroTitle}</h1>
+            {/* Social Media Dock in Banner */}
+            <div className="flagship-social-dock">
+              <span className="dock-hint">Sosyal Kanallar:</span>
+              <div className="dock-icons-cluster">
+                {socialLinks.instagram ? (
+                  <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-instagram" title="Instagram Sayfası">
+                    <InstagramIcon size={16} />
+                  </a>
+                ) : (
+                  <a href={`https://www.instagram.com/explore/tags/${encodeURIComponent((dealer?.name || 'seramik').replace(/\s+/g, ''))}`} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-instagram" title="Instagram">
+                    <InstagramIcon size={16} />
+                  </a>
+                )}
 
-            <p className="hero-desc-lead">{heroDescription}</p>
+                {socialLinks.facebook ? (
+                  <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-facebook" title="Facebook Sayfası">
+                    <FacebookIcon size={16} />
+                  </a>
+                ) : (
+                  <a href={`https://www.facebook.com/search/top?q=${encodeURIComponent(dealer?.name || 'seramik')}`} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-facebook" title="Facebook">
+                    <FacebookIcon size={16} />
+                  </a>
+                )}
 
-            {/* Compact, Symmetrical Info Bar */}
-            <div className="hero-info-chips-bar">
-              <div className="hero-info-chip status-open">
-                <span className="live-dot" />
+                {socialLinks.linkedin && (
+                  <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-linkedin" title="LinkedIn Sayfası">
+                    <LinkedinIcon size={16} />
+                  </a>
+                )}
+
+                {socialLinks.youtube && (
+                  <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-youtube" title="YouTube Kanalı">
+                    <YoutubeIcon size={16} />
+                  </a>
+                )}
+
+                {socialLinks.website && (
+                  <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-website" title="Resmi İnternet Sitesi">
+                    <Globe size={16} />
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Center Main Stage: Dealer Title & Architectural Intro */}
+          <div className="flagship-center-stage">
+            <h1 className="flagship-main-title">{heroTitle}</h1>
+            <p className="flagship-lead-text">{heroDescription}</p>
+
+            {/* Prestige Metrics & Status Chips */}
+            <div className="flagship-status-chips">
+              <div className="status-chip open-live">
+                <span className="emerald-pulse" />
                 <span>Açık • {workingDays}: {workingHours}</span>
               </div>
               {dealer?.city && (
-                <div className="hero-info-chip">
-                  <MapPin size={13} className="chip-icon" />
+                <div className="status-chip location-chip">
+                  <MapPin size={14} className="chip-ico" />
                   <span>{dealer.city}{dealer.district ? ` / ${dealer.district}` : ''}</span>
                 </div>
               )}
               {dealer?.phone && (
-                <a href={`tel:${dealer.phone}`} className="hero-info-chip tel-chip">
-                  <Phone size={13} className="chip-icon" />
+                <a href={`tel:${dealer.phone}`} className="status-chip phone-chip">
+                  <Phone size={14} className="chip-ico" />
                   <span>{dealer.phone}</span>
                 </a>
               )}
+              <div className="status-chip collection-chip">
+                <Sparkles size={14} className="chip-ico gold" />
+                <span>{allCatalogProducts.length}+ Teşhir Serisi</span>
+              </div>
             </div>
 
-            {/* Clean, Prominent Action Buttons */}
-            <div className="hero-actions-row">
-              <a href="#katalog" className="hero-btn-primary">
-                <span>{heroPrimaryBtnText || 'Koleksiyonu İncele'}</span>
-                <ArrowRight size={16} />
+            {/* High-Impact Executive Action Bar */}
+            <div className="flagship-actions-bar">
+              {/* 360 Sanal Gezi Button */}
+              <a href="#sanal-tur" className="flagship-btn-gold">
+                <Compass size={17} />
+                <span>360° Sanal Gezi</span>
               </a>
 
+              {/* Showroom Fotoğrafları Button */}
+              <a href="#galeri" className="flagship-btn-photos">
+                <Camera size={17} />
+                <span>Showroom Fotoğrafları ({displayShowroomImages.length})</span>
+              </a>
+
+              {/* Teklif Al Button */}
               <button 
                 onClick={() => {
                   setSelectedProductForLead(null);
                   setShowLeadModal(true);
                 }} 
-                className="hero-btn-secondary"
+                className="flagship-btn-quote"
               >
-                <span>{heroSecondaryBtnText || 'Fiyat Teklifi Al'}</span>
+                <FileText size={17} />
+                <span>Fiyat Teklifi Al</span>
               </button>
+
+              {/* Katalog / Ürünler Butonu */}
+              <a href="#katalog" className="flagship-btn-catalog">
+                <span>Ürün Kataloğu</span>
+                <ArrowRight size={16} />
+              </a>
 
               {dealer?.pdfCatalogUrl && (
                 <a 
@@ -670,28 +837,13 @@ export default function DealerProfileClient({ dealer, products }) {
                   target="_blank" 
                   rel="noopener noreferrer" 
                   download 
-                  className="hero-btn-pdf"
+                  className="flagship-btn-pdf"
                   title="PDF Katalog İndir"
                 >
-                  <Download size={15} />
-                  <span>PDF Katalog</span>
+                  <Download size={16} />
+                  <span>PDF İndir</span>
                 </a>
               )}
-            </div>
-          </div>
-
-          {/* Desktop Right Column: Curated Showroom Visual Card */}
-          <div className="hero-card-col">
-            <div className="hero-visual-card">
-              <img 
-                src={heroImage} 
-                alt={dealer?.name || 'Showroom Banyo'} 
-                className="visual-card-img" 
-              />
-              <div className="visual-card-overlay">
-                <p className="visual-cursive-text">{heroCursiveQuote}</p>
-                <span className="visual-cursive-sub">{heroCursiveSub}</span>
-              </div>
             </div>
           </div>
         </div>
@@ -1304,30 +1456,166 @@ export default function DealerProfileClient({ dealer, products }) {
         </section>
       )}
 
-      {/* Section: Showroom Görselleri Galerisi */}
-      {dealerShowroomImages.length > 0 && (
-        <section className="showroom-gallery-section">
-          <div className="section-header-centered">
-            <span className="section-badge-gold">FİZİKİ DENEYİM</span>
-            <h2 className="section-title-bold">Showroomumuzdan Kareler</h2>
-            <p className="section-desc-muted">
-              Canlı karo stantlarımızı, banyo ve zemin konsept teşhirlerimizi yakından inceleyin.
-            </p>
+      {/* =====================================================================
+          SECTION: 360° SHOWROOM SANAL GEZİ & DİJİTAL TUR (#sanal-tur)
+          ===================================================================== */}
+      <section id="sanal-tur" className="showroom-sanal-tur-section">
+        <div className="section-header-centered">
+          <div className="sanal-tur-live-tag">
+            <span className="live-dot" />
+            <span>İNTERAKTİF DENEYİM</span>
           </div>
+          <h2 className="section-title-bold">Showroom 360° Sanal Gezi</h2>
+          <p className="section-desc-muted">
+            {dealer?.name} showroomunu oturduğunuz yerden 360 derece gezin, mimari teşhirleri ve karo kombinasyonlarını canlı inceleyin.
+          </p>
+        </div>
 
-          <div className="showroom-gallery-grid">
-            {dealerShowroomImages.map((imgUrl, idx) => (
-              <div key={idx} className="showroom-gallery-item">
-                <img 
-                  src={imgUrl} 
-                  alt={`${dealer?.name} Showroom ${idx + 1}`} 
-                  className="gallery-img" 
-                  loading="lazy" 
-                />
+        <div className="sanal-tur-container">
+          {virtualTourUrl && isEmbeddableTour ? (
+            <div className="sanal-tur-embed-wrapper">
+              <div className="sanal-tur-embed-header">
+                <div className="embed-info">
+                  <Compass size={18} className="embed-compass-icon" />
+                  <span className="embed-title">{dealer?.name} 360° Dijital Showroom Turu</span>
+                </div>
+                <a 
+                  href={virtualTourUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="embed-fullscreen-btn"
+                  title="Tam Ekranda Aç"
+                >
+                  <Maximize2 size={15} />
+                  <span>Tam Ekran</span>
+                </a>
               </div>
-            ))}
+              <iframe
+                src={virtualTourUrl}
+                title={`${dealer?.name} Showroom 360 Sanal Tur`}
+                className="sanal-tur-iframe"
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
+          ) : (
+            <div className="sanal-tur-interactive-preview">
+              <div className="sanal-tur-preview-bg">
+                <img 
+                  src={dealer?.bannerUrl || heroImage || '/hero/modern_living.png'} 
+                  alt="360 Sanal Showroom" 
+                  className="sanal-tur-bg-img" 
+                />
+                <div className="sanal-tur-overlay" />
+              </div>
+              <div className="sanal-tur-preview-content">
+                <div className="sanal-tur-360-badge">
+                  <Compass size={36} className="compass-spin" />
+                  <span className="badge-360-text">360°</span>
+                </div>
+                <h3 className="sanal-tur-preview-title">{dealer?.name} Dijital Showroom Alanı</h3>
+                <p className="sanal-tur-preview-desc">
+                  {virtualTourUrl 
+                    ? '360° sanal tur bağlantınız hazır. Hemen sanal geziyi başlatın veya showroom randevusu oluşturun.' 
+                    : 'Showroomumuzun 3D sanal turu ve mimari seramik stantları online ziyarete açıktır. Dilerseniz hemen randevu alabilir ya da 3D tasarım stüdyomuzda karo kombinasyonlarını test edebilirsiniz.'}
+                </p>
+                <div className="sanal-tur-cta-row">
+                  {virtualTourUrl ? (
+                    <a 
+                      href={virtualTourUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="sanal-tur-launch-btn"
+                    >
+                      <Compass size={18} />
+                      <span>Sanal Geziyi Başlat</span>
+                    </a>
+                  ) : (
+                    <button 
+                      onClick={() => setShowApptModal(true)} 
+                      className="sanal-tur-launch-btn"
+                    >
+                      <Calendar size={18} />
+                      <span>Showroom Randevusu Al</span>
+                    </button>
+                  )}
+                  <Link 
+                    href="/?tab=studio#studio" 
+                    className="sanal-tur-studio-btn"
+                  >
+                    <Sparkles size={16} />
+                    <span>3D Tasarım Stüdyosu</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* =====================================================================
+          SECTION: SHOWROOM FOTOĞRAFLARI GALERİSİ & TEŞHİR ALANLARI (#galeri)
+          ===================================================================== */}
+      <section id="galeri" className="showroom-gallery-flagship-section">
+        <div className="section-header-centered">
+          <span className="section-badge-gold">FİZİKİ DENEYİM & TEŞHİR ALANLARI</span>
+          <h2 className="section-title-bold">Showroomumuzdan Seçkin Kareler</h2>
+          <p className="section-desc-muted">
+            Canlı karo stantlarımız, banyo & zemin konsept teşhirlerimiz ve mimari uygulama alanlarımız. Fotoğraflara tıklayarak büyütebilirsiniz.
+          </p>
+        </div>
+
+        <div className="showroom-gallery-flagship-grid">
+          {displayShowroomImages.map((imgUrl, idx) => (
+            <div 
+              key={idx} 
+              className={`gallery-mosaic-card ${idx === 0 ? 'mosaic-featured' : ''}`}
+              onClick={() => setSelectedLightboxImage(imgUrl)}
+              role="button"
+              tabIndex={0}
+              title="Fotoğrafı Büyüt"
+            >
+              <img 
+                src={imgUrl} 
+                alt={`${dealer?.name} Showroom Görseli ${idx + 1}`} 
+                className="mosaic-img" 
+                loading="lazy" 
+              />
+              <div className="mosaic-hover-overlay">
+                <Maximize2 size={24} className="mosaic-expand-icon" />
+                <span className="mosaic-zoom-text">Büyük Boyutta İncele</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Lightbox Modal for Showroom Photos */}
+      {selectedLightboxImage && (
+        <div 
+          className="showroom-lightbox-backdrop animate-fade-in"
+          onClick={() => setSelectedLightboxImage(null)}
+        >
+          <div className="lightbox-content-box" onClick={(e) => e.stopPropagation()}>
+            <button 
+              type="button" 
+              onClick={() => setSelectedLightboxImage(null)} 
+              className="lightbox-close-btn"
+              title="Kapat"
+            >
+              <X size={20} />
+            </button>
+            <img 
+              src={selectedLightboxImage} 
+              alt={`${dealer?.name} Showroom`} 
+              className="lightbox-main-img" 
+            />
+            <div className="lightbox-caption">
+              <Building2 size={16} />
+              <span>{dealer?.name} Showroom Teşhir Alanı</span>
+            </div>
           </div>
-        </section>
+        </div>
       )}
 
       {/* Section: Bayi Hakkında / Kurumsal Profil */}
@@ -1411,7 +1699,107 @@ export default function DealerProfileClient({ dealer, products }) {
         </section>
       )}
 
-      {/* Section 6: Showroom Location & Virtual Tour */}
+      {/* =====================================================================
+          SECTION: SOSYAL MEDYA & DİJİTAL KANALLAR (#sosyal-medya)
+          ===================================================================== */}
+      <section id="sosyal-medya" className="showroom-social-showcase-section">
+        <div className="section-header-centered">
+          <span className="section-badge-gold">DİJİTAL BAĞLANTI</span>
+          <h2 className="section-title-bold">Bizi Sosyal Medyada Takip Edin</h2>
+          <p className="section-desc-muted">
+            En güncel seramik serileri, mimari proje paylaşımları ve showroom etkinliklerimizi sosyal hesaplarımızdan takip edebilirsiniz.
+          </p>
+        </div>
+
+        <div className="social-showcase-grid">
+          {/* Instagram */}
+          <a 
+            href={socialLinks.instagram || `https://www.instagram.com/explore/tags/${encodeURIComponent((dealer?.name || 'seramik').replace(/\s+/g, ''))}`}
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="social-platform-card card-instagram"
+          >
+            <div className="platform-icon-wrap wrap-instagram">
+              <InstagramIcon size={24} />
+            </div>
+            <div className="platform-info">
+              <span className="platform-name">Instagram</span>
+              <p className="platform-tagline">Uygulama & Trendler</p>
+              <span className="platform-action-link">Profili Görüntüle →</span>
+            </div>
+          </a>
+
+          {/* Facebook */}
+          <a 
+            href={socialLinks.facebook || `https://www.facebook.com/search/top?q=${encodeURIComponent(dealer?.name || 'seramik')}`}
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="social-platform-card card-facebook"
+          >
+            <div className="platform-icon-wrap wrap-facebook">
+              <FacebookIcon size={24} />
+            </div>
+            <div className="platform-info">
+              <span className="platform-name">Facebook</span>
+              <p className="platform-tagline">Haberler & Duyurular</p>
+              <span className="platform-action-link">Sayfayı Ziyaret Et →</span>
+            </div>
+          </a>
+
+          {/* LinkedIn */}
+          <a 
+            href={socialLinks.linkedin || `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(dealer?.name || 'seramik')}`}
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="social-platform-card card-linkedin"
+          >
+            <div className="platform-icon-wrap wrap-linkedin">
+              <LinkedinIcon size={24} />
+            </div>
+            <div className="platform-info">
+              <span className="platform-name">LinkedIn</span>
+              <p className="platform-tagline">B2B & Mimari Ağ</p>
+              <span className="platform-action-link">Bağlantı Kur →</span>
+            </div>
+          </a>
+
+          {/* YouTube */}
+          <a 
+            href={socialLinks.youtube || `https://www.youtube.com/results?search_query=${encodeURIComponent(dealer?.name || 'seramik')}`}
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="social-platform-card card-youtube"
+          >
+            <div className="platform-icon-wrap wrap-youtube">
+              <YoutubeIcon size={24} />
+            </div>
+            <div className="platform-info">
+              <span className="platform-name">YouTube</span>
+              <p className="platform-tagline">Showroom & Video Tur</p>
+              <span className="platform-action-link">Videoları İzle →</span>
+            </div>
+          </a>
+
+          {/* Web Site */}
+          <a 
+            href={socialLinks.website || `https://www.google.com/search?q=${encodeURIComponent(dealer?.name || 'seramik')}`}
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="social-platform-card card-website"
+          >
+            <div className="platform-icon-wrap wrap-website">
+              <Globe size={24} />
+            </div>
+            <div className="platform-info">
+              <span className="platform-name">Web Sitesi</span>
+              <p className="platform-tagline">Resmi Portal</p>
+              <span className="platform-action-link">Siteyi Ziyaret Et →</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      {/* Section 6: Showroom Location */}
       <section id="lokasyon" className="showroom-location-section">
         <div className="showroom-location-container">
           <div className="location-info-col">
