@@ -44,7 +44,13 @@ import {
   Check,
   Eye,
   EyeOff,
-  Share2
+  Share2,
+  Sun,
+  Moon,
+  Palette,
+  Sliders,
+  CheckCircle,
+  ZoomIn
 } from 'lucide-react';
 import './dealer-profile.css';
 
@@ -134,6 +140,111 @@ export default function DealerProfileClient({ dealer, products }) {
   const servicesList = dealer.logisticsServices ? dealer.logisticsServices.split(',').filter(Boolean) : [];
 
   const featuredProductsList = products.filter(p => featuredIdsNormalized.includes(p.id));
+
+  // Modern Concept Flagship Store States
+  const initialShowcaseTile = featuredProductsList[0] || (dealer.inventories && dealer.inventories[0]?.product) || products[0] || null;
+  const [selectedShowcaseTile, setSelectedShowcaseTile] = useState(initialShowcaseTile);
+  const [activeMoodboard, setActiveMoodboard] = useState('all');
+  const [lightingMode, setLightingMode] = useState('day'); // 'day' | 'warm'
+  const [conciergeRoom, setConciergeRoom] = useState('banyo');
+  const [conciergeStyle, setConciergeStyle] = useState('marble');
+
+  const MOODBOARDS = [
+    {
+      id: 'marble',
+      name: 'İtalyan Mermer Zarafeti',
+      subtitle: 'Calacatta & Damarlı Beyazlar',
+      icon: '🏛️',
+      styleKey: 'Mermer',
+      tag: 'Zamansız Lüks',
+      bgGradient: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%)',
+      accentColor: '#d4af37',
+      desc: 'Mekanınıza saray ışıltısı ve derinlik katan parlak lappato damarlı porselen karolar.'
+    },
+    {
+      id: 'concrete',
+      name: 'Modern Loft & Brüt Beton',
+      subtitle: 'Minimalist Çizgiler & Gri Tonlar',
+      icon: '🏢',
+      styleKey: 'Beton',
+      tag: 'Endüstriyel Chic',
+      bgGradient: 'linear-gradient(135deg, rgba(241, 245, 249, 0.95) 0%, rgba(203, 213, 225, 0.9) 100%)',
+      accentColor: '#64748b',
+      desc: 'Sakin, dingin ve modern rezidans mimarisine uygun geniş ebat gri ve füme yüzeyler.'
+    },
+    {
+      id: 'wood',
+      name: 'Doğal İskandinav Ahşap',
+      subtitle: 'Meşe & Teak Parke Karolar',
+      icon: '🌿',
+      styleKey: 'Ahşap',
+      tag: 'Doğal & Dingin',
+      bgGradient: 'linear-gradient(135deg, rgba(254, 243, 199, 0.9) 0%, rgba(253, 230, 138, 0.8) 100%)',
+      accentColor: '#d97706',
+      desc: 'Ahşabın sıcaklığını porselenin çizilmez ve su geçirmez dayanıklılığıyla buluşturun.'
+    },
+    {
+      id: 'dark',
+      name: 'Monokrom & Lüks Spa',
+      subtitle: 'Antrasit, Mat Siyah & Karizma',
+      icon: '🖤',
+      styleKey: 'Antrasit',
+      tag: 'Boutique Hotel & Spa',
+      bgGradient: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%)',
+      accentColor: '#38bdf8',
+      desc: 'Derin gölgeler, sofistike mat dokular ve banyolar için otel konsepti aydınlatma uyumu.'
+    },
+    {
+      id: 'stone',
+      name: 'Akdeniz Traverten & Bej',
+      subtitle: 'Doğal Taş Dokusu & Rustik Esinti',
+      icon: '🌊',
+      styleKey: 'Taş',
+      tag: 'Akdeniz Esintisi',
+      bgGradient: 'linear-gradient(135deg, rgba(254, 242, 242, 0.9) 0%, rgba(254, 226, 226, 0.8) 100%)',
+      accentColor: '#b45309',
+      desc: 'Toprak tonlarının huzur verici dokusu, kaydırmaz yüzeyler ve ferah açık alanlar.'
+    }
+  ];
+
+  const handleMoodboardSelect = (board) => {
+    setActiveMoodboard(board.id);
+    setInventoryStyleFilter(board.styleKey);
+
+    const match = products.find(p => 
+      (p.style && p.style.toLowerCase().includes(board.styleKey.toLowerCase())) ||
+      (p.name && p.name.toLowerCase().includes(board.styleKey.toLowerCase()))
+    ) || products[0];
+
+    if (match) {
+      setSelectedShowcaseTile(match);
+    }
+
+    const el = document.querySelector('.concept-showcase-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    trackAction(`MOODBOARD_${board.id.toUpperCase()}`);
+  };
+
+  const getCuratedDuo = () => {
+    let floorTile = null;
+    let wallTile = null;
+
+    if (conciergeStyle === 'marble') {
+      floorTile = products.find(p => (p.style || '').toLowerCase().includes('mermer') || (p.name || '').toLowerCase().includes('calacatta')) || products[0];
+      wallTile = products.find(p => p.id !== floorTile?.id && ((p.style || '').toLowerCase().includes('antrasit') || (p.name || '').toLowerCase().includes('gold') || (p.style || '').toLowerCase().includes('mermer'))) || products[1] || products[0];
+    } else if (conciergeStyle === 'wood') {
+      floorTile = products.find(p => (p.style || '').toLowerCase().includes('ahşap') || (p.name || '').toLowerCase().includes('oak')) || products[0];
+      wallTile = products.find(p => p.id !== floorTile?.id && ((p.style || '').toLowerCase().includes('beton') || (p.style || '').toLowerCase().includes('taş') || (p.color || '').toLowerCase().includes('beyaz'))) || products[1] || products[0];
+    } else if (conciergeStyle === 'concrete') {
+      floorTile = products.find(p => (p.style || '').toLowerCase().includes('beton') || (p.name || '').toLowerCase().includes('stark')) || products[0];
+      wallTile = products.find(p => p.id !== floorTile?.id && ((p.style || '').toLowerCase().includes('ahşap') || (p.style || '').toLowerCase().includes('mermer'))) || products[1] || products[0];
+    } else {
+      floorTile = products.find(p => (p.style || '').toLowerCase().includes('antrasit') || (p.color || '').toLowerCase().includes('siyah')) || products[0];
+      wallTile = products.find(p => p.id !== floorTile?.id && ((p.style || '').toLowerCase().includes('mermer') || (p.name || '').toLowerCase().includes('calacatta'))) || products[1] || products[0];
+    }
+
+    return { floor: floorTile, wall: wallTile };
+  };
 
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
@@ -792,6 +903,209 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
         </div>
 
+        {/* SECTION: MEKAN & İLHAM MOODBOARD'U (CONCEPT FLAGSHIP STORE) */}
+        <div className="showroom-moodboards-section animate-fade-in">
+          <div className="moodboards-header">
+            <span className="moodboards-badge">
+              <Palette size={13} />
+              <span>2026 MİMARİ SHOWROOM KONSEPTLERİ</span>
+            </span>
+            <h2 className="moodboards-title">
+              Hangi Mekan Havasını Arıyorsunuz?
+            </h2>
+            <p className="moodboards-desc">
+              Tıpkı lüks bir konsept mağazada gezer gibi, hayalinizdeki tarza dokunun; bayimizin tüm stokları ve 3D simülasyonları anında sizin için hazırlansın.
+            </p>
+          </div>
+
+          <div className="moodboards-carousel-grid">
+            {MOODBOARDS.map((board) => {
+              const isActive = activeMoodboard === board.id;
+              return (
+                <div
+                  key={board.id}
+                  onClick={() => handleMoodboardSelect(board)}
+                  className={`moodboard-card ${isActive ? 'active' : ''}`}
+                  style={{
+                    '--card-accent': board.accentColor
+                  }}
+                >
+                  <div className="moodboard-card-top">
+                    <span className="moodboard-icon">{board.icon}</span>
+                    <span className="moodboard-tag">{board.tag}</span>
+                  </div>
+                  <h3 className="moodboard-name">{board.name}</h3>
+                  <span className="moodboard-sub">{board.subtitle}</span>
+                  <p className="moodboard-p">{board.desc}</p>
+                  <div className="moodboard-footer-action">
+                    <span>{isActive ? '✓ Aktif Konsept' : 'Bu Konsepti İncele'}</span>
+                    <ArrowRight size={13} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* SECTION: KIZAKLI TEŞHİR & YÜZEY İNCELEME STÜDYOSU (INTERACTIVE SLIDING TILE STAND) */}
+        {selectedShowcaseTile && (
+          <div className="concept-showcase-section animate-fade-in">
+            <div className="showcase-container-card">
+              <div className="showcase-header-row">
+                <div className="showcase-title-group">
+                  <span className="showcase-kicker">
+                    <Sparkles size={12} />
+                    <span>DİJİTAL TEŞHİR STANDI & IŞIK SİMÜLATÖRÜ</span>
+                  </span>
+                  <h3 className="showcase-main-title">
+                    {selectedShowcaseTile.name}
+                  </h3>
+                  <span className="showcase-code-meta">
+                    Seri Kodu: <strong>{selectedShowcaseTile.code || 'SB-2026'}</strong> • 
+                    Ebat: <strong>{selectedShowcaseTile.width}x{selectedShowcaseTile.height} cm</strong> • 
+                    Stil: <strong>{selectedShowcaseTile.style || 'Lüks Porselen'}</strong>
+                  </span>
+                </div>
+
+                {/* LIGHT SIMULATION TOGGLE */}
+                <div className="lighting-toggle-box">
+                  <span className="lighting-label">Showroom Aydınlatması:</span>
+                  <div className="lighting-btn-group">
+                    <button
+                      type="button"
+                      onClick={() => setLightingMode('day')}
+                      className={`light-btn ${lightingMode === 'day' ? 'active-day' : ''}`}
+                    >
+                      <Sun size={14} />
+                      <span>Gün Işığı (5500K)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLightingMode('warm')}
+                      className={`light-btn ${lightingMode === 'warm' ? 'active-warm' : ''}`}
+                    >
+                      <Moon size={14} />
+                      <span>Sıcak Spot (3000K)</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="showcase-body-grid">
+                {/* LARGE TILE SLAB WITH AMBIENT SHEEN */}
+                <div className={`showcase-tile-viewer ${lightingMode === 'warm' ? 'warm-lighting' : 'day-lighting'}`}>
+                  <div className="slab-frame">
+                    <img
+                      src={selectedShowcaseTile.imageUrl || getTextureFallback(selectedShowcaseTile)}
+                      alt={selectedShowcaseTile.name}
+                      className="slab-tile-image"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = getTextureFallback(selectedShowcaseTile);
+                      }}
+                    />
+                    <div className="slab-sheen-overlay"></div>
+                    <div className="slab-corner-ruler">
+                      <span>{selectedShowcaseTile.width} cm</span>
+                      <span className="ruler-x">×</span>
+                      <span>{selectedShowcaseTile.height} cm</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* TILE DETAILS, SPECS & 1-CLICK ACTIONS */}
+                <div className="showcase-specs-column">
+                  <div className="specs-pills-wrap">
+                    <span className="spec-badge-pill">
+                      💎 {selectedShowcaseTile.finish || 'Full Lappato'}
+                    </span>
+                    <span className="spec-badge-pill">
+                      📐 Rektifiye Sıfır Derz
+                    </span>
+                    <span className="spec-badge-pill">
+                      🛡️ Porselen E &lt; %0.5 Su Emme
+                    </span>
+                    <span className="spec-badge-pill">
+                      👣 Donma & Çizilmeye Dayanıklı
+                    </span>
+                  </div>
+
+                  <div className="showcase-stock-status-box">
+                    <div className="status-live-indicator">
+                      <span className="ping-dot"></span>
+                      <span className="status-text">Showroom Teşhirinde & Depoda Teslimata Hazır</span>
+                    </div>
+                    {selectedShowcaseTile.price && (!kioskMode || showPricesInKiosk) && (
+                      <div className="showcase-price-row">
+                        <span className="showcase-price-label">Bayi Özel Metrekare Fiyatı:</span>
+                        <span className="showcase-price-val">₺{selectedShowcaseTile.price.toLocaleString('tr-TR')} <small>/ m²</small></span>
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="showcase-architect-note">
+                    Bu karo, {dealer.name} showroomunda mimari zemin ve banyo teşhir standında sergilenmektedir. 
+                    Işık yansıma açısı ve rektifiye kenarları sayesinde mekanlarda derzsiz ve kesintisiz genişlik hissi yaratır.
+                  </p>
+
+                  <div className="showcase-cta-buttons">
+                    <Link
+                      href={selectedShowcaseTile.code ? `/?code=${encodeURIComponent(selectedShowcaseTile.code)}&tab=studio#studio` : `/?tab=studio#studio`}
+                      onClick={() => {
+                        try {
+                          const selectedObj = {
+                            ...selectedShowcaseTile,
+                            unitPrice: selectedShowcaseTile.price || selectedShowcaseTile.unitPrice,
+                            textureUrl: selectedShowcaseTile.textureUrl || selectedShowcaseTile.imageUrl || getTextureFallback(selectedShowcaseTile),
+                            imageUrl: selectedShowcaseTile.imageUrl || selectedShowcaseTile.textureUrl || getTextureFallback(selectedShowcaseTile)
+                          };
+                          localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
+                          sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
+                        } catch(e) {}
+                      }}
+                      className="btn-showcase-3d"
+                    >
+                      <Sparkles size={16} />
+                      <span>3D Banyo Stüdyosu'nda Canlı Döşe</span>
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => addToCart(selectedShowcaseTile, 30)}
+                      className={`btn-showcase-cart ${quoteCart.some(i => i.id === selectedShowcaseTile.id) ? 'in-cart' : ''}`}
+                    >
+                      {quoteCart.some(i => i.id === selectedShowcaseTile.id) ? (
+                        <>
+                          <Check size={16} />
+                          <span>Sepete Eklendi</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus size={16} />
+                          <span>Teklif Sepetime Ekle (+30 m²)</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNotes(`Showroom teşhirindeki "${selectedShowcaseTile.name}" (${selectedShowcaseTile.code || ''}) için numune karo ve palet fiyatı talep ediyorum.`);
+                        const el = document.getElementById('quote-form-section');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="btn-showcase-sample"
+                    >
+                      <Package size={15} />
+                      <span>Gerçek Numune / Palet Teklifi İste</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* QUICK STORE ACTIONS & TOOLS BAR */}
         <div className="quick-actions-store-bar">
           <span className="quick-actions-bar-title">⚡ Hızlı Mağaza Araçları:</span>
@@ -1306,6 +1620,136 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
 
         </div>
+
+        {/* SECTION: MİMARIN SEÇTİĞİ ZEMİN & DUVAR KOMBİNLERİ (CURATED TILE DUOS) */}
+        {(() => {
+          const duo = getCuratedDuo();
+          if (!duo.floor || !duo.wall) return null;
+
+          return (
+            <div className="curated-combos-section animate-fade-in" style={{ marginTop: '56px' }}>
+              <div className="curated-combos-header">
+                <span className="curated-badge">
+                  <Sparkles size={13} />
+                  <span>MİMARİ ZEMİN + DUVAR UYUMU</span>
+                </span>
+                <h2 className="section-main-heading" style={{ marginTop: '8px', marginBottom: '8px' }}>
+                  Showroom Mimarından İlham Veren Çiftler
+                </h2>
+                <p style={{ fontSize: '0.86rem', color: '#64748b', maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
+                  Tek bir karo yerine birbiriyle kusursuz konuşan zemin ve duvar seramiklerini eşleştirdik. Zıtlıkların uyumuyla mekana lüks bir derinlik kazandırın.
+                </p>
+
+                {/* STYLE SELECTOR PILLS */}
+                <div className="curated-style-pills">
+                  {[
+                    { id: 'marble', label: '🏛️ Mermer & Zarafet' },
+                    { id: 'concrete', label: '🏢 Beton & Loft' },
+                    { id: 'wood', label: '🌿 Doğal Ahşap' },
+                    { id: 'dark', label: '🖤 Spa & Antrasit' }
+                  ].map(s => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => setConciergeStyle(s.id)}
+                      className={`curated-pill ${conciergeStyle === s.id ? 'active' : ''}`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="curated-duo-cards-grid">
+                {/* FLOOR TILE */}
+                <div className="curated-card floor-card">
+                  <div className="curated-card-role-badge">
+                    <span>ZEMİN KAROSU</span>
+                  </div>
+                  <div className="curated-image-box">
+                    <img 
+                      src={duo.floor.imageUrl || getTextureFallback(duo.floor)} 
+                      alt={duo.floor.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = getTextureFallback(duo.floor);
+                      }}
+                    />
+                  </div>
+                  <div className="curated-card-content">
+                    <span className="curated-tile-style">{duo.floor.style} Serisi</span>
+                    <h3 className="curated-tile-name">{duo.floor.name}</h3>
+                    <span className="curated-tile-meta">Kod: {duo.floor.code} • {duo.floor.width}x{duo.floor.height} cm • {duo.floor.finish}</span>
+                  </div>
+                </div>
+
+                {/* PLUS CONNECTOR */}
+                <div className="curated-connector">
+                  <div className="connector-circle">
+                    <Plus size={20} />
+                  </div>
+                  <span className="connector-label">MİMARİ KOMBİN</span>
+                </div>
+
+                {/* WALL TILE */}
+                <div className="curated-card wall-card">
+                  <div className="curated-card-role-badge wall">
+                    <span>DUVAR & VİTRİN KAROSU</span>
+                  </div>
+                  <div className="curated-image-box">
+                    <img 
+                      src={duo.wall.imageUrl || getTextureFallback(duo.wall)} 
+                      alt={duo.wall.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = getTextureFallback(duo.wall);
+                      }}
+                    />
+                  </div>
+                  <div className="curated-card-content">
+                    <span className="curated-tile-style">{duo.wall.style} Serisi</span>
+                    <h3 className="curated-tile-name">{duo.wall.name}</h3>
+                    <span className="curated-tile-meta">Kod: {duo.wall.code} • {duo.wall.width}x{duo.wall.height} cm • {duo.wall.finish}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ACTION BAR FOR DUO */}
+              <div className="curated-duo-actions-bar">
+                <Link
+                  href={duo.floor.code ? `/?code=${encodeURIComponent(duo.floor.code)}&tab=studio#studio` : `/?tab=studio#studio`}
+                  onClick={() => {
+                    try {
+                      const selectedObj = {
+                        ...duo.floor,
+                        textureUrl: duo.floor.textureUrl || duo.floor.imageUrl || getTextureFallback(duo.floor),
+                        imageUrl: duo.floor.imageUrl || duo.floor.textureUrl || getTextureFallback(duo.floor)
+                      };
+                      localStorage.setItem('seramikbak_preselected_product', JSON.stringify(selectedObj));
+                      sessionStorage.setItem('kiosk_selected_product', JSON.stringify(selectedObj));
+                    } catch(e) {}
+                  }}
+                  className="btn-curated-3d"
+                >
+                  <Sparkles size={16} />
+                  <span>Bu İkiliyi 3D Mekan Stüdyosu'nda Canlı Gör</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    addToCart(duo.floor, 35);
+                    addToCart(duo.wall, 25);
+                  }}
+                  className="btn-curated-cart"
+                >
+                  <ShoppingBag size={16} />
+                  <span>İki Karoyu Birlikte Teklife Ekle (35 m² Zemin + 25 m² Duvar)</span>
+                </button>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* SECTION: SHOWROOM PRIVILEGES & SERVICES */}
         {servicesList.length > 0 && (
