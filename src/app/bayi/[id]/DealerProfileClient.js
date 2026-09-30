@@ -30,7 +30,21 @@ import {
   Layers,
   Calculator,
   Flame,
-  X
+  X,
+  QrCode,
+  Printer,
+  ShoppingBag,
+  Calendar,
+  Coffee,
+  Maximize2,
+  Minimize2,
+  Plus,
+  Minus,
+  Trash2,
+  Check,
+  Eye,
+  EyeOff,
+  Share2
 } from 'lucide-react';
 import './dealer-profile.css';
 
@@ -38,6 +52,32 @@ export default function DealerProfileClient({ dealer, products }) {
   const [galleryTab, setGalleryTab] = useState(dealer.virtualTourUrl ? '3d' : 'photos');
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [iframeLoading, setIframeLoading] = useState(true);
+
+  // Kiosk & Tablet Presentation Mode states
+  const [kioskMode, setKioskMode] = useState(false);
+  const [showPricesInKiosk, setShowPricesInKiosk] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Quote Cart states
+  const [quoteCart, setQuoteCart] = useState([]);
+  const [showCartDrawer, setShowCartDrawer] = useState(false);
+
+  // Appointment Modal states
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [apptName, setApptName] = useState('');
+  const [apptPhone, setApptPhone] = useState('');
+  const [apptDate, setApptDate] = useState('');
+  const [apptTimeSlot, setApptTimeSlot] = useState('14:00 - 16:00 (Öğleden Sonra)');
+  const [apptProjectType, setApptProjectType] = useState('Banyo Yenileme');
+  const [apptNotes, setApptNotes] = useState('');
+  const [apptSuccess, setApptSuccess] = useState(false);
+
+  // QR Modal states
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState('');
+
+  // Live showroom open/closed status
+  const [isOpenNow, setIsOpenNow] = useState(true);
 
   const handleTabChange = (tab) => {
     setGalleryTab(tab);
@@ -130,7 +170,180 @@ export default function DealerProfileClient({ dealer, products }) {
     if (dealer?.id) {
       trackAction('VIEW');
     }
+    if (typeof window !== 'undefined') {
+      setCurrentUrl(window.location.href);
+      const hour = new Date().getHours();
+      setIsOpenNow(hour >= 9 && hour < 19);
+
+      try {
+        const saved = localStorage.getItem(`seramikbak_cart_${dealer.id}`);
+        if (saved) {
+          setQuoteCart(JSON.parse(saved));
+        }
+      } catch (e) {}
+    }
   }, [dealer?.id]);
+
+  const saveCart = (newCart) => {
+    setQuoteCart(newCart);
+    try {
+      localStorage.setItem(`seramikbak_cart_${dealer.id}`, JSON.stringify(newCart));
+    } catch (e) {}
+  };
+
+  const addToCart = (product, defaultM2 = 30) => {
+    const existingIndex = quoteCart.findIndex(item => item.id === product.id);
+    let updated;
+    if (existingIndex > -1) {
+      updated = [...quoteCart];
+      updated[existingIndex].m2 = (parseFloat(updated[existingIndex].m2) || 0) + defaultM2;
+    } else {
+      updated = [
+        ...quoteCart,
+        {
+          id: product.id,
+          name: product.name,
+          code: product.code || '',
+          style: product.style || '',
+          finish: product.finish || '',
+          width: product.width || 60,
+          height: product.height || 120,
+          price: product.price || product.unitPrice || 0,
+          imageUrl: product.imageUrl || getTextureFallback(product),
+          m2: defaultM2
+        }
+      ];
+    }
+    saveCart(updated);
+    setShowCartDrawer(true);
+    trackAction('ADD_TO_CART');
+  };
+
+  const removeFromCart = (id) => {
+    const updated = quoteCart.filter(item => item.id !== id);
+    saveCart(updated);
+  };
+
+  const updateCartM2 = (id, delta) => {
+    const updated = quoteCart.map(item => {
+      if (item.id === id) {
+        const newM2 = Math.max(1, (parseFloat(item.m2) || 0) + delta);
+        return { ...item, m2: newM2 };
+      }
+      return item;
+    });
+    saveCart(updated);
+  };
+
+  const clearCart = () => {
+    saveCart([]);
+  };
+
+  const toggleFullscreen = () => {
+    if (typeof document === 'undefined') return;
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+      }
+    }
+  };
+
+  const sendCartToWhatsApp = () => {
+    if (quoteCart.length === 0) return;
+    const cleanPhone = (dealer.phone || '').replace(/[\s\-\(\)\+]/g, '');
+    let totalM2 = 0;
+    let totalEstimatedPrice = 0;
+    let hasPrice = false;
+
+    const itemsText = quoteCart.map((item, idx) => {
+      const m2 = parseFloat(item.m2) || 30;
+      totalM2 += m2;
+      const itemPrice = parseFloat(item.price) || 0;
+      if (itemPrice > 0) {
+        hasPrice = true;
+        totalEstimatedPrice += itemPrice * m2;
+      }
+      return `${idx + 1}) *${item.name}* (${item.code ? `Kod: ${item.code}, ` : ''}${item.width}x${item.height} cm) - *${m2} m²*` + (itemPrice > 0 ? ` [₺${itemPrice.toLocaleString('tr-TR')}/m²]` : '');
+    }).join('\n');
+
+    const grossTileM2 = totalM2 * 1.1; // 10% fire
+    const totalKalekimBags = Math.ceil((grossTileM2 * 4.5) / 25);
+    const totalGroutKg = Math.ceil(grossTileM2 * 0.45);
+    const totalBoxes = Math.ceil(grossTileM2 / 1.44);
+
+    let msg = `*SERAMİK TEKLİF & SİPARİŞ LİSTESİ*\n` +
+      `*${dealer.name}* Yetkili Showroom'una\n` +
+      `─────────────────────────────\n` +
+      `Merhaba, SeramikBak showroom profilinizden seçtiğim ürünler için stok teyidi ve en uygun fiyat teklifinizi rica ediyorum:\n\n` +
+      `*SEÇİLEN SERAMİKLER:*\n${itemsText}\n\n` +
+      `*TOPLAM METRAJ & ŞANTİYE İHTİYACI:*\n` +
+      `• Net İhtiyaç: *${totalM2.toFixed(1)} m²*\n` +
+      `• Fireli Sipariş: *${grossTileM2.toFixed(1)} m²* (~${totalBoxes} Kutu)\n` +
+      `• Tahmini Yapıştırıcı (Kalekim): *${totalKalekimBags} Torba* (25kg Flex)\n` +
+      `• Tahmini Derz Dolgusu: *${totalGroutKg} kg*\n` +
+      (hasPrice ? `• Tahmini Malzeme Tutarı: *₺${totalEstimatedPrice.toLocaleString('tr-TR')}*\n` : '') +
+      `─────────────────────────────\n` +
+      `Depo stok durumunuzu ve teslimat sürenizi öğrenebilir miyim? Teşekkürler.`;
+
+    const encoded = encodeURIComponent(msg);
+    const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encoded}` : `https://wa.me/?text=${encoded}`;
+    trackAction('WHATSAPP_CART_QUOTE');
+    window.open(waUrl, '_blank');
+  };
+
+  const fillLeadFormWithCart = () => {
+    let summary = quoteCart.map(i => `${i.name} (${i.code || i.width + 'x' + i.height}) - ${i.m2} m²`).join(', ');
+    setNotes(prev => prev ? `${prev} • Sepet: ${summary}` : `Seçilen Seramikler: ${summary}`);
+    setShowCartDrawer(false);
+    const el = document.getElementById('quote-form-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleAppointmentSubmit = async (e) => {
+    e.preventDefault();
+    if (!apptName || !apptPhone || !apptDate) return;
+
+    try {
+      fetch('/api/leads/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dealerId: dealer.id,
+          clientName: apptName,
+          clientPhone: apptPhone,
+          clientEmail: 'randevu@seramikbak.com',
+          notes: `[SHOWROOM VIP RANDEVU] Tarih: ${apptDate}, Saat Dilimi: ${apptTimeSlot}, Proje Türü: ${apptProjectType}. Not: ${apptNotes}`
+        })
+      }).catch(() => {});
+    } catch(err) {}
+
+    const cleanPhone = (dealer.phone || '').replace(/[\s\-\(\)\+]/g, '');
+    const msg = `*SHOWROOM ZİYARET & 3D MİMAR RANDEVUSU TALEBİ*\n` +
+      `*${dealer.name}* Mağazasına\n` +
+      `─────────────────────────────\n` +
+      `Merhaba, Seramik showroomunuzu ziyaret edip 3D mimari banyo danışmanlığı eşliğinde seramik seçmek için randevu oluşturmak istiyorum:\n\n` +
+      `• *Müşteri:* ${apptName}\n` +
+      `• *Telefon:* ${apptPhone}\n` +
+      `• *Tarih:* ${apptDate}\n` +
+      `• *Tercih Edilen Saat:* ${apptTimeSlot}\n` +
+      `• *Proje Türü:* ${apptProjectType}\n` +
+      (apptNotes ? `• *Özel Not:* ${apptNotes}\n` : '') +
+      `─────────────────────────────\n` +
+      `Randevu müsaitliğinizi teyit eder misiniz? Teşekkürler.`;
+
+    setApptSuccess(true);
+    trackAction('APPOINTMENT_REQUEST');
+
+    setTimeout(() => {
+      const encoded = encodeURIComponent(msg);
+      const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encoded}` : `https://wa.me/?text=${encoded}`;
+      window.open(waUrl, '_blank');
+      setShowAppointmentModal(false);
+      setApptSuccess(false);
+    }, 1200);
+  };
 
   const handleFeatureClick = (prodId) => {
     setSelectedProductId(prodId);
@@ -263,7 +476,7 @@ export default function DealerProfileClient({ dealer, products }) {
 
   return (
     <div 
-      className={`profile-page-wrapper ${isDarkTheme ? 'dark-theme-mode' : 'light-theme-mode'}`} 
+      className={`profile-page-wrapper ${isDarkTheme ? 'dark-theme-mode' : 'light-theme-mode'} ${kioskMode ? 'kiosk-mode-active' : ''}`} 
       style={{ 
         '--accent-gold': primaryColor, 
         '--accent-gold-rgb': primaryRgb,
@@ -284,13 +497,97 @@ export default function DealerProfileClient({ dealer, products }) {
             </span>
             <span className="dealer-badge-title">Yetkili Bayi</span>
             <span className="dealer-badge-tag">
-              <span className="dealer-badge-live-dot"></span>
-              <span>Onaylı</span>
+              <span className={`dealer-badge-live-dot ${isOpenNow ? 'online' : 'away'}`}></span>
+              <span>{isOpenNow ? 'Açık' : 'Yarın 09:00'}</span>
             </span>
           </div>
         </div>
-        <div className="desktop-header-spacer"></div>
+        <div className="header-quick-tools">
+          <button
+            type="button"
+            onClick={() => setKioskMode(!kioskMode)}
+            className={`btn-header-tool ${kioskMode ? 'active-kiosk' : ''}`}
+            title="Showroom iPad / TV için Müşteri Satış Sunum Modu"
+          >
+            <Maximize2 size={14} />
+            <span className="hide-mobile">{kioskMode ? 'Kiosk Açık' : 'Kiosk Satış'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowQrModal(true)}
+            className="btn-header-tool"
+            title="Masa Üstü Showroom QR Standı & Dijital Kartvizit"
+          >
+            <QrCode size={14} />
+            <span className="hide-mobile">Masa QR</span>
+          </button>
+          {quoteCart.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowCartDrawer(true)}
+              className="btn-header-tool cart-highlight"
+              title="Seçilen Seramikler ve Teklif Listesi"
+            >
+              <ShoppingBag size={14} />
+              <span>Teklif ({quoteCart.length})</span>
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* KIOSK / PRESENTATION MODE TOP CONTROLLER BAR */}
+      {kioskMode && (
+        <div className="kiosk-top-control-bar animate-fade-in">
+          <div className="kiosk-brand-info">
+            <span className="kiosk-live-dot"></span>
+            <span className="kiosk-tag">SHOWROOM SATIŞ & DİJİTAL SUNUM MODU</span>
+            <span className="kiosk-store-name">{dealer.name}</span>
+          </div>
+          <div className="kiosk-actions">
+            <button
+              type="button"
+              onClick={() => setShowPricesInKiosk(!showPricesInKiosk)}
+              className="kiosk-btn"
+              title="Fiyatları Gizle / Göster"
+            >
+              {showPricesInKiosk ? <Eye size={14} /> : <EyeOff size={14} />}
+              <span>{showPricesInKiosk ? 'Fiyatlar Açık' : 'Fiyatlar Gizli'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              className="kiosk-btn"
+              title="Tam Ekran Aç / Kapa"
+            >
+              {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+              <span>{isFullscreen ? 'Küçült' : 'Tam Ekran'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowQrModal(true)}
+              className="kiosk-btn"
+            >
+              <QrCode size={14} />
+              <span>Müşteri QR</span>
+            </button>
+            <Link
+              href="/?tab=studio#studio"
+              className="kiosk-btn gold"
+            >
+              <Sparkles size={14} />
+              <span>3D Banyo Stüdyosu</span>
+            </Link>
+            <button
+              type="button"
+              onClick={() => setKioskMode(false)}
+              className="kiosk-btn exit"
+            >
+              <X size={14} />
+              <span>Kiosk'tan Çık</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Container */}
       <div className="profile-main-container">
@@ -307,17 +604,29 @@ export default function DealerProfileClient({ dealer, products }) {
         >
           {/* AI ERA LIVE STATUS HUD BAR */}
           <div className="ai-hero-live-bar">
-            <div className="ai-status-pill">
-              <span className="live-dot-pulse"></span>
-              <span>Canlı Showroom (09:00 - 19:00)</span>
+            <div className={`ai-status-pill ${isOpenNow ? 'status-open' : 'status-closed'}`}>
+              <span className={`live-dot-pulse ${isOpenNow ? 'pulse-green' : 'pulse-amber'}`}></span>
+              <span>{isOpenNow ? '🟢 Şu An Açık • Ziyarete Hazır (09:00 - 19:00)' : '🌙 Şu An Kapalı • Yarın 09:00\'da Açılıyor'}</span>
             </div>
-            <div className="ai-badge-pill">
-              <Sparkles size={12} />
-              <span>3D Mimar Aktif</span>
-            </div>
+            <button 
+              type="button"
+              onClick={() => setShowAppointmentModal(true)}
+              className="ai-badge-pill clickable-pill"
+            >
+              <Coffee size={12} style={{ color: 'var(--accent-gold)' }} />
+              <span>Kahvemizi İçin & Mimar Randevusu</span>
+            </button>
             <div className="ai-stock-pill">
-              <span>📦 {dealer.inventories?.length || 0}+ Seri</span>
+              <span>📦 {dealer.inventories?.length || 0}+ Seri Stokta</span>
             </div>
+            <button
+              type="button"
+              onClick={() => setShowQrModal(true)}
+              className="ai-badge-pill clickable-pill hide-mobile"
+            >
+              <QrCode size={12} />
+              <span>Masa Standı QR</span>
+            </button>
           </div>
 
           <div className="profile-banner-info">
@@ -513,6 +822,44 @@ export default function DealerProfileClient({ dealer, products }) {
 
             <button
               type="button"
+              onClick={() => setKioskMode(!kioskMode)}
+              className={`quick-action-chip ${kioskMode ? 'gold-chip' : ''}`}
+            >
+              <Maximize2 size={14} />
+              <span>📺 {kioskMode ? 'Kiosk Modundan Çık' : 'Kiosk Satış Modu'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowAppointmentModal(true)}
+              className="quick-action-chip highlight-chip"
+            >
+              <Coffee size={14} style={{ color: '#d4af37' }} />
+              <span>☕ Showroom Ziyaret & Mimar Randevusu</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowQrModal(true)}
+              className="quick-action-chip"
+            >
+              <QrCode size={14} />
+              <span>📱 Masa QR Standı</span>
+            </button>
+
+            {quoteCart.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowCartDrawer(true)}
+                className="quick-action-chip gold-chip"
+              >
+                <ShoppingBag size={14} />
+                <span>🛒 Teklif Sepetim ({quoteCart.length} Ürün)</span>
+              </button>
+            )}
+
+            <button
+              type="button"
               onClick={() => {
                 const el = document.querySelector('.featured-products-section');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -541,7 +888,7 @@ export default function DealerProfileClient({ dealer, products }) {
               className="quick-action-chip gold-chip"
             >
               <Calculator size={14} />
-              <span>📐 Metraj & Kutu Hesaplayıcı</span>
+              <span>📐 Metraj & Sarfiyat Hesaplayıcı</span>
             </button>
 
             {dealer.pdfCatalogUrl ? (
@@ -1464,7 +1811,7 @@ export default function DealerProfileClient({ dealer, products }) {
                                 {item.status === 'IN_STOCK' ? `${item.stock.toLocaleString('tr-TR')} m²` : (item.status === 'DISPLAY_ONLY' ? 'Teşhir / Numune' : 'Siparişle (3-7 Gün)')}
                               </span>
                             </div>
-                            {item.price && (
+                            {(!kioskMode || showPricesInKiosk) && item.price && (
                               <div style={{ textAlign: 'right' }}>
                                 <span style={{ fontSize: '0.6rem', color: '#64748b', display: 'block' }}>Bayi Özel Fiyatı</span>
                                 <span style={{ fontSize: '0.82rem', fontWeight: '900', color: 'var(--accent-gold, #b38e47)' }}>
@@ -1475,7 +1822,7 @@ export default function DealerProfileClient({ dealer, products }) {
                             )}
                           </div>
                         </div>
-                        <div className="product-card-actions-group" style={{ display: 'flex', gap: '8px' }}>
+                        <div className="product-card-actions-group" style={{ display: 'flex', gap: '6px' }}>
                           <Link 
                             href={prod.code ? `/?code=${encodeURIComponent(prod.code)}&tab=studio#studio` : `/?tab=studio#studio`}
                             onClick={() => {
@@ -1492,18 +1839,35 @@ export default function DealerProfileClient({ dealer, products }) {
                             }}
                             className="btn-3d-try-card"
                             title="Bu ürünü 3D Sanal Banyo Stüdyosu'nda canlı uygulayın"
-                            style={{ flex: 1, textDecoration: 'none' }}
+                            style={{ flex: '1 1 auto', textDecoration: 'none' }}
                           >
-                            <Sparkles size={13} />
-                            3D'de Kapla
+                            <Sparkles size={12} />
+                            3D Gör
                           </Link>
+                          <button
+                            type="button"
+                            onClick={() => addToCart({ ...prod, price: item.price || prod.unitPrice }, 30)}
+                            className={`btn-add-quote-cart ${quoteCart.some(i => i.id === prod.id) ? 'added' : ''}`}
+                            title="Teklif listesine ekle"
+                          >
+                            {quoteCart.some(i => i.id === prod.id) ? (
+                              <>
+                                <Check size={12} />
+                                <span>Listede</span>
+                              </>
+                            ) : (
+                              <>
+                                <Plus size={12} />
+                                <span>+ Teklife Ekle</span>
+                              </>
+                            )}
+                          </button>
                           <button 
                             type="button" 
                             onClick={() => handleFeatureClick(prod.id)}
-                            className="featured-product-action-btn"
-                            style={{ flex: 1 }}
+                            className="featured-product-action-btn icon-only-btn"
+                            title="Doğrudan Teklif Formuna Doldur"
                           >
-                            <span>Stoktan Teklif İsteyin</span>
                             <ArrowRight size={12} />
                           </button>
                         </div>
@@ -1546,7 +1910,7 @@ export default function DealerProfileClient({ dealer, products }) {
                     <h3 className="featured-product-name">{prod.name}</h3>
                     <span className="featured-product-meta">Kod: {prod.code} • Ebat: {prod.width}x{prod.height} cm • Yüzey: {prod.finish}</span>
                   </div>
-                  <div className="product-card-actions-group">
+                  <div className="product-card-actions-group" style={{ display: 'flex', gap: '6px' }}>
                     <Link 
                       href={prod.code ? `/?code=${encodeURIComponent(prod.code)}&tab=studio#studio` : `/?tab=studio#studio`}
                       onClick={() => {
@@ -1562,16 +1926,35 @@ export default function DealerProfileClient({ dealer, products }) {
                       }}
                       className="btn-3d-try-card"
                       title="Bu ürünü 3D Sanal Banyo Stüdyosu'nda canlı uygulayın"
+                      style={{ flex: '1 1 auto', textDecoration: 'none' }}
                     >
-                      <Sparkles size={13} />
-                      3D'de Kapla
+                      <Sparkles size={12} />
+                      3D Gör
                     </Link>
+                    <button
+                      type="button"
+                      onClick={() => addToCart(prod, 30)}
+                      className={`btn-add-quote-cart ${quoteCart.some(i => i.id === prod.id) ? 'added' : ''}`}
+                      title="Teklif listesine ekle"
+                    >
+                      {quoteCart.some(i => i.id === prod.id) ? (
+                        <>
+                          <Check size={12} />
+                          <span>Listede</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus size={12} />
+                          <span>+ Teklife Ekle</span>
+                        </>
+                      )}
+                    </button>
                     <button 
                       type="button" 
                       onClick={() => handleFeatureClick(prod.id)}
-                      className="featured-product-action-btn"
+                      className="featured-product-action-btn icon-only-btn"
+                      title="Doğrudan Teklif Formuna Doldur"
                     >
-                      <span>Teklif Talebi Ekle</span>
                       <ArrowRight size={12} />
                     </button>
                   </div>
@@ -1748,7 +2131,408 @@ export default function DealerProfileClient({ dealer, products }) {
           <span>Teklif Al</span>
         </button>
       </div>
-      {/* SERAMİK METRAJ & KUTU HESAPLAYICI MODALI */}
+      {/* FLOATING QUOTE CART PILL */}
+      {quoteCart.length > 0 && !showCartDrawer && (
+        <div className="floating-cart-pill-container animate-bounce-subtle">
+          <button 
+            type="button" 
+            onClick={() => setShowCartDrawer(true)}
+            className="floating-cart-pill-btn"
+          >
+            <ShoppingBag size={18} />
+            <span className="cart-pill-title">Teklif Sepetim</span>
+            <span className="cart-pill-badge">{quoteCart.length}</span>
+          </button>
+        </div>
+      )}
+
+      {/* QUOTE CART DRAWER / MODAL */}
+      {showCartDrawer && (
+        <div className="cart-drawer-overlay" onClick={() => setShowCartDrawer(false)}>
+          <div className="cart-drawer-content" onClick={(e) => e.stopPropagation()}>
+            <div className="cart-drawer-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className="cart-header-icon-box">
+                  <ShoppingBag size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>
+                    Showroom Teklif Sepetim
+                  </h3>
+                  <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                    {dealer.name} • {quoteCart.length} Seramik Seçildi
+                  </span>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowCartDrawer(false)}
+                className="cart-drawer-close-btn"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="cart-drawer-body">
+              {quoteCart.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8' }}>
+                  <ShoppingBag size={48} strokeWidth={1.5} style={{ margin: '0 auto 12px', opacity: 0.5 }} />
+                  <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>Teklif sepetiniz henüz boş.</p>
+                  <span style={{ fontSize: '0.78rem' }}>Showroomdaki karoların üzerindeki "+ Teklife Ekle" butonuna tıklayarak sepetinize seramik ekleyebilirsiniz.</span>
+                </div>
+              ) : (
+                <>
+                  <div className="cart-items-scroll-list">
+                    {quoteCart.map((item) => {
+                      const m2 = parseFloat(item.m2) || 30;
+                      const boxCount = Math.ceil(m2 / 1.44);
+                      const unitPrice = parseFloat(item.price) || 0;
+                      const itemTotal = unitPrice > 0 ? unitPrice * m2 : 0;
+
+                      return (
+                        <div key={item.id} className="cart-item-row">
+                          <img 
+                            src={item.imageUrl} 
+                            alt={item.name} 
+                            className="cart-item-thumb"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = '/textures/calacatta_gold.jpg';
+                            }}
+                          />
+                          <div className="cart-item-info">
+                            <h4 className="cart-item-title">{item.name}</h4>
+                            <span className="cart-item-meta">
+                              {item.code ? `Kod: ${item.code} • ` : ''}{item.width}x{item.height} cm • ~{boxCount} Kutu
+                            </span>
+                            {unitPrice > 0 && (
+                              <span className="cart-item-price">
+                                ₺{unitPrice.toLocaleString('tr-TR')} / m² {itemTotal > 0 ? `(₺${itemTotal.toLocaleString('tr-TR')})` : ''}
+                              </span>
+                            )}
+                          </div>
+                          <div className="cart-item-stepper">
+                            <button 
+                              type="button" 
+                              onClick={() => updateCartM2(item.id, -5)}
+                              className="cart-step-btn"
+                              title="5 m² Azalt"
+                            >
+                              <Minus size={12} />
+                            </button>
+                            <span className="cart-m2-val">{m2} m²</span>
+                            <button 
+                              type="button" 
+                              onClick={() => updateCartM2(item.id, 5)}
+                              className="cart-step-btn"
+                              title="5 m² Artır"
+                            >
+                              <Plus size={12} />
+                            </button>
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={() => removeFromCart(item.id)}
+                            className="cart-item-del-btn"
+                            title="Listeden Çıkar"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Summary & Consumables Calculation Box */}
+                  {(() => {
+                    const totalM2 = quoteCart.reduce((acc, curr) => acc + (parseFloat(curr.m2) || 0), 0);
+                    const grossTileM2 = totalM2 * 1.1; // 10% fire
+                    const totalBoxes = Math.ceil(grossTileM2 / 1.44);
+                    const totalKalekimBags = Math.ceil((grossTileM2 * 4.5) / 25);
+                    const totalGroutKg = Math.ceil(grossTileM2 * 0.45);
+                    const totalWeightKg = Math.round(grossTileM2 * 22);
+
+                    return (
+                      <div className="cart-summary-card">
+                        <div className="cart-summary-header-row">
+                          <span className="summary-title">Şantiye & Malzeme İhtiyacı</span>
+                          <button type="button" onClick={clearCart} className="btn-clear-cart">
+                            Temizle
+                          </button>
+                        </div>
+
+                        <div className="cart-summary-grid">
+                          <div className="summary-grid-item">
+                            <span className="grid-label">Net Metraj</span>
+                            <span className="grid-val">{totalM2.toFixed(1)} m²</span>
+                          </div>
+                          <div className="summary-grid-item highlight">
+                            <span className="grid-label">Fireli Sipariş (+%10)</span>
+                            <span className="grid-val">{grossTileM2.toFixed(1)} m²</span>
+                          </div>
+                          <div className="summary-grid-item">
+                            <span className="grid-label">Kutu / Paket</span>
+                            <span className="grid-val">~{totalBoxes} Kutu</span>
+                          </div>
+                          <div className="summary-grid-item">
+                            <span className="grid-label">Kalekim Yapıştırıcı</span>
+                            <span className="grid-val">{totalKalekimBags} Torba (25kg)</span>
+                          </div>
+                          <div className="summary-grid-item">
+                            <span className="grid-label">Derz Dolgusu</span>
+                            <span className="grid-val">{totalGroutKg} kg</span>
+                          </div>
+                          <div className="summary-grid-item">
+                            <span className="grid-label">Tahmini Yük</span>
+                            <span className="grid-val">~{(totalWeightKg / 1000).toFixed(2)} Ton</span>
+                          </div>
+                        </div>
+
+                        <div className="cart-actions-column">
+                          <button
+                            type="button"
+                            onClick={sendCartToWhatsApp}
+                            className="btn-cart-whatsapp"
+                          >
+                            <MessageSquare size={16} />
+                            <span>WhatsApp ile Bayiye Proforma Gönder</span>
+                          </button>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                            <button
+                              type="button"
+                              onClick={fillLeadFormWithCart}
+                              className="btn-cart-fill-form"
+                            >
+                              <Send size={14} />
+                              <span>Teklif Formuna Doldur</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => window.print()}
+                              className="btn-cart-print"
+                            >
+                              <Printer size={14} />
+                              <span>Yazdır / PDF</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SHOWROOM ZİYARET & VIP MİMAR RANDEVUSU MODALI */}
+      {showAppointmentModal && (
+        <div className="appointment-modal-overlay" onClick={() => setShowAppointmentModal(false)}>
+          <div className="appointment-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="appointment-modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className="appointment-icon-box">
+                  <Coffee size={22} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                    Showroom Ziyaret & VIP Mimar Randevusu
+                  </h3>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                    {dealer.name} • 3D Mimari Tasarım Eşliğinde Banyonuzu Seçin
+                  </span>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowAppointmentModal(false)}
+                className="appointment-close-btn"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="appointment-modal-body">
+              <p className="appointment-intro-text">
+                Showroom'umuza gelin, sıcak bir kahve eşliğinde banyonuzun veya mekanınızın ölçülerini 
+                <strong> 3D Sanal Banyo Stüdyomuzda</strong> canlı kaplayalım ve şantiye metrajınızı birlikte çıkaralım.
+              </p>
+
+              {apptSuccess ? (
+                <div className="appointment-success-box">
+                  <CheckCircle2 size={32} style={{ color: '#10b981', margin: '0 auto 8px' }} />
+                  <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', color: '#0f172a' }}>Randevu Talebiniz Alındı!</h4>
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: '#64748b' }}>
+                    Bayimizin WhatsApp hattına yönlendiriliyorsunuz. Müsaitlik anında teyit edilecektir.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleAppointmentSubmit} className="appointment-form-grid">
+                  <div className="appt-input-group">
+                    <label>Adınız Soyadınız *</label>
+                    <input 
+                      type="text" 
+                      value={apptName} 
+                      onChange={(e) => setApptName(e.target.value)} 
+                      placeholder="Örn: Selin Demir"
+                      required
+                    />
+                  </div>
+
+                  <div className="appt-input-group">
+                    <label>Telefon Numaranız *</label>
+                    <input 
+                      type="tel" 
+                      value={apptPhone} 
+                      onChange={(e) => setApptPhone(e.target.value)} 
+                      placeholder="Örn: 0532 987 65 43"
+                      required
+                    />
+                  </div>
+
+                  <div className="appt-input-group">
+                    <label>Ziyaret Tarihi *</label>
+                    <input 
+                      type="date" 
+                      value={apptDate} 
+                      onChange={(e) => setApptDate(e.target.value)} 
+                      required
+                    />
+                  </div>
+
+                  <div className="appt-input-group">
+                    <label>Tercih Edilen Saat Dilimi</label>
+                    <select 
+                      value={apptTimeSlot} 
+                      onChange={(e) => setApptTimeSlot(e.target.value)}
+                    >
+                      <option value="10:00 - 13:00 (Sabah Kuşağı)">10:00 - 13:00 (Sabah Kuşağı)</option>
+                      <option value="14:00 - 16:00 (Öğleden Sonra)">14:00 - 16:00 (Öğleden Sonra)</option>
+                      <option value="16:00 - 19:00 (Akşamüstü)">16:00 - 19:00 (Akşamüstü)</option>
+                    </select>
+                  </div>
+
+                  <div className="appt-input-group full-width">
+                    <label>Proje Türü</label>
+                    <div className="appt-project-pills">
+                      {[
+                        'Banyo Yenileme',
+                        'Mutfak & Zemin',
+                        'Komple Daire / Villa',
+                        'Ticari / Mimar Projesi'
+                      ].map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => setApptProjectType(type)}
+                          className={`appt-pill-btn ${apptProjectType === type ? 'active' : ''}`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="appt-input-group full-width">
+                    <label>Özel Not veya Aradığınız Ebat (Opsiyonel)</label>
+                    <textarea 
+                      value={apptNotes} 
+                      onChange={(e) => setApptNotes(e.target.value)}
+                      placeholder="Örn: 60x120 mermer desen ve antrasit banyo karoları bakmak istiyoruz..."
+                      rows={2}
+                    />
+                  </div>
+
+                  <button type="submit" className="btn-submit-appointment">
+                    <Calendar size={16} />
+                    <span>Randevu Oluştur ve WhatsApp'tan Onay Al</span>
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MASA ÜSTÜ SHOWROOM QR STANDI MODALI */}
+      {showQrModal && (
+        <div className="qr-modal-overlay" onClick={() => setShowQrModal(false)}>
+          <div className="qr-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="qr-modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <QrCode size={20} style={{ color: 'var(--accent-gold)' }} />
+                <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>
+                  Showroom Masası QR Standı & Dijital Kartvizit
+                </h3>
+              </div>
+              <button type="button" onClick={() => setShowQrModal(false)} className="qr-close-btn">
+                ✕
+              </button>
+            </div>
+
+            <div className="qr-modal-body">
+              <div className="qr-desk-stand-card" id="printable-qr-stand">
+                <div className="qr-stand-header">
+                  {dealer.logoUrl && (
+                    <img src={dealer.logoUrl} alt={dealer.name} className="qr-stand-logo" />
+                  )}
+                  <h2 className="qr-stand-dealer-name">{dealer.name}</h2>
+                  <span className="qr-stand-badge">YETKİLİ DİJİTAL SHOWROOM</span>
+                </div>
+
+                <div className="qr-code-display-box">
+                  <img 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(currentUrl || `https://seramikbak.com/bayi/${dealer.id}`)}`}
+                    alt={`${dealer.name} Showroom QR Kodu`}
+                    className="qr-img-element"
+                  />
+                </div>
+
+                <div className="qr-stand-instructions">
+                  <h4>📱 Telefonunuzla Okutun</h4>
+                  <p>
+                    Showroom'daki tüm seramik serilerini, depo stoklarımızı ve 
+                    <strong> 3D Banyo Tasarım Stüdyosu'nu</strong> cep telefonunuzda açın!
+                  </p>
+                </div>
+
+                <div className="qr-stand-footer">
+                  <span>📍 {dealer.district}, {dealer.city}</span>
+                  <span>📞 {dealer.phone}</span>
+                </div>
+              </div>
+
+              <div className="qr-actions-row">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="btn-print-qr-stand"
+                >
+                  <Printer size={16} />
+                  <span>🖨️ Masa Standını Yazdır (A5 / A6)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (navigator.clipboard) {
+                      navigator.clipboard.writeText(currentUrl);
+                      alert('Showroom bağlantısı panoya kopyalandı!');
+                    }
+                  }}
+                  className="btn-copy-url"
+                >
+                  <Share2 size={16} />
+                  <span>Linki Kopyala</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* GELİŞMİŞ SERAMİK & USTA SARFİYAT HESAPLAYICI MODALI */}
       {showCalculatorModal && (
         <div className="calculator-modal-overlay" onClick={() => setShowCalculatorModal(false)}>
           <div className="calculator-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -1758,8 +2542,12 @@ export default function DealerProfileClient({ dealer, products }) {
                   <Calculator size={22} />
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>Akıllı Seramik & Kutu Hesaplayıcı</h3>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Banyo, salon veya dış mekan zemin/duvar ihtiyacınızı anında hesaplayın</span>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>
+                    Akıllı Metraj & Usta Sarfiyat Hesaplayıcı
+                  </h3>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                    Karo, Kutu, Flex Kalekim (Torba) ve Derz Dolgusu İhtiyacını Anında Hesaplayın
+                  </span>
                 </div>
               </div>
               <button type="button" onClick={() => setShowCalculatorModal(false)} className="calculator-modal-close-btn">
@@ -1804,7 +2592,7 @@ export default function DealerProfileClient({ dealer, products }) {
                   <select value={calcWastePercent} onChange={(e) => setCalcWastePercent(Number(e.target.value))}>
                     <option value={5}>%5 (Düz Döşeme)</option>
                     <option value={10}>%10 (Standart - Önerilen)</option>
-                    <option value={15}>%15 (Diyagonal / Derzli)</option>
+                    <option value={15}>%15 (Diyagonal / Bol Kesimli)</option>
                   </select>
                 </div>
               </div>
@@ -1822,6 +2610,8 @@ export default function DealerProfileClient({ dealer, products }) {
                 const boxM2 = 1.44; // standard box size for 60x120 or 60x60
                 const numBoxes = grossM2 > 0 ? Math.ceil(grossM2 / boxM2) : 0;
                 const totalWeightKg = Math.round(grossM2 * 22); // ~22kg per m² porcelain tile
+                const kalekimBags = grossM2 > 0 ? Math.ceil((grossM2 * 4.5) / 25) : 0;
+                const groutKg = grossM2 > 0 ? Math.ceil(grossM2 * 0.45) : 0;
 
                 return (
                   <div className="calculator-results-card">
@@ -1830,33 +2620,65 @@ export default function DealerProfileClient({ dealer, products }) {
                       <span className="res-value">{netM2.toFixed(2)} m²</span>
                     </div>
                     <div className="calc-res-item">
-                      <span className="res-label">Fireli Toplam İhtiyaç</span>
+                      <span className="res-label">Fireli Sipariş (+%{calcWastePercent})</span>
                       <span className="res-value highlight">{grossM2.toFixed(2)} m²</span>
                     </div>
                     <div className="calc-res-item">
-                      <span className="res-label">Tahmini Kutu Sayısı</span>
-                      <span className="res-value badge">{numBoxes} Paket / Kutu</span>
+                      <span className="res-label">Kutu / Paket</span>
+                      <span className="res-value badge">{numBoxes} Paket</span>
+                    </div>
+                    <div className="calc-res-item">
+                      <span className="res-label">Flex Kalekim Harcı</span>
+                      <span className="res-value badge">{kalekimBags} Torba (25kg)</span>
+                    </div>
+                    <div className="calc-res-item">
+                      <span className="res-label">Derz Dolgusu</span>
+                      <span className="res-value badge">{groutKg} kg</span>
                     </div>
                     <div className="calc-res-item">
                       <span className="res-label">Yaklaşık Ağırlık</span>
-                      <span className="res-value">~{totalWeightKg} kg</span>
+                      <span className="res-value">~{(totalWeightKg / 1000).toFixed(2)} Ton ({totalWeightKg} kg)</span>
                     </div>
 
                     {grossM2 > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const quoteMsg = `Hesaplanan Metraj: Net ${netM2.toFixed(2)} m², Fireli ${grossM2.toFixed(2)} m² (${numBoxes} Kutu / Paket, ~${totalWeightKg} kg)`;
-                          setNotes(prev => prev ? `${prev} • ${quoteMsg}` : quoteMsg);
-                          setShowCalculatorModal(false);
-                          const el = document.querySelector('#quote-form-section');
-                          if (el) el.scrollIntoView({ behavior: 'smooth' });
-                        }}
-                        className="btn-apply-calc-quote"
-                      >
-                        <Send size={15} />
-                        Bu Metrajla Bayiden Fiyat Teklifi İsteyin
-                      </button>
+                      <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const quoteMsg = `Hesaplanan Metraj & Sarfiyat: Net ${netM2.toFixed(2)} m², Fireli ${grossM2.toFixed(2)} m² (${numBoxes} Kutu), ${kalekimBags} Torba 25kg Kalekim, ${groutKg} kg Derz Dolgusu (~${totalWeightKg} kg)`;
+                            setNotes(prev => prev ? `${prev} • ${quoteMsg}` : quoteMsg);
+                            setShowCalculatorModal(false);
+                            const el = document.querySelector('#quote-form-section');
+                            if (el) el.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className="btn-apply-calc-quote"
+                        >
+                          <Send size={15} />
+                          Bu Metraj ve Sarfiyatla Bayiden Fiyat Teklifi İsteyin
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cleanPhone = (dealer.phone || '').replace(/[\s\-\(\)\+]/g, '');
+                            const msg = `*SERAMİK & SARFİYAT HESAP RAPORU*\n*${dealer.name}* Mağazasına\n` +
+                              `─────────────────────────────\n` +
+                              `Mekanım için yapılan metraj ve malzeme hesabı:\n` +
+                              `• Net Alan: *${netM2.toFixed(2)} m²*\n` +
+                              `• Fireli Sipariş: *${grossM2.toFixed(2)} m²* (~${numBoxes} Kutu)\n` +
+                              `• Kalekim İhtiyacı: *${kalekimBags} Torba* (25kg Flex)\n` +
+                              `• Derz Dolgusu: *${groutKg} kg*\n` +
+                              `• Tahmini Tonaj: *~${(totalWeightKg / 1000).toFixed(2)} Ton*\n` +
+                              `─────────────────────────────\n` +
+                              `Bu sarfiyata göre toplam fiyat teklifi alabilir miyim?`;
+                            const waUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+                            window.open(waUrl, '_blank');
+                          }}
+                          className="btn-calc-whatsapp"
+                        >
+                          <MessageSquare size={15} />
+                          WhatsApp ile Bayiye İlet
+                        </button>
+                      </div>
                     )}
                   </div>
                 );
