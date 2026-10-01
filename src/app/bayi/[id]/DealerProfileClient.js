@@ -763,6 +763,9 @@ export default function DealerProfileClient({ dealer, products }) {
       style={{
         '--sr-gold': themePrimary,
         '--accent-gold': themePrimary,
+        '--theme-primary': themePrimary,
+        '--sr-burgundy': themePrimary,
+        '--sr-burgundy-hover': themePrimary,
         backgroundColor: themeBgColor || '#f8f9fc'
       }}
     >
@@ -1043,13 +1046,21 @@ export default function DealerProfileClient({ dealer, products }) {
         <section id="showroom-urunleri" className="showroom-featured-showcase-section">
           <div className="featured-showcase-header">
             <div className="featured-badge-pill">
-              <Sparkles size={13} />
-              <span>SHOWROOM ÜRÜNLERİ & MAĞAZA STOĞU ({dealerFeaturedProducts.length} Ürün)</span>
+              <Sparkles size={12} />
+              <span>MAĞAZA TEŞHİR KOLEKSİYONU</span>
             </div>
-            <h2 className="featured-section-title">Showroom Ürünleri</h2>
-            <p className="featured-section-subtitle">
-              {dealer?.name} mağazamızda fiziki olarak teşhir edilen ve stoğumuzda hemen teslime hazır ürün koleksiyonu.
-            </p>
+            <div className="featured-title-row-flex">
+              <div>
+                <h2 className="featured-section-title">Showroom Ürünleri</h2>
+                <p className="featured-section-subtitle">
+                  {dealer?.name} mağazamızda fiziki olarak teşhir edilen ve stoğumuzda hemen teslime hazır ürün koleksiyonu.
+                </p>
+              </div>
+              <div className="featured-count-badge">
+                <span className="count-num">{dealerFeaturedProducts.length}</span>
+                <span className="count-txt">Teşhir Ürünü</span>
+              </div>
+            </div>
           </div>
 
           <div className={dealerFeaturedProducts.length > 8 ? "featured-scroll-viewport catalog-scroll-viewport" : ""}>
@@ -1057,10 +1068,13 @@ export default function DealerProfileClient({ dealer, products }) {
               {dealerFeaturedProducts.map(product => {
                 const isFav = favorites.includes(product.id);
                 return (
-                  <div key={`featured-${product.id}`} className="catalog-product-card">
+                  <div key={`featured-${product.id}`} className="catalog-product-card showroom-luxury-card">
                     <div className="product-card-media">
                       <div className="card-top-badges">
-                        <span className="badge-featured">★ Showroom</span>
+                        <span className="badge-featured">
+                          <Sparkles size={10} />
+                          <span>Showroom</span>
+                        </span>
                       </div>
                       <button 
                         onClick={(e) => toggleFavorite(product.id, e)} 
@@ -1115,7 +1129,7 @@ export default function DealerProfileClient({ dealer, products }) {
                           title="Teklif Listeme Ekle"
                         >
                           <Plus size={13} />
-                          <span>Teklif</span>
+                          <span>Teklif Al</span>
                         </button>
                       </div>
                     </div>
