@@ -49,7 +49,9 @@ import {
   Play,
   Box,
   Menu,
-  ShoppingBag
+  ShoppingBag,
+  Calculator,
+  RefreshCw
 } from 'lucide-react';
 import './dealer-profile.css';
 
@@ -381,9 +383,7 @@ export default function DealerProfileClient({ dealer, products }) {
     if (dealerSpecialConcepts.length > 0 || dealerLogisticsList.length > 0) {
       items.push({ id: 'hizmetler', label: 'Konseptler', fullLabel: 'Ayrıcalıklar & Hizmetler', icon: Store });
     }
-    if (pdfCatalogUrl) {
-      items.push({ id: 'pdf-katalog', label: 'E-Katalog', fullLabel: 'PDF Katalog İndir', icon: Download });
-    }
+    items.push({ id: 'metraj-hesapla', label: 'Metraj Hesapla', fullLabel: 'Seramik & Malzeme Hesapla', icon: Calculator });
     if (dealer?.aboutText) {
       items.push({ id: 'hakkimizda', label: 'Hakkımızda', fullLabel: 'Hakkımızda', icon: Building2 });
     }
@@ -458,6 +458,116 @@ export default function DealerProfileClient({ dealer, products }) {
   // Cart Customer details
   const [cartCustomerName, setCartCustomerName] = useState('');
   const [cartCustomerPhone, setCartCustomerPhone] = useState('');
+
+  // Smart Tile & Materials Calculator State
+  const [calcRoomType, setCalcRoomType] = useState('banyo'); // 'banyo', 'mutfak', 'salon', 'teras', 'custom'
+  const [calcInputMode, setCalcInputMode] = useState('dims'); // 'dims' or 'direct'
+  const [calcWidthM, setCalcWidthM] = useState(3.5);
+  const [calcLengthM, setCalcLengthM] = useState(4.0);
+  const [calcDirectM2, setCalcDirectM2] = useState(20);
+  const [calcWasteRate, setCalcWasteRate] = useState(10);
+  const [calcSelectedProductId, setCalcSelectedProductId] = useState('');
+
+  const calcCalculations = useMemo(() => {
+    let netM2 = 0;
+    if (calcInputMode === 'dims') {
+      const w = Math.max(0, parseFloat(calcWidthM) || 0);
+      const l = Math.max(0, parseFloat(calcLengthM) || 0);
+      netM2 = Math.round((w * l) * 100) / 100;
+    } else {
+      netM2 = Math.max(0, parseFloat(calcDirectM2) || 0);
+    }
+
+    const wasteP = parseFloat(calcWasteRate) || 10;
+    const wasteM2 = Math.round(((netM2 * wasteP) / 100) * 100) / 100;
+    const totalTileM2 = Math.round((netM2 + wasteM2) * 100) / 100;
+
+    // Adhesive: ~4.5 kg per m2 -> bags of 25kg
+    const autoAdhesiveKg = totalTileM2 * 4.5;
+    const adhesiveBags = Math.ceil(autoAdhesiveKg / 25) || 0;
+    const totalAdhesiveKg = adhesiveBags * 25;
+
+    // Grout: ~0.45 kg per m2
+    const groutKg = Math.ceil((totalTileM2 * 0.45) * 10) / 10 || 0;
+
+    return {
+      netM2,
+      wasteP,
+      wasteM2,
+      totalTileM2,
+      adhesiveBags,
+      totalAdhesiveKg,
+      groutKg
+    };
+  }, [calcInputMode, calcWidthM, calcLengthM, calcDirectM2, calcWasteRate]);
+
+  const handleSelectRoomPreset = (roomKey) => {
+    setCalcRoomType(roomKey);
+    if (roomKey === 'banyo') {
+      setCalcInputMode('dims');
+      setCalcWidthM(3);
+      setCalcLengthM(4);
+    } else if (roomKey === 'mutfak') {
+      setCalcInputMode('dims');
+      setCalcWidthM(3);
+      setCalcLengthM(5);
+    } else if (roomKey === 'salon') {
+      setCalcInputMode('dims');
+      setCalcWidthM(5);
+      setCalcLengthM(8);
+    } else if (roomKey === 'teras') {
+      setCalcInputMode('dims');
+      setCalcWidthM(3);
+      setCalcLengthM(6);
+    } else {
+      setCalcInputMode('direct');
+      setCalcDirectM2(25);
+    }
+  };
+
+  const handleCalcWhatsAppQuote = () => {
+    const selectedProd = allCatalogProducts.find(p => p.id === calcSelectedProductId);
+    const roomName = calcRoomType === 'banyo' ? 'Banyo (Zemin/Duvar)' 
+      : calcRoomType === 'mutfak' ? 'Mutfak'
+      : calcRoomType === 'salon' ? 'Salon & Antre'
+      : calcRoomType === 'teras' ? 'Balkon / Teras' : 'Mekan';
+
+    const msgLines = [
+      `*METRAJ & MALZEME FİYAT TALEBİ*`,
+      `*${dealer?.name || 'Yetkili Showroom'}*`,
+      `─────────────────────────────`,
+      `Merhaba, ${roomName} alanım için hesapladığım malzeme dökümüm aşağıdadır:`,
+      ``,
+      `• Net Uygulama Alanı: *${calcCalculations.netM2} m²*`,
+      `• Fire Payı Oranı: *%${calcCalculations.wasteP}* (+${calcCalculations.wasteM2} m²)`,
+      `• Toplam Seramik İhtiyacı: *${calcCalculations.totalTileM2} m²*`,
+      `• Gereken Yapıştırıcı Harç: *${calcCalculations.adhesiveBags} Torba (25 kg)*`,
+      `• Gereken Derz Dolgusu: *${calcCalculations.groutKg} kg*`,
+      selectedProd ? `• İlgilendiğim Ürün Modeli: *${selectedProd.name}*` : null,
+      ``,
+      `Bu liste için stok durumu ve iskontolu bayi proforma fiyat teklifinizi rica ediyorum.`,
+      `Teşekkürler.`
+    ].filter(Boolean).join('\n');
+
+    const cleanPhone = (dealer?.whatsapp || dealer?.phone || '').toString().replace(/[^\d]/g, '');
+    const fullPhone = cleanPhone.startsWith('90') ? cleanPhone : (cleanPhone.startsWith('0') ? '9' + cleanPhone : '90' + cleanPhone);
+    const url = `https://api.whatsapp.com/send?phone=${fullPhone}&text=${encodeURIComponent(msgLines)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleCalcLeadFormQuote = () => {
+    const selectedProd = allCatalogProducts.find(p => p.id === calcSelectedProductId);
+    const roomName = calcRoomType === 'banyo' ? 'Banyo' 
+      : calcRoomType === 'mutfak' ? 'Mutfak'
+      : calcRoomType === 'salon' ? 'Salon & Antre'
+      : calcRoomType === 'teras' ? 'Balkon / Teras' : 'Mekan';
+
+    setSelectedProductForLead(selectedProd || null);
+    setLeadNotes(
+      `${roomName} Alanı: ${calcCalculations.netM2} m² net, %${calcCalculations.wasteP} fire ile toplam ${calcCalculations.totalTileM2} m² seramik, ${calcCalculations.adhesiveBags} torba yapıştırıcı ve ${calcCalculations.groutKg} kg derz dolgusu için iskontolu fiyat teklifi rica ediyorum.`
+    );
+    setShowLeadModal(true);
+  };
 
   // Toast auto-clear
   useEffect(() => {
@@ -1474,100 +1584,257 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </section>
 
-      {/* Section 4: Kurumsal Mimari Katalog & Showroom İstatistikleri (Ayarlardan Gelen Özellikler) */}
-      <section id="pdf-katalog" className="showroom-catalog-stats-section">
-        <div className="showroom-catalog-stats-card">
-          {/* Left: Tag + Headline + CTA */}
-          <div className="catalog-stats-content-col">
-            <div className="catalog-stats-pill">
-              <FileText size={14} className="sparkle-gold" />
-              <span>{sc.pdfCatalogBadge || 'DİJİTAL MİMARİ KATALOG'}</span>
-            </div>
-
-            <h2 className="catalog-stats-headline">{pdfCatalogName}</h2>
-
-            <p className="catalog-stats-subtext">
-              {sc.pdfCatalogDesc || 'En seçkin seramik ve porselen karo serilerimizi, yüzey dokularını, teknik ebat ve metraj detaylarını içeren dijital kataloğumuzu inceleyin.'}
+      {/* =====================================================================
+          SECTION: AKILLI METRAJ & MALZEME HESAPLAMA MASASI (#metraj-hesapla)
+          ===================================================================== */}
+      <section id="metraj-hesapla" className="showroom-calc-section">
+        <div className="showroom-calc-container">
+          <div className="calc-header-box">
+            <span className="calc-badge-gold">
+              <Calculator size={14} />
+              <span>AKILLI METRAJ & MALZEME HESAPLAMA</span>
+            </span>
+            <h2 className="calc-main-title">Mekanınız İçin Ne Kadar Seramik & Malzeme Lazım?</h2>
+            <p className="calc-sub-desc">
+              Odanızı seçin veya ölçülerinizi girin; gereken seramik metrajını, yapıştırıcı harcını ve derz dolgusunu anında hesaplayıp {dealer?.name || 'bayimizden'} özel iskontolu teklif alın.
             </p>
-
-            {pdfCatalogUrl ? (
-              <a 
-                href={pdfCatalogUrl} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="catalog-stats-cta-btn"
-                title="PDF Kataloğu İndir"
-              >
-                <Download size={16} />
-                <span>PDF Kataloğu İndir</span>
-              </a>
-            ) : (
-              <button 
-                onClick={() => {
-                  setSelectedProductForLead(null);
-                  setShowLeadModal(true);
-                }} 
-                className="catalog-stats-cta-btn"
-                title="Katalog ve Fiyat Listesi Talep Et"
-              >
-                <FileText size={16} />
-                <span>Katalog & Fiyat Listesi İste</span>
-              </button>
-            )}
           </div>
 
-          {/* Center: Luxury 3D Ceramic Catalog Mockup Card */}
-          <div className="catalog-stats-visual-col">
-            <div className="catalog-book-mockup">
-              <div className="book-cover-inner">
-                <div className="book-top-badge">
-                  <span className="book-badge-dot" />
-                  <span>2026 MİMARİ SERİLER</span>
+          <div className="calc-main-grid">
+            {/* Left Column: Interactive Inputs */}
+            <div className="calc-inputs-card">
+              {/* Step 1: Room Presets */}
+              <div className="calc-field-section">
+                <label className="calc-field-label">1. Uygulama Alanı Seçin</label>
+                <div className="calc-preset-chips">
+                  {[
+                    { id: 'banyo', label: 'Banyo', sub: 'Zemin & Duvar' },
+                    { id: 'mutfak', label: 'Mutfak', sub: 'Zemin / Tezgah' },
+                    { id: 'salon', label: 'Salon & Antre', sub: 'Geniş Zemin' },
+                    { id: 'teras', label: 'Balkon / Teras', sub: 'Dış Mekan' },
+                    { id: 'custom', label: 'Özel Alan', sub: 'Serbest Ölçü' }
+                  ].map(preset => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => handleSelectRoomPreset(preset.id)}
+                      className={`calc-preset-chip ${calcRoomType === preset.id ? 'active' : ''}`}
+                    >
+                      <span className="preset-name">{preset.label}</span>
+                      <span className="preset-sub">{preset.sub}</span>
+                    </button>
+                  ))}
                 </div>
-                {dealer?.logoUrl ? (
-                  <img src={dealer.logoUrl} alt={dealer.name} className="book-dealer-logo" />
+              </div>
+
+              {/* Step 2: Dimension Inputs (En x Boy or Direct M2) */}
+              <div className="calc-field-section">
+                <div className="calc-mode-toggle-row">
+                  <label className="calc-field-label">2. Ölçü Girişi</label>
+                  <div className="calc-mode-switch">
+                    <button
+                      type="button"
+                      className={`calc-switch-btn ${calcInputMode === 'dims' ? 'active' : ''}`}
+                      onClick={() => setCalcInputMode('dims')}
+                    >
+                      En × Boy (m)
+                    </button>
+                    <button
+                      type="button"
+                      className={`calc-switch-btn ${calcInputMode === 'direct' ? 'active' : ''}`}
+                      onClick={() => setCalcInputMode('direct')}
+                    >
+                      Direkt m²
+                    </button>
+                  </div>
+                </div>
+
+                {calcInputMode === 'dims' ? (
+                  <div className="calc-dims-grid">
+                    <div className="calc-input-box">
+                      <span className="input-affix">En (metre)</span>
+                      <input 
+                        type="number" 
+                        min="0.5" 
+                        max="100" 
+                        step="0.1" 
+                        value={calcWidthM} 
+                        onChange={(e) => setCalcWidthM(e.target.value)} 
+                        className="calc-num-input"
+                      />
+                    </div>
+                    <span className="calc-times-sign">×</span>
+                    <div className="calc-input-box">
+                      <span className="input-affix">Boy (metre)</span>
+                      <input 
+                        type="number" 
+                        min="0.5" 
+                        max="100" 
+                        step="0.1" 
+                        value={calcLengthM} 
+                        onChange={(e) => setCalcLengthM(e.target.value)} 
+                        className="calc-num-input"
+                      />
+                    </div>
+                  </div>
                 ) : (
-                  <Building2 size={36} className="book-dealer-icon" />
+                  <div className="calc-direct-input-wrap">
+                    <input 
+                      type="number" 
+                      min="1" 
+                      max="10000" 
+                      step="0.5" 
+                      value={calcDirectM2} 
+                      onChange={(e) => setCalcDirectM2(e.target.value)} 
+                      className="calc-num-input-large"
+                      placeholder="Örn: 25"
+                    />
+                    <span className="input-unit-label">m² Net Alan</span>
+                  </div>
                 )}
-                <h4 className="book-title">{dealer?.name || 'Showroom'}</h4>
-                <p className="book-sub">Porselen & Seramik Seçkisi</p>
-                <div className="book-bottom-meta">
-                  <span className="book-file-tag">PDF DOKÜMAN</span>
-                  <span className="book-pages-tag">Tüm Ebat & Dokular</span>
+              </div>
+
+              {/* Step 3: Cutting Waste Options & Product Selection */}
+              <div className="calc-field-section">
+                <label className="calc-field-label">3. Döşeme Tipi & Fire Payı</label>
+                <div className="calc-waste-options">
+                  <label className={`waste-option-label ${calcWasteRate === 10 ? 'active' : ''}`}>
+                    <input 
+                      type="radio" 
+                      name="calcWaste" 
+                      value="10" 
+                      checked={calcWasteRate === 10} 
+                      onChange={() => setCalcWasteRate(10)} 
+                    />
+                    <div>
+                      <strong>%10 Fire Payı</strong>
+                      <span>Düz ve standart döşemeler için tavsiye edilen</span>
+                    </div>
+                  </label>
+                  <label className={`waste-option-label ${calcWasteRate === 15 ? 'active' : ''}`}>
+                    <input 
+                      type="radio" 
+                      name="calcWaste" 
+                      value="15" 
+                      checked={calcWasteRate === 15} 
+                      onChange={() => setCalcWasteRate(15)} 
+                    />
+                    <div>
+                      <strong>%15 Fire Payı</strong>
+                      <span>Diyagonal, balıksırtı veya çok kırımlı mekanlar için</span>
+                    </div>
+                  </label>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Right: Showroom Stats from Dealer Settings */}
-          <div className="catalog-stats-metrics-col">
-            <div className="catalog-metric-item">
-              <div className="metric-badge-box">
-                <Award size={18} />
-              </div>
-              <div className="metric-info">
-                <strong className="metric-val">{experienceStat}</strong>
-                <span className="metric-label">Sektörel Tecrübe & Mimari Çözüm Ortaklığı</span>
-              </div>
-            </div>
-
-            <div className="catalog-metric-item">
-              <div className="metric-badge-box">
-                <Store size={18} />
-              </div>
-              <div className="metric-info">
-                <strong className="metric-val">{showroomAreaStat}</strong>
-                <span className="metric-label">Canlı Teşhir & Numune İnceleme Alanı</span>
-              </div>
+              {/* Optional Product Selection from Dealer Catalog */}
+              {allCatalogProducts.length > 0 && (
+                <div className="calc-field-section">
+                  <label className="calc-field-label">İlgilendiğiniz Seramik Modeli (Opsiyonel)</label>
+                  <select 
+                    value={calcSelectedProductId} 
+                    onChange={(e) => setCalcSelectedProductId(e.target.value)}
+                    className="calc-product-select"
+                  >
+                    <option value="">Genel Fiyat Teklifi / Belirli Model Yok</option>
+                    {allCatalogProducts.slice(0, 30).map(p => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} {p.dimensionText ? `(${p.dimensionText})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
-            <div className="catalog-metric-item">
-              <div className="metric-badge-box">
-                <CheckCircle2 size={18} />
+            {/* Right Column: Live Calculated Results & Instant Deal Closing Actions */}
+            <div className="calc-results-card">
+              <div className="results-top-bar">
+                <span className="results-title">MALZEME DÖKÜMÜ & SİPARİŞ LİSTESİ</span>
+                <span className="results-badge-live">Canlı Hesaplandı</span>
               </div>
-              <div className="metric-info">
-                <strong className="metric-val">{happyClientsStat}</strong>
-                <span className="metric-label">Tamamlanan Konut, Villa & Proje Teslimi</span>
+
+              <div className="results-metrics-stack">
+                {/* Metric 1: Total Tiles */}
+                <div className="result-metric-box metric-tiles">
+                  <div className="metric-icon-box">
+                    <Layers size={22} />
+                  </div>
+                  <div className="metric-detail">
+                    <span className="metric-title">TOPLAM SERAMİK İHTİYACI</span>
+                    <div className="metric-value-row">
+                      <span className="metric-num">{calcCalculations.totalTileM2}</span>
+                      <span className="metric-unit">m²</span>
+                    </div>
+                    <span className="metric-note">
+                      Net {calcCalculations.netM2} m² + %{calcCalculations.wasteP} ({calcCalculations.wasteM2} m²) fire payı dahil
+                    </span>
+                  </div>
+                </div>
+
+                {/* Metric 2: Adhesive Bags */}
+                <div className="result-metric-box metric-adhesive">
+                  <div className="metric-icon-box">
+                    <Package size={22} />
+                  </div>
+                  <div className="metric-detail">
+                    <span className="metric-title">YAPIŞTIRICI HARÇ</span>
+                    <div className="metric-value-row">
+                      <span className="metric-num">{calcCalculations.adhesiveBags}</span>
+                      <span className="metric-unit">Torba (25 kg)</span>
+                    </div>
+                    <span className="metric-note">
+                      Toplam {calcCalculations.totalAdhesiveKg} kg standart yapıştırıcı harç
+                    </span>
+                  </div>
+                </div>
+
+                {/* Metric 3: Grout kg */}
+                <div className="result-metric-box metric-grout">
+                  <div className="metric-icon-box">
+                    <Wrench size={22} />
+                  </div>
+                  <div className="metric-detail">
+                    <span className="metric-title">DERZ DOLGUSU</span>
+                    <div className="metric-value-row">
+                      <span className="metric-num">{calcCalculations.groutKg}</span>
+                      <span className="metric-unit">kg</span>
+                    </div>
+                    <span className="metric-note">
+                      Anti-bakteriyel suya dayanıklı flex derz dolgu
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons to Close Sale Directly for Dealers */}
+              <div className="calc-action-buttons-wrap">
+                <button
+                  type="button"
+                  onClick={handleCalcWhatsAppQuote}
+                  className="calc-btn-whatsapp"
+                  title="Hesaplanan Malzemeler İçin WhatsApp'tan Teklif Al"
+                >
+                  <MessageSquare size={18} />
+                  <span>WhatsApp ile İskontolu Fiyat İste</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCalcLeadFormQuote}
+                  className="calc-btn-lead"
+                  title="Resmi Teklif Formu İlet"
+                >
+                  <FileText size={17} />
+                  <span>Resmi Proforma Teklif İste</span>
+                </button>
+              </div>
+
+              <div className="calc-guarantee-note">
+                <ShieldCheck size={16} className="guarantee-icon" />
+                <span>
+                  {dealer?.name || 'Bayimiz'} tarafından en uygun proje iskontosu ve şantiye teslimi opsiyonu ile 2 saat içinde yanıtlanır.
+                </span>
               </div>
             </div>
           </div>
