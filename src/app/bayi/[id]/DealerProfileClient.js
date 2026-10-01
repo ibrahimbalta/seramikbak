@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
   MapPin, 
   Phone, 
   Sparkles, 
   ChevronLeft, 
+  ChevronDown,
   Send, 
   CheckCircle2, 
   Building2, 
@@ -366,25 +367,25 @@ export default function DealerProfileClient({ dealer, products }) {
   const navItems = useMemo(() => {
     const items = [];
     if (dealerFeaturedProducts.length > 0) {
-      items.push({ id: 'showroom-urunleri', label: 'Showroom Ürünleri' });
+      items.push({ id: 'showroom-urunleri', label: 'Öne Çıkanlar', fullLabel: 'Showroom Öne Çıkanlar', icon: Sparkles });
     }
-    items.push({ id: 'katalog', label: 'Dijital Katalog' });
+    items.push({ id: 'katalog', label: 'Katalog', fullLabel: 'Tüm Ürün Kataloğu', icon: Layers });
     if (virtualTourUrl) {
-      items.push({ id: 'sanal-tur', label: '360° Sanal Tur' });
+      items.push({ id: 'sanal-tur', label: 'Sanal Tur', fullLabel: '360° Sanal Tur', icon: Compass });
     }
     if (dealerShowroomImages.length > 0) {
-      items.push({ id: 'galeri', label: 'Showroom Fotoğrafları' });
+      items.push({ id: 'galeri', label: 'Galeri', fullLabel: 'Showroom Fotoğrafları', icon: Camera });
     }
     if (dealerSpecialConcepts.length > 0 || dealerLogisticsList.length > 0) {
-      items.push({ id: 'hizmetler', label: 'Ayrıcalıklar & Konseptler' });
+      items.push({ id: 'hizmetler', label: 'Konseptler', fullLabel: 'Ayrıcalıklar & Hizmetler', icon: Store });
     }
     if (pdfCatalogUrl) {
-      items.push({ id: 'pdf-katalog', label: 'PDF Katalog' });
+      items.push({ id: 'pdf-katalog', label: 'E-Katalog', fullLabel: 'PDF Katalog İndir', icon: Download });
     }
     if (dealer?.aboutText) {
-      items.push({ id: 'hakkimizda', label: 'Hakkımızda' });
+      items.push({ id: 'hakkimizda', label: 'Hakkımızda', fullLabel: 'Hakkımızda', icon: Building2 });
     }
-    items.push({ id: 'lokasyon', label: 'İletişim & Konum' });
+    items.push({ id: 'lokasyon', label: 'İletişim', fullLabel: 'İletişim & Konum', icon: MapPin });
     return items;
   }, [
     dealerFeaturedProducts.length,
@@ -397,6 +398,35 @@ export default function DealerProfileClient({ dealer, products }) {
   ]);
 
   const [activeSection, setActiveSection] = useState('katalog');
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const moreMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target)) {
+        setMoreMenuOpen(false);
+      }
+    };
+    if (moreMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [moreMenuOpen]);
+
+  // Priority navigation: first 4 items inline, remainder in sleek dropdown
+  const visibleNavItems = useMemo(() => {
+    if (navItems.length <= 5) return navItems;
+    return navItems.slice(0, 4);
+  }, [navItems]);
+
+  const overflowNavItems = useMemo(() => {
+    if (navItems.length <= 5) return [];
+    return navItems.slice(4);
+  }, [navItems]);
+
+  const isOverflowActive = useMemo(() => {
+    return overflowNavItems.some(item => item.id === activeSection);
+  }, [overflowNavItems, activeSection]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -752,11 +782,13 @@ export default function DealerProfileClient({ dealer, products }) {
           <div className="header-left">
             <a href="#hero" className="header-dealer-brand" title={dealer?.name || 'Showroom'}>
               {dealer?.logoUrl ? (
-                <img 
-                  src={dealer.logoUrl} 
-                  alt={dealer.name || 'Bayi Logosu'} 
-                  className="header-dealer-main-logo" 
-                />
+                <div className="header-dealer-logo-wrap">
+                  <img 
+                    src={dealer.logoUrl} 
+                    alt={dealer.name || 'Bayi Logosu'} 
+                    className="header-dealer-main-logo" 
+                  />
+                </div>
               ) : (
                 <div className="header-dealer-avatar-fallback">
                   {(dealer?.name || 'B').charAt(0).toUpperCase()}
@@ -774,7 +806,7 @@ export default function DealerProfileClient({ dealer, products }) {
           </div>
 
           <nav className="header-nav-menu">
-            {navItems.map((item) => (
+            {visibleNavItems.map((item) => (
               <a 
                 key={item.id} 
                 href={`#${item.id}`} 
@@ -783,6 +815,40 @@ export default function DealerProfileClient({ dealer, products }) {
                 {item.label}
               </a>
             ))}
+
+            {overflowNavItems.length > 0 && (
+              <div className="header-nav-dropdown-wrap" ref={moreMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+                  className={`header-nav-link header-nav-dropdown-btn ${isOverflowActive ? 'active' : ''}`}
+                  title="Daha fazla bölüm"
+                  aria-expanded={moreMenuOpen}
+                >
+                  <span>Daha Fazla</span>
+                  <ChevronDown size={14} className={`dropdown-chevron ${moreMenuOpen ? 'open' : ''}`} />
+                </button>
+
+                {moreMenuOpen && (
+                  <div className="header-nav-dropdown-menu animate-fade-in">
+                    {overflowNavItems.map((item) => {
+                      const IconComp = item.icon;
+                      return (
+                        <a
+                          key={item.id}
+                          href={`#${item.id}`}
+                          className={`dropdown-menu-item ${activeSection === item.id ? 'active' : ''}`}
+                          onClick={() => setMoreMenuOpen(false)}
+                        >
+                          {IconComp && <IconComp size={15} className="dropdown-item-icon" />}
+                          <span>{item.fullLabel || item.label}</span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
 
           <div className="header-actions-group">
@@ -943,19 +1009,6 @@ export default function DealerProfileClient({ dealer, products }) {
             <ArrowRight size={14} className="cat-floating-arrow" />
           </div>
 
-          <div 
-            onClick={() => handleFloatingCategoryClick('Armatür', 'armatür')} 
-            className="cat-floating-item"
-            role="button"
-            tabIndex={0}
-          >
-            <img src="/renders/luxury_bathroom_albatros_antrasit.jpg" alt="Armatür & Duş Sistemleri" className="cat-floating-thumb" />
-            <div className="cat-floating-text">
-              <strong className="cat-floating-main">Armatür</strong>
-              <span className="cat-floating-sub">&amp; Duş Sistemleri</span>
-            </div>
-            <ArrowRight size={14} className="cat-floating-arrow" />
-          </div>
 
           <div 
             onClick={() => handleFloatingCategoryClick('Dekoratif', 'ahşap')} 
