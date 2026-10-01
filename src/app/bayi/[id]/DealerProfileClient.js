@@ -782,32 +782,6 @@ export default function DealerProfileClient({ dealer, products }) {
           ===================================================================== */}
       <header className="showroom-top-header">
         <div className="showroom-header-inner">
-          <div className="header-left">
-            <a href="#hero" className="header-dealer-brand" title={dealer?.name || 'Showroom'}>
-              {dealer?.logoUrl ? (
-                <div className="header-dealer-logo-wrap">
-                  <img 
-                    src={dealer.logoUrl} 
-                    alt={dealer.name || 'Bayi Logosu'} 
-                    className="header-dealer-main-logo" 
-                  />
-                </div>
-              ) : (
-                <div className="header-dealer-avatar-fallback">
-                  {(dealer?.name || 'B').charAt(0).toUpperCase()}
-                </div>
-              )}
-              <div className="header-dealer-brand-text">
-                <span className="header-dealer-main-name">
-                  {dealer?.name || 'Yetkili Showroom'}
-                </span>
-                <span className="header-dealer-brand-sub">
-                  {dealer?.brand?.name ? `${dealer.brand.name} Yetkili Showroom` : (dealer?.city ? `${dealer.district ? `${dealer.district}, ` : ''}${dealer.city}` : 'Showroom & Tasarım')}
-                </span>
-              </div>
-            </a>
-          </div>
-
           <nav className="header-nav-menu">
             {visibleNavItems.map((item) => (
               <a 
@@ -960,6 +934,31 @@ export default function DealerProfileClient({ dealer, products }) {
                   <span>{heroSecondaryBtnText || "Teklif Al"}</span>
                 </button>
               )}
+            </div>
+          </div>
+
+          {/* Top-Right Dealer Logo & Name Corner Badge (From Image 1 into Image 2 area) */}
+          <div className="flagship-hero-dealer-corner-badge">
+            {dealer?.logoUrl ? (
+              <div className="hero-corner-logo-wrap">
+                <img 
+                  src={dealer.logoUrl} 
+                  alt={dealer.name || 'Bayi Logosu'} 
+                  className="hero-corner-logo-img" 
+                />
+              </div>
+            ) : (
+              <div className="hero-corner-avatar-fallback">
+                {(dealer?.name || 'B').charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div className="hero-corner-text-wrap">
+              <span className="hero-corner-dealer-name">
+                {dealer?.name || 'Yetkili Showroom'}
+              </span>
+              <span className="hero-corner-dealer-sub">
+                {dealer?.brand?.name ? `${dealer.brand.name.toUpperCase()} YETKİLİ SHOWROOM` : (dealer?.city ? `${(dealer.district ? `${dealer.district}, ` : '') + dealer.city} YETKİLİ SHOWROOM`.toUpperCase() : 'YETKİLİ SHOWROOM')}
+              </span>
             </div>
           </div>
         </div>
