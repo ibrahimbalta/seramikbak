@@ -44,7 +44,9 @@ import {
   Camera,
   Store,
   Share2,
-  Maximize2
+  Maximize2,
+  Play,
+  Box
 } from 'lucide-react';
 import './dealer-profile.css';
 
@@ -633,6 +635,26 @@ export default function DealerProfileClient({ dealer, products }) {
     }
   };
 
+  const handleFloatingCategoryClick = (categoryName, keyword) => {
+    const matchingCat = Object.keys(categoryCounts).find(c => 
+      c.toLowerCase() === categoryName.toLowerCase() ||
+      c.toLowerCase().includes(keyword.toLowerCase())
+    );
+
+    if (matchingCat && matchingCat !== 'all') {
+      setSelectedCategory(matchingCat);
+      setSearchTerm('');
+    } else {
+      setSelectedCategory('all');
+      setSearchTerm(keyword);
+    }
+
+    const targetEl = document.getElementById('katalog') || document.getElementById('showroom-urunleri');
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const handleApptSubmit = (e) => {
     e.preventDefault();
     setApptSuccess(true);
@@ -655,194 +677,245 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       )}
 
-      {/* Top Header / Status Bar */}
+      {/* =====================================================================
+          FLAGSHIP SHOWROOM TOP HEADER (CLEAN LUXURY DESIGN)
+          ===================================================================== */}
       <header className="showroom-top-header">
         <div className="showroom-header-inner">
           <div className="header-left">
-            <Link href="/bayi" className="back-to-dealers-btn">
-              <ChevronLeft size={16} />
-              <span className="back-btn-text">Tüm Bayiler</span>
+            <Link href="/" className="header-brand-logo" title="SeramikBak Ana Sayfa">
+              <div className="brand-tiles-icon">
+                <span className="tile-1" />
+                <span className="tile-2" />
+                <span className="tile-3" />
+                <span className="tile-4" />
+              </div>
+              <div className="brand-text-col">
+                <span className="brand-title-main">SERAMİKBAK</span>
+                <span className="brand-sub-tag">SERAMİK &amp; BANYO ÇÖZÜMLERİ</span>
+              </div>
             </Link>
-            <div className="header-brand-summary">
-              <span className="crumb-brand">SeramikBak</span>
-              <span className="crumb-sep">/</span>
-              <span className="crumb-dealer" title={dealer?.name}>{dealer?.name}</span>
-            </div>
+
+            {dealer?.name && (
+              <div className="header-dealer-pill-badge" title={dealer.name}>
+                <span className="dealer-badge-dot" />
+                <span>{dealer.name}</span>
+              </div>
+            )}
           </div>
 
-          <div className="header-right">
+          <nav className="header-nav-menu">
+            <Link href="/" className="header-nav-link">Ana Sayfa</Link>
+            <a href="#katalog" className="header-nav-link">Ürünler</a>
+            <Link href="/marka" className="header-nav-link">Markalar</Link>
+            <a href="#showroom-urunleri" className="header-nav-link active">Showroom</a>
+            <a href="#hakkimizda" className="header-nav-link">Hakkımızda</a>
+            <a href="#iletisim" className="header-nav-link">İletişim</a>
+          </nav>
+
+          <div className="header-actions-group">
             {dealer?.phone && (
-              <a href={`tel:${dealer.phone}`} className="header-contact-pill" title="Showroomu Ara">
-                <Phone size={14} />
-                <span className="btn-label-desktop">{dealer.phone}</span>
+              <a href={`tel:${dealer.phone}`} className="header-phone-link" title="Showroomu Ara">
+                <Phone size={15} className="header-phone-icon" />
+                <span>{dealer.phone}</span>
               </a>
             )}
-            
-            <button 
-              onClick={() => setShowQrModal(true)} 
-              className="header-action-btn"
-              title="Masaüstü QR Kodu"
-            >
-              <QrCode size={15} />
-              <span className="btn-label-desktop">Masa QR</span>
-            </button>
 
             <button 
-              onClick={() => setShowCartDrawer(true)} 
-              className="header-cart-btn"
-              title="Teklif Sepetim"
+              onClick={() => {
+                setSelectedProductForLead(null);
+                setShowLeadModal(true);
+              }} 
+              className="header-quote-pill-btn"
+              title="Hızlı Teklif İste"
             >
-              <FileText size={15} />
-              <span className="btn-label-desktop">Teklif Sepeti</span>
-              {quoteCart.length > 0 && (
-                <span className="cart-counter-badge">{quoteCart.length}</span>
-              )}
+              <FileText size={14} />
+              <span>Teklif Al</span>
             </button>
+
+            {quoteCart.length > 0 && (
+              <button 
+                onClick={() => setShowCartDrawer(true)} 
+                className="header-cart-icon-btn"
+                title="Teklif Sepetim"
+              >
+                <FileText size={15} />
+                <span className="cart-counter-badge">{quoteCart.length}</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
 
       {/* =====================================================================
-          FLAGSHIP ARCHITECTURAL SHOWROOM BANNER (ULTRA-LUXURY DESIGN)
+          FLAGSHIP SHOWROOM HERO BANNER (MATCHING REFERENCE DESIGN)
           ===================================================================== */}
-      {/* =====================================================================
-          CLEAN LUXURY SHOWROOM BANNER (MINIMAL & PRESTIGE)
-          ===================================================================== */}
-      <section className="clean-hero-banner">
-        {/* Dynamic Architectural Backdrop */}
-        <div className="clean-hero-backdrop">
+      <section className="flagship-showroom-hero">
+        <div className="flagship-hero-bg-wrapper">
           <img 
-            src={dealer?.bannerUrl || heroImage} 
+            src={dealer?.bannerUrl || '/images/showroom_hero_flagship.jpg'} 
             alt={dealer?.name || 'Showroom Banner'} 
-            className="clean-hero-bg-img" 
+            className="flagship-hero-bg-img" 
           />
-          <div className="clean-hero-gradient" />
+          <div className="flagship-hero-gradient-overlay" />
         </div>
 
-        <div className="clean-hero-container">
-          <div className="clean-hero-glass-card">
-            {/* Top Brand Tag & Discreet Social Icons */}
-            <div className="clean-hero-top-row">
-            <div className="clean-hero-partner-tag">
-              {dealer?.logoUrl && (
-                <img src={dealer.logoUrl} alt={dealer.name} className="partner-logo-mini" />
-              )}
-              <ShieldCheck size={14} className="tag-shield-ico" />
-              <span>{dealer?.brand?.name ? `${dealer.brand.name} Yetkili Bayisi` : heroBadge}</span>
+        <div className="flagship-hero-inner">
+          <div className="flagship-hero-content-col">
+            <span className="flagship-hero-overline">
+              {dealer?.brand?.name ? `${dealer.brand.name.toUpperCase()} SHOWROOM` : `${(dealer?.name || 'SERAMİKBAK').toUpperCase()} SHOWROOM`}
+            </span>
+
+            <h1 className="flagship-hero-h1">
+              Hayalinizdeki Mekanlar <br />
+              <span className="flagship-gold-text">Burada Başlıyor</span>
+            </h1>
+
+            <p className="flagship-hero-desc">
+              Modern tasarımları, kaliteli markaları ve geniş ürün yelpazesiyle seramik, porselen ve banyo çözümlerini showroomumuzda keşfedin. Hayalinizdeki yaşam alanı için ilham alın.
+            </p>
+
+            {/* 4 Feature Badges Row */}
+            <div className="flagship-badges-row">
+              <div className="flagship-badge-item">
+                <Sparkles size={14} className="badge-gold-ico" />
+                <span>Kaliteli Markalar</span>
+              </div>
+              <div className="flagship-badge-item">
+                <Compass size={14} className="badge-gold-ico" />
+                <span>Profesyonel Danışmanlık</span>
+              </div>
+              <div className="flagship-badge-item">
+                <Box size={14} className="badge-gold-ico" />
+                <span>3D Tasarım Desteği</span>
+              </div>
+              <div className="flagship-badge-item">
+                <Store size={14} className="badge-gold-ico" />
+                <span>Geniş Showroom</span>
+              </div>
             </div>
 
-            {hasAnySocial && (
-              <div className="clean-hero-social-strip">
-                {socialLinks.instagram && (
-                  <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="clean-social-ico" title="Instagram">
-                    <InstagramIcon size={15} />
-                  </a>
-                )}
-                {socialLinks.facebook && (
-                  <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="clean-social-ico" title="Facebook">
-                    <FacebookIcon size={15} />
-                  </a>
-                )}
-                {socialLinks.linkedin && (
-                  <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="clean-social-ico" title="LinkedIn">
-                    <LinkedinIcon size={15} />
-                  </a>
-                )}
-                {socialLinks.youtube && (
-                  <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="clean-social-ico" title="YouTube">
-                    <YoutubeIcon size={15} />
-                  </a>
-                )}
-                {socialLinks.website && (
-                  <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="clean-social-ico" title="Web Sitesi">
-                    <Globe size={15} />
-                  </a>
-                )}
-              </div>
-            )}
+            {/* Action Buttons */}
+            <div className="flagship-cta-row">
+              <a href="#katalog" className="flagship-btn-primary">
+                <span>Showroom&apos;u Keşfet</span>
+                <ArrowRight size={16} />
+              </a>
+
+              {dealer?.virtualTourUrl ? (
+                <a href="#sanal-tur" className="flagship-btn-video">
+                  <span className="play-circle-ico">
+                    <Play size={10} fill="#ffffff" />
+                  </span>
+                  <span>360° Sanal Gezi</span>
+                </a>
+              ) : (
+                <button 
+                  onClick={() => {
+                    setSelectedProductForLead(null);
+                    setShowLeadModal(true);
+                  }} 
+                  className="flagship-btn-video"
+                >
+                  <span className="play-circle-ico">
+                    <Play size={10} fill="#ffffff" />
+                  </span>
+                  <span>Showroom Tanıtım Videosu</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================================
+          FLOATING CATEGORIES BAR (OVERLAPPING HERO BOTTOM)
+          ===================================================================== */}
+      <div className="flagship-categories-bar-wrapper">
+        <div className="flagship-categories-card">
+          <div 
+            onClick={() => handleFloatingCategoryClick('Seramik', 'seramik')} 
+            className="cat-floating-item"
+            role="button"
+            tabIndex={0}
+          >
+            <img src="/textures/calacatta_gold.jpg" alt="Seramik Karo" className="cat-floating-thumb" />
+            <div className="cat-floating-text">
+              <strong className="cat-floating-main">Seramik</strong>
+              <span className="cat-floating-sub">Karo</span>
+            </div>
+            <ArrowRight size={14} className="cat-floating-arrow" />
           </div>
 
-          {/* Central Stage */}
-          <div className="clean-hero-content">
-            <h1 className="clean-hero-title">{heroTitle}</h1>
-            <p className="clean-hero-desc">{heroDescription}</p>
-
-            {/* Understated Single-Line Meta Bar */}
-            <div className="clean-hero-meta-bar">
-              <span className="meta-pill live">
-                <span className="meta-dot" />
-                <span>Açık ({workingHours})</span>
-              </span>
-              {dealer?.city && (
-                <span className="meta-pill">
-                  <MapPin size={13} />
-                  <span>{dealer.city}{dealer.district ? ` / ${dealer.district}` : ''}</span>
-                </span>
-              )}
-              {dealer?.phone && (
-                <a href={`tel:${dealer.phone}`} className="meta-pill phone">
-                  <Phone size={13} />
-                  <span>{dealer.phone}</span>
-                </a>
-              )}
+          <div 
+            onClick={() => handleFloatingCategoryClick('Porselen', 'porselen')} 
+            className="cat-floating-item"
+            role="button"
+            tabIndex={0}
+          >
+            <img src="/textures/travertino_classico.jpg" alt="Porselen Seramik" className="cat-floating-thumb" />
+            <div className="cat-floating-text">
+              <strong className="cat-floating-main">Porselen</strong>
+              <span className="cat-floating-sub">Seramik</span>
             </div>
+            <ArrowRight size={14} className="cat-floating-arrow" />
+          </div>
 
-            {/* Clean & Focused Action Buttons (Max 3 cohesive buttons) */}
-            <div className="clean-hero-actions">
-              <button 
-                onClick={() => {
-                  setSelectedProductForLead(null);
-                  setShowLeadModal(true);
-                }} 
-                className="clean-btn-primary"
-              >
-                <FileText size={16} />
-                <span>Fiyat Teklifi Al</span>
-              </button>
-
-              <a href="#sanal-tur" className="clean-btn-secondary">
-                <Compass size={16} />
-                <span>360° Sanal Gezi</span>
-              </a>
-
-              <a href="#galeri" className="clean-btn-secondary">
-                <Camera size={16} />
-                <span>Fotoğraflar ({displayShowroomImages.length})</span>
-              </a>
-
-              <a href="#katalog" className="clean-btn-link">
-                <span>Kataloğa Git ↓</span>
-              </a>
+          <div 
+            onClick={() => handleFloatingCategoryClick('Banyo', 'banyo')} 
+            className="cat-floating-item"
+            role="button"
+            tabIndex={0}
+          >
+            <img src="/hero/luxury_bathroom.png" alt="Banyo Ürünleri" className="cat-floating-thumb" />
+            <div className="cat-floating-text">
+              <strong className="cat-floating-main">Banyo</strong>
+              <span className="cat-floating-sub">Ürünleri</span>
             </div>
+            <ArrowRight size={14} className="cat-floating-arrow" />
+          </div>
+
+          <div 
+            onClick={() => handleFloatingCategoryClick('Armatür', 'armatür')} 
+            className="cat-floating-item"
+            role="button"
+            tabIndex={0}
+          >
+            <img src="/renders/luxury_bathroom_albatros_antrasit.jpg" alt="Armatür & Duş Sistemleri" className="cat-floating-thumb" />
+            <div className="cat-floating-text">
+              <strong className="cat-floating-main">Armatür</strong>
+              <span className="cat-floating-sub">&amp; Duş Sistemleri</span>
+            </div>
+            <ArrowRight size={14} className="cat-floating-arrow" />
+          </div>
+
+          <div 
+            onClick={() => handleFloatingCategoryClick('Dekoratif', 'ahşap')} 
+            className="cat-floating-item"
+            role="button"
+            tabIndex={0}
+          >
+            <img src="/textures/natural_oak.jpg" alt="Dekoratif Ürünler" className="cat-floating-thumb" />
+            <div className="cat-floating-text">
+              <strong className="cat-floating-main">Dekoratif</strong>
+              <span className="cat-floating-sub">Ürünler</span>
+            </div>
+            <ArrowRight size={14} className="cat-floating-arrow" />
           </div>
         </div>
       </div>
-    </section>
 
-      {/* Section 2: 4 Feature Pillars Bar (Symmetrical 2x2 on Mobile, 4-Col Desktop) */}
-      <section className="feature-pillars-bar">
-        <div className="feature-pillars-container">
-          {featurePillars.map((pillar, idx) => {
-            const icons = [
-              <Package key="1" size={20} />,
-              <Sparkles key="2" size={20} />,
-              <Layers key="3" size={20} />,
-              <CheckCircle2 key="4" size={20} />
-            ];
-            return (
-              <div key={idx} className="feature-pillar-card">
-                <div className="pillar-icon-box">
-                  {icons[idx] || <CheckCircle2 size={20} />}
-                </div>
-                <div className="pillar-text-group">
-                  <h3 className="pillar-title">{pillar.title}</h3>
-                  <p className="pillar-desc">{pillar.desc}</p>
-                </div>
-              </div>
-            );
-          })}
+      {/* Slogan & Script Subline */}
+      <div className="flagship-slogan-strip">
+        <div className="slogan-divider-group">
+          <span className="slogan-line" />
+          <span className="slogan-caps-text">MODERN YAŞAM ALANLARI İÇİN DOĞRU ADRES</span>
+          <span className="slogan-line" />
         </div>
-      </section>
+        <div className="slogan-script-text">
+          Daha Güzel Mekanlar...
+        </div>
+      </div>
 
       {/* Section: Strictly Dealer Selected Showroom Products Showcase */}
       {dealerFeaturedProducts.length > 0 && (
