@@ -47,7 +47,9 @@ import {
   Share2,
   Maximize2,
   Play,
-  Box
+  Box,
+  Menu,
+  ShoppingBag
 } from 'lucide-react';
 import './dealer-profile.css';
 
@@ -430,6 +432,7 @@ export default function DealerProfileClient({ dealer, products }) {
   // Modals & Drawer States
   const [quoteCart, setQuoteCart] = useState([]);
   const [showCartDrawer, setShowCartDrawer] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showLeadModal, setShowLeadModal] = useState(false);
   const [selectedProductForLead, setSelectedProductForLead] = useState(null);
   const [showApptModal, setShowApptModal] = useState(false);
@@ -753,6 +756,17 @@ export default function DealerProfileClient({ dealer, products }) {
           ===================================================================== */}
       <header className="showroom-top-header">
         <div className="showroom-header-inner">
+          {/* Mobile Hamburger Button */}
+          <button 
+            type="button" 
+            onClick={() => setMobileNavOpen(true)}
+            className="header-mobile-hamburger-btn"
+            title="Menüyü Aç"
+            aria-label="Menüyü Aç"
+          >
+            <Menu size={22} />
+          </button>
+
           <nav className="header-nav-menu">
             {navItems.map((item) => (
               <a 
@@ -786,16 +800,18 @@ export default function DealerProfileClient({ dealer, products }) {
               <span>Teklif Al</span>
             </button>
 
-            {quoteCart.length > 0 && (
-              <button 
-                onClick={() => setShowCartDrawer(true)} 
-                className="header-cart-icon-btn"
-                title="Teklif Sepetim"
-              >
-                <FileText size={15} />
+            {/* Cart Button: ALWAYS visible so users can easily see and click it anytime on mobile & desktop */}
+            <button 
+              onClick={() => setShowCartDrawer(true)} 
+              className={`header-cart-icon-btn ${quoteCart.length > 0 ? 'has-items' : ''}`}
+              title={quoteCart.length > 0 ? `Teklif Sepeti (${quoteCart.length} ürün)` : 'Teklif Sepetim'}
+              aria-label="Teklif Sepetim"
+            >
+              <ShoppingBag size={18} />
+              {quoteCart.length > 0 && (
                 <span className="cart-counter-badge">{quoteCart.length}</span>
-              </button>
-            )}
+              )}
+            </button>
           </div>
         </div>
       </header>
@@ -2108,6 +2124,18 @@ export default function DealerProfileClient({ dealer, products }) {
             <span>WhatsApp</span>
           </a>
 
+          {quoteCart.length > 0 && (
+            <button 
+              type="button"
+              onClick={() => setShowCartDrawer(true)} 
+              className="bottom-action-btn btn-cart-highlight animate-fade-in"
+              style={{ background: themePrimary }}
+            >
+              <ShoppingBag size={17} />
+              <span>Sepet ({quoteCart.length})</span>
+            </button>
+          )}
+
           {customMapsUrl ? (
             <a 
               href={customMapsUrl}
@@ -2120,6 +2148,7 @@ export default function DealerProfileClient({ dealer, products }) {
             </a>
           ) : (
             <button 
+              type="button"
               onClick={() => setShowApptModal(true)}
               className="bottom-action-btn btn-directions"
             >
@@ -2129,6 +2158,7 @@ export default function DealerProfileClient({ dealer, products }) {
           )}
 
           <button 
+            type="button"
             onClick={() => {
               setSelectedProductForLead(null);
               setShowLeadModal(true);
@@ -2140,6 +2170,115 @@ export default function DealerProfileClient({ dealer, products }) {
           </button>
         </div>
       </div>
+
+      {/* =====================================================================
+          MOBILE SLIDE-OUT NAVIGATION DRAWER (HAMBURGER MENÜ)
+          ===================================================================== */}
+      {mobileNavOpen && (
+        <div className="showroom-modal-backdrop mobile-drawer-backdrop" onClick={() => setMobileNavOpen(false)}>
+          <div className="mobile-nav-drawer-sheet animate-slide-left" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-drawer-header">
+              <div className="mobile-drawer-brand">
+                {dealer?.logoUrl ? (
+                  <div className="mobile-drawer-logo-wrap">
+                    <img src={dealer.logoUrl} alt={dealer.name || 'Bayi Logosu'} />
+                  </div>
+                ) : (
+                  <div className="mobile-drawer-avatar-fallback">
+                    {(dealer?.name || 'B').charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="mobile-drawer-brand-text">
+                  <span className="mobile-drawer-dealer-name">{dealer?.name || 'Yetkili Showroom'}</span>
+                  <span className="mobile-drawer-dealer-sub">
+                    {dealer?.brand?.name ? `${dealer.brand.name.toUpperCase()} SHOWROOM` : 'YETKİLİ SHOWROOM'}
+                  </span>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setMobileNavOpen(false)}
+                className="mobile-drawer-close-btn"
+                aria-label="Kapat"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Quick Cart Shortcut in Mobile Drawer */}
+            <div 
+              className={`mobile-drawer-cart-card ${quoteCart.length > 0 ? 'has-items' : ''}`} 
+              onClick={() => { setMobileNavOpen(false); setShowCartDrawer(true); }}
+            >
+              <div className="drawer-cart-card-left">
+                <div className="drawer-cart-icon-circle">
+                  <ShoppingBag size={18} />
+                </div>
+                <div>
+                  <div className="drawer-cart-title">Teklif Sepetim</div>
+                  <div className="drawer-cart-subtitle">
+                    {quoteCart.length > 0 ? `${quoteCart.length} ürün listelendi` : 'Henüz ürün eklenmedi'}
+                  </div>
+                </div>
+              </div>
+              <span className={`drawer-cart-badge ${quoteCart.length > 0 ? 'active' : ''}`}>
+                {quoteCart.length}
+              </span>
+            </div>
+
+            {/* Mobile Drawer Navigation Links */}
+            <div className="mobile-drawer-nav-list">
+              <div className="mobile-drawer-section-label">SHOWROOM MENÜ</div>
+              {navItems.map((item) => {
+                const IconComp = item.icon;
+                const isActive = activeSection === item.id;
+                return (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    className={`mobile-drawer-nav-item ${isActive ? 'active' : ''}`}
+                    onClick={() => setMobileNavOpen(false)}
+                  >
+                    <div className="drawer-item-left">
+                      {IconComp && <IconComp size={18} className="drawer-item-icon" />}
+                      <span>{item.fullLabel || item.label}</span>
+                    </div>
+                    <ArrowRight size={15} className="drawer-item-arrow" />
+                  </a>
+                );
+              })}
+            </div>
+
+            {/* Mobile Drawer Footer Actions */}
+            <div className="mobile-drawer-footer">
+              {dealer?.phone && (
+                <a href={`tel:${dealer.phone}`} className="drawer-footer-action-btn btn-call">
+                  <Phone size={16} />
+                  <span>{dealer.phone}</span>
+                </a>
+              )}
+              <a 
+                href={`https://wa.me/${dealerWhatsAppPhone}?text=${encodeURIComponent(whatsappGreeting)}`}
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="drawer-footer-action-btn btn-whatsapp"
+              >
+                <MessageSquare size={16} />
+                <span>WhatsApp İletişim</span>
+              </a>
+              <button 
+                type="button"
+                onClick={() => { setMobileNavOpen(false); setSelectedProductForLead(null); setShowLeadModal(true); }}
+                className="drawer-footer-action-btn btn-quote"
+                style={{ background: themePrimary }}
+              >
+                <FileText size={16} />
+                <span>Hızlı Teklif İste</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MOBILE BOTTOM SHEET MODAL: Filter Sheet */}
       {showMobileFilterModal && (
