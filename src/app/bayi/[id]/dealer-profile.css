@@ -82,102 +82,73 @@
   gap: 20px;
 }
 
-/* Brand Logo with 4-Quadrant Icon */
-.header-brand-logo {
+/* Dealer Brand Logo & Name (Showroom Header) */
+.header-dealer-brand {
   display: flex;
   align-items: center;
   gap: 12px;
   text-decoration: none;
   flex-shrink: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.brand-tiles-icon {
-  display: grid;
-  grid-template-columns: repeat(2, 9px);
-  grid-template-rows: repeat(2, 9px);
-  gap: 3px;
-  padding: 2px;
+.header-dealer-brand:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
 }
 
-.brand-tiles-icon .tile-1 { background-color: #1e293b; border-radius: 2px; }
-.brand-tiles-icon .tile-2 { background-color: #64748b; border-radius: 2px; }
-.brand-tiles-icon .tile-3 { background-color: #d9a05b; border-radius: 2px; }
-.brand-tiles-icon .tile-4 { background-color: #cbd5e1; border-radius: 2px; }
+.header-dealer-main-logo {
+  height: 42px;
+  max-width: 160px;
+  object-fit: contain;
+  display: block;
+}
 
-.brand-text-col {
+.header-dealer-avatar-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--theme-primary, #d9a05b);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.header-dealer-brand-text {
   display: flex;
   flex-direction: column;
 }
 
-.brand-title-main {
+.header-dealer-main-name {
   font-size: 1.15rem;
-  font-weight: 900;
-  letter-spacing: 0.05em;
+  font-weight: 800;
+  letter-spacing: 0.03em;
   color: #0f172a;
-  line-height: 1.1;
+  line-height: 1.15;
   text-transform: uppercase;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.brand-sub-tag {
-  font-size: 0.62rem;
+.header-dealer-brand-sub {
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   color: #94a3b8;
   text-transform: uppercase;
   margin-top: 2px;
-}
-
-.header-dealer-pill-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #475569;
-  max-width: 200px;
+  max-width: 280px;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
-}
-
-.header-dealer-brand-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 12px 4px 8px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 24px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  max-width: 240px;
-}
-
-.header-dealer-logo-img {
-  height: 22px;
-  max-width: 65px;
-  object-fit: contain;
-  border-radius: 4px;
-}
-
-.header-dealer-brand-name {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #1e293b;
-  overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.dealer-badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #10b981;
-  flex-shrink: 0;
 }
 
 /* Center Nav Menu */
@@ -3137,6 +3108,35 @@
   /* Header on Mobile */
   .showroom-top-header {
     padding: 10px 14px;
+  }
+
+  .header-nav-menu {
+    display: none;
+  }
+
+  .header-dealer-brand-sub {
+    display: none;
+  }
+
+  .header-dealer-main-name {
+    font-size: 0.95rem;
+    max-width: 170px;
+  }
+
+  .header-dealer-main-logo {
+    height: 32px;
+    max-width: 110px;
+  }
+
+  .header-dealer-avatar-fallback {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    border-radius: 6px;
+  }
+
+  .header-phone-link {
+    display: none;
   }
 
   .back-btn-text {

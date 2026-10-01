@@ -750,30 +750,27 @@ export default function DealerProfileClient({ dealer, products }) {
       <header className="showroom-top-header">
         <div className="showroom-header-inner">
           <div className="header-left">
-            <Link href="/" className="header-brand-logo" title="SeramikBak Ana Sayfa">
-              <div className="brand-tiles-icon">
-                <span className="tile-1" />
-                <span className="tile-2" />
-                <span className="tile-3" />
-                <span className="tile-4" />
+            <a href="#hero" className="header-dealer-brand" title={dealer?.name || 'Showroom'}>
+              {dealer?.logoUrl ? (
+                <img 
+                  src={dealer.logoUrl} 
+                  alt={dealer.name || 'Bayi Logosu'} 
+                  className="header-dealer-main-logo" 
+                />
+              ) : (
+                <div className="header-dealer-avatar-fallback">
+                  {(dealer?.name || 'B').charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="header-dealer-brand-text">
+                <span className="header-dealer-main-name">
+                  {dealer?.name || 'Yetkili Showroom'}
+                </span>
+                <span className="header-dealer-brand-sub">
+                  {dealer?.brand?.name ? `${dealer.brand.name} Yetkili Showroom` : (dealer?.city ? `${dealer.district ? `${dealer.district}, ` : ''}${dealer.city}` : 'Showroom & Tasarım')}
+                </span>
               </div>
-              <div className="brand-text-col">
-                <span className="brand-title-main">SERAMİKBAK</span>
-                <span className="brand-sub-tag">SERAMİK &amp; BANYO ÇÖZÜMLERİ</span>
-              </div>
-            </Link>
-
-            {dealer?.logoUrl ? (
-              <div className="header-dealer-brand-badge" title={dealer.name}>
-                <img src={dealer.logoUrl} alt={dealer.name} className="header-dealer-logo-img" />
-                <span className="header-dealer-brand-name">{dealer.name}</span>
-              </div>
-            ) : dealer?.name ? (
-              <div className="header-dealer-pill-badge" title={dealer.name}>
-                <span className="dealer-badge-dot" />
-                <span>{dealer.name}</span>
-              </div>
-            ) : null}
+            </a>
           </div>
 
           <nav className="header-nav-menu">
@@ -826,7 +823,7 @@ export default function DealerProfileClient({ dealer, products }) {
       {/* =====================================================================
           FLAGSHIP SHOWROOM HERO BANNER (MATCHING REFERENCE DESIGN)
           ===================================================================== */}
-      <section className="flagship-showroom-hero">
+      <section id="hero" className="flagship-showroom-hero">
         <div className="flagship-hero-bg-wrapper">
           <img 
             src={dealer?.bannerUrl || '/images/showroom_hero_flagship.jpg'} 
