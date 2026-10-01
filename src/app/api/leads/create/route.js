@@ -88,28 +88,48 @@ export async function POST(request) {
     }
 
     // If product not explicitly passed (e.g. general showroom quote) or not found:
+    if (!product && dealer.featuredProducts) {
+      try {
+        const rawFeat = JSON.parse(dealer.featuredProducts);
+        const featIds = Array.isArray(rawFeat)
+          ? rawFeat.map(item => (typeof item === 'object' && item !== null ? item.id : item)).filter(Boolean)
+          : [];
+        if (featIds.length > 0) {
+          product = await prisma.product.findFirst({
+            where: { id: { in: featIds } }
+          });
+        }
+      } catch (e) {}
+    }
+
     if (!product) {
-      // 1. Try dealer's catalog products
-      const dealerCat = await prisma.dealerCatalogProduct.findFirst({
-        where: { dealerId: dealer.id }
-      });
-      if (dealerCat?.productId) {
-        product = await prisma.product.findUnique({
-          where: { id: dealerCat.productId }
+      // 1. Try dealer's inventory
+      try {
+        const inv = await prisma.dealerInventory.findFirst({
+          where: { dealerId: dealer.id }
         });
-      }
+        if (inv?.productId) {
+          product = await prisma.product.findUnique({
+            where: { id: inv.productId }
+          });
+        }
+      } catch (e) {}
     }
 
     if (!product && dealer.brandId) {
       // 2. Try dealer's brand products
-      product = await prisma.product.findFirst({
-        where: { brandId: dealer.brandId }
-      });
+      try {
+        product = await prisma.product.findFirst({
+          where: { brandId: dealer.brandId }
+        });
+      } catch (e) {}
     }
 
     if (!product) {
       // 3. Fallback to any active product to satisfy relational integrity
-      product = await prisma.product.findFirst();
+      try {
+        product = await prisma.product.findFirst();
+      } catch (e) {}
     }
 
     if (!product) {
@@ -164,28 +184,36 @@ export async function POST(request) {
     }
 
     // Send email notification to seramikbak@gmail.com and dealer
-    sendLeadNotification({
-      name: resolvedName,
-      phone: resolvedPhone,
-      city: dealer.city,
-      notes: resolvedNotes,
-      dealerName: dealer.name,
-      dealerEmail: dealer.email,
-      productName: productName || product.name
-    }).catch(err => {
-      console.error('Lead email notification trigger error:', err);
-    });
+    try {
+      sendLeadNotification({
+        name: resolvedName,
+        phone: resolvedPhone,
+        city: dealer.city,
+        notes: resolvedNotes,
+        dealerName: dealer.name,
+        dealerEmail: dealer.email,
+        productName: productName || product.name
+      }).catch(err => {
+        console.error('Lead email notification trigger error:', err);
+      });
+    } catch (e) {
+      console.warn('sendLeadNotification failed:', e.message);
+    }
 
     // Send Web Push notification to dealer
-    sendPushNotification({
-      userType: 'DEALER',
-      userId: dealerId,
-      title: '🎯 Yeni Müşteri Teklif Talebi!',
-      body: `${resolvedName} (${dealer.city || 'Genel'}) - ${productName || product.name} için fiyat teklifi bekliyor.`,
-      url: '/bayi'
-    }).catch(err => {
-      console.warn('Lead push notification error:', err.message);
-    });
+    try {
+      sendPushNotification({
+        userType: 'DEALER',
+        userId: dealerId,
+        title: '🎯 Yeni Müşteri Teklif Talebi!',
+        body: `${resolvedName} (${dealer.city || 'Genel'}) - ${productName || product.name} için fiyat teklifi bekliyor.`,
+        url: '/bayi'
+      }).catch(err => {
+        console.warn('Lead push notification error:', err.message);
+      });
+    } catch (e) {
+      console.warn('sendPushNotification failed:', e.message);
+    }
 
     return NextResponse.json({
       success: true,
