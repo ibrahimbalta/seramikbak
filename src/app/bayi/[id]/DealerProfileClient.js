@@ -706,8 +706,9 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
 
         <div className="clean-hero-container">
-          {/* Top Brand Tag & Discreet Social Icons */}
-          <div className="clean-hero-top-row">
+          <div className="clean-hero-glass-card">
+            {/* Top Brand Tag & Discreet Social Icons */}
+            <div className="clean-hero-top-row">
             <div className="clean-hero-partner-tag">
               {dealer?.logoUrl && (
                 <img src={dealer.logoUrl} alt={dealer.name} className="partner-logo-mini" />
@@ -801,7 +802,8 @@ export default function DealerProfileClient({ dealer, products }) {
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* Section 2: 4 Feature Pillars Bar (Symmetrical 2x2 on Mobile, 4-Col Desktop) */}
       <section className="feature-pillars-bar">
