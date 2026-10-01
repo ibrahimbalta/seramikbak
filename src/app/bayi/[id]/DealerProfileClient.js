@@ -691,167 +691,113 @@ export default function DealerProfileClient({ dealer, products }) {
       {/* =====================================================================
           FLAGSHIP ARCHITECTURAL SHOWROOM BANNER (ULTRA-LUXURY DESIGN)
           ===================================================================== */}
-      <section className="flagship-hero-banner">
+      {/* =====================================================================
+          CLEAN LUXURY SHOWROOM BANNER (MINIMAL & PRESTIGE)
+          ===================================================================== */}
+      <section className="clean-hero-banner">
         {/* Dynamic Architectural Backdrop */}
-        <div className="flagship-backdrop">
+        <div className="clean-hero-backdrop">
           <img 
             src={dealer?.bannerUrl || heroImage} 
             alt={dealer?.name || 'Showroom Banner'} 
-            className="flagship-bg-img"
+            className="clean-hero-bg-img" 
           />
-          <div className="flagship-bg-gradient" />
-          <div className="flagship-bg-glow" />
+          <div className="clean-hero-gradient" />
         </div>
 
-        <div className="flagship-container">
-          {/* Top Row: Official Authorized Plaque + Social Media Dock */}
-          <div className="flagship-top-bar">
-            <div className="flagship-brand-plaque">
-              <div className="plaque-logo-frame">
-                {dealer?.logoUrl ? (
-                  <img src={dealer.logoUrl} alt={dealer.name} className="plaque-logo-img" />
-                ) : (
-                  <Building2 size={26} className="plaque-monogram-icon" />
-                )}
-              </div>
-              <div className="plaque-text-group">
-                <div className="plaque-badge-pill">
-                  <ShieldCheck size={14} className="plaque-shield-icon" />
-                  <span>{heroBadge}</span>
-                </div>
-                {dealer?.brand?.name && (
-                  <span className="plaque-partner-brand">{dealer.brand.name} Yetkili Bayisi</span>
-                )}
-              </div>
+        <div className="clean-hero-container">
+          {/* Top Brand Tag & Discreet Social Icons */}
+          <div className="clean-hero-top-row">
+            <div className="clean-hero-partner-tag">
+              {dealer?.logoUrl && (
+                <img src={dealer.logoUrl} alt={dealer.name} className="partner-logo-mini" />
+              )}
+              <ShieldCheck size={14} className="tag-shield-ico" />
+              <span>{dealer?.brand?.name ? `${dealer.brand.name} Yetkili Bayisi` : heroBadge}</span>
             </div>
 
-            {/* Social Media Dock in Banner */}
-            <div className="flagship-social-dock">
-              <span className="dock-hint">Sosyal Kanallar:</span>
-              <div className="dock-icons-cluster">
-                {socialLinks.instagram ? (
-                  <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-instagram" title="Instagram Sayfası">
-                    <InstagramIcon size={16} />
-                  </a>
-                ) : (
-                  <a href={`https://www.instagram.com/explore/tags/${encodeURIComponent((dealer?.name || 'seramik').replace(/\s+/g, ''))}`} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-instagram" title="Instagram">
-                    <InstagramIcon size={16} />
+            {hasAnySocial && (
+              <div className="clean-hero-social-strip">
+                {socialLinks.instagram && (
+                  <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="clean-social-ico" title="Instagram">
+                    <InstagramIcon size={15} />
                   </a>
                 )}
-
-                {socialLinks.facebook ? (
-                  <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-facebook" title="Facebook Sayfası">
-                    <FacebookIcon size={16} />
-                  </a>
-                ) : (
-                  <a href={`https://www.facebook.com/search/top?q=${encodeURIComponent(dealer?.name || 'seramik')}`} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-facebook" title="Facebook">
-                    <FacebookIcon size={16} />
+                {socialLinks.facebook && (
+                  <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="clean-social-ico" title="Facebook">
+                    <FacebookIcon size={15} />
                   </a>
                 )}
-
                 {socialLinks.linkedin && (
-                  <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-linkedin" title="LinkedIn Sayfası">
-                    <LinkedinIcon size={16} />
+                  <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="clean-social-ico" title="LinkedIn">
+                    <LinkedinIcon size={15} />
                   </a>
                 )}
-
                 {socialLinks.youtube && (
-                  <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-youtube" title="YouTube Kanalı">
-                    <YoutubeIcon size={16} />
+                  <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="clean-social-ico" title="YouTube">
+                    <YoutubeIcon size={15} />
                   </a>
                 )}
-
                 {socialLinks.website && (
-                  <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="dock-icon-btn dock-website" title="Resmi İnternet Sitesi">
-                    <Globe size={16} />
+                  <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="clean-social-ico" title="Web Sitesi">
+                    <Globe size={15} />
                   </a>
                 )}
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Center Main Stage: Dealer Title & Architectural Intro */}
-          <div className="flagship-center-stage">
-            <h1 className="flagship-main-title">{heroTitle}</h1>
-            <p className="flagship-lead-text">{heroDescription}</p>
+          {/* Central Stage */}
+          <div className="clean-hero-content">
+            <h1 className="clean-hero-title">{heroTitle}</h1>
+            <p className="clean-hero-desc">{heroDescription}</p>
 
-            {/* Prestige Metrics & Status Chips */}
-            <div className="flagship-status-chips">
-              <div className="status-chip open-live">
-                <span className="emerald-pulse" />
-                <span>Açık • {workingDays}: {workingHours}</span>
-              </div>
+            {/* Understated Single-Line Meta Bar */}
+            <div className="clean-hero-meta-bar">
+              <span className="meta-pill live">
+                <span className="meta-dot" />
+                <span>Açık ({workingHours})</span>
+              </span>
               {dealer?.city && (
-                <div className="status-chip location-chip">
-                  <MapPin size={14} className="chip-ico" />
+                <span className="meta-pill">
+                  <MapPin size={13} />
                   <span>{dealer.city}{dealer.district ? ` / ${dealer.district}` : ''}</span>
-                </div>
+                </span>
               )}
               {dealer?.phone && (
-                <a href={`tel:${dealer.phone}`} className="status-chip phone-chip">
-                  <Phone size={14} className="chip-ico" />
+                <a href={`tel:${dealer.phone}`} className="meta-pill phone">
+                  <Phone size={13} />
                   <span>{dealer.phone}</span>
                 </a>
               )}
-              <div className="status-chip collection-chip">
-                <Sparkles size={14} className="chip-ico gold" />
-                <span>{allCatalogProducts.length}+ Teşhir Serisi</span>
-              </div>
             </div>
 
-            {/* High-Impact Executive Action Bar */}
-            <div className="flagship-actions-bar">
-              {/* 360 Sanal Gezi Button */}
-              <a href="#sanal-tur" className="flagship-btn-gold">
-                <Compass size={17} />
-                <span>360° Sanal Gezi</span>
-              </a>
-
-              {/* Showroom Fotoğrafları Button */}
-              <a href="#galeri" className="flagship-btn-photos">
-                <Camera size={17} />
-                <span>Showroom Fotoğrafları ({displayShowroomImages.length})</span>
-              </a>
-
-              {/* Teklif Al Button */}
+            {/* Clean & Focused Action Buttons (Max 3 cohesive buttons) */}
+            <div className="clean-hero-actions">
               <button 
                 onClick={() => {
                   setSelectedProductForLead(null);
                   setShowLeadModal(true);
                 }} 
-                className="flagship-btn-quote"
+                className="clean-btn-primary"
               >
-                <FileText size={17} />
+                <FileText size={16} />
                 <span>Fiyat Teklifi Al</span>
               </button>
 
-              {/* Showroom Ürünleri Butonu */}
-              {dealerFeaturedProducts.length > 0 && (
-                <a href="#showroom-urunleri" className="flagship-btn-featured">
-                  <Store size={17} />
-                  <span>Showroom Ürünleri ({dealerFeaturedProducts.length})</span>
-                </a>
-              )}
-
-              {/* Dijital Katalog Butonu */}
-              <a href="#katalog" className="flagship-btn-catalog">
-                <Package size={17} />
-                <span>Dijital Katalog</span>
+              <a href="#sanal-tur" className="clean-btn-secondary">
+                <Compass size={16} />
+                <span>360° Sanal Gezi</span>
               </a>
 
-              {dealer?.pdfCatalogUrl && (
-                <a 
-                  href={dealer.pdfCatalogUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  download 
-                  className="flagship-btn-pdf"
-                  title="PDF Katalog İndir"
-                >
-                  <Download size={16} />
-                  <span>PDF İndir</span>
-                </a>
-              )}
+              <a href="#galeri" className="clean-btn-secondary">
+                <Camera size={16} />
+                <span>Fotoğraflar ({displayShowroomImages.length})</span>
+              </a>
+
+              <a href="#katalog" className="clean-btn-link">
+                <span>Kataloğa Git ↓</span>
+              </a>
             </div>
           </div>
         </div>
