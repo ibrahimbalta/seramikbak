@@ -4043,47 +4043,73 @@
   gap: 32px;
 }
 
-/* Top-Right Dealer Logo & Name Card inside Hero Banner (from Image 1) */
+/* Top-Right Dealer Logo & Name Card inside Hero Banner (Modern 3D Luxury Frosted Glass) */
 .flagship-hero-dealer-corner-badge {
   display: flex;
   align-items: center;
-  gap: 14px;
-  background: #ffffff;
-  padding: 10px 18px 10px 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.08);
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(20, 26, 38, 0.78) 0%, rgba(11, 15, 23, 0.88) 100%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  padding: 10px 20px 10px 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 20px 45px -10px rgba(0, 0, 0, 0.65),
+    0 8px 18px -4px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.5);
   flex-shrink: 0;
-  max-width: 440px;
+  max-width: 460px;
   margin-top: 4px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transform: translateY(0) translateZ(0);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
   user-select: none;
+  position: relative;
 }
 
 .flagship-hero-dealer-corner-badge:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.42);
+  transform: translateY(-3px) scale(1.015);
+  border-color: rgba(217, 160, 91, 0.45);
+  border-top-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 26px 55px -10px rgba(0, 0, 0, 0.75),
+    0 12px 24px -4px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 20px rgba(217, 160, 91, 0.15);
 }
 
 .hero-corner-logo-wrap {
-  height: 54px;
-  min-width: 54px;
-  max-width: 160px;
+  height: 52px;
+  min-width: 52px;
+  max-width: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 3px 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 12px;
+  padding: 3px 6px;
+  box-shadow: 
+    inset 0 1px 3px rgba(0, 0, 0, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
+  overflow: hidden;
+  transition: transform 0.25s ease;
+}
+
+.flagship-hero-dealer-corner-badge:hover .hero-corner-logo-wrap {
+  transform: scale(1.03);
 }
 
 .hero-corner-logo-img {
   max-height: 100%;
   max-width: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 8px;
   display: block;
 }
 
@@ -4091,40 +4117,71 @@
   width: 52px;
   height: 52px;
   border-radius: 12px;
-  background: var(--theme-primary, #d9a05b);
-  color: #ffffff;
+  background: linear-gradient(135deg, #e5b376 0%, #b8823b 100%);
+  color: #0f172a;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 1.4rem;
+  font-weight: 900;
+  font-size: 1.45rem;
   letter-spacing: -0.02em;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    0 4px 12px rgba(217, 160, 91, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .hero-corner-text-wrap {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+.hero-corner-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 }
 
 .hero-corner-dealer-name {
   font-size: 1.25rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
-  color: #0f172a;
+  letter-spacing: 0.03em;
+  color: #ffffff;
   line-height: 1.2;
   text-transform: uppercase;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-corner-verified-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d9a05b 0%, #b8823b 100%);
+  color: #0c1017;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(217, 160, 91, 0.4);
 }
 
 .hero-corner-dealer-sub {
-  font-size: 0.70rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.10em;
-  color: #64748b;
+  letter-spacing: 0.12em;
+  color: var(--sr-gold, #d9a05b);
   text-transform: uppercase;
-  margin-top: 2px;
+  margin-top: 3px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .flagship-hero-content-col {
@@ -4403,14 +4460,17 @@
   }
   .flagship-hero-inner {
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
+    align-items: flex-start;
   }
   .flagship-hero-dealer-corner-badge {
     order: -1;
     margin-top: 0;
-    margin-bottom: 8px;
-    width: 100%;
+    margin-bottom: 4px;
+    width: auto;
     max-width: 100%;
+    padding: 8px 16px 8px 10px;
+    gap: 12px;
     box-sizing: border-box;
   }
   .flagship-categories-card {
@@ -4419,6 +4479,31 @@
 }
 
 @media (max-width: 768px) {
+  .flagship-hero-dealer-corner-badge {
+    padding: 7px 14px 7px 8px;
+    gap: 10px;
+    border-radius: 14px;
+  }
+  .hero-corner-logo-wrap {
+    height: 44px;
+    min-width: 44px;
+    max-width: 110px;
+    border-radius: 10px;
+    padding: 2px 5px;
+  }
+  .hero-corner-avatar-fallback {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    font-size: 1.25rem;
+  }
+  .hero-corner-dealer-name {
+    font-size: 1.05rem;
+  }
+  .hero-corner-dealer-sub {
+    font-size: 0.64rem;
+    letter-spacing: 0.08em;
+  }
   .flagship-hero-h1 {
     font-size: 2.2rem;
   }

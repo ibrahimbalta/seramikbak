@@ -937,7 +937,7 @@ export default function DealerProfileClient({ dealer, products }) {
             </div>
           </div>
 
-          {/* Top-Right Dealer Logo & Name Corner Badge (From Image 1 into Image 2 area) */}
+          {/* Top-Right Dealer Logo & Name Corner Badge (3D Luxury Card) */}
           <div className="flagship-hero-dealer-corner-badge">
             {dealer?.logoUrl ? (
               <div className="hero-corner-logo-wrap">
@@ -953,9 +953,16 @@ export default function DealerProfileClient({ dealer, products }) {
               </div>
             )}
             <div className="hero-corner-text-wrap">
-              <span className="hero-corner-dealer-name">
-                {dealer?.name || 'Yetkili Showroom'}
-              </span>
+              <div className="hero-corner-name-row">
+                <span className="hero-corner-dealer-name">
+                  {dealer?.name || 'Yetkili Showroom'}
+                </span>
+                <span className="hero-corner-verified-icon" title="Onaylı Yetkili Bayi">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </span>
+              </div>
               <span className="hero-corner-dealer-sub">
                 {dealer?.brand?.name ? `${dealer.brand.name.toUpperCase()} YETKİLİ SHOWROOM` : (dealer?.city ? `${(dealer.district ? `${dealer.district}, ` : '') + dealer.city} YETKİLİ SHOWROOM`.toUpperCase() : 'YETKİLİ SHOWROOM')}
               </span>
