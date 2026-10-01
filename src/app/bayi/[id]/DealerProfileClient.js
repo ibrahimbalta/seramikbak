@@ -398,35 +398,6 @@ export default function DealerProfileClient({ dealer, products }) {
   ]);
 
   const [activeSection, setActiveSection] = useState('katalog');
-  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
-  const moreMenuRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target)) {
-        setMoreMenuOpen(false);
-      }
-    };
-    if (moreMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [moreMenuOpen]);
-
-  // Priority navigation: first 4 items inline, remainder in sleek dropdown
-  const visibleNavItems = useMemo(() => {
-    if (navItems.length <= 5) return navItems;
-    return navItems.slice(0, 4);
-  }, [navItems]);
-
-  const overflowNavItems = useMemo(() => {
-    if (navItems.length <= 5) return [];
-    return navItems.slice(4);
-  }, [navItems]);
-
-  const isOverflowActive = useMemo(() => {
-    return overflowNavItems.some(item => item.id === activeSection);
-  }, [overflowNavItems, activeSection]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -783,7 +754,7 @@ export default function DealerProfileClient({ dealer, products }) {
       <header className="showroom-top-header">
         <div className="showroom-header-inner">
           <nav className="header-nav-menu">
-            {visibleNavItems.map((item) => (
+            {navItems.map((item) => (
               <a 
                 key={item.id} 
                 href={`#${item.id}`} 
@@ -792,40 +763,6 @@ export default function DealerProfileClient({ dealer, products }) {
                 {item.label}
               </a>
             ))}
-
-            {overflowNavItems.length > 0 && (
-              <div className="header-nav-dropdown-wrap" ref={moreMenuRef}>
-                <button
-                  type="button"
-                  onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-                  className={`header-nav-link header-nav-dropdown-btn ${isOverflowActive ? 'active' : ''}`}
-                  title="Daha fazla bölüm"
-                  aria-expanded={moreMenuOpen}
-                >
-                  <span>Daha Fazla</span>
-                  <ChevronDown size={14} className={`dropdown-chevron ${moreMenuOpen ? 'open' : ''}`} />
-                </button>
-
-                {moreMenuOpen && (
-                  <div className="header-nav-dropdown-menu animate-fade-in">
-                    {overflowNavItems.map((item) => {
-                      const IconComp = item.icon;
-                      return (
-                        <a
-                          key={item.id}
-                          href={`#${item.id}`}
-                          className={`dropdown-menu-item ${activeSection === item.id ? 'active' : ''}`}
-                          onClick={() => setMoreMenuOpen(false)}
-                        >
-                          {IconComp && <IconComp size={15} className="dropdown-item-icon" />}
-                          <span>{item.fullLabel || item.label}</span>
-                        </a>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
           </nav>
 
           <div className="header-actions-group">
