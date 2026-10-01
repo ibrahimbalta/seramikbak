@@ -120,17 +120,12 @@ export default function DealerProfileClient({ dealer, products }) {
   const consultationTitle = sc.consultationTitle || 'Banyonuz İçin Birlikte Çizelim';
   const consultationDesc = sc.consultationDesc || 'Showroom uzmanımızla randevu alarak projenize özel karo seçimi yapın.';
 
-  // 4. AI Designer Banner
-  const aiBadge = sc.aiBadge || 'YAPAY ZEKA DESTEKLİ';
-  const aiTitle = sc.aiTitle || 'Mekanını Tasarla';
-  const aiDesc = sc.aiDesc || 'Kendi banyonuzun veya salonunuzun fotoğrafını yükleyin; seramiklerimizin evinizde nasıl duracağını yapay zeka ile saniyeler içinde fotogerçekçi görün.';
-  const aiBtnText = sc.aiBtnText || 'Fotoğraf Yükle & Tasarla';
-  const defaultAiBullets = [
-    { title: 'Saniyeler İçinde 3D Çıktı', desc: 'Karmaşık mimari çizim programlarına gerek kalmadan anında sonuç alın.' },
-    { title: 'Gerçek Işık & Yansıma Uyumu', desc: 'Seramik yüzey dokuları odanızın gerçek gün ışığına göre birebir render edilir.' },
-    { title: 'Doğrudan Bayiden Sipariş', desc: 'Oluşturduğunuz tasarımın metrajını tek tıkla WhatsApp üzerinden bayimize iletin.' }
-  ];
-  const aiBullets = (sc.aiBullets && sc.aiBullets.length === 3) ? sc.aiBullets : defaultAiBullets;
+  // 4. Showroom Digital Catalog & Stats Showcase (from Dealer Settings)
+  const pdfCatalogName = dealer?.pdfCatalogName || sc?.pdfCatalogName || `${dealer?.name || 'Showroom'} 2026 Mimari Seramik Kataloğu`;
+  const pdfCatalogUrl = dealer?.pdfCatalogUrl || sc?.pdfCatalogUrl || null;
+  const experienceStat = dealerStatsObj?.experience || sc?.experience || '15+ Yıl';
+  const happyClientsStat = dealerStatsObj?.happyClients || sc?.happyClients || '1.000+';
+  const showroomAreaStat = dealerStatsObj?.showroomArea || sc?.showroomArea || '350 m²';
 
   // 5. Campaigns
   const rawCampaigns = safeParseJSON(dealer?.dealerCampaigns, []);
@@ -1293,56 +1288,102 @@ export default function DealerProfileClient({ dealer, products }) {
         </div>
       </section>
 
-      {/* Section 4: AI "Mekanını Tasarla" Promo Banner (Mobile Responsive) */}
-      <section className="ai-designer-banner-section">
-        <div className="ai-designer-banner-card">
+      {/* Section 4: Kurumsal Mimari Katalog & Showroom İstatistikleri (Ayarlardan Gelen Özellikler) */}
+      <section className="showroom-catalog-stats-section">
+        <div className="showroom-catalog-stats-card">
           {/* Left: Tag + Headline + CTA */}
-          <div className="ai-banner-content-col">
-            <div className="ai-banner-pill">
-              <Sparkles size={14} className="sparkle-gold" />
-              <span>{aiBadge}</span>
+          <div className="catalog-stats-content-col">
+            <div className="catalog-stats-pill">
+              <FileText size={14} className="sparkle-gold" />
+              <span>DİJİTAL MİMARİ KATALOG</span>
             </div>
 
-            <h2 className="ai-banner-headline">{aiTitle}</h2>
+            <h2 className="catalog-stats-headline">{pdfCatalogName}</h2>
 
-            <p className="ai-banner-subtext">{aiDesc}</p>
+            <p className="catalog-stats-subtext">
+              En seçkin seramik ve porselen karo serilerimizi, yüzey dokularını, teknik ebat ve metraj detaylarını içeren dijital kataloğumuzu inceleyin.
+            </p>
 
-            <Link href="/?tab=studio#studio" className="ai-banner-cta-btn" title="3D Sanal Tasarım Stüdyosu">
-              <span>{aiBtnText}</span>
-              <ArrowRight size={16} />
-            </Link>
+            {pdfCatalogUrl ? (
+              <a 
+                href={pdfCatalogUrl} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="catalog-stats-cta-btn"
+                title="PDF Kataloğu İndir"
+              >
+                <Download size={16} />
+                <span>PDF Kataloğu İndir</span>
+              </a>
+            ) : (
+              <button 
+                onClick={() => {
+                  setSelectedProductForLead(null);
+                  setShowLeadModal(true);
+                }} 
+                className="catalog-stats-cta-btn"
+                title="Katalog ve Fiyat Listesi Talep Et"
+              >
+                <FileText size={16} />
+                <span>Katalog & Fiyat Listesi İste</span>
+              </button>
+            )}
           </div>
 
-          {/* Center: Before & After Split Image Comparison */}
-          <div className="ai-banner-visual-col">
-            <div className="ai-split-preview-box">
-              <div className="split-side split-before">
-                <img src="/textures/sample_bathroom.png" alt="Mevcut Görünüm" className="split-img" />
-                <span className="split-tag">Mevcut Görünüm</span>
-              </div>
-              <div className="split-divider-line">
-                <span className="split-pill-center">AI</span>
-              </div>
-              <div className="split-side split-after">
-                <img src="/renders/luxury_bathroom_calacatta_gold.jpg" alt="AI ile Yenilenmiş" className="split-img" />
-                <span className="split-tag tag-after">AI ile Yenilenmiş</span>
+          {/* Center: Luxury 3D Ceramic Catalog Mockup Card */}
+          <div className="catalog-stats-visual-col">
+            <div className="catalog-book-mockup">
+              <div className="book-cover-inner">
+                <div className="book-top-badge">
+                  <span className="book-badge-dot" />
+                  <span>2026 MİMARİ SERİLER</span>
+                </div>
+                {dealer?.logoUrl ? (
+                  <img src={dealer.logoUrl} alt={dealer.name} className="book-dealer-logo" />
+                ) : (
+                  <Building2 size={36} className="book-dealer-icon" />
+                )}
+                <h4 className="book-title">{dealer?.name || 'Showroom'}</h4>
+                <p className="book-sub">Porselen & Seramik Seçkisi</p>
+                <div className="book-bottom-meta">
+                  <span className="book-file-tag">PDF DOKÜMAN</span>
+                  <span className="book-pages-tag">Tüm Ebat & Dokular</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Right: Feature Bullet Points */}
-          <div className="ai-banner-features-col">
-            {aiBullets.map((bullet, idx) => (
-              <div key={idx} className="ai-bullet-item">
-                <div className="bullet-check-circle">
-                  <Check size={13} />
-                </div>
-                <div className="bullet-text">
-                  <strong>{bullet.title}</strong>
-                  <p>{bullet.desc}</p>
-                </div>
+          {/* Right: Showroom Stats from Dealer Settings */}
+          <div className="catalog-stats-metrics-col">
+            <div className="catalog-metric-item">
+              <div className="metric-badge-box">
+                <Award size={18} />
               </div>
-            ))}
+              <div className="metric-info">
+                <strong className="metric-val">{experienceStat}</strong>
+                <span className="metric-label">Sektörel Tecrübe & Mimari Çözüm Ortaklığı</span>
+              </div>
+            </div>
+
+            <div className="catalog-metric-item">
+              <div className="metric-badge-box">
+                <Store size={18} />
+              </div>
+              <div className="metric-info">
+                <strong className="metric-val">{showroomAreaStat}</strong>
+                <span className="metric-label">Canlı Teşhir & Numune İnceleme Alanı</span>
+              </div>
+            </div>
+
+            <div className="catalog-metric-item">
+              <div className="metric-badge-box">
+                <CheckCircle2 size={18} />
+              </div>
+              <div className="metric-info">
+                <strong className="metric-val">{happyClientsStat}</strong>
+                <span className="metric-label">Tamamlanan Konut, Villa & Proje Teslimi</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>

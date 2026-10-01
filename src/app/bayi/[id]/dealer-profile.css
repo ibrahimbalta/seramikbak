@@ -992,189 +992,240 @@
 
 /* --------------------------------------------------------------------------
    SECTION 4: AI "MEKANINI TASARLA" BANNER
-   -------------------------------------------------------------------------- */
-.ai-designer-banner-section {
+/* ==========================================================================
+   SHOWROOM DİJİTAL KATALOG & STATS SHOWCASE (PRESTIGE ARCHITECTURAL BANNER)
+   ========================================================================== */
+.showroom-catalog-stats-section {
   max-width: 1320px;
   margin: 0 auto 64px auto;
   padding: 0 24px;
 }
 
-.ai-designer-banner-card {
+.showroom-catalog-stats-card {
   background: linear-gradient(135deg, #f9f7f2 0%, #ede6d8 100%);
   border: 1px solid #e2dac8;
-  border-radius: 18px;
-  padding: 36px;
+  border-radius: 20px;
+  padding: 38px 40px;
   display: grid;
-  grid-template-columns: 1.1fr 1.25fr 1fr;
+  grid-template-columns: 1.15fr 1fr 1.05fr;
   gap: 32px;
   align-items: center;
+  box-shadow: 0 12px 30px -8px rgba(107, 29, 47, 0.06);
 }
 
-.ai-banner-content-col {
+.catalog-stats-content-col {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
 
-.ai-banner-pill {
+.catalog-stats-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 5px 12px;
   background: #ffffff;
   border: 1px solid rgba(197, 160, 89, 0.4);
   border-radius: 20px;
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 800;
   color: var(--sr-burgundy);
+  letter-spacing: 0.5px;
   margin-bottom: 12px;
 }
 
-.sparkle-gold {
-  color: #d97706;
-}
-
-.ai-banner-headline {
-  font-size: 1.9rem;
+.catalog-stats-headline {
+  font-size: 1.85rem;
   font-weight: 800;
   color: var(--sr-text-dark);
-  line-height: 1.2;
+  line-height: 1.22;
   margin: 0 0 10px 0;
+  letter-spacing: -0.4px;
 }
 
-.ai-banner-subtext {
+.catalog-stats-subtext {
   font-size: 0.9rem;
   color: var(--sr-text-sub);
-  line-height: 1.55;
-  margin: 0 0 20px 0;
+  line-height: 1.6;
+  margin: 0 0 22px 0;
 }
 
-.ai-banner-cta-btn {
+.catalog-stats-cta-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 11px 22px;
+  padding: 12px 24px;
   background: var(--sr-burgundy);
-  color: #ffffff;
-  border-radius: 8px;
+  color: #ffffff !important;
+  border-radius: 10px;
   font-size: 0.88rem;
   font-weight: 700;
   text-decoration: none;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(107, 29, 47, 0.25);
+  transition: all 0.2s ease;
 }
 
-.ai-banner-visual-col {
+.catalog-stats-cta-btn:hover {
+  background: #84233a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(107, 29, 47, 0.35);
+}
+
+/* Center Luxury Catalog Book Mockup */
+.catalog-stats-visual-col {
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
-.ai-split-preview-box {
-  display: flex;
+.catalog-book-mockup {
   position: relative;
   width: 100%;
-  max-width: 440px;
-  height: 210px;
+  max-width: 280px;
+  height: 230px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-  border: 2px solid #ffffff;
+  box-shadow: -10px 18px 36px -8px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-left: 8px solid #c5a059;
+  transition: transform 0.3s ease;
 }
 
-.split-side {
-  width: 50%;
+.catalog-book-mockup:hover {
+  transform: translateY(-4px) rotate(-1deg);
+}
+
+.book-cover-inner {
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  position: relative;
+  justify-content: space-between;
 }
 
-.split-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.split-tag {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  background: rgba(15, 23, 42, 0.75);
-  color: #ffffff;
+.book-top-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.65rem;
-  font-weight: 600;
-  padding: 3px 7px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: #d4af37;
+  text-transform: uppercase;
+}
+
+.book-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d4af37;
+}
+
+.book-dealer-logo {
+  max-width: 80px;
+  max-height: 40px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  margin: 8px 0;
+}
+
+.book-dealer-icon {
+  color: #d4af37;
+  margin: 6px 0;
+}
+
+.book-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.book-sub {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin: 2px 0 0 0;
+}
+
+.book-bottom-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.book-file-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.15);
+  padding: 2px 6px;
   border-radius: 4px;
 }
 
-.tag-after {
-  left: auto;
-  right: 8px;
-  background: rgba(107, 29, 47, 0.85);
+.book-pages-tag {
+  font-size: 0.65rem;
+  color: #cbd5e1;
 }
 
-.split-divider-line {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: #ffffff;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 3;
-}
-
-.split-pill-center {
-  background: #ffffff;
-  color: var(--sr-burgundy);
-  font-size: 0.68rem;
-  font-weight: 800;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
-
-.ai-banner-features-col {
+/* Right Metrics Column */
+.catalog-stats-metrics-col {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.ai-bullet-item {
+.catalog-metric-item {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: center;
+  gap: 14px;
+  background: #ffffff;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(226, 218, 200, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease;
 }
 
-.bullet-check-circle {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #ffffff;
+.catalog-metric-item:hover {
+  transform: translateX(3px);
+  border-color: #c5a059;
+}
+
+.metric-badge-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(107, 29, 47, 0.08);
   color: var(--sr-burgundy);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  margin-top: 2px;
 }
 
-.bullet-text strong {
-  display: block;
-  font-size: 0.88rem;
+.metric-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-val {
+  font-size: 1.15rem;
+  font-weight: 800;
   color: var(--sr-text-dark);
-  font-weight: 700;
 }
 
-.bullet-text p {
-  font-size: 0.78rem;
+.metric-label {
+  font-size: 0.76rem;
   color: var(--sr-text-sub);
-  margin: 0;
+  line-height: 1.35;
 }
 
 /* --------------------------------------------------------------------------
@@ -3372,39 +3423,39 @@
     text-overflow: ellipsis !important;
   }
 
-  /* AI Banner on Mobile */
-  .ai-designer-banner-section {
+  /* Showroom Catalog & Stats Banner on Mobile */
+  .showroom-catalog-stats-section {
     padding: 0 14px;
     margin-bottom: 40px;
   }
 
-  .ai-designer-banner-card {
+  .showroom-catalog-stats-card {
     grid-template-columns: 1fr;
     gap: 20px;
     padding: 22px 18px;
-    border-radius: 14px;
+    border-radius: 16px;
   }
 
-  .ai-banner-headline {
-    font-size: 1.5rem;
+  .catalog-stats-headline {
+    font-size: 1.45rem;
   }
 
-  .ai-banner-subtext {
+  .catalog-stats-subtext {
     font-size: 0.85rem;
     margin-bottom: 16px;
   }
 
-  .ai-banner-cta-btn {
+  .catalog-stats-cta-btn {
     width: 100%;
     height: 44px;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: 10px;
     box-sizing: border-box;
   }
 
-  .ai-split-preview-box {
-    height: 170px;
+  .catalog-book-mockup {
     max-width: 100%;
+    height: 190px;
   }
 
   /* Campaigns on Mobile */

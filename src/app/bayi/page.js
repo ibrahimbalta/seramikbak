@@ -5105,81 +5105,59 @@ Yetkili Satış & Showroom Departmanı`;
                           </div>
                         </div>
 
-                        {/* 4. YAPAY ZEKA "MEKANINI TASARLA" PANELİ */}
-                        <div style={{ background: '#fdf8f4', border: '1px solid #f3d8c2', borderRadius: '12px', padding: '20px' }}>
-                          <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#b45309', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span>4.</span> Yapay Zeka Destekli "Mekanını Tasarla" Paneli
-                          </h4>
+                        {/* 4. DİJİTAL MİMARİ KATALOG & SHOWROOM VİTRİNİ */}
+                        <div style={{ background: '#fdfbf7', border: '1px solid #ebd9c8', borderRadius: '12px', padding: '20px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                            <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#6b1d2f', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span>4.</span> Dijital Mimari Katalog & Showroom Prestij Vitrini
+                            </h4>
+                            <span style={{ fontSize: '0.72rem', color: '#64748b' }}>Showroom sayfanızdaki PDF katalog ve başarı metrikleri alanını yönetin</span>
+                          </div>
 
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '14px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>AI Rozet Metni</label>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Katalog Rozet Metni</label>
                               <input 
                                 type="text"
-                                value={sc.aiBadge || ''}
-                                onChange={(e) => updateShowroomConfigField('aiBadge', e.target.value)}
-                                placeholder="YAPAY ZEKA DESTEKLİ"
+                                value={sc.pdfCatalogBadge || ''}
+                                onChange={(e) => updateShowroomConfigField('pdfCatalogBadge', e.target.value)}
+                                placeholder="DİJİTAL MİMARİ KATALOG"
                                 style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>AI Başlığı</label>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Katalog Vitrin Başlığı</label>
                               <input 
                                 type="text"
-                                value={sc.aiTitle || ''}
-                                onChange={(e) => updateShowroomConfigField('aiTitle', e.target.value)}
-                                placeholder="Mekanını Tasarla"
+                                value={profilePdfCatalogName || ''}
+                                onChange={(e) => setProfilePdfCatalogName(e.target.value)}
+                                placeholder={dealerInfo?.name ? `${dealerInfo.name} 2026 Mimari Seramik Kataloğu` : '2026 Mimari Seramik Kataloğu'}
                                 style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>AI Buton Metni</label>
+                              <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>İndirilebilir PDF Linki</label>
                               <input 
                                 type="text"
-                                value={sc.aiBtnText || ''}
-                                onChange={(e) => updateShowroomConfigField('aiBtnText', e.target.value)}
-                                placeholder="Fotoğraf Yükle & Tasarla"
+                                value={profilePdfCatalogUrl || ''}
+                                onChange={(e) => setProfilePdfCatalogUrl(e.target.value)}
+                                placeholder="https://site.com/katalog.pdf"
                                 style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff' }}
                               />
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
-                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>AI Açıklama Metni</label>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155' }}>Katalog Tanıtım Açıklaması</label>
                             <textarea 
                               rows={2}
-                              value={sc.aiDesc || ''}
-                              onChange={(e) => updateShowroomConfigField('aiDesc', e.target.value)}
-                              placeholder="Kendi banyonuzun veya salonunuzun fotoğrafını yükleyin..."
+                              value={sc.pdfCatalogDesc || ''}
+                              onChange={(e) => updateShowroomConfigField('pdfCatalogDesc', e.target.value)}
+                              placeholder="En seçkin seramik ve porselen karo serilerimizi, yüzey dokularını, teknik ebat ve metraj detaylarını içeren dijital kataloğumuzu inceleyin."
                               style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.82rem', background: '#fff', resize: 'vertical' }}
                             />
-                          </div>
-
-                          <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#334155', display: 'block', marginBottom: '8px' }}>
-                            3 Avantaj Maddesi (Tik İşaretli)
-                          </label>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
-                            {bullets.map((b, idx) => (
-                              <div key={idx} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#b45309' }}>MADDE #{idx + 1}</span>
-                                <input 
-                                  type="text"
-                                  value={b.title}
-                                  onChange={(e) => updateAiBulletField(idx, 'title', e.target.value)}
-                                  placeholder="Madde Başlığı"
-                                  style={{ padding: '7px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.78rem', fontWeight: '700' }}
-                                />
-                                <input 
-                                  type="text"
-                                  value={b.desc}
-                                  onChange={(e) => updateAiBulletField(idx, 'desc', e.target.value)}
-                                  placeholder="Madde Açıklaması"
-                                  style={{ padding: '7px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.75rem', color: '#64748b' }}
-                                />
-                              </div>
-                            ))}
                           </div>
                         </div>
 
