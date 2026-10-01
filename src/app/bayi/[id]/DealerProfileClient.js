@@ -588,27 +588,46 @@ export default function DealerProfileClient({ dealer, products }) {
 
   const handleLeadSubmit = async (e) => {
     e.preventDefault();
+    if (!leadName?.trim() || !leadPhone?.trim()) {
+      showToast('Lütfen adınızı ve telefon numaranızı giriniz.');
+      return;
+    }
     setLeadLoading(true);
     try {
-      await fetch('/api/leads', {
+      const res = await fetch('/api/leads/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           dealerId: dealer.id,
-          name: leadName,
-          phone: leadPhone,
-          email: leadEmail,
-          message: leadNotes,
+          clientName: leadName.trim(),
+          clientPhone: leadPhone.trim(),
+          clientEmail: leadEmail?.trim() || '',
+          notes: leadNotes?.trim() || '',
           productId: selectedProductForLead?.id || null,
-          productName: selectedProductForLead?.name || 'Genel Showroom Teklifi',
-          source: 'SHOWROOM_PAGE'
+          productName: selectedProductForLead?.name || (dealer?.name ? `${dealer.name} Showroom Teklifi` : 'Genel Showroom Teklifi'),
+          source: 'SHOWROOM_PAGE',
+          // backwards compatibility
+          name: leadName.trim(),
+          phone: leadPhone.trim(),
+          email: leadEmail?.trim() || '',
+          message: leadNotes?.trim() || ''
         })
       });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Teklif talebi iletilemedi.');
+      }
+
       setLeadSuccess(true);
       showToast('Teklif talebiniz bayiye başarıyla iletildi!');
+      setLeadName('');
+      setLeadPhone('');
+      setLeadEmail('');
+      setLeadNotes('');
     } catch (err) {
-      console.error(err);
-      setLeadSuccess(true);
+      console.error('Lead submission failed:', err);
+      showToast(err.message || 'Teklif talebi gönderilemedi, lütfen tekrar deneyin.');
     } finally {
       setLeadLoading(false);
     }

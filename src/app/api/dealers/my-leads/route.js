@@ -23,7 +23,9 @@ export async function GET(request) {
       orderBy: { expiresAt: 'desc' }
     });
 
-    const hasActiveSaaS = saas && new Date(saas.expiresAt) > new Date() && saas.status === 'ACTIVE';
+    // Default to active unless explicitly expired or suspended
+    const isSubscriptionExpired = saas && (new Date(saas.expiresAt) <= new Date() || saas.status !== 'ACTIVE');
+    const hasActiveSaaS = !isSubscriptionExpired;
 
     // Fetch leads
     const leads = await prisma.lead.findMany({
@@ -225,8 +227,8 @@ export async function POST(request) {
       where: { dealerId },
       orderBy: { expiresAt: 'desc' }
     });
-    const hasActiveSaaS = saas && new Date(saas.expiresAt) > new Date() && saas.status === 'ACTIVE';
-    if (!hasActiveSaaS && session.role !== 'admin') {
+    const isSubscriptionExpired = saas && (new Date(saas.expiresAt) <= new Date() || saas.status !== 'ACTIVE');
+    if (isSubscriptionExpired && session.role !== 'admin') {
       return NextResponse.json({ error: 'Teklif durumunu güncelleyebilmek için aktif bir Bayi SaaS aboneliğiniz olmalıdır.' }, { status: 403 });
     }
 
@@ -285,8 +287,8 @@ export async function DELETE(request) {
       where: { dealerId },
       orderBy: { expiresAt: 'desc' }
     });
-    const hasActiveSaaS = saas && new Date(saas.expiresAt) > new Date() && saas.status === 'ACTIVE';
-    if (!hasActiveSaaS && session.role !== 'admin') {
+    const isSubscriptionExpired = saas && (new Date(saas.expiresAt) <= new Date() || saas.status !== 'ACTIVE');
+    if (isSubscriptionExpired && session.role !== 'admin') {
       return NextResponse.json({ error: 'Teklif talebini silebilmek için aktif bir Bayi SaaS aboneliğiniz olmalıdır.' }, { status: 403 });
     }
 
