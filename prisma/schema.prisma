@@ -22,6 +22,7 @@ model Brand {
   podiumBids PodiumBid[]
   outletListings OutletListing[]
   specInLeads    SpecInLead[]
+  projectBids    ProjectBid[]
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
@@ -70,6 +71,7 @@ model Product {
   specInLeads SpecInLead[]
   architectProjectItems ArchitectProjectItem[]
   architectSamples      ArchitectSample[]
+  projectBids           ProjectBid[]
   
   // Technical Specifications
   peiRating        Int?           // Wear resistance rating (1-5)
@@ -164,8 +166,8 @@ model DealerSaaSConfig {
 
 model Lead {
   id                 String   @id @default(uuid())
-  productId          String
-  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId          String?
+  product            Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   dealerId           String
   dealer             Dealer   @relation(fields: [dealerId], references: [id], onDelete: Cascade)
   clientName         String
@@ -325,8 +327,29 @@ model ProjectRequest {
   deliveryTimeline String   // e.g. "30 gün içinde", "90 gün içinde"
   notes            String?
   status           String   @default("PENDING") // PENDING, APPROVED, COMPLETED, REJECTED
+  bids             ProjectBid[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+model ProjectBid {
+  id          String         @id @default(uuid())
+  projectId   String
+  project     ProjectRequest @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  brandId     String
+  brand       Brand          @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  priceM2     Float
+  totalPrice  Float
+  timeline    String
+  note        String?
+  status      String         @default("PENDING_APPROVAL") // PENDING_APPROVAL, ACCEPTED, REJECTED
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([projectId])
+  @@index([brandId])
 }
 
 model SystemSetting {

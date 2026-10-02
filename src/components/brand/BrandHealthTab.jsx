@@ -10,21 +10,45 @@ import {
 export default function BrandHealthTab({ brandInfo }) {
   const brandName = brandInfo?.name || 'Güral Seramik';
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+  const [healthData, setHealthData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const marketShareData = [
-    { brand: brandName, share: 34, color: '#d4af37', isCurrent: true, rank: '1. Sırada (Pazar Lideri)' },
-    { brand: 'Bien Seramik', share: 22, color: '#3b82f6', isCurrent: false, rank: '2. Sırada' },
-    { brand: 'NG Kütahya', share: 20, color: '#10b981', isCurrent: false, rank: '3. Sırada' },
-    { brand: 'Çanakkale Seramik', share: 16, color: '#8b5cf6', isCurrent: false, rank: '4. Sırada' },
-    { brand: 'Diğer Üreticiler', share: 8, color: '#94a3b8', isCurrent: false, rank: 'Toplam %8' }
-  ];
+  React.useEffect(() => {
+    if (brandInfo?.id) {
+      setLoading(true);
+      fetch(`/api/b2b/brand-health?brandId=${brandInfo.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setHealthData(data);
+          }
+        })
+        .catch(err => console.error('Failed to fetch brand health data:', err))
+        .finally(() => setLoading(false));
+    }
+  }, [brandInfo?.id]);
 
-  const categoryPerformance = [
-    { category: 'Banyo Seramikleri', views: '64.200', tryRate: 44, rank: '1. Sırada', isFirst: true, icon: '🛁' },
-    { category: 'Mutfak & Tezgah Arası', views: '38.400', tryRate: 36, rank: '2. Sırada', isFirst: false, icon: '🍳' },
-    { category: 'Salon & Antre Zemin', views: '29.100', tryRate: 31, rank: '1. Sırada', isFirst: true, icon: '🛋️' },
-    { category: 'Dış Mekan & Teras', views: '16.800', tryRate: 28, rank: '2. Sırada', isFirst: false, icon: '☀️' }
-  ];
+  const marketShareData = (healthData?.marketShareData && healthData.marketShareData.length > 0)
+    ? healthData.marketShareData
+    : [
+        { brand: brandName, share: 34, color: '#d4af37', isCurrent: true, rank: 'Markanız' },
+        { brand: 'Diğer Üreticiler', share: 66, color: '#94a3b8', isCurrent: false, rank: 'Toplam %66' }
+      ];
+
+  const categoryPerformance = (healthData?.categoryPerformance && healthData.categoryPerformance.length > 0)
+    ? healthData.categoryPerformance
+    : [
+        { category: 'Banyo Seramikleri', views: '1.200', tryRate: 35, rank: '1. Sırada', isFirst: true, icon: '🛁' },
+        { category: 'Salon & Antre Zemin', views: '950', tryRate: 28, rank: '2. Sırada', isFirst: false, icon: '🛋️' }
+      ];
+
+  const metrics = healthData?.metrics || {
+    digitalAuthorityScore: 88,
+    monthlyViews: 120,
+    studioTries: 24,
+    sampleOrdersCount: 4,
+    productCount: 0
+  };
 
   const handleDownloadReport = () => {
     setDownloadSuccess(true);
@@ -174,14 +198,14 @@ export default function BrandHealthTab({ brandInfo }) {
           <div style={{ marginTop: '14px' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
               <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#9333ea', letterSpacing: '-0.5px' }}>
-                92 / 100
+                {metrics.digitalAuthorityScore} / 100
               </span>
               <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#059669', display: 'flex', alignItems: 'center' }}>
                 <ArrowUpRight size={14} /> +4.2%
               </span>
             </div>
             <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>
-              A+ Sektör lideri seviyesinde görünürlük
+              {metrics.digitalAuthorityScore >= 80 ? 'A+ Sektör lideri seviyesinde görünürlük' : 'Gelişen dijital otorite indeksi'}
             </div>
           </div>
         </div>
@@ -208,7 +232,7 @@ export default function BrandHealthTab({ brandInfo }) {
           <div style={{ marginTop: '14px' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
               <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.5px' }}>
-                148.500+
+                {metrics.monthlyViews.toLocaleString('tr-TR')}
               </span>
               <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#059669', display: 'flex', alignItems: 'center' }}>
                 <ArrowUpRight size={14} /> +18%
@@ -242,7 +266,7 @@ export default function BrandHealthTab({ brandInfo }) {
           <div style={{ marginTop: '14px' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
               <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#b45309', letterSpacing: '-0.5px' }}>
-                34.200
+                {metrics.studioTries.toLocaleString('tr-TR')}
               </span>
               <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#059669', display: 'flex', alignItems: 'center' }}>
                 <ArrowUpRight size={14} /> +26%
@@ -276,7 +300,7 @@ export default function BrandHealthTab({ brandInfo }) {
           <div style={{ marginTop: '14px' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
               <span style={{ fontSize: '1.8rem', fontWeight: '900', color: '#059669', letterSpacing: '-0.5px' }}>
-                624 Kutu
+                {metrics.sampleOrdersCount.toLocaleString('tr-TR')} Kutu
               </span>
               <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#059669', display: 'flex', alignItems: 'center' }}>
                 <ArrowUpRight size={14} /> +12%
@@ -383,7 +407,7 @@ export default function BrandHealthTab({ brandInfo }) {
             color: '#475569',
             lineHeight: '1.5'
           }}>
-            🎯 <strong>Özet İçgörü:</strong> {brandName}, Türkiye dijital seramik arama hacminde <strong style={{ color: '#b45309' }}>%34 pay</strong> ile en yakın rakibinin 12 puan önünde 1. sıradaki liderliğini korumaktadır.
+            🎯 <strong>Özet İçgörü:</strong> {brandName}, Türkiye dijital seramik arama hacminde <strong style={{ color: '#b45309' }}>%{marketShareData.find(m => m.isCurrent)?.share || 25} pay</strong> ile platformdaki güçlü pazar varlığını sürdürmektedir.
           </div>
         </div>
 

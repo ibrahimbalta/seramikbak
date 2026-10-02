@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req) {
   try {
+    const clientIp = getClientIp(req);
+    const rateLimit = checkRateLimit(clientIp, 5, 60000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Çok fazla numune siparişi talebi gönderdiniz. Lütfen bir süre sonra tekrar deneyin.' },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
     const { productId, dealerId, clientName, clientPhone, clientEmail, city, district, address, notes } = body;
 

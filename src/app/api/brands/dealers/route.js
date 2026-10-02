@@ -82,6 +82,10 @@ export async function GET(request) {
 export async function PUT(request) {
   try {
     const session = await verifyAuth(request);
+    if (!session || (session.role !== 'brand' && session.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen giriş yapınız.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { id, status, brandId: bodyBrandId } = body;
 
@@ -90,12 +94,10 @@ export async function PUT(request) {
     }
 
     let targetBrandId = null;
-    if (session && session.role === 'brand') {
+    if (session.role === 'brand') {
       targetBrandId = session.id;
-    } else if (session && session.role === 'admin') {
-      targetBrandId = null; // Admin can update any dealer
-    } else if (bodyBrandId) {
-      targetBrandId = bodyBrandId;
+    } else if (session.role === 'admin') {
+      targetBrandId = bodyBrandId || null; // Admin can update any dealer or specific brand's dealer
     }
 
     const whereCondition = { id };
@@ -126,13 +128,17 @@ export async function PUT(request) {
 export async function POST(request) {
   try {
     const session = await verifyAuth(request);
+    if (!session || (session.role !== 'brand' && session.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen giriş yapınız.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { name, phone, email, password, address, city, district, lat, lng, brandId: bodyBrandId } = body;
 
     let targetBrandId = null;
-    if (session && session.role === 'brand') {
+    if (session.role === 'brand') {
       targetBrandId = session.id;
-    } else if (bodyBrandId) {
+    } else if (session.role === 'admin') {
       targetBrandId = bodyBrandId;
     }
 

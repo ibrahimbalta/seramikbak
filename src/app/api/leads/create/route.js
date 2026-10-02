@@ -126,21 +126,7 @@ export async function POST(request) {
       } catch (e) {}
     }
 
-    if (!product) {
-      // 3. Fallback to any active product to satisfy relational integrity
-      try {
-        product = await prisma.product.findFirst();
-      } catch (e) {}
-    }
-
-    if (!product) {
-      return NextResponse.json(
-        { error: 'Katalogda kayıtlı ürün bulunamadı.' },
-        { status: 404 }
-      );
-    }
-
-    resolvedProductId = product.id;
+    resolvedProductId = product ? product.id : null;
 
     // If no specific product was chosen in the modal, prefix note with showroom context
     if (!productId) {
@@ -176,13 +162,15 @@ export async function POST(request) {
         data: {
           action: 'LEAD',
           productId: resolvedProductId,
-          brandId: product.brandId || dealer.brandId,
+          brandId: product?.brandId || dealer.brandId || null,
           city: dealer.city || 'İstanbul'
         }
       });
     } catch (e) {
       console.warn('Analytics log failed:', e.message);
     }
+
+    const displayProductName = productName || product?.name || 'Genel Showroom / Proje Teklifi';
 
     // Send email notification to seramikbak@gmail.com and dealer
     try {
@@ -193,7 +181,7 @@ export async function POST(request) {
         notes: resolvedNotes,
         dealerName: dealer.name,
         dealerEmail: dealer.email,
-        productName: productName || product.name
+        productName: displayProductName
       }).catch(err => {
         console.error('Lead email notification trigger error:', err);
       });
@@ -207,7 +195,7 @@ export async function POST(request) {
         userType: 'DEALER',
         userId: dealerId,
         title: '🎯 Yeni Müşteri Teklif Talebi!',
-        body: `${resolvedName} (${dealer.city || 'Genel'}) - ${productName || product.name} için fiyat teklifi bekliyor.`,
+        body: `${resolvedName} (${dealer.city || 'Genel'}) - ${displayProductName} için fiyat teklifi bekliyor.`,
         url: '/bayi'
       }).catch(err => {
         console.warn('Lead push notification error:', err.message);

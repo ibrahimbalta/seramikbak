@@ -86,6 +86,11 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const session = await verifyAuth(request);
+    if (!session || (session.role !== 'brand' && session.role !== 'admin')) {
+      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' }, { status: 401 });
+    }
+
     const body = await request.json();
 
     // 1. Dekont / Referans Güncelleme Aksiyonu (Onaylandıktan / Tekliften Sonra)
@@ -93,6 +98,18 @@ export async function POST(request) {
       const { bidId, paymentRef } = body;
       if (!bidId || !paymentRef) {
         return NextResponse.json({ error: 'Eksik parametre: bidId ve paymentRef zorunludur.' }, { status: 400 });
+      }
+
+      const existingBid = await prisma.podiumBid.findUnique({
+        where: { id: bidId }
+      });
+
+      if (!existingBid) {
+        return NextResponse.json({ error: 'Teklif bulunamadı.' }, { status: 404 });
+      }
+
+      if (session.role !== 'admin' && existingBid.brandId !== session.id) {
+        return NextResponse.json({ error: 'Bu teklifi güncelleme yetkiniz bulunmamaktadır.' }, { status: 403 });
       }
 
       const updated = await prisma.podiumBid.update({
@@ -111,29 +128,31 @@ export async function POST(request) {
     // 2. Yeni Teklif Oluşturma Aksiyonu
     const { brandId, productId, bidAmount, title, description, targetWeek, targetYear } = body;
 
-    if (!brandId || !productId || !bidAmount) {
+    if (!productId || !bidAmount) {
       return NextResponse.json(
-        { error: 'Eksik parametre: brandId, productId ve bidAmount zorunludur.' },
+        { error: 'Eksik parametre: productId ve bidAmount zorunludur.' },
         { status: 400 }
       );
     }
+
+    const effectiveBrandId = session.role === 'brand' ? session.id : (brandId || session.id);
 
     const { weekNumber: currentWeek, year: currentYear } = getISOWeekDetails();
     const weekNumber = parseInt(targetWeek || currentWeek, 10);
     const year = parseInt(targetYear || currentYear, 10);
     const numericBid = parseFloat(bidAmount);
 
-    // Enforce Brand Session Authentication
-    const session = await verifyAuth(request);
-    if (!session || (session.role !== 'brand' && session.role !== 'admin')) {
-      return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' }, { status: 401 });
-    }
-
-    const effectiveBrandId = session.role === 'brand' ? session.id : (brandId || session.id);
-
     // Atomic Transaction to prevent race condition bids
     const result = await prisma.$transaction(async (tx) => {
-      // 1. KONTROL: Eğer bu hafta için onaylanmış aktif bir reklam varsa ihale KAPALIDIR!
+      // 1. KONTROL: Ürünün markaya ait olduğunu doğrula
+      const prodCheck = await tx.product.findFirst({
+        where: { id: productId, brandId: effectiveBrandId }
+      });
+      if (!prodCheck) {
+        throw new Error('Seçilen ürün markanıza ait değil veya bulunamadı.');
+      }
+
+      // 2. KONTROL: Eğer bu hafta için onaylanmış aktif bir reklam varsa ihale KAPALIDIR!
       const activeWinner = await tx.podiumBid.findFirst({
         where: { weekNumber, year, status: 'WINNER_ACTIVE' }
       });
@@ -142,7 +161,7 @@ export async function POST(request) {
         throw new Error('Bu hafta için yönetici tarafından onaylanmış aktif bir podyum reklamı bulunmaktadır. Bu haftanın reklam alanı kapatılmıştır.');
       }
 
-      // 2. Mevcut en yüksek teklif kontrolü
+      // 3. Mevcut en yüksek teklif kontrolü
       const currentHighest = await tx.podiumBid.findFirst({
         where: { weekNumber, year, status: 'PENDING_APPROVAL' },
         orderBy: { bidAmount: 'desc' }

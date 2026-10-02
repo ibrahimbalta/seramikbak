@@ -78,6 +78,18 @@ export async function POST(request) {
       );
     }
 
+    // Verify product belongs to this brand
+    const product = await prisma.product.findFirst({
+      where: { id: productId, brandId }
+    });
+
+    if (!product) {
+      return NextResponse.json(
+        { error: 'Seçilen ürün markanıza ait değil veya sistemde bulunamadı.' },
+        { status: 403 }
+      );
+    }
+
     // Check if there is already a campaign for this product (e.g. pending or active)
     const existingCampaign = await prisma.adCampaign.findFirst({
       where: { productId, brandId }

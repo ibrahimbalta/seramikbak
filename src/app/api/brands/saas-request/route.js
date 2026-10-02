@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { hashPassword } from '@/lib/auth';
 
 export async function POST(request) {
   try {
@@ -30,11 +31,12 @@ export async function POST(request) {
 
     if (!brand) {
       const cleanUsername = brandName.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(1000 + Math.random() * 9000);
+      const rawPassword = 'marka' + Math.floor(1000 + Math.random() * 9000);
       brand = await prisma.brand.create({
         data: {
           name: brandName,
           username: cleanUsername,
-          password: 'marka' + Math.floor(1000 + Math.random() * 9000)
+          password: hashPassword(rawPassword)
         }
       });
     }

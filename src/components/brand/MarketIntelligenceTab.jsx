@@ -9,14 +9,30 @@ import {
 
 export default function MarketIntelligenceTab({ brandInfo }) {
   const brandName = brandInfo?.name || 'Güral Seramik';
+  const [intelData, setIntelData] = useState(null);
 
-  const dimensionTrends = [
-    { size: '60x120 cm Porselen Karo', share: 48, growth: '+28%', popularUsage: 'Tüm Zemin & Banyo Duvar', status: 'YÜKSELİŞTE', color: '#3b82f6' },
-    { size: '80x80 cm Kare Karo', share: 22, growth: '+4%', popularUsage: 'Geniş Salon & Antre Zemin', status: 'DENGELİ', color: '#10b981' },
-    { size: '120x240 cm Dev Slab Plaka', share: 14, growth: '+62%', popularUsage: 'Mutfak Adası & Lüks Banyo', status: 'HIZLI YÜKSELİŞ', color: '#8b5cf6' },
-    { size: '20x120 cm Ahşap Desen', share: 10, growth: '+8%', popularUsage: 'Yatak Odası & Islak Hacim', status: 'DENGELİ', color: '#f59e0b' },
-    { size: '60x60 cm Standart Karo', share: 6, growth: '-14%', popularUsage: 'Balkon & Servis Alanları', status: 'DÜŞÜŞTE', color: '#ef4444' }
-  ];
+  React.useEffect(() => {
+    if (brandInfo?.id) {
+      fetch(`/api/b2b/brand-health?brandId=${brandInfo.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setIntelData(data);
+          }
+        })
+        .catch(err => console.error('Failed to fetch market intel:', err));
+    }
+  }, [brandInfo?.id]);
+
+  const dimensionTrends = (intelData?.dimensionTrends && intelData.dimensionTrends.length > 0)
+    ? intelData.dimensionTrends
+    : [
+        { size: '60x120 cm Porselen Karo', share: 48, growth: '+28%', popularUsage: 'Tüm Zemin & Banyo Duvar', status: 'YÜKSELİŞTE', color: '#3b82f6' },
+        { size: '80x80 cm Kare Karo', share: 22, growth: '+4%', popularUsage: 'Geniş Salon & Antre Zemin', status: 'DENGELİ', color: '#10b981' },
+        { size: '120x240 cm Dev Slab Plaka', share: 14, growth: '+62%', popularUsage: 'Mutfak Adası & Lüks Banyo', status: 'HIZLI YÜKSELİŞ', color: '#8b5cf6' },
+        { size: '20x120 cm Ahşap Desen', share: 10, growth: '+8%', popularUsage: 'Yatak Odası & Islak Hacim', status: 'DENGELİ', color: '#f59e0b' },
+        { size: '60x60 cm Standart Karo', share: 6, growth: '-14%', popularUsage: 'Balkon & Servis Alanları', status: 'DÜŞÜŞTE', color: '#ef4444' }
+      ];
 
   const textureTrends = [
     { name: 'Pietra Traverten & Sıcak Bej', share: 36, growth: '+45%', color: '#d97706', swatch: '#d4b996', desc: 'Doğal taş ve sıcak Akdeniz esintisi' },

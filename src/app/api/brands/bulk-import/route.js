@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // Helper to determine texture fallback
 function getDefaultTexture(style) {
@@ -12,8 +13,15 @@ function getDefaultTexture(style) {
 
 export async function POST(request) {
   try {
+    const session = await verifyAuth(request);
     const body = await request.json();
-    const { brandId, tsvData, xmlFeedUrl, defaultStyle = 'Mermer', productsArray } = body;
+    const { brandId: bodyBrandId, tsvData, xmlFeedUrl, defaultStyle = 'Mermer', productsArray } = body;
+
+    const brandId = session?.role === 'brand' ? session.id : (bodyBrandId || session?.id);
+
+    if (!session || (session.role !== 'admin' && !(session.role === 'brand' && session.id === brandId))) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' }, { status: 401 });
+    }
 
     if (!brandId) {
       return NextResponse.json({ success: false, error: 'Marka ID (brandId) parametresi zorunludur.' }, { status: 400 });
@@ -178,6 +186,11 @@ export async function POST(request) {
         const existing = await prisma.product.findUnique({
           where: { code: item.code }
         });
+
+        if (existing && existing.brandId !== brand.id) {
+          errors.push(`Ürün kodu "${item.code}" başka bir markaya ait olduğu için güncellenmedi.`);
+          continue;
+        }
 
         await prisma.product.upsert({
           where: { code: item.code },

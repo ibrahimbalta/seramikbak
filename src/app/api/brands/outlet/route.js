@@ -1,5 +1,8 @@
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
+import { verifyAuth } from '@/lib/auth-check';
+
+export const dynamic = 'force-dynamic';
 
 // GET: Fetch brand's own outlet listings
 export async function GET(request) {
@@ -36,9 +39,10 @@ export async function GET(request) {
 // POST: Add new outlet stock listing for a brand
 export async function POST(request) {
   try {
+    const session = await verifyAuth(request);
     const body = await request.json();
     const {
-      brandId,
+      brandId: bodyBrandId,
       productId,
       title,
       category,
@@ -52,6 +56,12 @@ export async function POST(request) {
       notes,
       status
     } = body;
+
+    const brandId = session?.role === 'brand' ? session.id : (bodyBrandId || session?.id);
+
+    if (!session || (session.role !== 'admin' && !(session.role === 'brand' && session.id === brandId))) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' }, { status: 401 });
+    }
 
     if (!brandId || !title || !unitPrice || !quantityM2) {
       return NextResponse.json({ success: false, error: 'Lütfen zorunlu alanları (Marka, Başlık, Metraj, Outlet Fiyatı) doldurun.' }, { status: 400 });
@@ -97,10 +107,11 @@ export async function POST(request) {
 // PUT: Update a brand's outlet listing
 export async function PUT(request) {
   try {
+    const session = await verifyAuth(request);
     const body = await request.json();
     const {
       id,
-      brandId,
+      brandId: bodyBrandId,
       title,
       category,
       badgeTag,
@@ -114,6 +125,12 @@ export async function PUT(request) {
       status
     } = body;
 
+    const brandId = session?.role === 'brand' ? session.id : (bodyBrandId || session?.id);
+
+    if (!session || (session.role !== 'admin' && !(session.role === 'brand' && session.id === brandId))) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' }, { status: 401 });
+    }
+
     if (!id || !brandId) {
       return NextResponse.json({ success: false, error: 'İlan ID ve Marka ID zorunludur.' }, { status: 400 });
     }
@@ -122,7 +139,7 @@ export async function PUT(request) {
       where: { id }
     });
 
-    if (!existing || existing.brandId !== brandId) {
+    if (!existing || (session.role !== 'admin' && existing.brandId !== brandId)) {
       return NextResponse.json({ success: false, error: 'İlan bulunamadı veya düzenleme yetkiniz yok.' }, { status: 403 });
     }
 
@@ -153,9 +170,16 @@ export async function PUT(request) {
 // DELETE: Delete a brand's outlet listing
 export async function DELETE(request) {
   try {
+    const session = await verifyAuth(request);
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    const brandId = searchParams.get('brandId');
+    const queryBrandId = searchParams.get('brandId');
+
+    const brandId = session?.role === 'brand' ? session.id : (queryBrandId || session?.id);
+
+    if (!session || (session.role !== 'admin' && !(session.role === 'brand' && session.id === brandId))) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen marka girişi yapınız.' }, { status: 401 });
+    }
 
     if (!id || !brandId) {
       return NextResponse.json({ success: false, error: 'İlan ID ve Marka ID zorunludur.' }, { status: 400 });
@@ -165,7 +189,7 @@ export async function DELETE(request) {
       where: { id }
     });
 
-    if (!existing || existing.brandId !== brandId) {
+    if (!existing || (session.role !== 'admin' && existing.brandId !== brandId)) {
       return NextResponse.json({ success: false, error: 'İlan bulunamadı veya silme yetkiniz yok.' }, { status: 403 });
     }
 

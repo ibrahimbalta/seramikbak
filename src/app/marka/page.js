@@ -367,6 +367,7 @@ export default function BrandPortalPage() {
       fetchB2bStats(brandInfo.id);
       fetchBrandProducts(brandInfo.id);
       loadBrandProjects(brandInfo.id);
+      loadBrandBids(brandInfo.id);
       loadBankDetails();
       fetchDealers();
       fetchB2bTrends(brandInfo.id);
@@ -511,6 +512,21 @@ export default function BrandPortalPage() {
       console.error('Failed to load projects:', err);
     } finally {
       setProjectsLoading(false);
+    }
+  };
+
+  const loadBrandBids = async (brandId) => {
+    if (!brandId) return;
+    try {
+      const res = await fetch(`/api/b2b/project-bids?brandId=${brandId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.bids)) {
+          setBids(data.bids);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load project bids:', err);
     }
   };
 
@@ -1013,39 +1029,52 @@ export default function BrandPortalPage() {
     }
   };
 
-  const handleB2bBidSubmit = (e) => {
+  const handleB2bBidSubmit = async (e) => {
     e.preventDefault();
     if (!biddingProject || !bidProduct || !bidPrice) return;
 
     const selectedProduct = brandProducts.find(p => p.id === bidProduct);
-    const newBid = {
-      id: 'bid-' + Date.now(),
-      projectId: biddingProject.id,
-      projectName: biddingProject.projectName,
-      companyName: biddingProject.companyName || biddingProject.projectName,
-      productId: selectedProduct.id,
-      productName: selectedProduct.name,
-      productCode: selectedProduct.code,
-      priceM2: parseFloat(bidPrice),
-      totalPrice: parseFloat(bidPrice) * biddingProject.quantityM2,
-      timeline: bidTimeline,
-      note: bidNote,
-      status: 'PENDING_APPROVAL',
-      createdAt: new Date().toISOString()
-    };
+    if (!selectedProduct) {
+      alert('Lütfen teklif verilecek ürünü seçiniz.');
+      return;
+    }
 
-    const updatedBids = [...bids, newBid];
-    setBids(updatedBids);
-    localStorage.setItem('sb_brand_bids', JSON.stringify(updatedBids));
+    try {
+      const res = await fetch('/api/b2b/project-bids', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId: biddingProject.id,
+          productId: selectedProduct.id,
+          priceM2: parseFloat(bidPrice),
+          timeline: bidTimeline,
+          note: bidNote,
+          brandId: brandInfo?.id
+        })
+      });
 
-    // Clear form and modal
-    setBiddingProject(null);
-    setBidPrice('');
-    setBidProduct('');
-    setBidTimeline('30 gün içinde');
-    setBidNote('');
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Teklif iletilirken bir hata oluştu.');
+      }
 
-    alert('Toptan seramik fiyat teklifiniz başarıyla simüle edildi ve proje sahiplerine iletildi!');
+      // Re-fetch bids from database for absolute real-time synchronization
+      if (brandInfo?.id) {
+        await loadBrandBids(brandInfo.id);
+      }
+
+      // Clear form and modal
+      setBiddingProject(null);
+      setBidPrice('');
+      setBidProduct('');
+      setBidTimeline('30 gün içinde');
+      setBidNote('');
+
+      alert('Toptan seramik fiyat teklifiniz başarıyla sisteme kaydedildi ve proje sahiplerine iletildi!');
+    } catch (err) {
+      console.error('Bid submit error:', err);
+      alert(err.message || 'Teklif gönderilirken hata oluştu.');
+    }
   };
 
   // Dynamic SVG Chart Coordinates Generator
