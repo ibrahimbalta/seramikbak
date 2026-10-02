@@ -1,10 +1,23 @@
 export default function robots() {
+  const disallowList = [
+    '/admin/',
+    '/api/',
+    '/*?*sort=*',
+    '/*?*filter=*',
+    '/*?*color=*',
+    '/*?*finish=*',
+    '/*?*size=*',
+    '/*?*style=*',
+    '/*?*area=*',
+    '/*?*clear=*'
+  ];
+
   return {
     rules: [
       {
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: disallowList,
       },
       {
         userAgent: 'GPTBot',
@@ -39,17 +52,17 @@ export default function robots() {
       {
         userAgent: 'Bingbot',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: disallowList,
       },
       {
         userAgent: 'Yandex',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: disallowList,
       },
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin/', '/api/'],
+        disallow: disallowList,
       },
     ],
     sitemap: [

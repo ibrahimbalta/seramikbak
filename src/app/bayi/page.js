@@ -686,7 +686,7 @@ Yetkili Satış & Showroom Departmanı`;
 
   const loadBankDetails = async () => {
     try {
-      const res = await fetch('/api/admin/settings');
+      const res = await fetch('/api/settings/bank-info');
       if (res.ok) {
         const data = await res.json();
         setBankDetails({

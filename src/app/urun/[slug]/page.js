@@ -89,7 +89,7 @@ export async function generateMetadata({ params }) {
     const title = `${product.name} ${dimensions} | ${brandName} | SeramikBak`;
     const description = `${brandName} ${product.name} (${dimensions}) seramik karosu. ${product.finish} yüzey, ${product.color} renk, ${product.style} dokusu. En yakın yetkili bayiden fiyat teklifi alın veya 15x15 kesit numune isteyin.`;
     
-    const productSlug = slugify(`${brandName} ${product.name}`);
+    const productSlug = product.slug || slugify(`${brandName} ${product.name}`);
     const canonicalUrl = `https://www.seramikbak.com/urun/${productSlug}`;
     const imageUrl = product.imageUrl || 'https://www.seramikbak.com/logo.png';
 

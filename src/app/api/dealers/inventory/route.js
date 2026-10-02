@@ -4,14 +4,14 @@ import { verifyAuth } from '@/lib/auth-check';
 
 export async function GET(request) {
   try {
-    const auth = await verifyAuth(request, 'dealer');
-    const { searchParams } = new URL(request.url);
-    const paramDealerId = searchParams.get('dealerId');
-    const dealerId = auth?.id || paramDealerId;
-
-    if (!dealerId) {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'dealer' && auth.role !== 'admin')) {
       return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen tekrar giriş yapın.' }, { status: 401 });
     }
+
+    const { searchParams } = new URL(request.url);
+    // Anti-IDOR: Regular dealers can only access their own inventory. Admin can inspect by query param.
+    const dealerId = auth.role === 'dealer' ? auth.id : (searchParams.get('dealerId') || auth.id);
 
     const inventory = await prisma.dealerInventory.findMany({
       where: { dealerId },
@@ -51,21 +51,23 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const auth = await verifyAuth(request, 'dealer');
-    const body = await request.json();
-    const { action } = body;
-    const dealerId = auth?.id || body?.dealerId;
-
-    if (!dealerId) {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'dealer' && auth.role !== 'admin')) {
       return NextResponse.json({ error: 'Yetkisiz erişim. Lütfen tekrar giriş yapın.' }, { status: 401 });
     }
+
+    const body = await request.json();
+    const { action } = body;
+    // Anti-IDOR: Regular dealers can only mutate their own inventory. Admin can specify dealerId.
+    const dealerId = auth.role === 'dealer' ? auth.id : (body?.dealerId || auth.id);
 
     // Check SaaS subscription active status
     const saas = await prisma.dealerSaaSConfig.findFirst({
       where: { dealerId },
       orderBy: { expiresAt: 'desc' }
     });
-    const hasActiveSaaS = saas ? (new Date(saas.expiresAt) > new Date() && saas.status === 'ACTIVE') : true;
+    // Active SaaS requires active status and valid future expiry date (or admin override)
+    const hasActiveSaaS = Boolean(saas && saas.status === 'ACTIVE' && new Date(saas.expiresAt) > new Date()) || auth.role === 'admin';
 
     if (!hasActiveSaaS) {
       return NextResponse.json({ 

@@ -467,6 +467,7 @@ export default function DealerProfileClient({ dealer, products }) {
   const [calcDirectM2, setCalcDirectM2] = useState(20);
   const [calcWasteRate, setCalcWasteRate] = useState(10);
   const [calcSelectedProductId, setCalcSelectedProductId] = useState('');
+  const [calcMobileTab, setCalcMobileTab] = useState('inputs'); // 'inputs' | 'results'
 
   const calcCalculations = useMemo(() => {
     let netM2 = 0;
@@ -829,14 +830,42 @@ export default function DealerProfileClient({ dealer, products }) {
     }
   };
 
-  const handleApptSubmit = (e) => {
+  const handleApptSubmit = async (e) => {
     e.preventDefault();
-    setApptSuccess(true);
-    showToast('Showroom randevu talebiniz oluşturuldu.');
-    setTimeout(() => {
-      setShowApptModal(false);
-      setApptSuccess(false);
-    }, 2500);
+    if (!apptName || !apptPhone) return;
+
+    try {
+      const notesFormatted = `[VIP Showroom Randevusu] Tarih: ${apptDate || 'Belirtilmedi'}, Saat: ${apptTime || 'Belirtilmedi'}. ${apptNotes ? `Not: ${apptNotes}` : ''}`;
+      const res = await fetch('/api/leads/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dealerId: dealer?.id,
+          clientName: apptName,
+          clientPhone: apptPhone,
+          notes: notesFormatted,
+          requestedArchitect: true
+        })
+      });
+
+      if (res.ok) {
+        setApptSuccess(true);
+        showToast('Showroom randevu talebiniz bayiye iletildi!');
+        setTimeout(() => {
+          setShowApptModal(false);
+          setApptSuccess(false);
+          if (typeof setApptName === 'function') setApptName('');
+          if (typeof setApptPhone === 'function') setApptPhone('');
+          if (typeof setApptNotes === 'function') setApptNotes('');
+        }, 2500);
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Randevu iletilirken bir hata oluştu.');
+      }
+    } catch (err) {
+      console.error('Appointment submit error:', err);
+      showToast('Randevu iletilirken sistemsel bir hata oluştu.');
+    }
   };
 
   const hasActiveFilters = selectedCategory !== 'all' || selectedDimension !== 'all' || selectedFinish !== 'all' || searchTerm;
@@ -1471,6 +1500,41 @@ export default function DealerProfileClient({ dealer, products }) {
               </div>
             </div>
 
+            {/* Active Filter Chips Bar (UX-2) */}
+            {(selectedCategory !== 'all' || selectedDimension !== 'all' || selectedFinish !== 'all' || searchTerm.trim()) && (
+              <div className="active-filters-chips-bar animate-fade-in">
+                <span className="chips-title">Aktif Filtreler ({filteredProducts.length} Ürün):</span>
+                {selectedCategory !== 'all' && (
+                  <button type="button" className="filter-chip-btn" onClick={() => setSelectedCategory('all')}>
+                    <span>Kategori: {selectedCategory}</span>
+                    <X size={12} />
+                  </button>
+                )}
+                {selectedDimension !== 'all' && (
+                  <button type="button" className="filter-chip-btn" onClick={() => setSelectedDimension('all')}>
+                    <span>Ebat: {selectedDimension}</span>
+                    <X size={12} />
+                  </button>
+                )}
+                {selectedFinish !== 'all' && (
+                  <button type="button" className="filter-chip-btn" onClick={() => setSelectedFinish('all')}>
+                    <span>Yüzey: {selectedFinish}</span>
+                    <X size={12} />
+                  </button>
+                )}
+                {searchTerm.trim() && (
+                  <button type="button" className="filter-chip-btn" onClick={() => setSearchTerm('')}>
+                    <span>Arama: &ldquo;{searchTerm}&rdquo;</span>
+                    <X size={12} />
+                  </button>
+                )}
+                <button type="button" className="filter-clear-all-chip" onClick={resetFilters}>
+                  <Trash2 size={12} />
+                  <span>Tümünü Temizle</span>
+                </button>
+              </div>
+            )}
+
             {/* Products Grid */}
             {filteredProducts.length === 0 ? (
               <div className="catalog-empty-state">
@@ -1600,9 +1664,29 @@ export default function DealerProfileClient({ dealer, products }) {
             </p>
           </div>
 
+          {/* Mobile 2-Step Wizard Navigation Tabs (MOB-2) */}
+          <div className="calc-mobile-wizard-tabs">
+            <button
+              type="button"
+              onClick={() => setCalcMobileTab('inputs')}
+              className={`calc-wizard-tab ${calcMobileTab === 'inputs' ? 'active' : ''}`}
+            >
+              <span className="tab-num">1</span>
+              <span>1. Ölçü & Mekan</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setCalcMobileTab('results')}
+              className={`calc-wizard-tab ${calcMobileTab === 'results' ? 'active' : ''}`}
+            >
+              <span className="tab-num">2</span>
+              <span>2. Malzeme & Fiyat ({calcCalculations.totalTileM2} m²)</span>
+            </button>
+          </div>
+
           <div className="calc-main-grid">
             {/* Left Column: Interactive Inputs */}
-            <div className="calc-inputs-card">
+            <div className={`calc-inputs-card ${calcMobileTab === 'results' ? 'mobile-hidden' : ''}`}>
               {/* Step 1: Room Presets */}
               <div className="calc-field-section">
                 <label className="calc-field-label">1. Uygulama Alanı Seçin</label>
@@ -1745,10 +1829,28 @@ export default function DealerProfileClient({ dealer, products }) {
                   </select>
                 </div>
               )}
+              {/* Mobile Step 1 -> Step 2 Proceed Button */}
+              <button
+                type="button"
+                onClick={() => setCalcMobileTab('results')}
+                className="calc-mobile-step-next-btn"
+              >
+                <span>Malzeme & Teklif Özetini Gör</span>
+                <ArrowRight size={16} />
+              </button>
             </div>
 
             {/* Right Column: Live Calculated Results & Instant Deal Closing Actions */}
-            <div className="calc-results-card">
+            <div className={`calc-results-card ${calcMobileTab === 'inputs' ? 'mobile-hidden' : ''}`}>
+              {/* Mobile Step 2 -> Step 1 Back Button */}
+              <button
+                type="button"
+                onClick={() => setCalcMobileTab('inputs')}
+                className="calc-mobile-step-prev-btn"
+              >
+                <span>← Ölçüleri Yeniden Düzenle</span>
+              </button>
+
               <div className="results-top-bar">
                 <span className="results-title">MALZEME DÖKÜMÜ & SİPARİŞ LİSTESİ</span>
                 <span className="results-badge-live">Canlı Hesaplandı</span>

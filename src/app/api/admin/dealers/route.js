@@ -29,7 +29,9 @@ export async function GET(request) {
       },
       orderBy: { createdAt: 'desc' }
     });
-    return NextResponse.json(dealers);
+    // Omit password hash for information security
+    const safeDealers = dealers.map(({ password, ...rest }) => rest);
+    return NextResponse.json(safeDealers);
   } catch (error) {
     console.error('Admin Dealers GET Error:', error);
     return NextResponse.json({ error: 'Failed to fetch dealers' }, { status: 500 });
@@ -77,7 +79,8 @@ export async function POST(request) {
       }
     });
 
-    return NextResponse.json({ success: true, dealer: newDealer });
+    const { password: _p, ...dealerWithoutPassword } = newDealer;
+    return NextResponse.json({ success: true, dealer: dealerWithoutPassword });
   } catch (error) {
     console.error('Admin Dealers POST Error:', error);
     return NextResponse.json({ error: 'Failed to create dealer', details: error.message }, { status: 500 });
@@ -214,7 +217,8 @@ export async function PUT(request) {
       }
     });
 
-    return NextResponse.json({ success: true, dealer: updatedDealer });
+    const { password: _p, ...updatedWithoutPassword } = updatedDealer;
+    return NextResponse.json({ success: true, dealer: updatedWithoutPassword });
   } catch (error) {
     console.error('Admin Dealers PUT Error:', error);
     return NextResponse.json({ error: 'Failed to update dealer', details: error.message }, { status: 500 });

@@ -24,8 +24,11 @@
   --text-secondary: #475569;
   --text-muted: #8e9bb0;
   
-  /* Layout */
+  /* Layout & Mobile Viewport Support (MOB-1) */
   --max-width: 1400px;
+  --viewport-height: 100vh;
+  --viewport-height: 100dvh;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
   --border-radius-sm: 8px;
   --border-radius-md: 14px;
   --border-radius-lg: 24px;

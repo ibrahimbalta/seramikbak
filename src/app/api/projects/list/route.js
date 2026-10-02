@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 // Helper to mask name (e.g., "Ahmet Yılmaz" -> "A*** Y***")
 function maskName(name) {
@@ -32,10 +33,29 @@ function maskEmail(email) {
 
 export async function GET(request) {
   try {
+    const auth = await verifyAuth(request);
     const { searchParams } = new URL(request.url);
-    const dealerId = searchParams.get('dealerId');
-    const brandId = searchParams.get('brandId');
+    const queryDealerId = searchParams.get('dealerId');
+    const queryBrandId = searchParams.get('brandId');
     const email = searchParams.get('email');
+
+    // Anti-IDOR: Resolve dealer and brand strictly from session if authenticated
+    let dealerId = null;
+    let brandId = null;
+
+    if (auth) {
+      if (auth.role === 'dealer') {
+        dealerId = auth.id;
+      } else if (auth.role === 'brand') {
+        brandId = auth.id;
+      } else if (auth.role === 'admin') {
+        dealerId = queryDealerId;
+        brandId = queryBrandId;
+      }
+    } else {
+      dealerId = queryDealerId;
+      brandId = queryBrandId;
+    }
 
     if (!dealerId && !brandId && !email) {
       return NextResponse.json(

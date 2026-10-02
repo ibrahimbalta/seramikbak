@@ -18968,7 +18968,7 @@ export default function Home() {
             display: grid !important;
             grid-template-columns: repeat(5, 1fr) !important;
             position: fixed !important;
-            bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+            bottom: max(12px, calc(8px + env(safe-area-inset-bottom, 0px))) !important;
             left: 10px !important;
             right: 10px !important;
             max-width: calc(100vw - 20px) !important;

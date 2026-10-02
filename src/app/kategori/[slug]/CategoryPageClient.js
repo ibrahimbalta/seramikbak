@@ -13,7 +13,9 @@ import {
   Send, 
   Box, 
   SlidersHorizontal,
-  ChevronDown
+  ChevronDown,
+  X,
+  Trash2
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import TileVisualPreview from '@/components/TileVisualPreview';
@@ -246,6 +248,112 @@ export default function CategoryPageClient({ category, products = [], otherCateg
           </div>
 
         </div>
+
+        {/* Active Filter Chips Bar & Results Counter (UX-2) */}
+        {(selectedBrand !== 'ALL' || selectedFinish !== 'ALL' || searchQuery.trim()) && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '8px',
+            marginBottom: '24px',
+            padding: '10px 14px',
+            background: 'rgba(212, 175, 55, 0.08)',
+            border: '1px solid rgba(212, 175, 55, 0.25)',
+            borderRadius: '10px'
+          }}>
+            <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Aktif Filtreler ({filteredProducts.length} Ürün):
+            </span>
+            {selectedBrand !== 'ALL' && (
+              <button
+                type="button"
+                onClick={() => setSelectedBrand('ALL')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  color: '#fff',
+                  fontSize: '0.78rem',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                <span>Marka: {brands.find(b => b.id === selectedBrand)?.name || selectedBrand}</span>
+                <X size={13} />
+              </button>
+            )}
+            {selectedFinish !== 'ALL' && (
+              <button
+                type="button"
+                onClick={() => setSelectedFinish('ALL')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  color: '#fff',
+                  fontSize: '0.78rem',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                <span>Yüzey: {selectedFinish}</span>
+                <X size={13} />
+              </button>
+            )}
+            {searchQuery.trim() && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  color: '#fff',
+                  fontSize: '0.78rem',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                <span>Arama: &ldquo;{searchQuery}&rdquo;</span>
+                <X size={13} />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => { setSelectedBrand('ALL'); setSelectedFinish('ALL'); setSearchQuery(''); }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '4px 10px',
+                borderRadius: '9999px',
+                background: 'rgba(239, 68, 68, 0.2)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                color: '#fca5a5',
+                fontSize: '0.78rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                marginLeft: 'auto'
+              }}
+            >
+              <Trash2 size={13} />
+              <span>Tümünü Temizle</span>
+            </button>
+          </div>
+        )}
 
         {/* Product Cards Grid */}
         {filteredProducts.length === 0 ? (

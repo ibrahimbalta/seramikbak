@@ -98,8 +98,6 @@ export async function GET(request) {
       dealerId = session.id;
     } else if (session && session.role === 'admin' && queryDealerId) {
       dealerId = queryDealerId;
-    } else if (queryDealerId) {
-      dealerId = queryDealerId;
     }
 
     if (!dealerId) {

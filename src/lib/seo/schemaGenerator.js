@@ -224,6 +224,18 @@ export function generateLocalBusinessSchema(dealer) {
       latitude: dealer.lat || 41.0082,
       longitude: dealer.lng || 28.9784
     },
+    currenciesAccepted: 'TRY',
+    paymentAccepted: 'Nakit, Kredi Kartı, Banka Havalesi',
+    areaServed: {
+      '@type': 'AdministrativeArea',
+      name: `${dealer.district ? dealer.district + ', ' : ''}${dealer.city || 'Türkiye'}`
+    },
+    ...(dealer.brand?.name ? {
+      brand: {
+        '@type': 'Brand',
+        name: dealer.brand.name
+      }
+    } : {}),
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',

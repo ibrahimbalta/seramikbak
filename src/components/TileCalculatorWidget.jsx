@@ -22,6 +22,7 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
   const [tileStyle, setTileStyle] = useState('mermer');
   const [includeLabor, setIncludeLabor] = useState(false); // Usta işçilik seçeneği
   const [layingStyle, setLayingStyle] = useState('duz'); // duz (%8 fire), capraz (%12 fire), baliksirti (%15 fire)
+  const [mobileStep, setMobileStep] = useState(1); // 1 = Ölçü & Tercihler, 2 = Malzeme & Teklif Özeti
 
   // 1. Seramik Ebadına Göre Kutu m², Malzeme Çarpanı & Usta İşçilik Tarifesi (2026 Türkiye Pazar Standartları)
   const tileSizeConfigMap = {
@@ -185,10 +186,30 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
         </h3>
       </div>
 
+      {/* Mobile 2-Step Wizard Tabs (MOB-2) */}
+      <div className="tile-calc-mobile-tabs">
+        <button
+          type="button"
+          onClick={() => setMobileStep(1)}
+          className={`tile-calc-tab-btn ${mobileStep === 1 ? 'active' : ''}`}
+        >
+          <span className="tab-circle">1</span>
+          <span>1. Ölçü & Tercihler</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileStep(2)}
+          className={`tile-calc-tab-btn ${mobileStep === 2 ? 'active' : ''}`}
+        >
+          <span className="tab-circle">2</span>
+          <span>2. Malzeme & Fiyat ({totalM2WithWastage} m²)</span>
+        </button>
+      </div>
+
       {/* Main Grid Layout */}
       <div className="tile-calc-grid">
         {/* Left Inputs */}
-        <div className="tile-calc-inputs">
+        <div className={`tile-calc-inputs ${mobileStep === 2 ? 'calc-mobile-hidden' : ''}`}>
           
           {/* Mekan Seçimi */}
           <div className="calc-group">
@@ -306,10 +327,28 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
             </div>
           </div>
 
+          {/* Mobile Proceed CTA (MOB-2) */}
+          <button
+            type="button"
+            onClick={() => setMobileStep(2)}
+            className="calc-mobile-wizard-next-btn"
+          >
+            <span>Malzeme & Bütçe Hesabını Gör</span>
+            <ArrowRight size={15} />
+          </button>
         </div>
 
         {/* Right Results & Action */}
-        <div className="tile-calc-results">
+        <div className={`tile-calc-results ${mobileStep === 1 ? 'calc-mobile-hidden' : ''}`}>
+          {/* Mobile Back CTA (MOB-2) */}
+          <button
+            type="button"
+            onClick={() => setMobileStep(1)}
+            className="calc-mobile-wizard-back-btn"
+          >
+            <span>← Ölçü ve Tercihleri Değiştir</span>
+          </button>
+
           <div className="results-inner-grid">
             <div className="result-item">
               <span className="result-label">GEREKLİ KUTU</span>
@@ -367,6 +406,15 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
       </div>
 
       <style jsx>{`
+        .tile-calc-mobile-tabs {
+          display: none;
+        }
+
+        .calc-mobile-wizard-next-btn,
+        .calc-mobile-wizard-back-btn {
+          display: none;
+        }
+
         .tile-calculator-card {
           background: #ffffff;
           border-radius: 16px;
@@ -1083,6 +1131,94 @@ export default function TileCalculatorWidget({ onOpenQuoteModal, onGoToDealers }
             gap: 6px;
             font-weight: 800;
             color: #ffffff !important;
+          }
+
+          .tile-calc-mobile-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            width: 100%;
+          }
+
+          .tile-calc-tab-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 0.74rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+          }
+
+          .tile-calc-tab-btn.active {
+            background: #ffffff;
+            border-color: #b38e47;
+            color: #b38e47;
+            box-shadow: 0 2px 8px rgba(179, 142, 71, 0.2);
+          }
+
+          .tile-calc-tab-btn .tab-circle {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            color: #1e293b;
+            font-size: 0.68rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .tile-calc-tab-btn.active .tab-circle {
+            background: #b38e47;
+            color: #ffffff;
+          }
+
+          .tile-calc-inputs.calc-mobile-hidden,
+          .tile-calc-results.calc-mobile-hidden {
+            display: none !important;
+          }
+
+          .calc-mobile-wizard-next-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 10px 14px;
+            margin-top: 12px;
+            background: linear-gradient(135deg, #b38e47 0%, #987532 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(179, 142, 71, 0.25);
+          }
+
+          .calc-mobile-wizard-back-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 7px 10px;
+            margin-bottom: 8px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
           }
         }
       `}</style>

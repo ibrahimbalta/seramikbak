@@ -1,11 +1,18 @@
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
+import { verifyAuth } from '@/lib/auth-check';
 
 // GET: Fetch dealer's own outlet listings
 export async function GET(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'dealer' && auth.role !== 'admin')) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen giriş yapınız.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-    const dealerId = searchParams.get('dealerId');
+    // Anti-IDOR: Regular dealers can only view their own listings
+    const dealerId = auth.role === 'dealer' ? auth.id : (searchParams.get('dealerId') || auth.id);
 
     if (!dealerId) {
       return NextResponse.json({ success: false, error: 'Bayi Kimliği (dealerId) zorunludur.' }, { status: 400 });
@@ -36,9 +43,13 @@ export async function GET(request) {
 // POST: Add new outlet stock listing
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'dealer' && auth.role !== 'admin')) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen giriş yapınız.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const {
-      dealerId,
       productId,
       title,
       category,
@@ -52,6 +63,9 @@ export async function POST(request) {
       notes,
       status
     } = body;
+
+    // Anti-IDOR: Force session ID for dealers
+    const dealerId = auth.role === 'dealer' ? auth.id : (body.dealerId || auth.id);
 
     if (!dealerId || !title || !unitPrice || !quantityM2) {
       return NextResponse.json({ success: false, error: 'Lütfen zorunlu alanları (Bayi, Başlık, Metraj, Outlet Fiyatı) doldurun.' }, { status: 400 });
@@ -110,10 +124,14 @@ export async function POST(request) {
 // PUT: Update an outlet listing (details or status)
 export async function PUT(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'dealer' && auth.role !== 'admin')) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen giriş yapınız.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const {
       id,
-      dealerId,
       title,
       category,
       badgeTag,
@@ -127,16 +145,17 @@ export async function PUT(request) {
       status
     } = body;
 
-    if (!id || !dealerId) {
-      return NextResponse.json({ success: false, error: 'İlan ID ve Bayi ID zorunludur.' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'İlan ID zorunludur.' }, { status: 400 });
     }
 
     const existing = await prisma.outletListing.findUnique({
       where: { id }
     });
 
-    if (!existing || existing.dealerId !== dealerId) {
-      return NextResponse.json({ success: false, error: 'İlan bulunamadı veya düzenleme yetkiniz yok.' }, { status: 404 });
+    // Anti-IDOR check: Dealer must own this listing unless admin
+    if (!existing || (auth.role === 'dealer' && existing.dealerId !== auth.id)) {
+      return NextResponse.json({ success: false, error: 'İlan bulunamadı veya düzenleme yetkiniz yok.' }, { status: 403 });
     }
 
     const updated = await prisma.outletListing.update({
@@ -166,20 +185,25 @@ export async function PUT(request) {
 // DELETE: Delete an outlet listing
 export async function DELETE(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'dealer' && auth.role !== 'admin')) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen giriş yapınız.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    const dealerId = searchParams.get('dealerId');
 
-    if (!id || !dealerId) {
-      return NextResponse.json({ success: false, error: 'İlan ID ve Bayi ID zorunludur.' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'İlan ID zorunludur.' }, { status: 400 });
     }
 
     const existing = await prisma.outletListing.findUnique({
       where: { id }
     });
 
-    if (!existing || existing.dealerId !== dealerId) {
-      return NextResponse.json({ success: false, error: 'İlan bulunamadı veya silme yetkiniz yok.' }, { status: 404 });
+    // Anti-IDOR check: Dealer must own this listing unless admin
+    if (!existing || (auth.role === 'dealer' && existing.dealerId !== auth.id)) {
+      return NextResponse.json({ success: false, error: 'İlan bulunamadı veya silme yetkiniz yok.' }, { status: 403 });
     }
 
     await prisma.outletListing.delete({

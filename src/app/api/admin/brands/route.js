@@ -16,7 +16,6 @@ export async function GET(request) {
         name: true,
         logoUrl: true,
         username: true,
-        password: true,
         createdAt: true,
         _count: {
           select: {

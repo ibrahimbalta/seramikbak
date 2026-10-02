@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 export async function GET(request) {
   try {
@@ -78,6 +79,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const auth = await verifyAuth(request);
     const body = await request.json();
     const {
       type, // 'NEED_STOCK' | 'HAVE_STOCK'
@@ -89,9 +91,10 @@ export async function POST(request) {
       urgent,
       notes,
       contactName,
-      contactPhone,
-      dealerId
+      contactPhone
     } = body;
+
+    const resolvedDealerId = auth && auth.role === 'dealer' ? auth.id : (body.dealerId || null);
 
     if (!productName || !contactName || !contactPhone || !city) {
       return NextResponse.json({
@@ -114,7 +117,7 @@ export async function POST(request) {
         notes: notes ? notes.trim() : null,
         contactName: contactName.trim(),
         contactPhone: cleanPhone,
-        dealerId: dealerId || null,
+        dealerId: resolvedDealerId,
         status: 'OPEN'
       }
     });
@@ -132,6 +135,11 @@ export async function POST(request) {
 
 export async function PUT(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'dealer' && auth.role !== 'admin')) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen giriş yapınız.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const {
       id,
@@ -150,6 +158,19 @@ export async function PUT(request) {
 
     if (!id) {
       return NextResponse.json({ success: false, error: 'İlan ID zorunludur.' }, { status: 400 });
+    }
+
+    const existing = await prisma.dealerStockExchange.findUnique({
+      where: { id }
+    });
+
+    if (!existing) {
+      return NextResponse.json({ success: false, error: 'İlan bulunamadı.' }, { status: 404 });
+    }
+
+    // Ownership check: Dealers can only edit their own listings
+    if (auth.role === 'dealer' && existing.dealerId && existing.dealerId !== auth.id) {
+      return NextResponse.json({ success: false, error: 'Bu ilanı düzenleme yetkiniz yok.' }, { status: 403 });
     }
 
     const updateData = {};
@@ -179,11 +200,29 @@ export async function PUT(request) {
 
 export async function DELETE(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth || (auth.role !== 'dealer' && auth.role !== 'admin')) {
+      return NextResponse.json({ success: false, error: 'Yetkisiz erişim. Lütfen giriş yapınız.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
     if (!id) {
       return NextResponse.json({ success: false, error: 'Silinecek ilan ID\'si gereklidir.' }, { status: 400 });
+    }
+
+    const existing = await prisma.dealerStockExchange.findUnique({
+      where: { id }
+    });
+
+    if (!existing) {
+      return NextResponse.json({ success: false, error: 'İlan bulunamadı.' }, { status: 404 });
+    }
+
+    // Ownership check: Dealers can only delete their own listings
+    if (auth.role === 'dealer' && existing.dealerId && existing.dealerId !== auth.id) {
+      return NextResponse.json({ success: false, error: 'Bu ilanı silme yetkiniz yok.' }, { status: 403 });
     }
 
     await prisma.dealerStockExchange.delete({
