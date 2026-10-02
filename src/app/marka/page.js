@@ -175,6 +175,8 @@ export default function BrandPortalPage() {
   const [b2bStats, setB2bStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [brandProducts, setBrandProducts] = useState([]);
+  const [brandProductsLoading, setBrandProductsLoading] = useState(false);
+  const [catalogVisibleCount, setCatalogVisibleCount] = useState(48);
   
   // Trends Analytics states
   const [trendsData, setTrendsData] = useState(null);
@@ -568,14 +570,17 @@ export default function BrandPortalPage() {
   };
 
   const fetchBrandProducts = async (brandId) => {
+    setBrandProductsLoading(true);
     try {
       const res = await fetch(`/api/search?brandId=${brandId}&limit=all&fullDetail=true`);
       if (res.ok) {
         const data = await res.json();
-        setBrandProducts(data);
+        setBrandProducts(Array.isArray(data) ? data : []);
       }
     } catch (err) {
       console.error('Failed to fetch brand products:', err);
+    } finally {
+      setBrandProductsLoading(false);
     }
   };
 
@@ -2449,9 +2454,16 @@ export default function BrandPortalPage() {
                       </p>
                     </div>
 
-                    <span style={{ fontSize: '0.78rem', background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', padding: '6px 14px', borderRadius: '20px', fontWeight: '700' }}>
-                      Toplam {brandProducts.length} Ürün Listeli
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {brandProductsLoading && (
+                        <span style={{ fontSize: '0.78rem', background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe', padding: '6px 14px', borderRadius: '20px', fontWeight: '600' }}>
+                          Katalog Yükleniyor...
+                        </span>
+                      )}
+                      <span style={{ fontSize: '0.78rem', background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', padding: '6px 14px', borderRadius: '20px', fontWeight: '700' }}>
+                        Toplam {brandProducts.length} Ürün Listeli
+                      </span>
+                    </div>
                   </div>
 
                   {/* Filter & Search Bar */}
@@ -2470,7 +2482,10 @@ export default function BrandPortalPage() {
                       <input 
                         type="text" 
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                          setCatalogVisibleCount(48);
+                        }}
                         placeholder="Ürün adı veya koduna göre ara..."
                         style={{
                           width: '100%',
@@ -2495,7 +2510,10 @@ export default function BrandPortalPage() {
                         {!isMobile && <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600' }}>Tarz:</span>}
                         <select 
                           value={selectedStyle} 
-                          onChange={(e) => setSelectedStyle(e.target.value)}
+                          onChange={(e) => {
+                            setSelectedStyle(e.target.value);
+                            setCatalogVisibleCount(48);
+                          }}
                           style={{
                             padding: '10px 12px',
                             fontSize: '0.8rem',
@@ -2519,7 +2537,10 @@ export default function BrandPortalPage() {
                         {!isMobile && <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: '600' }}>Yüzey:</span>}
                         <select 
                           value={selectedFinish} 
-                          onChange={(e) => setSelectedFinish(e.target.value)}
+                          onChange={(e) => {
+                            setSelectedFinish(e.target.value);
+                            setCatalogVisibleCount(48);
+                          }}
                           style={{
                             padding: '10px 12px',
                             fontSize: '0.8rem',
@@ -2540,7 +2561,20 @@ export default function BrandPortalPage() {
                   </div>
 
                   {/* Product Grid */}
-                  {brandProducts.length === 0 ? (
+                  {brandProductsLoading ? (
+                    <div style={{ textAlign: 'center', padding: '64px', color: '#64748b' }}>
+                      <div style={{
+                        margin: '0 auto 16px auto',
+                        width: '36px',
+                        height: '36px',
+                        border: '3px solid #e2e8f0',
+                        borderTop: '3px solid #0f172a',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite'
+                      }} />
+                      <span style={{ fontWeight: '600', fontSize: '0.9rem' }}>Markanıza ait tüm ürün kataloğu yükleniyor...</span>
+                    </div>
+                  ) : brandProducts.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '64px', color: '#94a3b8' }}>
                       <Layers size={36} style={{ margin: '0 auto 12px auto', opacity: 0.5 }} />
                       <span>Ürünleriniz yüklenemedi veya henüz yüklenmiş bir ürün bulunmamaktadır.</span>
@@ -2562,91 +2596,149 @@ export default function BrandPortalPage() {
                         );
                       }
 
+                      const visibleProducts = filtered.slice(0, catalogVisibleCount);
+                      const hasMore = filtered.length > catalogVisibleCount;
+
                       return (
-                        <div style={{
-                          display: 'grid',
-                          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
-                          gap: isMobile ? '16px' : '24px'
-                        }}>
-                          {filtered.map(prod => (
-                            <div 
-                              key={prod.id} 
-                              style={{
-                                background: '#fff',
-                                border: '1px solid #e2e8f0',
-                                borderRadius: '16px',
-                                overflow: 'hidden',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.01)',
-                                transition: 'all 0.25s'
-                              }}
-                              className="product-card hover-lift"
-                            >
-                              {/* Product Thumbnail */}
-                              <div style={{ position: 'relative', height: '180px', background: '#f8fafc', overflow: 'hidden' }}>
-                                <img 
-                                  src={prod.imageUrl || '/textures/concrete_light_grey.jpg'} 
-                                  alt={prod.name}
-                                  style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover'
-                                  }}
-                                  onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = '/textures/concrete_light_grey.jpg';
-                                  }}
-                                />
-                                {prod.isPremium && (
+                        <>
+                          <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
+                            gap: isMobile ? '16px' : '24px'
+                          }}>
+                            {visibleProducts.map(prod => (
+                              <div 
+                                key={prod.id} 
+                                style={{
+                                  background: '#fff',
+                                  border: '1px solid #e2e8f0',
+                                  borderRadius: '16px',
+                                  overflow: 'hidden',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  boxShadow: '0 4px 12px rgba(0,0,0,0.01)',
+                                  transition: 'all 0.25s'
+                                }}
+                                className="product-card hover-lift"
+                              >
+                                {/* Product Thumbnail */}
+                                <div style={{ position: 'relative', height: '180px', background: '#f8fafc', overflow: 'hidden' }}>
+                                  <img 
+                                    src={prod.imageUrl || '/textures/concrete_light_grey.jpg'} 
+                                    alt={prod.name}
+                                    style={{
+                                      width: '100%',
+                                      height: '100%',
+                                      objectFit: 'cover'
+                                    }}
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = '/textures/concrete_light_grey.jpg';
+                                    }}
+                                  />
+                                  {prod.isPremium && (
+                                    <span style={{
+                                      position: 'absolute',
+                                      top: '12px',
+                                      right: '12px',
+                                      background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
+                                      color: '#000',
+                                      fontSize: '0.62rem',
+                                      fontWeight: '800',
+                                      padding: '3px 8px',
+                                      borderRadius: '10px',
+                                      boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                                    }}>
+                                      ÖNE ÇIKAN (AD)
+                                    </span>
+                                  )}
                                   <span style={{
                                     position: 'absolute',
-                                    top: '12px',
-                                    right: '12px',
-                                    background: 'linear-gradient(135deg, #b38e47 0%, #d4af37 100%)',
-                                    color: '#000',
-                                    fontSize: '0.62rem',
-                                    fontWeight: '800',
-                                    padding: '3px 8px',
-                                    borderRadius: '10px',
-                                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                                    bottom: '10px',
+                                    left: '10px',
+                                    background: 'rgba(9, 13, 22, 0.75)',
+                                    color: '#fff',
+                                    fontSize: '0.68rem',
+                                    padding: '2px 6px',
+                                    borderRadius: '4px',
+                                    fontWeight: '600'
                                   }}>
-                                    ÖNE ÇIKAN (AD)
+                                    {prod.width}x{prod.height} cm
                                   </span>
-                                )}
-                                <span style={{
-                                  position: 'absolute',
-                                  bottom: '10px',
-                                  left: '10px',
-                                  background: 'rgba(9, 13, 22, 0.75)',
-                                  color: '#fff',
-                                  fontSize: '0.68rem',
-                                  padding: '2px 6px',
-                                  borderRadius: '4px',
-                                  fontWeight: '600'
-                                }}>
-                                  {prod.width}x{prod.height} cm
-                                </span>
-                              </div>
+                                </div>
 
-                              {/* Card Content */}
-                              <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', justifyItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                                <div>
-                                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700' }}>Kod: {prod.code}</div>
-                                  <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', margin: '4px 0 8px 0', minHeight: '38px', display: 'flex', alignItems: 'center' }}>
-                                    {prod.name}
-                                  </h4>
+                                {/* Card Content */}
+                                <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', justifyItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                                  <div>
+                                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: '700' }}>Kod: {prod.code}</div>
+                                    <h4 style={{ fontSize: '0.92rem', fontWeight: '800', color: '#0f172a', margin: '4px 0 8px 0', minHeight: '38px', display: 'flex', alignItems: 'center' }}>
+                                      {prod.name}
+                                    </h4>
 
-                                  <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '10px' }}>
-                                    <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.style}</span>
-                                    <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.finish} Yüzey</span>
-                                    <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.color}</span>
+                                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                                      <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.style}</span>
+                                      <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.finish} Yüzey</span>
+                                      <span style={{ fontSize: '0.65rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px' }}>{prod.color}</span>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
+                            ))}
+                          </div>
+
+                          {/* Load More Pagination Bar */}
+                          {hasMore && (
+                            <div style={{
+                              display: 'flex',
+                              flexDirection: isMobile ? 'column' : 'row',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              gap: '12px',
+                              padding: '28px 0 12px 0'
+                            }}>
+                              <button
+                                type="button"
+                                onClick={() => setCatalogVisibleCount(prev => prev + 48)}
+                                style={{
+                                  background: '#0f172a',
+                                  color: '#fff',
+                                  border: 'none',
+                                  padding: '12px 28px',
+                                  borderRadius: '12px',
+                                  fontSize: '0.85rem',
+                                  fontWeight: '700',
+                                  cursor: 'pointer',
+                                  boxShadow: '0 4px 12px rgba(15, 23, 42, 0.15)',
+                                  transition: 'all 0.2s',
+                                  width: isMobile ? '100%' : 'auto'
+                                }}
+                              >
+                                Daha Fazla Ürün Göster (+48)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCatalogVisibleCount(filtered.length)}
+                                style={{
+                                  background: '#f8fafc',
+                                  color: '#334155',
+                                  border: '1.5px solid #cbd5e1',
+                                  padding: '12px 24px',
+                                  borderRadius: '12px',
+                                  fontSize: '0.85rem',
+                                  fontWeight: '600',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s',
+                                  width: isMobile ? '100%' : 'auto'
+                                }}
+                              >
+                                Tümünü Göster ({filtered.length} Ürün)
+                              </button>
                             </div>
-                          ))}
-                        </div>
+                          )}
+                          <div style={{ textAlign: 'center', fontSize: '0.78rem', color: '#94a3b8', marginTop: '6px' }}>
+                            Gösterilen: {visibleProducts.length} / Toplam: {filtered.length} Ürün
+                          </div>
+                        </>
                       );
                     })()
                   )}

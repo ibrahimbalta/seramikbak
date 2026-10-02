@@ -116,14 +116,30 @@ test('Security Engine - User Registration & Password Rules', (t) => {
   assert.equal(emailRegex.test('bad@no-tld'), false);
 });
 
-test('Security Engine - Query Limit Clamping (DoS Mitigation)', (t) => {
-  const clampLimit = (rawLimit, fallback = 24, max = 100) => {
-    return Math.min(Math.max(parseInt(rawLimit) || fallback, 1), max);
+test('Security Engine - Query Limit Clamping and All-Catalog Resolution', (t) => {
+  const resolvePagination = (limitParam, pageParam = '1') => {
+    let skip = undefined;
+    let take = undefined;
+
+    if (limitParam !== 'all') {
+      const parsedLimit = parseInt(limitParam || '24', 10);
+      const limit = Math.max(1, Math.min(isNaN(parsedLimit) ? 24 : parsedLimit, 100));
+      const page = Math.max(1, parseInt(pageParam || '1', 10) || 1);
+      take = limit;
+      skip = (page - 1) * limit;
+    }
+    return { take, skip };
   };
 
-  assert.equal(clampLimit(50), 50);
-  assert.equal(clampLimit(999999), 100, 'Should cap at maximum 100');
-  assert.equal(clampLimit(-10), 1, 'Should floor at minimum 1');
-  assert.equal(clampLimit('invalid'), 24, 'Should fallback on NaN');
+  // Full catalog fetch for brand portals
+  assert.deepEqual(resolvePagination('all'), { take: undefined, skip: undefined });
+
+  // Standard clamped pagination for general searches
+  assert.deepEqual(resolvePagination(null, '1'), { take: 24, skip: 0 });
+  assert.deepEqual(resolvePagination('12', '2'), { take: 12, skip: 12 });
+  assert.deepEqual(resolvePagination('999999', '1'), { take: 100, skip: 0 }, 'Must cap at maximum 100');
+  assert.deepEqual(resolvePagination('-5', '1'), { take: 1, skip: 0 }, 'Must floor at minimum 1');
+  assert.deepEqual(resolvePagination('invalid', '1'), { take: 24, skip: 0 }, 'Fallback on NaN');
 });
+
 

@@ -55,11 +55,11 @@ export async function GET(request) {
     const limitParam = searchParams.get('limit');
     const pageParam = searchParams.get('page');
     let skip = undefined;
-    let take = 60; // Safe default upper bound
+    let take = undefined;
 
     if (limitParam !== 'all') {
       const parsedLimit = parseInt(limitParam || '24', 10);
-      const limit = Math.max(1, Math.min(isNaN(parsedLimit) ? 24 : parsedLimit, 60));
+      const limit = Math.max(1, Math.min(isNaN(parsedLimit) ? 24 : parsedLimit, 100));
       const page = Math.max(1, parseInt(pageParam || '1', 10) || 1);
       take = limit;
       skip = (page - 1) * limit;
