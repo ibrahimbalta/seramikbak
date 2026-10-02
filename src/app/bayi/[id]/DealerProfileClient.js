@@ -640,7 +640,7 @@ export default function DealerProfileClient({ dealer, products }) {
       }
       return [...prev, { product, quantity: 25, unit: 'm²' }];
     });
-    showToast(`${product.name} teklif sepetine eklendi`);
+    showToast(`${product.name} teklif listenize eklendi`);
   };
 
   const updateCartQty = (productId, delta) => {
@@ -914,8 +914,8 @@ export default function DealerProfileClient({ dealer, products }) {
             <button 
               onClick={() => setShowCartDrawer(true)} 
               className={`header-cart-icon-btn ${quoteCart.length > 0 ? 'has-items' : ''}`}
-              title={quoteCart.length > 0 ? `Teklif Sepeti (${quoteCart.length} ürün)` : 'Teklif Sepetim'}
-              aria-label="Teklif Sepetim"
+              title={quoteCart.length > 0 ? `Teklif Listem (${quoteCart.length} ürün)` : 'Teklif Listem'}
+              aria-label="Teklif Listem"
             >
               <ShoppingBag size={18} />
               {quoteCart.length > 0 && (
@@ -2399,7 +2399,7 @@ export default function DealerProfileClient({ dealer, products }) {
               style={{ background: themePrimary }}
             >
               <ShoppingBag size={17} />
-              <span>Sepet ({quoteCart.length})</span>
+              <span>Teklif Listem ({quoteCart.length})</span>
             </button>
           )}
 
@@ -2482,7 +2482,7 @@ export default function DealerProfileClient({ dealer, products }) {
                   <ShoppingBag size={18} />
                 </div>
                 <div>
-                  <div className="drawer-cart-title">Teklif Sepetim</div>
+                  <div className="drawer-cart-title">Teklif Listem</div>
                   <div className="drawer-cart-subtitle">
                     {quoteCart.length > 0 ? `${quoteCart.length} ürün listelendi` : 'Henüz ürün eklenmedi'}
                   </div>
@@ -2633,7 +2633,7 @@ export default function DealerProfileClient({ dealer, products }) {
             <div className="drawer-header">
               <div className="drawer-title-group">
                 <FileText size={20} className="drawer-title-icon" />
-                <h3>Teklif Sepetim</h3>
+                <h3>Teklif Listem</h3>
                 <span className="drawer-count-badge">{quoteCart.length} Kalem</span>
               </div>
               <button onClick={() => setShowCartDrawer(false)} className="drawer-close-btn">
@@ -2645,8 +2645,8 @@ export default function DealerProfileClient({ dealer, products }) {
               {quoteCart.length === 0 ? (
                 <div className="drawer-empty-state">
                   <Package size={40} className="drawer-empty-icon" />
-                  <h4>Sepetiniz Boş</h4>
-                  <p>Katalogdan beğendiğiniz seramikleri "Teklif Ekle" butonuna basarak sepetinize ekleyebilirsiniz.</p>
+                  <h4>Teklif Listeniz Boş</h4>
+                  <p>Katalogdan beğendiğiniz modelleri "Teklife Ekle" butonuna basarak listenize ekleyebilir ve bayiden toplu iskonto talep edebilirsiniz.</p>
                   <button onClick={() => setShowCartDrawer(false)} className="drawer-browse-btn">
                     Ürünleri Keşfet
                   </button>

@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sendLeadNotification } from '@/lib/email';
 import { sendPushNotification } from '@/lib/pushServer';
-import { checkRateLimit } from '@/lib/rate-limit';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request) {
   try {
-    const rateLimit = checkRateLimit(request, 10, 60000);
+    const clientIp = getClientIp(request);
+    const rateLimit = checkRateLimit(clientIp, 10, 60000);
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: 'Çok fazla teklif talebi gönderdiniz. Lütfen bir süre sonra tekrar deneyin.' },
@@ -224,7 +225,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('Create Lead API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to submit lead', details: error.message },
+      { error: 'Teklif talebi iletilirken bir hata oluştu. Lütfen tekrar deneyiniz.' },
       { status: 500 }
     );
   }

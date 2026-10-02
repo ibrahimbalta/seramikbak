@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sendContactNotification } from '@/lib/email';
-import { checkRateLimit } from '@/lib/rate-limit';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req) {
   try {
-    const rateLimit = checkRateLimit(req, 5, 60000);
+    const clientIp = getClientIp(req);
+    const rateLimit = checkRateLimit(clientIp, 5, 60000);
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: 'Çok fazla mesaj gönderdiniz. Lütfen bir dakika sonra tekrar deneyin.' },

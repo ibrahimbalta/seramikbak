@@ -23,28 +23,53 @@ function parseJwtPayload(token) {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { credential, email: bodyEmail, name: bodyName, picture: bodyPicture } = body;
+    const { credential } = body;
 
-    let userEmail = bodyEmail;
-    let userName = bodyName;
-    let userPicture = bodyPicture;
-
-    // 1. If Google Identity Services JWT credential token was returned
-    if (credential) {
-      const payload = parseJwtPayload(credential);
-      if (payload && payload.email) {
-        userEmail = payload.email;
-        userName = payload.name || payload.email.split('@')[0];
-        userPicture = payload.picture || null;
-      }
-    }
-
-    if (!userEmail || !userEmail.includes('@')) {
+    // 1. Validate that Google Identity Services JWT credential is provided
+    if (!credential) {
       return NextResponse.json(
-        { error: 'Geçerli bir Google e-posta adresi alınamadı.' },
+        { error: 'Google kimlik doğrulama belirteci (credential) eksik veya geçersiz.' },
         { status: 400 }
       );
     }
+
+    const payload = parseJwtPayload(credential);
+    if (!payload || !payload.email) {
+      return NextResponse.json(
+        { error: 'Google kimlik belirteci çözümlenemedi.' },
+        { status: 400 }
+      );
+    }
+
+    // Verify Token Issuer (Google)
+    const validIssuers = ['accounts.google.com', 'https://accounts.google.com'];
+    if (!validIssuers.includes(payload.iss)) {
+      return NextResponse.json(
+        { error: 'Geçersiz Google kimlik sağlayıcısı.' },
+        { status: 401 }
+      );
+    }
+
+    // Verify Token Expiration
+    if (payload.exp && Date.now() >= payload.exp * 1000) {
+      return NextResponse.json(
+        { error: 'Google oturum süresi dolmuş. Lütfen tekrar giriş yapınız.' },
+        { status: 401 }
+      );
+    }
+
+    // Verify Audience if GOOGLE_CLIENT_ID is configured
+    const configuredClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (configuredClientId && payload.aud && payload.aud !== configuredClientId) {
+      return NextResponse.json(
+        { error: 'Google istemci kimliği eşleşmedi.' },
+        { status: 401 }
+      );
+    }
+
+    const userEmail = payload.email;
+    const userName = payload.name || payload.email.split('@')[0];
+    const userPicture = payload.picture || null;
 
     const cleanEmail = userEmail.toLowerCase().trim();
 

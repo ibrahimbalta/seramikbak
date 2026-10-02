@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { slugify } from '@/lib/slugify';
+import { generateLocalBusinessSchema } from '@/lib/seo/schemaGenerator';
 import DealerProfileClient from './DealerProfileClient';
 
 export async function generateMetadata({ params }) {
@@ -175,5 +176,17 @@ export default async function Page({ params }) {
     notFound();
   }
 
-  return <DealerProfileClient dealer={dealer} products={products} />;
+  const localBusinessSchema = generateLocalBusinessSchema(dealer);
+
+  return (
+    <>
+      {localBusinessSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        />
+      )}
+      <DealerProfileClient dealer={dealer} products={products} />
+    </>
+  );
 }

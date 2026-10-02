@@ -4,11 +4,12 @@ import prisma from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
 import { sendVerificationEmail } from '@/lib/email';
 
-import { checkRateLimit } from '@/lib/rate-limit';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request) {
   try {
-    const rateLimit = checkRateLimit(request, 5, 60000);
+    const clientIp = getClientIp(request);
+    const rateLimit = checkRateLimit(clientIp, 5, 60000);
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: 'Çok fazla kayıt denemesi yaptınız. Lütfen bir süre sonra tekrar deneyin.' },
@@ -89,7 +90,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('Registration API Error:', error);
     return NextResponse.json(
-      { error: 'Kayıt işlemi başarısız oldu.', details: error.message },
+      { error: 'Kayıt işlemi sırasında bir hata oluştu. Lütfen bilgilerinizi kontrol edip tekrar deneyiniz.' },
       { status: 500 }
     );
   }

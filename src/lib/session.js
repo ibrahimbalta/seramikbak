@@ -1,10 +1,10 @@
 import crypto from 'crypto';
 
 if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
-  console.warn('⚠️ GÜVENLİK UYARISI: SESSION_SECRET ortam değişkeni tanımlı değil! Üretim ortamında .env dosyasına rastgele güçlü bir SESSION_SECRET ekleyiniz.');
+  throw new Error('CRITICAL SECURITY: SESSION_SECRET ortam değişkeni üretim ortamında tanımlanmalıdır.');
 }
 
-const SECRET = process.env.SESSION_SECRET || 'seramikbak_super_secret_session_key_32_chars';
+const SECRET = process.env.SESSION_SECRET || 'seramikbak_dev_session_key_do_not_use_in_prod';
 const ALGORITHM = 'aes-256-cbc';
 
 // Generate 32-byte key deterministically from secret using SHA-256

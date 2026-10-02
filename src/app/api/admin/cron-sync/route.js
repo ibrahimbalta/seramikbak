@@ -13,7 +13,12 @@ async function handleCronSync(request) {
   try {
     // 1. Authorize Request using Bearer token or query parameter fallback
     const authHeader = request.headers.get('Authorization');
-    const cronSecret = process.env.CRON_SECRET || 'sb_cron_secret_7d9383_95c5652c_f7b0_4616';
+    const cronSecret = process.env.CRON_SECRET;
+    
+    if (!cronSecret) {
+      console.error('CRITICAL: CRON_SECRET is not configured in environment.');
+      return NextResponse.json({ error: 'CRON_SECRET is not configured' }, { status: 500 });
+    }
     
     let isAuthorized = false;
     if (authHeader === `Bearer ${cronSecret}`) {

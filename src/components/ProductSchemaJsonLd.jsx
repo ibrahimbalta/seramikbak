@@ -103,13 +103,15 @@ export default function ProductSchemaJsonLd({ product, currency = 'TRY', lang = 
         }
       }
     },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "reviewCount": "128",
-      "bestRating": "5",
-      "worstRating": "1"
-    },
+    ...(product.rating && product.reviewCount ? {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": String(product.rating),
+        "reviewCount": String(product.reviewCount),
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    } : {}),
     "additionalProperty": [
       { "@type": "PropertyValue", "name": "Ebat / Dimensions", "value": dimensions },
       { "@type": "PropertyValue", "name": "Yüzey / Finish", "value": finish },

@@ -40,7 +40,15 @@ export async function POST(request) {
         const totalAdmins = await prisma.adminUser.count();
         if (totalAdmins === 0) {
           const envUsername = process.env.ADMIN_USERNAME || 'admin';
-          const envPassword = process.env.ADMIN_PASSWORD || '6032.,Elif.';
+          const envPassword = process.env.ADMIN_PASSWORD;
+          
+          if (!envPassword) {
+            console.error('CRITICAL: ADMIN_PASSWORD environment variable is not defined.');
+            return NextResponse.json(
+              { error: 'Yönetici hesabı için ADMIN_PASSWORD ortam değişkeni tanımlanmalıdır.' },
+              { status: 500 }
+            );
+          }
           
           if (loginIdentifier === envUsername || loginIdentifier === 'admin@seramikbak.com') {
             admin = await prisma.adminUser.create({
