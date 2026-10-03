@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { 
   Box, Copy, Check, ExternalLink, Sparkles, Monitor, Smartphone, 
   Code, Eye, Sliders, ShieldCheck, CheckCircle2, QrCode, Layers,
-  Palette, RefreshCw, Maximize2, Shield, ArrowRight, Zap, CheckCircle
+  Palette, RefreshCw, Maximize2, Shield, ArrowRight, Zap, CheckCircle,
+  Tablet
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 
@@ -16,6 +17,7 @@ export default function EmbedStudioTab({ brandInfo }) {
   const [panelBg, setPanelBg] = useState('#0b1120');
   const [defaultScene, setDefaultScene] = useState('banyo');
   const [deviceView, setDeviceView] = useState('tablet'); // 'tablet' | 'kiosk'
+  const [liveDevice, setLiveDevice] = useState('desktop'); // 'desktop' | 'tablet' | 'mobile'
   const [activeCodeType, setActiveCodeType] = useState('iframe'); // 'iframe' | 'react' | 'sdk' | 'kiosk'
   const [copied, setCopied] = useState(false);
 
@@ -766,22 +768,115 @@ Web sitenizin ana menüsüne "3D Mekan Tasarla" linki olarak ekleyebilir veya sh
 
           {/* SIMULATED DEVICE FRAME OR LIVE 3D IFRAME */}
           {livePreviewActive ? (
-            <div style={{
-              background: '#090d16',
-              borderRadius: '16px',
-              overflow: 'hidden',
-              height: '360px',
-              border: '2px solid rgba(212, 175, 55, 0.4)',
-              boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.5)',
-              position: 'relative'
-            }}>
-              <iframe
-                src={embedUrl}
-                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
-                allow="camera; accelerometer; gyroscope; fullscreen"
-                loading="lazy"
-                title={`${brandName} Canlı Önizleme`}
-              />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {/* Responsive Device Toolbar */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '8px',
+                background: '#f8fafc',
+                padding: '8px 12px',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#64748b' }}>Cihaz Önizlemesi:</span>
+                  {[
+                    { id: 'desktop', label: 'Masaüstü (100%)', icon: Monitor },
+                    { id: 'tablet', label: 'Tablet (768px)', icon: Tablet },
+                    { id: 'mobile', label: 'Mobil (390px)', icon: Smartphone }
+                  ].map(d => {
+                    const isSelected = liveDevice === d.id;
+                    const Icon = d.icon;
+                    return (
+                      <button
+                        key={d.id}
+                        type="button"
+                        onClick={() => setLiveDevice(d.id)}
+                        style={{
+                          height: '28px',
+                          padding: '0 10px',
+                          borderRadius: '6px',
+                          border: isSelected ? '1px solid #0f172a' : '1px solid #e2e8f0',
+                          background: isSelected ? '#0f172a' : '#ffffff',
+                          color: isSelected ? '#ffffff' : '#475569',
+                          fontSize: '0.72rem',
+                          fontWeight: isSelected ? '800' : '600',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <Icon size={12} />
+                        <span>{d.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <a
+                    href={embedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      height: '28px',
+                      padding: '0 10px',
+                      borderRadius: '6px',
+                      background: 'rgba(212, 175, 55, 0.15)',
+                      border: '1px solid rgba(212, 175, 55, 0.35)',
+                      color: '#b45309',
+                      fontSize: '0.72rem',
+                      fontWeight: '700',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      textDecoration: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <span>Yeni Sekmede Tam Ekran Aç</span>
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
+              </div>
+
+              {/* Iframe Viewport Wrapper */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                background: '#090d16',
+                borderRadius: '16px',
+                padding: liveDevice === 'desktop' ? '0' : '16px 12px',
+                border: '2px solid rgba(212, 175, 55, 0.4)',
+                boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.5)',
+                overflow: 'hidden',
+                transition: 'all 0.3s ease'
+              }}>
+                <div style={{
+                  width: liveDevice === 'desktop' ? '100%' : (liveDevice === 'tablet' ? '768px' : '390px'),
+                  height: '620px',
+                  borderRadius: liveDevice === 'desktop' ? '14px' : '18px',
+                  overflow: 'hidden',
+                  border: liveDevice === 'desktop' ? 'none' : '3px solid #1e293b',
+                  boxShadow: liveDevice === 'desktop' ? 'none' : '0 10px 30px rgba(0,0,0,0.6)',
+                  background: '#0b1120',
+                  position: 'relative',
+                  transition: 'width 0.3s ease'
+                }}>
+                  <iframe
+                    src={embedUrl}
+                    style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+                    allow="camera; accelerometer; gyroscope; fullscreen"
+                    loading="lazy"
+                    title={`${brandName} Canlı Önizleme`}
+                  />
+                </div>
+              </div>
             </div>
           ) : (
             <div style={{
