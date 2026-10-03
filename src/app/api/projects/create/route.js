@@ -1,9 +1,21 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sendProjectDemandNotification } from '@/lib/email';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request) {
   try {
+    // Spam/abuse protection: Max 5 project submissions per IP per 15 minutes
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`project_create_${clientIp}`, 5, 15 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      const waitMinutes = Math.ceil(rateCheck.resetInMs / 60000);
+      return NextResponse.json(
+        { error: `Çok fazla proje talebi gönderildi. Lütfen ${waitMinutes} dakika sonra tekrar deneyin.` },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const {
       companyName,

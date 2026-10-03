@@ -3,9 +3,21 @@ import prisma from '@/lib/prisma';
 import { hashPassword, verifyPassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
 import { encryptSession } from '@/lib/session';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request) {
   try {
+    // Rate limit: Max 20 requests per IP per 15 minutes
+    const clientIp = getClientIp(request);
+    const rateCheck = checkRateLimit(`arch_auth_${clientIp}`, 20, 15 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      const waitMinutes = Math.ceil(rateCheck.resetInMs / 60000);
+      return NextResponse.json(
+        { error: `Çok fazla istek yapıldı. Lütfen ${waitMinutes} dakika sonra tekrar deneyin.` },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { action, email, password, officeName, name, phone, city, title, chamberNo, isDemo } = body;
 

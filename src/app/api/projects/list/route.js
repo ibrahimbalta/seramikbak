@@ -34,37 +34,27 @@ function maskEmail(email) {
 export async function GET(request) {
   try {
     const auth = await verifyAuth(request);
+    if (!auth) {
+      return NextResponse.json(
+        { error: 'Yetkilendirme gerekli. Lütfen giriş yapın.' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const queryDealerId = searchParams.get('dealerId');
     const queryBrandId = searchParams.get('brandId');
     const email = searchParams.get('email');
 
-    // Anti-IDOR: Resolve dealer and brand strictly from session if authenticated
-    let dealerId = null;
-    let brandId = null;
-
-    if (auth) {
-      if (auth.role === 'dealer') {
-        dealerId = auth.id;
-      } else if (auth.role === 'brand') {
-        brandId = auth.id;
-      } else if (auth.role === 'admin') {
-        dealerId = queryDealerId;
-        brandId = queryBrandId;
-      }
-    } else {
-      dealerId = queryDealerId;
-      brandId = queryBrandId;
-    }
-
-    if (!dealerId && !brandId && !email) {
-      return NextResponse.json(
-        { error: 'Giriş yapan bayiId, markaId veya e-posta adresi belirtilmelidir.' },
-        { status: 400 }
-      );
-    }
-
+    // Email inquiry: Only the authenticated user matching email or admin can view
     if (email) {
+      if (auth.role !== 'admin' && auth.email !== email) {
+        return NextResponse.json(
+          { error: 'Bu e-posta adresine ait taleplere erişim yetkiniz bulunmuyor.' },
+          { status: 403 }
+        );
+      }
+
       const userProjects = await prisma.projectRequest.findMany({
         where: { contactEmail: email },
         orderBy: { createdAt: 'desc' }
@@ -73,6 +63,31 @@ export async function GET(request) {
         success: true,
         projects: userProjects
       });
+    }
+
+    // Anti-IDOR: Resolve dealer and brand strictly from session
+    let dealerId = null;
+    let brandId = null;
+
+    if (auth.role === 'dealer') {
+      dealerId = auth.id;
+    } else if (auth.role === 'brand') {
+      brandId = auth.id;
+    } else if (auth.role === 'admin') {
+      dealerId = queryDealerId;
+      brandId = queryBrandId;
+    } else {
+      return NextResponse.json(
+        { error: 'Bu veriye erişim yetkiniz bulunmuyor.' },
+        { status: 403 }
+      );
+    }
+
+    if (!dealerId && !brandId) {
+      return NextResponse.json(
+        { error: 'Giriş yapan bayiId veya markaId belirtilmelidir.' },
+        { status: 400 }
+      );
     }
 
     // Get all approved/active projects (or all PENDING and APPROVED ones for portal view)

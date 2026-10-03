@@ -3,13 +3,25 @@ import prisma from '@/lib/prisma';
 
 export async function POST(request) {
   try {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const providedSig = request.headers.get('stripe-signature') || request.headers.get('x-webhook-secret');
+
+    // Security validation: verify webhook signature if configured
+    if (webhookSecret) {
+      if (!providedSig || providedSig !== webhookSecret) {
+        return NextResponse.json(
+          { error: 'Unauthorized webhook call: Invalid or missing signature' },
+          { status: 401 }
+        );
+      }
+    } else if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json(
+        { error: 'Webhook processing disabled: STRIPE_WEBHOOK_SECRET is not configured' },
+        { status: 503 }
+      );
+    }
+
     const payload = await request.json();
-    
-    // In production, you would verify Stripe's signature:
-    // const sig = request.headers.get('stripe-signature');
-    // const event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
-    
-    // Simulate webhook event parsing
     const { eventType, brandId, dealerId, plan, durationMonths } = payload;
 
     if (!eventType || (!brandId && !dealerId)) {
