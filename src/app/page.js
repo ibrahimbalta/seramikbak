@@ -108,9 +108,6 @@ import ProductCard from '@/components/ProductCard';
 import TileCalculatorWidget from '@/components/TileCalculatorWidget';
 import LiveDealsTicker from '@/components/LiveDealsTicker';
 import ProductSchemaJsonLd from '@/components/ProductSchemaJsonLd';
-import IndustrialTicker from '@/components/IndustrialTicker';
-import BrandAuthorityStrip from '@/components/BrandAuthorityStrip';
-import FastQuoteHeroWidget from '@/components/FastQuoteHeroWidget';
 
 const PhotoVisualizer = dynamic(() => import('@/components/PhotoVisualizer'), { ssr: false });
 
@@ -337,25 +334,25 @@ function generateMoodboardFromProduct(product, index) {
 
 const heroSlides = [
   {
-    title: "Türkiye Seramik & Yapı Tedarik Ekosistemi",
-    subtitle: "25.000+ fabrika seramiğini keşfedin, 3D stüdyoda deneyin; şantiye ve ev metrajınız için 81 ildeki yetkili bayilerden ve üreticiden 24 saatte en iyi fiyat teklifini alın.",
+    title: "Türkiye'nin Seramik Arama Motoru",
+    subtitle: "40+ seçkin üretici markanın binlerce seramik modelini keşfedin, 3D stüdyoda odanıza uygulayın ve 81 ildeki yetkili bayilerden doğrudan teklif alın.",
     bg: "/hero/luxury_bathroom.png",
-    tag: "TÜRKİYE SERAMİK & YAPI TEDARİK BORSASI",
-    highlight: "Doğrudan Üretici ve Yetkili Bayi Teklifi"
+    tag: "TÜRKİYE'NİN EN KAPSAMLI SERAMİK DİZİNİ",
+    highlight: "Yetkili Bayilerden Teklif Alın"
   },
   {
-    title: "Müteahhit & Proje Metraj İhalesi",
-    subtitle: "Şantiye metrajınızı sisteme girin; lider seramik fabrikaları ve bölge distribütörleri projenize özel fabrika iskontolu teklif yarıştırsın.",
+    title: "Seramikleri Evinizde Canlı Deneyin",
+    subtitle: "Seçtiğiniz fayans veya karoyu interaktif 3D Sanal Stüdyo'da döşeyin; derz genişliğini, rengini, döşeme desenini ve oda ışıklarını özelleştirin.",
     bg: "/hero/scandinavian_kitchen.png",
-    tag: "B2B & B2C PROJE METRAJ İHALESİ",
-    highlight: "24 Saatte Bağlayıcı Proje Teklifi"
+    tag: "3D DİJİTAL ODA SİMÜLASYONU",
+    highlight: "3D Sanal Stüdyo Modu"
   },
   {
-    title: "Mimarlık & Tasarım Ofisi Portalı",
-    subtitle: "Revit/BIM ve 4K dokuları indirin, şartnamenizi hazırlayın; projenizde kullanacağınız karolar için ofisinize ücretsiz Mimari Numune Kutusu isteyin.",
+    title: "Kendi Odanızı AI ile Tasarlayın",
+    subtitle: "Banyonuzun veya mutfağınızın fotoğrafını yükleyin; Google Gemini yapay zekası zemin/duvar sınırlarını maskeleyip seçtiğiniz seramikleri giydirsin.",
     bg: "/hero/modern_living.png",
-    tag: "ARCHSTUDIO • TMMOB UYUMLU ŞARTNAME",
-    highlight: "Kapınıza Teslim Mimari Numune Kutusu"
+    tag: "YAPAY ZEKA FOTOĞRAF GİYDİRME",
+    highlight: "AI Tasarım Asistanı"
   }
 ];
 
@@ -3815,9 +3812,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Live Industrial & Sector Exchange Ticker */}
-      {!isKioskMode && <IndustrialTicker />}
-
       {/* Top Utility Bar (B2B and Corporate Portal Links) */}
       {!isKioskMode && (
         <div className="top-utility-bar">
@@ -3844,11 +3838,12 @@ export default function Home() {
                 <span>{t('corporate') || 'Kurumsal'}</span>
                 <ChevronDown size={11} className={`dropdown-chevron ${activeUtilityDropdown === 'kurumsal' ? 'rotated' : ''}`} />
               </button>
+
               {activeUtilityDropdown === 'kurumsal' && (
                 <div className="utility-dropdown-menu">
                   <button 
-                    type="button" 
-                    className="utility-dropdown-item" 
+                    type="button"
+                    className="utility-dropdown-item"
                     onClick={() => { 
                       setShowHowItWorksModal(true); 
                       setHowItWorksActiveTab('customers'); 
@@ -3995,12 +3990,7 @@ export default function Home() {
       <header className="main-header glass-panel">
         <div className="header-brand" onClick={() => setActiveTab('search')} style={{ cursor: 'pointer' }}>
           <div className="logo-icon">SB</div>
-          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
-            <span className="logo-text">SeramikBayi</span>
-            <span style={{ fontSize: '0.62rem', color: '#94a3b8', fontWeight: '700', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-              Türkiye Seramik & Yapı Tedarik Borsası
-            </span>
-          </div>
+          <span className="logo-text">SeramikBak</span>
         </div>
         
         {/* Navigation tabs */}
@@ -4568,9 +4558,38 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Right Column: Interactive Fast Quote & Project Tender Terminal */}
-              <div className="hero-fast-quote-column">
-                <FastQuoteHeroWidget />
+              {/* Display Stand with Upright 3D Slabs */}
+              <div className="hero-display-stand-container">
+                <div className="display-stand-platform">
+                  {/* Slab 1 (Left - Active or Calacatta Gold) */}
+                  <div className="display-slab-wrapper left-slab">
+                    <div className="slab-visual-container">
+                      <TileVisualPreview 
+                        style={activeProduct?.style || "Mermer"} 
+                        color={activeProduct?.color || "Beyaz"} 
+                        finish={activeProduct?.finish || "Mat"} 
+                        width={activeProduct?.width || 60} 
+                        height={activeProduct?.height || 120} 
+                        imageUrl={activeProduct?.imageUrl || "/textures/calacatta_gold.jpg"} 
+                      />
+                      <div className="slab-badge-overlay">
+                        <span className="slab-badge-title">{activeProduct?.name || "Calacatta Gold"}</span>
+                        <span className="slab-badge-specs">{activeProduct?.width || 60}x{activeProduct?.height || 120} cm</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Slab 2 (Right - Featured or Borneo Antrasit) */}
+                  <div className="display-slab-wrapper right-slab">
+                    <div className="slab-visual-container">
+                      <TileVisualPreview style="Mermer" color="Antrasit" finish="Mat" width={60} height={120} imageUrl="/textures/borneo_antrasit.jpg" />
+                      <div className="slab-badge-overlay">
+                        <span className="slab-badge-title">Borneo Antrasit</span>
+                        <span className="slab-badge-specs">60x120 cm</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Slider Dots */}
@@ -4601,117 +4620,99 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Manufacturer Brand Authority & Trust Pillars Strip */}
-            <BrandAuthorityStrip 
-              onBrandClick={(brandName) => {
-                setSearchQuery(brandName);
-                if (brandName) {
-                  applyFilter('brand', brandName);
-                }
-              }}
-            />
-
-            {/* PERSONA GATEWAY CARDS: 4 Pillars of the Ceramic Industry */}
-            <section className="persona-gateway-section" aria-label="Sektörel İhale ve İşlem Kapıları">
+            {/* PERSONA GATEWAY CARDS: Modern Visual Cards Matching Studio Banner Style */}
+            <section className="persona-gateway-section" aria-label="Kullanıcı Odaklı Hızlı Yönlendirme">
               <div className="persona-gateway-grid">
                 
-                {/* 1. Müteahhit & Proje Masası */}
-                <Link 
-                  href="/proje-talep"
-                  className="persona-banner-card card-project-tender"
-                  style={{ textDecoration: 'none' }}
+                {/* 1. Evini Yenileyenler */}
+                <div 
+                  onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="persona-banner-card card-studio"
+                  style={{ textDecoration: 'none', cursor: 'pointer' }}
+                  role="button"
+                  tabIndex={0}
                 >
                   <div className="promo-text-column">
                     <div className="promo-top-badge gold">
-                      <Building2 size={11} className="promo-sparkle-icon" />
-                      <span>B2B ŞANTİYE İHALESİ</span>
+                      <Sparkles size={11} className="promo-sparkle-icon" />
+                      <span>AI 3D MEKAN</span>
                     </div>
-                    <h5 className="persona-card-title">Proje & İskonto Masası</h5>
-                    <p className="persona-card-desc">500+ m² için fabrikalardan doğrudan teklif yarışsın</p>
+                    <h5 className="persona-card-title">3D Sanal Stüdyo</h5>
+                    <p className="persona-card-desc">Seramiklerinizi odanızda canlı görün</p>
                     <div className="promo-action-btn-gold">
-                      <span>Metraj İhalesi Aç</span>
+                      <span>Hemen Deneyin</span>
                       <ArrowRight size={12} />
                     </div>
                   </div>
                   <div className="promo-image-column">
-                    <img src="/hero/modern_living.png" alt="Proje İskonto Masası" />
-                    <div className="promo-image-badge gold">İHALE</div>
+                    <img src="/hero/luxury_bathroom.png" alt="3D Sanal Stüdyo" />
+                    <div className="promo-image-badge">3D</div>
                   </div>
-                </Link>
+                </div>
 
-                {/* 2. Mimarlar & Tasarım Ofisleri */}
-                <Link 
-                  href="/mimar"
-                  className="persona-banner-card card-architect"
-                  style={{ textDecoration: 'none' }}
+                {/* 2. Mimarlar & Müteahhitler */}
+                <div 
+                  className="persona-banner-card card-calculator"
+                  onClick={() => {
+                    setShowCalculatorWidget(prev => !prev);
+                    setTimeout(() => {
+                      calculatorSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 80);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  style={{ cursor: 'pointer' }}
                 >
                   <div className="promo-text-column">
                     <div className="promo-top-badge blue">
-                      <Compass size={11} className="promo-sparkle-icon" />
-                      <span>ARCHSTUDIO • TMMOB</span>
+                      <FileText size={11} className="promo-sparkle-icon" />
+                      <span>MİMAR & METRAJ</span>
                     </div>
-                    <h5 className="persona-card-title">Mimar & BIM Masası</h5>
-                    <p className="persona-card-desc">4K doku, şartname motoru ve kapıya numune kutusu</p>
+                    <h5 className="persona-card-title">Metraj & Maliyet Robotu</h5>
+                    <p className="persona-card-desc">Kutu ve fire ihtiyacını anında hesaplayın</p>
                     <div className="promo-action-btn-gold">
-                      <span>Mimar Masasına Git</span>
+                      <span>{showCalculatorWidget ? 'Robotu Kapat ✕' : 'Metrajı Başlat'}</span>
                       <ArrowRight size={12} />
                     </div>
                   </div>
                   <div className="promo-image-column">
-                    <img src="/hero/luxury_bathroom.png" alt="Mimar Portalı" />
+                    <img src="/hero/modern_living.png" alt="BIM ve Metraj" />
                     <div className="promo-image-badge blue">BIM</div>
                   </div>
-                </Link>
+                </div>
 
-                {/* 3. Yetkili Showroom Ağı & 3D Stüdyo */}
+                {/* 3. Hemen Satın Almak İsteyenler */}
                 <div 
-                  className="persona-banner-card card-studio"
-                  onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="persona-banner-card card-dealers"
+                  onClick={() => {
+                    setActiveTab('dealers');
+                    setTimeout(() => {
+                      const el = document.getElementById('bayi-bul-section') || document.getElementById('resmi-yetkili-bayiler-section');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      else window.scrollTo({ top: 300, behavior: 'smooth' });
+                    }, 100);
+                  }}
                   role="button"
                   tabIndex={0}
                   style={{ cursor: 'pointer' }}
                 >
                   <div className="promo-text-column">
                     <div className="promo-top-badge emerald">
-                      <Palette size={11} className="promo-sparkle-icon" />
-                      <span>81 İL SHOWROOM AĞI</span>
+                      <Store size={11} className="promo-sparkle-icon" />
+                      <span>YETKİLİ BAYİ AĞI</span>
                     </div>
-                    <h5 className="persona-card-title">3D Sanal Showroom</h5>
-                    <p className="persona-card-desc">1.250+ bayi stoğu ve odanızda 3D seramik simülasyonu</p>
+                    <h5 className="persona-card-title">En Yakın Bayiyi Bul</h5>
+                    <p className="persona-card-desc">81 ildeki 150+ showroom ve stoka ulaşın</p>
                     <div className="promo-action-btn-gold">
-                      <span>3D Stüdyoda Dene</span>
+                      <span>Bayi Haritası</span>
                       <ArrowRight size={12} />
                     </div>
                   </div>
                   <div className="promo-image-column">
-                    <img src="/hero/scandinavian_kitchen.png" alt="3D Showroom" />
-                    <div className="promo-image-badge emerald">3D</div>
+                    <img src="/hero/scandinavian_kitchen.png" alt="Yetkili Bayiler" />
+                    <div className="promo-image-badge emerald">81 İL</div>
                   </div>
                 </div>
-
-                {/* 4. B2B Stok Borsası & Outlet */}
-                <Link 
-                  href="/bayi/stok-borsasi"
-                  className="persona-banner-card card-stock-exchange"
-                  style={{ textDecoration: 'none' }}
-                >
-                  <div className="promo-text-column">
-                    <div className="promo-top-badge red">
-                      <Activity size={11} className="promo-sparkle-icon" />
-                      <span>B2B STOK TAKASI</span>
-                    </div>
-                    <h5 className="persona-card-title">Bayi Stok Borsası</h5>
-                    <p className="persona-card-desc">Şantiyede eksik son paletler veya acil stok takası</p>
-                    <div className="promo-action-btn-gold">
-                      <span>Borsayı İncele</span>
-                      <ArrowRight size={12} />
-                    </div>
-                  </div>
-                  <div className="promo-image-column">
-                    <img src="/hero/hero_ceramics.jpg" alt="B2B Stok Borsası" />
-                    <div className="promo-image-badge red">BORSA</div>
-                  </div>
-                </Link>
 
               </div>
 
@@ -10031,14 +10032,8 @@ export default function Home() {
 
         :global(.persona-gateway-grid) {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
-        }
-
-        @media (max-width: 1200px) {
-          :global(.persona-gateway-grid) {
-            grid-template-columns: repeat(2, 1fr);
-          }
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
         }
 
         :global(.persona-banner-card) {
@@ -11654,14 +11649,6 @@ export default function Home() {
           align-items: flex-start;
           text-align: left;
           gap: 18px;
-        }
-
-        .hero-fast-quote-column {
-          position: relative;
-          z-index: 2;
-          width: 100%;
-          max-width: 480px;
-          justify-self: end;
         }
 
         .hero-badge-capsule {

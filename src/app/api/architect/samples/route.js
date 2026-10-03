@@ -1,31 +1,19 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sendPushNotification } from '@/lib/pushServer';
-import { verifyAuth } from '@/lib/auth-check';
 
 // GET: List sample orders requested by the architect
 export async function GET(request) {
   try {
-    const auth = await verifyAuth(request);
-    if (!auth) {
-      return NextResponse.json({ error: 'Yetkilendirme gerekli. Lütfen giriş yapın.' }, { status: 401 });
-    }
-
-    if (auth.role !== 'architect' && auth.role !== 'admin') {
-      return NextResponse.json({ error: 'Bu işlem için mimar yetkisi gereklidir.' }, { status: 403 });
-    }
-
     const { searchParams } = new URL(request.url);
-    const queryArchitectId = searchParams.get('architectId');
+    const architectId = searchParams.get('architectId');
 
-    const effectiveArchitectId = (auth.role === 'admin' && queryArchitectId) ? queryArchitectId : auth.id;
-
-    if (queryArchitectId && auth.role !== 'admin' && auth.id !== queryArchitectId) {
-      return NextResponse.json({ error: 'Bu verilere erişim yetkiniz bulunmuyor.' }, { status: 403 });
+    if (!architectId) {
+      return NextResponse.json({ error: 'architectId gerekli.' }, { status: 400 });
     }
 
     const samples = await prisma.architectSample.findMany({
-      where: { architectId: effectiveArchitectId },
+      where: { architectId },
       include: {
         product: {
           include: {
@@ -46,24 +34,10 @@ export async function GET(request) {
 // POST: Request new sample box for selected product(s)
 export async function POST(request) {
   try {
-    const auth = await verifyAuth(request);
-    if (!auth) {
-      return NextResponse.json({ error: 'Yetkilendirme gerekli. Lütfen giriş yapın.' }, { status: 401 });
-    }
-
-    if (auth.role !== 'architect' && auth.role !== 'admin') {
-      return NextResponse.json({ error: 'Bu işlem için mimar yetkisi gereklidir.' }, { status: 403 });
-    }
-
     const body = await request.json();
     const { architectId, productIds, officeAddress, city, notes, projectName, neededM2 } = body;
 
-    const effectiveArchitectId = (auth.role === 'admin' && architectId) ? architectId : auth.id;
-    if (architectId && auth.role !== 'admin' && auth.id !== architectId) {
-      return NextResponse.json({ error: 'Başka bir mimar adına talep oluşturamazsınız.' }, { status: 403 });
-    }
-
-    if (!effectiveArchitectId || !productIds || !Array.isArray(productIds) || productIds.length === 0) {
+    if (!architectId || !productIds || !Array.isArray(productIds) || productIds.length === 0) {
       return NextResponse.json({ error: 'Mimar ID ve en az bir ürün seçilmelidir.' }, { status: 400 });
     }
 
@@ -73,7 +47,7 @@ export async function POST(request) {
 
     // Get architect details
     const architect = await prisma.architect.findUnique({
-      where: { id: effectiveArchitectId }
+      where: { id: architectId }
     });
 
     if (!architect) {
@@ -122,7 +96,7 @@ export async function POST(request) {
 
       const sample = await prisma.architectSample.create({
         data: {
-          architectId: effectiveArchitectId,
+          architectId,
           productId,
           officeAddress: officeAddress.trim(),
           city: city.trim(),
@@ -141,12 +115,12 @@ export async function POST(request) {
 
       // Determine needed m2 from input or project item
       let effectiveM2 = neededM2 ? parseFloat(neededM2) : null;
-      if (!effectiveM2 && effectiveArchitectId && productId) {
+      if (!effectiveM2 && architectId && productId) {
         try {
           const item = await prisma.architectProjectItem.findFirst({
             where: {
               productId: productId,
-              project: { architectId: effectiveArchitectId }
+              project: { architectId: architectId }
             },
             select: { areaM2: true, project: { select: { totalAreaM2: true } } }
           });

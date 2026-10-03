@@ -1,19 +1,9 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { verifyAuth } from '@/lib/auth-check';
 
 // POST: Architect submits a large project B2B wholesale / factory price request
 export async function POST(request) {
   try {
-    const auth = await verifyAuth(request);
-    if (!auth) {
-      return NextResponse.json({ error: 'Yetkilendirme gerekli. Lütfen giriş yapın.' }, { status: 401 });
-    }
-
-    if (auth.role !== 'architect' && auth.role !== 'admin') {
-      return NextResponse.json({ error: 'Bu işlem için mimar yetkisi gereklidir.' }, { status: 403 });
-    }
-
     const body = await request.json();
     const { 
       architectId, 
@@ -27,17 +17,12 @@ export async function POST(request) {
       notes 
     } = body;
 
-    const effectiveArchitectId = (auth.role === 'admin' && architectId) ? architectId : auth.id;
-    if (architectId && auth.role !== 'admin' && auth.id !== architectId) {
-      return NextResponse.json({ error: 'Başka bir mimar adına fiyat teklifi talebi oluşturamazsınız.' }, { status: 403 });
-    }
-
-    if (!effectiveArchitectId || !projectName || !totalM2) {
+    if (!architectId || !projectName || !totalM2) {
       return NextResponse.json({ error: 'Mimar ID, proje adı ve toplam m² bilgisi zorunludur.' }, { status: 400 });
     }
 
     const architect = await prisma.architect.findUnique({
-      where: { id: effectiveArchitectId }
+      where: { id: architectId }
     });
 
     if (!architect) {

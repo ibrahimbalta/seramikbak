@@ -1,33 +1,15 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { verifyAuth } from '@/lib/auth-check';
 
 export async function POST(request) {
   try {
-    const auth = await verifyAuth(request);
-    if (!auth) {
-      return NextResponse.json(
-        { error: 'Yetkilendirme gerekli. Lütfen giriş yapın.' },
-        { status: 401 }
-      );
-    }
-
     const body = await request.json();
     const { userId, productId } = body;
 
-    if (!productId) {
+    if (!userId || !productId) {
       return NextResponse.json(
-        { error: 'Ürün ID bilgisi gereklidir.' },
+        { error: 'Kullanıcı ve ürün ID bilgisi gereklidir.' },
         { status: 400 }
-      );
-    }
-
-    // Anti-IDOR: Regular users can only modify their own favorites
-    const targetUserId = (auth.role === 'admin' && userId) ? userId : auth.id;
-    if (userId && auth.role !== 'admin' && auth.id !== userId) {
-      return NextResponse.json(
-        { error: 'Bu işlem için yetkiniz bulunmuyor.' },
-        { status: 403 }
       );
     }
 
@@ -35,7 +17,7 @@ export async function POST(request) {
     const existingFavorite = await prisma.favorite.findUnique({
       where: {
         userId_productId: {
-          userId: targetUserId,
+          userId,
           productId
         }
       }
@@ -46,7 +28,7 @@ export async function POST(request) {
       await prisma.favorite.delete({
         where: {
           userId_productId: {
-            userId: targetUserId,
+            userId,
             productId
           }
         }
@@ -61,7 +43,7 @@ export async function POST(request) {
       // Create (Add to favorites)
       await prisma.favorite.create({
         data: {
-          userId: targetUserId,
+          userId,
           productId
         }
       });
