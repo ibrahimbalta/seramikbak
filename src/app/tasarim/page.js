@@ -85,8 +85,9 @@ export default function BrandConsumerStudioPage() {
     id: '',
     name: 'Güral Seramik',
     slug: 'gural-seramik',
-    logoUrl: '/logos/gural.png'
+    logoUrl: ''
   });
+  const [logoError, setLogoError] = useState(false);
   const [themeColor, setThemeColor] = useState('#d4af37');
   const [panelBg, setPanelBg] = useState('#0b1120');
   const [showBgPicker, setShowBgPicker] = useState(false);
@@ -237,6 +238,7 @@ export default function BrandConsumerStudioPage() {
               slug: matchedBrand.slug || targetBrandSlug,
               logoUrl: matchedBrand.logoUrl || ''
             });
+            setLogoError(false);
           }
         }
 
@@ -1097,14 +1099,29 @@ export default function BrandConsumerStudioPage() {
               padding: '2px',
               boxSizing: 'border-box'
             }}>
-              {brandInfo.logoUrl ? (
+              {brandInfo.logoUrl && !logoError ? (
                 <img 
                   src={brandInfo.logoUrl} 
                   alt={brandInfo.name} 
+                  onError={() => setLogoError(true)}
                   style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} 
                 />
               ) : (
-                <Sparkles size={16} color={themeColor} />
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '7px',
+                  background: `linear-gradient(135deg, ${themeColor} 0%, #b89628 100%)`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#0b0f19',
+                  fontWeight: '900',
+                  fontSize: isMobile ? '0.78rem' : '0.88rem',
+                  fontFamily: 'var(--font-title, sans-serif)'
+                }}>
+                  {brandInfo.name ? brandInfo.name.charAt(0).toUpperCase() : 'G'}
+                </div>
               )}
             </div>
 
@@ -1338,6 +1355,8 @@ export default function BrandConsumerStudioPage() {
               layPattern={layPattern}
               lightIntensity={1.05}
               backgroundColor={panelBg}
+              topOffset={isMobile ? 58 : 74}
+              showSnapshot={false}
             />
           )}
         </div>

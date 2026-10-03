@@ -39,7 +39,9 @@ export default function StudioCanvas({
   onShowerGlassChange,
   extraTopLeft = null,
   extraTopRight = null,
-  backgroundColor = '#1c202a'
+  backgroundColor = '#1c202a',
+  topOffset = null,
+  showSnapshot = true
 }) {
   const containerRef = useRef(null);
   const rendererRef = useRef(null);
@@ -2304,7 +2306,13 @@ export default function StudioCanvas({
       )}
 
       {/* 3D Viewport Overlays (Top & Bottom Symmetrical Edges) */}
-      <div className="canvas-overlay-top">
+      <div 
+        className="canvas-overlay-top"
+        style={topOffset !== null && topOffset !== undefined ? { 
+          '--canvas-top-offset': typeof topOffset === 'number' ? `${topOffset}px` : topOffset, 
+          top: typeof topOffset === 'number' ? `${topOffset}px` : topOffset 
+        } : undefined}
+      >
         <div className="overlay-top-left-badges">
           <div className="desktop-badges-group">
             <div className="overlay-badge">
@@ -2389,11 +2397,13 @@ export default function StudioCanvas({
         </div>
 
         <div className="overlay-top-right-actions">
-          <button onClick={downloadSnapshot} className="overlay-action-btn" title="Yüksek Çözünürlüklü Görüntüyü İndir" type="button">
-            <span className="snapshot-icon">📷</span>
-            <span className="snapshot-label">HD Fotoğraf</span>
-            <span className="snapshot-label-mob">HD</span>
-          </button>
+          {showSnapshot && (
+            <button onClick={downloadSnapshot} className="overlay-action-btn" title="Yüksek Çözünürlüklü Görüntüyü İndir" type="button">
+              <span className="snapshot-icon">📷</span>
+              <span className="snapshot-label">HD Fotoğraf</span>
+              <span className="snapshot-label-mob">HD</span>
+            </button>
+          )}
           {extraTopRight}
         </div>
       </div>
@@ -2417,7 +2427,7 @@ export default function StudioCanvas({
         /* Top Overlay (Badges at Left, Download Button at Right) */
         .canvas-overlay-top {
           position: absolute;
-          top: 14px;
+          top: var(--canvas-top-offset, 14px);
           left: 14px;
           right: 14px;
           display: flex;
@@ -2591,7 +2601,7 @@ export default function StudioCanvas({
         @media (max-width: 768px) {
           /* Top Overlay Mobile */
           .canvas-overlay-top {
-            top: 6px;
+            top: var(--canvas-top-offset, 6px);
             left: 6px;
             right: 6px;
             gap: 4px;
