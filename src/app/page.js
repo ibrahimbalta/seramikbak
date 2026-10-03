@@ -7747,244 +7747,207 @@ export default function Home() {
 
       {/* HOW IT WORKS & DEALER/BRAND ONBOARDING EXECUTIVE MODAL */}
       {showHowItWorksModal && (
-        <div className="modal-overlay animate-fade-in" onClick={() => setShowHowItWorksModal(false)} style={{ zIndex: 99999, background: 'rgba(2, 6, 23, 0.88)', backdropFilter: 'blur(16px)' }}>
+        <div className="modal-overlay animate-fade-in how-it-works-overlay" onClick={() => setShowHowItWorksModal(false)} style={{ zIndex: 99999, background: 'rgba(2, 6, 23, 0.88)', backdropFilter: 'blur(16px)' }}>
           <div 
+            className="how-it-works-modal-content"
             onClick={(e) => e.stopPropagation()} 
-            style={{ 
-              maxWidth: '980px', 
-              width: '94%', 
-              borderRadius: '28px', 
-              padding: '32px',
-              background: 'linear-gradient(135deg, #080d1a 0%, #0f172a 50%, #172033 100%)',
-              border: '1px solid rgba(212, 175, 55, 0.4)',
-              boxShadow: '0 25px 70px rgba(0, 0, 0, 0.8), 0 0 50px rgba(212, 175, 55, 0.15)',
-              color: '#ffffff',
-              maxHeight: '92vh',
-              overflowY: 'auto'
-            }}
           >
-            
+            {/* Native Mobile Pull Handle */}
+            <div className="how-it-works-pull-handle" />
+
             {/* Modal Header */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '18px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(179,142,71,0.1) 100%)', border: '1px solid rgba(212, 175, 55, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4af37', boxShadow: '0 4px 16px rgba(212,175,55,0.25)' }}>
-                  <Sparkles size={24} />
+            <div className="how-it-works-header">
+              <div className="how-it-works-header-left">
+                <div className="how-it-works-badge-icon">
+                  <Sparkles size={22} />
                 </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '1.45rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)', letterSpacing: '-0.01em' }}>
+                <div className="how-it-works-header-titles">
+                  <h3 className="how-it-works-title">
                     SeramikBak Platform Rehberi
                   </h3>
-                  <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: '500' }}>
+                  <span className="how-it-works-subtitle">
                     Türkiye'nin ve Dünyanın Lider Akıllı Seramik, 3D Teşhir & İhracat Portalı
                   </span>
                 </div>
               </div>
               <button 
                 onClick={() => setShowHowItWorksModal(false)} 
-                style={{ 
-                  background: 'rgba(255, 255, 255, 0.08)', 
-                  border: '1px solid rgba(255, 255, 255, 0.15)', 
-                  color: '#ffffff', 
-                  width: '38px', 
-                  height: '38px', 
-                  borderRadius: '50%', 
-                  cursor: 'pointer', 
-                  fontSize: '1.1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
+                className="how-it-works-close-btn"
+                aria-label="Kapat"
+                type="button"
               >
-                ✕
+                <X size={18} />
               </button>
             </div>
 
             {/* Modal Segmented 3-Tab Switcher */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px', background: 'rgba(0, 0, 0, 0.45)', padding: '6px', borderRadius: '18px', marginBottom: '24px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <div className="how-it-works-tabs-container">
               <button 
                 onClick={() => setHowItWorksActiveTab('customers')}
-                style={{
-                  padding: '12px 16px',
-                  borderRadius: '14px',
-                  border: 'none',
-                  background: howItWorksActiveTab === 'customers' ? 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)' : 'transparent',
-                  color: howItWorksActiveTab === 'customers' ? '#ffffff' : '#94a3b8',
-                  fontWeight: '800',
-                  fontSize: '0.86rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.25s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: howItWorksActiveTab === 'customers' ? '0 4px 16px rgba(179,142,71,0.35)' : 'none'
-                }}
+                className={`how-it-works-tab-btn ${howItWorksActiveTab === 'customers' ? 'active' : ''}`}
+                type="button"
               >
                 <HomeIcon size={16} />
-                <span>Müşteriler İçin (Nasıl Çalışır?)</span>
+                <span className="tab-label-desktop">Müşteriler İçin (Nasıl Çalışır?)</span>
+                <span className="tab-label-mobile">Müşteriler</span>
               </button>
 
               <button 
                 onClick={() => setHowItWorksActiveTab('dealers')}
-                style={{
-                  padding: '12px 16px',
-                  borderRadius: '14px',
-                  border: 'none',
-                  background: howItWorksActiveTab === 'dealers' ? 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)' : 'transparent',
-                  color: howItWorksActiveTab === 'dealers' ? '#ffffff' : '#94a3b8',
-                  fontWeight: '800',
-                  fontSize: '0.86rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.25s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: howItWorksActiveTab === 'dealers' ? '0 4px 16px rgba(179,142,71,0.35)' : 'none'
-                }}
+                className={`how-it-works-tab-btn ${howItWorksActiveTab === 'dealers' ? 'active' : ''}`}
+                type="button"
               >
                 <Building2 size={16} />
-                <span>Seramik Bayileri İçin</span>
+                <span className="tab-label-desktop">Seramik Bayileri İçin</span>
+                <span className="tab-label-mobile">Bayiler</span>
               </button>
 
               <button 
                 onClick={() => setHowItWorksActiveTab('brands')}
-                style={{
-                  padding: '12px 16px',
-                  borderRadius: '14px',
-                  border: 'none',
-                  background: howItWorksActiveTab === 'brands' ? 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)' : 'transparent',
-                  color: howItWorksActiveTab === 'brands' ? '#ffffff' : '#94a3b8',
-                  fontWeight: '800',
-                  fontSize: '0.86rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.25s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: howItWorksActiveTab === 'brands' ? '0 4px 16px rgba(179,142,71,0.35)' : 'none'
-                }}
+                className={`how-it-works-tab-btn ${howItWorksActiveTab === 'brands' ? 'active' : ''}`}
+                type="button"
               >
                 <Globe size={16} />
-                <span>Markalar & Üreticiler İçin</span>
+                <span className="tab-label-desktop">Markalar & Üreticiler</span>
+                <span className="tab-label-mobile">Markalar</span>
               </button>
             </div>
 
             {/* Tab 1: For Customers */}
             {howItWorksActiveTab === 'customers' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                <div style={{ background: 'rgba(212, 175, 55, 0.08)', border: '1px solid rgba(212, 175, 55, 0.25)', borderRadius: '16px', padding: '14px 20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Sparkles size={20} style={{ color: '#d4af37', flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.88rem', color: '#fef08a', fontWeight: '700', lineHeight: '1.5' }}>
+              <div className="how-it-works-tab-content">
+                <div className="how-it-works-intro-banner">
+                  <Sparkles size={20} className="banner-sparkle" />
+                  <span className="banner-text">
                     Mağaza mağaza gezmeden hayalinizdeki banyo ve zemin seramiğini evinizin konforunda tasarlayın, canlı stok görün ve en iyi teklifi alın!
                   </span>
                 </div>
 
-                {/* Step 1 */}
-                <div style={{ display: 'flex', gap: '18px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '22px', transition: 'all 0.2s ease' }}>
-                  <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)', color: '#ffffff', fontWeight: '900', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(179,142,71,0.35)' }}>1</div>
-                  <div>
-                    <h4 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', fontWeight: '800', color: '#ffffff' }}>
-                      🎨 Modeli Seç & 3D Stüdyoda / Telefon Kameranla (Web-AR) Canlı Gör
-                    </h4>
-                    <p style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#cbd5e1', lineHeight: '1.65' }}>
-                      VitrA, Ege Seramik, NG Kütahya, Bien, QUA Granite gibi Türkiye'nin önde gelen seramik markalarının koleksiyonlarını tarz, ebat ve renge göre filtreleyin. <strong>3D Sanal Stüdyo</strong> veya akıllı telefon kameranız (Web-AR) ile doğrudan banyonuza ya da salonunuza döşeyerek 3D canlı inceleyin.
-                    </p>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#38bdf8', fontWeight: '700', background: 'rgba(56, 189, 248, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
-                      ✨ Yanlış seramik veya uyumsuz renk seçme riskine son!
-                    </span>
+                <div className="how-it-works-steps-list">
+                  {/* Step 1 */}
+                  <div className="how-it-works-step-card">
+                    <div className="how-it-works-step-num">1</div>
+                    <div className="how-it-works-step-details">
+                      <h4 className="how-it-works-step-title">
+                        🎨 Modeli Seç & 3D Stüdyoda Canlı Gör
+                      </h4>
+                      <p className="how-it-works-step-desc">
+                        VitrA, Ege Seramik, NG Kütahya, Bien, QUA Granite gibi Türkiye'nin önde gelen seramik markalarının koleksiyonlarını filtreleyin. <strong>3D Sanal Stüdyo</strong> veya telefon kameranız (Web-AR) ile doğrudan banyonuza ya da salonunuza canlı döşeyin.
+                      </p>
+                      <div className="how-it-works-step-pill cyan">
+                        ✨ Yanlış seramik veya uyumsuz renk seçme riskine son!
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="how-it-works-step-card">
+                    <div className="how-it-works-step-num">2</div>
+                    <div className="how-it-works-step-details">
+                      <h4 className="how-it-works-step-title">
+                        📍 Şehrindeki Yetkili Bayilerden Canlı Fiyat Al
+                      </h4>
+                      <p className="how-it-works-step-desc">
+                        Beğendiğiniz seramiğin bulunduğunuz şehirdeki yetkili bayilerdeki canlı stok durumunu ve m² fiyatlarını görüntüleyin. Tek tıkla yetkili bayi ile WhatsApp veya teklif formu üzerinden doğrudan iletişim kurun.
+                      </p>
+                      <div className="how-it-works-step-pill green">
+                        💰 Doğrudan en yakın yetkili bayiden aracısız en iyi fiyat teklifi.
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="how-it-works-step-card">
+                    <div className="how-it-works-step-num">3</div>
+                    <div className="how-it-works-step-details">
+                      <h4 className="how-it-works-step-title">
+                        🚚 Ücretsiz Numune Karo & Sigortalı Teslimat
+                      </h4>
+                      <p className="how-it-works-step-desc">
+                        Seramiğin dokusunu elinizle hissetmek isterseniz adresinize numune karo talep edin. Sipariş sürecinde sigortalı lojistik ve sertifikalı usta rehberimizle kapınıza kadar güvenle teslim alın.
+                      </p>
+                      <div className="how-it-works-step-pill gold">
+                        🛠️ Kapıda teslim ve 0 kırık garantili lojistik altyapısı.
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Step 2 */}
-                <div style={{ display: 'flex', gap: '18px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '22px', transition: 'all 0.2s ease' }}>
-                  <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)', color: '#ffffff', fontWeight: '900', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(179,142,71,0.35)' }}>2</div>
-                  <div>
-                    <h4 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', fontWeight: '800', color: '#ffffff' }}>
-                      📍 Şehrindeki Yetkili Bayilerden Canlı Fiyat & Stok Al
-                    </h4>
-                    <p style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#cbd5e1', lineHeight: '1.65' }}>
-                      Beğendiğiniz seramiğin bulunduğunuz şehirdeki yetkili bayilerdeki canlı stok durumunu ve m² fiyatlarını görüntüleyin. Tek tıkla yetkili bayi ile WhatsApp veya özel teklif formu üzerinden doğrudan iletişim kurun.
-                    </p>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#34d399', fontWeight: '700', background: 'rgba(52, 211, 153, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
-                      💰 Doğrudan en yakın yetkili bayiden aracısız en iyi fiyat teklifi.
-                    </span>
-                  </div>
-                </div>
-
-                {/* Step 3 */}
-                <div style={{ display: 'flex', gap: '18px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '22px', transition: 'all 0.2s ease' }}>
-                  <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)', color: '#ffffff', fontWeight: '900', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 14px rgba(179,142,71,0.35)' }}>3</div>
-                  <div>
-                    <h4 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', fontWeight: '800', color: '#ffffff' }}>
-                      🚚 Ücretsiz Numune Karo, Sigortalı Nakliye & Sertifikalı Usta
-                    </h4>
-                    <p style={{ margin: '0 0 10px 0', fontSize: '0.88rem', color: '#cbd5e1', lineHeight: '1.65' }}>
-                      Seramiğin dokusunu elinizle hissetmek isterseniz adresinize numune karo talep edin. Sipariş sürecinde sigortalı lojistik ve sertifikalı usta rehberimizle kapınıza kadar güvenle teslim alın.
-                    </p>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#fef08a', fontWeight: '700', background: 'rgba(254, 240, 138, 0.1)', padding: '4px 12px', borderRadius: '12px' }}>
-                      🛠️ Kapıda teslim ve 0 kırık garantili lojistik altyapısı.
-                    </span>
-                  </div>
+                {/* Mobile Quick Action Buttons Bar */}
+                <div className="how-it-works-action-footer">
+                  <Link 
+                    href="/tasarim" 
+                    onClick={() => setShowHowItWorksModal(false)}
+                    className="how-it-works-primary-cta"
+                  >
+                    <Camera size={16} />
+                    <span>3D Mekan Stüdyosu'nu Başlat</span>
+                  </Link>
+                  <button 
+                    onClick={() => setShowHowItWorksModal(false)}
+                    className="how-it-works-secondary-cta"
+                    type="button"
+                  >
+                    <span>Koleksiyonları İncele</span>
+                  </button>
                 </div>
               </div>
             )}
 
             {/* Tab 2: For Dealers */}
             {howItWorksActiveTab === 'dealers' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                <div style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(30,41,59,0.85) 100%)', border: '1px solid rgba(212,175,55,0.35)', borderRadius: '22px', padding: '26px' }}>
-                  <h4 style={{ margin: '0 0 10px 0', fontSize: '1.25rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)' }}>
+              <div className="how-it-works-tab-content">
+                <div className="how-it-works-b2b-hero gold-theme">
+                  <div className="b2b-badge gold">
+                    <Building2 size={14} />
+                    <span>Yetkili Bayi & Showroom SaaS</span>
+                  </div>
+                  <h4 className="b2b-hero-title">
                     🏬 Showroom'unuzu Dijitalleştirin, Bölgenizdeki Müşterileri Çekin!
                   </h4>
-                  <p style={{ margin: '0 0 20px 0', fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.65' }}>
+                  <p className="b2b-hero-desc">
                     SeramikBak platformu; yetkili seramik bayilerinin stoklarını sergilediği, bölgenizdeki seramik arayan binlerce ev sahibini mağazanıza çeken ve showroom tabletlerinizde 3D Teşhir Kiosk hizmeti sunan yeni nesil SaaS altyapısıdır.
                   </p>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
-                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
-                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fbbf24', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <MapPin size={16} /> Harita Görünürlüğü
+                  <div className="b2b-features-grid">
+                    <div className="b2b-feature-card">
+                      <div className="b2b-feature-title">
+                        <MapPin size={16} color="#fbbf24" />
+                        <span>Harita Görünürlüğü</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Şehrinizde seramik arayan müşterilerin doğrudan haritada mağazanızı ve stoklarınızı bulmasını sağlayın.</div>
+                      <p className="b2b-feature-text">
+                        Şehrinizde seramik arayan müşterilerin doğrudan haritada mağazanızı ve stoklarınızı bulmasını sağlayın.
+                      </p>
                     </div>
 
-                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
-                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fbbf24', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Smartphone size={16} /> 3D Kiosk Lisansı
+                    <div className="b2b-feature-card">
+                      <div className="b2b-feature-title">
+                        <Smartphone size={16} color="#fbbf24" />
+                        <span>3D Kiosk Lisansı</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Mağazanızdaki tablet ve dokunmatik ekranlarda tüm kataloğu 3D canlı giydirerek müşterilerinize sunun.</div>
+                      <p className="b2b-feature-text">
+                        Mağazanızdaki tablet ve dokunmatik ekranlarda tüm kataloğu 3D canlı giydirerek müşterilerinize sunun.
+                      </p>
                     </div>
 
-                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
-                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#fbbf24', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <TrendingUp size={16} /> Canlı Teklif Talepleri
+                    <div className="b2b-feature-card">
+                      <div className="b2b-feature-title">
+                        <TrendingUp size={16} color="#fbbf24" />
+                        <span>Canlı Teklif Talepleri</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Müşterilerin platform üzerinden gönderdiği fiyat teklif taleplerini anında dijital panellerde yanıtlayın.</div>
+                      <p className="b2b-feature-text">
+                        Müşterilerin gönderdiği fiyat teklif taleplerini anında dijital bayi panelinizden yanıtlayın.
+                      </p>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+                  <div className="b2b-cta-row">
                     <Link 
                       href="/bayi" 
                       onClick={() => setShowHowItWorksModal(false)} 
-                      style={{
-                        padding: '12px 24px',
-                        fontSize: '0.9rem',
-                        borderRadius: '12px',
-                        textDecoration: 'none',
-                        fontWeight: '800',
-                        background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
-                        color: '#ffffff',
-                        boxShadow: '0 6px 18px rgba(179,142,71,0.35)',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}
+                      className="b2b-main-btn gold"
                     >
-                      <Building2 size={18} />
+                      <Building2 size={16} />
                       <span>Hemen Bayi Paneline Gir</span>
                     </Link>
                   </div>
@@ -7994,67 +7957,68 @@ export default function Home() {
 
             {/* Tab 3: For Brands & Manufacturers */}
             {howItWorksActiveTab === 'brands' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                <div style={{ background: 'linear-gradient(135deg, rgba(56,189,248,0.12) 0%, rgba(15,23,42,0.9) 100%)', border: '1px solid rgba(56,189,248,0.35)', borderRadius: '22px', padding: '26px' }}>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '4px 12px', borderRadius: '20px', fontSize: '0.78rem', fontWeight: '800', marginBottom: '12px' }}>
-                    🏭 Seramik Markaları & İmalatçıları İçin Kurumsal Dijitalleşme
+              <div className="how-it-works-tab-content">
+                <div className="how-it-works-b2b-hero blue-theme">
+                  <div className="b2b-badge blue">
+                    <Globe size={14} />
+                    <span>Seramik Markaları & İmalatçıları İçin</span>
                   </div>
-                  <h4 style={{ margin: '0 0 10px 0', fontSize: '1.25rem', fontWeight: '900', color: '#ffffff', fontFamily: 'var(--font-title)' }}>
+                  <h4 className="b2b-hero-title">
                     Koleksiyonlarınızı 3D Dijitalleştirin, Global Bayi & İhracat Ağı Kurun!
                   </h4>
-                  <p style={{ margin: '0 0 20px 0', fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.65' }}>
+                  <p className="b2b-hero-desc">
                     SeramikBak; VitrA, Kalebodur, Kütahya, Bien, Ege, QUA gibi Türkiye'nin lider üreticilerinin seramik koleksiyonlarını Web-3D ve AR altyapısına dönüştürerek hem yurt içi bayi ağınıza hem de 16+ ülkede ihracat alıcılarına sunar.
                   </p>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
-                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
-                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#38bdf8', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Globe size={16} /> Global Dijital Katalog & 3D Teşhir
+                  <div className="b2b-features-grid two-cols">
+                    <div className="b2b-feature-card">
+                      <div className="b2b-feature-title">
+                        <Globe size={16} color="#38bdf8" />
+                        <span>Global 3D Teşhir</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Tüm karo ve porselen koleksiyonlarınızı 3D Sanal Stüdyo ve Web-AR formatında canlı sergileyin.</div>
+                      <p className="b2b-feature-text">
+                        Tüm karo ve porselen koleksiyonlarınızı 3D Sanal Stüdyo ve Web-AR formatında canlı sergileyin.
+                      </p>
                     </div>
 
-                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
-                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#38bdf8', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Send size={16} /> 16+ Ülke B2B İhracat Hub
+                    <div className="b2b-feature-card">
+                      <div className="b2b-feature-title">
+                        <Send size={16} color="#38bdf8" />
+                        <span>16+ Ülke İhracat Hub</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Global Export Hub ve B2B Stok Borsası ile uluslararası distribütör ve ithalatçılara doğrudan ulaşın.</div>
+                      <p className="b2b-feature-text">
+                        Global Export Hub ve B2B Stok Borsası ile uluslararası distribütör ve ithalatçılara doğrudan ulaşın.
+                      </p>
                     </div>
 
-                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
-                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#38bdf8', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <TrendingUp size={16} /> Gerçek Zamanlı Pazar Analitiği
+                    <div className="b2b-feature-card">
+                      <div className="b2b-feature-title">
+                        <TrendingUp size={16} color="#38bdf8" />
+                        <span>Gerçek Zamanlı Pazar Analitiği</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Hangi bölgede hangi seramik ebadı, deseni ve renginin arandığını canlı veri panelleriyle anlık izleyin.</div>
+                      <p className="b2b-feature-text">
+                        Hangi bölgede hangi seramik ebadı, deseni ve renginin arandığını canlı veri panelleriyle anlık izleyin.
+                      </p>
                     </div>
 
-                    <div style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '16px' }}>
-                      <div style={{ fontSize: '0.92rem', fontWeight: '800', color: '#38bdf8', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Building2 size={16} /> Yetkili Bayi Ağı Entegrasyonu
+                    <div className="b2b-feature-card">
+                      <div className="b2b-feature-title">
+                        <Building2 size={16} color="#38bdf8" />
+                        <span>Bayi Ağı Entegrasyonu</span>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>Türkiye genelindeki tüm yetkili bayilerinizi harita ve dijital stok havuzu ile merkezden destekleyin.</div>
+                      <p className="b2b-feature-text">
+                        Türkiye genelindeki tüm yetkili bayilerinizi harita ve dijital stok havuzu ile merkezden destekleyin.
+                      </p>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+                  <div className="b2b-cta-row">
                     <Link 
                       href="/marka" 
                       onClick={() => setShowHowItWorksModal(false)} 
-                      style={{
-                        padding: '12px 24px',
-                        fontSize: '0.9rem',
-                        borderRadius: '12px',
-                        textDecoration: 'none',
-                        fontWeight: '800',
-                        background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
-                        color: '#ffffff',
-                        boxShadow: '0 6px 18px rgba(2,132,199,0.35)',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}
+                      className="b2b-main-btn blue"
                     >
-                      <Globe size={18} />
+                      <Globe size={16} />
                       <span>Marka & Üretici Portalını İncele</span>
                     </Link>
                   </div>
@@ -15210,6 +15174,380 @@ export default function Home() {
           box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.25) !important;
         }
 
+        /* How It Works Modal Styling - Desktop Luxury & Mobile App Grade */
+        .how-it-works-modal-content {
+          max-width: 960px;
+          width: 94%;
+          border-radius: 28px;
+          padding: 28px 32px;
+          background: linear-gradient(135deg, #080d1a 0%, #0f172a 50%, #172033 100%);
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8), 0 0 50px rgba(212, 175, 55, 0.15);
+          color: #ffffff;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-sizing: border-box;
+          position: relative;
+          scrollbar-width: thin;
+        }
+        .how-it-works-pull-handle {
+          display: none;
+        }
+        .how-it-works-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 20px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          padding-bottom: 16px;
+          gap: 12px;
+        }
+        .how-it-works-header-left {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          min-width: 0;
+        }
+        .how-it-works-badge-icon {
+          width: 44px;
+          height: 44px;
+          border-radius: 14px;
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(179, 142, 71, 0.1) 100%);
+          border: 1px solid rgba(212, 175, 55, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #d4af37;
+          box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25);
+          flex-shrink: 0;
+        }
+        .how-it-works-header-titles {
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+        }
+        .how-it-works-title {
+          margin: 0;
+          font-size: 1.4rem;
+          font-weight: 900;
+          color: #ffffff;
+          font-family: var(--font-title);
+          letter-spacing: -0.01em;
+          line-height: 1.2;
+        }
+        .how-it-works-subtitle {
+          font-size: 0.82rem;
+          color: #94a3b8;
+          font-weight: 500;
+          margin-top: 2px;
+          line-height: 1.3;
+        }
+        .how-it-works-close-btn {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: #ffffff;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        }
+        .how-it-works-close-btn:hover {
+          background: rgba(255, 255, 255, 0.18);
+          transform: rotate(90deg);
+        }
+
+        /* 3-Tab Segmented Control */
+        .how-it-works-tabs-container {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 6px;
+          background: rgba(0, 0, 0, 0.45);
+          padding: 5px;
+          border-radius: 16px;
+          margin-bottom: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .how-it-works-tab-btn {
+          padding: 11px 12px;
+          border-radius: 12px;
+          border: none;
+          background: transparent;
+          color: #94a3b8;
+          font-weight: 750;
+          font-size: 0.84rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 7px;
+          white-space: nowrap;
+        }
+        .how-it-works-tab-btn:hover {
+          color: #f1f5f9;
+          background: rgba(255, 255, 255, 0.04);
+        }
+        .how-it-works-tab-btn.active {
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          color: #ffffff;
+          box-shadow: 0 4px 14px rgba(179, 142, 71, 0.35);
+        }
+        .tab-label-desktop {
+          display: inline;
+        }
+        .tab-label-mobile {
+          display: none;
+        }
+
+        /* Body Content */
+        .how-it-works-tab-content {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .how-it-works-intro-banner {
+          background: rgba(212, 175, 55, 0.08);
+          border: 1px solid rgba(212, 175, 55, 0.25);
+          border-radius: 16px;
+          padding: 14px 18px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .banner-sparkle {
+          color: #d4af37;
+          flex-shrink: 0;
+        }
+        .banner-text {
+          font-size: 0.86rem;
+          color: #fef08a;
+          font-weight: 700;
+          line-height: 1.5;
+        }
+
+        /* Step Cards */
+        .how-it-works-steps-list {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+        .how-it-works-step-card {
+          display: flex;
+          gap: 16px;
+          align-items: flex-start;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 18px;
+          padding: 18px 20px;
+          transition: all 0.2s ease;
+        }
+        .how-it-works-step-card:hover {
+          background: rgba(255, 255, 255, 0.05);
+          border-color: rgba(212, 175, 55, 0.3);
+        }
+        .how-it-works-step-num {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          color: #ffffff;
+          font-weight: 900;
+          font-size: 1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.35);
+        }
+        .how-it-works-step-details {
+          flex: 1;
+          min-width: 0;
+        }
+        .how-it-works-step-title {
+          margin: 0 0 6px 0;
+          font-size: 1.05rem;
+          font-weight: 800;
+          color: #ffffff;
+          line-height: 1.3;
+        }
+        .how-it-works-step-desc {
+          margin: 0 0 10px 0;
+          font-size: 0.84rem;
+          color: #cbd5e1;
+          line-height: 1.6;
+        }
+        .how-it-works-step-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.76rem;
+          font-weight: 700;
+          padding: 4px 12px;
+          border-radius: 12px;
+        }
+        .how-it-works-step-pill.cyan {
+          color: #38bdf8;
+          background: rgba(56, 189, 248, 0.1);
+          border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+        .how-it-works-step-pill.green {
+          color: #34d399;
+          background: rgba(52, 211, 153, 0.1);
+          border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+        .how-it-works-step-pill.gold {
+          color: #fef08a;
+          background: rgba(254, 240, 138, 0.1);
+          border: 1px solid rgba(254, 240, 138, 0.2);
+        }
+
+        /* Action Footer */
+        .how-it-works-action-footer {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-top: 6px;
+        }
+        .how-it-works-primary-cta {
+          flex: 1;
+          height: 44px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          color: #ffffff;
+          text-decoration: none;
+          font-weight: 800;
+          font-size: 0.86rem;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          box-shadow: 0 4px 16px rgba(179, 142, 71, 0.35);
+          transition: all 0.2s ease;
+        }
+        .how-it-works-primary-cta:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(179, 142, 71, 0.45);
+        }
+        .how-it-works-secondary-cta {
+          height: 44px;
+          padding: 0 20px;
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          color: #cbd5e1;
+          font-weight: 750;
+          font-size: 0.84rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+        .how-it-works-secondary-cta:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: #ffffff;
+        }
+
+        /* B2B Sections */
+        .how-it-works-b2b-hero {
+          border-radius: 20px;
+          padding: 24px;
+        }
+        .how-it-works-b2b-hero.gold-theme {
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(30, 41, 59, 0.85) 100%);
+          border: 1px solid rgba(212, 175, 55, 0.35);
+        }
+        .how-it-works-b2b-hero.blue-theme {
+          background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0.9) 100%);
+          border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+        .b2b-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 0.76rem;
+          font-weight: 800;
+          margin-bottom: 12px;
+        }
+        .b2b-badge.gold {
+          background: rgba(212, 175, 55, 0.15);
+          color: #fbbf24;
+        }
+        .b2b-badge.blue {
+          background: rgba(56, 189, 248, 0.15);
+          color: #38bdf8;
+        }
+        .b2b-hero-title {
+          margin: 0 0 10px 0;
+          font-size: 1.25rem;
+          font-weight: 900;
+          color: #ffffff;
+          font-family: var(--font-title);
+          line-height: 1.3;
+        }
+        .b2b-hero-desc {
+          margin: 0 0 18px 0;
+          font-size: 0.86rem;
+          color: #cbd5e1;
+          line-height: 1.6;
+        }
+        .b2b-features-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 12px;
+          margin-bottom: 20px;
+        }
+        .b2b-feature-card {
+          background: rgba(0, 0, 0, 0.35);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 14px;
+          padding: 14px;
+        }
+        .b2b-feature-title {
+          font-size: 0.88rem;
+          font-weight: 800;
+          color: #ffffff;
+          margin-bottom: 6px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .b2b-feature-text {
+          font-size: 0.78rem;
+          color: #94a3b8;
+          line-height: 1.5;
+          margin: 0;
+        }
+        .b2b-cta-row {
+          display: flex;
+          gap: 12px;
+        }
+        .b2b-main-btn {
+          padding: 12px 24px;
+          font-size: 0.88rem;
+          border-radius: 12px;
+          text-decoration: none;
+          font-weight: 800;
+          color: #ffffff;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.2s ease;
+        }
+        .b2b-main-btn.gold {
+          background: linear-gradient(135deg, #d4af37 0%, #b38e47 100%);
+          box-shadow: 0 6px 18px rgba(179, 142, 71, 0.35);
+        }
+        .b2b-main-btn.blue {
+          background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+          box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35);
+        }
+
         /* Showroom Modal Custom Styling */
         .dealer-showroom-modal {
           animation: scaleUp 0.3s ease-out;
@@ -18469,6 +18807,145 @@ export default function Home() {
             align-items: flex-end !important;
             justify-content: center !important;
             z-index: 99999 !important;
+          }
+
+          /* How It Works Modal Mobile App Sheet Overrides */
+          .how-it-works-modal-content {
+            width: 100% !important;
+            max-width: 100% !important;
+            max-height: 90vh !important;
+            height: auto !important;
+            border-radius: 24px 24px 0 0 !important;
+            padding: 10px 16px 28px 16px !important;
+            margin: 0 !important;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.85) !important;
+            border-bottom: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            -webkit-overflow-scrolling: touch !important;
+          }
+          .how-it-works-pull-handle {
+            display: block !important;
+            width: 38px !important;
+            height: 4px !important;
+            background: rgba(255, 255, 255, 0.28) !important;
+            border-radius: 3px !important;
+            margin: 0 auto 12px auto !important;
+          }
+          .how-it-works-header {
+            margin-bottom: 12px !important;
+            padding-bottom: 10px !important;
+          }
+          .how-it-works-badge-icon {
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 10px !important;
+          }
+          .how-it-works-title {
+            font-size: 1.1rem !important;
+          }
+          .how-it-works-subtitle {
+            font-size: 0.72rem !important;
+          }
+          .how-it-works-close-btn {
+            width: 32px !important;
+            height: 32px !important;
+          }
+          /* 3 Equal Symmetrical Tabs on Mobile Single Row */
+          .how-it-works-tabs-container {
+            grid-template-columns: 1fr 1fr 1fr !important;
+            gap: 4px !important;
+            padding: 4px !important;
+            border-radius: 12px !important;
+            margin-bottom: 12px !important;
+          }
+          .how-it-works-tab-btn {
+            padding: 8px 3px !important;
+            font-size: 0.75rem !important;
+            border-radius: 9px !important;
+            gap: 4px !important;
+          }
+          .tab-label-desktop {
+            display: none !important;
+          }
+          .tab-label-mobile {
+            display: inline !important;
+          }
+          .how-it-works-intro-banner {
+            padding: 10px 12px !important;
+            border-radius: 12px !important;
+            gap: 8px !important;
+          }
+          .banner-text {
+            font-size: 0.78rem !important;
+          }
+          .how-it-works-step-card {
+            padding: 12px 12px !important;
+            gap: 12px !important;
+            border-radius: 14px !important;
+          }
+          .how-it-works-step-num {
+            width: 28px !important;
+            height: 28px !important;
+            font-size: 0.85rem !important;
+          }
+          .how-it-works-step-title {
+            font-size: 0.94rem !important;
+            margin-bottom: 4px !important;
+          }
+          .how-it-works-step-desc {
+            font-size: 0.78rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 6px !important;
+          }
+          .how-it-works-step-pill {
+            font-size: 0.70rem !important;
+            padding: 3px 8px !important;
+          }
+          .how-it-works-action-footer {
+            flex-direction: column !important;
+            gap: 8px !important;
+          }
+          .how-it-works-primary-cta {
+            width: 100% !important;
+            height: 42px !important;
+            font-size: 0.82rem !important;
+          }
+          .how-it-works-secondary-cta {
+            width: 100% !important;
+            height: 38px !important;
+            font-size: 0.80rem !important;
+          }
+          .how-it-works-b2b-hero {
+            padding: 16px 14px !important;
+            border-radius: 16px !important;
+          }
+          .b2b-hero-title {
+            font-size: 1.05rem !important;
+          }
+          .b2b-hero-desc {
+            font-size: 0.78rem !important;
+            margin-bottom: 14px !important;
+          }
+          .b2b-features-grid {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+          }
+          .b2b-feature-card {
+            padding: 10px 12px !important;
+            border-radius: 10px !important;
+          }
+          .b2b-feature-title {
+            font-size: 0.82rem !important;
+          }
+          .b2b-feature-text {
+            font-size: 0.74rem !important;
+          }
+          .b2b-main-btn {
+            width: 100% !important;
+            justify-content: center !important;
+            height: 42px !important;
+            padding: 0 !important;
           }
           .detail-modal-content-premium {
             width: 100% !important;
