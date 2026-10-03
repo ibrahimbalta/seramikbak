@@ -4899,7 +4899,7 @@ export default function BrandPortalPage() {
                     width: '100%',
                     boxSizing: 'border-box'
                   }}>
-                    <div style={{ width: '100%' }}>
+                    <div style={{ flex: '1 1 auto', minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', marginBottom: '8px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <div style={{ background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', padding: '8px', borderRadius: '10px', display: 'flex', flexShrink: 0 }}>
@@ -4917,7 +4917,7 @@ export default function BrandPortalPage() {
                           Canlı
                         </span>
                       </div>
-                      <p style={{ fontSize: isMobile ? '0.78rem' : '0.85rem', color: '#64748b', margin: 0, lineHeight: '1.45' }}>
+                      <p style={{ fontSize: isMobile ? '0.78rem' : '0.85rem', color: '#64748b', margin: 0, lineHeight: '1.45', maxWidth: '640px' }}>
                         {brandInfo?.name || 'Marka'} seramik koleksiyonlarınızın Google Global, Yandex ve B2B platformlarındaki ülke bazlı gösterimlerini ve şartname taleplerini takip edin.
                       </p>
                     </div>
@@ -4926,25 +4926,27 @@ export default function BrandPortalPage() {
                     <div style={{
                       display: 'flex',
                       flexDirection: isMobile ? 'column' : 'row',
-                      alignItems: isMobile ? 'stretch' : 'center',
+                      alignItems: 'center',
                       gap: '10px',
-                      width: isMobile ? '100%' : 'auto',
-                      marginTop: isMobile ? '4px' : '0'
+                      flexShrink: 0,
+                      width: isMobile ? '100%' : 'auto'
                     }}>
                       <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-                        gap: '4px',
+                        display: isMobile ? 'grid' : 'inline-flex',
+                        gridTemplateColumns: isMobile ? 'repeat(4, minmax(0, 1fr))' : undefined,
+                        alignItems: 'center',
+                        gap: '3px',
                         background: '#f8fafc',
                         padding: '4px',
                         borderRadius: '12px',
                         border: '1px solid #e2e8f0',
+                        height: isMobile ? 'auto' : '42px',
                         width: isMobile ? '100%' : 'auto',
                         boxSizing: 'border-box'
                       }}>
                         {[
-                          { id: '30d', label: isMobile ? '30 Gün' : 'Son 30 Gün' },
-                          { id: '90d', label: isMobile ? '90 Gün' : 'Son 90 Gün' },
+                          { id: '30d', label: isMobile ? '30G' : 'Son 30 Gün' },
+                          { id: '90d', label: isMobile ? '90G' : 'Son 90 Gün' },
                           { id: '1y', label: '1 Yıl' },
                           { id: 'all', label: isMobile ? 'Tümü' : 'Tüm Zamanlar' }
                         ].map(p => (
@@ -4955,7 +4957,8 @@ export default function BrandPortalPage() {
                               if (brandInfo) fetchCountryAnalytics(brandInfo.id, p.id);
                             }}
                             style={{
-                              padding: isMobile ? '8px 2px' : '6px 14px',
+                              height: '34px',
+                              padding: isMobile ? '0 4px' : '0 14px',
                               fontSize: isMobile ? '0.72rem' : '0.78rem',
                               fontWeight: '700',
                               borderRadius: '8px',
@@ -4963,11 +4966,14 @@ export default function BrandPortalPage() {
                               cursor: 'pointer',
                               background: countryPeriod === p.id ? '#0f172a' : 'transparent',
                               color: countryPeriod === p.id ? '#ffffff' : '#64748b',
-                              transition: 'all 0.2s ease',
-                              textAlign: 'center',
+                              transition: 'all 0.15s ease',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
                               whiteSpace: 'nowrap',
-                              minWidth: 0,
-                              boxSizing: 'border-box'
+                              flex: isMobile ? 1 : 'none',
+                              boxSizing: 'border-box',
+                              boxShadow: countryPeriod === p.id ? '0 1px 3px rgba(0,0,0,0.12)' : 'none'
                             }}
                           >
                             {p.label}
@@ -4982,22 +4988,26 @@ export default function BrandPortalPage() {
                         }}
                         title="Verileri Yenile"
                         style={{
-                          padding: isMobile ? '10px 14px' : '8px 14px',
-                          borderRadius: '10px',
-                          border: countryRefreshMsg ? '1px solid #10b981' : '1px solid #cbd5e1',
+                          height: '42px',
+                          padding: '0 16px',
+                          borderRadius: '12px',
+                          border: countryRefreshMsg ? '1px solid #10b981' : '1px solid #e2e8f0',
                           background: countryRefreshMsg ? '#ecfdf5' : '#ffffff',
-                          color: countryRefreshMsg ? '#047857' : '#475569',
+                          color: countryRefreshMsg ? '#047857' : '#334155',
                           cursor: countryLoading ? 'not-allowed' : 'pointer',
-                          display: 'flex',
+                          display: 'inline-flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: '6px',
+                          gap: '8px',
                           fontSize: '0.78rem',
                           fontWeight: '700',
-                          transition: 'all 0.2s ease',
+                          transition: 'all 0.15s ease',
                           opacity: countryLoading ? 0.7 : 1,
                           width: isMobile ? '100%' : 'auto',
-                          boxSizing: 'border-box'
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0,
+                          boxSizing: 'border-box',
+                          boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
                         }}
                       >
                         <RefreshCw size={14} className={countryLoading ? "animate-spin" : ""} style={{ color: countryRefreshMsg ? '#10b981' : '#64748b' }} />
