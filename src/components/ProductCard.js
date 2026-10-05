@@ -16,7 +16,8 @@ export default function ProductCard({
   navigateToDealers,
   getProductBadge,
   handleProductCardClick,
-  onOpenAR
+  onOpenAR,
+  onOpenStudioModal
 }) {
   const { t, translateFinish, translateStyle } = useLanguage();
   const hasAd = product.campaigns && product.campaigns.length > 0;
@@ -60,27 +61,27 @@ export default function ProductCard({
           <HeartIcon size={16} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
         </button>
 
-        {/* Quick Action 3-Button Strip (3D Gör, Tam Ekran Stüdyo, Bayi) */}
+        {/* Quick Action 3-Button Strip (3D, Stüdyo, Bayi) */}
         <div className="card-quick-actions-row">
           <button 
             type="button"
             onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
             className="card-action-btn-new btn-action-3d"
-            title="Seçili seramiği 3D mekana giydir"
+            title="3D Sanal Mekanda Gör"
           >
-            ✨ 3D Gör
+            3D
           </button>
-          <a 
-            href={`/tasarim?product=${encodeURIComponent(product.id || product.code || '')}&brand=${encodeURIComponent(product.brand?.slug || '')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
+          <button 
+            type="button"
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              if (onOpenStudioModal) onOpenStudioModal(product); 
+            }}
             className="card-action-btn-new btn-action-studio"
-            title="Tam Ekran 3D Tasarım Stüdyosunda Aç"
-            style={{ textDecoration: 'none' }}
+            title="AI Mimari Mekanda Canlı Gör"
           >
-            🚀 Stüdyo
-          </a>
+            Stüdyo
+          </button>
           <button 
             type="button"
             onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}

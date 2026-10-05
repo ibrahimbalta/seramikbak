@@ -71,6 +71,8 @@ import dynamic from 'next/dynamic';
 import WebARModal from '@/components/WebARModal';
 import BimSpecDownloadModal from '@/components/BimSpecDownloadModal';
 
+const AIStudioRoomModal = dynamic(() => import('@/components/AIStudioRoomModal'), { ssr: false });
+
 // Dynamically import client-only components to prevent Next.js SSR hydration mismatches
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
   ssr: false,
@@ -1094,6 +1096,14 @@ export default function Home() {
   const handleOpenWebAR = (product) => {
     setWebarProduct(product || null);
     setShowWebARModal(true);
+  };
+
+  // AI Photorealistic Studio Room Modal State
+  const [showAIStudioModal, setShowAIStudioModal] = useState(false);
+  const [aiStudioProduct, setAiStudioProduct] = useState(null);
+  const handleOpenAIStudio = (product) => {
+    setAiStudioProduct(product || null);
+    setShowAIStudioModal(true);
   };
 
   // 3D Studio Options
@@ -5648,6 +5658,7 @@ export default function Home() {
                         getProductBadge={getProductBadge}
                         handleProductCardClick={handleProductCardClick}
                         onOpenAR={(p) => handleOpenWebAR(p)}
+                        onOpenStudioModal={(p) => handleOpenAIStudio(p)}
                       />
                     ))
                   )}
@@ -19829,6 +19840,22 @@ export default function Home() {
         isOpen={isBimModalOpen}
         onClose={() => setIsBimModalOpen(false)}
         product={bimModalProduct}
+      />
+
+      {/* AI PHOTOREALISTIC 3D LIVING SPACE VISUALIZER MODAL */}
+      <AIStudioRoomModal
+        isOpen={showAIStudioModal}
+        onClose={() => setShowAIStudioModal(false)}
+        selectedProduct={aiStudioProduct}
+        onGoToDealers={(p) => {
+          setShowAIStudioModal(false);
+          navigateToDealers(p || aiStudioProduct);
+        }}
+        onRequestSample={(p) => {
+          setShowAIStudioModal(false);
+          setDetailProduct(p || aiStudioProduct);
+          setShowDetailModal(true);
+        }}
       />
     </main>
   );
