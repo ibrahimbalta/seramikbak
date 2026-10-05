@@ -4548,12 +4548,21 @@ export default function Home() {
                   </label>
 
                   <button 
-                    onClick={() => handleOpenWebAR()} 
+                    onClick={() => {
+                      const studioEl = document.getElementById('studio-canvas-container') || document.getElementById('studio-interactive-section');
+                      if (studioEl) {
+                        const yOffset = -70;
+                        const y = studioEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+                      } else {
+                        window.location.href = '/tasarim';
+                      }
+                    }} 
                     className="hero-feature-btn emerald-theme"
-                    title="Kamera ile Seramiği Kendi Odanda Canlı Gör"
+                    title="Canlı 3D Mekan & Seramik Tasarım Stüdyosunu Aç"
                   >
-                    <Smartphone size={15} />
-                    <span>📱 Odamda Canlı Gör</span>
+                    <Sparkles size={15} />
+                    <span>✨ 3D Tasarım Stüdyosu</span>
                   </button>
                 </div>
               </div>

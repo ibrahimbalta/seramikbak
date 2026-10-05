@@ -23,11 +23,8 @@ import {
   Phone,
   Grid,
   ChevronDown,
-  Palette,
-  Smartphone
+  Palette
 } from 'lucide-react';
-
-const WebARModal = dynamic(() => import('@/components/WebARModal'), { ssr: false });
 
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
   ssr: false,
@@ -147,7 +144,6 @@ export default function BrandConsumerStudioPage() {
   // Modals & Feedback
   const [showDealersModal, setShowDealersModal] = useState(false);
   const [showSampleModal, setShowSampleModal] = useState(false);
-  const [showWebARModal, setShowWebARModal] = useState(false);
   const [dealers, setDealers] = useState([]);
   const [loadingDealers, setLoadingDealers] = useState(false);
   const [sampleForm, setSampleForm] = useState({ name: '', phone: '', city: '', note: '' });
@@ -1242,32 +1238,6 @@ export default function BrandConsumerStudioPage() {
               <span className="btn-label-desktop">Fotoğraf</span>
             </button>
 
-            {/* Odamda Canlı Gör (AR / Kamera) Button */}
-            <button
-              onClick={() => setShowWebARModal(true)}
-              style={{
-                height: isMobile ? '34px' : '36px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                padding: isMobile ? '0 9px' : '0 13px',
-                borderRadius: '9px',
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                border: 'none',
-                color: '#fff',
-                fontSize: isMobile ? '0.72rem' : '0.76rem',
-                fontWeight: '800',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                boxSizing: 'border-box',
-                boxShadow: '0 2px 10px rgba(16,185,129,0.35)'
-              }}
-              title="Seçili seramiği kendi odanın zemininde canlı kamerayla gör"
-            >
-              <Smartphone size={14} />
-              <span>Odamda Gör</span>
-            </button>
-
             {/* Mobile View Toggle Button (3D Full vs Split) */}
             {isMobile ? (
               <button
@@ -1806,15 +1776,6 @@ export default function BrandConsumerStudioPage() {
             </div>
           </div>
         </div>
-      )}
-
-      {/* WebAR / Odamda Canlı Gör Modal */}
-      {showWebARModal && (
-        <WebARModal
-          isOpen={showWebARModal}
-          onClose={() => setShowWebARModal(false)}
-          selectedProduct={floorProduct || selectedProduct}
-        />
       )}
 
       {/* Global Responsive CSS */}

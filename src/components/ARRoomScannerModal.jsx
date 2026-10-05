@@ -37,22 +37,10 @@ export default function ARRoomScannerModal({
   const [surfaceType, setSurfaceType] = useState('WALL');
 
   // Tile Laying Style & Customization
-  const [layStyle, setLayStyle] = useState('straight'); // straight, bond, diagonal, herringbone
+  const [layStyle, setLayStyle] = useState('straight'); // straight, diagonal, herringbone
   const [groutColor, setGroutColor] = useState('#d4af37'); // Gold, White, Grey, Anthracite, Beige
   const [tileScale, setTileScale] = useState(1.0); // 0.6x to 1.6x zoom scale
   const [perspectiveTilt, setPerspectiveTilt] = useState(55); // Perspective horizon angle
-
-  // TilesView-grade 4-Corner Pinning & Perspective State
-  const [customCorners, setCustomCorners] = useState(null);
-  const [showCornerPins, setShowCornerPins] = useState(true);
-  const [draggingPin, setDraggingPin] = useState(-1);
-  const draggingPinRef = useRef(-1);
-  const containerRef = useRef(null);
-
-  // TilesView-grade Room Lighting & Shadow Preservation
-  const [enableRoomLighting, setEnableRoomLighting] = useState(true);
-  const [shadowIntensity, setShadowIntensity] = useState(0.42);
-  const [showSettingsPopover, setShowSettingsPopover] = useState(false);
 
   // Active Tile Product Texture
   const [activeTileTexture, setActiveTileTexture] = useState(
@@ -132,77 +120,6 @@ export default function ARRoomScannerModal({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // TilesView-grade 4-Corner helper
-  const getDefaultCorners = useCallback((type, tilt) => {
-    if (type === 'WALL') {
-      return [
-        { x: 0.08, y: 0.88, label: 'Sol Alt' },
-        { x: 0.92, y: 0.88, label: 'Sağ Alt' },
-        { x: 0.88, y: 0.12, label: 'Sağ Üst' },
-        { x: 0.12, y: 0.12, label: 'Sol Üst' }
-      ];
-    }
-    const horizonFrac = Math.max(0.15, Math.min(0.85, 1 - (tilt || 55) / 100));
-    return [
-      { x: -0.06, y: 1.0, label: 'Sol Ön' },
-      { x: 1.06, y: 1.0, label: 'Sağ Ön' },
-      { x: 0.72, y: horizonFrac, label: 'Sağ Arka' },
-      { x: 0.28, y: horizonFrac, label: 'Sol Arka' }
-    ];
-  }, []);
-
-  const handlePointerDown = (index, e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    draggingPinRef.current = index;
-    setDraggingPin(index);
-  };
-
-  useEffect(() => {
-    const handlePointerMove = (e) => {
-      if (draggingPinRef.current === -1) return;
-      const container = containerRef.current;
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      const clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX);
-      const clientY = e.clientY ?? (e.touches && e.touches[0]?.clientY);
-      if (clientX === undefined || clientY === undefined) return;
-
-      const nx = Math.max(-0.25, Math.min(1.25, (clientX - rect.left) / rect.width));
-      const ny = Math.max(-0.10, Math.min(1.10, (clientY - rect.top) / rect.height));
-
-      setCustomCorners((prev) => {
-        const base = prev || getDefaultCorners(surfaceType, perspectiveTilt);
-        const next = base.map((pt, idx) => {
-          if (idx === draggingPinRef.current) {
-            return { ...pt, x: nx, y: ny };
-          }
-          return pt;
-        });
-        return next;
-      });
-    };
-
-    const handlePointerUp = () => {
-      if (draggingPinRef.current !== -1) {
-        draggingPinRef.current = -1;
-        setDraggingPin(-1);
-      }
-    };
-
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-    window.addEventListener('touchmove', handlePointerMove, { passive: false });
-    window.addEventListener('touchend', handlePointerUp);
-
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
-      window.removeEventListener('touchmove', handlePointerMove);
-      window.removeEventListener('touchend', handlePointerUp);
-    };
-  }, [getDefaultCorners, surfaceType, perspectiveTilt]);
 
   // Update texture when product changes
   useEffect(() => {
@@ -539,215 +456,102 @@ export default function ARRoomScannerModal({
       const h = canvas.height;
 
       // -------------------------------------------------------------
-      // 1. CALCULATE SURFACE CORNERS WITH PERSPECTIVE PINS
+      // 1. CALCULATE SURFACE POLYGON (WALL vs FLOOR PERSPECTIVE)
       // -------------------------------------------------------------
-      const activeCornersNorm = customCorners || getDefaultCorners(surfaceType, perspectiveTilt);
-      const p0 = { x: activeCornersNorm[0].x * w, y: activeCornersNorm[0].y * h };
-      const p1 = { x: activeCornersNorm[1].x * w, y: activeCornersNorm[1].y * h };
-      const p2 = { x: activeCornersNorm[2].x * w, y: activeCornersNorm[2].y * h };
-      const p3 = { x: activeCornersNorm[3].x * w, y: activeCornersNorm[3].y * h };
+      let p0, p1, p2, p3;
+
+      if (surfaceType === 'WALL') {
+        // Wall Surface: Covers central and upper area with subtle perspective
+        const topY = h * 0.12;
+        const botY = h * 0.88;
+        const padX = w * 0.10;
+        p0 = { x: padX, y: botY };
+        p1 = { x: w - padX, y: botY };
+        p2 = { x: w - padX * 0.95, y: topY };
+        p3 = { x: padX * 0.95, y: topY };
+      } else {
+        // Floor Surface: Perspective trapezoid stretching towards the camera
+        const horizonY = h * (1 - perspectiveTilt / 100);
+        const topWidth = w * 0.40;
+        const bottomWidth = w * 1.10;
+        p0 = { x: (w - bottomWidth) / 2, y: h };
+        p1 = { x: (w + bottomWidth) / 2, y: h };
+        p2 = { x: (w + topWidth) / 2, y: horizonY };
+        p3 = { x: (w - topWidth) / 2, y: horizonY };
+      }
 
       // -------------------------------------------------------------
-      // 2. PERSPECTIVE TILE RENDERING ENGINE (TILESVIEW DEPTH FORESHORTENING)
+      // 2. RENDER TILES INSIDE PERSPECTIVE POLYGON
       // -------------------------------------------------------------
-      if (surfaceType === 'FLOOR') {
-        const wNear = Math.hypot(p1.x - p0.x, p1.y - p0.y);
-        const wFar = Math.max(15, Math.hypot(p2.x - p3.x, p2.y - p3.y));
-        const zRatio = Math.max(1.3, Math.min(7.5, wNear / wFar));
-        const numSlices = 36;
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.lineTo(p3.x, p3.y);
+      ctx.closePath();
+      ctx.clip();
 
-        for (let k = 0; k < numSlices; k++) {
-          const s0 = k / numSlices;
-          const s1 = (k + 1) / numSlices;
-
-          const l0x = p0.x + (p3.x - p0.x) * s0;
-          const l0y = p0.y + (p3.y - p0.y) * s0;
-          const r0x = p1.x + (p2.x - p1.x) * s0;
-          const r0y = p1.y + (p2.y - p1.y) * s0;
-
-          const l1x = p0.x + (p3.x - p0.x) * s1;
-          const l1y = p0.y + (p3.y - p0.y) * s1;
-          const r1x = p1.x + (p2.x - p1.x) * s1;
-          const r1y = p1.y + (p2.y - p1.y) * s1;
-
+      if (tileImg.complete && tileImg.naturalWidth > 0) {
+        ctx.globalAlpha = 0.90;
+        const pattern = ctx.createPattern(tileImg, 'repeat');
+        if (pattern) {
           ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(l0x, l0y);
-          ctx.lineTo(r0x, r0y);
-          ctx.lineTo(r1x, r1y);
-          ctx.lineTo(l1x, l1y);
-          ctx.closePath();
-          ctx.clip();
+          const centerX = (p0.x + p1.x + p2.x + p3.x) / 4;
+          const centerY = (p0.y + p1.y + p2.y + p3.y) / 4;
+          ctx.translate(centerX, centerY);
 
-          if (tileImg.complete && tileImg.naturalWidth > 0) {
-            ctx.globalAlpha = 0.92;
-            const pattern = ctx.createPattern(tileImg, 'repeat');
-            if (pattern) {
-              const smid = (s0 + s1) / 2;
-              const midX = (l0x + r0x + l1x + r1x) / 4;
-              const midY = (l0y + r0y + l1y + r1y) / 4;
+          if (layStyle === 'diagonal') ctx.rotate(Math.PI / 4);
+          if (layStyle === 'herringbone') ctx.rotate(Math.PI / 6);
 
-              // Perspective foreshortening: scale decreases towards horizon (s=1)
-              const depthFactor = (1 - smid) + smid * zRatio;
-              const currentScale = (0.38 * tileScale) / depthFactor;
+          const scaleX = 0.36 * tileScale;
+          const scaleY = (surfaceType === 'FLOOR' ? 0.22 : 0.36) * tileScale;
+          ctx.scale(scaleX, scaleY);
+          ctx.translate(-centerX, -centerY);
 
-              // Continuous world distance V(s)
-              const vWorld = (smid * zRatio) / depthFactor;
-              const vOffset = vWorld * 550 * tileScale;
-
-              ctx.translate(midX, midY);
-              if (layStyle === 'diagonal') ctx.rotate(Math.PI / 4);
-              if (layStyle === 'herringbone') ctx.rotate(Math.PI / 6);
-              if (layStyle === 'bond') {
-                const rowIdx = Math.floor(vOffset / 60);
-                if (rowIdx % 2 === 1) ctx.translate(30 * currentScale, 0);
-              }
-
-              ctx.scale(currentScale, currentScale * 0.88);
-              ctx.translate(-midX, -midY + (vOffset % 256));
-
-              ctx.fillStyle = pattern;
-              ctx.fillRect(-w * 2, -h * 2, w * 5, h * 5);
-            }
-          } else {
-            ctx.fillStyle = 'rgba(212, 175, 55, 0.45)';
-            ctx.fillRect(0, 0, w, h);
-          }
+          ctx.fillStyle = pattern;
+          ctx.fillRect(-w * 2, -h * 2, w * 5, h * 5);
           ctx.restore();
         }
-
-        // Perspective Grout Lines
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.lineTo(p3.x, p3.y);
-        ctx.closePath();
-        ctx.clip();
-
-        ctx.strokeStyle = groutColor || '#d4af37';
-        ctx.globalAlpha = 0.75;
-
-        // Converging Longitudinal lines (fanning from horizon to camera)
-        const cols = Math.max(3, Math.round(roomWidth * 2.2));
-        for (let i = 1; i < cols; i++) {
-          const t = i / cols;
-          const botX = p0.x + (p1.x - p0.x) * t;
-          const botY = p0.y + (p1.y - p0.y) * t;
-          const topX = p3.x + (p2.x - p3.x) * t;
-          const topY = p3.y + (p2.y - p3.y) * t;
-          ctx.lineWidth = 1.6;
-          ctx.beginPath();
-          ctx.moveTo(botX, botY);
-          ctx.lineTo(topX, topY);
-          ctx.stroke();
-        }
-
-        // Perspective Transverse lines (bunched towards horizon)
-        const rows = Math.max(3, Math.round(roomHeight * 2.4));
-        for (let j = 1; j < rows; j++) {
-          const f = j / rows;
-          const s = f / (f + (1 - f) * zRatio);
-          const leftX = p0.x + (p3.x - p0.x) * s;
-          const leftY = p0.y + (p3.y - p0.y) * s;
-          const rightX = p1.x + (p2.x - p1.x) * s;
-          const rightY = p1.y + (p2.y - p1.y) * s;
-
-          ctx.lineWidth = Math.max(0.7, 1.8 * (1 - s * 0.55));
-          ctx.beginPath();
-          ctx.moveTo(leftX, leftY);
-          ctx.lineTo(rightX, rightY);
-          ctx.stroke();
-        }
-        ctx.restore();
-
       } else {
-        // WALL Surface
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.lineTo(p3.x, p3.y);
-        ctx.closePath();
-        ctx.clip();
-
-        if (tileImg.complete && tileImg.naturalWidth > 0) {
-          ctx.globalAlpha = 0.92;
-          const pattern = ctx.createPattern(tileImg, 'repeat');
-          if (pattern) {
-            ctx.save();
-            const centerX = (p0.x + p1.x + p2.x + p3.x) / 4;
-            const centerY = (p0.y + p1.y + p2.y + p3.y) / 4;
-            ctx.translate(centerX, centerY);
-
-            if (layStyle === 'diagonal') ctx.rotate(Math.PI / 4);
-            if (layStyle === 'herringbone') ctx.rotate(Math.PI / 6);
-            if (layStyle === 'bond') {
-              ctx.translate(20, 0);
-            }
-
-            const scaleVal = 0.34 * tileScale;
-            ctx.scale(scaleVal, scaleVal);
-            ctx.translate(-centerX, -centerY);
-
-            ctx.fillStyle = pattern;
-            ctx.fillRect(-w * 2, -h * 2, w * 5, h * 5);
-            ctx.restore();
-          }
-        }
-
-        // Wall Grout
-        ctx.strokeStyle = groutColor || '#d4af37';
-        ctx.lineWidth = 1.4;
-        ctx.globalAlpha = 0.70;
-
-        const cols = Math.max(3, Math.round(roomWidth * 2.2));
-        const rows = Math.max(3, Math.round(roomHeight * 2.2));
-
-        for (let i = 1; i < cols; i++) {
-          const t = i / cols;
-          ctx.beginPath();
-          ctx.moveTo(p0.x + (p1.x - p0.x) * t, p0.y + (p1.y - p0.y) * t);
-          ctx.lineTo(p3.x + (p2.x - p3.x) * t, p3.y + (p2.y - p3.y) * t);
-          ctx.stroke();
-        }
-        for (let j = 1; j < rows; j++) {
-          const t = j / rows;
-          ctx.beginPath();
-          ctx.moveTo(p0.x + (p3.x - p0.x) * t, p0.y + (p3.y - p0.y) * t);
-          ctx.lineTo(p1.x + (p2.x - p1.x) * t, p1.y + (p2.y - p1.y) * t);
-          ctx.stroke();
-        }
-        ctx.restore();
+        ctx.fillStyle = 'rgba(212, 175, 55, 0.45)';
+        ctx.fillRect(0, 0, w, h);
       }
 
       // -------------------------------------------------------------
-      // 3. REALISTIC ROOM LIGHTING & SHADOW PASS (TILESVIEW MULTIPLY)
+      // 3. REALISTIC GROUT GRID LINES
       // -------------------------------------------------------------
-      if (enableRoomLighting && (userPhotoBg || capturedSnapshot || hasLiveVideo)) {
-        ctx.save();
+      ctx.strokeStyle = groutColor || '#d4af37';
+      ctx.lineWidth = 1.8;
+      ctx.globalAlpha = 0.70;
+
+      const cols = Math.max(3, Math.round(roomWidth * 2.2));
+      const rows = Math.max(3, Math.round(roomHeight * 2.2));
+
+      for (let i = 1; i < cols; i++) {
+        const t = i / cols;
+        const botX = p0.x + (p1.x - p0.x) * t;
+        const botY = p0.y + (p1.y - p0.y) * t;
+        const topX = p3.x + (p2.x - p3.x) * t;
+        const topY = p3.y + (p2.y - p3.y) * t;
         ctx.beginPath();
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.lineTo(p3.x, p3.y);
-        ctx.closePath();
-        ctx.clip();
-
-        ctx.globalCompositeOperation = 'multiply';
-        ctx.globalAlpha = shadowIntensity;
-
-        if (hasLiveVideo) {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        } else if (capturedSnapshot && snapshotImg.complete) {
-          ctx.drawImage(snapshotImg, 0, 0, canvas.width, canvas.height);
-        } else if (userPhotoBg && userBgImg.complete) {
-          ctx.drawImage(userBgImg, 0, 0, canvas.width, canvas.height);
-        }
-        ctx.restore();
+        ctx.moveTo(botX, botY);
+        ctx.lineTo(topX, topY);
+        ctx.stroke();
       }
+
+      for (let j = 1; j < rows; j++) {
+        const t = j / rows;
+        const leftX = p0.x + (p3.x - p0.x) * t;
+        const leftY = p0.y + (p3.y - p0.y) * t;
+        const rightX = p1.x + (p2.x - p1.x) * t;
+        const rightY = p1.y + (p2.y - p1.y) * t;
+        ctx.beginPath();
+        ctx.moveTo(leftX, leftY);
+        ctx.lineTo(rightX, rightY);
+        ctx.stroke();
+      }
+      ctx.restore();
 
       // -------------------------------------------------------------
       // 4. ELEGANT GOLD PERIMETER BORDER & SHADOW
@@ -756,7 +560,7 @@ export default function ARRoomScannerModal({
       ctx.strokeStyle = '#d4af37';
       ctx.shadowColor = 'rgba(212, 175, 55, 0.5)';
       ctx.shadowBlur = 10;
-      ctx.lineWidth = 2.0;
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.moveTo(p0.x, p0.y);
       ctx.lineTo(p1.x, p1.y);
@@ -794,10 +598,6 @@ export default function ARRoomScannerModal({
     groutColor,
     tileScale,
     perspectiveTilt,
-    customCorners,
-    enableRoomLighting,
-    shadowIntensity,
-    getDefaultCorners,
     activeTileTexture,
     roomWidth,
     roomHeight,
@@ -1045,17 +845,14 @@ export default function ARRoomScannerModal({
         {/* ================================================================= */}
         {/* TAB 1: INSTANT ROOM VISUALIZER (ODAMDA CANLI GÖR)                 */}
         {/* ================================================================= */}
-        <div 
-          ref={containerRef}
-          style={{
-            flex: 1,
-            position: 'relative',
-            display: activeTab === 'VISUALIZER' ? 'flex' : 'none',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden'
-          }}
-        >
+        <div style={{
+          flex: 1,
+          position: 'relative',
+          display: activeTab === 'VISUALIZER' ? 'flex' : 'none',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden'
+        }}>
           {/* Hidden HTML5 Video Stream */}
           <video ref={videoRef} playsInline muted autoPlay style={{ display: 'none' }} />
 
@@ -1079,75 +876,6 @@ export default function ARRoomScannerModal({
             }}
           />
 
-          {/* TilesView-style 4-Corner Interactive Pin Handles */}
-          {showCornerPins && (customCorners || getDefaultCorners(surfaceType, perspectiveTilt)).map((pt, idx) => {
-            const isDraggingThis = draggingPin === idx;
-            return (
-              <div
-                key={idx}
-                onPointerDown={(e) => handlePointerDown(idx, e)}
-                style={{
-                  position: 'absolute',
-                  left: `${pt.x * 100}%`,
-                  top: `${pt.y * 100}%`,
-                  transform: 'translate(-50%, -50%)',
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: isDraggingThis ? 'grabbing' : 'grab',
-                  zIndex: 22,
-                  touchAction: 'none',
-                  userSelect: 'none'
-                }}
-                title={`${pt.label || `Köşe ${idx + 1}`} - Zemin köşesini hizalamak için sürükleyin`}
-              >
-                {/* Outer Ring */}
-                <div style={{
-                  width: '22px',
-                  height: '22px',
-                  borderRadius: '50%',
-                  background: isDraggingThis ? '#ffffff' : '#d4af37',
-                  border: '3px solid #0f172a',
-                  boxShadow: '0 0 16px rgba(212,175,55,0.95), 0 3px 8px rgba(0,0,0,0.7)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'transform 0.15s ease',
-                  transform: isDraggingThis ? 'scale(1.25)' : 'scale(1)'
-                }}>
-                  <div style={{
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    background: '#0f172a'
-                  }} />
-                </div>
-                {/* Pill label */}
-                <span style={{
-                  position: 'absolute',
-                  top: idx < 2 ? '28px' : '-22px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  background: 'rgba(15, 23, 42, 0.92)',
-                  border: '1px solid rgba(212, 175, 55, 0.5)',
-                  color: '#f8fafc',
-                  fontSize: '0.62rem',
-                  fontWeight: '800',
-                  padding: '2px 7px',
-                  borderRadius: '6px',
-                  whiteSpace: 'nowrap',
-                  pointerEvents: 'none',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.5)'
-                }}>
-                  {pt.label || `Köşe ${idx + 1}`}
-                </span>
-              </div>
-            );
-          })}
-
           {/* Top Floating Control Capsule */}
           <div style={{
             position: 'absolute',
@@ -1160,7 +888,7 @@ export default function ARRoomScannerModal({
             flexWrap: 'wrap',
             justifyContent: 'center',
             width: 'calc(100% - 24px)',
-            maxWidth: '640px'
+            maxWidth: '540px'
           }}>
             {/* Freeze Frame Button */}
             {!capturedSnapshot ? (
@@ -1170,10 +898,10 @@ export default function ARRoomScannerModal({
                   background: 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)',
                   color: '#000',
                   border: 'none',
-                  padding: '7px 14px',
+                  padding: '7px 16px',
                   borderRadius: '20px',
                   fontWeight: '900',
-                  fontSize: '0.75rem',
+                  fontSize: '0.78rem',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -1182,7 +910,7 @@ export default function ARRoomScannerModal({
                 }}
               >
                 <Camera size={15} />
-                <span>📸 Dondur</span>
+                <span>📸 Fotoğrafı Dondur & Odana Döşe</span>
               </button>
             ) : (
               <div style={{ display: 'flex', gap: '6px' }}>
@@ -1192,29 +920,29 @@ export default function ARRoomScannerModal({
                     background: 'rgba(239, 68, 68, 0.9)',
                     color: '#fff',
                     border: 'none',
-                    padding: '7px 12px',
+                    padding: '7px 14px',
                     borderRadius: '20px',
                     fontWeight: '800',
-                    fontSize: '0.72rem',
+                    fontSize: '0.75rem',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '4px'
                   }}
                 >
-                  <RefreshCw size={13} />
-                  <span>Kameraya Dön</span>
+                  <RefreshCw size={14} />
+                  <span>Canlı Kameraya Dön</span>
                 </button>
                 <a
                   href={capturedSnapshot}
-                  download="seramikbak-oda-tasarim.png"
+                  download={`seramikbak-oda-${Date.now()}.png`}
                   style={{
                     background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                     color: '#fff',
-                    padding: '7px 12px',
+                    padding: '7px 14px',
                     borderRadius: '20px',
                     fontWeight: '800',
-                    fontSize: '0.72rem',
+                    fontSize: '0.75rem',
                     textDecoration: 'none',
                     display: 'flex',
                     alignItems: 'center',
@@ -1222,7 +950,7 @@ export default function ARRoomScannerModal({
                     boxShadow: '0 4px 14px rgba(16,185,129,0.4)'
                   }}
                 >
-                  <Download size={13} />
+                  <Download size={14} />
                   <span>İndir</span>
                 </a>
               </div>
@@ -1236,7 +964,7 @@ export default function ARRoomScannerModal({
                 color: '#cbd5e1',
                 border: '1px solid rgba(255,255,255,0.2)',
                 backdropFilter: 'blur(10px)',
-                padding: '7px 12px',
+                padding: '7px 14px',
                 borderRadius: '20px',
                 fontWeight: '700',
                 fontSize: '0.75rem',
@@ -1247,184 +975,9 @@ export default function ARRoomScannerModal({
               }}
             >
               <Upload size={14} />
-              <span>Fotoğraf Yükle</span>
-            </button>
-
-            {/* 4-Corner Pin Toggle */}
-            <button
-              onClick={() => setShowCornerPins(!showCornerPins)}
-              style={{
-                background: showCornerPins ? 'rgba(212, 175, 55, 0.25)' : 'rgba(15, 23, 42, 0.88)',
-                color: showCornerPins ? '#d4af37' : '#cbd5e1',
-                border: showCornerPins ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.2)',
-                backdropFilter: 'blur(10px)',
-                padding: '7px 12px',
-                borderRadius: '20px',
-                fontWeight: '700',
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}
-              title="Zemin köşe tutamaçlarını aç veya kapat"
-            >
-              <Target size={14} />
-              <span>{showCornerPins ? '📍 Köşeleri Gizle' : '📍 4 Köşeyi Ayarla'}</span>
-            </button>
-
-            {/* Reset Corners button if customized */}
-            {customCorners && (
-              <button
-                onClick={() => setCustomCorners(null)}
-                style={{
-                  background: 'rgba(239, 68, 68, 0.2)',
-                  color: '#fca5a5',
-                  border: '1px solid rgba(239, 68, 68, 0.4)',
-                  backdropFilter: 'blur(10px)',
-                  padding: '7px 11px',
-                  borderRadius: '20px',
-                  fontWeight: '700',
-                  fontSize: '0.72rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
-                title="Köşeleri varsayılan perspektife sıfırla"
-              >
-                <RefreshCw size={12} />
-                <span>Sıfırla</span>
-              </button>
-            )}
-
-            {/* Settings Popover Button */}
-            <button
-              onClick={() => setShowSettingsPopover(!showSettingsPopover)}
-              style={{
-                background: showSettingsPopover ? 'linear-gradient(135deg, #d4af37 0%, #b38e47 100%)' : 'rgba(15, 23, 42, 0.88)',
-                color: showSettingsPopover ? '#000' : '#cbd5e1',
-                border: showSettingsPopover ? 'none' : '1px solid rgba(255,255,255,0.2)',
-                backdropFilter: 'blur(10px)',
-                padding: '7px 12px',
-                borderRadius: '20px',
-                fontWeight: '800',
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}
-              title="Perspektif ufku, ölçek ve oda gölge ayarları"
-            >
-              <Sliders size={14} />
-              <span>İnce Ayar</span>
+              <span>Galeriden Fotoğraf Yükle</span>
             </button>
           </div>
-
-          {/* Perspective & Lighting Settings Drawer */}
-          {showSettingsPopover && (
-            <div style={{
-              position: 'absolute',
-              top: '64px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: 26,
-              background: 'rgba(15, 23, 42, 0.95)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(212, 175, 55, 0.4)',
-              borderRadius: '16px',
-              padding: '14px 18px',
-              width: 'calc(100% - 32px)',
-              maxWidth: '380px',
-              boxShadow: '0 16px 36px rgba(0,0,0,0.7)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '8px' }}>
-                <span style={{ fontSize: '0.82rem', fontWeight: '800', color: '#d4af37', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Sliders size={15} />
-                  <span>Perspektif & Işık Ayarları</span>
-                </span>
-                <button
-                  onClick={() => setShowSettingsPopover(false)}
-                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '2px' }}
-                >
-                  <X size={16} />
-                </button>
-              </div>
-
-              {/* Perspective Horizon Tilt Slider */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
-                  <span>Ufuk Açısı (Eğim)</span>
-                  <span style={{ color: '#d4af37' }}>%{perspectiveTilt}</span>
-                </div>
-                <input
-                  type="range"
-                  min="25"
-                  max="80"
-                  step="1"
-                  value={perspectiveTilt}
-                  onChange={(e) => {
-                    setPerspectiveTilt(Number(e.target.value));
-                    if (customCorners) setCustomCorners(null);
-                  }}
-                  style={{ width: '100%', accentColor: '#d4af37', cursor: 'pointer' }}
-                />
-              </div>
-
-              {/* Tile Zoom Scale Slider */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', color: '#cbd5e1', marginBottom: '4px', fontWeight: '600' }}>
-                  <span>Karo Ölçeği</span>
-                  <span style={{ color: '#d4af37' }}>{tileScale.toFixed(1)}x</span>
-                </div>
-                <input
-                  type="range"
-                  min="0.6"
-                  max="1.6"
-                  step="0.1"
-                  value={tileScale}
-                  onChange={(e) => setTileScale(Number(e.target.value))}
-                  style={{ width: '100%', accentColor: '#d4af37', cursor: 'pointer' }}
-                />
-              </div>
-
-              {/* Room Lighting / Shadow Preservation Toggle */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.74rem', color: '#cbd5e1', fontWeight: '600' }}>
-                    💡 Gerçekçi Oda Işığı & Gölgeleri
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={enableRoomLighting}
-                    onChange={(e) => setEnableRoomLighting(e.target.checked)}
-                    style={{ width: '16px', height: '16px', accentColor: '#d4af37', cursor: 'pointer' }}
-                  />
-                </div>
-                {enableRoomLighting && (
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#94a3b8', marginBottom: '2px' }}>
-                      <span>Gölge Yoğunluğu</span>
-                      <span style={{ color: '#d4af37' }}>%{Math.round(shadowIntensity * 100)}</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="0.15"
-                      max="0.80"
-                      step="0.05"
-                      value={shadowIntensity}
-                      onChange={(e) => setShadowIntensity(Number(e.target.value))}
-                      style={{ width: '100%', accentColor: '#d4af37', cursor: 'pointer' }}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Camera Permission / Fallback Information Banner */}
           {cameraError && !userPhotoBg && (
@@ -1540,7 +1093,6 @@ export default function ARRoomScannerModal({
               <div style={{ display: 'flex', gap: '4px' }}>
                 {[
                   { id: 'straight', label: 'Düz' },
-                  { id: 'bond', label: 'Şaşırtmalı' },
                   { id: 'diagonal', label: 'Çapraz' },
                   { id: 'herringbone', label: 'Balıksırtı' }
                 ].map((s) => (

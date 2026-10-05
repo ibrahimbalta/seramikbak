@@ -60,29 +60,32 @@ export default function ProductCard({
           <HeartIcon size={16} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
         </button>
 
-        {/* Quick Action 3-Button Strip (3D, AR, Bayi - Guaranteed to Fit) */}
+        {/* Quick Action 3-Button Strip (3D Gör, Tam Ekran Stüdyo, Bayi) */}
         <div className="card-quick-actions-row">
           <button 
             type="button"
             onClick={(e) => { e.stopPropagation(); navigateTo3DStudio(product); }}
             className="card-action-btn-new btn-action-3d"
-            title="3D Mekan"
+            title="Seçili seramiği 3D mekana giydir"
           >
-            3D
+            ✨ 3D Gör
           </button>
-          <button 
-            type="button"
-            onClick={(e) => { e.stopPropagation(); onOpenAR ? onOpenAR(product) : navigateTo3DStudio(product); }}
-            className="card-action-btn-new btn-action-ar"
-            title="Odamda Canlı Gör (Kamera / AR)"
+          <a 
+            href={`/tasarim?product=${encodeURIComponent(product.id || product.code || '')}&brand=${encodeURIComponent(product.brand?.slug || '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="card-action-btn-new btn-action-studio"
+            title="Tam Ekran 3D Tasarım Stüdyosunda Aç"
+            style={{ textDecoration: 'none' }}
           >
-            📷 Odanda Gör
-          </button>
+            🚀 Stüdyo
+          </a>
           <button 
             type="button"
             onClick={(e) => { e.stopPropagation(); navigateToDealers(product); }}
             className="card-action-btn-new btn-action-dealer"
-            title="Yetkili Bayi"
+            title="Yetkili Bayiler & Fiyat"
           >
             Bayi
           </button>
