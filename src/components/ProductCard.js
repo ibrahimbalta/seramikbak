@@ -74,9 +74,9 @@ export default function ProductCard({
             type="button"
             onClick={(e) => { e.stopPropagation(); onOpenAR ? onOpenAR(product) : navigateTo3DStudio(product); }}
             className="card-action-btn-new btn-action-ar"
-            title="AR ile Gör"
+            title="Odamda Canlı Gör (Kamera / AR)"
           >
-            📷 AR
+            📷 Odanda Gör
           </button>
           <button 
             type="button"

@@ -4550,10 +4550,10 @@ export default function Home() {
                   <button 
                     onClick={() => handleOpenWebAR()} 
                     className="hero-feature-btn emerald-theme"
-                    title="Kamera İle Seramiği Odanda Canlı Gör"
+                    title="Kamera ile Seramiği Kendi Odanda Canlı Gör"
                   >
                     <Smartphone size={15} />
-                    <span>Web-AR ile Odanda Gör</span>
+                    <span>📱 Odamda Canlı Gör</span>
                   </button>
                 </div>
               </div>
