@@ -16,8 +16,7 @@ export default function ProductCard({
   navigateToDealers,
   getProductBadge,
   handleProductCardClick,
-  onOpenAR,
-  onOpenStudioModal
+  onOpenAR
 }) {
   const { t, translateFinish, translateStyle } = useLanguage();
   const hasAd = product.campaigns && product.campaigns.length > 0;
@@ -61,7 +60,7 @@ export default function ProductCard({
           <HeartIcon size={16} fill={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'none'} stroke={isProductFavorited(product.id) ? 'var(--accent-gold)' : 'currentColor'} />
         </button>
 
-        {/* Quick Action 3-Button Strip (3D, Stüdyo, Bayi) */}
+        {/* Quick Action Buttons (3D, Bayi) */}
         <div className="card-quick-actions-row">
           <button 
             type="button"
@@ -70,17 +69,6 @@ export default function ProductCard({
             title="3D Sanal Mekanda Gör"
           >
             3D
-          </button>
-          <button 
-            type="button"
-            onClick={(e) => { 
-              e.stopPropagation(); 
-              if (onOpenStudioModal) onOpenStudioModal(product); 
-            }}
-            className="card-action-btn-new btn-action-studio"
-            title="AI Mimari Mekanda Canlı Gör"
-          >
-            Stüdyo
           </button>
           <button 
             type="button"
