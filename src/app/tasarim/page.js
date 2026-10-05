@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { slugify } from '@/lib/slugify';
 import { 
   Sparkles, 
   Layers, 
@@ -57,17 +58,68 @@ const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), {
   )
 });
 
-// Built-in Brand Catalogs Fallback
-const DEFAULT_BRAND_CATALOG = [
-  { id: 'gur-1', name: 'Güral White Silver Full Lappato', code: 'GUR-SILV-60120', width: 60, height: 120, style: 'Mermer', finish: 'Full Lappato', color: 'Beyaz / Gümüş', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg' },
-  { id: 'gur-2', name: 'Güral West Wood Mat Teak', code: 'GUR-WOOD-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat', color: 'Teak', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/teak_ahsap.jpg', textureUrl: '/textures/teak_ahsap.jpg' },
-  { id: 'gur-3', name: 'Güral West Wood Mat Kayın', code: 'GUR-KAYIN-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat', color: 'Doğal Meşe', brand: { id: 'gural', name: 'Güral Seramik' }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg' },
-  { id: 'kal-1', name: 'Kalebodur Calacatta Gold Porselen', code: 'KAL-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Parlak Rektifiye', color: 'Beyaz / Altın', brand: { id: 'kalebodur', name: 'Kalebodur' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg' },
-  { id: 'kal-2', name: 'Kalebodur Nero Marquina Siyah', code: 'KAL-NERO-60120', width: 60, height: 120, style: 'Mermer', finish: 'Lüks Parlak', color: 'Siyah', brand: { id: 'kalebodur', name: 'Kalebodur' }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg' },
-  { id: 'vit-1', name: 'VitrA Marbleous Calacatta Porselen', code: 'VIT-CAL-60120', width: 60, height: 120, style: 'Mermer', finish: 'Mat Rektifiye', color: 'Beyaz / Gold', brand: { id: 'vitra', name: 'VitrA' }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg' },
-  { id: 'vit-2', name: 'VitrA Cementmix Gri Beton Karo', code: 'VIT-CEM-6060', width: 60, height: 60, style: 'Beton', finish: 'Lapatto', color: 'Açık Gri', brand: { id: 'vitra', name: 'VitrA' }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg' },
-  { id: 'bie-1', name: 'Bien Nordic Meşe Ahşap Karo', code: 'BIE-OAK-20120', width: 20, height: 120, style: 'Ahşap', finish: 'Mat Ahşap', color: 'Doğal Meşe', brand: { id: 'bien', name: 'Bien Seramik' }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg' }
+// Neutral high-resolution tile textures for 3D PBR rendering
+const NEUTRAL_TEXTURES = [
+  '/textures/calacatta_gold.jpg',
+  '/textures/natural_oak.jpg',
+  '/textures/concrete_light_grey.jpg',
+  '/textures/albatros_antrasit.jpg'
 ];
+
+const BRAND_NAME_DICTIONARY = {
+  'bien-seramik': 'Bien Seramik',
+  'bien': 'Bien Seramik',
+  'vitra': 'VitrA',
+  'kalebodur': 'Kalebodur',
+  'kale': 'Kalebodur',
+  'ng-kutahya-seramik': 'NG Kütahya Seramik',
+  'ng-kutahya': 'NG Kütahya Seramik',
+  'kutahya': 'NG Kütahya Seramik',
+  'canakkale-seramik': 'Çanakkale Seramik',
+  'canakkale': 'Çanakkale Seramik',
+  'gural-seramik': 'Güral Seramik',
+  'gural': 'Güral Seramik',
+  'ege-seramik': 'Ege Seramik',
+  'ege': 'Ege Seramik',
+  'seramiksan': 'Seramiksan',
+  'yurtbay-seramik': 'Yurtbay Seramik',
+  'yurtbay': 'Yurtbay Seramik',
+  'duratiles': 'DuraTiles',
+  'qua-granite': 'Qua Granite',
+  'qua': 'Qua Granite',
+  'seranit': 'Seranit',
+  'graniser': 'Graniser',
+  'hitit-seramik': 'Hitit Seramik',
+  'hitit': 'Hitit Seramik',
+  'usak-seramik': 'Uşak Seramik',
+  'usak': 'Uşak Seramik',
+  'termal-seramik': 'Termal Seramik',
+  'termal': 'Termal Seramik',
+  'decovita': 'Decovita'
+};
+
+function resolveBrandName(slug) {
+  if (!slug) return 'Seramik';
+  const clean = slug.toLowerCase().trim();
+  if (BRAND_NAME_DICTIONARY[clean]) return BRAND_NAME_DICTIONARY[clean];
+  return clean
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+function generateBrandFallbacks(brand) {
+  const bName = brand?.name || 'Seramik';
+  const bId = brand?.id || brand?.slug || 'brand';
+  const cleanPrefix = (brand?.slug || bName).replace(/[^a-zA-Z0-9]/g, '').slice(0, 3).toUpperCase() || 'SRM';
+  return [
+    { id: `${bId}-f1`, name: `${bName} Calacatta Gold Porselen`, code: `${cleanPrefix}-CAL-60120`, width: 60, height: 120, style: 'Mermer', finish: 'Parlak Rektifiye', color: 'Beyaz / Gold', brand: { id: bId, name: bName }, imageUrl: '/textures/calacatta_gold.jpg', textureUrl: '/textures/calacatta_gold.jpg' },
+    { id: `${bId}-f2`, name: `${bName} Doğal Meşe Parke Porselen`, code: `${cleanPrefix}-OAK-20120`, width: 20, height: 120, style: 'Ahşap', finish: 'Mat Rektifiye', color: 'Doğal Meşe', brand: { id: bId, name: bName }, imageUrl: '/textures/natural_oak.jpg', textureUrl: '/textures/natural_oak.jpg' },
+    { id: `${bId}-f3`, name: `${bName} Urban Beton Gri Zemin`, code: `${cleanPrefix}-BET-6060`, width: 60, height: 60, style: 'Beton', finish: 'Mat', color: 'Açık Gri', brand: { id: bId, name: bName }, imageUrl: '/textures/concrete_light_grey.jpg', textureUrl: '/textures/concrete_light_grey.jpg' },
+    { id: `${bId}-f4`, name: `${bName} Nero Antrasit Lüks Mermer`, code: `${cleanPrefix}-NER-60120`, width: 60, height: 120, style: 'Mermer', finish: 'Full Lappato', color: 'Siyah / Antrasit', brand: { id: bId, name: bName }, imageUrl: '/textures/albatros_antrasit.jpg', textureUrl: '/textures/albatros_antrasit.jpg' }
+  ];
+}
 
 const PANEL_BG_PRESETS = [
   { id: 'obsidian', label: 'Gece Mavisi', color: '#0b1120' },
@@ -81,11 +133,36 @@ const PANEL_BG_PRESETS = [
 
 export default function BrandConsumerStudioPage() {
   const [mounted, setMounted] = useState(false);
-  const [brandInfo, setBrandInfo] = useState({
-    id: '',
-    name: 'Güral Seramik',
-    slug: 'gural-seramik',
-    logoUrl: ''
+  const [brandInfo, setBrandInfo] = useState(() => {
+    let initialBrandName = 'Bien Seramik';
+    let initialSlug = 'bien-seramik';
+
+    if (typeof window !== 'undefined') {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const qBrand = urlParams.get('brand') || urlParams.get('brandSlug') || urlParams.get('brandId');
+        if (qBrand) {
+          initialSlug = qBrand;
+          initialBrandName = resolveBrandName(qBrand);
+        } else {
+          const saved = localStorage.getItem('sb_brand_session');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed?.name) {
+              initialBrandName = parsed.name;
+              initialSlug = parsed.slug || (parsed.name ? slugify(parsed.name) : 'bien-seramik');
+            }
+          }
+        }
+      } catch {}
+    }
+
+    return {
+      id: '',
+      name: initialBrandName,
+      slug: initialSlug,
+      logoUrl: ''
+    };
   });
   const [logoError, setLogoError] = useState(false);
   const [themeColor, setThemeColor] = useState('#d4af37');
@@ -120,11 +197,12 @@ export default function BrandConsumerStudioPage() {
   const [timeOfDay, setTimeOfDay] = useState('day'); // 'day' | 'sunset' | 'night'
   const [layPattern, setLayPattern] = useState('flat'); // 'flat' | 'diagonal' | 'herringbone'
 
-  // Products & Surface Application
-  const [products, setProducts] = useState(DEFAULT_BRAND_CATALOG);
-  const [selectedProduct, setSelectedProduct] = useState(DEFAULT_BRAND_CATALOG[0]);
-  const [floorProduct, setFloorProduct] = useState(DEFAULT_BRAND_CATALOG[0]);
-  const [wallProduct, setWallProduct] = useState(DEFAULT_BRAND_CATALOG[0]);
+  // Products & Surface Application (Initialized cleanly with active brand fallbacks)
+  const initialFallbacks = React.useMemo(() => generateBrandFallbacks(brandInfo), []);
+  const [products, setProducts] = useState(initialFallbacks);
+  const [selectedProduct, setSelectedProduct] = useState(initialFallbacks[0]);
+  const [floorProduct, setFloorProduct] = useState(initialFallbacks[0]);
+  const [wallProduct, setWallProduct] = useState(initialFallbacks[0]);
   const [stripeWallProduct, setStripeWallProduct] = useState(null);
   const [activeTargetSurface, setActiveTargetSurface] = useState('both'); // 'floor' | 'walls' | 'both'
   const [applyFloor, setApplyFloor] = useState(true);
@@ -201,16 +279,30 @@ export default function BrandConsumerStudioPage() {
       }
     }
 
-    // Load Brand Metadata and ALL Products from DB (e.g. 320+ products for Güral)
+    // Load Brand Metadata and ALL Products from DB
     async function initBrandData() {
       setIsLoadingProducts(true);
-      const targetBrandSlug = queryBrand || 'gural-seramik';
+
+      // 1. Resolve target brand slug from URL or localStorage
+      let targetBrandSlug = queryBrand;
+      if (!targetBrandSlug && typeof window !== 'undefined') {
+        try {
+          const session = localStorage.getItem('sb_brand_session');
+          if (session) {
+            const parsed = JSON.parse(session);
+            targetBrandSlug = parsed.slug || (parsed.name ? slugify(parsed.name) : null);
+          }
+        } catch {}
+      }
+      if (!targetBrandSlug) {
+        targetBrandSlug = 'bien-seramik';
+      }
 
       try {
         // Parallel fetch for brand profile and products
         const [brandRes, prodRes] = await Promise.all([
           fetch('/api/brands').then(r => r.json()).catch(() => null),
-          fetch(`/api/products?brandId=${encodeURIComponent(targetBrandSlug)}&limit=450`).then(r => r.json()).catch(() => null)
+          fetch(`/api/products?brandId=${encodeURIComponent(targetBrandSlug)}&limit=500`).then(r => r.json()).catch(() => null)
         ]);
 
         let matchedBrand = null;
@@ -230,16 +322,27 @@ export default function BrandConsumerStudioPage() {
               normTarget.includes(normSlug)
             );
           });
+        }
 
-          if (matchedBrand) {
-            setBrandInfo({
-              id: matchedBrand.id,
-              name: matchedBrand.name,
-              slug: matchedBrand.slug || targetBrandSlug,
-              logoUrl: matchedBrand.logoUrl || ''
-            });
-            setLogoError(false);
-          }
+        if (!matchedBrand) {
+          matchedBrand = {
+            id: targetBrandSlug,
+            name: resolveBrandName(targetBrandSlug),
+            slug: targetBrandSlug,
+            logoUrl: ''
+          };
+        }
+
+        setBrandInfo({
+          id: matchedBrand.id,
+          name: matchedBrand.name,
+          slug: matchedBrand.slug || targetBrandSlug,
+          logoUrl: matchedBrand.logoUrl || ''
+        });
+        setLogoError(false);
+
+        if (typeof document !== 'undefined') {
+          document.title = `${matchedBrand.name} - 3D Mimari Mekan & Tasarım Stüdyosu | SeramikBak`;
         }
 
         let loadedProducts = [];
@@ -247,65 +350,75 @@ export default function BrandConsumerStudioPage() {
         // Check first API response
         if (prodRes && prodRes.products && prodRes.products.length > 0) {
           loadedProducts = prodRes.products;
-        } else if (matchedBrand?.id) {
-          // Retry with matched brand ID if slug query returned empty
-          const retryRes = await fetch(`/api/products?brandId=${matchedBrand.id}&limit=450`).then(r => r.json()).catch(() => null);
+        } else if (matchedBrand?.id && matchedBrand.id !== targetBrandSlug) {
+          // Retry with matched brand UUID if slug query returned empty
+          const retryRes = await fetch(`/api/products?brandId=${encodeURIComponent(matchedBrand.id)}&limit=500`).then(r => r.json()).catch(() => null);
           if (retryRes && retryRes.products && retryRes.products.length > 0) {
             loadedProducts = retryRes.products;
           }
         }
 
-        if (loadedProducts.length > 0) {
-          const sanitized = loadedProducts.map((p, idx) => {
-            let tex = p.textureUrl || p.imageUrl;
-            let img = p.imageUrl || tex;
-            if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
-              tex = DEFAULT_BRAND_CATALOG[idx % DEFAULT_BRAND_CATALOG.length].textureUrl;
-            }
-            if (!img) img = tex;
-            return {
-              ...p,
-              imageUrl: img,
-              textureUrl: tex
-            };
-          });
+        // Strict brand isolation: reject any product belonging to another brand
+        const strictlyBrandProducts = loadedProducts.filter(p => {
+          if (p.brandId && matchedBrand.id && p.brandId === matchedBrand.id) return true;
+          if (p.brand?.id && matchedBrand.id && p.brand.id === matchedBrand.id) return true;
+          if (p.brand?.name && matchedBrand.name && p.brand.name.toLowerCase() === matchedBrand.name.toLowerCase()) return true;
+          return false;
+        });
 
-          setProducts(sanitized);
+        const activeCatalog = strictlyBrandProducts.length > 0
+          ? strictlyBrandProducts
+          : (loadedProducts.length > 0 ? loadedProducts : generateBrandFallbacks(matchedBrand));
 
-          // Find target or initial product
-          let initial = sanitized[0];
-          if (queryProduct) {
-            const match = sanitized.find(p => 
-              String(p.id) === queryProduct || 
-              p.code?.toLowerCase() === queryProduct.toLowerCase() ||
-              p.name?.toLowerCase().includes(queryProduct.toLowerCase())
-            );
-            if (match) initial = match;
+        const sanitized = activeCatalog.map((p, idx) => {
+          let tex = p.textureUrl || p.imageUrl;
+          let img = p.imageUrl || tex;
+          if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
+            tex = NEUTRAL_TEXTURES[idx % NEUTRAL_TEXTURES.length];
           }
+          if (!img) img = tex;
+          return {
+            ...p,
+            imageUrl: img,
+            textureUrl: tex,
+            brand: p.brand || { id: matchedBrand.id, name: matchedBrand.name }
+          };
+        });
 
-          setSelectedProduct(initial);
-          setFloorProduct(initial);
-          setWallProduct(initial);
-          setIsLoadingProducts(false);
-          return;
+        setProducts(sanitized);
+
+        // Find target or initial product
+        let initial = sanitized[0];
+        if (queryProduct) {
+          const match = sanitized.find(p => 
+            String(p.id) === queryProduct || 
+            p.code?.toLowerCase() === queryProduct.toLowerCase() ||
+            p.name?.toLowerCase().includes(queryProduct.toLowerCase())
+          );
+          if (match) initial = match;
         }
+
+        setSelectedProduct(initial);
+        setFloorProduct(initial);
+        setWallProduct(initial);
+        setIsLoadingProducts(false);
+        return;
       } catch (e) {
         console.warn('Brand metadata & products fetch error:', e);
       }
 
-      // Fallback matching in local catalog if API returns nothing
-      const bLower = targetBrandSlug.toLowerCase();
-      const localMatches = DEFAULT_BRAND_CATALOG.filter(p =>
-        p.brand?.id?.toLowerCase().includes(bLower) ||
-        p.brand?.name?.toLowerCase().includes(bLower) ||
-        bLower.includes(p.brand?.id?.toLowerCase())
-      );
-      if (localMatches.length > 0) {
-        setProducts(localMatches);
-        setSelectedProduct(localMatches[0]);
-        setFloorProduct(localMatches[0]);
-        setWallProduct(localMatches[0]);
-      }
+      // Fallback matching using dynamic brand generator if network failed completely
+      const fallbackBrand = {
+        id: targetBrandSlug,
+        name: resolveBrandName(targetBrandSlug),
+        slug: targetBrandSlug,
+        logoUrl: ''
+      };
+      const localMatches = generateBrandFallbacks(fallbackBrand);
+      setProducts(localMatches);
+      setSelectedProduct(localMatches[0]);
+      setFloorProduct(localMatches[0]);
+      setWallProduct(localMatches[0]);
       setIsLoadingProducts(false);
     }
 
@@ -1120,7 +1233,7 @@ export default function BrandConsumerStudioPage() {
                   fontSize: isMobile ? '0.78rem' : '0.88rem',
                   fontFamily: 'var(--font-title, sans-serif)'
                 }}>
-                  {brandInfo.name ? brandInfo.name.charAt(0).toUpperCase() : 'G'}
+                  {brandInfo.name ? brandInfo.name.charAt(0).toUpperCase() : 'S'}
                 </div>
               )}
             </div>

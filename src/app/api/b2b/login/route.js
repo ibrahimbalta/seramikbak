@@ -45,6 +45,7 @@ export async function POST(request) {
       brand: {
         id: brand.id,
         name: brand.name,
+        slug: brand.slug,
         logoUrl: brand.logoUrl
       },
       token

@@ -8,7 +8,9 @@ import {
 } from 'lucide-react';
 
 export default function BrandHealthTab({ brandInfo }) {
-  const brandName = brandInfo?.name || 'Güral Seramik';
+  const brandName = brandInfo?.name || (typeof window !== 'undefined' ? (() => {
+    try { return JSON.parse(localStorage.getItem('sb_brand_session') || '{}')?.name || 'Markanız'; } catch { return 'Markanız'; }
+  })() : 'Markanız');
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [healthData, setHealthData] = useState(null);
   const [loading, setLoading] = useState(true);

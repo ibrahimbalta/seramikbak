@@ -10,8 +10,31 @@ import {
 import { slugify } from '@/lib/slugify';
 
 export default function EmbedStudioTab({ brandInfo }) {
-  const brandName = brandInfo?.name || 'Güral Seramik';
-  const brandSlug = brandInfo?.slug || slugify(brandName);
+  // Read from prop or fallback to localStorage session immediately
+  const [activeBrand, setActiveBrand] = useState(() => {
+    if (brandInfo?.name) return brandInfo;
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('sb_brand_session');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return null;
+  });
+
+  React.useEffect(() => {
+    if (brandInfo?.name) {
+      setActiveBrand(brandInfo);
+    } else if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('sb_brand_session');
+        if (saved) setActiveBrand(JSON.parse(saved));
+      } catch {}
+    }
+  }, [brandInfo]);
+
+  const brandName = activeBrand?.name || brandInfo?.name || 'Markanız';
+  const brandSlug = activeBrand?.slug || brandInfo?.slug || (brandName !== 'Markanız' ? slugify(brandName) : '');
 
   const [themeColor, setThemeColor] = useState('#d4af37');
   const [panelBg, setPanelBg] = useState('#0b1120');
@@ -411,6 +434,12 @@ Web sitenizin ana menüsüne "3D Mekan Tasarla" linki olarak ekleyebilir veya sh
             href={kioskUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => {
+              const curSlug = activeBrand?.slug || brandInfo?.slug || (brandName && brandName !== 'Markanız' ? slugify(brandName) : '');
+              if (curSlug) {
+                e.currentTarget.href = `${baseUrl}/tasarim?brand=${encodeURIComponent(curSlug)}&scene=${encodeURIComponent(defaultScene)}&theme=${encodeURIComponent(themeColor)}${panelBg && panelBg !== '#0b1120' ? `&bg=${encodeURIComponent(panelBg.replace('#', ''))}` : ''}`;
+              }
+            }}
             style={{
               padding: '12px 20px',
               borderRadius: '12px',
