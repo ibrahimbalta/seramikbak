@@ -29,7 +29,7 @@ const PRESET_SAMPLE_ROOMS = [
     id: 'modern_living',
     title: 'Açık Konsept Salon',
     subtitle: 'Geniş zemin & doğal ışık',
-    url: '/hero/hero_ceramics.jpg',
+    url: '/hero/modern_living.png',
     type: 'salon'
   }
 ];
@@ -150,7 +150,7 @@ export default function NeuralRenovationModal({
   };
   const [currentTile, setCurrentTile] = useState(initialTile);
 
-  const [targetSurface, setTargetSurface] = useState('floor'); // 'floor' | 'walls' | 'both'
+  const [targetSurface, setTargetSurface] = useState('both'); // 'floor' | 'walls' | 'both'
   const [tileRotation, setTileRotation] = useState(0); // 0 or 90
   const [tileScale, setTileScale] = useState(1.0);
   const [groutColor, setGroutColor] = useState('rgba(148, 163, 184, 0.45)'); // subtle grey/white
@@ -502,43 +502,57 @@ export default function NeuralRenovationModal({
           ],
           vanishingPoint: [50, 48],
           obstacles: [
-            { type: 'bathtub', surface: 'floor', polygon: [[14, 64], [35, 65], [36, 89], [22, 92], [14, 78]] },
-            { type: 'side_table', surface: 'floor', polygon: [[18, 80], [26, 80], [26, 96], [18, 96]] },
-            { type: 'vanity', surface: 'both', polygon: [[34, 60], [53, 60], [53, 73], [34, 73]] },
-            { type: 'mirror', surface: 'walls', polygon: [[29, 39], [46, 39], [46, 60], [29, 60]] },
-            { type: 'window', surface: 'walls', polygon: [[0, 18], [24, 18], [24, 72], [0, 72]] }
+            { type: 'bathtub', surface: 'floor', polygon: [[14, 62], [50, 62], [50, 77], [14, 77]] },
+            { type: 'side_table', surface: 'floor', polygon: [[18, 78], [28, 78], [28, 96], [18, 96]] },
+            { type: 'vanity', surface: 'both', polygon: [[31, 57], [55, 57], [55, 75], [31, 75]] },
+            { type: 'mirror', surface: 'walls', polygon: [[28, 38], [47, 38], [47, 60], [28, 60]] },
+            { type: 'window', surface: 'walls', polygon: [[0, 15], [14, 15], [14, 70], [0, 70]] }
           ]
         };
 
         // Sub-function: Draw true OpenCV Homography Perspective Tiled Surface
-        const drawSurface = (quadCorners) => {
+        const drawSurface = (quadCorners, isFloor = false) => {
           if (!Array.isArray(quadCorners) || quadCorners.length < 4) return;
           const p0 = [quadCorners[0][0] / 100 * w, quadCorners[0][1] / 100 * h]; // TL
           const p1 = [quadCorners[1][0] / 100 * w, quadCorners[1][1] / 100 * h]; // TR
           const p2 = [quadCorners[2][0] / 100 * w, quadCorners[2][1] / 100 * h]; // BR
           const p3 = [quadCorners[3][0] / 100 * w, quadCorners[3][1] / 100 * h]; // BL
 
-          // 1. Create a large, high-res 2400x2400 flat pattern of the REAL catalog tile with grout lines
+          const minX = Math.min(p0[0], p1[0], p2[0], p3[0]);
+          const maxX = Math.max(p0[0], p1[0], p2[0], p3[0]);
+          const minY = Math.min(p0[1], p1[1], p2[1], p3[1]);
+          const maxY = Math.max(p0[1], p1[1], p2[1], p3[1]);
+          const quadW = Math.max(100, maxX - minX);
+          const quadH = Math.max(100, maxY - minY);
+
+          // 1. Real-World Architectural Physical Slab Scale (approx 2 slabs high on walls, 3 on floor)
+          const isRotated = tileRotation === 90;
+          const tileAspect = (currentTile.width || 60) / (currentTile.height || 120);
+          const effectiveAspect = isRotated ? (1 / tileAspect) : tileAspect;
+
+          const numSlabsY = isFloor ? 3.2 : 2.0;
+          const slabH = Math.max(60, Math.round((quadH / numSlabsY) * (tileScale || 1.0)));
+          const slabW = Math.max(30, Math.round(slabH * effectiveAspect));
+
+          const repeatX = Math.max(2, Math.ceil(quadW / slabW) + 1);
+          const repeatY = Math.max(2, Math.ceil(quadH / slabH) + 1);
+          const gridW = repeatX * slabW;
+          const gridH = repeatY * slabH;
+
           const patCanvas = document.createElement('canvas');
-          const gridW = 2400, gridH = 2400;
           patCanvas.width = gridW;
           patCanvas.height = gridH;
           const patCtx = patCanvas.getContext('2d');
 
-          const isRotated = tileRotation === 90;
-          const aspect = (currentTile.width || 60) / (currentTile.height || 120);
-          const tileW = Math.max(20, Math.round(140 * tileScale * (isRotated ? (1 / aspect) : 1)));
-          const tileH = Math.max(20, Math.round(140 * tileScale * (isRotated ? aspect : (1 / aspect))));
-
-          // Single tile stamp with grout border
+          // Single large porcelain slab stamp with crisp realistic grout
           const stamp = document.createElement('canvas');
-          stamp.width = tileW;
-          stamp.height = tileH;
+          stamp.width = slabW;
+          stamp.height = slabH;
           const sCtx = stamp.getContext('2d');
-          sCtx.drawImage(tileImg, 0, 0, tileW, tileH);
+          sCtx.drawImage(tileImg, 0, 0, slabW, slabH);
           sCtx.strokeStyle = groutColor;
-          sCtx.lineWidth = Math.max(1, groutWidth * 2);
-          sCtx.strokeRect(0, 0, tileW, tileH);
+          sCtx.lineWidth = Math.max(1, groutWidth);
+          sCtx.strokeRect(0, 0, slabW, slabH);
 
           const pattern = patCtx.createPattern(stamp, 'repeat');
           if (pattern) {
@@ -548,7 +562,6 @@ export default function NeuralRenovationModal({
 
           // 2. Warp the flat pattern onto the 4 corners using homography bilinear subdivision
           renoCtx.save();
-          // Clip to the quad polygon first
           renoCtx.beginPath();
           renoCtx.moveTo(p0[0], p0[1]);
           renoCtx.lineTo(p1[0], p1[1]);
@@ -559,10 +572,25 @@ export default function NeuralRenovationModal({
 
           warpQuadToCanvas(renoCtx, patCanvas, p0, p1, p2, p3, 16);
 
-          // 3. Ambient Shadow & Contact Lighting Preservation (Multiply Blend)
+          // 3. Ambient Lighting & Lappato Specular Gloss (Soft-Light + Multiply + Screen)
+          // Soft-Light preserves vibrant ceramic colors without turning blues into muddy dark grey
+          renoCtx.save();
+          renoCtx.globalCompositeOperation = 'soft-light';
+          renoCtx.globalAlpha = 0.65;
+          renoCtx.drawImage(baseImg, 0, 0, w, h);
+          renoCtx.restore();
+
+          // Subtle contact shadow depth
           renoCtx.save();
           renoCtx.globalCompositeOperation = 'multiply';
-          renoCtx.globalAlpha = 0.52;
+          renoCtx.globalAlpha = 0.20;
+          renoCtx.drawImage(baseImg, 0, 0, w, h);
+          renoCtx.restore();
+
+          // Specular Lappato gloss (window light reflections)
+          renoCtx.save();
+          renoCtx.globalCompositeOperation = 'screen';
+          renoCtx.globalAlpha = 0.22;
           renoCtx.drawImage(baseImg, 0, 0, w, h);
           renoCtx.restore();
 
@@ -683,8 +711,8 @@ export default function NeuralRenovationModal({
           tile_image: currentTile?.textureUrl || currentTile?.imageUrl || '/textures/calacatta_gold.jpg',
           dst_corners: corners,
           obstacles: analysisResult?.obstacles || [],
-          tile_w_px: Math.round(140 * tileScale),
-          tile_h_px: Math.round(280 * tileScale),
+          tile_w_px: Math.round(320 * tileScale),
+          tile_h_px: Math.round(640 * tileScale),
           grout_size: groutWidth,
           grout_color: [200, 200, 200]
         })

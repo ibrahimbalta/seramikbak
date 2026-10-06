@@ -37,6 +37,10 @@ def create_tiled_texture(tile_img, target_width, target_height, tile_w_px=140, t
 def decode_image(img_input):
     if not img_input:
         return None
+    if "url=" in img_input:
+        import urllib.parse
+        parsed_url = urllib.parse.unquote(img_input.split("url=")[1].split("&")[0])
+        return decode_image(parsed_url)
     if img_input.startswith("data:"):
         # Base64 data URI
         base64_data = img_input.split("base64,")[1]
@@ -46,7 +50,7 @@ def decode_image(img_input):
     elif img_input.startswith("http://") or img_input.startswith("https://"):
         try:
             req = urllib.request.Request(img_input, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(req, timeout=6) as resp:
+            with urllib.request.urlopen(req, timeout=8) as resp:
                 arr = np.asarray(bytearray(resp.read()), dtype=np.uint8)
                 return cv2.imdecode(arr, cv2.IMREAD_COLOR)
         except Exception as e:
@@ -65,29 +69,45 @@ def apply_tiles_to_room(
     tile_img,
     dst_corners,
     obstacles=None,
-    tile_size_px=(140, 280),
+    tile_size_px=(320, 640),
     grout_color=(210, 210, 210),
     grout_size=2
 ):
     h_room, w_room = room_img.shape[:2]
-
-    # 1. 2D Seramik Dokusunu Üret
-    tex_w, tex_h = 2400, 2400
-    flat_pattern = create_tiled_texture(
-        tile_img,
-        tex_w,
-        tex_h,
-        tile_w_px=tile_size_px[0],
-        tile_h_px=tile_size_px[1],
-        grout_px=grout_size,
-        grout_color=grout_color
-    )
 
     # Convert dst_corners from percentage (0-100) to absolute pixels if needed
     corners = np.array(dst_corners, dtype=np.float32)
     if np.max(corners) <= 100.0:
         corners[:, 0] = corners[:, 0] / 100.0 * w_room
         corners[:, 1] = corners[:, 1] / 100.0 * h_room
+
+    # Calculate real-world physical quad dimensions
+    x_min, y_min = np.min(corners, axis=0)
+    x_max, y_max = np.max(corners, axis=0)
+    quad_w = max(100.0, float(x_max - x_min))
+    quad_h = max(100.0, float(y_max - y_min))
+
+    # Real-world physical slab scale:
+    # A 60x120 cm slab: ~2 slabs high from floor to ceiling (or ~3 slabs on floor)
+    aspect = float(tile_size_px[0]) / float(tile_size_px[1])
+    slab_h = int(quad_h / 2.2)
+    slab_w = max(20, int(slab_h * aspect))
+
+    repeat_x = max(2, int(quad_w / slab_w) + 1)
+    repeat_y = max(2, int(quad_h / slab_h) + 1)
+
+    tex_w = repeat_x * slab_w
+    tex_h = repeat_y * slab_h
+
+    flat_pattern = create_tiled_texture(
+        tile_img,
+        tex_w,
+        tex_h,
+        tile_w_px=slab_w,
+        tile_h_px=slab_h,
+        grout_px=grout_size,
+        grout_color=grout_color
+    )
 
     src_corners = np.float32([
         [0, 0],
@@ -115,28 +135,35 @@ def apply_tiles_to_room(
                     obs_pts[:, 1] = obs_pts[:, 1] / 100.0 * h_room
                 cv2.fillPoly(mask, [obs_pts.astype(np.int32)], 0)
 
-    # 4. Doğal Işık & Gölge Çıkarma (Luminance Ambient Shading)
+    # 4. Doğal Işık & Gölge Çıkarma (Luminance Ambient Shading & Gloss)
     room_gray = cv2.cvtColor(room_img, cv2.COLOR_BGR2GRAY)
-    shadow_map = cv2.GaussianBlur(room_gray, (21, 21), 0).astype(np.float32)
+    shadow_map = cv2.GaussianBlur(room_gray, (25, 25), 0).astype(np.float32)
     
     masked_pixels = shadow_map[mask > 0]
     if len(masked_pixels) > 0:
         mean_val = np.mean(masked_pixels) + 1e-5
-        shadow_map = shadow_map / mean_val
-        shadow_map = np.clip(shadow_map, 0.45, 1.35)
+        lum_ratio = np.clip(shadow_map / mean_val, 0.65, 1.25)
     else:
-        shadow_map = np.ones((h_room, w_room), dtype=np.float32)
+        lum_ratio = np.ones((h_room, w_room), dtype=np.float32)
 
-    # Multiply Blend
+    # Soft ambient blend
     shaded_tiles = warped_tiles.astype(np.float32)
     for c in range(3):
-        shaded_tiles[:, :, c] = np.clip(shaded_tiles[:, :, c] * shadow_map, 0, 255)
+        shaded_tiles[:, :, c] = np.clip(shaded_tiles[:, :, c] * lum_ratio, 0, 255)
+
+    # Specular Lappato gloss (window light reflections)
+    specular = np.clip((shadow_map - 180.0) / 75.0, 0, 1.0) * 0.35
+    for c in range(3):
+        shaded_tiles[:, :, c] = np.clip(shaded_tiles[:, :, c] + 255.0 * specular, 0, 255)
+
     shaded_tiles = shaded_tiles.astype(np.uint8)
 
     # 5. Maske ile Odaya Giydirme (Alpha Blending)
-    mask_blurred = cv2.GaussianBlur(mask, (3, 3), 0)
+    mask_blurred = cv2.GaussianBlur(mask, (5, 5), 0)
     mask_3ch = cv2.merge([mask_blurred, mask_blurred, mask_blurred]) / 255.0
     result = (room_img * (1.0 - mask_3ch) + shaded_tiles * mask_3ch).astype(np.uint8)
+
+    return result
 
     return result
 

@@ -10,8 +10,8 @@ export async function POST(req) {
       tile_image,
       dst_corners,
       obstacles = [],
-      tile_w_px = 140,
-      tile_h_px = 280,
+      tile_w_px = 320,
+      tile_h_px = 640,
       grout_size = 2,
       grout_color = [200, 200, 200]
     } = body;
