@@ -115,13 +115,25 @@ const FEATURED_STUDIO_TILES = [
 // Resolves tile texture URL with local fallback mapping
 function getResolvedTileTexture(tile) {
   if (!tile) return '/textures/calacatta_gold.jpg';
+
+  // 1. Direct local texture
   if (tile.textureUrl && tile.textureUrl.startsWith('/textures/')) {
     return tile.textureUrl;
   }
+
+  // 2. Direct remote image or proxy image
+  const rawUrl = tile.textureUrl || tile.imageUrl;
+  if (rawUrl && (rawUrl.startsWith('http://') || rawUrl.startsWith('https://'))) {
+    return `/api/proxy?url=${encodeURIComponent(rawUrl)}`;
+  }
+  if (rawUrl && rawUrl.startsWith('/')) {
+    return rawUrl;
+  }
+
+  // 3. Smart local texture fallback based on product properties
   const name = (tile.name || tile.title || '').toLowerCase();
   const color = (tile.color || '').toLowerCase();
 
-  // Smart local matching
   if (name.includes('calacatta') || name.includes('mermer') || name.includes('marfil') || color.includes('beyaz')) {
     return '/textures/calacatta_gold.jpg';
   }
@@ -139,15 +151,6 @@ function getResolvedTileTexture(tile) {
   }
   if (name.includes('antrasit') || name.includes('siyah') || color.includes('siyah')) {
     return '/textures/albatros_antrasit.jpg';
-  }
-
-  // Remote image URL via proxy
-  const rawUrl = tile.textureUrl || tile.imageUrl;
-  if (rawUrl && (rawUrl.startsWith('http://') || rawUrl.startsWith('https://'))) {
-    return `/api/proxy?url=${encodeURIComponent(rawUrl)}`;
-  }
-  if (rawUrl && rawUrl.startsWith('/')) {
-    return rawUrl;
   }
 
   return '/textures/calacatta_gold.jpg';
@@ -298,21 +301,21 @@ export default function NeuralRenovationModal({
   const getDefaultCorners = useCallback((presetId, surface) => {
     if (presetId === 'modern_living') {
       return surface === 'walls'
-        ? [[0, 10], [100, 10], [100, 52], [0, 52]]
-        : [[0, 52], [100, 52], [100, 100], [0, 100]];
+        ? [[0, 10], [22, 10], [22, 52], [0, 52]]
+        : [[0, 48], [100, 48], [100, 100], [0, 100]];
     }
     if (presetId === 'scandi_kitchen') {
       return surface === 'walls'
-        ? [[40, 27], [100, 27], [100, 57], [40, 57]]
-        : [[0, 65], [100, 65], [100, 100], [0, 100]];
+        ? [[38, 36], [100, 36], [100, 58], [38, 58]]
+        : [[0, 60], [100, 60], [100, 100], [0, 100]];
     }
     // luxury_bath or custom
     return surface === 'walls'
-      ? [[0, 18], [100, 18], [100, 68], [0, 68]]
-      : [[0, 68], [100, 66], [100, 100], [0, 100]];
+      ? [[32, 0], [100, 0], [100, 68], [32, 68]]
+      : [[0, 65], [100, 65], [100, 100], [0, 100]];
   }, []);
 
-  const [corners, setCorners] = useState([[0, 68], [100, 66], [100, 100], [0, 100]]);
+  const [corners, setCorners] = useState([[32, 0], [100, 0], [100, 68], [32, 68]]);
   const [showCornerPins, setShowCornerPins] = useState(false);
   const [activeCornerIndex, setActiveCornerIndex] = useState(null);
   const [isOpenCvProcessing, setIsOpenCvProcessing] = useState(false);
@@ -700,23 +703,6 @@ export default function NeuralRenovationModal({
 
       if (!tileImg) return;
 
-      const analysis = analysisResult || {
-        floorPolygon: [
-          [0, 100], [100, 100], [100, 68], [56, 62], [34, 60], [18, 66], [0, 72]
-        ],
-        wallPolygon: [
-          [0, 18], [100, 18], [100, 68], [0, 72]
-        ],
-        vanishingPoint: [50, 48],
-        obstacles: [
-          { type: 'bathtub', surface: 'floor', polygon: [[14, 62], [50, 62], [50, 77], [14, 77]] },
-          { type: 'side_table', surface: 'floor', polygon: [[18, 78], [28, 78], [28, 96], [18, 96]] },
-          { type: 'vanity', surface: 'both', polygon: [[31, 57], [55, 57], [55, 75], [31, 75]] },
-          { type: 'mirror', surface: 'walls', polygon: [[28, 38], [47, 38], [47, 60], [28, 60]] },
-          { type: 'window', surface: 'walls', polygon: [[0, 15], [14, 15], [14, 70], [0, 70]] }
-        ]
-      };
-
       // Katman 2 (Orta): OpenCV Homografi Perspektif Giydirme
       const drawSurface = (quadCorners, isFloor = false) => {
         if (!Array.isArray(quadCorners) || quadCorners.length < 4) return;
@@ -810,63 +796,45 @@ export default function NeuralRenovationModal({
         renoCtx.restore();
       };
 
-      // Engel Kesitleri (Küvet, Ayna, vb.)
-      const drawObstacles = (surfaceFilter) => {
-        if (!Array.isArray(analysis.obstacles) || analysis.obstacles.length === 0) return;
-
-        analysis.obstacles.forEach(obs => {
-          if (surfaceFilter && obs.surface && obs.surface !== 'both' && obs.surface !== surfaceFilter) {
-            return;
-          }
-          if (!Array.isArray(obs.polygon) || obs.polygon.length < 3) return;
-
-          const obsPts = obs.polygon.map(pt => ({
-            x: (pt[0] / 100) * w,
-            y: (pt[1] / 100) * h
-          }));
-
-          renoCtx.save();
-          renoCtx.beginPath();
-          renoCtx.moveTo(obsPts[0].x, obsPts[0].y);
-          for (let j = 1; j < obsPts.length; j++) {
-            renoCtx.lineTo(obsPts[j].x, obsPts[j].y);
-          }
-          renoCtx.closePath();
-          renoCtx.clip();
-
-          renoCtx.drawImage(baseImg, 0, 0, w, h);
-          renoCtx.restore();
-        });
-      };
-
       // Yüzey seçimlerine göre seramiği döşe
       const wallCorners = getDefaultCorners(activePresetId, 'walls');
       const floorCorners = getDefaultCorners(activePresetId, 'floor');
 
-      if (targetSurface === 'walls') {
-        drawSurface(corners);
-        drawObstacles('walls');
-      } else if (targetSurface === 'floor') {
-        drawSurface(corners, true);
-        drawObstacles('floor');
-      } else if (targetSurface === 'both') {
-        drawSurface(wallCorners);
-        drawObstacles('walls');
-        drawSurface(floorCorners, true);
-        drawObstacles('floor');
+      if (activePresetId === 'modern_living') {
+        if (targetSurface === 'walls') {
+          drawSurface(wallCorners);
+        } else {
+          // 'floor' or 'both' -> Geniş açık konsept salon zemini
+          drawSurface(floorCorners, true);
+        }
+      } else if (activePresetId === 'scandi_kitchen') {
+        if (targetSurface === 'floor') {
+          drawSurface(floorCorners, true);
+        } else {
+          // 'walls' or 'both' -> Tezgah arkası seramik duvarı
+          drawSurface(wallCorners);
+        }
+      } else {
+        // luxury_bath veya kullanıcı yüklemesi
+        if (targetSurface === 'walls') {
+          drawSurface(wallCorners);
+        } else if (targetSurface === 'floor') {
+          drawSurface(floorCorners, true);
+        } else if (targetSurface === 'both') {
+          drawSurface(wallCorners);
+          drawSurface(floorCorners, true);
+        }
       }
 
       // -----------------------------------------------------------------
       // Katman 3 (En üst): Duvardan bağımsız ön plandaki nesneler
-      // Kadın, tezgah, musluk, dolaplar, küvet şeffaf PNG katmanı
+      // Kadın, tezgah, musluk, dolaplar, küvet, kanepe şeffaf PNG katmanı
       // -----------------------------------------------------------------
       if (fgImg) {
         renoCtx.save();
         renoCtx.drawImage(fgImg, 0, 0, w, h);
         renoCtx.restore();
       }
-
-      drawObstacles();
     });
   }, [roomSource, userUploadedImage, customForegroundImg, isForegroundLayerActive, activePresetId, currentTile, targetSurface, tileRotation, tileScale, groutColor, groutWidth, analysisResult, renderMode, aiRenderedImage, corners, getDefaultCorners]);
 
@@ -1272,22 +1240,45 @@ export default function NeuralRenovationModal({
           </div>
         )}
 
+        {/* Ambient Room Glow / Backdrop to eliminate black side void */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: -20,
+            backgroundImage: `url(${PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId)?.url || PRESET_SAMPLE_ROOMS[0].url})`,
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+            filter: 'blur(60px) brightness(0.2)',
+            opacity: 0.7,
+            pointerEvents: 'none',
+            zIndex: 1
+          }}
+        />
+
         {/* Canvases: Renovated vs Original */}
         <canvas
           ref={renovatedCanvasRef}
           style={{
-            width: '100%',
-            height: '100%',
+            position: 'relative',
+            zIndex: 2,
+            maxWidth: '100%',
+            maxHeight: '100%',
             objectFit: 'contain',
+            borderRadius: '12px',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.08)',
             display: showOriginal ? 'none' : 'block'
           }}
         />
         <canvas
           ref={originalCanvasRef}
           style={{
-            width: '100%',
-            height: '100%',
+            position: 'relative',
+            zIndex: 2,
+            maxWidth: '100%',
+            maxHeight: '100%',
             objectFit: 'contain',
+            borderRadius: '12px',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.08)',
             display: showOriginal ? 'block' : 'none'
           }}
         />
