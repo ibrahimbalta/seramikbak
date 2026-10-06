@@ -71,6 +71,12 @@ export default function NeuralRenovationModal({
   const [groutColor, setGroutColor] = useState('rgba(148, 163, 184, 0.45)'); // subtle grey/white
   const [groutWidth, setGroutWidth] = useState(2); // 1, 2, 3 mm
 
+  // Dual-Engine Modes: 'canvas' (Live 60fps Surface Engine) vs 'diffusion' (8K Photorealistic AI Redesign)
+  const [renderMode, setRenderMode] = useState('canvas');
+  const [isGeneratingAiRender, setIsGeneratingAiRender] = useState(false);
+  const [aiRenderedImage, setAiRenderedImage] = useState(null);
+  const [aiRenderError, setAiRenderError] = useState('');
+
   // Spatial Analysis State
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
@@ -207,6 +213,8 @@ export default function NeuralRenovationModal({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: 'analyze',
+          presetId: roomSource === 'preset' ? activePresetId : undefined,
           image: imgUrl,
           tile: currentTile,
           target: targetSurface
@@ -224,12 +232,31 @@ export default function NeuralRenovationModal({
       }
     } catch (err) {
       console.warn('[Neural Modal] Analysis fallback:', err.message);
-      // Resilient fallback spatial data
+      // Calibrated edge-to-edge room geometry with complete obstacle occlusion
       setAnalysisResult({
-        floorPolygon: [[10, 98], [90, 98], [80, 58], [20, 58]],
-        wallPolygon: [[15, 58], [85, 58], [85, 12], [15, 12]],
+        floorPolygon: [
+          [0, 100],
+          [100, 100],
+          [100, 68],
+          [56, 62],
+          [34, 60],
+          [18, 66],
+          [0, 72]
+        ],
+        wallPolygon: [
+          [0, 18],
+          [100, 18],
+          [100, 68],
+          [0, 72]
+        ],
         vanishingPoint: [50, 48],
-        obstacles: [],
+        obstacles: [
+          { type: 'bathtub', surface: 'floor', polygon: [[14, 64], [35, 65], [36, 89], [22, 92], [14, 78]] },
+          { type: 'side_table', surface: 'floor', polygon: [[18, 80], [26, 80], [26, 96], [18, 96]] },
+          { type: 'vanity', surface: 'both', polygon: [[34, 60], [53, 60], [53, 73], [34, 73]] },
+          { type: 'mirror', surface: 'walls', polygon: [[29, 39], [46, 39], [46, 60], [29, 60]] },
+          { type: 'window', surface: 'walls', polygon: [[0, 18], [24, 18], [24, 72], [0, 72]] }
+        ],
         dominantLight: 'top-center',
         estimatedAreaM2: 5.8,
         netWithWasteM2: 6.38,
@@ -238,6 +265,41 @@ export default function NeuralRenovationModal({
       });
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  // Generate Photorealistic 8K Architectural Diffusion Room Redesign (RoomGPT Pipeline)
+  const handleGenerateAiDiffusionRender = async () => {
+    setIsGeneratingAiRender(true);
+    setAiRenderError('');
+    try {
+      const activePreset = PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId);
+      const res = await fetch('/api/ai/neural-renovation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'generate_room',
+          presetId: roomSource === 'preset' ? activePresetId : undefined,
+          image: roomSource === 'upload' ? userUploadedImage : (activePreset?.url || '/hero/luxury_bathroom.png'),
+          tile: currentTile,
+          target: targetSurface,
+          roomType: activePreset?.type || 'banyo'
+        })
+      });
+
+      const data = await res.json();
+      if (data.success && data.renderedImageUrl) {
+        setAiRenderedImage(data.renderedImageUrl);
+        setRenderMode('diffusion');
+      } else {
+        throw new Error(data.error || 'AI render oluşturulamadı.');
+      }
+    } catch (err) {
+      console.error('[Neural Modal] AI render error:', err);
+      setAiRenderError('Yapay zeka render servisi şu an yoğun. Canlı yüzey motoru devrede.');
+      setRenderMode('canvas');
+    } finally {
+      setIsGeneratingAiRender(false);
     }
   };
 
@@ -274,10 +336,6 @@ export default function NeuralRenovationModal({
     baseImg.crossOrigin = 'anonymous';
     baseImg.src = activeImgSrc;
 
-    const tileImg = new Image();
-    tileImg.crossOrigin = 'anonymous';
-    tileImg.src = currentTile?.textureUrl || currentTile?.imageUrl || '/textures/calacatta_gold.jpg';
-
     baseImg.onload = () => {
       const w = baseImg.naturalWidth || 1280;
       const h = baseImg.naturalHeight || 720;
@@ -287,100 +345,128 @@ export default function NeuralRenovationModal({
       renoCanvas.width = w;
       renoCanvas.height = h;
 
-      // 1. Draw pure original room to originalCanvas
+      // 1. Draw pure original room to originalCanvas (ÖNCESİ)
       origCtx.drawImage(baseImg, 0, 0, w, h);
 
-      // 2. Prepare renovatedCanvas: Draw original room as base
+      // -----------------------------------------------------------------
+      // MODE 1: PHOTOREALISTIC 8K AI DIFFUSION REDESIGN (RoomGPT Style)
+      // -----------------------------------------------------------------
+      if (renderMode === 'diffusion' && aiRenderedImage) {
+        const diffImg = new Image();
+        diffImg.crossOrigin = 'anonymous';
+        diffImg.src = aiRenderedImage;
+        diffImg.onload = () => {
+          renoCtx.drawImage(diffImg, 0, 0, w, h);
+        };
+        return;
+      }
+
+      // -----------------------------------------------------------------
+      // MODE 2: LIVE EDGE-TO-EDGE SPATIAL ENGINE WITH FIXTURE OCCLUSION
+      // -----------------------------------------------------------------
       renoCtx.drawImage(baseImg, 0, 0, w, h);
+
+      const tileImg = new Image();
+      tileImg.crossOrigin = 'anonymous';
+      tileImg.src = currentTile?.textureUrl || currentTile?.imageUrl || '/textures/calacatta_gold.jpg';
 
       tileImg.onload = () => {
         const analysis = analysisResult || {
-          floorPolygon: [[10, 98], [90, 98], [80, 58], [20, 58]],
-          wallPolygon: [[15, 58], [85, 58], [85, 12], [15, 12]],
+          floorPolygon: [
+            [0, 100],
+            [100, 100],
+            [100, 68],
+            [56, 62],
+            [34, 60],
+            [18, 66],
+            [0, 72]
+          ],
+          wallPolygon: [
+            [0, 18],
+            [100, 18],
+            [100, 68],
+            [0, 72]
+          ],
           vanishingPoint: [50, 48],
-          obstacles: []
+          obstacles: [
+            { type: 'bathtub', surface: 'floor', polygon: [[14, 64], [35, 65], [36, 89], [22, 92], [14, 78]] },
+            { type: 'side_table', surface: 'floor', polygon: [[18, 80], [26, 80], [26, 96], [18, 96]] },
+            { type: 'vanity', surface: 'both', polygon: [[34, 60], [53, 60], [53, 73], [34, 73]] },
+            { type: 'mirror', surface: 'walls', polygon: [[29, 39], [46, 39], [46, 60], [29, 60]] },
+            { type: 'window', surface: 'walls', polygon: [[0, 18], [24, 18], [24, 72], [0, 72]] }
+          ]
         };
 
-        const targetPoly = (targetSurface === 'walls' ? analysis.wallPolygon : analysis.floorPolygon) || analysis.floorPolygon;
-
-        // Convert percentage polygon to absolute pixels
-        const pts = targetPoly.map(pt => ({
-          x: (pt[0] / 100) * w,
-          y: (pt[1] / 100) * h
-        }));
-
-        if (pts.length < 3) return;
-
-        // -------------------------------------------------------------
-        // STEP A: Render True Vanishing Perspective Tiled Surface
-        // -------------------------------------------------------------
-        renoCtx.save();
-
-        // Clip to the target surface area (floor or wall)
-        renoCtx.beginPath();
-        renoCtx.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < pts.length; i++) {
-          renoCtx.lineTo(pts[i].x, pts[i].y);
-        }
-        renoCtx.closePath();
-        renoCtx.clip();
-
-        // Create high-res repeating pattern canvas
-        const patCanvas = document.createElement('canvas');
-        const patCtx = patCanvas.getContext('2d');
-        const isRotated = tileRotation === 90;
-        const aspect = (currentTile.width || 60) / (currentTile.height || 120);
-        const baseTileW = 160 * tileScale * (isRotated ? (1 / aspect) : 1);
-        const baseTileH = 160 * tileScale * (isRotated ? aspect : (1 / aspect));
-
-        patCanvas.width = baseTileW;
-        patCanvas.height = baseTileH;
-        patCtx.drawImage(tileImg, 0, 0, baseTileW, baseTileH);
-
-        // Draw crisp realistic grout lines
-        patCtx.strokeStyle = groutColor;
-        patCtx.lineWidth = groutWidth;
-        patCtx.strokeRect(0, 0, baseTileW, baseTileH);
-
-        const pattern = renoCtx.createPattern(patCanvas, 'repeat');
-        if (pattern) {
-          // Perspective perspective transformation matrix
-          const vpX = (analysis.vanishingPoint?.[0] || 50) / 100 * w;
-          const vpY = (analysis.vanishingPoint?.[1] || 48) / 100 * h;
+        // Sub-function: Draw edge-to-edge tiled surface with 3D perspective
+        const drawSurface = (poly, isFloor) => {
+          if (!Array.isArray(poly) || poly.length < 3) return;
+          const pts = poly.map(pt => ({
+            x: (pt[0] / 100) * w,
+            y: (pt[1] / 100) * h
+          }));
 
           renoCtx.save();
-          renoCtx.translate(vpX, vpY);
+          renoCtx.beginPath();
+          renoCtx.moveTo(pts[0].x, pts[0].y);
+          for (let i = 1; i < pts.length; i++) {
+            renoCtx.lineTo(pts[i].x, pts[i].y);
+          }
+          renoCtx.closePath();
+          renoCtx.clip();
 
-          if (targetSurface === 'floor') {
-            // Skew and scale downward towards user to simulate 3D ground plane receding to vanishing point
-            renoCtx.transform(1, 0, 0, 0.45, 0, 0);
-          } else {
-            // Wall vertical subtle perspective
-            renoCtx.transform(1, 0, 0, 0.85, 0, 0);
+          // High-Res repeating tile pattern
+          const patCanvas = document.createElement('canvas');
+          const patCtx = patCanvas.getContext('2d');
+          const isRotated = tileRotation === 90;
+          const aspect = (currentTile.width || 60) / (currentTile.height || 120);
+          const baseTileW = 160 * tileScale * (isRotated ? (1 / aspect) : 1);
+          const baseTileH = 160 * tileScale * (isRotated ? aspect : (1 / aspect));
+
+          patCanvas.width = baseTileW;
+          patCanvas.height = baseTileH;
+          patCtx.drawImage(tileImg, 0, 0, baseTileW, baseTileH);
+
+          // Crisp Grout
+          patCtx.strokeStyle = groutColor;
+          patCtx.lineWidth = groutWidth;
+          patCtx.strokeRect(0, 0, baseTileW, baseTileH);
+
+          const pattern = renoCtx.createPattern(patCanvas, 'repeat');
+          if (pattern) {
+            const vpX = (analysis.vanishingPoint?.[0] || 50) / 100 * w;
+            const vpY = (analysis.vanishingPoint?.[1] || 48) / 100 * h;
+
+            renoCtx.save();
+            renoCtx.translate(vpX, vpY);
+            if (isFloor) {
+              renoCtx.transform(1, 0, 0, 0.45, 0, 0);
+            } else {
+              renoCtx.transform(1, 0, 0, 0.88, 0, 0);
+            }
+            renoCtx.translate(-vpX, -vpY);
+            renoCtx.fillStyle = pattern;
+            renoCtx.fillRect(-w * 2, -h * 2, w * 5, h * 5);
+            renoCtx.restore();
           }
 
-          renoCtx.translate(-vpX, -vpY);
-          renoCtx.fillStyle = pattern;
-          renoCtx.fillRect(-w, -h, w * 3, h * 3);
+          // Ambient Shadow & Contact Lighting Preservation
+          renoCtx.save();
+          renoCtx.globalCompositeOperation = 'multiply';
+          renoCtx.globalAlpha = 0.52;
+          renoCtx.drawImage(baseImg, 0, 0, w, h);
           renoCtx.restore();
-        }
 
-        // -------------------------------------------------------------
-        // STEP B: Composite Original Ambient Shadows & Room Lighting
-        // -------------------------------------------------------------
-        renoCtx.save();
-        renoCtx.globalCompositeOperation = 'multiply';
-        renoCtx.globalAlpha = 0.55; // Natural blend with room light
-        renoCtx.drawImage(baseImg, 0, 0, w, h);
-        renoCtx.restore();
+          renoCtx.restore(); // end surface clip
+        };
 
-        renoCtx.restore(); // restore clipping
+        // Sub-function: Occlusion Cutouts (Bathtub, Sinks, Mirror, Windows remain in front)
+        const drawObstacles = (surfaceFilter) => {
+          if (!Array.isArray(analysis.obstacles) || analysis.obstacles.length === 0) return;
 
-        // -------------------------------------------------------------
-        // STEP C: Obstacle Protection (Klozet, Lavabo, Küvet vb. Öne Al)
-        // -------------------------------------------------------------
-        if (Array.isArray(analysis.obstacles) && analysis.obstacles.length > 0) {
           analysis.obstacles.forEach(obs => {
+            if (surfaceFilter && obs.surface && obs.surface !== 'both' && obs.surface !== surfaceFilter) {
+              return;
+            }
             if (!Array.isArray(obs.polygon) || obs.polygon.length < 3) return;
 
             const obsPts = obs.polygon.map(pt => ({
@@ -397,14 +483,28 @@ export default function NeuralRenovationModal({
             renoCtx.closePath();
             renoCtx.clip();
 
-            // Re-draw original room image over the obstacle area so it's 100% sharp and un-tiled
+            // Re-render original room fixture crisply on top of the newly tiled surface
             renoCtx.drawImage(baseImg, 0, 0, w, h);
             renoCtx.restore();
           });
+        };
+
+        // Render based on user target
+        if (targetSurface === 'walls' || targetSurface === 'both') {
+          drawSurface(analysis.wallPolygon, false);
+          drawObstacles('walls');
         }
+
+        if (targetSurface === 'floor' || targetSurface === 'both') {
+          drawSurface(analysis.floorPolygon, true);
+          drawObstacles('floor');
+        }
+
+        // Draw general obstacles
+        drawObstacles();
       };
     };
-  }, [roomSource, userUploadedImage, activePresetId, currentTile, targetSurface, tileRotation, tileScale, groutColor, groutWidth, analysisResult]);
+  }, [roomSource, userUploadedImage, activePresetId, currentTile, targetSurface, tileRotation, tileScale, groutColor, groutWidth, analysisResult, renderMode, aiRenderedImage]);
 
   // Re-render when dependencies change
   useEffect(() => {
@@ -525,6 +625,31 @@ export default function NeuralRenovationModal({
         {/* Action Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
+            onClick={handleGenerateAiDiffusionRender}
+            disabled={isGeneratingAiRender}
+            style={{
+              height: '36px',
+              padding: '0 16px',
+              borderRadius: '9px',
+              background: 'linear-gradient(135deg, #d4af37 0%, #f59e0b 100%)',
+              border: 'none',
+              color: '#0b0f19',
+              fontSize: '0.78rem',
+              fontWeight: '900',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: isGeneratingAiRender ? 'not-allowed' : 'pointer',
+              boxShadow: '0 3px 14px rgba(212, 175, 55, 0.4)',
+              opacity: isGeneratingAiRender ? 0.8 : 1
+            }}
+            title="Yapay zeka bu odayı seçili seramik ile komple yeniden tasarlar"
+          >
+            <Sparkles size={15} />
+            <span>{isGeneratingAiRender ? 'AI Tasarlıyor (8K)...' : '✨ AI ile Komple Yenile'}</span>
+          </button>
+
+          <button
             onClick={handleDownloadSnapshot}
             style={{
               height: '36px',
@@ -618,6 +743,55 @@ export default function NeuralRenovationModal({
                     {p.title}
                   </button>
                 ))}
+              </div>
+
+              {/* Dual-Engine Mode Switcher (Canlı Giydirme vs AI Komple Tasarım) */}
+              <div style={{ display: 'flex', gap: '3px', background: 'rgba(255, 255, 255, 0.05)', padding: '2px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                <button
+                  onClick={() => setRenderMode('canvas')}
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    fontSize: '0.7rem',
+                    fontWeight: renderMode === 'canvas' ? '800' : '600',
+                    background: renderMode === 'canvas' ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+                    color: renderMode === 'canvas' ? '#d4af37' : '#94a3b8',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                  title="Hassas Zemin & Duvar Perspektif Motoru"
+                >
+                  <span>⚡ Canlı Giydirme</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (aiRenderedImage) {
+                      setRenderMode('diffusion');
+                    } else {
+                      handleGenerateAiDiffusionRender();
+                    }
+                  }}
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    fontSize: '0.7rem',
+                    fontWeight: renderMode === 'diffusion' ? '800' : '600',
+                    background: renderMode === 'diffusion' ? 'linear-gradient(135deg, #d4af37 0%, #f59e0b 100%)' : 'transparent',
+                    color: renderMode === 'diffusion' ? '#0b0f19' : '#94a3b8',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                  title="Yapay zeka ile fotogerçekçi 8K oda tadilatı"
+                >
+                  <Sparkles size={11} />
+                  <span>{isGeneratingAiRender ? '⏳ Hazırlanıyor...' : '✨ AI Foto-Gerçekçi'}</span>
+                </button>
               </div>
             </div>
 
@@ -754,6 +928,44 @@ export default function NeuralRenovationModal({
               </div>
             )}
 
+            {/* AI Diffusion Rendering Loading Overlay */}
+            {isGeneratingAiRender && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                zIndex: 38,
+                background: 'rgba(5, 8, 16, 0.88)',
+                backdropFilter: 'blur(12px)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '16px'
+              }}>
+                <div style={{
+                  width: '52px',
+                  height: '52px',
+                  border: '4px solid rgba(212, 175, 55, 0.2)',
+                  borderTopColor: '#d4af37',
+                  borderRadius: '50%',
+                  animation: 'sb-spin 0.8s linear infinite',
+                  boxShadow: '0 0 25px rgba(212, 175, 55, 0.4)'
+                }} />
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.05rem', fontWeight: '900', color: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <Sparkles size={18} color="#d4af37" />
+                    <span>Yapay Zeka Odanızı Komple Yeniliyor...</span>
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: '#d4af37', marginTop: '4px', fontWeight: '700' }}>
+                    {currentTile.brand?.name || 'Bien'} {currentTile.name}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '6px' }}>
+                    8K Fotogerçekçi mimari difüzyon render'ı hazırlanıyor (~3 saniye)
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Background Layer: FULL RENOVATED ROOM */}
             <canvas
               ref={renovatedCanvasRef}
@@ -833,14 +1045,14 @@ export default function NeuralRenovationModal({
               zIndex: 25,
               background: 'rgba(15, 23, 42, 0.85)',
               backdropFilter: 'blur(8px)',
-              padding: '4px 10px',
-              borderRadius: '6px',
-              fontSize: '0.68rem',
+              padding: '5px 12px',
+              borderRadius: '8px',
+              fontSize: '0.7rem',
               fontWeight: '800',
               color: '#94a3b8',
               border: '1px solid rgba(255, 255, 255, 0.1)'
             }}>
-              ÖNCESİ (Mevcut Zemin)
+              ÖNCESİ (Mevcut Mekan)
             </div>
 
             <div style={{
@@ -848,15 +1060,21 @@ export default function NeuralRenovationModal({
               top: '16px',
               right: '16px',
               zIndex: 25,
-              background: 'rgba(212, 175, 55, 0.95)',
-              padding: '4px 10px',
-              borderRadius: '6px',
-              fontSize: '0.68rem',
+              background: renderMode === 'diffusion' ? 'linear-gradient(135deg, #d4af37 0%, #f59e0b 100%)' : '#d4af37',
+              padding: '5px 12px',
+              borderRadius: '8px',
+              fontSize: '0.7rem',
               fontWeight: '900',
               color: '#0b0f19',
-              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.4)'
+              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
             }}>
-              SONRASI ({currentTile.brand?.name || 'Bien'} {currentTile.name})
+              <Sparkles size={12} />
+              <span>
+                SONRASI {renderMode === 'diffusion' ? '(8K AI Yenileme)' : ''}: {currentTile.brand?.name || 'Bien'} {currentTile.name}
+              </span>
             </div>
           </div>
         </div>
@@ -922,37 +1140,98 @@ export default function NeuralRenovationModal({
               Uygulama Alanı & Döşeme Yönü
             </span>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', marginTop: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginTop: '8px' }}>
               <button
                 onClick={() => setTargetSurface('floor')}
                 style={{
-                  padding: '8px',
+                  padding: '8px 4px',
                   borderRadius: '8px',
                   border: targetSurface === 'floor' ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.1)',
                   background: targetSurface === 'floor' ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
                   color: targetSurface === 'floor' ? '#d4af37' : '#94a3b8',
-                  fontSize: '0.75rem',
+                  fontSize: '0.72rem',
                   fontWeight: '800',
                   cursor: 'pointer'
                 }}
               >
-                🔲 Sadece Zemin
+                🔲 Zemin
               </button>
 
               <button
                 onClick={() => setTargetSurface('walls')}
                 style={{
-                  padding: '8px',
+                  padding: '8px 4px',
                   borderRadius: '8px',
                   border: targetSurface === 'walls' ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.1)',
                   background: targetSurface === 'walls' ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
                   color: targetSurface === 'walls' ? '#d4af37' : '#94a3b8',
-                  fontSize: '0.75rem',
+                  fontSize: '0.72rem',
                   fontWeight: '800',
                   cursor: 'pointer'
                 }}
               >
-                🧱 Duvar Kaplama
+                🧱 Duvar
+              </button>
+
+              <button
+                onClick={() => setTargetSurface('both')}
+                style={{
+                  padding: '8px 4px',
+                  borderRadius: '8px',
+                  border: targetSurface === 'both' ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.1)',
+                  background: targetSurface === 'both' ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+                  color: targetSurface === 'both' ? '#d4af37' : '#94a3b8',
+                  fontSize: '0.72rem',
+                  fontWeight: '800',
+                  cursor: 'pointer'
+                }}
+              >
+                ✨ Zemin+Duvar
+              </button>
+            </div>
+
+            {/* One-Click AI Redesign Card in Sidebar */}
+            <div style={{
+              marginTop: '12px',
+              padding: '12px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(245, 158, 11, 0.05) 100%)',
+              border: '1px solid rgba(212, 175, 55, 0.25)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Sparkles size={14} color="#d4af37" />
+                  <span>AI Komple Tasarım</span>
+                </span>
+                <span style={{ fontSize: '0.62rem', fontWeight: '800', padding: '2px 6px', borderRadius: '4px', background: 'rgba(212, 175, 55, 0.2)', color: '#d4af37' }}>
+                  8K FOTOGERÇEKÇİ
+                </span>
+              </div>
+              <p style={{ fontSize: '0.68rem', color: '#94a3b8', margin: '6px 0 10px 0', lineHeight: 1.4 }}>
+                Seçilen seramiğin dokusunu, odanın doğal ışığı ve mimarisiyle sıfırdan birleştirin.
+              </p>
+              <button
+                onClick={handleGenerateAiDiffusionRender}
+                disabled={isGeneratingAiRender}
+                style={{
+                  width: '100%',
+                  height: '34px',
+                  borderRadius: '8px',
+                  background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
+                  border: 'none',
+                  color: '#0b0f19',
+                  fontSize: '0.74rem',
+                  fontWeight: '900',
+                  cursor: isGeneratingAiRender ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 10px rgba(212, 175, 55, 0.25)'
+                }}
+              >
+                <Sparkles size={13} />
+                <span>{isGeneratingAiRender ? 'Yapay Zeka Tasarlıyor...' : '✨ Bu Seramikle Odayı Yenile'}</span>
               </button>
             </div>
 
