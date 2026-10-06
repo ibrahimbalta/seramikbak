@@ -6,19 +6,29 @@ export async function POST(req) {
   try {
     const body = await req.json();
     const {
+      action = 'render',
       room_image,
       tile_image,
       dst_corners,
       obstacles = [],
+      foreground_image,
+      auto_segment = false,
       tile_w_px = 320,
       tile_h_px = 640,
       grout_size = 2,
       grout_color = [200, 200, 200]
     } = body;
 
-    if (!room_image || !tile_image || !dst_corners || dst_corners.length !== 4) {
+    if (!room_image) {
       return NextResponse.json(
-        { success: false, error: 'Oda görseli, seramik ve 4 köşe noktası gereklidir.' },
+        { success: false, error: 'Oda görseli gereklidir.' },
+        { status: 400 }
+      );
+    }
+
+    if (action === 'render' && (!tile_image || !dst_corners || dst_corners.length !== 4)) {
+      return NextResponse.json(
+        { success: false, error: 'Seramik görseli ve 4 köşe noktası gereklidir.' },
         { status: 400 }
       );
     }
@@ -35,13 +45,16 @@ export async function POST(req) {
       const timeout = setTimeout(() => {
         pyProcess.kill();
         resolve({ success: false, error: 'OpenCV işlemi zaman aşımına uğradı' });
-      }, 8000);
+      }, 12000);
 
       pyProcess.stdin.write(JSON.stringify({
+        action,
         room_image,
         tile_image,
         dst_corners,
         obstacles,
+        foreground_image,
+        auto_segment,
         tile_w_px,
         tile_h_px,
         grout_size,

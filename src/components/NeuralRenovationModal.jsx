@@ -16,6 +16,7 @@ const PRESET_SAMPLE_ROOMS = [
     title: 'Modern Lüks Banyo',
     subtitle: 'Mermer duvarlar, küvet & çift lavabo',
     url: '/hero/luxury_bathroom.png',
+    fgUrl: '/hero/luxury_bathroom_fg.png',
     type: 'banyo'
   },
   {
@@ -23,6 +24,7 @@ const PRESET_SAMPLE_ROOMS = [
     title: 'İskandinav Mutfak',
     subtitle: 'Meşe tezgah & ada mutfak',
     url: '/hero/scandinavian_kitchen.png',
+    fgUrl: '/hero/scandinavian_kitchen_fg.png',
     type: 'mutfak'
   },
   {
@@ -30,9 +32,70 @@ const PRESET_SAMPLE_ROOMS = [
     title: 'Açık Konsept Salon',
     subtitle: 'Geniş zemin & doğal ışık',
     url: '/hero/modern_living.png',
+    fgUrl: '/hero/modern_living_fg.png',
     type: 'salon'
   }
 ];
+
+// Resolves tile texture URL with local fallback mapping
+function getResolvedTileTexture(tile) {
+  if (!tile) return '/textures/calacatta_gold.jpg';
+  if (tile.textureUrl && tile.textureUrl.startsWith('/textures/')) {
+    return tile.textureUrl;
+  }
+  const name = (tile.name || tile.title || '').toLowerCase();
+  const color = (tile.color || '').toLowerCase();
+
+  // Smart local matching
+  if (name.includes('calacatta') || name.includes('mermer') || name.includes('marfil') || color.includes('beyaz')) {
+    return '/textures/calacatta_gold.jpg';
+  }
+  if (name.includes('volcano') || name.includes('beton') || name.includes('loft') || name.includes('cement') || color.includes('gri') || color.includes('grey')) {
+    if (name.includes('anthracite') || name.includes('antrasit') || name.includes('siyah') || color.includes('antrasit')) {
+      return '/textures/albatros_antrasit.jpg';
+    }
+    return '/textures/concrete_light_grey.jpg';
+  }
+  if (name.includes('ahşap') || name.includes('wood') || name.includes('meşe') || name.includes('oak') || name.includes('parke')) {
+    return '/textures/natural_oak.jpg';
+  }
+  if (name.includes('travertin') || name.includes('bej') || name.includes('ivory') || name.includes('krem') || color.includes('bej')) {
+    return '/textures/travertino_classico.jpg';
+  }
+  if (name.includes('antrasit') || name.includes('siyah') || color.includes('siyah')) {
+    return '/textures/albatros_antrasit.jpg';
+  }
+
+  // Remote image URL via proxy
+  const rawUrl = tile.textureUrl || tile.imageUrl;
+  if (rawUrl && (rawUrl.startsWith('http://') || rawUrl.startsWith('https://'))) {
+    return `/api/proxy?url=${encodeURIComponent(rawUrl)}`;
+  }
+  if (rawUrl && rawUrl.startsWith('/')) {
+    return rawUrl;
+  }
+
+  return '/textures/calacatta_gold.jpg';
+}
+
+// Background fill color for stamp before drawing tile
+function getTileBaseColor(tile) {
+  const name = (tile?.name || tile?.title || '').toLowerCase();
+  const color = (tile?.color || '').toLowerCase();
+  if (name.includes('antrasit') || name.includes('siyah') || color.includes('antrasit') || color.includes('siyah')) {
+    return '#2b2d30';
+  }
+  if (name.includes('gri') || name.includes('grey') || color.includes('gri') || color.includes('grey')) {
+    return '#b0b5b9';
+  }
+  if (name.includes('bej') || name.includes('travertin') || name.includes('ivory') || color.includes('bej')) {
+    return '#ded6c7';
+  }
+  if (name.includes('ahşap') || name.includes('oak') || name.includes('meşe')) {
+    return '#b98f62';
+  }
+  return '#eae8e4';
+}
 
 // =========================================================================
 // OPENCV / HOMOGRAPHY BILINEAR QUAD WARP MATHEMATICAL ENGINE
@@ -165,8 +228,8 @@ export default function NeuralRenovationModal({
     }
     if (presetId === 'scandi_kitchen') {
       return surface === 'walls'
-        ? [[0, 20], [100, 20], [100, 64], [0, 64]]
-        : [[0, 64], [100, 64], [100, 100], [0, 100]];
+        ? [[40, 27], [100, 27], [100, 57], [40, 57]]
+        : [[0, 65], [100, 65], [100, 100], [0, 100]];
     }
     // luxury_bath or custom
     return surface === 'walls'
@@ -178,6 +241,11 @@ export default function NeuralRenovationModal({
   const [showCornerPins, setShowCornerPins] = useState(false);
   const [activeCornerIndex, setActiveCornerIndex] = useState(null);
   const [isOpenCvProcessing, setIsOpenCvProcessing] = useState(false);
+
+  // 3-Layer Composite Architecture States (Katman 3 Ön Plan Nesneleri)
+  const [customForegroundImg, setCustomForegroundImg] = useState(null);
+  const [isSegmentingForeground, setIsSegmentingForeground] = useState(false);
+  const [isForegroundLayerActive, setIsForegroundLayerActive] = useState(true);
 
   // Sync corners when preset or surface changes
   useEffect(() => {
@@ -274,6 +342,29 @@ export default function NeuralRenovationModal({
     }
   };
 
+  // Extract Foreground objects via rembg (Katman 3)
+  const extractCustomForeground = async (imgData) => {
+    setIsSegmentingForeground(true);
+    try {
+      const res = await fetch('/api/ai/opencv-tile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'extract_foreground',
+          room_image: imgData
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.foreground_image) {
+        setCustomForegroundImg(data.foreground_image);
+      }
+    } catch (err) {
+      console.warn('Foreground extraction fallback:', err.message);
+    } finally {
+      setIsSegmentingForeground(false);
+    }
+  };
+
   // Capture frame from camera
   const captureCameraFrame = () => {
     const video = videoRef.current;
@@ -289,6 +380,7 @@ export default function NeuralRenovationModal({
     stopCamera();
     setUserUploadedImage(dataUrl);
     setRoomSource('upload');
+    extractCustomForeground(dataUrl);
     runSpatialAnalysis(dataUrl);
   };
 
@@ -303,6 +395,7 @@ export default function NeuralRenovationModal({
       setUserUploadedImage(dataUrl);
       setRoomSource('upload');
       stopCamera();
+      extractCustomForeground(dataUrl);
       runSpatialAnalysis(dataUrl);
     };
     reader.readAsDataURL(file);
@@ -440,16 +533,37 @@ export default function NeuralRenovationModal({
     const origCtx = origCanvas.getContext('2d');
     const renoCtx = renoCanvas.getContext('2d');
 
-    // Get current active base image URL
+    // Katman 1: Base room image URL
     const activeImgSrc = roomSource === 'upload' && userUploadedImage
       ? userUploadedImage
       : (PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId)?.url || PRESET_SAMPLE_ROOMS[0].url);
 
-    const baseImg = new Image();
-    baseImg.crossOrigin = 'anonymous';
-    baseImg.src = activeImgSrc;
+    // Katman 3: Foreground objects cutout URL
+    const activeFgUrl = roomSource === 'upload' && customForegroundImg
+      ? customForegroundImg
+      : (PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId)?.fgUrl);
 
-    baseImg.onload = () => {
+    // Katman 2: Resolved high-definition tile texture
+    const tileSrc = getResolvedTileTexture(currentTile);
+
+    const loadImg = (url) => new Promise((resolve) => {
+      if (!url) return resolve(null);
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+
+    Promise.all([
+      loadImg(activeImgSrc),
+      loadImg(tileSrc).then(async (img) => {
+        if (img) return img;
+        return await loadImg('/textures/calacatta_gold.jpg');
+      }),
+      isForegroundLayerActive ? loadImg(activeFgUrl) : Promise.resolve(null)
+    ]).then(([baseImg, tileImg, fgImg]) => {
+      if (!baseImg) return;
       const w = baseImg.naturalWidth || 1280;
       const h = baseImg.naturalHeight || 720;
 
@@ -458,7 +572,7 @@ export default function NeuralRenovationModal({
       renoCanvas.width = w;
       renoCanvas.height = h;
 
-      // 1. Draw pure original room to originalCanvas (ÖNCESİ)
+      // 1. Katman 1 (En alt): Orijinal oda fotografi (ÖNCESİ)
       origCtx.drawImage(baseImg, 0, 0, w, h);
 
       // -----------------------------------------------------------------
@@ -467,189 +581,190 @@ export default function NeuralRenovationModal({
       if (renderMode === 'diffusion' && aiRenderedImage) {
         const diffImg = new Image();
         diffImg.crossOrigin = 'anonymous';
-        diffImg.src = aiRenderedImage;
         diffImg.onload = () => {
           renoCtx.drawImage(diffImg, 0, 0, w, h);
         };
+        diffImg.src = aiRenderedImage;
         return;
       }
 
       // -----------------------------------------------------------------
-      // MODE 2: LIVE EDGE-TO-EDGE SPATIAL ENGINE WITH FIXTURE OCCLUSION
+      // MODE 2: 3-KATMANLI OPENCV HOMOGRAFİ VE MASKELEME MOTORU
       // -----------------------------------------------------------------
+      // Katman 1 (En alt): Orijinal oda fotoğrafı zemine basılır
       renoCtx.drawImage(baseImg, 0, 0, w, h);
 
-      const tileImg = new Image();
-      tileImg.crossOrigin = 'anonymous';
-      tileImg.src = currentTile?.textureUrl || currentTile?.imageUrl || '/textures/calacatta_gold.jpg';
+      if (!tileImg) return;
 
-      tileImg.onload = () => {
-        const analysis = analysisResult || {
-          floorPolygon: [
-            [0, 100],
-            [100, 100],
-            [100, 68],
-            [56, 62],
-            [34, 60],
-            [18, 66],
-            [0, 72]
-          ],
-          wallPolygon: [
-            [0, 18],
-            [100, 18],
-            [100, 68],
-            [0, 72]
-          ],
-          vanishingPoint: [50, 48],
-          obstacles: [
-            { type: 'bathtub', surface: 'floor', polygon: [[14, 62], [50, 62], [50, 77], [14, 77]] },
-            { type: 'side_table', surface: 'floor', polygon: [[18, 78], [28, 78], [28, 96], [18, 96]] },
-            { type: 'vanity', surface: 'both', polygon: [[31, 57], [55, 57], [55, 75], [31, 75]] },
-            { type: 'mirror', surface: 'walls', polygon: [[28, 38], [47, 38], [47, 60], [28, 60]] },
-            { type: 'window', surface: 'walls', polygon: [[0, 15], [14, 15], [14, 70], [0, 70]] }
-          ]
-        };
+      const analysis = analysisResult || {
+        floorPolygon: [
+          [0, 100], [100, 100], [100, 68], [56, 62], [34, 60], [18, 66], [0, 72]
+        ],
+        wallPolygon: [
+          [0, 18], [100, 18], [100, 68], [0, 72]
+        ],
+        vanishingPoint: [50, 48],
+        obstacles: [
+          { type: 'bathtub', surface: 'floor', polygon: [[14, 62], [50, 62], [50, 77], [14, 77]] },
+          { type: 'side_table', surface: 'floor', polygon: [[18, 78], [28, 78], [28, 96], [18, 96]] },
+          { type: 'vanity', surface: 'both', polygon: [[31, 57], [55, 57], [55, 75], [31, 75]] },
+          { type: 'mirror', surface: 'walls', polygon: [[28, 38], [47, 38], [47, 60], [28, 60]] },
+          { type: 'window', surface: 'walls', polygon: [[0, 15], [14, 15], [14, 70], [0, 70]] }
+        ]
+      };
 
-        // Sub-function: Draw true OpenCV Homography Perspective Tiled Surface
-        const drawSurface = (quadCorners, isFloor = false) => {
-          if (!Array.isArray(quadCorners) || quadCorners.length < 4) return;
-          const p0 = [quadCorners[0][0] / 100 * w, quadCorners[0][1] / 100 * h]; // TL
-          const p1 = [quadCorners[1][0] / 100 * w, quadCorners[1][1] / 100 * h]; // TR
-          const p2 = [quadCorners[2][0] / 100 * w, quadCorners[2][1] / 100 * h]; // BR
-          const p3 = [quadCorners[3][0] / 100 * w, quadCorners[3][1] / 100 * h]; // BL
+      // Katman 2 (Orta): OpenCV Homografi Perspektif Giydirme
+      const drawSurface = (quadCorners, isFloor = false) => {
+        if (!Array.isArray(quadCorners) || quadCorners.length < 4) return;
+        const p0 = [quadCorners[0][0] / 100 * w, quadCorners[0][1] / 100 * h]; // TL
+        const p1 = [quadCorners[1][0] / 100 * w, quadCorners[1][1] / 100 * h]; // TR
+        const p2 = [quadCorners[2][0] / 100 * w, quadCorners[2][1] / 100 * h]; // BR
+        const p3 = [quadCorners[3][0] / 100 * w, quadCorners[3][1] / 100 * h]; // BL
 
-          const minX = Math.min(p0[0], p1[0], p2[0], p3[0]);
-          const maxX = Math.max(p0[0], p1[0], p2[0], p3[0]);
-          const minY = Math.min(p0[1], p1[1], p2[1], p3[1]);
-          const maxY = Math.max(p0[1], p1[1], p2[1], p3[1]);
-          const quadW = Math.max(100, maxX - minX);
-          const quadH = Math.max(100, maxY - minY);
+        const minX = Math.min(p0[0], p1[0], p2[0], p3[0]);
+        const maxX = Math.max(p0[0], p1[0], p2[0], p3[0]);
+        const minY = Math.min(p0[1], p1[1], p2[1], p3[1]);
+        const maxY = Math.max(p0[1], p1[1], p2[1], p3[1]);
+        const quadW = Math.max(100, maxX - minX);
+        const quadH = Math.max(100, maxY - minY);
 
-          // 1. Real-World Architectural Physical Slab Scale (approx 2 slabs high on walls, 3 on floor)
-          const isRotated = tileRotation === 90;
-          const tileAspect = (currentTile.width || 60) / (currentTile.height || 120);
-          const effectiveAspect = isRotated ? (1 / tileAspect) : tileAspect;
+        // Mimari Gerçek Dünya Karo Ölçeklemesi (60x120 cm ebat oranı)
+        const isRotated = tileRotation === 90;
+        const tileAspect = (currentTile.width || 60) / (currentTile.height || 120);
+        const effectiveAspect = isRotated ? (1 / tileAspect) : tileAspect;
 
-          const numSlabsY = isFloor ? 3.2 : 2.0;
-          const slabH = Math.max(60, Math.round((quadH / numSlabsY) * (tileScale || 1.0)));
-          const slabW = Math.max(30, Math.round(slabH * effectiveAspect));
+        const numSlabsY = isFloor ? 3.2 : 2.0;
+        const slabH = Math.max(60, Math.round((quadH / numSlabsY) * (tileScale || 1.0)));
+        const slabW = Math.max(30, Math.round(slabH * effectiveAspect));
 
-          const repeatX = Math.max(2, Math.ceil(quadW / slabW) + 1);
-          const repeatY = Math.max(2, Math.ceil(quadH / slabH) + 1);
-          const gridW = repeatX * slabW;
-          const gridH = repeatY * slabH;
+        const repeatX = Math.max(2, Math.ceil(quadW / slabW) + 1);
+        const repeatY = Math.max(2, Math.ceil(quadH / slabH) + 1);
+        const gridW = repeatX * slabW;
+        const gridH = repeatY * slabH;
 
-          const patCanvas = document.createElement('canvas');
-          patCanvas.width = gridW;
-          patCanvas.height = gridH;
-          const patCtx = patCanvas.getContext('2d');
+        const patCanvas = document.createElement('canvas');
+        patCanvas.width = gridW;
+        patCanvas.height = gridH;
+        const patCtx = patCanvas.getContext('2d');
 
-          // Single large porcelain slab stamp with crisp realistic grout
-          const stamp = document.createElement('canvas');
-          stamp.width = slabW;
-          stamp.height = slabH;
-          const sCtx = stamp.getContext('2d');
+        // Tek bir porselen karo damgası: Opak taban + Seramik deseni + İnce gerçek derz
+        const stamp = document.createElement('canvas');
+        stamp.width = slabW;
+        stamp.height = slabH;
+        const sCtx = stamp.getContext('2d');
+
+        sCtx.fillStyle = getTileBaseColor(currentTile);
+        sCtx.fillRect(0, 0, slabW, slabH);
+        try {
           sCtx.drawImage(tileImg, 0, 0, slabW, slabH);
-          sCtx.strokeStyle = groutColor;
-          sCtx.lineWidth = Math.max(1, groutWidth);
-          sCtx.strokeRect(0, 0, slabW, slabH);
+        } catch (e) {
+          // ignore potential tainted image
+        }
+        sCtx.strokeStyle = groutColor || 'rgba(180, 180, 180, 0.45)';
+        sCtx.lineWidth = Math.max(1, groutWidth || 2);
+        sCtx.strokeRect(0, 0, slabW, slabH);
 
-          const pattern = patCtx.createPattern(stamp, 'repeat');
-          if (pattern) {
-            patCtx.fillStyle = pattern;
-            patCtx.fillRect(0, 0, gridW, gridH);
+        const pattern = patCtx.createPattern(stamp, 'repeat');
+        if (pattern) {
+          patCtx.fillStyle = pattern;
+          patCtx.fillRect(0, 0, gridW, gridH);
+        }
+
+        // 2D ızgarayı 4 köşeye homografi perspektifiyle ger (cv2.warpPerspective eşdeğeri)
+        renoCtx.save();
+        renoCtx.beginPath();
+        renoCtx.moveTo(p0[0], p0[1]);
+        renoCtx.lineTo(p1[0], p1[1]);
+        renoCtx.lineTo(p2[0], p2[1]);
+        renoCtx.lineTo(p3[0], p3[1]);
+        renoCtx.closePath();
+        renoCtx.clip();
+
+        warpQuadToCanvas(renoCtx, patCanvas, p0, p1, p2, p3, 16);
+
+        // Doğal Işık & Gölge Çıkarma (Soft-Light + Multiply + Screen)
+        renoCtx.save();
+        renoCtx.globalCompositeOperation = 'soft-light';
+        renoCtx.globalAlpha = 0.65;
+        renoCtx.drawImage(baseImg, 0, 0, w, h);
+        renoCtx.restore();
+
+        // İnce temas gölgesi derinliği
+        renoCtx.save();
+        renoCtx.globalCompositeOperation = 'multiply';
+        renoCtx.globalAlpha = 0.20;
+        renoCtx.drawImage(baseImg, 0, 0, w, h);
+        renoCtx.restore();
+
+        // Lappato parlaklık yansıması
+        renoCtx.save();
+        renoCtx.globalCompositeOperation = 'screen';
+        renoCtx.globalAlpha = 0.22;
+        renoCtx.drawImage(baseImg, 0, 0, w, h);
+        renoCtx.restore();
+
+        renoCtx.restore();
+      };
+
+      // Engel Kesitleri (Küvet, Ayna, vb.)
+      const drawObstacles = (surfaceFilter) => {
+        if (!Array.isArray(analysis.obstacles) || analysis.obstacles.length === 0) return;
+
+        analysis.obstacles.forEach(obs => {
+          if (surfaceFilter && obs.surface && obs.surface !== 'both' && obs.surface !== surfaceFilter) {
+            return;
           }
+          if (!Array.isArray(obs.polygon) || obs.polygon.length < 3) return;
 
-          // 2. Warp the flat pattern onto the 4 corners using homography bilinear subdivision
+          const obsPts = obs.polygon.map(pt => ({
+            x: (pt[0] / 100) * w,
+            y: (pt[1] / 100) * h
+          }));
+
           renoCtx.save();
           renoCtx.beginPath();
-          renoCtx.moveTo(p0[0], p0[1]);
-          renoCtx.lineTo(p1[0], p1[1]);
-          renoCtx.lineTo(p2[0], p2[1]);
-          renoCtx.lineTo(p3[0], p3[1]);
+          renoCtx.moveTo(obsPts[0].x, obsPts[0].y);
+          for (let j = 1; j < obsPts.length; j++) {
+            renoCtx.lineTo(obsPts[j].x, obsPts[j].y);
+          }
           renoCtx.closePath();
           renoCtx.clip();
 
-          warpQuadToCanvas(renoCtx, patCanvas, p0, p1, p2, p3, 16);
-
-          // 3. Ambient Lighting & Lappato Specular Gloss (Soft-Light + Multiply + Screen)
-          // Soft-Light preserves vibrant ceramic colors without turning blues into muddy dark grey
-          renoCtx.save();
-          renoCtx.globalCompositeOperation = 'soft-light';
-          renoCtx.globalAlpha = 0.65;
           renoCtx.drawImage(baseImg, 0, 0, w, h);
           renoCtx.restore();
-
-          // Subtle contact shadow depth
-          renoCtx.save();
-          renoCtx.globalCompositeOperation = 'multiply';
-          renoCtx.globalAlpha = 0.20;
-          renoCtx.drawImage(baseImg, 0, 0, w, h);
-          renoCtx.restore();
-
-          // Specular Lappato gloss (window light reflections)
-          renoCtx.save();
-          renoCtx.globalCompositeOperation = 'screen';
-          renoCtx.globalAlpha = 0.22;
-          renoCtx.drawImage(baseImg, 0, 0, w, h);
-          renoCtx.restore();
-
-          renoCtx.restore(); // end surface clip
-        };
-
-        // Sub-function: Occlusion Cutouts (Bathtub, Sinks, Mirror, Windows remain in front)
-        const drawObstacles = (surfaceFilter) => {
-          if (!Array.isArray(analysis.obstacles) || analysis.obstacles.length === 0) return;
-
-          analysis.obstacles.forEach(obs => {
-            if (surfaceFilter && obs.surface && obs.surface !== 'both' && obs.surface !== surfaceFilter) {
-              return;
-            }
-            if (!Array.isArray(obs.polygon) || obs.polygon.length < 3) return;
-
-            const obsPts = obs.polygon.map(pt => ({
-              x: (pt[0] / 100) * w,
-              y: (pt[1] / 100) * h
-            }));
-
-            renoCtx.save();
-            renoCtx.beginPath();
-            renoCtx.moveTo(obsPts[0].x, obsPts[0].y);
-            for (let j = 1; j < obsPts.length; j++) {
-              renoCtx.lineTo(obsPts[j].x, obsPts[j].y);
-            }
-            renoCtx.closePath();
-            renoCtx.clip();
-
-            // Re-render original room fixture crisply on top of the newly tiled surface
-            renoCtx.drawImage(baseImg, 0, 0, w, h);
-            renoCtx.restore();
-          });
-        };
-
-        // Default wall corners for preset or custom
-        const wallCorners = getDefaultCorners(activePresetId, 'walls');
-        const floorCorners = getDefaultCorners(activePresetId, 'floor');
-
-        // Render based on user target
-        if (targetSurface === 'walls') {
-          drawSurface(corners);
-          drawObstacles('walls');
-        } else if (targetSurface === 'floor') {
-          drawSurface(corners);
-          drawObstacles('floor');
-        } else if (targetSurface === 'both') {
-          drawSurface(wallCorners);
-          drawObstacles('walls');
-          drawSurface(floorCorners);
-          drawObstacles('floor');
-        }
-
-        // Draw general obstacles
-        drawObstacles();
+        });
       };
-    };
-  }, [roomSource, userUploadedImage, activePresetId, currentTile, targetSurface, tileRotation, tileScale, groutColor, groutWidth, analysisResult, renderMode, aiRenderedImage, corners, getDefaultCorners]);
+
+      // Yüzey seçimlerine göre seramiği döşe
+      const wallCorners = getDefaultCorners(activePresetId, 'walls');
+      const floorCorners = getDefaultCorners(activePresetId, 'floor');
+
+      if (targetSurface === 'walls') {
+        drawSurface(corners);
+        drawObstacles('walls');
+      } else if (targetSurface === 'floor') {
+        drawSurface(corners, true);
+        drawObstacles('floor');
+      } else if (targetSurface === 'both') {
+        drawSurface(wallCorners);
+        drawObstacles('walls');
+        drawSurface(floorCorners, true);
+        drawObstacles('floor');
+      }
+
+      // -----------------------------------------------------------------
+      // Katman 3 (En üst): Duvardan bağımsız ön plandaki nesneler
+      // Kadın, tezgah, musluk, dolaplar, küvet şeffaf PNG katmanı
+      // -----------------------------------------------------------------
+      if (fgImg) {
+        renoCtx.save();
+        renoCtx.drawImage(fgImg, 0, 0, w, h);
+        renoCtx.restore();
+      }
+
+      drawObstacles();
+    });
+  }, [roomSource, userUploadedImage, customForegroundImg, isForegroundLayerActive, activePresetId, currentTile, targetSurface, tileRotation, tileScale, groutColor, groutWidth, analysisResult, renderMode, aiRenderedImage, corners, getDefaultCorners]);
 
   // Handle Corner Pin Dragging
   const handlePinMouseDown = (index, e) => {
@@ -703,14 +818,20 @@ export default function NeuralRenovationModal({
         ? userUploadedImage
         : (PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId)?.url || PRESET_SAMPLE_ROOMS[0].url);
 
+      const activeFgUrl = roomSource === 'upload' && customForegroundImg
+        ? customForegroundImg
+        : (PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId)?.fgUrl);
+
       const res = await fetch('/api/ai/opencv-tile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           room_image: activeImgSrc,
-          tile_image: currentTile?.textureUrl || currentTile?.imageUrl || '/textures/calacatta_gold.jpg',
+          tile_image: getResolvedTileTexture(currentTile),
           dst_corners: corners,
           obstacles: analysisResult?.obstacles || [],
+          foreground_image: isForegroundLayerActive ? activeFgUrl : null,
+          auto_segment: roomSource === 'upload',
           tile_w_px: Math.round(320 * tileScale),
           tile_h_px: Math.round(640 * tileScale),
           grout_size: groutWidth,
@@ -951,6 +1072,7 @@ export default function NeuralRenovationModal({
                     onClick={() => {
                       setRoomSource('preset');
                       setActivePresetId(p.id);
+                      setCustomForegroundImg(null);
                       stopCamera();
                     }}
                     style={{
@@ -1055,6 +1177,37 @@ export default function NeuralRenovationModal({
                 >
                   <span>🔄 Sıfırla</span>
                 </button>
+              </div>
+
+              {/* 3-Layer Foreground Occlusion Protection Toggle */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255, 255, 255, 0.05)', padding: '2px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                <button
+                  onClick={() => setIsForegroundLayerActive(prev => !prev)}
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    fontSize: '0.7rem',
+                    fontWeight: '800',
+                    background: isForegroundLayerActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.15)',
+                    color: isForegroundLayerActive ? '#10b981' : '#f87171',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}
+                  title="Ön plandaki insanı, tezgahı, musluğu ve ahşap dolapları seramiğin üzerinde korur"
+                >
+                  <ShieldCheck size={13} color={isForegroundLayerActive ? '#10b981' : '#f87171'} />
+                  <span>{isForegroundLayerActive ? '🛡️ Katman 3: Ön Plan Koruma (Açık)' : 'Katman 3: Kapalı'}</span>
+                </button>
+
+                {isSegmentingForeground && (
+                  <span style={{ fontSize: '0.66rem', color: '#10b981', padding: '0 6px', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                    <RefreshCw size={10} className="animate-spin" />
+                    <span>Ön Plan Kesiliyor...</span>
+                  </span>
+                )}
               </div>
             </div>
 

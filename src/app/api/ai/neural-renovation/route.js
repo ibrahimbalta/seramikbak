@@ -118,7 +118,8 @@ const PRESET_SPATIAL_REGISTRY = {
       }
     ],
     dominantLight: 'top-center',
-    estimatedAreaM2: 5.8
+    estimatedAreaM2: 5.8,
+    fgUrl: '/hero/luxury_bathroom_fg.png'
   },
   scandi_kitchen: {
     floorPolygon: [
@@ -129,27 +130,50 @@ const PRESET_SPATIAL_REGISTRY = {
       [0, 65]
     ],
     wallPolygon: [
-      [0, 20],
-      [100, 20],
-      [100, 65],
-      [0, 65]
+      [40, 27],
+      [100, 27],
+      [100, 57],
+      [40, 57]
     ],
     vanishingPoint: [50, 45],
     obstacles: [
       {
-        type: 'kitchen_island',
-        name: 'Island Counter',
-        surface: 'floor',
+        type: 'person',
+        name: 'Standing Woman',
+        surface: 'both',
         polygon: [
-          [25, 60],
-          [72, 60],
-          [76, 88],
-          [20, 88]
+          [40, 35],
+          [62, 35],
+          [62, 75],
+          [40, 75]
+        ]
+      },
+      {
+        type: 'upper_cabinets',
+        name: 'Upper Cabinets & Shelves',
+        surface: 'walls',
+        polygon: [
+          [0, 0],
+          [100, 0],
+          [100, 28],
+          [0, 28]
+        ]
+      },
+      {
+        type: 'countertop_island',
+        name: 'Countertop, Faucet & Island',
+        surface: 'both',
+        polygon: [
+          [0, 57],
+          [100, 57],
+          [100, 100],
+          [0, 100]
         ]
       }
     ],
     dominantLight: 'window-left',
-    estimatedAreaM2: 8.5
+    estimatedAreaM2: 8.5,
+    fgUrl: '/hero/scandinavian_kitchen_fg.png'
   },
   modern_living: {
     floorPolygon: [
@@ -171,15 +195,16 @@ const PRESET_SPATIAL_REGISTRY = {
         name: 'Modern Sofa & Rug',
         surface: 'floor',
         polygon: [
-          [28, 55],
-          [78, 55],
+          [20, 52],
+          [82, 52],
           [82, 85],
-          [24, 85]
+          [20, 85]
         ]
       }
     ],
     dominantLight: 'top-center',
-    estimatedAreaM2: 18.0
+    estimatedAreaM2: 18.0,
+    fgUrl: '/hero/modern_living_fg.png'
   }
 };
 
