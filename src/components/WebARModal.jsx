@@ -1,12 +1,15 @@
 'use client';
 
 import React from 'react';
-import ARRoomScannerModal from './ARRoomScannerModal';
+import NeuralRenovationModal from './NeuralRenovationModal';
 
 /**
  * WebARModal wrapper component.
- * Directly delegates to ARRoomScannerModal to avoid duplicate MediaStream allocations
- * and ensure instantaneous hardware camera track shutdown on modal closure.
+ * Upgraded from legacy 2D trapezoid AR to Neural Renovation Engine:
+ * - Real spatial vision analysis (Gemini 3.6 Flash)
+ * - Fixture & obstacle protection (klozet, lavabo, küvet maskeleme)
+ * - True vanishing 3D perspective tiling
+ * - Interactive Before/After split comparison slider
  */
 export default function WebARModal({ 
   isOpen, 
@@ -20,14 +23,11 @@ export default function WebARModal({
   if (!isOpen) return null;
 
   return (
-    <ARRoomScannerModal
+    <NeuralRenovationModal
       isOpen={isOpen}
       onClose={onClose}
       selectedProduct={selectedProduct}
-      currentDealer={currentDealer}
-      userLocationCoords={userLocationCoords}
-      userLocationName={userLocationName}
-      initialNearbyDealers={initialNearbyDealers}
+      activeTile={selectedProduct}
     />
   );
 }

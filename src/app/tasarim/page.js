@@ -59,6 +59,8 @@ const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), {
   )
 });
 
+const NeuralRenovationModal = dynamic(() => import('@/components/NeuralRenovationModal'), { ssr: false });
+
 // Neutral high-resolution tile textures for 3D PBR rendering
 const NEUTRAL_TEXTURES = [
   '/textures/calacatta_gold.jpg',
@@ -225,6 +227,7 @@ export default function BrandConsumerStudioPage() {
   const [mobileTab, setMobileTab] = useState('split'); // 'split' | '3d' | 'catalog'
 
   // Modals & Feedback
+  const [showNeuralRenovation, setShowNeuralRenovation] = useState(false);
   const [showDealersModal, setShowDealersModal] = useState(false);
   const [showSampleModal, setShowSampleModal] = useState(false);
   const [dealers, setDealers] = useState([]);
@@ -1477,6 +1480,31 @@ export default function BrandConsumerStudioPage() {
           {/* Right: Actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '6px', flexShrink: 0 }}>
             <button
+              onClick={() => setShowNeuralRenovation(true)}
+              style={{
+                height: isMobile ? '34px' : '36px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: isMobile ? '0 9px' : '0 13px',
+                borderRadius: '9px',
+                background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.06) 100%)',
+                border: '1px solid #d4af37',
+                color: '#d4af37',
+                fontSize: isMobile ? '0.72rem' : '0.76rem',
+                fontWeight: '800',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                boxSizing: 'border-box',
+                boxShadow: '0 2px 10px rgba(212,175,55,0.2)'
+              }}
+              title="Kendi odanın veya banyonun fotoğrafını yükle, seçtiğin seramiği gerçekçi giydir"
+            >
+              <Sparkles size={14} color="#d4af37" />
+              <span>Odamda Gör (AI)</span>
+            </button>
+
+            <button
               onClick={handleDownloadSnapshot}
               style={{
                 height: isMobile ? '34px' : '36px',
@@ -2038,6 +2066,17 @@ export default function BrandConsumerStudioPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* -------------------- 5. NEURAL RENOVATION ENGINE (GERÇEK ODAYA GİYDİRME) -------------------- */}
+      {showNeuralRenovation && (
+        <NeuralRenovationModal
+          isOpen={showNeuralRenovation}
+          onClose={() => setShowNeuralRenovation(false)}
+          activeTile={selectedProduct}
+          onSelectAlternativeTile={(tile) => handleApplyTile(tile)}
+          availableProducts={products}
+        />
       )}
 
       {/* Global Responsive CSS */}
