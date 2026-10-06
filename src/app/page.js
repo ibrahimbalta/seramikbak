@@ -4558,6 +4558,16 @@ export default function Home() {
                     <Sparkles size={15} />
                     <span>✨ 3D Tasarım Stüdyosu</span>
                   </button>
+
+                  <button 
+                    onClick={() => handleOpenWebAR(activeProduct)} 
+                    className="hero-feature-btn gold-theme"
+                    title="Kendi Odanın Fotoğrafını Yükle veya Çek, Seçtiğin Seramiği Gerçekçi Giydir"
+                    style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.06) 100%)', border: '1px solid #d4af37', color: '#d4af37' }}
+                  >
+                    <Sparkles size={15} color="#d4af37" />
+                    <span>✨ Odamda Gör (AI)</span>
+                  </button>
                 </div>
               </div>
 
@@ -5738,13 +5748,14 @@ export default function Home() {
                     type="button"
                     onClick={() => {
                       if (activeProduct) logInteraction('AR_TRY', activeProduct.id, activeProduct.brandId);
-                      startArCamera();
+                      handleOpenWebAR(activeProduct);
                     }}
                     className="canvas-mode-btn"
-                    title="Kameranızı açarak gerçek zeminde karoları görün"
+                    style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.06) 100%)', border: '1px solid #d4af37', color: '#d4af37', fontWeight: '800' }}
+                    title="Kendi odanın veya banyonun fotoğrafını yükle, seçtiğin seramiği gerçekçi giydir"
                   >
-                    <Smartphone size={13} />
-                    <span>📱 AR Kamera</span>
+                    <Sparkles size={13} color="#d4af37" />
+                    <span>✨ Odamda Gör (AI)</span>
                   </button>
 
                   <button

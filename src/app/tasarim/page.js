@@ -844,8 +844,36 @@ export default function BrandConsumerStudioPage() {
           </div>
         )}
 
+        {/* Prominent Neural AI Room Scanner CTA in Sidebar */}
+        <div style={{ padding: '12px 16px 4px 16px', flexShrink: 0 }}>
+          <button
+            onClick={() => setShowNeuralRenovation(true)}
+            style={{
+              width: '100%',
+              height: '42px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
+              border: 'none',
+              color: '#0b0f19',
+              fontSize: '0.82rem',
+              fontWeight: '800',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(212, 175, 55, 0.35)',
+              transition: 'transform 0.15s ease'
+            }}
+          >
+            <Sparkles size={16} />
+            <span>✨ Kendi Odamda Gör (AI)</span>
+            <span style={{ fontSize: '0.62rem', padding: '2px 6px', background: 'rgba(0,0,0,0.22)', color: '#ffffff', borderRadius: '6px', fontWeight: '900' }}>YENİ</span>
+          </button>
+        </div>
+
         {/* Search Bar */}
-        <div style={{ padding: '12px 16px 8px 16px', flexShrink: 0 }}>
+        <div style={{ padding: '10px 16px 8px 16px', flexShrink: 0 }}>
           <div style={{ position: 'relative', width: '100%' }}>
             <Search size={13} color={textMuted} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
             <input
@@ -1712,6 +1740,32 @@ export default function BrandConsumerStudioPage() {
               {wallProduct?.name?.length > 22 ? wallProduct.name.slice(0, 22) + '...' : wallProduct?.name}
             </span>
           </div>
+
+          <div style={{ width: '1px', height: '24px', background: panelBorder }} />
+
+          <button
+            onClick={() => setShowNeuralRenovation(true)}
+            style={{
+              height: '32px',
+              padding: '0 12px',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
+              border: 'none',
+              color: '#0b0f19',
+              fontSize: '0.74rem',
+              fontWeight: '800',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 2px 10px rgba(212, 175, 55, 0.35)'
+            }}
+            title="Seçili seramiği kendi odanın fotoğrafında gör"
+          >
+            <Sparkles size={13} />
+            <span>Odamda Gör (AI)</span>
+          </button>
         </div>
       </main>
 
