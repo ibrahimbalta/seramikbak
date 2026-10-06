@@ -4549,14 +4549,8 @@ export default function Home() {
 
                   <button 
                     onClick={() => {
-                      const studioEl = document.getElementById('studio-canvas-container') || document.getElementById('studio-interactive-section');
-                      if (studioEl) {
-                        const yOffset = -70;
-                        const y = studioEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
-                        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
-                      } else {
-                        window.location.href = '/tasarim';
-                      }
+                      setActiveTab('studio');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }} 
                     className="hero-feature-btn emerald-theme"
                     title="Canlı 3D Mekan & Seramik Tasarım Stüdyosunu Aç"

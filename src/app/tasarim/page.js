@@ -24,7 +24,8 @@ import {
   Phone,
   Grid,
   ChevronDown,
-  Palette
+  Palette,
+  ArrowLeft
 } from 'lucide-react';
 
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
@@ -133,34 +134,36 @@ const PANEL_BG_PRESETS = [
 
 export default function BrandConsumerStudioPage() {
   const [mounted, setMounted] = useState(false);
-  const [brandInfo, setBrandInfo] = useState(() => {
-    let initialBrandName = 'Bien Seramik';
-    let initialSlug = 'bien-seramik';
+  // Detect if accessed in White-Label Brand Mode via URL parameter (?brand=... or ?brandSlug=... or ?brandId=...)
+  const [isBrandMode, setIsBrandMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      return !!(urlParams.get('brand') || urlParams.get('brandSlug') || urlParams.get('brandId'));
+    }
+    return false;
+  });
 
+  const [brandInfo, setBrandInfo] = useState(() => {
     if (typeof window !== 'undefined') {
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const qBrand = urlParams.get('brand') || urlParams.get('brandSlug') || urlParams.get('brandId');
         if (qBrand) {
-          initialSlug = qBrand;
-          initialBrandName = resolveBrandName(qBrand);
-        } else {
-          const saved = localStorage.getItem('sb_brand_session');
-          if (saved) {
-            const parsed = JSON.parse(saved);
-            if (parsed?.name) {
-              initialBrandName = parsed.name;
-              initialSlug = parsed.slug || (parsed.name ? slugify(parsed.name) : 'bien-seramik');
-            }
-          }
+          return {
+            id: '',
+            name: resolveBrandName(qBrand),
+            slug: qBrand,
+            logoUrl: ''
+          };
         }
       } catch {}
     }
 
+    // Default: SeramikBak Public Studio for general consumers
     return {
       id: '',
-      name: initialBrandName,
-      slug: initialSlug,
+      name: 'SeramikBak',
+      slug: '',
       logoUrl: ''
     };
   });
@@ -212,6 +215,8 @@ export default function BrandConsumerStudioPage() {
 
   // Filters & Left Sidebar State
   const [selectedStyle, setSelectedStyle] = useState('all');
+  const [availableBrands, setAvailableBrands] = useState([]);
+  const [selectedBrand, setSelectedBrand] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [visibleCount, setVisibleCount] = useState(16);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -279,96 +284,170 @@ export default function BrandConsumerStudioPage() {
       }
     }
 
-    // Load Brand Metadata and ALL Products from DB
+    // Load Brand Metadata and Products (Public vs White-Label Mode)
     async function initBrandData() {
       setIsLoadingProducts(true);
 
-      // 1. Resolve target brand slug from URL or localStorage
-      let targetBrandSlug = queryBrand;
-      if (!targetBrandSlug && typeof window !== 'undefined') {
+      // ONLY activate White-Label Brand Mode if URL query explicitly provides brand/brandSlug/brandId!
+      const targetBrandSlug = queryBrand;
+
+      if (targetBrandSlug) {
+        // =========================================================================
+        // 1. WHITE-LABEL BRAND MODE (Only accessed via brand portal or embed snippet)
+        // =========================================================================
+        setIsBrandMode(true);
         try {
-          const session = localStorage.getItem('sb_brand_session');
-          if (session) {
-            const parsed = JSON.parse(session);
-            targetBrandSlug = parsed.slug || (parsed.name ? slugify(parsed.name) : null);
+          const [brandRes, prodRes] = await Promise.all([
+            fetch('/api/brands').then(r => r.json()).catch(() => null),
+            fetch(`/api/products?brandId=${encodeURIComponent(targetBrandSlug)}&limit=500`).then(r => r.json()).catch(() => null)
+          ]);
+
+          let matchedBrand = null;
+          if (Array.isArray(brandRes)) {
+            const normTarget = targetBrandSlug.toLowerCase().replace(/[-_\s]/g, '');
+            matchedBrand = brandRes.find(b => {
+              const normSlug = (b.slug || '').toLowerCase().replace(/[-_\s]/g, '');
+              const normName = (b.name || '').toLowerCase().replace(/[-_\s]/g, '');
+              const trClean = normName.replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ğ/g, 'g');
+              return (
+                b.id === targetBrandSlug ||
+                b.slug === targetBrandSlug ||
+                normSlug === normTarget ||
+                normSlug.startsWith(normTarget) ||
+                normName.includes(normTarget) ||
+                trClean.includes(normTarget) ||
+                normTarget.includes(normSlug)
+              );
+            });
           }
-        } catch {}
-      }
-      if (!targetBrandSlug) {
-        targetBrandSlug = 'bien-seramik';
-      }
 
-      try {
-        // Parallel fetch for brand profile and products
-        const [brandRes, prodRes] = await Promise.all([
-          fetch('/api/brands').then(r => r.json()).catch(() => null),
-          fetch(`/api/products?brandId=${encodeURIComponent(targetBrandSlug)}&limit=500`).then(r => r.json()).catch(() => null)
-        ]);
+          if (!matchedBrand) {
+            matchedBrand = {
+              id: targetBrandSlug,
+              name: resolveBrandName(targetBrandSlug),
+              slug: targetBrandSlug,
+              logoUrl: ''
+            };
+          }
 
-        let matchedBrand = null;
-        if (Array.isArray(brandRes)) {
-          const normTarget = targetBrandSlug.toLowerCase().replace(/[-_\s]/g, '');
-          matchedBrand = brandRes.find(b => {
-            const normSlug = (b.slug || '').toLowerCase().replace(/[-_\s]/g, '');
-            const normName = (b.name || '').toLowerCase().replace(/[-_\s]/g, '');
-            const trClean = normName.replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ğ/g, 'g');
-            return (
-              b.id === targetBrandSlug ||
-              b.slug === targetBrandSlug ||
-              normSlug === normTarget ||
-              normSlug.startsWith(normTarget) ||
-              normName.includes(normTarget) ||
-              trClean.includes(normTarget) ||
-              normTarget.includes(normSlug)
-            );
+          setBrandInfo({
+            id: matchedBrand.id,
+            name: matchedBrand.name,
+            slug: matchedBrand.slug || targetBrandSlug,
+            logoUrl: matchedBrand.logoUrl || ''
           });
-        }
+          setLogoError(false);
 
-        if (!matchedBrand) {
-          matchedBrand = {
+          if (typeof document !== 'undefined') {
+            document.title = `${matchedBrand.name} - 3D Mimari Mekan & Tasarım Stüdyosu | SeramikBak`;
+          }
+
+          let loadedProducts = [];
+
+          if (prodRes && prodRes.products && prodRes.products.length > 0) {
+            loadedProducts = prodRes.products;
+          } else if (matchedBrand?.id && matchedBrand.id !== targetBrandSlug) {
+            const retryRes = await fetch(`/api/products?brandId=${encodeURIComponent(matchedBrand.id)}&limit=500`).then(r => r.json()).catch(() => null);
+            if (retryRes && retryRes.products && retryRes.products.length > 0) {
+              loadedProducts = retryRes.products;
+            }
+          }
+
+          // Strict brand isolation: reject any product belonging to another brand
+          const strictlyBrandProducts = loadedProducts.filter(p => {
+            if (p.brandId && matchedBrand.id && p.brandId === matchedBrand.id) return true;
+            if (p.brand?.id && matchedBrand.id && p.brand.id === matchedBrand.id) return true;
+            if (p.brand?.name && matchedBrand.name && p.brand.name.toLowerCase() === matchedBrand.name.toLowerCase()) return true;
+            return false;
+          });
+
+          const activeCatalog = strictlyBrandProducts.length > 0
+            ? strictlyBrandProducts
+            : (loadedProducts.length > 0 ? loadedProducts : generateBrandFallbacks(matchedBrand));
+
+          const sanitized = activeCatalog.map((p, idx) => {
+            let tex = p.textureUrl || p.imageUrl;
+            let img = p.imageUrl || tex;
+            if (!tex || tex.includes('hero_ceramics') || tex.includes('luxury_bathroom')) {
+              tex = NEUTRAL_TEXTURES[idx % NEUTRAL_TEXTURES.length];
+            }
+            if (!img) img = tex;
+            return {
+              ...p,
+              imageUrl: img,
+              textureUrl: tex,
+              brand: p.brand || { id: matchedBrand.id, name: matchedBrand.name }
+            };
+          });
+
+          setProducts(sanitized);
+
+          let initial = sanitized[0];
+          if (queryProduct) {
+            const match = sanitized.find(p => 
+              String(p.id) === queryProduct || 
+              p.code?.toLowerCase() === queryProduct.toLowerCase() ||
+              p.name?.toLowerCase().includes(queryProduct.toLowerCase())
+            );
+            if (match) initial = match;
+          }
+
+          setSelectedProduct(initial);
+          setFloorProduct(initial);
+          setWallProduct(initial);
+          setIsLoadingProducts(false);
+          return;
+        } catch (e) {
+          console.warn('Brand metadata & products fetch error:', e);
+          const fallbackBrand = {
             id: targetBrandSlug,
             name: resolveBrandName(targetBrandSlug),
             slug: targetBrandSlug,
             logoUrl: ''
           };
+          const localMatches = generateBrandFallbacks(fallbackBrand);
+          setProducts(localMatches);
+          setSelectedProduct(localMatches[0]);
+          setFloorProduct(localMatches[0]);
+          setWallProduct(localMatches[0]);
+          setIsLoadingProducts(false);
+          return;
         }
+      }
 
-        setBrandInfo({
-          id: matchedBrand.id,
-          name: matchedBrand.name,
-          slug: matchedBrand.slug || targetBrandSlug,
-          logoUrl: matchedBrand.logoUrl || ''
-        });
-        setLogoError(false);
+      // =========================================================================
+      // 2. PUBLIC CONSUMER MODE (Standard SeramikBak 3D Studio for normal users)
+      // =========================================================================
+      setIsBrandMode(false);
+      setBrandInfo({
+        id: '',
+        name: 'SeramikBak',
+        slug: '',
+        logoUrl: ''
+      });
 
-        if (typeof document !== 'undefined') {
-          document.title = `${matchedBrand.name} - 3D Mimari Mekan & Tasarım Stüdyosu | SeramikBak`;
+      if (typeof document !== 'undefined') {
+        document.title = '3D Mimari Mekan & Seramik Tasarım Stüdyosu | SeramikBak';
+      }
+
+      try {
+        const [prodRes, brandsRes] = await Promise.all([
+          fetch('/api/products?limit=500').then(r => r.json()).catch(() => null),
+          fetch('/api/brands').then(r => r.json()).catch(() => null)
+        ]);
+
+        if (Array.isArray(brandsRes)) {
+          setAvailableBrands(brandsRes);
         }
 
         let loadedProducts = [];
-
-        // Check first API response
         if (prodRes && prodRes.products && prodRes.products.length > 0) {
           loadedProducts = prodRes.products;
-        } else if (matchedBrand?.id && matchedBrand.id !== targetBrandSlug) {
-          // Retry with matched brand UUID if slug query returned empty
-          const retryRes = await fetch(`/api/products?brandId=${encodeURIComponent(matchedBrand.id)}&limit=500`).then(r => r.json()).catch(() => null);
-          if (retryRes && retryRes.products && retryRes.products.length > 0) {
-            loadedProducts = retryRes.products;
-          }
         }
 
-        // Strict brand isolation: reject any product belonging to another brand
-        const strictlyBrandProducts = loadedProducts.filter(p => {
-          if (p.brandId && matchedBrand.id && p.brandId === matchedBrand.id) return true;
-          if (p.brand?.id && matchedBrand.id && p.brand.id === matchedBrand.id) return true;
-          if (p.brand?.name && matchedBrand.name && p.brand.name.toLowerCase() === matchedBrand.name.toLowerCase()) return true;
-          return false;
-        });
-
-        const activeCatalog = strictlyBrandProducts.length > 0
-          ? strictlyBrandProducts
-          : (loadedProducts.length > 0 ? loadedProducts : generateBrandFallbacks(matchedBrand));
+        const activeCatalog = loadedProducts.length > 0
+          ? loadedProducts
+          : generateBrandFallbacks({ name: 'SeramikBak', id: 'sb', slug: 'seramikbak' });
 
         const sanitized = activeCatalog.map((p, idx) => {
           let tex = p.textureUrl || p.imageUrl;
@@ -381,13 +460,12 @@ export default function BrandConsumerStudioPage() {
             ...p,
             imageUrl: img,
             textureUrl: tex,
-            brand: p.brand || { id: matchedBrand.id, name: matchedBrand.name }
+            brand: p.brand || { id: 'sb', name: 'SeramikBak' }
           };
         });
 
         setProducts(sanitized);
 
-        // Find target or initial product
         let initial = sanitized[0];
         if (queryProduct) {
           const match = sanitized.find(p => 
@@ -402,24 +480,15 @@ export default function BrandConsumerStudioPage() {
         setFloorProduct(initial);
         setWallProduct(initial);
         setIsLoadingProducts(false);
-        return;
-      } catch (e) {
-        console.warn('Brand metadata & products fetch error:', e);
+      } catch (err) {
+        console.warn('Public studio initialization error:', err);
+        const fallbacks = generateBrandFallbacks({ name: 'SeramikBak', id: 'sb', slug: 'seramikbak' });
+        setProducts(fallbacks);
+        setSelectedProduct(fallbacks[0]);
+        setFloorProduct(fallbacks[0]);
+        setWallProduct(fallbacks[0]);
+        setIsLoadingProducts(false);
       }
-
-      // Fallback matching using dynamic brand generator if network failed completely
-      const fallbackBrand = {
-        id: targetBrandSlug,
-        name: resolveBrandName(targetBrandSlug),
-        slug: targetBrandSlug,
-        logoUrl: ''
-      };
-      const localMatches = generateBrandFallbacks(fallbackBrand);
-      setProducts(localMatches);
-      setSelectedProduct(localMatches[0]);
-      setFloorProduct(localMatches[0]);
-      setWallProduct(localMatches[0]);
-      setIsLoadingProducts(false);
     }
 
     initBrandData();
@@ -434,15 +503,15 @@ export default function BrandConsumerStudioPage() {
     setShowDealersModal(true);
     setLoadingDealers(true);
     try {
-      const brandIdParam = brandInfo?.id ? `?brandId=${brandInfo.id}` : '';
+      const brandIdParam = isBrandMode && brandInfo?.id ? `?brandId=${brandInfo.id}` : '';
       const res = await fetch(`/api/dealers${brandIdParam}`).then(r => r.json()).catch(() => null);
       if (Array.isArray(res) && res.length > 0) {
         setDealers(res);
       } else {
         setDealers([
-          { id: 'd1', name: `${brandInfo.name} Merkez Showroom`, city: 'İstanbul', district: 'Kadıköy', phone: '0216 444 00 00', address: 'Bağdat Caddesi No: 120' },
-          { id: 'd2', name: `${brandInfo.name} Konsept Mağaza`, city: 'Ankara', district: 'Çankaya', phone: '0312 444 00 00', address: 'Turan Güneş Bulvarı No: 45' },
-          { id: 'd3', name: `${brandInfo.name} Ege Bölge Bayi`, city: 'İzmir', district: 'Alsancak', phone: '0232 444 00 00', address: 'Şair Eşref Bulvarı No: 18' }
+          { id: 'd1', name: isBrandMode ? `${brandInfo.name} Merkez Showroom` : 'SeramikBak Merkez Showroom', city: 'İstanbul', district: 'Kadıköy', phone: '0216 444 00 00', address: 'Bağdat Caddesi No: 120' },
+          { id: 'd2', name: isBrandMode ? `${brandInfo.name} Konsept Mağaza` : 'SeramikBak Konsept Showroom', city: 'Ankara', district: 'Çankaya', phone: '0312 444 00 00', address: 'Turan Güneş Bulvarı No: 45' },
+          { id: 'd3', name: isBrandMode ? `${brandInfo.name} Ege Bölge Bayi` : 'SeramikBak Ege Bölge Showroom', city: 'İzmir', district: 'Alsancak', phone: '0232 444 00 00', address: 'Şair Eşref Bulvarı No: 18' }
         ]);
       }
     } catch (e) {
@@ -518,6 +587,12 @@ export default function BrandConsumerStudioPage() {
 
   // Filter Catalog Products
   const filteredProducts = products.filter(p => {
+    let brandMatch = true;
+    if (!isBrandMode && selectedBrand !== 'all') {
+      const pbName = (p.brand?.name || '').toLowerCase();
+      const sel = selectedBrand.toLowerCase();
+      brandMatch = pbName.includes(sel) || sel.includes(pbName) || (p.brandId === selectedBrand);
+    }
     let styleMatch = true;
     if (selectedStyle !== 'all') {
       const s = (p.style || '').toLowerCase();
@@ -527,15 +602,18 @@ export default function BrandConsumerStudioPage() {
     let searchMatch = true;
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase();
-      searchMatch = (p.name || '').toLowerCase().includes(q) || (p.code || '').toLowerCase().includes(q);
+      const bn = (p.brand?.name || '').toLowerCase();
+      searchMatch = (p.name || '').toLowerCase().includes(q) || 
+                    (p.code || '').toLowerCase().includes(q) ||
+                    bn.includes(q);
     }
-    return styleMatch && searchMatch;
+    return brandMatch && styleMatch && searchMatch;
   });
 
   // Reset pagination on filter or search change
   useEffect(() => {
     setVisibleCount(16);
-  }, [searchTerm, selectedStyle]);
+  }, [searchTerm, selectedStyle, selectedBrand]);
 
   // Lazy progressive slice (loads 16 initially, more as user scrolls)
   const displayedProducts = filteredProducts.slice(0, visibleCount);
@@ -605,7 +683,7 @@ export default function BrandConsumerStudioPage() {
                 Koleksiyon Kataloğu
               </div>
               <div style={{ fontSize: '0.66rem', color: themeColor, fontWeight: '700' }}>
-                {brandInfo.name} ({filteredProducts.length} Model)
+                {isBrandMode ? brandInfo.name : (selectedBrand === 'all' ? 'Tüm Markalar' : selectedBrand)} ({filteredProducts.length} Model)
               </div>
             </div>
           </div>
@@ -769,7 +847,7 @@ export default function BrandConsumerStudioPage() {
             <Search size={13} color={textMuted} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
             <input
               type="text"
-              placeholder={`${brandInfo.name} modellerinde ara...`}
+              placeholder={isBrandMode ? `${brandInfo.name} modellerinde ara...` : 'Tüm seramik modellerinde ara...'}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -795,6 +873,39 @@ export default function BrandConsumerStudioPage() {
             )}
           </div>
         </div>
+
+        {/* Public Mode: Brand Selector Dropdown */}
+        {!isBrandMode && availableBrands.length > 0 && (
+          <div style={{ padding: '0 16px 8px 16px', display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            <span style={{ fontSize: '0.68rem', fontWeight: '700', color: textMuted, whiteSpace: 'nowrap' }}>
+              Marka:
+            </span>
+            <select
+              value={selectedBrand}
+              onChange={(e) => setSelectedBrand(e.target.value)}
+              style={{
+                flex: 1,
+                height: '32px',
+                background: inputBg,
+                border: `1px solid ${inputBorder}`,
+                borderRadius: '8px',
+                color: textColor,
+                fontSize: '0.74rem',
+                fontWeight: '700',
+                padding: '0 8px',
+                outline: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="all" style={{ background: panelBg, color: textColor }}>Tüm Üretici Markalar ({products.length} Ürün)</option>
+              {availableBrands.map(b => (
+                <option key={b.id} value={b.name} style={{ background: panelBg, color: textColor }}>
+                  {b.name} {b._count?.products ? `(${b._count.products})` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* Style Category Filter Pills */}
         <div style={{
@@ -904,7 +1015,7 @@ export default function BrandConsumerStudioPage() {
                 animation: 'sb-spin 0.8s linear infinite',
                 margin: '0 auto 10px auto'
               }} />
-              <span>{brandInfo.name} seramik koleksiyonu yükleniyor...</span>
+              <span>{isBrandMode ? brandInfo.name : 'SeramikBak'} seramik koleksiyonu yükleniyor...</span>
             </div>
           ) : filteredProducts.length === 0 ? (
             <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '40px 0', color: textMuted, fontSize: '0.78rem' }}>
@@ -1007,6 +1118,19 @@ export default function BrandConsumerStudioPage() {
                     }} title={tile.name}>
                       {tile.name}
                     </div>
+                    {!isBrandMode && (tile.brand?.name || tile.brandName) && (
+                      <div style={{
+                        fontSize: '0.62rem',
+                        fontWeight: '700',
+                        color: themeColor,
+                        marginTop: '1px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}>
+                        {tile.brand?.name || tile.brandName}
+                      </div>
+                    )}
                     <div style={{ 
                       fontSize: '0.62rem', 
                       color: textMuted, 
@@ -1146,6 +1270,32 @@ export default function BrandConsumerStudioPage() {
         }}>
           {/* Left: Re-open Sidebar Button / Mobile View Switcher + Brand Identity */}
           <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '6px' : '10px', minWidth: 0, flexShrink: 0 }}>
+            {!isBrandMode && (
+              <a
+                href="/"
+                style={{
+                  height: isMobile ? '30px' : '34px',
+                  padding: isMobile ? '0 8px' : '0 10px',
+                  borderRadius: '8px',
+                  background: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.07)',
+                  border: `1px solid ${panelBorder}`,
+                  color: textColor,
+                  fontSize: isMobile ? '0.7rem' : '0.75rem',
+                  fontWeight: '700',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  textDecoration: 'none',
+                  cursor: 'pointer',
+                  flexShrink: 0
+                }}
+                title="SeramikBak Anasayfasına Dön"
+              >
+                <ArrowLeft size={13} />
+                <span className="btn-label-desktop">Anasayfa</span>
+              </a>
+            )}
+
             {!isMobile && !isSidebarOpen && (
               <button
                 onClick={() => setIsSidebarOpen(true)}
@@ -1201,7 +1351,7 @@ export default function BrandConsumerStudioPage() {
               width: isMobile ? '30px' : '36px',
               height: isMobile ? '30px' : '36px',
               borderRadius: '9px',
-              background: '#ffffff',
+              background: isBrandMode && brandInfo.logoUrl && !logoError ? '#ffffff' : `linear-gradient(135deg, ${themeColor} 0%, #b89628 100%)`,
               border: `1px solid ${panelBorder}`,
               display: 'flex',
               alignItems: 'center',
@@ -1209,10 +1359,10 @@ export default function BrandConsumerStudioPage() {
               boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
               overflow: 'hidden',
               flexShrink: 0,
-              padding: '2px',
+              padding: isBrandMode && brandInfo.logoUrl && !logoError ? '2px' : 0,
               boxSizing: 'border-box'
             }}>
-              {brandInfo.logoUrl && !logoError ? (
+              {isBrandMode && brandInfo.logoUrl && !logoError ? (
                 <img 
                   src={brandInfo.logoUrl} 
                   alt={brandInfo.name} 
@@ -1224,7 +1374,6 @@ export default function BrandConsumerStudioPage() {
                   width: '100%',
                   height: '100%',
                   borderRadius: '7px',
-                  background: `linear-gradient(135deg, ${themeColor} 0%, #b89628 100%)`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1233,7 +1382,7 @@ export default function BrandConsumerStudioPage() {
                   fontSize: isMobile ? '0.78rem' : '0.88rem',
                   fontFamily: 'var(--font-title, sans-serif)'
                 }}>
-                  {brandInfo.name ? brandInfo.name.charAt(0).toUpperCase() : 'S'}
+                  {isBrandMode ? (brandInfo.name ? brandInfo.name.charAt(0).toUpperCase() : 'B') : 'SB'}
                 </div>
               )}
             </div>
@@ -1249,7 +1398,7 @@ export default function BrandConsumerStudioPage() {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}>
-                {brandInfo.name}
+                {isBrandMode ? brandInfo.name : 'SeramikBak'}
               </span>
               <span className="brand-studio-title" style={{ 
                 fontSize: '0.58rem', 
@@ -1259,7 +1408,7 @@ export default function BrandConsumerStudioPage() {
                 letterSpacing: '0.04em',
                 lineHeight: 1.2
               }}>
-                3D Mekan Stüdyosu
+                {isBrandMode ? '3D Mekan Stüdyosu' : '3D Tasarım Stüdyosu'}
               </span>
             </div>
           </div>
@@ -1600,7 +1749,7 @@ export default function BrandConsumerStudioPage() {
                 </div>
                 <div>
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '800', color: '#f8fafc' }}>
-                    {brandInfo.name} Yetkili Showroom & Bayileri
+                    {isBrandMode ? brandInfo.name : 'SeramikBak'} Yetkili Showroom & Bayileri
                   </h3>
                   <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
                     Seramikleri mağazada canlı görüp dokunmak için en yakın noktayı seçin
@@ -1863,7 +2012,7 @@ export default function BrandConsumerStudioPage() {
                     </button>
 
                     <a
-                      href={`https://wa.me/905321381061?text=${encodeURIComponent(`Merhaba, ${brandInfo.name} web sitesinden 3D mekanımda tasarladığım ${selectedProduct?.name} (${selectedProduct?.code}) modeli hakkında numune ve fiyat bilgisi almak istiyorum.`)}`}
+                      href={`https://wa.me/905321381061?text=${encodeURIComponent(`Merhaba, ${isBrandMode ? brandInfo.name : 'SeramikBak'} web sitesinden 3D mekanımda tasarladığım ${selectedProduct?.name} (${selectedProduct?.code}) modeli hakkında numune ve fiyat bilgisi almak istiyorum.`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
