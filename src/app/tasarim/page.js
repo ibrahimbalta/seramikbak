@@ -59,8 +59,6 @@ const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), {
   )
 });
 
-const NeuralRenovationModal = dynamic(() => import('@/components/NeuralRenovationModal'), { ssr: false });
-
 // Neutral high-resolution tile textures for 3D PBR rendering
 const NEUTRAL_TEXTURES = [
   '/textures/calacatta_gold.jpg',
@@ -227,7 +225,6 @@ export default function BrandConsumerStudioPage() {
   const [mobileTab, setMobileTab] = useState('split'); // 'split' | '3d' | 'catalog'
 
   // Modals & Feedback
-  const [showNeuralRenovation, setShowNeuralRenovation] = useState(false);
   const [showDealersModal, setShowDealersModal] = useState(false);
   const [showSampleModal, setShowSampleModal] = useState(false);
   const [dealers, setDealers] = useState([]);
@@ -844,33 +841,6 @@ export default function BrandConsumerStudioPage() {
           </div>
         )}
 
-        {/* Prominent Neural AI Room Scanner CTA in Sidebar */}
-        <div style={{ padding: '12px 16px 4px 16px', flexShrink: 0 }}>
-          <button
-            onClick={() => setShowNeuralRenovation(true)}
-            style={{
-              width: '100%',
-              height: '42px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
-              border: 'none',
-              color: '#0b0f19',
-              fontSize: '0.82rem',
-              fontWeight: '800',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              cursor: 'pointer',
-              boxShadow: '0 4px 15px rgba(212, 175, 55, 0.35)',
-              transition: 'transform 0.15s ease'
-            }}
-          >
-            <Sparkles size={16} />
-            <span>✨ Kendi Odamda Gör (AI)</span>
-            <span style={{ fontSize: '0.62rem', padding: '2px 6px', background: 'rgba(0,0,0,0.22)', color: '#ffffff', borderRadius: '6px', fontWeight: '900' }}>YENİ</span>
-          </button>
-        </div>
 
         {/* Search Bar */}
         <div style={{ padding: '10px 16px 8px 16px', flexShrink: 0 }}>
@@ -1508,31 +1478,6 @@ export default function BrandConsumerStudioPage() {
           {/* Right: Actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '4px' : '6px', flexShrink: 0 }}>
             <button
-              onClick={() => setShowNeuralRenovation(true)}
-              style={{
-                height: isMobile ? '34px' : '36px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: isMobile ? '0 9px' : '0 13px',
-                borderRadius: '9px',
-                background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.06) 100%)',
-                border: '1px solid #d4af37',
-                color: '#d4af37',
-                fontSize: isMobile ? '0.72rem' : '0.76rem',
-                fontWeight: '800',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                boxSizing: 'border-box',
-                boxShadow: '0 2px 10px rgba(212,175,55,0.2)'
-              }}
-              title="Kendi odanın veya banyonun fotoğrafını yükle, seçtiğin seramiği gerçekçi giydir"
-            >
-              <Sparkles size={14} color="#d4af37" />
-              <span>Odamda Gör (AI)</span>
-            </button>
-
-            <button
               onClick={handleDownloadSnapshot}
               style={{
                 height: isMobile ? '34px' : '36px',
@@ -1742,30 +1687,6 @@ export default function BrandConsumerStudioPage() {
           </div>
 
           <div style={{ width: '1px', height: '24px', background: panelBorder }} />
-
-          <button
-            onClick={() => setShowNeuralRenovation(true)}
-            style={{
-              height: '32px',
-              padding: '0 12px',
-              borderRadius: '8px',
-              background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
-              border: 'none',
-              color: '#0b0f19',
-              fontSize: '0.74rem',
-              fontWeight: '800',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              whiteSpace: 'nowrap',
-              boxShadow: '0 2px 10px rgba(212, 175, 55, 0.35)'
-            }}
-            title="Seçili seramiği kendi odanın fotoğrafında gör"
-          >
-            <Sparkles size={13} />
-            <span>Odamda Gör (AI)</span>
-          </button>
         </div>
       </main>
 
@@ -2122,16 +2043,7 @@ export default function BrandConsumerStudioPage() {
         </div>
       )}
 
-      {/* -------------------- 5. NEURAL RENOVATION ENGINE (GERÇEK ODAYA GİYDİRME) -------------------- */}
-      {showNeuralRenovation && (
-        <NeuralRenovationModal
-          isOpen={showNeuralRenovation}
-          onClose={() => setShowNeuralRenovation(false)}
-          activeTile={selectedProduct}
-          onSelectAlternativeTile={(tile) => handleApplyTile(tile)}
-          availableProducts={products}
-        />
-      )}
+
 
       {/* Global Responsive CSS */}
       <style>{`

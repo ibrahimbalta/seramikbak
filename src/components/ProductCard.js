@@ -15,8 +15,7 @@ export default function ProductCard({
   navigateTo3DStudio,
   navigateToDealers,
   getProductBadge,
-  handleProductCardClick,
-  onOpenAR
+  handleProductCardClick
 }) {
   const { t, translateFinish, translateStyle } = useLanguage();
   const hasAd = product.campaigns && product.campaigns.length > 0;

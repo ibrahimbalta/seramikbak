@@ -5,7 +5,7 @@ import { Camera, Sparkles, QrCode, X, ExternalLink, Layers, Smartphone, Maximize
 import * as THREE from 'three';
 import { cropWhiteBorders } from '../utils/imageTextureUtils';
 
-export default function ModelViewerAR({ product, onClose, onLaunchWebAR }) {
+export default function ModelViewerAR({ product, onClose }) {
   const [modelViewerLoaded, setModelViewerLoaded] = useState(false);
   const [glbUrl, setGlbUrl] = useState(null);
   const [showQrModal, setShowQrModal] = useState(false);
@@ -287,35 +287,11 @@ export default function ModelViewerAR({ product, onClose, onLaunchWebAR }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Smartphone size={18} style={{ color: 'var(--accent-gold)' }} />
               <span style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
-                Google Play Hizmetleri gerektirmeyen canlı kamera tarayıcısı için:
+                Mobilde 1:1 gerçek ebatta incelemek için:
               </span>
             </div>
 
             <div style={{ display: 'flex', gap: '8px' }}>
-              {onLaunchWebAR && (
-                <button
-                  onClick={() => {
-                    onClose();
-                    onLaunchWebAR(product);
-                  }}
-                  style={{
-                    fontSize: '0.75rem',
-                    padding: '8px 14px',
-                    borderRadius: '8px',
-                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                    border: 'none',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    fontWeight: '800',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  <Sparkles size={14} />
-                  <span>📷 WebAR Scanner Aç</span>
-                </button>
-              )}
 
               <button 
                 onClick={() => setShowQrModal(true)}

@@ -71,10 +71,6 @@ import dynamic from 'next/dynamic';
 import BimSpecDownloadModal from '@/components/BimSpecDownloadModal';
 
 // Dynamically import client-only components to prevent Next.js SSR hydration mismatches
-const WebARModal = dynamic(() => import('@/components/WebARModal'), { 
-  ssr: false,
-  loading: () => null
-});
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
   ssr: false,
   loading: () => (
@@ -1090,14 +1086,6 @@ export default function Home() {
   const [uploadedImageFile, setUploadedImageFile] = useState(null);
   const [detectedColorInfo, setDetectedColorInfo] = useState(null);
   const [visualSearchMatches, setVisualSearchMatches] = useState(null);
-
-  // WebAR Camera Modal State
-  const [showWebARModal, setShowWebARModal] = useState(false);
-  const [webarProduct, setWebarProduct] = useState(null);
-  const handleOpenWebAR = (product) => {
-    setWebarProduct(product || null);
-    setShowWebARModal(true);
-  };
 
   // 3D Studio Options
   const [studioTarget, setStudioTarget] = useState('floor'); // floor, walls, accent, shower, showerFloor, toilet, leftWallAccent, stripe
@@ -4551,9 +4539,12 @@ export default function Home() {
                   </label>
 
                   <button 
-                    onClick={() => handleOpenWebAR(activeProduct)} 
+                    onClick={() => {
+                      setActiveTab('studio');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }} 
                     className="hero-feature-btn gold-theme"
-                    title="Banyo, Mutfak, Salon ve Antre mekanlarında canlı 3D seramik simülasyonu"
+                    title="Canlı 3D Mekan & Seramik Tasarım Stüdyosunu Aç"
                     style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.08) 100%)', border: '1px solid #d4af37', color: '#d4af37', fontWeight: '800' }}
                   >
                     <Sparkles size={15} color="#d4af37" />
@@ -5642,7 +5633,6 @@ export default function Home() {
                         navigateToDealers={navigateToDealers}
                         getProductBadge={getProductBadge}
                         handleProductCardClick={handleProductCardClick}
-                        onOpenAR={(p) => handleOpenWebAR(p)}
                       />
                     ))
                   )}
@@ -5733,20 +5723,6 @@ export default function Home() {
                     title="İki Seramiği Yan Yana Canlı Kıyaslayın"
                   >
                     <span>{studioComparisonMode ? '✓ Kıyaslama Açık' : '⚖️ 3D Kıyasla'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (activeProduct) logInteraction('AR_TRY', activeProduct.id, activeProduct.brandId);
-                      handleOpenWebAR(activeProduct);
-                    }}
-                    className="canvas-mode-btn"
-                    style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.06) 100%)', border: '1px solid #d4af37', color: '#d4af37', fontWeight: '800' }}
-                    title="Banyo, Mutfak, Salon ve Antre mekanlarında canlı 3D seramik simülasyonu"
-                  >
-                    <Sparkles size={13} color="#d4af37" />
-                    <span>✨ 3D Mekan Giydirme</span>
                   </button>
 
                   <button
@@ -9984,7 +9960,6 @@ export default function Home() {
         <ModelViewerAR 
           product={arModalProduct} 
           onClose={() => setArModalProduct(null)} 
-          onLaunchWebAR={(p) => handleOpenWebAR(p)}
         />
       )}
 
@@ -19808,18 +19783,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      {/* WEB-AR CAMERA FLOOR OVERLAY MODAL */}
-      <WebARModal 
-        isOpen={showWebARModal} 
-        onClose={() => setShowWebARModal(false)} 
-        selectedProduct={webarProduct}
-        userLocationCoords={userCoords}
-        userLocationName={userLocationName}
-        currentDealer={activeDealerOnMap}
-        initialNearbyDealers={nearestDealers}
-        availableProducts={products}
-      />
 
       {/* BIM & ARCHITECTURAL SPEC DOWNLOAD MODAL */}
       <BimSpecDownloadModal
