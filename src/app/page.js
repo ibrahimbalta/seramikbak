@@ -68,10 +68,13 @@ import {
   CheckCircle
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import WebARModal from '@/components/WebARModal';
 import BimSpecDownloadModal from '@/components/BimSpecDownloadModal';
 
 // Dynamically import client-only components to prevent Next.js SSR hydration mismatches
+const WebARModal = dynamic(() => import('@/components/WebARModal'), { 
+  ssr: false,
+  loading: () => null
+});
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
   ssr: false,
   loading: () => (

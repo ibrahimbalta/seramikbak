@@ -387,6 +387,11 @@ export default function NeuralRenovationModal({
     }
   }, [activeTile, selectedProduct]);
 
+  // Close handler
+  const handleModalClose = useCallback(() => {
+    if (onClose) onClose();
+  }, [onClose]);
+
   // Escape key handler
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -395,11 +400,6 @@ export default function NeuralRenovationModal({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, handleModalClose]);
-
-  // Close handler
-  const handleModalClose = useCallback(() => {
-    if (onClose) onClose();
-  }, [onClose]);
 
   // =========================================================================
   // CORE PHOTOREALISTIC RENDERING ENGINE
@@ -743,7 +743,7 @@ export default function NeuralRenovationModal({
     const canvas = showOriginal ? originalCanvasRef.current : renovatedCanvasRef.current;
     if (!canvas) return;
     const link = document.createElement('a');
-    link.download = `seramikbak-tadilat-${currentTile.name?.toLowerCase().replace(/\s+/g, '-') || 'tasarim'}.jpg`;
+    link.download = `seramikbak-tadilat-${currentTile?.name?.toLowerCase().replace(/\s+/g, '-') || 'tasarim'}.jpg`;
     link.href = canvas.toDataURL('image/jpeg', 0.95);
     link.click();
   };
@@ -751,7 +751,7 @@ export default function NeuralRenovationModal({
   // Current active preset room
   const currentPreset = PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId) || PRESET_SAMPLE_ROOMS[0];
   const roomAreaM2 = currentPreset?.areaM2 || 6.4;
-  const tileM2 = ((currentTile.width || 60) * (currentTile.height || 120)) / 10000;
+  const tileM2 = ((currentTile?.width || 60) * (currentTile?.height || 120)) / 10000;
   const tilesPerBox = Math.max(2, Math.round(1.44 / (tileM2 || 0.72)));
   const boxAreaM2 = tileM2 * tilesPerBox;
   const calculatedBoxes = Math.ceil((roomAreaM2 * 1.10) / (boxAreaM2 || 1.44));
@@ -788,7 +788,7 @@ export default function NeuralRenovationModal({
     });
   }, [allStudioTiles, tileCategory]);
 
-  const waMessage = `Merhaba, SeramikBak Stüdyo 2.0 uygulamasında ${currentPreset.title} (${roomAreaM2} m²) için "${currentTile.brand?.name || ''} ${currentTile.name}" seramiğini denedim. Yaklaşık ${calculatedBoxes} kutu için bayi fiyat teklifi ve numune talebinde bulunmak istiyorum.`;
+  const waMessage = `Merhaba, SeramikBak Stüdyo 2.0 uygulamasında ${currentPreset?.title || 'Mekan'} (${roomAreaM2} m²) için "${currentTile?.brand?.name || ''} ${currentTile?.name || ''}" seramiğini denedim. Yaklaşık ${calculatedBoxes} kutu için bayi fiyat teklifi ve numune talebinde bulunmak istiyorum.`;
   const waUrl = `https://wa.me/905321381061?text=${encodeURIComponent(waMessage)}`;
 
   if (!isOpen) return null;
