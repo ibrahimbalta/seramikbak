@@ -18,7 +18,8 @@ export default function WebARModal({
   currentDealer,
   userLocationCoords,
   userLocationName,
-  initialNearbyDealers
+  initialNearbyDealers,
+  availableProducts = []
 }) {
   if (!isOpen) return null;
 
@@ -28,6 +29,7 @@ export default function WebARModal({
       onClose={onClose}
       selectedProduct={selectedProduct}
       activeTile={selectedProduct}
+      availableProducts={availableProducts}
     />
   );
 }

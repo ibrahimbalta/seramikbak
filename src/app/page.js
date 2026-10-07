@@ -4548,25 +4548,13 @@ export default function Home() {
                   </label>
 
                   <button 
-                    onClick={() => {
-                      setActiveTab('studio');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }} 
-                    className="hero-feature-btn emerald-theme"
-                    title="Canlı 3D Mekan & Seramik Tasarım Stüdyosunu Aç"
-                  >
-                    <Sparkles size={15} />
-                    <span>✨ 3D Tasarım Stüdyosu</span>
-                  </button>
-
-                  <button 
                     onClick={() => handleOpenWebAR(activeProduct)} 
                     className="hero-feature-btn gold-theme"
-                    title="Kendi Odanın Fotoğrafını Yükle veya Çek, Seçtiğin Seramiği Gerçekçi Giydir"
-                    style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.06) 100%)', border: '1px solid #d4af37', color: '#d4af37' }}
+                    title="Banyo, Mutfak, Salon ve Antre mekanlarında canlı 3D seramik simülasyonu"
+                    style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.08) 100%)', border: '1px solid #d4af37', color: '#d4af37', fontWeight: '800' }}
                   >
                     <Sparkles size={15} color="#d4af37" />
-                    <span>✨ Odamda Gör (AI)</span>
+                    <span>✨ 3D Tasarım Stüdyosu</span>
                   </button>
                 </div>
               </div>
@@ -5752,10 +5740,10 @@ export default function Home() {
                     }}
                     className="canvas-mode-btn"
                     style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.06) 100%)', border: '1px solid #d4af37', color: '#d4af37', fontWeight: '800' }}
-                    title="Kendi odanın veya banyonun fotoğrafını yükle, seçtiğin seramiği gerçekçi giydir"
+                    title="Banyo, Mutfak, Salon ve Antre mekanlarında canlı 3D seramik simülasyonu"
                   >
                     <Sparkles size={13} color="#d4af37" />
-                    <span>✨ Odamda Gör (AI)</span>
+                    <span>✨ 3D Mekan Giydirme</span>
                   </button>
 
                   <button
@@ -19827,6 +19815,7 @@ export default function Home() {
         userLocationName={userLocationName}
         currentDealer={activeDealerOnMap}
         initialNearbyDealers={nearestDealers}
+        availableProducts={products}
       />
 
       {/* BIM & ARCHITECTURAL SPEC DOWNLOAD MODAL */}

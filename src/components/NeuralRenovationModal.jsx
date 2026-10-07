@@ -12,34 +12,44 @@ import {
 
 const PRESET_SAMPLE_ROOMS = [
   {
-    id: 'scandi_kitchen',
-    title: 'İskandinav Mutfak',
-    icon: '🍳',
-    subtitle: 'Meşe tezgah & ada mutfak',
-    url: '/hero/scandinavian_kitchen.png',
-    fgUrl: '/hero/scandinavian_kitchen_fg.png',
-    areaM2: 6.4,
-    type: 'mutfak'
-  },
-  {
     id: 'luxury_bath',
     title: 'Modern Lüks Banyo',
     icon: '🛁',
-    subtitle: 'Mermer duvarlar, küvet & çift lavabo',
+    subtitle: 'Mermer duvarlar, bağımsız küvet & çift lavabo',
     url: '/hero/luxury_bathroom.png',
     fgUrl: '/hero/luxury_bathroom_fg.png',
     areaM2: 8.5,
     type: 'banyo'
   },
   {
+    id: 'scandi_kitchen',
+    title: 'İskandinav Ada Mutfak',
+    icon: '🍳',
+    subtitle: 'Meşe tezgah, ada mutfak & tezgah arası seramik',
+    url: '/hero/scandinavian_kitchen.png',
+    fgUrl: '/hero/scandinavian_kitchen_fg.png',
+    areaM2: 6.4,
+    type: 'mutfak'
+  },
+  {
     id: 'modern_living',
     title: 'Açık Konsept Salon',
     icon: '🛋️',
-    subtitle: 'Geniş zemin & doğal ışık',
+    subtitle: 'Geniş zemin & doğal bahçe ışığı',
     url: '/hero/modern_living.png',
     fgUrl: '/hero/modern_living_fg.png',
     areaM2: 18.0,
     type: 'salon'
+  },
+  {
+    id: 'modern_hallway',
+    title: 'Modern Antre & Hol',
+    icon: '🚪',
+    subtitle: 'Yüksek tavan, dresuar & karşılama koridoru',
+    url: '/hero/modern_hallway.png',
+    fgUrl: '/hero/modern_hallway_fg.png',
+    areaM2: 12.0,
+    type: 'antre'
   }
 ];
 
@@ -268,16 +278,7 @@ export default function NeuralRenovationModal({
   onSelectAlternativeTile,
   availableProducts = []
 }) {
-  const [roomSource, setRoomSource] = useState('preset'); // 'preset' | 'upload' | 'camera'
   const [activePresetId, setActivePresetId] = useState('luxury_bath');
-  const [userUploadedImage, setUserUploadedImage] = useState(null);
-  
-  // Camera state
-  const [isCameraActive, setIsCameraActive] = useState(false);
-  const [cameraLoading, setCameraLoading] = useState(false);
-  const [cameraError, setCameraError] = useState('');
-  const videoRef = useRef(null);
-  const streamRef = useRef(null);
 
   // Tile settings
   const initialTile = activeTile || selectedProduct || {
@@ -309,7 +310,12 @@ export default function NeuralRenovationModal({
         ? [[38, 36], [100, 36], [100, 58], [38, 58]]
         : [[0, 60], [100, 60], [100, 100], [0, 100]];
     }
-    // luxury_bath or custom
+    if (presetId === 'modern_hallway') {
+      return surface === 'walls'
+        ? [[0, 20], [25, 20], [25, 80], [0, 80]]
+        : [[32, 59], [66, 59], [100, 100], [0, 95]];
+    }
+    // luxury_bath or default
     return surface === 'walls'
       ? [[32, 0], [100, 0], [100, 68], [32, 68]]
       : [[0, 65], [100, 65], [100, 100], [0, 100]];
@@ -321,8 +327,6 @@ export default function NeuralRenovationModal({
   const [isOpenCvProcessing, setIsOpenCvProcessing] = useState(false);
 
   // 3-Layer Composite Architecture States (Katman 3 Ön Plan Nesneleri)
-  const [customForegroundImg, setCustomForegroundImg] = useState(null);
-  const [isSegmentingForeground, setIsSegmentingForeground] = useState(false);
   const [isForegroundLayerActive, setIsForegroundLayerActive] = useState(true);
 
   // Sync corners when preset or surface changes
@@ -335,11 +339,6 @@ export default function NeuralRenovationModal({
   const [isGeneratingAiRender, setIsGeneratingAiRender] = useState(false);
   const [aiRenderedImage, setAiRenderedImage] = useState(null);
   const [aiRenderError, setAiRenderError] = useState('');
-
-  // Spatial Analysis State
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState(null);
-  const [analysisStepText, setAnalysisStepText] = useState('');
 
   // Interactive Before/After Split Slider State (0 to 100 percentage)
   const [splitPos, setSplitPos] = useState(50);
@@ -388,22 +387,6 @@ export default function NeuralRenovationModal({
     }
   }, [activeTile, selectedProduct]);
 
-  // Stop camera helper
-  const stopCamera = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop());
-      streamRef.current = null;
-    }
-    setIsCameraActive(false);
-    setCameraLoading(false);
-  }, []);
-
-  // Close handler
-  const handleModalClose = useCallback(() => {
-    stopCamera();
-    if (onClose) onClose();
-  }, [stopCamera, onClose]);
-
   // Escape key handler
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -413,220 +396,10 @@ export default function NeuralRenovationModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, handleModalClose]);
 
-  // Start Live Camera
-  const startCamera = async () => {
-    setCameraLoading(true);
-    setCameraError('');
-    setIsCameraActive(true);
-    setRoomSource('camera');
-
-    try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Tarayıcınız kamera erişimini desteklemiyor.');
-      }
-
-      let mediaStream;
-      try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-          audio: false
-        });
-      } catch (err1) {
-        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      }
-
-      streamRef.current = mediaStream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        videoRef.current.play();
-      }
-      setCameraLoading(false);
-    } catch (err) {
-      console.error('Camera start error:', err);
-      setCameraError(err.message || 'Kamera açılamadı. Lütfen izinleri kontrol edin.');
-      setCameraLoading(false);
-      setIsCameraActive(false);
-    }
-  };
-
-  // Extract Foreground objects via rembg (Katman 3)
-  const extractCustomForeground = async (imgData) => {
-    setIsSegmentingForeground(true);
-    try {
-      const res = await fetch('/api/ai/opencv-tile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'extract_foreground',
-          room_image: imgData
-        })
-      });
-      const data = await res.json();
-      if (data.success && data.foreground_image) {
-        setCustomForegroundImg(data.foreground_image);
-      }
-    } catch (err) {
-      console.warn('Foreground extraction fallback:', err.message);
-    } finally {
-      setIsSegmentingForeground(false);
-    }
-  };
-
-  // Capture frame from camera
-  const captureCameraFrame = () => {
-    const video = videoRef.current;
-    if (!video || video.readyState !== 4) return;
-
-    const offscreen = document.createElement('canvas');
-    offscreen.width = video.videoWidth || 1280;
-    offscreen.height = video.videoHeight || 720;
-    const ctx = offscreen.getContext('2d');
-    ctx.drawImage(video, 0, 0, offscreen.width, offscreen.height);
-    const dataUrl = offscreen.toDataURL('image/jpeg', 0.92);
-
-    stopCamera();
-    setUserUploadedImage(dataUrl);
-    setRoomSource('upload');
-    extractCustomForeground(dataUrl);
-    runSpatialAnalysis(dataUrl);
-  };
-
-  // Native Photo Upload
-  const handlePhotoUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const dataUrl = evt.target.result;
-      setUserUploadedImage(dataUrl);
-      setRoomSource('upload');
-      stopCamera();
-      extractCustomForeground(dataUrl);
-      runSpatialAnalysis(dataUrl);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Run Spatial AI Vision Analysis
-  const runSpatialAnalysis = async (imgUrl) => {
-    setIsAnalyzing(true);
-    setAnalysisStepText('Oda geometrisi ve zemin sınırları analiz ediliyor...');
-
-    const timer1 = setTimeout(() => {
-      setAnalysisStepText('Klozet, lavabo ve eşyalar hassas maskeleniyor...');
-    }, 1200);
-
-    const timer2 = setTimeout(() => {
-      setAnalysisStepText('Ufuk çizgisi ve 3D perspektif derinliği hesaplanıyor...');
-    }, 2400);
-
-    try {
-      const res = await fetch('/api/ai/neural-renovation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'analyze',
-          presetId: roomSource === 'preset' ? activePresetId : undefined,
-          image: imgUrl,
-          tile: currentTile,
-          target: targetSurface
-        })
-      });
-
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-
-      const data = await res.json();
-      if (data.success && data.analysis) {
-        setAnalysisResult(data.analysis);
-      } else {
-        throw new Error('Analiz tamamlanamadı.');
-      }
-    } catch (err) {
-      console.warn('[Neural Modal] Analysis fallback:', err.message);
-      // Calibrated edge-to-edge room geometry with complete obstacle occlusion
-      setAnalysisResult({
-        floorPolygon: [
-          [0, 100],
-          [100, 100],
-          [100, 68],
-          [56, 62],
-          [34, 60],
-          [18, 66],
-          [0, 72]
-        ],
-        wallPolygon: [
-          [0, 18],
-          [100, 18],
-          [100, 68],
-          [0, 72]
-        ],
-        vanishingPoint: [50, 48],
-        obstacles: [
-          { type: 'bathtub', surface: 'floor', polygon: [[14, 64], [35, 65], [36, 89], [22, 92], [14, 78]] },
-          { type: 'side_table', surface: 'floor', polygon: [[18, 80], [26, 80], [26, 96], [18, 96]] },
-          { type: 'vanity', surface: 'both', polygon: [[34, 60], [53, 60], [53, 73], [34, 73]] },
-          { type: 'mirror', surface: 'walls', polygon: [[29, 39], [46, 39], [46, 60], [29, 60]] },
-          { type: 'window', surface: 'walls', polygon: [[0, 18], [24, 18], [24, 72], [0, 72]] }
-        ],
-        dominantLight: 'top-center',
-        estimatedAreaM2: 5.8,
-        netWithWasteM2: 6.38,
-        boxCount: 5,
-        totalEstCost: 3100
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  // Generate Photorealistic 8K Architectural Diffusion Room Redesign (RoomGPT Pipeline)
-  const handleGenerateAiDiffusionRender = async () => {
-    setIsGeneratingAiRender(true);
-    setAiRenderError('');
-    try {
-      const activePreset = PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId);
-      const res = await fetch('/api/ai/neural-renovation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'generate_room',
-          presetId: roomSource === 'preset' ? activePresetId : undefined,
-          image: roomSource === 'upload' ? userUploadedImage : (activePreset?.url || '/hero/luxury_bathroom.png'),
-          tile: currentTile,
-          target: targetSurface,
-          roomType: activePreset?.type || 'banyo'
-        })
-      });
-
-      const data = await res.json();
-      if (data.success && data.renderedImageUrl) {
-        setAiRenderedImage(data.renderedImageUrl);
-        setRenderMode('diffusion');
-      } else {
-        throw new Error(data.error || 'AI render oluşturulamadı.');
-      }
-    } catch (err) {
-      console.error('[Neural Modal] AI render error:', err);
-      setAiRenderError('Yapay zeka render servisi şu an yoğun. Canlı yüzey motoru devrede.');
-      setRenderMode('canvas');
-    } finally {
-      setIsGeneratingAiRender(false);
-    }
-  };
-
-  // Trigger analysis whenever room changes
-  useEffect(() => {
-    if (!isOpen) return;
-
-    if (roomSource === 'preset') {
-      const preset = PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId) || PRESET_SAMPLE_ROOMS[0];
-      runSpatialAnalysis(preset.url);
-    } else if (roomSource === 'upload' && userUploadedImage) {
-      runSpatialAnalysis(userUploadedImage);
-    }
-  }, [isOpen, roomSource, activePresetId]);
+  // Close handler
+  const handleModalClose = useCallback(() => {
+    if (onClose) onClose();
+  }, [onClose]);
 
   // =========================================================================
   // CORE PHOTOREALISTIC RENDERING ENGINE
@@ -641,14 +414,11 @@ export default function NeuralRenovationModal({
     const renoCtx = renoCanvas.getContext('2d');
 
     // Katman 1: Base room image URL
-    const activeImgSrc = roomSource === 'upload' && userUploadedImage
-      ? userUploadedImage
-      : (PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId)?.url || PRESET_SAMPLE_ROOMS[0].url);
+    const activePreset = PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId) || PRESET_SAMPLE_ROOMS[0];
+    const activeImgSrc = activePreset.url;
 
     // Katman 3: Foreground objects cutout URL
-    const activeFgUrl = roomSource === 'upload' && customForegroundImg
-      ? customForegroundImg
-      : (PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId)?.fgUrl);
+    const activeFgUrl = isForegroundLayerActive ? activePreset.fgUrl : null;
 
     // Katman 2: Resolved high-definition tile texture
     const tileSrc = getResolvedTileTexture(currentTile);
@@ -814,8 +584,15 @@ export default function NeuralRenovationModal({
           // 'walls' or 'both' -> Tezgah arkası seramik duvarı
           drawSurface(wallCorners);
         }
+      } else if (activePresetId === 'modern_hallway') {
+        if (targetSurface === 'walls') {
+          drawSurface(wallCorners);
+        } else {
+          // 'floor' or 'both' -> Karşılama koridoru ve antre zemini
+          drawSurface(floorCorners, true);
+        }
       } else {
-        // luxury_bath veya kullanıcı yüklemesi
+        // luxury_bath
         if (targetSurface === 'walls') {
           drawSurface(wallCorners);
         } else if (targetSurface === 'floor') {
@@ -828,7 +605,7 @@ export default function NeuralRenovationModal({
 
       // -----------------------------------------------------------------
       // Katman 3 (En üst): Duvardan bağımsız ön plandaki nesneler
-      // Kadın, tezgah, musluk, dolaplar, küvet, kanepe şeffaf PNG katmanı
+      // Kadın, tezgah, musluk, dolaplar, küvet, dresuar şeffaf PNG katmanı
       // -----------------------------------------------------------------
       if (fgImg) {
         renoCtx.save();
@@ -836,7 +613,7 @@ export default function NeuralRenovationModal({
         renoCtx.restore();
       }
     });
-  }, [roomSource, userUploadedImage, customForegroundImg, isForegroundLayerActive, activePresetId, currentTile, targetSurface, tileRotation, tileScale, groutColor, groutWidth, analysisResult, renderMode, aiRenderedImage, corners, getDefaultCorners]);
+  }, [isForegroundLayerActive, activePresetId, currentTile, targetSurface, tileRotation, tileScale, groutColor, groutWidth, renderMode, aiRenderedImage, corners, getDefaultCorners]);
 
   // Handle Corner Pin Dragging
   const handlePinMouseDown = (index, e) => {
@@ -886,13 +663,9 @@ export default function NeuralRenovationModal({
   const handleOpenCvHdRender = async () => {
     setIsOpenCvProcessing(true);
     try {
-      const activeImgSrc = roomSource === 'upload' && userUploadedImage
-        ? userUploadedImage
-        : (PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId)?.url || PRESET_SAMPLE_ROOMS[0].url);
-
-      const activeFgUrl = roomSource === 'upload' && customForegroundImg
-        ? customForegroundImg
-        : (PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId)?.fgUrl);
+      const activePreset = PRESET_SAMPLE_ROOMS.find(r => r.id === activePresetId) || PRESET_SAMPLE_ROOMS[0];
+      const activeImgSrc = activePreset.url;
+      const activeFgUrl = isForegroundLayerActive ? activePreset.fgUrl : null;
 
       const res = await fetch('/api/ai/opencv-tile', {
         method: 'POST',
@@ -901,9 +674,9 @@ export default function NeuralRenovationModal({
           room_image: activeImgSrc,
           tile_image: getResolvedTileTexture(currentTile),
           dst_corners: corners,
-          obstacles: analysisResult?.obstacles || [],
-          foreground_image: isForegroundLayerActive ? activeFgUrl : null,
-          auto_segment: roomSource === 'upload',
+          obstacles: [],
+          foreground_image: activeFgUrl,
+          auto_segment: false,
           tile_w_px: Math.round(320 * tileScale),
           tile_h_px: Math.round(640 * tileScale),
           grout_size: groutWidth,
@@ -1077,24 +850,23 @@ export default function NeuralRenovationModal({
           </div>
         </div>
 
-        {/* Center: Room Selector Tabs */}
+        {/* Center: 4-Room Architectural Selector Tabs */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255, 255, 255, 0.04)', padding: '3px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
           {PRESET_SAMPLE_ROOMS.map(p => {
-            const isActive = roomSource === 'preset' && activePresetId === p.id;
+            const isActive = activePresetId === p.id;
             return (
               <button
                 key={p.id}
                 onClick={() => {
-                  setRoomSource('preset');
                   setActivePresetId(p.id);
-                  setCustomForegroundImg(null);
-                  stopCamera();
+                  setAiRenderedImage(null);
+                  setRenderMode('canvas');
                 }}
                 style={{
-                  padding: '6px 14px',
+                  padding: '7px 14px',
                   borderRadius: '8px',
                   border: 'none',
-                  fontSize: '0.76rem',
+                  fontSize: '0.78rem',
                   fontWeight: isActive ? '800' : '600',
                   background: isActive ? '#d4af37' : 'transparent',
                   color: isActive ? '#0b0f19' : '#cbd5e1',
@@ -1111,34 +883,6 @@ export default function NeuralRenovationModal({
               </button>
             );
           })}
-
-          {/* Upload Room Photo Option */}
-          <label
-            style={{
-              padding: '6px 12px',
-              borderRadius: '8px',
-              border: 'none',
-              fontSize: '0.74rem',
-              fontWeight: roomSource === 'upload' ? '800' : '600',
-              background: roomSource === 'upload' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
-              color: roomSource === 'upload' ? '#38bdf8' : '#94a3b8',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              transition: 'all 0.15s ease'
-            }}
-            title="Kendi odanızın fotoğrafını yükleyin"
-          >
-            <Upload size={13} />
-            <span>Fotoğraf Yükle</span>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handlePhotoUpload}
-              style={{ display: 'none' }}
-            />
-          </label>
         </div>
 
         {/* Right: Surface Pills & Close Button */}
@@ -1205,41 +949,6 @@ export default function NeuralRenovationModal({
           overflow: 'hidden'
         }}
       >
-        {/* Live Camera Video Feed (if user turned on camera) */}
-        {isCameraActive && (
-          <div style={{ position: 'absolute', inset: 0, zIndex: 45, background: '#000000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <video
-              ref={videoRef}
-              playsInline
-              autoPlay
-              muted
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-            />
-            <button
-              onClick={captureCameraFrame}
-              style={{
-                position: 'absolute',
-                bottom: '24px',
-                padding: '12px 24px',
-                borderRadius: '30px',
-                background: 'linear-gradient(135deg, #d4af37 0%, #aa8c2c 100%)',
-                color: '#0b0f19',
-                fontSize: '0.9rem',
-                fontWeight: '900',
-                border: 'none',
-                boxShadow: '0 8px 25px rgba(0,0,0,0.6)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              <Camera size={18} />
-              <span>Fotoğrafı Çek & Odaya Dön</span>
-            </button>
-          </div>
-        )}
-
         {/* Ambient Room Glow / Backdrop to eliminate black side void */}
         <div
           style={{
@@ -1282,30 +991,6 @@ export default function NeuralRenovationModal({
             display: showOriginal ? 'block' : 'none'
           }}
         />
-
-        {/* Processing Indicator */}
-        {isSegmentingForeground && (
-          <div style={{
-            position: 'absolute',
-            top: '16px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 40,
-            background: 'rgba(11, 16, 29, 0.9)',
-            border: '1px solid rgba(212, 175, 55, 0.4)',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            fontSize: '0.74rem',
-            color: '#d4af37',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
-          }}>
-            <RefreshCw size={12} className="animate-spin" />
-            <span>Ön plan eşyaları ve derinlik ayrıştırılıyor...</span>
-          </div>
-        )}
 
         {/* Active Tile Tag (Top-Left) */}
         <div style={{
