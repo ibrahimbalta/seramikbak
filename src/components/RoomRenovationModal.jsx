@@ -53,7 +53,13 @@ export default function RoomRenovationModal({
   onOpenQuote 
 }) {
   // Active product details
-  const [currentProduct, setCurrentProduct] = useState(product);
+  const currentProduct = product || {};
+  const brandDisplayName = typeof currentProduct.brand === 'string'
+    ? currentProduct.brand
+    : (currentProduct.brand?.name || 'SeramikBak');
+  const finishText = typeof currentProduct.finish === 'string'
+    ? currentProduct.finish
+    : (typeof currentProduct.surface === 'string' ? currentProduct.surface : '');
 
   // Workflow Step: 1 = Upload, 2 = Configure & Detect, 3 = Refine Mask, 4 = Result
   const [currentStep, setCurrentStep] = useState(1);
@@ -74,7 +80,15 @@ export default function RoomRenovationModal({
   // Surface & Pattern Options (Step 2)
   const [surface, setSurface] = useState('floor'); // 'floor' | 'wall' | 'both'
   const [pattern, setPattern] = useState('grid');   // 'grid' | 'brick'
-  const [tileScale, setTileScale] = useState(1.0);
+  
+  const initialScale = (() => {
+    const w = Number(product?.width) || 60;
+    const h = Number(product?.height) || 120;
+    if (w >= 120 || h >= 120) return 1.4;
+    if (w <= 30 && h <= 30) return 0.7;
+    return 1.0;
+  })();
+  const [tileScale, setTileScale] = useState(initialScale);
 
   // AI Segmentation & Mask Editor State (Step 3)
   const [maskB64Original, setMaskB64Original] = useState(null);
@@ -119,27 +133,6 @@ export default function RoomRenovationModal({
       })
       .catch(() => setIsBackendOnline(false));
   }, []);
-
-  // Sync when product prop changes
-  useEffect(() => {
-    if (product) {
-      setCurrentProduct(product);
-      const tex = resolveSafeTextureUrl(product.textureUrl || product.imageUrl || '/textures/calacatta_gold.jpg');
-      setTileUrl(tex);
-      setTileFile(null);
-
-      // Auto-adapt scale for grand format slabs vs small tiles
-      const w = Number(product.width) || 60;
-      const h = Number(product.height) || 120;
-      if (w >= 120 || h >= 120) {
-        setTileScale(1.4);
-      } else if (w <= 30 && h <= 30) {
-        setTileScale(0.7);
-      } else {
-        setTileScale(1.0);
-      }
-    }
-  }, [product]);
 
   // Handle ESC key to close modal
   useEffect(() => {
@@ -625,11 +618,11 @@ export default function RoomRenovationModal({
                   />
                 </div>
                 <div className="sb-tile-meta">
-                  <span className="sb-tile-brand">{currentProduct.brand || 'SeramikBak'}</span>
-                  <span className="sb-tile-name">{currentProduct.name}</span>
+                  <span className="sb-tile-brand">{brandDisplayName}</span>
+                  <span className="sb-tile-name">{currentProduct?.name || 'Seramik'}</span>
                   <span className="sb-tile-dimensions">
-                    {currentProduct.width || 60} × {currentProduct.height || 120} cm
-                    {currentProduct.finish && ` • ${currentProduct.finish}`}
+                    {currentProduct?.width || 60} × {currentProduct?.height || 120} cm
+                    {finishText ? ` • ${finishText}` : ''}
                   </span>
                 </div>
               </div>
