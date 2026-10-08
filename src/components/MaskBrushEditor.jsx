@@ -330,12 +330,15 @@ export default function MaskBrushEditor({
     <div style={{
       background: 'rgba(8, 12, 22, 0.98)',
       border: '1px solid rgba(255, 255, 255, 0.14)',
-      borderRadius: '20px',
-      padding: '20px',
+      borderRadius: '16px',
+      padding: '14px',
       display: 'flex',
       flexDirection: 'column',
-      gap: '14px',
+      gap: '10px',
       maxWidth: '960px',
+      width: '100%',
+      maxHeight: '94vh',
+      overflowY: 'auto',
       margin: '0 auto',
       boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8)'
     }}>

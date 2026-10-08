@@ -1729,36 +1729,200 @@ export default function RoomRenovationModal({
         }
 
         @media (max-width: 768px) {
+          .sb-renovation-backdrop {
+            padding: 0 !important;
+          }
           .sb-renovation-modal {
-            max-height: 98vh;
-            border-radius: 12px;
+            width: 100vw !important;
+            height: 100dvh !important;
+            max-height: 100dvh !important;
+            border-radius: 0 !important;
+            border: none !important;
           }
           .sb-renovation-header {
-            padding: 12px 14px;
-            flex-wrap: wrap;
+            padding: 8px 12px !important;
+            flex-wrap: nowrap !important;
+            gap: 8px !important;
+          }
+          .sb-renovation-badge {
+            display: none !important;
+          }
+          .sb-renovation-title {
+            font-size: 0.88rem !important;
+            line-height: 1.2 !important;
+          }
+          .sb-renovation-subtitle {
+            display: none !important;
           }
           .sb-renovation-active-pill {
-            display: none;
+            display: none !important;
+          }
+          .sb-renovation-close-btn {
+            width: 28px !important;
+            height: 28px !important;
+            padding: 4px !important;
+            flex-shrink: 0 !important;
           }
           .sb-renovation-body {
-            padding: 10px 12px;
+            padding: 6px 8px !important;
+            gap: 8px !important;
           }
+
+          /* Compact Horizontal Scrollable Toolbars */
           .sb-renovation-toolbar {
-            padding: 8px;
-            gap: 10px;
+            padding: 6px 8px !important;
+            gap: 6px !important;
+            display: flex !important;
+            flex-direction: column !important;
+          }
+          .sb-toolbar-group {
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            width: 100% !important;
+            overflow-x: auto !important;
+            white-space: nowrap !important;
+            scrollbar-width: none !important;
+            -webkit-overflow-scrolling: touch !important;
+            padding-bottom: 2px !important;
+          }
+          .sb-toolbar-group::-webkit-scrollbar {
+            display: none !important;
+          }
+          .sb-toolbar-label {
+            font-size: 0.65rem !important;
+            color: #94a3b8 !important;
+            flex-shrink: 0 !important;
+            margin-right: 2px !important;
+          }
+          .sb-source-btn-row, .sb-adjust-btn-row {
+            display: flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            flex-shrink: 0 !important;
+          }
+          .sb-toolbar-btn {
+            padding: 4px 8px !important;
+            font-size: 0.68rem !important;
+            border-radius: 6px !important;
+            gap: 4px !important;
+            min-height: 28px !important;
+            flex-shrink: 0 !important;
+          }
+          .sb-surface-toggle-group {
+            padding: 2px !important;
+            border-radius: 6px !important;
+            flex-shrink: 0 !important;
+          }
+          .sb-surface-btn {
+            padding: 3px 7px !important;
+            font-size: 0.66rem !important;
+            border-radius: 4px !important;
+          }
+          .sb-btn-reset-mask {
+            padding: 3px 6px !important;
+            font-size: 0.65rem !important;
+            flex-shrink: 0 !important;
+          }
+
+          /* Compact Stage */
+          .sb-stage-outer-box {
+            min-height: unset !important;
+            padding: 2px !important;
+            border-radius: 10px !important;
           }
           .sb-renovation-stage {
-            min-height: 280px;
+            max-height: 38vh !important;
+            min-height: 200px !important;
+            border-radius: 8px !important;
+          }
+          .sb-stage-base-img, .sb-stage-tiled-img {
+            max-height: 38vh !important;
+          }
+          .sb-split-handle {
+            width: 26px !important;
+            height: 26px !important;
+            font-size: 10px !important;
+          }
+          .sb-ai-fixture-badge {
+            top: 8px !important;
+            right: 8px !important;
+            padding: 3px 7px !important;
+            font-size: 0.62rem !important;
+            border-radius: 6px !important;
+          }
+          .sb-label-before, .sb-label-after {
+            bottom: 6px !important;
+            padding: 2px 6px !important;
+            font-size: 0.62rem !important;
+          }
+          .sb-label-before {
+            left: 8px !important;
+          }
+          .sb-label-after {
+            right: 8px !important;
+          }
+
+          /* Compact Slider Controls */
+          .sb-slider-quick-bar {
+            gap: 4px !important;
+          }
+          .sb-quick-btn {
+            padding: 3px 7px !important;
+            font-size: 0.66rem !important;
+            border-radius: 5px !important;
+          }
+
+          /* Compact Carousel */
+          .sb-carousel-section {
+            padding: 6px 8px !important;
+            border-radius: 10px !important;
+            margin-top: 2px !important;
+          }
+          .sb-carousel-header {
+            margin-bottom: 6px !important;
+          }
+          .sb-carousel-title {
+            font-size: 0.72rem !important;
+          }
+          .sb-carousel-note {
+            display: none !important;
+          }
+          .sb-carousel-card {
+            flex: 0 0 80px !important;
+            padding: 5px !important;
+            border-radius: 8px !important;
+          }
+          .sb-card-img {
+            height: 42px !important;
+            margin-bottom: 3px !important;
+          }
+          .sb-card-name {
+            font-size: 0.64rem !important;
+          }
+          .sb-card-dim {
+            font-size: 0.58rem !important;
+          }
+
+          /* Compact Footer */
+          .sb-renovation-footer {
+            padding: 8px 12px !important;
+            gap: 8px !important;
+          }
+          .sb-footer-privacy {
+            display: none !important;
           }
           .sb-footer-right {
-            width: 100%;
-            justify-content: stretch;
+            width: 100% !important;
+            justify-content: stretch !important;
+            gap: 8px !important;
           }
           .sb-btn-download, .sb-btn-quote {
-            flex: 1;
-            justify-content: center;
-            padding: 9px 12px;
-            font-size: 0.8rem;
+            flex: 1 !important;
+            justify-content: center !important;
+            padding: 8px 10px !important;
+            font-size: 0.76rem !important;
+            border-radius: 8px !important;
           }
         }
       `}</style>

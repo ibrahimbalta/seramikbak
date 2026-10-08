@@ -2277,132 +2277,137 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
           }
 
           :global(.product-detail-main) {
-            padding: 12px 10px 100px !important;
+            padding: 8px 8px 75px !important;
           }
 
           :global(.product-hero-grid) {
             grid-template-columns: 100% !important;
-            gap: 20px !important;
+            gap: 12px !important;
             width: 100% !important;
           }
 
           .product-stage-card {
-            aspect-ratio: 1 / 1 !important;
-            max-height: 360px !important;
-            border-radius: 18px !important;
+            aspect-ratio: 4 / 3 !important;
+            max-height: 290px !important;
+            border-radius: 14px !important;
           }
 
           .product-stage-badges {
-            top: 10px !important;
-            left: 10px !important;
-            gap: 6px !important;
+            top: 8px !important;
+            left: 8px !important;
+            gap: 4px !important;
           }
 
           .badge-stage-brand,
           .badge-stage-finish {
-            padding: 4px 8px !important;
-            font-size: 0.65rem !important;
+            padding: 3px 6px !important;
+            font-size: 0.6rem !important;
+            border-radius: 6px !important;
           }
 
           .btn-stage-zoom {
-            top: 10px !important;
-            right: 10px !important;
-            width: 32px !important;
-            height: 32px !important;
+            top: 8px !important;
+            right: 8px !important;
+            width: 28px !important;
+            height: 28px !important;
+            border-radius: 8px !important;
           }
 
           .product-stage-view-switcher {
-            bottom: 10px !important;
-            padding: 3px !important;
-            gap: 3px !important;
+            bottom: 8px !important;
+            padding: 2px 4px !important;
+            gap: 2px !important;
           }
 
           .btn-view-tab {
-            padding: 5px 9px !important;
-            font-size: 0.7rem !important;
+            padding: 4px 8px !important;
+            font-size: 0.66rem !important;
+            gap: 3px !important;
           }
 
           .product-understage-specs {
             grid-template-columns: repeat(3, 1fr) !important;
-            gap: 6px !important;
-            margin-top: 10px !important;
+            gap: 4px !important;
+            margin-top: 8px !important;
           }
 
           .understage-spec-box {
-            padding: 8px 4px !important;
-            border-radius: 10px !important;
+            padding: 5px 3px !important;
+            border-radius: 8px !important;
           }
 
           .spec-box-label {
-            font-size: 0.62rem !important;
+            font-size: 0.58rem !important;
+            margin-bottom: 2px !important;
           }
 
           .spec-box-val {
-            font-size: 0.8rem !important;
+            font-size: 0.76rem !important;
           }
 
           .spec-box-sub {
-            font-size: 0.6rem !important;
+            font-size: 0.56rem !important;
+            margin-top: 1px !important;
           }
 
           :global(.product-title) {
-            font-size: 1.4rem !important;
+            font-size: 1.15rem !important;
             line-height: 1.25 !important;
-            margin-bottom: 6px !important;
+            margin-bottom: 4px !important;
           }
 
           :global(.product-specs-grid) {
             grid-template-columns: repeat(2, 1fr) !important;
-            gap: 6px !important;
-            margin-bottom: 18px !important;
+            gap: 4px !important;
+            margin-bottom: 12px !important;
           }
 
-          /* AI Box & Buttons on Mobile: Perfectly Symmetrical 50-50 */
+          /* AI Box & Buttons on Mobile: Compact & Ergonomic */
           .ai-remodel-btn-grid {
             grid-template-columns: 1fr 1fr !important;
-            gap: 8px !important;
+            gap: 6px !important;
           }
 
           .btn-ai-remodel-primary,
           .btn-ai-remodel-secondary {
-            padding: 10px 6px !important;
-            font-size: 0.76rem !important;
-            border-radius: 10px !important;
-            min-height: 42px !important;
+            padding: 7px 8px !important;
+            font-size: 0.72rem !important;
+            border-radius: 8px !important;
+            min-height: 36px !important;
             gap: 4px !important;
           }
 
-          /* Conversion Box & Buttons on Mobile: Perfectly Symmetrical 50-50 */
+          /* Conversion Box & Buttons on Mobile: Compact & Ergonomic */
           .product-conversion-card {
-            padding: 14px 12px !important;
-            border-radius: 16px !important;
-            margin-bottom: 18px !important;
+            padding: 12px 10px !important;
+            border-radius: 14px !important;
+            margin-bottom: 12px !important;
           }
 
           .product-conversion-btn-grid {
             grid-template-columns: 1fr 1fr !important;
-            gap: 8px !important;
-            margin-bottom: 10px !important;
+            gap: 6px !important;
+            margin-bottom: 8px !important;
           }
 
           .btn-conversion-quote,
           .btn-conversion-sample {
-            padding: 10px 4px !important;
-            font-size: 0.78rem !important;
-            border-radius: 10px !important;
-            min-height: 42px !important;
+            padding: 8px 6px !important;
+            font-size: 0.74rem !important;
+            border-radius: 8px !important;
+            min-height: 36px !important;
             gap: 4px !important;
           }
 
           .conversion-sub-note {
-            font-size: 0.62rem !important;
-            margin-top: 4px !important;
+            font-size: 0.6rem !important;
+            margin-top: 3px !important;
           }
 
           :global(.calc-input-row) {
             flex-direction: column !important;
             align-items: stretch !important;
-            gap: 8px !important;
+            gap: 6px !important;
           }
           :global(.calc-input-row > div),
           :global(.calc-input-row > button) {
@@ -2422,18 +2427,20 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid rgba(212, 175, 55, 0.25);
-            padding: 10px 14px;
+            padding: 6px 12px !important;
             z-index: 50;
-            box-shadow: 0 -8px 24px rgba(0,0,0,0.5);
+            box-shadow: 0 -6px 20px rgba(0,0,0,0.5);
+            height: 50px !important;
+            box-sizing: border-box;
           }
 
           .mobile-sticky-wa-btn {
             background: rgba(37, 211, 102, 0.14);
             border: 1px solid rgba(37, 211, 102, 0.35);
             color: #25d366;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 8px !important;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2445,15 +2452,15 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
             background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
             color: #000000;
             border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-size: 0.82rem;
+            padding: 8px 14px !important;
+            border-radius: 8px !important;
+            font-size: 0.76rem !important;
             font-weight: 850;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35);
+            gap: 5px !important;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
             white-space: nowrap;
           }
         }
