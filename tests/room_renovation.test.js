@@ -228,6 +228,18 @@ describe('Room Renovation Engine - Tile Grid Calculation & Architectural Aspect'
     assert.equal(grid.cols, 2);
     assert.equal(grid.rows, 1);
   });
+
+  it('should dynamically adapt tile columns and rows when a specific surface quad is provided', () => {
+    // Narrow niche quad spanning only 35% of room width
+    const narrowNicheQuad = [ [31, 31], [66, 31], [66, 50], [31, 50] ];
+    const nicheGrid = calculateTileGrid(60, 120, false, 'vertical', narrowNicheQuad);
+    assert.ok(nicheGrid.cols <= 2, 'Narrow niche should have fewer tile columns than full room');
+
+    // Wide living room floor spanning 100% of room width
+    const wideFloorQuad = [ [0, 50], [100, 50], [100, 100], [0, 100] ];
+    const wideGrid = calculateTileGrid(60, 60, true, 'vertical', wideFloorQuad);
+    assert.ok(wideGrid.cols >= 4, 'Full room width should tile across multiple columns');
+  });
 });
 
 describe('Room Renovation Engine - Displayed Dimensions & Zero-Letterbox Stage', () => {

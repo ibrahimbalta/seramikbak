@@ -199,7 +199,7 @@ export function projectPoint(H, u, v) {
  * @param {'vertical'|'horizontal'} orientation 
  * @returns {{ cols: number, rows: number, effectiveW: number, effectiveH: number, ratio: number }}
  */
-export function calculateTileGrid(tileWCm = 60, tileHCm = 120, isFloor = true, orientation = 'vertical') {
+export function calculateTileGrid(tileWCm = 60, tileHCm = 120, isFloor = true, orientation = 'vertical', quad = null) {
   let w = Number(tileWCm) || 60;
   let h = Number(tileHCm) || 120;
 
@@ -208,15 +208,29 @@ export function calculateTileGrid(tileWCm = 60, tileHCm = 120, isFloor = true, o
   }
 
   // Standard room patch representation (240 cm floor width, 240 cm depth / 260 cm wall height)
-  const roomWidthCm = 240;
-  const roomDepthCm = isFloor ? 240 : 260;
+  let roomWidthCm = 240;
+  let roomDepthCm = isFloor ? 240 : 260;
 
-  let cols = Math.max(2, Math.round(roomWidthCm / w));
+  if (Array.isArray(quad) && quad.length >= 4) {
+    const pTopW = Math.hypot(quad[1][0] - quad[0][0], quad[1][1] - quad[0][1]);
+    const pBotW = Math.hypot(quad[2][0] - quad[3][0], quad[2][1] - quad[3][1]);
+    const pAvgW = Math.max(pTopW, pBotW);
+    const pAvgH = (Math.hypot(quad[3][0] - quad[0][0], quad[3][1] - quad[0][1]) + Math.hypot(quad[2][0] - quad[1][0], quad[2][1] - quad[1][1])) / 2;
+
+    if (pAvgW > 5 && pAvgH > 5) {
+      roomWidthCm = Math.max(80, Math.round((pAvgW / 100) * 320));
+      roomDepthCm = Math.max(60, Math.round((pAvgH / 100) * (isFloor ? 380 : 280)));
+    }
+  }
+
+  let cols = Math.max(1, Math.round(roomWidthCm / w));
   let rows = Math.max(1, Math.round(roomDepthCm / h));
 
-  // Minimum sensible repeat counts
-  if (cols < 3 && w < 100) cols = 4;
-  if (rows < 2 && h < 100) rows = 3;
+  // Minimum sensible repeat counts when quad is not explicitly provided
+  if (!quad) {
+    if (cols < 3 && w < 100) cols = 4;
+    if (rows < 2 && h < 100) rows = 3;
+  }
 
   return { cols, rows, effectiveW: w, effectiveH: h, ratio: w / h };
 }

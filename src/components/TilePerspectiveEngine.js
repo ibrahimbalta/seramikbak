@@ -549,6 +549,71 @@ function extractDeTexturedLighting(roomImg, width, height, isGlossy) {
   return { smoothLumCanvas, specCanvas, shadowCanvas };
 }
 
+/**
+ * Fast client-side porcelain / fixture scanner within a floor quadrilateral.
+ * Automatically identifies bathtubs, toilets, and pedestal sinks resting on the ground.
+ */
+function scanFloorFixtures(roomImg, floorPolygon, canvasW, canvasH) {
+  if (!floorPolygon || floorPolygon.length < 4 || typeof document === 'undefined') return [];
+  const dw = Math.min(300, canvasW);
+  const dh = Math.round(canvasH * (dw / canvasW));
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = dw;
+  tempCanvas.height = dh;
+  const tCtx = tempCanvas.getContext('2d');
+  tCtx.drawImage(roomImg, 0, 0, dw, dh);
+
+  let imgData;
+  try {
+    imgData = tCtx.getImageData(0, 0, dw, dh);
+  } catch {
+    return [];
+  }
+  const data = imgData.data;
+
+  const minY = Math.round((Math.min(...floorPolygon.map((p) => p[1])) / 100) * dh);
+  const maxY = Math.round((Math.max(...floorPolygon.map((p) => p[1])) / 100) * dh);
+  const minX = Math.round((Math.min(...floorPolygon.map((p) => p[0])) / 100) * dw);
+  const maxX = Math.round((Math.max(...floorPolygon.map((p) => p[0])) / 100) * dw);
+
+  let fixtureMinX = dw, fixtureMaxX = 0, fixtureMinY = dh, fixtureMaxY = 0;
+  let count = 0;
+
+  for (let y = minY; y < Math.min(dh - 5, maxY - 5); y += 4) {
+    for (let x = minX + 5; x < maxX - 5; x += 4) {
+      const idx = (y * dw + x) * 4;
+      const r = data[idx];
+      const g = data[idx + 1];
+      const b = data[idx + 2];
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      if (lum > 218 && Math.abs(r - g) < 15 && Math.abs(g - b) < 15) {
+        fixtureMinX = Math.min(fixtureMinX, x);
+        fixtureMaxX = Math.max(fixtureMaxX, x);
+        fixtureMinY = Math.min(fixtureMinY, y);
+        fixtureMaxY = Math.max(fixtureMaxY, y);
+        count++;
+      }
+    }
+  }
+
+  const fWidthPct = Math.round(((fixtureMaxX - fixtureMinX) / dw) * 100);
+  const fHeightPct = Math.round(((fixtureMaxY - fixtureMinY) / dh) * 100);
+
+  if (count > 20 && fWidthPct >= 8 && fWidthPct <= 45 && fHeightPct >= 8 && fHeightPct <= 50) {
+    const fx1 = Math.max(0, Math.round((fixtureMinX / dw) * 100));
+    const fx2 = Math.min(100, Math.round((fixtureMaxX / dw) * 100));
+    const fy1 = Math.max(0, Math.round((fixtureMinY / dh) * 100));
+    const fy2 = Math.min(100, Math.round((fixtureMaxY / dh) * 100));
+    return [[
+      [fx1, fy1],
+      [fx2, fy1],
+      [fx2, fy2],
+      [fx1, fy2]
+    ]];
+  }
+  return [];
+}
+
 // ---------------------------------------------------------------------------
 // Main Preview Generator
 // ---------------------------------------------------------------------------
@@ -565,6 +630,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     subdivisions = 28,
     finish = 'Full Lappato',
     layout = 'straight',
+    orientation = 'vertical',
     customMaskCanvas = null,
     foregroundImg = null,
     obstacles = [],
@@ -612,32 +678,21 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
 
   const groutPx = Math.max(1.0, Math.min(3.5, (groutWidth || 2) * 0.7));
 
-  // Compute physically accurate tile grid preserving 60x120, 60x60, 20x120 proportions
-  const floorGrid = calculateTileGrid(tileWCm, tileHCm, true);
-  const wallGrid = calculateTileGrid(tileWCm, tileHCm, false);
-
-  // Step 2: Create floor pattern with realistic scale, layout and multi-face veining
-  const floorPattern = createTiledPattern(
-    tileImg,
-    floorGrid.cols,
-    floorGrid.rows,
-    floorGrid.effectiveW,
-    floorGrid.effectiveH,
-    groutPx,
-    resolvedGrout,
-    layout
-  );
-
-  const wallPattern = createTiledPattern(
-    tileImg,
-    wallGrid.cols,
-    wallGrid.rows,
-    wallGrid.effectiveW,
-    wallGrid.effectiveH,
-    groutPx,
-    resolvedGrout,
-    layout
-  );
+  // Pattern factory per surface: generates physically proportional tile patterns
+  // scaled to each quadrilateral's actual geometric perspective span
+  const getPatternForSurface = (surf, isFloor) => {
+    const grid = calculateTileGrid(tileWCm, tileHCm, isFloor, orientation, surf.polygon);
+    return createTiledPattern(
+      tileImg,
+      grid.cols,
+      grid.rows,
+      grid.effectiveW,
+      grid.effectiveH,
+      groutPx,
+      resolvedGrout,
+      layout
+    );
+  };
 
   // Step 3: Offscreen layer for rendered tiles
   const tileLayer = document.createElement('canvas');
@@ -676,20 +731,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
 
   const renderedQuads = [];
 
-  // Render floor surfaces
-  floorSurfaces.forEach((surf) => {
-    const quad = surf.polygon.map(([x, y]) => [
-      (x / 100) * canvasW,
-      (y / 100) * canvasH,
-    ]);
-    const excludePixels = (surf.exclude || []).map((poly) =>
-      poly.map(([x, y]) => [(x / 100) * canvasW, (y / 100) * canvasH])
-    );
-    renderedQuads.push({ quad, type: 'floor' });
-    renderPerspectiveTiles(tCtx, floorPattern, quad, excludePixels, subdivisions, true);
-  });
-
-  // Render wall surfaces
+  // Step 3A: Render wall surfaces first (walls are positioned behind floors in architectural 3D depth)
   wallSurfaces.forEach((surf) => {
     const quad = surf.polygon.map(([x, y]) => [
       (x / 100) * canvasW,
@@ -699,7 +741,22 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
       poly.map(([x, y]) => [(x / 100) * canvasW, (y / 100) * canvasH])
     );
     renderedQuads.push({ quad, type: 'wall' });
+    const wallPattern = getPatternForSurface(surf, false);
     renderPerspectiveTiles(tCtx, wallPattern, quad, excludePixels, subdivisions, false);
+  });
+
+  // Step 3B: Render floor surfaces second (floor extends forward into the foreground)
+  floorSurfaces.forEach((surf) => {
+    const quad = surf.polygon.map(([x, y]) => [
+      (x / 100) * canvasW,
+      (y / 100) * canvasH,
+    ]);
+    const excludePixels = (surf.exclude || []).map((poly) =>
+      poly.map(([x, y]) => [(x / 100) * canvasW, (y / 100) * canvasH])
+    );
+    renderedQuads.push({ quad, type: 'floor' });
+    const floorPattern = getPatternForSurface(surf, true);
+    renderPerspectiveTiles(tCtx, floorPattern, quad, excludePixels, subdivisions, true);
   });
 
   // Step 4: Extract Subtle Neutral Contact Shadows & Specular Catchlights
@@ -732,6 +789,14 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     ...(Array.isArray(surfaces.obstacles) ? surfaces.obstacles : []),
     ...(Array.isArray(obstacles) ? obstacles : [])
   ];
+
+  // Automatic Client-Side Fixture Detection fallback (e.g. user custom photo without AI API or manual mask)
+  if (combinedObstacles.length === 0 && !customMaskCanvas && floorSurfaces.length > 0) {
+    const autoExcludes = scanFloorFixtures(roomImg, floorSurfaces[0].polygon, canvasW, canvasH);
+    if (autoExcludes.length > 0) {
+      combinedObstacles.push(...autoExcludes);
+    }
+  }
 
   if (combinedObstacles.length > 0) {
     tCtx.save();
@@ -814,13 +879,12 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
 
     lCtx.restore();
 
-    // If client provided a customMaskCanvas (from MaskBrushEditor), also clip lighting pass
-    if (customMaskCanvas) {
-      lCtx.save();
-      lCtx.globalCompositeOperation = 'destination-in';
-      lCtx.drawImage(customMaskCanvas, 0, 0, canvasW, canvasH);
-      lCtx.restore();
-    }
+    // Strict Alpha Isolation: Clip lightCanvas directly to tileLayer alpha channel.
+    // Guarantees specular glares, sheens and shadows NEVER bleed onto erased obstacles, fixtures or original photo pixels.
+    lCtx.save();
+    lCtx.globalCompositeOperation = 'destination-in';
+    lCtx.drawImage(tileLayer, 0, 0);
+    lCtx.restore();
 
     ctx.drawImage(lightCanvas, 0, 0);
   }
