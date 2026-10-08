@@ -27,10 +27,14 @@ import {
   Ruler,
   Palette,
   Calculator,
-  X
+  X,
+  Camera
 } from 'lucide-react';
 import { slugify } from '@/lib/slugify';
 import { generateTilePreview, loadImage } from '@/components/TilePerspectiveEngine';
+
+const RoomRenovationModal = dynamic(() => import('@/components/RoomRenovationModal'), { ssr: false });
+
 
 
 
@@ -50,14 +54,18 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
   const [activeView, setActiveView] = useState('image'); // 'image' | 'texture' | 'room'
   const [copied, setCopied] = useState(false);
   const [showImageZoom, setShowImageZoom] = useState(false);
+  const [showRenovationModal, setShowRenovationModal] = useState(false);
+  const [renovationProduct, setRenovationProduct] = useState(product);
 
-  // Otomatik 3D Tasarım Görünümü Desteği (?view=3d veya ?view=room veya ?view=studio)
+  // Otomatik 3D Tasarım veya Mekân Yenileme Desteği (?view=3d, ?view=renovate, ?view=studio)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       const viewParam = urlParams.get('view');
       if (viewParam === '3d' || viewParam === 'studio') {
         handleGoTo3DStudio();
+      } else if (viewParam === 'renovate' || viewParam === 'remodel' || viewParam === 'try') {
+        setShowRenovationModal(true);
       } else if (viewParam === 'room') {
         setActiveView('room');
       }
@@ -606,6 +614,16 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 )}
 
                 <button
+                  onClick={() => { setRenovationProduct(product); setShowRenovationModal(true); }}
+                  className="btn-view-tab"
+                  title="Kendi Banyo veya Mutfak Fotoğrafınızda Deneyin"
+                  style={{ color: '#f3d375', borderColor: 'rgba(212, 175, 55, 0.4)' }}
+                >
+                  <Camera size={13} style={{ color: '#d4af37' }} />
+                  <span>Mekânımda Dene</span>
+                </button>
+
+                <button
                   onClick={handleGoTo3DStudio}
                   className={`btn-view-tab ${activeView === 'room' ? 'active' : ''}`}
                   title="3D Sanal Stüdyoda Döşenmiş Gör"
@@ -848,14 +866,25 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
                 Bu seramiği 3D sanal stüdyomuzda banyo, mutfak veya salon mekanlarında canlı olarak döşeyin; derz renklerini, döşeme yönünü ve ışık açılarını serbestçe deneyimleyin.
               </p>
 
-              <button
-                onClick={handleGoTo3DStudio}
-                className="btn-ai-remodel-primary"
-                style={{ width: '100%', justifyContent: 'center' }}
-              >
-                <Eye size={16} style={{ flexShrink: 0 }} />
-                <span>3D Sanal Stüdyoda Aç & Tasarla →</span>
-              </button>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '10px' }}>
+                <button
+                  onClick={() => { setRenovationProduct(product); setShowRenovationModal(true); }}
+                  className="btn-ai-remodel-primary"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  <Camera size={16} style={{ flexShrink: 0, color: '#090d16' }} />
+                  <span>Mekânımda Gör & Dene</span>
+                </button>
+
+                <button
+                  onClick={handleGoTo3DStudio}
+                  className="btn-ai-remodel-secondary"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  <Eye size={16} style={{ flexShrink: 0 }} />
+                  <span>3D Stüdyo →</span>
+                </button>
+              </div>
             </div>
 
             {/* Haute-Couture Conversion Suite (Teklif & Numune) */}
@@ -1705,6 +1734,26 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
         </div>
       )}
 
+      {/* ---------------- ROOM RENOVATION MODAL ---------------- */}
+      {showRenovationModal && (
+        <RoomRenovationModal
+          isOpen={showRenovationModal}
+          onClose={() => setShowRenovationModal(false)}
+          product={renovationProduct || product}
+          relatedProducts={relatedProducts}
+          onOpenQuote={(chosenProduct, snapshot) => {
+            setShowRenovationModal(false);
+            setShowQuoteModal(true);
+            if (chosenProduct) {
+              setQuoteForm(prev => ({
+                ...prev,
+                notes: `Mekânımda Yenileme simülasyonu ile seçildi: ${chosenProduct.name} (${chosenProduct.width}x${chosenProduct.height} cm, Kod: ${chosenProduct.code})`
+              }));
+            }
+          }}
+        />
+      )}
+
       {/* Mobile Sticky Bottom Action Bar (Native Mobile App Experience) */}
       <div className="mobile-sticky-bar">
         <div style={{ minWidth: 0, flex: 1, paddingRight: '8px' }}>
@@ -1717,6 +1766,15 @@ export default function ProductDetailClient({ product, relatedProducts = [], aut
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          <button
+            onClick={() => { setRenovationProduct(product); setShowRenovationModal(true); }}
+            className="mobile-sticky-wa-btn"
+            title="Mekânımda Dene"
+            style={{ color: '#d4af37', borderColor: 'rgba(212, 175, 55, 0.4)' }}
+          >
+            <Camera size={16} />
+          </button>
+
           <a
             href={whatsappUrl}
             target="_blank"
