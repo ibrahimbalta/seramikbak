@@ -24,7 +24,10 @@
 import { 
   createHomographyFromUnitSquare, 
   projectPoint, 
-  calculateTileGrid 
+  calculateTileGrid,
+  calculateShadowRatio,
+  calculateLuminanceMultiplier,
+  featherAlphaBuffer
 } from '../utils/renovationUtils';
 import { validateRenderResult } from '../utils/qualityValidator';
 
@@ -550,6 +553,139 @@ function extractDeTexturedLighting(roomImg, width, height, isGlossy) {
 }
 
 /**
+ * Applies realistic relative shadow ratio (Preserve Shadows from Predipta17/floor-tile-visualizer)
+ * directly to rendered tile pixels.
+ * Preserves dark contact shadows under bathtubs, furniture, and vanities without darkening unaffected areas.
+ * Cost: $0 (100% in-browser typed array processing)
+ */
+export function applyShadowMapRatio(tCtx, roomCanvas, width, height, shadowStrength = 0.95) {
+  try {
+    const blurFactor = 14;
+    const lowW = Math.max(16, Math.round(width / blurFactor));
+    const lowH = Math.max(16, Math.round(height / blurFactor));
+
+    const lowCanvas = document.createElement('canvas');
+    lowCanvas.width = lowW;
+    lowCanvas.height = lowH;
+    const lowCtx = lowCanvas.getContext('2d');
+    lowCtx.drawImage(roomCanvas, 0, 0, lowW, lowH);
+
+    const blurCanvas = document.createElement('canvas');
+    blurCanvas.width = width;
+    blurCanvas.height = height;
+    const blurCtx = blurCanvas.getContext('2d');
+    blurCtx.imageSmoothingEnabled = true;
+    blurCtx.imageSmoothingQuality = 'high';
+    blurCtx.drawImage(lowCanvas, 0, 0, width, height);
+
+    const roomCtx = roomCanvas.getContext('2d');
+    const roomData = roomCtx.getImageData(0, 0, width, height).data;
+    const blurData = blurCtx.getImageData(0, 0, width, height).data;
+    const tileImgData = tCtx.getImageData(0, 0, width, height);
+    const tileData = tileImgData.data;
+
+    for (let i = 0; i < tileData.length; i += 4) {
+      if (tileData[i + 3] === 0) continue;
+
+      const rG = 0.299 * roomData[i] + 0.587 * roomData[i + 1] + 0.114 * roomData[i + 2];
+      const bG = 0.299 * blurData[i] + 0.587 * blurData[i + 1] + 0.114 * blurData[i + 2];
+
+      const mult = calculateShadowRatio(rG, bG, shadowStrength);
+
+      tileData[i] = Math.min(255, Math.max(0, Math.round(tileData[i] * mult)));
+      tileData[i + 1] = Math.min(255, Math.max(0, Math.round(tileData[i + 1] * mult)));
+      tileData[i + 2] = Math.min(255, Math.max(0, Math.round(tileData[i + 2] * mult)));
+    }
+
+    tCtx.putImageData(tileImgData, 0, 0);
+  } catch (err) {
+    console.warn('SeramikBak: shadow map ratio fallback:', err);
+  }
+}
+
+/**
+ * Harmonizes tile lightness with room ambient light (Luminance Transfer / LAB matching).
+ * Blends raw studio catalog scans to sit naturally inside dim or warm bathroom lighting.
+ * Cost: $0 (100% in-browser typed array processing)
+ */
+export function applyLuminanceTransfer(tCtx, roomCanvas, width, height, strength = 0.50) {
+  try {
+    const roomCtx = roomCanvas.getContext('2d');
+    const roomData = roomCtx.getImageData(0, 0, width, height).data;
+    const tileImgData = tCtx.getImageData(0, 0, width, height);
+    const tileData = tileImgData.data;
+
+    // Step 1: Calculate statistics for masked area
+    let roomLumSum = 0;
+    let roomLumSqSum = 0;
+    let tileLumSum = 0;
+    let tileLumSqSum = 0;
+    let count = 0;
+
+    for (let i = 0; i < tileData.length; i += 16) { // 4-pixel sampling for speed
+      if (tileData[i + 3] > 20) {
+        const rL = 0.299 * roomData[i] + 0.587 * roomData[i + 1] + 0.114 * roomData[i + 2];
+        const tL = 0.299 * tileData[i] + 0.587 * tileData[i + 1] + 0.114 * tileData[i + 2];
+        roomLumSum += rL;
+        roomLumSqSum += rL * rL;
+        tileLumSum += tL;
+        tileLumSqSum += tL * tL;
+        count++;
+      }
+    }
+
+    if (count < 20) return; // Not enough tile pixels to match
+
+    const roomMean = roomLumSum / count;
+    const roomStd = Math.sqrt(Math.max(1, (roomLumSqSum / count) - (roomMean * roomMean)));
+    const tileMean = tileLumSum / count;
+    const tileStd = Math.sqrt(Math.max(1, (tileLumSqSum / count) - (tileMean * tileMean)));
+
+    for (let i = 0; i < tileData.length; i += 4) {
+      if (tileData[i + 3] === 0) continue;
+
+      const curLum = 0.299 * tileData[i] + 0.587 * tileData[i + 1] + 0.114 * tileData[i + 2];
+      const mult = calculateLuminanceMultiplier(curLum, tileMean, tileStd, roomMean, roomStd, strength);
+
+      tileData[i] = Math.min(255, Math.max(0, Math.round(tileData[i] * mult)));
+      tileData[i + 1] = Math.min(255, Math.max(0, Math.round(tileData[i + 1] * mult)));
+      tileData[i + 2] = Math.min(255, Math.max(0, Math.round(tileData[i + 2] * mult)));
+    }
+
+    tCtx.putImageData(tileImgData, 0, 0);
+  } catch (err) {
+    console.warn('SeramikBak: luminance transfer fallback:', err);
+  }
+}
+
+/**
+ * Softens alpha boundaries of the tile layer (Feather Mask from Predipta17/floor-tile-visualizer).
+ * Prevents razor-sharp sticker borders at baseboards, walls, and obstacle cutouts.
+ * Cost: $0 (100% in-browser typed array processing)
+ */
+export function featherMaskEdges(tCtx, width, height, radius = 3) {
+  try {
+    const tileImgData = tCtx.getImageData(0, 0, width, height);
+    const data = tileImgData.data;
+
+    const alphaBuffer = new Uint8ClampedArray(width * height);
+    for (let i = 0, j = 0; i < data.length; i += 4, j++) {
+      alphaBuffer[j] = data[i + 3];
+    }
+
+    const featheredAlpha = featherAlphaBuffer(alphaBuffer, width, height, radius);
+
+    for (let i = 0, j = 0; i < data.length; i += 4, j++) {
+      data[i + 3] = featheredAlpha[j];
+    }
+
+    tCtx.putImageData(tileImgData, 0, 0);
+  } catch (err) {
+    console.warn('SeramikBak: feather mask edges fallback:', err);
+  }
+}
+
+/**
  * Fast client-side porcelain / fixture scanner within a floor quadrilateral.
  * Automatically identifies bathtubs, toilets, and pedestal sinks resting on the ground.
  */
@@ -768,15 +904,9 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     isGlossy
   );
 
-  // Modulate tiles with the room's real ambient illumination (soft multiply blend)
-  // This blends the tiles into the room's real lighting environment instead of looking like a flat sticker
-  tCtx.save();
-  tCtx.globalCompositeOperation = 'multiply';
-  tCtx.globalAlpha = 0.50;
-  tCtx.drawImage(smoothLumCanvas, 0, 0, canvasW, canvasH);
-  tCtx.restore();
+  // Step 4: Masking, Fixture Protection, Exposure Transfer & Shadow Baking
 
-  // If client provided a customMaskCanvas (from MaskBrushEditor), apply it as alpha clip
+  // 4A: If client provided a customMaskCanvas (from MaskBrushEditor), apply it as alpha clip
   if (customMaskCanvas) {
     tCtx.save();
     tCtx.globalCompositeOperation = 'destination-in';
@@ -784,7 +914,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     tCtx.restore();
   }
 
-  // Automatic Obstacle & Fixture Protection (Bathtubs, vanities, toilets, faucets)
+  // 4B: Automatic Obstacle & Fixture Protection (Bathtubs, vanities, toilets, faucets)
   const combinedObstacles = [
     ...(Array.isArray(surfaces.obstacles) ? surfaces.obstacles : []),
     ...(Array.isArray(obstacles) ? obstacles : [])
@@ -816,6 +946,15 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     tCtx.restore();
   }
 
+  // 4C: Luminance Transfer (ambient lightness matching - harmonizes raw studio catalog scan with room exposure)
+  applyLuminanceTransfer(tCtx, canvas, canvasW, canvasH, 0.45);
+
+  // 4D: Relative Shadow Preservation (preserves dark contact shadows under bathtubs, furniture, and vanities)
+  applyShadowMapRatio(tCtx, canvas, canvasW, canvasH, 0.95);
+
+  // 4E: Feather Mask Edges (soft 3px transition preventing razor-sharp sticker borders at baseboards and fixtures)
+  featherMaskEdges(tCtx, canvasW, canvasH, 3);
+
   // Step 5: Draw natural, realistic tiles onto main canvas
   ctx.save();
   ctx.globalAlpha = 1.0;
@@ -838,14 +977,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     });
     lCtx.clip();
 
-    // 6A. Ambient Contact Shadows under furniture / fixtures
-    lCtx.save();
-    lCtx.globalCompositeOperation = 'multiply';
-    lCtx.globalAlpha = 0.35;
-    lCtx.drawImage(shadowCanvas, 0, 0);
-    lCtx.restore();
-
-    // 6B. Natural Specular Window Glare
+    // 6A. Natural Specular Window Glare
     lCtx.save();
     lCtx.globalCompositeOperation = 'screen';
     lCtx.globalAlpha = isGlossy ? 0.35 : 0.15;

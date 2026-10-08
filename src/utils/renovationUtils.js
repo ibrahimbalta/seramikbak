@@ -256,3 +256,99 @@ export function calculateDisplayedDimensions(imgW, imgH, maxW = 1100, maxH = 520
 
   return { width: w, height: h, aspectRatio: aspect };
 }
+
+/**
+ * Calculates relative shadow map multiplier based on original vs smoothed illumination.
+ * Dark contact shadows (< surroundings) yield values < 1.0.
+ * Highlights (> surroundings) yield values > 1.0.
+ * @param {number} roomGray 
+ * @param {number} blurredGray 
+ * @param {number} shadowStrength 
+ * @returns {number}
+ */
+export function calculateShadowRatio(roomGray, blurredGray, shadowStrength = 1.0) {
+  const safeBlur = Math.max(0.1, Number(blurredGray) || 0.1);
+  const safeRoom = Math.max(0, Number(roomGray) || 0);
+  const ratio = Math.max(0.40, Math.min(1.40, safeRoom / safeBlur));
+  return Math.max(0.0, Math.min(2.0, 1.0 - (1.0 - ratio) * (Number(shadowStrength) || 1.0)));
+}
+
+/**
+ * Calculates luminance adjustment multiplier to harmonize catalog tile exposure with ambient room.
+ * @param {number} currentLum 
+ * @param {number} tileMean 
+ * @param {number} tileStd 
+ * @param {number} targetMean 
+ * @param {number} targetStd 
+ * @param {number} strength 
+ * @returns {number}
+ */
+export function calculateLuminanceMultiplier(currentLum, tileMean, tileStd, targetMean, targetStd, strength = 0.55) {
+  const safeTileStd = Math.max(0.1, Number(tileStd) || 0.1);
+  const safeTargetStd = Math.max(0.1, Number(targetStd) || 0.1);
+  const scale = Math.max(0.70, Math.min(1.30, safeTargetStd / safeTileStd));
+  
+  const cLum = Number(currentLum) || 0;
+  const tMean = Number(tileMean) || 128;
+  const tgtMean = Number(targetMean) || 128;
+  const str = Math.max(0, Math.min(1.0, Number(strength) || 0.55));
+
+  const targetLum = (cLum - tMean) * scale + tgtMean;
+  const blendedLum = cLum * (1 - str) + targetLum * str;
+  const ratio = blendedLum / Math.max(0.1, cLum);
+  return Math.max(0.55, Math.min(1.45, ratio));
+}
+
+/**
+ * Feathers binary or semi-transparent alpha channel buffer using separable box blur.
+ * Creates smooth soft-edge falloff at boundary transitions without harsh sticker borders.
+ * @param {Uint8ClampedArray} alphaArray 
+ * @param {number} width 
+ * @param {number} height 
+ * @param {number} radius 
+ * @returns {Uint8ClampedArray}
+ */
+export function featherAlphaBuffer(alphaArray, width, height, radius = 2) {
+  if (!alphaArray || radius <= 0 || width <= 0 || height <= 0) return alphaArray;
+  const r = Math.min(6, Math.max(1, Math.round(radius)));
+  const kSize = 2 * r + 1;
+  const len = width * height;
+  if (alphaArray.length < len) return alphaArray;
+
+  const temp = new Float32Array(len);
+  const out = new Uint8ClampedArray(len);
+
+  // Horizontal pass
+  for (let y = 0; y < height; y++) {
+    const rowOffset = y * width;
+    for (let x = 0; x < width; x++) {
+      let sum = 0;
+      for (let dx = -r; dx <= r; dx++) {
+        const nx = Math.max(0, Math.min(width - 1, x + dx));
+        sum += alphaArray[rowOffset + nx];
+      }
+      temp[rowOffset + x] = sum / kSize;
+    }
+  }
+
+  // Vertical pass & edge attenuation
+  for (let y = 0; y < height; y++) {
+    const rowOffset = y * width;
+    for (let x = 0; x < width; x++) {
+      let sum = 0;
+      for (let dy = -r; dy <= r; dy++) {
+        const ny = Math.max(0, Math.min(height - 1, y + dy));
+        sum += temp[ny * width + x];
+      }
+      const val = Math.round(sum / kSize);
+      const origAlpha = alphaArray[rowOffset + x];
+      if (origAlpha > 0) {
+        out[rowOffset + x] = Math.min(origAlpha, val);
+      } else {
+        out[rowOffset + x] = 0;
+      }
+    }
+  }
+
+  return out;
+}

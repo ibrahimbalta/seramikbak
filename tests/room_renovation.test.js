@@ -10,7 +10,10 @@ import {
   projectPoint,
   calculateTileGrid,
   calculateDisplayedDimensions,
-  normalizePolygon
+  normalizePolygon,
+  calculateShadowRatio,
+  calculateLuminanceMultiplier,
+  featherAlphaBuffer
 } from '../src/utils/renovationUtils.js';
 import { 
   isConvexQuad, 
@@ -329,5 +332,81 @@ describe('Room Renovation Engine - Architectural Fallback Service', () => {
     assert.ok(portrait.floor.polygon[0][1] >= 65, 'Portrait floor horizon should be lower');
     assert.ok(landscape.floor.polygon[0][1] <= 60, 'Landscape floor horizon should start higher');
     assert.equal(portrait.walls.length, 3, 'Should generate left, right and back wall quads');
+  });
+});
+
+describe('Room Renovation Engine - Shadow Preservation & Lighting Blending (Option 1)', () => {
+  it('should darken shadow areas where room luminance is lower than surrounding blurred luminance', () => {
+    // Under bathtub/vanity: local luminance is 60, surrounding blurred background is 140
+    const ratio = calculateShadowRatio(60, 140, 1.0);
+    assert.ok(ratio < 0.70, `Expected shadow ratio < 0.70, got ${ratio}`);
+    assert.ok(ratio >= 0.40, `Expected shadow ratio clamped >= 0.40, got ${ratio}`);
+  });
+
+  it('should maintain or brighten highlights where local luminance exceeds surroundings', () => {
+    // Window sunlight patch: local luminance is 220, surrounding blurred background is 160
+    const ratio = calculateShadowRatio(220, 160, 1.0);
+    assert.ok(ratio > 1.10, `Expected highlight ratio > 1.10, got ${ratio}`);
+    assert.ok(ratio <= 1.40, `Expected highlight ratio clamped <= 1.40, got ${ratio}`);
+  });
+
+  it('should respect shadow strength parameter', () => {
+    const fullStrength = calculateShadowRatio(60, 140, 1.0);
+    const halfStrength = calculateShadowRatio(60, 140, 0.5);
+    // Half strength should be closer to 1.0 than full strength
+    assert.ok(Math.abs(1.0 - halfStrength) < Math.abs(1.0 - fullStrength));
+  });
+
+  it('should safely handle division by zero and extreme values without throwing or NaN', () => {
+    const zeroBlur = calculateShadowRatio(100, 0, 1.0);
+    assert.ok(!Number.isNaN(zeroBlur) && Number.isFinite(zeroBlur));
+    const zeroRoom = calculateShadowRatio(0, 100, 1.0);
+    assert.ok(!Number.isNaN(zeroRoom) && Number.isFinite(zeroRoom));
+  });
+
+  it('should downscale overly bright catalog tile scans in dim rooms via luminance multiplier', () => {
+    // Bright white studio catalog scan (mean 230) placed in dim bathroom (mean 90)
+    const mult = calculateLuminanceMultiplier(230, 230, 20, 90, 25, 0.55);
+    assert.ok(mult < 0.90, `Expected luminance multiplier < 0.90 for dimming, got ${mult}`);
+    assert.ok(mult >= 0.55, `Expected clamped multiplier >= 0.55, got ${mult}`);
+  });
+
+  it('should upscale dark tile scans in brightly lit sunrooms via luminance multiplier', () => {
+    // Dark anthracite tile scan (mean 60) placed in bright sunlit bathroom (mean 190)
+    const mult = calculateLuminanceMultiplier(60, 60, 20, 190, 25, 0.55);
+    assert.ok(mult > 1.10, `Expected luminance multiplier > 1.10 for brightening, got ${mult}`);
+    assert.ok(mult <= 1.45, `Expected clamped multiplier <= 1.45, got ${mult}`);
+  });
+
+  it('should feather alpha buffer edges smoothly while preserving 100% opacity in interior', () => {
+    const w = 8, h = 6;
+    const alpha = new Uint8ClampedArray(w * h);
+    // Fill interior box x: 2..5, y: 2..3 with 255
+    for (let y = 1; y <= 4; y++) {
+      for (let x = 1; x <= 6; x++) {
+        alpha[y * w + x] = 255;
+      }
+    }
+
+    const feathered = featherAlphaBuffer(alpha, w, h, 1);
+    assert.equal(feathered.length, w * h);
+
+    // Deep interior pixel (x: 3, y: 2) should remain 100% full opacity (255)
+    assert.equal(feathered[2 * w + 3], 255);
+
+    // Boundary pixel (x: 1, y: 1) should be feathered to softer value (< 255)
+    assert.ok(feathered[1 * w + 1] < 255, 'Boundary pixel should be softened');
+    assert.ok(feathered[1 * w + 1] > 0, 'Boundary pixel should not be erased completely');
+
+    // Exterior pixel (x: 0, y: 0) should remain strictly 0
+    assert.equal(feathered[0 * w + 0], 0);
+  });
+
+  it('should handle invalid or zero-dimension featherAlphaBuffer safely', () => {
+    const empty = featherAlphaBuffer(null, 0, 0, 2);
+    assert.equal(empty, null);
+    const dummy = new Uint8ClampedArray(10);
+    const out = featherAlphaBuffer(dummy, 0, 0, 2);
+    assert.equal(out, dummy);
   });
 });
