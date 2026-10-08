@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  tile-visualizer-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: seramikbak-segformer-ai
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - HF_HOME=/root/.cache/huggingface
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Optional: Map cache to host disk to avoid re-downloading model weights (~47MB)
+      - hf_cache:/root/.cache/huggingface
+
+volumes:
+  hf_cache:
+    name: seramikbak_hf_cache

@@ -115,6 +115,12 @@ export default function RoomRenovationModal({
   const [sliderPos, setSliderPos] = useState(50); // 0 to 100
   const [isDraggingSlider, setIsDraggingSlider] = useState(false);
 
+  // SegFormer AI Python Microservice states
+  const [pythonAiOnline, setPythonAiOnline] = useState(false);
+  const [engineMode, setEngineMode] = useState('webgl'); // 'python' | 'webgl'
+  const [pythonMask, setPythonMask] = useState(null);
+  const [isNeuralRendering, setIsNeuralRendering] = useState(false);
+
   // DOM References
   const stageRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -125,6 +131,33 @@ export default function RoomRenovationModal({
       setCurrentProduct(product);
     }
   }, [product, isOpen]);
+
+  // Check Python SegFormer AI Microservice Health on Open
+  useEffect(() => {
+    if (isOpen) {
+      let isCancelled = false;
+      fetch('/api/ai/python-visualizer')
+        .then((res) => res.json())
+        .then((data) => {
+          if (!isCancelled && data?.online) {
+            setPythonAiOnline(true);
+            setEngineMode('python');
+          } else if (!isCancelled) {
+            setPythonAiOnline(false);
+            setEngineMode('webgl');
+          }
+        })
+        .catch(() => {
+          if (!isCancelled) {
+            setPythonAiOnline(false);
+            setEngineMode('webgl');
+          }
+        });
+      return () => {
+        isCancelled = true;
+      };
+    }
+  }, [isOpen]);
 
   // Load room photo image object
   useEffect(() => {
@@ -158,6 +191,46 @@ export default function RoomRenovationModal({
     try {
       // 1. Resolve safe texture URL
       const textureUrl = resolveSafeTextureUrl(currentProduct.textureUrl || currentProduct.imageUrl);
+
+      // Option 2: SegFormer Python Neural Render Engine (when online and active)
+      if (engineMode === 'python' && pythonAiOnline) {
+        setIsNeuralRendering(true);
+        try {
+          const widthNum = Number(currentProduct.width) || 60;
+          const scaleMultiplier = widthNum <= 30 ? 0.6 : (widthNum >= 120 ? 1.4 : 1.0);
+          const pyRes = await fetch('/api/ai/python-visualizer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'apply',
+              room_image: roomPhotoUrl,
+              tile_image: textureUrl,
+              mask: pythonMask,
+              pattern: (layout === 'staggered_50' || layout === 'staggered_33') ? 'brick' : 'grid',
+              tile_scale: scaleMultiplier,
+              surface: activeSurface === 'walls' ? 'wall' : (activeSurface === 'both' ? 'both' : 'floor')
+            })
+          });
+
+          const pyData = await pyRes.json();
+          if (pyData?.success && pyData?.renderedImage) {
+            setRenderedDataUrl(pyData.renderedImage);
+            setBeforeDataUrl(roomPhotoUrl);
+            if (pyData.mask && !pythonMask) {
+              setPythonMask(pyData.mask);
+            }
+            setIsRendering(false);
+            setIsNeuralRendering(false);
+            return;
+          }
+        } catch (pyErr) {
+          console.warn('[RoomRenovationModal] Python SegFormer fallback to WebGL:', pyErr);
+        } finally {
+          setIsNeuralRendering(false);
+        }
+      }
+
+      // Option 1 & Fallback: Client-Side WebGL / Canvas PBR Engine
       const tileImg = await loadImage(textureUrl);
 
       // 2. Prepare surface quads based on active selection with multi-surface and obstacle awareness
@@ -212,7 +285,7 @@ export default function RoomRenovationModal({
     } finally {
       setIsRendering(false);
     }
-  }, [roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, detectedWalls, detectedObstacles, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, roomPhotoUrl, isCustomUpload]);
+  }, [roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, detectedWalls, detectedObstacles, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, roomPhotoUrl, isCustomUpload, engineMode, pythonAiOnline, pythonMask]);
 
   // Trigger re-render whenever geometry, product, surface or styling changes
   useEffect(() => {
@@ -222,7 +295,7 @@ export default function RoomRenovationModal({
       }, 50);
       return () => clearTimeout(timer);
     }
-  }, [isOpen, roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, detectedWalls, detectedObstacles, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, triggerRender]);
+  }, [isOpen, roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, detectedWalls, detectedObstacles, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, engineMode, pythonMask, triggerRender]);
 
   // Handle Photo Upload (Processed purely in browser memory + AI Surface Analysis)
   const handlePhotoUpload = async (e) => {
@@ -247,6 +320,7 @@ export default function RoomRenovationModal({
     setRenderError(null);
     setDetectedObstacles([]);
     setDetectedWalls([]);
+    setPythonMask(null);
 
     const reader = new FileReader();
     reader.onload = async (event) => {
@@ -262,6 +336,26 @@ export default function RoomRenovationModal({
         setFloorQuad([ [10, 62], [90, 62], [100, 100], [0, 100] ]);
         setWallQuad([ [10, 15], [90, 15], [90, 62], [10, 62] ]);
         setPinEditingMode('none');
+
+        // Asynchronous SegFormer AI segmentation if Python is online
+        if (pythonAiOnline) {
+          fetch('/api/ai/python-visualizer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'segment',
+              room_image: optimizedDataUrl,
+              surface: activeSurface === 'walls' ? 'wall' : (activeSurface === 'both' ? 'both' : 'floor')
+            })
+          })
+            .then((r) => r.json())
+            .then((data) => {
+              if (data?.success && data?.mask) {
+                setPythonMask(data.mask);
+              }
+            })
+            .catch((e) => console.warn('[SegFormer] Initial segment error:', e));
+        }
 
         // 2. Trigger asynchronous AI Architectural Room Analysis
         setIsAnalyzingRoom(true);
@@ -428,10 +522,41 @@ export default function RoomRenovationModal({
         {/* MODAL HEADER */}
         <div className="sb-renovation-header">
           <div className="sb-renovation-title-box">
-            <div className="sb-renovation-badge">
-              <Sparkles size={13} style={{ color: '#d4af37' }} />
-              <span>Gerçek Doku & Perspektif Korumalı</span>
+            <div className="sb-header-meta-row">
+              <div className="sb-renovation-badge">
+                <Sparkles size={13} style={{ color: '#d4af37' }} />
+                <span>Gerçek Doku & Perspektif Korumalı</span>
+              </div>
+
+              {pythonAiOnline ? (
+                <div className="sb-engine-switcher">
+                  <button
+                    type="button"
+                    onClick={() => { setEngineMode('python'); setRenderedDataUrl(null); }}
+                    className={`sb-engine-btn ${engineMode === 'python' ? 'active-python' : ''}`}
+                    title="NVIDIA SegFormer-B3 Derin Öğrenme Modeli (PyTorch)"
+                  >
+                    <span className="sb-engine-dot-green" />
+                    <span>SegFormer AI (PyTorch)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setEngineMode('webgl'); setRenderedDataUrl(null); }}
+                    className={`sb-engine-btn ${engineMode === 'webgl' ? 'active-webgl' : ''}`}
+                    title="Hızlı Tarayıcı İçi WebGL / Canvas Motoru"
+                  >
+                    <span className="sb-engine-dot-yellow" />
+                    <span>WebGL Motoru</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="sb-engine-badge-webgl">
+                  <span className="sb-engine-dot-yellow" />
+                  <span>WebGL Hızlı Motor</span>
+                </div>
+              )}
             </div>
+
             <h2 className="sb-renovation-title">
               Mekânımda Yenile & Görselleştir
             </h2>
@@ -521,19 +646,19 @@ export default function RoomRenovationModal({
               <span className="sb-toolbar-label">Uygulama Alanı:</span>
               <div className="sb-surface-toggle-group">
                 <button
-                  onClick={() => { setActiveSurface('floor'); setPinEditingMode('none'); }}
+                  onClick={() => { setActiveSurface('floor'); setPinEditingMode('none'); setPythonMask(null); }}
                   className={`sb-surface-btn ${activeSurface === 'floor' ? 'active' : ''}`}
                 >
                   Zemin
                 </button>
                 <button
-                  onClick={() => { setActiveSurface('walls'); setPinEditingMode('none'); }}
+                  onClick={() => { setActiveSurface('walls'); setPinEditingMode('none'); setPythonMask(null); }}
                   className={`sb-surface-btn ${activeSurface === 'walls' ? 'active' : ''}`}
                 >
                   Duvarlar
                 </button>
                 <button
-                  onClick={() => { setActiveSurface('both'); setPinEditingMode('none'); }}
+                  onClick={() => { setActiveSurface('both'); setPinEditingMode('none'); setPythonMask(null); }}
                   className={`sb-surface-btn ${activeSurface === 'both' ? 'active' : ''}`}
                 >
                   Zemin + Duvar
@@ -813,11 +938,15 @@ export default function RoomRenovationModal({
             )}
 
             {/* RENDERING & AI ANALYSIS LOADER SPINNER */}
-            {(isRendering || isAnalyzingRoom) && (
+            {(isRendering || isAnalyzingRoom || isNeuralRendering) && (
               <div className="sb-rendering-overlay">
                 <div className="sb-render-spinner" />
                 <div className="sb-render-spinnerText">
-                  {isAnalyzingRoom ? 'AI ile Mekân & Yüzeyler Analiz Ediliyor...' : 'Doku, Perspektif & Işık Hesaplanıyor...'}
+                  {isAnalyzingRoom
+                    ? 'SegFormer AI ile Mekân & Yüzeyler Analiz Ediliyor...'
+                    : isNeuralRendering
+                    ? '🚀 SegFormer AI (PyTorch) Seramiği Odaya Giydiriyor...'
+                    : 'Doku, Perspektif & Işık Hesaplanıyor...'}
                 </div>
               </div>
             )}
@@ -979,6 +1108,14 @@ export default function RoomRenovationModal({
           flex: 1;
         }
 
+        .sb-header-meta-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+          margin-bottom: 6px;
+        }
+
         .sb-renovation-badge {
           display: inline-flex;
           align-items: center;
@@ -992,8 +1129,87 @@ export default function RoomRenovationModal({
           border: 1px solid rgba(212, 175, 55, 0.25);
           padding: 3px 10px;
           border-radius: 9999px;
-          margin-bottom: 6px;
         }
+
+        .sb-engine-switcher {
+          display: inline-flex;
+          align-items: center;
+          background: rgba(15, 23, 42, 0.85);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 9999px;
+          padding: 2px;
+          gap: 2px;
+        }
+
+        .sb-engine-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 3px 10px;
+          border-radius: 9999px;
+          font-size: 0.68rem;
+          font-weight: 700;
+          border: 1px solid transparent;
+          background: transparent;
+          color: #94a3b8;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+
+        .sb-engine-btn:hover {
+          color: #ffffff;
+        }
+
+        .sb-engine-btn.active-python {
+          background: rgba(16, 185, 129, 0.16);
+          border-color: rgba(16, 185, 129, 0.45);
+          color: #34d399;
+          box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+        }
+
+        .sb-engine-btn.active-webgl {
+          background: rgba(212, 175, 55, 0.16);
+          border-color: rgba(212, 175, 55, 0.45);
+          color: #f3d375;
+          box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
+        }
+
+        .sb-engine-dot-green {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #10b981;
+          box-shadow: 0 0 8px #10b981;
+          display: inline-block;
+          animation: pulseGreen 2s infinite ease-in-out;
+        }
+
+        .sb-engine-dot-yellow {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #d4af37;
+          display: inline-block;
+        }
+
+        .sb-engine-badge-webgl {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: #94a3b8;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          padding: 3px 9px;
+          border-radius: 9999px;
+        }
+
+        @keyframes pulseGreen {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.55; transform: scale(0.9); }
+        }
+
 
         .sb-renovation-title {
           font-size: 1.25rem;
