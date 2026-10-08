@@ -565,6 +565,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     finish = 'Full Lappato',
     layout = 'straight',
     customMaskCanvas = null,
+    foregroundImg = null,
   } = options;
 
   const isGlossy =
@@ -796,6 +797,14 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     }
 
     ctx.drawImage(lightCanvas, 0, 0);
+  }
+
+  // Step 7: Foreground Fixture & Furniture Overlay (preserves bathtubs, sinks, mirrors, furniture)
+  if (foregroundImg) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(foregroundImg, 0, 0, canvasW, canvasH);
+    ctx.restore();
   }
 
   const renderedDataUrl = canvas.toDataURL('image/jpeg', 0.94);

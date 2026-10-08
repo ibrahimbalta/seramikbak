@@ -39,6 +39,7 @@ const QUICK_ROOM_PRESETS = [
     id: 'luxury_bath',
     name: 'Lüks Ebeveyn Banyosu',
     url: '/hero/luxury_bathroom.png',
+    fgUrl: '/hero/luxury_bathroom_fg.png',
     floorQuad: [ [15, 68], [85, 68], [100, 100], [0, 100] ],
     wallQuad: [ [0, 18], [100, 18], [100, 68], [0, 68] ]
   },
@@ -46,6 +47,7 @@ const QUICK_ROOM_PRESETS = [
     id: 'scandi_kitchen',
     name: 'İskandinav Mutfak',
     url: '/hero/scandinavian_kitchen.png',
+    fgUrl: '/hero/scandinavian_kitchen_fg.png',
     floorQuad: [ [0, 68], [100, 68], [100, 100], [0, 100] ],
     wallQuad: [ [35, 25], [100, 25], [100, 68], [35, 68] ]
   },
@@ -53,6 +55,7 @@ const QUICK_ROOM_PRESETS = [
     id: 'modern_living',
     name: 'Çağdaş Ferah Salon',
     url: '/hero/modern_living.png',
+    fgUrl: '/hero/modern_living_fg.png',
     floorQuad: [ [0, 56], [100, 56], [100, 100], [0, 100] ],
     wallQuad: [ [0, 12], [100, 12], [100, 56], [0, 56] ]
   }
@@ -163,6 +166,19 @@ export default function RoomRenovationModal({
         ] : []
       };
 
+      // Resolve preset foreground fixture layer (bathtubs, vanity, mirrors)
+      let foregroundImg = null;
+      if (!isCustomUpload) {
+        const activePreset = QUICK_ROOM_PRESETS.find((p) => p.url === roomPhotoUrl);
+        if (activePreset?.fgUrl) {
+          try {
+            foregroundImg = await loadImage(activePreset.fgUrl);
+          } catch {
+            foregroundImg = null;
+          }
+        }
+      }
+
       // 3. Render using client-side TilePerspectiveEngine
       const result = generateTilePreview(roomImgObj, tileImg, surfaces, {
         groutColor,
@@ -172,6 +188,7 @@ export default function RoomRenovationModal({
         layout,
         orientation: tileOrientation,
         customMaskCanvas,
+        foregroundImg,
         finish: currentProduct.finish || 'Lappato Parlak'
       });
 
@@ -186,7 +203,7 @@ export default function RoomRenovationModal({
     } finally {
       setIsRendering(false);
     }
-  }, [roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, roomPhotoUrl]);
+  }, [roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, roomPhotoUrl, isCustomUpload]);
 
   // Trigger re-render whenever geometry, product, surface or styling changes
   useEffect(() => {
@@ -215,6 +232,11 @@ export default function RoomRenovationModal({
       return;
     }
 
+    // Clean previous render state immediately
+    setRenderedDataUrl(null);
+    setBeforeDataUrl(null);
+    setRenderError(null);
+
     const reader = new FileReader();
     reader.onload = async (event) => {
       const rawDataUrl = event.target.result;
@@ -240,6 +262,9 @@ export default function RoomRenovationModal({
 
   // Preset Selection
   const handleSelectPreset = (preset) => {
+    setRenderedDataUrl(null);
+    setBeforeDataUrl(null);
+    setRenderError(null);
     setRoomPhotoUrl(preset.url);
     setFloorQuad(preset.floorQuad);
     setWallQuad(preset.wallQuad);
