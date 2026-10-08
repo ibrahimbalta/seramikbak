@@ -21,6 +21,12 @@
  * Speed: ~150-250ms total
  */
 
+import { 
+  createHomographyFromUnitSquare, 
+  projectPoint, 
+  calculateTileGrid 
+} from '../utils/renovationUtils';
+
 // ---------------------------------------------------------------------------
 // Math Helpers
 // ---------------------------------------------------------------------------
@@ -108,28 +114,30 @@ export function createTiledPattern(
   groutColor = '#222222',
   layout = 'straight'
 ) {
-  const ratio = (tileWCm || 60) / (tileHCm || 120);
+  const w = Number(tileWCm) || 60;
+  const h = Number(tileHCm) || 120;
+  const ratio = w / h;
   const isPlank = ratio <= 0.35 || ratio >= 2.8;
 
   let cellW, cellH;
   if (isPlank) {
     // Narrow wood plank e.g. 20x120
-    cellW = 75;
-    cellH = Math.round(75 / Math.min(ratio, 1 / ratio));
-    cols = Math.max(cols || 14, 14);
-    rows = Math.max(rows || 6, 6);
+    cellW = 60;
+    cellH = Math.round(cellW / Math.min(ratio, 1 / ratio));
+    cols = cols || 12;
+    rows = rows || 2;
   } else if (Math.abs(ratio - 1) < 0.15) {
     // Square tile e.g. 60x60 or 80x80 or 120x120
     cellW = 160;
     cellH = 160;
-    cols = Math.max(cols || 8, 8);
-    rows = Math.max(rows || 8, 8);
+    cols = cols || 4;
+    rows = rows || 4;
   } else {
     // Large rectangular slab e.g. 60x120 cm (Architectural Grand Format)
-    cellW = 150;
-    cellH = Math.round(150 / ratio);
-    cols = Math.max(cols || 8, 8);
-    rows = Math.max(rows || 6, 6);
+    cellW = 160;
+    cellH = Math.round(cellW * (h / w));
+    cols = cols || 4;
+    rows = rows || 2;
   }
 
   const patternW = cols * (cellW + groutPx) + groutPx;
@@ -222,9 +230,10 @@ export function createTiledPattern(
 // ---------------------------------------------------------------------------
 
 /**
- * Render a tiled pattern onto a perspective quadrilateral with exclusion zones.
+ * Render a tiled pattern onto a perspective quadrilateral with exclusion zones
+ * using true Projective Homography mapping.
  */
-export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28, isFloor = true) {
+export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 32, isFloor = true) {
   const pw = pattern.width;
   const ph = pattern.height;
 
@@ -239,50 +248,39 @@ export function renderPerspectiveTiles(ctx, pattern, quad, excludes, subs = 28, 
   ctx.closePath();
   ctx.clip();
 
-  // Non-linear camera perspective foreshortening for ground floor planes
-  const depthPower = isFloor ? 1.55 : 1.0;
-
-  // Construct true 3D perspective quad for mesh mapping (vanishing point convergence for floors)
-  let meshQuad = quad;
-  if (isFloor && quad.length >= 4) {
-    const centerX = (quad[0][0] + quad[1][0]) * 0.5;
-    // Top corners converge towards the room's central vanishing point
-    const tlX = quad[0][0] + (centerX - quad[0][0]) * 0.38;
-    const trX = quad[1][0] - (quad[1][0] - centerX) * 0.38;
-    // Bottom corners fan out towards viewer camera
-    const blX = quad[3][0] - (centerX - quad[3][0]) * 0.28;
-    const brX = quad[2][0] + (quad[2][0] - centerX) * 0.28;
-
-    meshQuad = [
-      [tlX, quad[0][1]],
-      [trX, quad[1][1]],
-      [brX, quad[2][1]],
-      [blX, quad[3][1]]
-    ];
-  }
+  // Calculate closed-form 3x3 Projective Homography from unit square to quad
+  const H = createHomographyFromUnitSquare(quad);
 
   // Render subdivided perspective-mapped mesh
   for (let j = 0; j < subs; j++) {
     for (let i = 0; i < subs; i++) {
       const u0 = i / subs;
       const u1 = (i + 1) / subs;
+      const v0 = j / subs;
+      const v1 = (j + 1) / subs;
 
-      const v0Linear = j / subs;
-      const v1Linear = (j + 1) / subs;
-      const v0 = isFloor ? Math.pow(v0Linear, depthPower) : v0Linear;
-      const v1 = isFloor ? Math.pow(v1Linear, depthPower) : v1Linear;
+      // 4 corners of sub-quad in canvas space projected via true perspective
+      let p00, p10, p01, p11;
+      if (H) {
+        p00 = projectPoint(H, u0, v0);
+        p10 = projectPoint(H, u1, v0);
+        p01 = projectPoint(H, u0, v1);
+        p11 = projectPoint(H, u1, v1);
+      } else {
+        // Safe fallback to bilinear interpolation if quad is degenerate
+        p00 = bilinear(quad, u0, v0);
+        p10 = bilinear(quad, u1, v0);
+        p01 = bilinear(quad, u0, v1);
+        p11 = bilinear(quad, u1, v1);
+      }
 
-      // 4 corners of sub-quad in canvas space
-      const p00 = bilinear(meshQuad, u0, v0);
-      const p10 = bilinear(meshQuad, u1, v0);
-      const p01 = bilinear(meshQuad, u0, v1);
-      const p11 = bilinear(meshQuad, u1, v1);
+      if (!p00 || !p10 || !p01 || !p11) continue;
 
       // Corresponding source region in pattern texture
       const sx0 = u0 * pw;
       const sx1 = u1 * pw;
-      const sy0 = v0Linear * ph;
-      const sy1 = v1Linear * ph;
+      const sy0 = v0 * ph;
+      const sy1 = v1 * ph;
 
       // Draw as 2 triangles for perspective mapping
       drawTexturedTriangle(
@@ -595,6 +593,9 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
   // Step 1: Draw base room photo
   ctx.drawImage(roomImg, 0, 0, canvasW, canvasH);
 
+  // Exact 1:1 pixel twin for Before comparison (zero subpixel jitter/shift)
+  const beforeDataUrl = canvas.toDataURL('image/jpeg', 0.94);
+
   // Proportions & Grout
   const ratio = (tileWCm || 60) / (tileHCm || 120);
   const isPlank = ratio <= 0.35 || ratio >= 2.8;
@@ -608,16 +609,17 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
 
   const groutPx = Math.max(1.0, Math.min(3.5, (groutWidth || 2) * 0.7));
 
-  const floorCols = isPlank ? 14 : Math.abs(ratio - 1) < 0.15 ? 8 : 8;
-  const floorRows = isPlank ? 6 : Math.abs(ratio - 1) < 0.15 ? 8 : 6;
+  // Compute physically accurate tile grid preserving 60x120, 60x60, 20x120 proportions
+  const floorGrid = calculateTileGrid(tileWCm, tileHCm, true);
+  const wallGrid = calculateTileGrid(tileWCm, tileHCm, false);
 
   // Step 2: Create floor pattern with realistic scale, layout and multi-face veining
   const floorPattern = createTiledPattern(
     tileImg,
-    floorCols,
-    floorRows,
-    tileWCm,
-    tileHCm,
+    floorGrid.cols,
+    floorGrid.rows,
+    floorGrid.effectiveW,
+    floorGrid.effectiveH,
     groutPx,
     resolvedGrout,
     layout
@@ -625,10 +627,10 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
 
   const wallPattern = createTiledPattern(
     tileImg,
-    8,
-    6,
-    tileWCm,
-    tileHCm,
+    wallGrid.cols,
+    wallGrid.rows,
+    wallGrid.effectiveW,
+    wallGrid.effectiveH,
     groutPx,
     resolvedGrout,
     layout
@@ -796,7 +798,11 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     ctx.drawImage(lightCanvas, 0, 0);
   }
 
-  return canvas.toDataURL('image/jpeg', 0.94);
+  const renderedDataUrl = canvas.toDataURL('image/jpeg', 0.94);
+  const result = new String(renderedDataUrl);
+  result.renderedDataUrl = renderedDataUrl;
+  result.beforeDataUrl = beforeDataUrl;
+  return result;
 }
 
 // ---------------------------------------------------------------------------

@@ -5,7 +5,11 @@ import {
   classifyTileProportion, 
   buildSurfaces, 
   validateUploadFile,
-  clampCoord
+  clampCoord,
+  createHomographyFromUnitSquare,
+  projectPoint,
+  calculateTileGrid,
+  calculateDisplayedDimensions
 } from '../src/utils/renovationUtils.js';
 
 describe('Room Renovation Engine - Texture URL & Security Resolver', () => {
@@ -115,5 +119,128 @@ describe('Room Renovation Engine - File Validation & Client-side Memory Safety',
   it('should reject null or undefined file input safely', () => {
     assert.equal(validateUploadFile(null).valid, false);
     assert.equal(validateUploadFile(undefined).valid, false);
+  });
+});
+
+describe('Room Renovation Engine - Projective 3D Homography Matrix', () => {
+  // Trapezoid quad representing a floor in perspective
+  const floorQuad = [
+    [200, 300], // Top-Left
+    [800, 300], // Top-Right
+    [1000, 700], // Bottom-Right
+    [50, 700]    // Bottom-Left
+  ];
+
+  it('should accurately map unit square 4 corners to exact destination quad coordinates', () => {
+    const H = createHomographyFromUnitSquare(floorQuad);
+    assert.ok(H, 'Homography matrix should not be null');
+
+    const p0 = projectPoint(H, 0, 0); // TL
+    const p1 = projectPoint(H, 1, 0); // TR
+    const p2 = projectPoint(H, 1, 1); // BR
+    const p3 = projectPoint(H, 0, 1); // BL
+
+    assert.ok(Math.abs(p0[0] - 200) < 1e-4);
+    assert.ok(Math.abs(p0[1] - 300) < 1e-4);
+
+    assert.ok(Math.abs(p1[0] - 800) < 1e-4);
+    assert.ok(Math.abs(p1[1] - 300) < 1e-4);
+
+    assert.ok(Math.abs(p2[0] - 1000) < 1e-4);
+    assert.ok(Math.abs(p2[1] - 700) < 1e-4);
+
+    assert.ok(Math.abs(p3[0] - 50) < 1e-4);
+    assert.ok(Math.abs(p3[1] - 700) < 1e-4);
+  });
+
+  it('should project interior points inside the quadrilateral with realistic perspective foreshortening', () => {
+    const H = createHomographyFromUnitSquare(floorQuad);
+    const center = projectPoint(H, 0.5, 0.5);
+
+    // X center should be between left and right bounds
+    assert.ok(center[0] > 100 && center[0] < 900);
+    // Y center with perspective foreshortening should be higher than linear midpoint 500
+    assert.ok(center[1] > 300 && center[1] < 700);
+  });
+
+  it('should handle affine parallelogram quads correctly', () => {
+    const parallelogram = [
+      [100, 100],
+      [500, 100],
+      [600, 400],
+      [200, 400]
+    ];
+    const H = createHomographyFromUnitSquare(parallelogram);
+    assert.ok(H);
+    assert.equal(H.g, 0);
+    assert.equal(H.h, 0);
+
+    const br = projectPoint(H, 1, 1);
+    assert.ok(Math.abs(br[0] - 600) < 1e-4);
+    assert.ok(Math.abs(br[1] - 400) < 1e-4);
+  });
+
+  it('should safely return null for degenerate or collinear points', () => {
+    const collinear = [
+      [100, 100],
+      [200, 200],
+      [300, 300],
+      [400, 400]
+    ];
+    const H = createHomographyFromUnitSquare(collinear);
+    assert.equal(H, null);
+    assert.equal(projectPoint(null, 0.5, 0.5), null);
+  });
+});
+
+describe('Room Renovation Engine - Tile Grid Calculation & Architectural Aspect', () => {
+  it('should compute 4 cols and 2 rows for 60x120 cm slabs (1:2 ratio, not square)', () => {
+    const grid = calculateTileGrid(60, 120, true);
+    assert.equal(grid.cols, 4);
+    assert.equal(grid.rows, 2);
+    assert.equal(grid.ratio, 0.5);
+  });
+
+  it('should compute 4 cols and 4 rows for 60x60 cm square tiles (1:1 ratio)', () => {
+    const grid = calculateTileGrid(60, 60, true);
+    assert.equal(grid.cols, 4);
+    assert.equal(grid.rows, 4);
+    assert.equal(grid.ratio, 1.0);
+  });
+
+  it('should compute 12 cols and 2 rows for 20x120 cm wood plank tiles', () => {
+    const grid = calculateTileGrid(20, 120, true);
+    assert.equal(grid.cols, 12);
+    assert.equal(grid.rows, 2);
+    assert.ok(grid.ratio < 0.2);
+  });
+
+  it('should compute 2 cols and 1 row for 120x240 cm grand format slabs', () => {
+    const grid = calculateTileGrid(120, 240, true);
+    assert.equal(grid.cols, 2);
+    assert.equal(grid.rows, 1);
+  });
+});
+
+describe('Room Renovation Engine - Displayed Dimensions & Zero-Letterbox Stage', () => {
+  it('should preserve 4:3 aspect ratio perfectly within max constraints', () => {
+    const dim = calculateDisplayedDimensions(1200, 900, 1100, 520);
+    // Height capped at 520, width should be 520 * (4/3) = 693
+    assert.equal(dim.height, 520);
+    assert.equal(dim.width, 693);
+    assert.ok(Math.abs(dim.aspectRatio - 4 / 3) < 1e-4);
+  });
+
+  it('should preserve 16:9 widescreen aspect ratio within max constraints', () => {
+    const dim = calculateDisplayedDimensions(1920, 1080, 1100, 520);
+    // Width capped at 1100, height = 1100 / (16/9) = 619 > 520 -> so height is 520, width = 520 * (16/9) = 924
+    assert.equal(dim.height, 520);
+    assert.equal(dim.width, 924);
+  });
+
+  it('should handle vertical 9:16 smartphone photos without overflowing max height', () => {
+    const dim = calculateDisplayedDimensions(1080, 1920, 1100, 520);
+    assert.equal(dim.height, 520);
+    assert.equal(dim.width, 293);
   });
 });

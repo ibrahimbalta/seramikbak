@@ -97,6 +97,8 @@ export default function RoomRenovationModal({
 
   // Render & Comparison state
   const [renderedDataUrl, setRenderedDataUrl] = useState(null);
+  const [beforeDataUrl, setBeforeDataUrl] = useState(null);
+  const [tileOrientation, setTileOrientation] = useState('vertical'); // 'vertical' | 'horizontal'
   const [isRendering, setIsRendering] = useState(false);
   const [renderError, setRenderError] = useState(null);
   const [sliderPos, setSliderPos] = useState(50); // 0 to 100
@@ -162,24 +164,29 @@ export default function RoomRenovationModal({
       };
 
       // 3. Render using client-side TilePerspectiveEngine
-      const resultDataUrl = generateTilePreview(roomImgObj, tileImg, surfaces, {
+      const result = generateTilePreview(roomImgObj, tileImg, surfaces, {
         groutColor,
         groutWidth,
         tileWCm: Number(currentProduct.width) || 60,
         tileHCm: Number(currentProduct.height) || 120,
         layout,
+        orientation: tileOrientation,
         customMaskCanvas,
         finish: currentProduct.finish || 'Lappato Parlak'
       });
 
-      setRenderedDataUrl(resultDataUrl);
+      const rendered = (result && result.renderedDataUrl) ? result.renderedDataUrl : result.toString();
+      const before = (result && result.beforeDataUrl) ? result.beforeDataUrl : roomPhotoUrl;
+
+      setRenderedDataUrl(rendered);
+      setBeforeDataUrl(before);
     } catch (err) {
       console.error('Render preview error:', err);
       setRenderError('Seramik dokusu uygulanamadı. Lütfen tekrar deneyin.');
     } finally {
       setIsRendering(false);
     }
-  }, [roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, groutColor, groutWidth, layout, customMaskCanvas]);
+  }, [roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, roomPhotoUrl]);
 
   // Trigger re-render whenever geometry, product, surface or styling changes
   useEffect(() => {
@@ -189,7 +196,7 @@ export default function RoomRenovationModal({
       }, 50);
       return () => clearTimeout(timer);
     }
-  }, [isOpen, roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, groutColor, groutWidth, layout, customMaskCanvas, triggerRender]);
+  }, [isOpen, roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, triggerRender]);
 
   // Handle Photo Upload (Processed purely in browser memory - zero server upload)
   const handlePhotoUpload = async (e) => {
@@ -305,6 +312,32 @@ export default function RoomRenovationModal({
     setSliderPos(pct);
   };
 
+  // Global window listener for silky-smooth slider dragging
+  useEffect(() => {
+    if (!isDraggingSlider) return;
+
+    const onPointerMove = (e) => {
+      const clientX = e.touches && e.touches[0] ? e.touches[0].clientX : e.clientX;
+      handleSliderMove(clientX);
+    };
+
+    const onPointerUp = () => {
+      setIsDraggingSlider(false);
+    };
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('touchmove', onPointerMove);
+    window.addEventListener('touchend', onPointerUp);
+
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('touchmove', onPointerMove);
+      window.removeEventListener('touchend', onPointerUp);
+    };
+  }, [isDraggingSlider]);
+
   // Download High-Res Result
   const handleDownload = () => {
     if (!renderedDataUrl) return;
@@ -375,8 +408,8 @@ export default function RoomRenovationModal({
         {isBrushOpen && (
           <div className="sb-brush-overlay-container">
             <MaskBrushEditor
-              backgroundImage={roomPhotoUrl}
-              initialMask={{
+              backgroundImage={beforeDataUrl || roomPhotoUrl}
+              initialMask={customMaskCanvas || {
                 floor: { polygon: floorQuad },
                 walls: [{ polygon: wallQuad }]
               }}
@@ -469,13 +502,25 @@ export default function RoomRenovationModal({
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => setIsBrushOpen(true)}
                   className={`sb-toolbar-btn ${customMaskCanvas ? 'has-mask' : ''}`}
-                  title="Fırça ile seramik alanlarını genişletin veya eşyaları maskeleyin"
+                  title="Küvet, lavabo ve mobilyaları seramikten korumak için maskeyi düzenleyin"
                 >
-                  <Paintbrush size={14} />
-                  <span>{customMaskCanvas ? 'Maske Fırçası (Uygulandı)' : 'Maske Fırçası'}</span>
+                  <Scissors size={14} />
+                  <span>{customMaskCanvas ? '✓ Küvet/Eşya Maskesi Aktif' : 'Küvet & Eşya Silgisi'}</span>
                 </button>
+
+                {customMaskCanvas && (
+                  <button
+                    type="button"
+                    onClick={() => setCustomMaskCanvas(null)}
+                    className="sb-btn-reset-mask"
+                    title="Özel maskeyi kaldır ve tam poligonu kullan"
+                  >
+                    ✕ Maskeyi Kaldır
+                  </button>
+                )}
 
                 <button
                   onClick={handleResetPins}
@@ -548,6 +593,18 @@ export default function RoomRenovationModal({
                   <option value="diagonal">45° Çapraz Dizilim</option>
                 </select>
               </div>
+
+              <div className="sb-advanced-item">
+                <label>Karo Yönü:</label>
+                <select 
+                  value={tileOrientation} 
+                  onChange={(e) => setTileOrientation(e.target.value)}
+                  className="sb-select"
+                >
+                  <option value="vertical">Boyuna (Derinlik Boyunca)</option>
+                  <option value="horizontal">Enine (Yatay Döşeme)</option>
+                </select>
+              </div>
             </div>
           )}
 
@@ -580,48 +637,55 @@ export default function RoomRenovationModal({
           )}
 
           {/* INTERACTIVE STAGE & BEFORE/AFTER SPLIT VIEW */}
-          <div 
-            ref={stageRef}
-            className="sb-renovation-stage"
-            onPointerMove={pinEditingMode !== 'none' ? handleStagePointerMove : undefined}
-            onPointerUp={pinEditingMode !== 'none' ? handleStagePointerUp : undefined}
-          >
-            {/* BASE ORIGINAL PHOTO (LEFT SIDE) */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img 
-              src={roomPhotoUrl} 
-              alt="Orijinal Mekân" 
-              className="sb-stage-base-img"
-            />
+          <div className="sb-stage-outer-box">
+            <div 
+              ref={stageRef}
+              className="sb-renovation-stage"
+              style={{
+                aspectRatio: roomImgObj ? `${roomImgObj.naturalWidth} / ${roomImgObj.naturalHeight}` : '16 / 9'
+              }}
+              onPointerMove={pinEditingMode !== 'none' ? handleStagePointerMove : undefined}
+              onPointerUp={pinEditingMode !== 'none' ? handleStagePointerUp : undefined}
+            >
+              {/* BASE ORIGINAL PHOTO (LEFT SIDE) */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src={beforeDataUrl || roomPhotoUrl} 
+                alt="Orijinal Mekân" 
+                className="sb-stage-base-img"
+              />
 
-            {/* RENDERED TILED RESULT (RIGHT SIDE VIA CLIP-PATH) */}
-            {renderedDataUrl && (
-              <div 
-                className="sb-stage-tiled-layer"
-                style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  src={renderedDataUrl} 
-                  alt="Yenilenmiş Mekân" 
-                  className="sb-stage-tiled-img"
-                />
-              </div>
-            )}
-
-            {/* BEFORE / AFTER SLIDER SEPARATOR */}
-            {pinEditingMode === 'none' && renderedDataUrl && (
-              <div 
-                className="sb-split-divider"
-                style={{ left: `${sliderPos}%` }}
-                onPointerDown={() => setIsDraggingSlider(true)}
-              >
-                <div className="sb-split-line" />
-                <div className="sb-split-handle">
-                  <span>↔</span>
+              {/* RENDERED TILED RESULT (RIGHT SIDE VIA CLIP-PATH) */}
+              {renderedDataUrl && (
+                <div 
+                  className="sb-stage-tiled-layer"
+                  style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src={renderedDataUrl} 
+                    alt="Yenilenmiş Mekân" 
+                    className="sb-stage-tiled-img"
+                  />
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* BEFORE / AFTER SLIDER SEPARATOR */}
+              {pinEditingMode === 'none' && renderedDataUrl && (
+                <div 
+                  className="sb-split-divider"
+                  style={{ left: `${sliderPos}%` }}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    setIsDraggingSlider(true);
+                  }}
+                >
+                  <div className="sb-split-line" />
+                  <div className="sb-split-handle">
+                    <span>↔</span>
+                  </div>
+                </div>
+              )}
 
             {/* FULL STAGE SLIDER TOUCH/MOUSE LISTENER */}
             {pinEditingMode === 'none' && isDraggingSlider && (
@@ -693,6 +757,7 @@ export default function RoomRenovationModal({
                 <div className="sb-render-spinnerText">Doku & Işık Hesaplanıyor...</div>
               </div>
             )}
+            </div>
           </div>
 
           {/* SLIDER QUICK BUTTONS */}
@@ -1134,25 +1199,57 @@ export default function RoomRenovationModal({
         }
 
         /* STAGE CONTAINER */
-        .sb-renovation-stage {
-          position: relative;
+        .sb-stage-outer-box {
           width: 100%;
-          min-height: 380px;
-          max-height: 520px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           background: #020617;
           border-radius: 16px;
-          overflow: hidden;
           border: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 6px;
+          overflow: hidden;
+          min-height: 380px;
+        }
+
+        .sb-renovation-stage {
+          position: relative;
+          width: auto;
+          height: auto;
+          max-width: 100%;
+          max-height: 520px;
+          background: #020617;
+          border-radius: 12px;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.1);
           user-select: none;
           touch-action: none;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
         }
 
         .sb-stage-base-img, .sb-stage-tiled-img {
           width: 100%;
           height: 100%;
           max-height: 520px;
-          object-fit: contain;
+          object-fit: fill;
           display: block;
+        }
+
+        .sb-btn-reset-mask {
+          background: rgba(239, 68, 68, 0.15);
+          border: 1px solid rgba(239, 68, 68, 0.35);
+          color: #fca5a5;
+          padding: 5px 10px;
+          border-radius: 8px;
+          font-size: 0.72rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+
+        .sb-btn-reset-mask:hover {
+          background: rgba(239, 68, 68, 0.3);
+          color: #ffffff;
         }
 
         .sb-stage-tiled-layer {
