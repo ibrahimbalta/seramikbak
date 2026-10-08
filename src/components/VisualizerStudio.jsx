@@ -29,7 +29,7 @@ const QUICK_ROOM_PRESETS = [
   { id: 'living', name: 'Çağdaş Ferah Salon', url: '/hero/modern_living.png' }
 ];
 
-export default function VisualizerStudio({ initialProduct = null }) {
+export default function VisualizerStudio({ initialProduct = null, initialSlug = null }) {
   // --- State ---
   const [product, setProduct] = useState(initialProduct);
 
@@ -89,7 +89,7 @@ export default function VisualizerStudio({ initialProduct = null }) {
       .catch(() => setServerOnline(false));
   }, []);
 
-  // Pre-load initial product texture if provided
+  // Pre-load initial product texture if provided or query by slug
   useEffect(() => {
     if (initialProduct) {
       setProduct(initialProduct);
@@ -101,8 +101,20 @@ export default function VisualizerStudio({ initialProduct = null }) {
       if (w <= 30) setTileScale(0.6);
       else if (w >= 120) setTileScale(1.4);
       else setTileScale(1.0);
+    } else if (initialSlug) {
+      fetch(`/api/products?search=${encodeURIComponent(initialSlug)}`)
+        .then(res => res.json())
+        .then(data => {
+          const list = data?.products || (Array.isArray(data) ? data : []);
+          const matched = list.find(p => p.slug === initialSlug || p.code === initialSlug) || list[0];
+          if (matched) {
+            setProduct(matched);
+            setTileUrl(matched.textureUrl || matched.imageUrl || '/textures/calacatta_gold.jpg');
+          }
+        })
+        .catch(() => {});
     }
-  }, [initialProduct]);
+  }, [initialProduct, initialSlug]);
 
   // Set default room if none chosen
   useEffect(() => {
