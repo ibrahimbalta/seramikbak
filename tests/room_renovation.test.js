@@ -9,8 +9,16 @@ import {
   createHomographyFromUnitSquare,
   projectPoint,
   calculateTileGrid,
-  calculateDisplayedDimensions
+  calculateDisplayedDimensions,
+  normalizePolygon
 } from '../src/utils/renovationUtils.js';
+import { 
+  isConvexQuad, 
+  calculatePolygonArea, 
+  validateSurfaces, 
+  validateRenderResult 
+} from '../src/utils/qualityValidator.js';
+import { getArchitecturalFallback } from '../src/services/RoomAnalysisService.js';
 
 describe('Room Renovation Engine - Texture URL & Security Resolver', () => {
   it('should return default fallback texture when url is empty or undefined', () => {
@@ -242,5 +250,72 @@ describe('Room Renovation Engine - Displayed Dimensions & Zero-Letterbox Stage',
     const dim = calculateDisplayedDimensions(1080, 1920, 1100, 520);
     assert.equal(dim.height, 520);
     assert.equal(dim.width, 293);
+  });
+});
+
+describe('Room Renovation Engine - Coordinate Normalizer', () => {
+  it('should clamp standard 0-100 coordinates without scaling', () => {
+    const poly = [[10, 20], [80, 90]];
+    const res = normalizePolygon(poly);
+    assert.deepEqual(res, [[10, 20], [80, 90]]);
+  });
+
+  it('should downscale 0-1000 range Gemini vision coordinates to 0-100 percentage space', () => {
+    const poly = [[100, 200], [800, 950]];
+    const res = normalizePolygon(poly);
+    assert.deepEqual(res, [[10, 20], [80, 95]]);
+  });
+
+  it('should safely return empty array for invalid input', () => {
+    assert.deepEqual(normalizePolygon(null), []);
+    assert.deepEqual(normalizePolygon([]), []);
+  });
+});
+
+describe('Room Renovation Engine - Quality Validator & Geometry Tests', () => {
+  it('should accept valid clockwise convex floor quadrilateral', () => {
+    const quad = [[15, 65], [85, 65], [100, 100], [0, 100]];
+    assert.equal(isConvexQuad(quad), true);
+  });
+
+  it('should reject self-intersecting / hourglass / bow-tie quad', () => {
+    // Cross-over shape: P0(0,0), P1(100,100), P2(100,0), P3(0,100)
+    const selfIntersecting = [[0, 0], [100, 100], [100, 0], [0, 100]];
+    assert.equal(isConvexQuad(selfIntersecting), false);
+  });
+
+  it('should accurately calculate polygon area via Shoelace formula', () => {
+    // 50x50 rectangle in percentage space = 2500 area
+    const rect = [[10, 10], [60, 10], [60, 60], [10, 60]];
+    const area = calculatePolygonArea(rect);
+    assert.equal(area, 2500);
+  });
+
+  it('should validate sane surface configurations and reject tiny/degenerate polygons', () => {
+    const validSurfaces = {
+      floor: { polygon: [[10, 60], [90, 60], [100, 100], [0, 100]] },
+      walls: [{ name: 'back', polygon: [[10, 20], [90, 20], [90, 60], [10, 60]] }]
+    };
+    const report = validateSurfaces(validSurfaces);
+    assert.equal(report.isValid, true);
+    assert.equal(report.issues.length, 0);
+
+    const invalidSurfaces = {
+      floor: { polygon: [[10, 60], [10.1, 60], [10.1, 60.1], [10, 60.1]] } // Tiny 0.01 area
+    };
+    const badReport = validateSurfaces(invalidSurfaces);
+    assert.equal(badReport.isValid, false);
+    assert.ok(badReport.issues.length > 0);
+  });
+});
+
+describe('Room Renovation Engine - Architectural Fallback Service', () => {
+  it('should adapt horizon for portrait vs widescreen photos', () => {
+    const portrait = getArchitecturalFallback('both', 0.6); // 9:16 mobile portrait
+    const landscape = getArchitecturalFallback('both', 1.77); // 16:9 widescreen landscape
+
+    assert.ok(portrait.floor.polygon[0][1] >= 65, 'Portrait floor horizon should be lower');
+    assert.ok(landscape.floor.polygon[0][1] <= 60, 'Landscape floor horizon should start higher');
+    assert.equal(portrait.walls.length, 3, 'Should generate left, right and back wall quads');
   });
 });

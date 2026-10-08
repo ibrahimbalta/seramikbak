@@ -26,6 +26,7 @@ import {
   projectPoint, 
   calculateTileGrid 
 } from '../utils/renovationUtils';
+import { validateRenderResult } from '../utils/qualityValidator';
 
 // ---------------------------------------------------------------------------
 // Math Helpers
@@ -566,6 +567,7 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     layout = 'straight',
     customMaskCanvas = null,
     foregroundImg = null,
+    obstacles = [],
   } = options;
 
   const isGlossy =
@@ -725,6 +727,30 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
     tCtx.restore();
   }
 
+  // Automatic Obstacle & Fixture Protection (Bathtubs, vanities, toilets, faucets)
+  const combinedObstacles = [
+    ...(Array.isArray(surfaces.obstacles) ? surfaces.obstacles : []),
+    ...(Array.isArray(obstacles) ? obstacles : [])
+  ];
+
+  if (combinedObstacles.length > 0) {
+    tCtx.save();
+    tCtx.globalCompositeOperation = 'destination-out';
+    combinedObstacles.forEach((obs) => {
+      const poly = obs.polygon || obs;
+      if (Array.isArray(poly) && poly.length >= 3) {
+        tCtx.beginPath();
+        tCtx.moveTo((poly[0][0] / 100) * canvasW, (poly[0][1] / 100) * canvasH);
+        for (let i = 1; i < poly.length; i++) {
+          tCtx.lineTo((poly[i][0] / 100) * canvasW, (poly[i][1] / 100) * canvasH);
+        }
+        tCtx.closePath();
+        tCtx.fill();
+      }
+    });
+    tCtx.restore();
+  }
+
   // Step 5: Draw natural, realistic tiles onto main canvas
   ctx.save();
   ctx.globalAlpha = 1.0;
@@ -808,9 +834,12 @@ export function generateTilePreview(roomImg, tileImg, surfaces, options = {}) {
   }
 
   const renderedDataUrl = canvas.toDataURL('image/jpeg', 0.94);
+  const qualityReport = validateRenderResult(canvas, surfaces);
+
   const result = new String(renderedDataUrl);
   result.renderedDataUrl = renderedDataUrl;
   result.beforeDataUrl = beforeDataUrl;
+  result.qualityReport = qualityReport;
   return result;
 }
 

@@ -31,6 +31,7 @@ import {
   buildSurfaces, 
   validateUploadFile 
 } from '../utils/renovationUtils';
+import { analyzeRoomSurfaces } from '../services/RoomAnalysisService';
 
 
 // Preset rooms for quick trial without uploading
@@ -83,6 +84,11 @@ export default function RoomRenovationModal({
   // [ Top-Left, Top-Right, Bottom-Right, Bottom-Left ]
   const [floorQuad, setFloorQuad] = useState(QUICK_ROOM_PRESETS[0].floorQuad);
   const [wallQuad, setWallQuad] = useState(QUICK_ROOM_PRESETS[0].wallQuad);
+
+  // AI Room Analysis & Obstacle Detection state
+  const [isAnalyzingRoom, setIsAnalyzingRoom] = useState(false);
+  const [detectedObstacles, setDetectedObstacles] = useState([]);
+  const [detectedWalls, setDetectedWalls] = useState([]);
 
   // Active pin editor mode ('none' | 'floor' | 'walls')
   const [pinEditingMode, setPinEditingMode] = useState('none');
@@ -152,18 +158,18 @@ export default function RoomRenovationModal({
       const textureUrl = resolveSafeTextureUrl(currentProduct.textureUrl || currentProduct.imageUrl);
       const tileImg = await loadImage(textureUrl);
 
-      // 2. Prepare surface quads based on active selection
+      // 2. Prepare surface quads based on active selection with multi-surface and obstacle awareness
       const surfaces = {
         floor: (activeSurface === 'floor' || activeSurface === 'both') ? {
           polygon: floorQuad,
           exclude: []
         } : null,
-        walls: (activeSurface === 'walls' || activeSurface === 'both') ? [
-          {
-            polygon: wallQuad,
-            exclude: []
-          }
-        ] : []
+        walls: (activeSurface === 'walls' || activeSurface === 'both') ? (
+          detectedWalls.length > 0 
+            ? detectedWalls 
+            : [{ polygon: wallQuad, exclude: [] }]
+        ) : [],
+        obstacles: detectedObstacles
       };
 
       // Resolve preset foreground fixture layer (bathtubs, vanity, mirrors)
@@ -189,6 +195,7 @@ export default function RoomRenovationModal({
         orientation: tileOrientation,
         customMaskCanvas,
         foregroundImg,
+        obstacles: detectedObstacles,
         finish: currentProduct.finish || 'Lappato Parlak'
       });
 
@@ -203,7 +210,7 @@ export default function RoomRenovationModal({
     } finally {
       setIsRendering(false);
     }
-  }, [roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, roomPhotoUrl, isCustomUpload]);
+  }, [roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, detectedWalls, detectedObstacles, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, roomPhotoUrl, isCustomUpload]);
 
   // Trigger re-render whenever geometry, product, surface or styling changes
   useEffect(() => {
@@ -213,9 +220,9 @@ export default function RoomRenovationModal({
       }, 50);
       return () => clearTimeout(timer);
     }
-  }, [isOpen, roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, triggerRender]);
+  }, [isOpen, roomImgObj, currentProduct, activeSurface, floorQuad, wallQuad, detectedWalls, detectedObstacles, groutColor, groutWidth, layout, tileOrientation, customMaskCanvas, triggerRender]);
 
-  // Handle Photo Upload (Processed purely in browser memory - zero server upload)
+  // Handle Photo Upload (Processed purely in browser memory + AI Surface Analysis)
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -236,6 +243,8 @@ export default function RoomRenovationModal({
     setRenderedDataUrl(null);
     setBeforeDataUrl(null);
     setRenderError(null);
+    setDetectedObstacles([]);
+    setDetectedWalls([]);
 
     const reader = new FileReader();
     reader.onload = async (event) => {
@@ -247,10 +256,30 @@ export default function RoomRenovationModal({
         setIsCustomUpload(true);
         setCustomMaskCanvas(null); // Reset brush mask on new room photo
 
-        // Sensible default perspective quads for room photo
+        // 1. Sensible initial fallback
         setFloorQuad([ [10, 62], [90, 62], [100, 100], [0, 100] ]);
         setWallQuad([ [10, 15], [90, 15], [90, 62], [10, 62] ]);
         setPinEditingMode('none');
+
+        // 2. Trigger asynchronous AI Architectural Room Analysis
+        setIsAnalyzingRoom(true);
+        try {
+          const analysis = await analyzeRoomSurfaces(optimizedDataUrl, activeSurface);
+          if (analysis?.floor?.polygon && analysis.floor.polygon.length >= 4) {
+            setFloorQuad(analysis.floor.polygon);
+          }
+          if (Array.isArray(analysis?.walls) && analysis.walls.length > 0) {
+            setDetectedWalls(analysis.walls);
+            setWallQuad(analysis.walls[0].polygon);
+          }
+          if (Array.isArray(analysis?.obstacles) && analysis.obstacles.length > 0) {
+            setDetectedObstacles(analysis.obstacles);
+          }
+        } catch (aiErr) {
+          console.warn('[RoomRenovationModal] Room AI Analysis fallback used:', aiErr);
+        } finally {
+          setIsAnalyzingRoom(false);
+        }
       } catch (err) {
         console.error('Image optimization error:', err);
         setRoomPhotoUrl(rawDataUrl);
@@ -265,6 +294,8 @@ export default function RoomRenovationModal({
     setRenderedDataUrl(null);
     setBeforeDataUrl(null);
     setRenderError(null);
+    setDetectedObstacles([]);
+    setDetectedWalls([]);
     setRoomPhotoUrl(preset.url);
     setFloorQuad(preset.floorQuad);
     setWallQuad(preset.wallQuad);
@@ -775,11 +806,21 @@ export default function RoomRenovationModal({
               </>
             )}
 
-            {/* RENDERING LOADER SPINNER */}
-            {isRendering && (
+            {/* RENDERING & AI ANALYSIS LOADER SPINNER */}
+            {(isRendering || isAnalyzingRoom) && (
               <div className="sb-rendering-overlay">
                 <div className="sb-render-spinner" />
-                <div className="sb-render-spinnerText">Doku & Işık Hesaplanıyor...</div>
+                <div className="sb-render-spinnerText">
+                  {isAnalyzingRoom ? 'AI ile Mekân & Yüzeyler Analiz Ediliyor...' : 'Doku, Perspektif & Işık Hesaplanıyor...'}
+                </div>
+              </div>
+            )}
+
+            {/* AI DETECTED OBSTACLES BADGE */}
+            {detectedObstacles.length > 0 && pinEditingMode === 'none' && !isAnalyzingRoom && (
+              <div className="sb-ai-fixture-badge">
+                <Sparkles size={11} style={{ color: '#38bdf8' }} />
+                <span>AI: {detectedObstacles.length} Nesne/Vitrifiye Korumada</span>
               </div>
             )}
             </div>
@@ -1408,6 +1449,25 @@ export default function RoomRenovationModal({
           background: rgba(15, 23, 42, 0.9);
           color: #f3d375;
           border: 1px solid rgba(212, 175, 55, 0.4);
+        }
+
+        .sb-ai-fixture-badge {
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(15, 23, 42, 0.88);
+          border: 1px solid rgba(56, 189, 248, 0.45);
+          color: #7dd3fc;
+          padding: 5px 10px;
+          border-radius: 8px;
+          font-size: 0.72rem;
+          font-weight: 700;
+          z-index: 20;
+          backdrop-filter: blur(8px);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
 
         /* LOADER */

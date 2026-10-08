@@ -97,6 +97,26 @@ export function clampCoord(val, min = 0, max = 100) {
 }
 
 /**
+ * Normalizes an array of [x, y] coordinates into standard 0-100 percentage space.
+ * @param {Array<[number, number]>} poly 
+ * @returns {Array<[number, number]>}
+ */
+export function normalizePolygon(poly) {
+  if (!Array.isArray(poly) || poly.length === 0) return [];
+  let maxVal = 0;
+  for (const pt of poly) {
+    if (Array.isArray(pt)) {
+      maxVal = Math.max(maxVal, Number(pt[0]) || 0, Number(pt[1]) || 0);
+    }
+  }
+  const scale = maxVal > 105 ? (maxVal > 2000 ? 100 : 10) : 1;
+  return poly.map(([x, y]) => [
+    clampCoord((Number(x) || 0) / scale),
+    clampCoord((Number(y) || 0) / scale)
+  ]);
+}
+
+/**
  * Computes a 3x3 Projective Homography matrix mapping the unit square [0,1]^2
  * to an arbitrary destination quadrilateral quad = [P0, P1, P2, P3].
  * P0: Top-Left, P1: Top-Right, P2: Bottom-Right, P3: Bottom-Left.
