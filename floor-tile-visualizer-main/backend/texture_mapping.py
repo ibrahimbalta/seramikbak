@@ -202,14 +202,31 @@ def map_texture(
     """
     h, w = hall_img.shape[:2]
 
+    # Handle combined surface: perspective on floor, planar on walls
+    if surface == "both":
+        floor_cutoff = int(h * 0.52)
+        floor_mask = np.zeros_like(mask)
+        floor_mask[floor_cutoff:, :] = mask[floor_cutoff:, :]
+
+        wall_mask = np.zeros_like(mask)
+        wall_mask[:floor_cutoff, :] = mask[:floor_cutoff, :]
+
+        # Process floor with perspective
+        floor_result = hall_img.copy()
+        if np.any(floor_mask > 0):
+            floor_result = map_texture(hall_img, tile_img, floor_mask, pattern, tile_scale, surface="floor")
+
+        # Process wall with planar tiling
+        if np.any(wall_mask > 0):
+            return map_texture(floor_result, tile_img, wall_mask, pattern, tile_scale, surface="wall")
+        return floor_result
+
     # Estimate perspective quad depending on surface
     target_quad = None
     if surface == "floor":
         target_quad = estimate_floor_quad(mask)
     elif surface == "wall":
         target_quad = estimate_wall_quad(mask)
-    elif surface == "both":
-        target_quad = estimate_floor_quad(mask)
 
     # Auto-calculate a reasonable tile_scale
     effective_scale = tile_scale

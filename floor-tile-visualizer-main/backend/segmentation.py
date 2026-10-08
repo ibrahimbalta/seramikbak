@@ -25,6 +25,49 @@ class FloorSegmentor:
     FLOOR_CLASS = 3
     RUG_CLASS = 28
 
+    # ADE20K classes that should NEVER be covered by tiles (fixtures, openings, furniture, ceiling)
+    EXCLUDE_CLASSES = (
+        1,   # building
+        2,   # sky
+        5,   # ceiling
+        7,   # bed
+        8,   # windowpane
+        10,  # cabinet
+        12,  # person
+        14,  # door
+        15,  # table
+        19,  # chair
+        22,  # painting
+        23,  # sofa
+        24,  # shelf
+        27,  # mirror
+        30,  # armchair
+        31,  # seat
+        33,  # desk
+        35,  # wardrobe
+        36,  # lamp
+        37,  # bathtub
+        42,  # column
+        44,  # chest of drawers
+        45,  # counter
+        47,  # sink
+        50,  # refrigerator
+        58,  # screen door
+        62,  # bookcase
+        64,  # coffee table
+        65,  # toilet
+        70,  # countertop
+        71,  # stove
+        73,  # kitchen island
+        81,  # towel
+        107, # washer
+        124, # microwave
+        129, # dishwasher
+        145, # shower
+        146, # radiator
+        147, # glass
+    )
+
     def __init__(
         self,
         model_name: str = "nvidia/segformer-b3-finetuned-ade-512-512",
@@ -98,6 +141,10 @@ class FloorSegmentor:
         for cls_idx in target_classes:
             mask[pred == cls_idx] = 255
 
+        # Strictly exclude fixtures, obstacles, doors, windows, ceilings, appliances
+        for cls_idx in self.EXCLUDE_CLASSES:
+            mask[pred == cls_idx] = 0
+
         # Clean up
         mask = self._cleanup_mask(mask)
         return mask
@@ -116,22 +163,23 @@ class FloorSegmentor:
 
     @staticmethod
     def _cleanup_mask(mask: np.ndarray) -> np.ndarray:
-        """Morphological cleanup: close gaps, remove noise, keep large blobs."""
-        kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))
-        kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+        """Morphological cleanup: close small grout lines without erasing fixture cutouts."""
+        kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
 
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel_close)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel_open)
 
-        # Keep only blobs larger than 1 % of the image area
-        contours, _ = cv2.findContours(
-            mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-        )
-        if contours:
+        # Remove small isolated speckle noise (< 0.2% of image area)
+        # Note: connectedComponents preserves all holes/fixtures (unlike cv2.drawContours FILLED)
+        num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
+        if num_labels > 1:
             img_area = mask.shape[0] * mask.shape[1]
-            big = [c for c in contours if cv2.contourArea(c) > img_area * 0.01]
-            if big:
-                mask = np.zeros_like(mask)
-                cv2.drawContours(mask, big, -1, 255, cv2.FILLED)
+            min_area = int(img_area * 0.002)
+            cleaned = np.zeros_like(mask)
+            for i in range(1, num_labels):
+                if stats[i, cv2.CC_STAT_AREA] >= min_area:
+                    cleaned[labels == i] = 255
+            mask = cleaned
 
         return mask

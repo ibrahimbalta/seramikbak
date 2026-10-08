@@ -1220,8 +1220,8 @@ function generateFallbackMask(w, h, surface) {
 
     if (surface === "floor") {
         cx.beginPath();
-        cx.moveTo(w * 0.08, h * 0.52);
-        cx.lineTo(w * 0.92, h * 0.52);
+        cx.moveTo(w * 0.15, h * 0.58);
+        cx.lineTo(w * 0.85, h * 0.58);
         cx.lineTo(w, h);
         cx.lineTo(0, h);
         cx.closePath();
@@ -1230,15 +1230,23 @@ function generateFallbackMask(w, h, surface) {
         cx.beginPath();
         cx.moveTo(0, 0);
         cx.lineTo(w, 0);
-        cx.lineTo(w, h * 0.58);
-        cx.lineTo(0, h * 0.58);
+        cx.lineTo(w, h * 0.55);
+        cx.lineTo(0, h * 0.55);
         cx.closePath();
         cx.fill();
     } else {
-        // Both
+        // Both: Upper wall + perspective floor, leaving middle boundary clear
         cx.beginPath();
         cx.moveTo(0, 0);
         cx.lineTo(w, 0);
+        cx.lineTo(w, h * 0.48);
+        cx.lineTo(0, h * 0.48);
+        cx.closePath();
+        cx.fill();
+
+        cx.beginPath();
+        cx.moveTo(w * 0.15, h * 0.60);
+        cx.lineTo(w * 0.85, h * 0.60);
         cx.lineTo(w, h);
         cx.lineTo(0, h);
         cx.closePath();
@@ -1256,6 +1264,7 @@ detectBtn.addEventListener("click", async () => {
     try {
         let maskReceived = null;
         let imgW = 800, imgH = 600;
+        let isAiMask = false;
 
         // Try Python AI Microservice first
         try {
@@ -1270,6 +1279,7 @@ detectBtn.addEventListener("click", async () => {
                     maskReceived = data.mask;
                     imgW = data.width || 800;
                     imgH = data.height || 600;
+                    isAiMask = true;
                 }
             }
         } catch (netErr) {
@@ -1289,7 +1299,11 @@ detectBtn.addEventListener("click", async () => {
 
         editorSection.classList.add("visible");
         editorSection.scrollIntoView({ behavior: "smooth", block: "start" });
-        showToast("Yüzey sınırları belirlendi! İnce ayar yapabilir veya direkt uygulayabilirsiniz.", "success");
+        if (isAiMask) {
+            showToast("SegFormer-B3 AI yüzey sınırlarını başarıyla tespit etti! Fırça ile ince ayar yapabilir veya seramiği uygulayabilirsiniz.", "success");
+        } else {
+            showToast("Temel maske yüklendi. En iyi sonuç için fırça aracıyla maskeyi ince ayar yapabilirsiniz.", "info");
+        }
     } catch (err) {
         console.error(err);
         showToast("Yüzey tespitinde hata: " + err.message);
