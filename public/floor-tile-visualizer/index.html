@@ -2,71 +2,838 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="SeramikBak AI Mekân ve Zemin Görselleştirici — SegFormer yapay zekâ segmentasyonu ve 3D perspektif haritalama ile seramikleri mekânınızda canlı görün." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="SeramikBak AI Mekân ve Zemin Görselleştirici" />
     <title>SeramikBak — AI Mekân &amp; Zemin Görselleştirici</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>" />
+    <style>
+/* ================================================================
+   SeramikBak Floor Tile Visualizer — Complete Self-Contained Styles
+   ================================================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg-deep:        #06060c;
+    --bg-surface:     #0b0f19;
+    --bg-card:        rgba(255, 255, 255, 0.05);
+    --bg-card-hover:  rgba(255, 255, 255, 0.08);
+    --border:         rgba(255, 255, 255, 0.1);
+    --border-focus:   rgba(99, 102, 241, 0.5);
+
+    --accent-1:       #6366f1;          /* indigo */
+    --accent-2:       #8b5cf6;          /* violet */
+    --accent-3:       #22d3ee;          /* cyan  */
+    --accent-gold:    #d4af37;          /* gold */
+    --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+    --gold-gradient:   linear-gradient(135deg, #d4af37, #f59e0b);
+
+    --text-primary:   #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted:     #64748b;
+
+    --success:        #34d399;
+    --error:          #f87171;
+    --warning:        #fbbf24;
+
+    --radius:         14px;
+    --radius-sm:      8px;
+    --radius-xs:      6px;
+    --transition:     0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Embedded Modal Mode Adjustments */
+body.embedded {
+    background-color: #080c16;
+}
+body.embedded .app-container {
+    padding: 0.5rem 0.75rem 2rem;
+    max-width: 100%;
+}
+body.embedded .header {
+    display: none !important;
+}
+
+/* Layout */
+.app-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 1.75rem;
+}
+
+.header__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-3);
+    margin-bottom: 0.5rem;
+}
+
+.header__logo svg {
+    width: 18px;
+    height: 18px;
+    max-width: 18px;
+    max-height: 18px;
+    flex-shrink: 0;
+}
+
+.header__title {
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    font-weight: 800;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.25;
+    margin-bottom: 0.4rem;
+}
+
+.header__subtitle {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    max-width: 540px;
+    margin: 0 auto;
+}
+
+/* Product banner */
+.product-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(99, 102, 241, 0.08));
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: var(--radius-sm);
+}
+
+.product-banner__left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.product-badge {
+    background: rgba(212, 175, 55, 0.2);
+    color: #fce79a;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+}
+
+.product-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.product-status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--success);
+    font-weight: 600;
+}
+
+.pulse-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--success);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--success);
+    animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* Glass card */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: background var(--transition), border-color var(--transition);
+}
+
+/* Section titles */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.section-title .step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent-gradient);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Upload Grid & Presets */
+.upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.upload-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.room-presets-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    min-height: 26px;
+}
+
+.presets-label {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.presets-hint {
+    font-size: 0.72rem;
+    color: var(--accent-3);
+    font-weight: 500;
+}
+
+.presets-buttons {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+}
+
+.preset-pill {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-primary);
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.preset-pill:hover {
+    background: rgba(99, 102, 241, 0.25);
+    border-color: rgba(99, 102, 241, 0.5);
+    color: #fff;
+}
+
+.preset-pill.active {
+    background: var(--accent-gradient);
+    border-color: var(--accent-1);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.4);
+}
+
+.upload-zone {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem 0.75rem;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition);
+    min-height: 140px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+    border-color: var(--accent-1);
+    background: rgba(99, 102, 241, 0.08);
+}
+
+.upload-zone.has-file {
+    padding: 0.4rem;
+    border-style: solid;
+    border-color: var(--accent-1);
+}
+
+.upload-zone input[type="file"] {
+    display: none;
+}
+
+.upload-zone__icon {
+    width: 28px;
+    height: 28px;
+    max-width: 28px;
+    max-height: 28px;
+    margin-bottom: 0.4rem;
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+
+.upload-zone__label {
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-align: center;
+    margin-bottom: 0.15rem;
+    color: var(--text-primary);
+}
+
+.upload-zone__hint {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.upload-zone__preview {
+    width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    display: block;
+}
+
+.upload-zone__remove {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(248, 113, 113, 0.9);
+    color: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.upload-zone.has-file .upload-zone__remove { display: flex; }
+
+/* Options bar */
+.options-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding: 0.85rem 1rem;
+}
+
+.option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.option-group label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.surface-toggle-group {
+    display: flex;
+    gap: 0.25rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    padding: 0.2rem;
+    border-radius: var(--radius-xs);
+}
+
+.surface-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.35rem 0.65rem;
+    border-radius: calc(var(--radius-xs) - 2px);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.surface-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.surface-btn.active {
+    background: var(--accent-gradient);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.option-group select {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    color: var(--text-primary);
+    padding: 0.35rem 0.6rem;
+    font-size: 0.78rem;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+}
+
+.scale-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.scale-value {
+    font-size: 0.78rem;
+    color: var(--accent-3);
+    font-weight: 600;
+    min-width: 2.2em;
+    text-align: right;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 4px;
+    outline: none;
+    width: 100px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--accent-1);
+    cursor: pointer;
+    border: 2px solid #fff;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.6rem 1.25rem;
+    font-family: inherit;
+    font-size: 0.84rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+}
+
+.btn svg {
+    width: 16px;
+    height: 16px;
+    max-width: 16px;
+    max-height: 16px;
+    flex-shrink: 0;
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: var(--accent-gradient);
+    color: #fff;
+    box-shadow: 0 3px 14px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.45);
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #fff;
+}
+
+.btn-success:hover:not(:disabled) {
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+    transform: translateY(-1px);
+}
+
+.action-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Mask Editor */
+.editor-section {
+    margin-bottom: 1.5rem;
+    display: none;
+}
+
+.editor-section.visible { display: block; }
+
+.editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.tool-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    background: rgba(255,255,255,0.04);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.tool-btn.active {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: var(--accent-1);
+    color: #a5b4fc;
+}
+
+.brush-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: auto;
+}
+
+.brush-group label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.editor-canvas-wrap {
+    position: relative;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: #000;
+    cursor: crosshair;
+    line-height: 0;
+    max-height: 52vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editor-canvas-wrap canvas {
+    max-width: 100%;
+    max-height: 52vh;
+    object-fit: contain;
+    display: block;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    justify-content: flex-end;
+}
+
+/* Result & Comparison */
+.result-section {
+    margin-top: 1.5rem;
+    display: none;
+}
+
+.result-section.visible { display: block; }
+
+.comparison-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    user-select: none;
+    touch-action: none;
+    line-height: 0;
+    max-height: 55vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
+
+.comparison-container img {
+    max-width: 100%;
+    max-height: 55vh;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+}
+
+.comparison-before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow: hidden;
+    border-right: 3px solid var(--accent-3);
+    z-index: 2;
+}
+
+.comparison-before img {
+    height: 100%;
+    max-height: 55vh;
+    object-fit: contain;
+}
+
+.comparison-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 36px;
+    transform: translateX(-50%);
+    z-index: 3;
+    cursor: ew-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comparison-handle__grip {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent-3);
+    box-shadow: 0 2px 10px rgba(34, 211, 238, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comparison-handle__grip svg {
+    width: 16px;
+    height: 16px;
+    fill: #000;
+}
+
+.comparison-labels {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.comparison-label {
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-xs);
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #fff;
+}
+
+.download-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(6, 6, 12, 0.88);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.loading-overlay.active { display: flex; }
+
+.spinner {
+    width: 44px;
+    height: 44px;
+    border: 3.5px solid rgba(255,255,255,0.1);
+    border-top-color: var(--accent-1);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-overlay p {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(120px);
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 600;
+    z-index: 2000;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    max-width: 90vw;
+    text-align: center;
+}
+
+.toast.visible { transform: translateX(-50%) translateY(0); }
+.toast.error { background: var(--error); color: #fff; }
+.toast.success { background: var(--success); color: #000; }
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .app-container { padding: 0.5rem 0.5rem 2rem; }
+    .upload-grid { gap: 0.5rem; }
+    .upload-zone { min-height: 125px; padding: 0.75rem 0.4rem; }
+    .upload-zone__preview { max-height: 110px; }
+    .upload-zone__label { font-size: 0.75rem; }
+    .upload-zone__hint { display: none; }
+    .options-bar { gap: 0.5rem; padding: 0.75rem; }
+    .action-row { width: 100%; margin-left: 0 !important; }
+    .action-row .btn { width: 100%; }
+    .editor-toolbar { gap: 0.35rem; padding: 0.5rem; }
+    .brush-group { width: 100%; margin-left: 0; justify-content: space-between; }
+    .brush-group input[type="range"] { flex: 1; }
+    .editor-actions .btn { width: 100%; }
+}
+    </style>
 </head>
 <body>
 
 <div class="app-container">
 
-    <!-- ============================================================
-         Header & Product Banner
-         ============================================================ -->
-    <header class="header fade-in-up">
+    <!-- Header & Product Banner -->
+    <header class="header">
         <div class="header__logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="width:18px;height:18px;flex-shrink:0;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             <span>SeramikBak &bull; AI Mekân &amp; Zemin Stüdyosu</span>
         </div>
         <h1 class="header__title">Mekânınızda Görün &amp; Deneyin</h1>
-        <p class="header__subtitle">Kendi odanızın fotoğrafını yükleyin veya örnek mekân seçin. SegFormer yapay zekâsı zemini ve duvarları milimetrik tespit ederek seramiği gerçekçi ışık ve perspektifle uygulasın.</p>
-        
-        <!-- Active Selected Product Banner -->
-        <div class="product-banner card" id="product-banner" style="display:none">
-            <div class="product-banner__left">
-                <span class="product-badge">SEÇİLİ SERAMİK</span>
-                <span class="product-name" id="product-name">Seramik Modeli</span>
-            </div>
-            <div class="product-banner__right">
-                <span class="product-status-tag" id="product-status-tag">
-                    <span class="pulse-dot"></span> AI Motoru Hazır
-                </span>
-            </div>
-        </div>
+        <p class="header__subtitle">Kendi odanızın fotoğrafını yükleyin veya örnek mekân seçin. SegFormer yapay zekâsı zemini tespit ederek seramiği 3D perspektifle uygulasın.</p>
     </header>
 
-    <!-- ============================================================
-         Step 1 — Upload images & Quick Presets
-         ============================================================ -->
-    <section class="fade-in-up" style="animation-delay:.1s">
-        <div class="section-header-row">
-            <h2 class="section-title"><span class="step-badge">1</span> Mekân ve Seramik Seçimi</h2>
+    <!-- Active Product Banner -->
+    <div class="product-banner card" id="product-banner" style="display:none; margin-bottom: 0.85rem;">
+        <div class="product-banner__left">
+            <span class="product-badge">SEÇİLİ SERAMİK</span>
+            <span class="product-name" id="product-name">Seramik Modeli</span>
+        </div>
+        <div class="product-status-tag" id="product-status-tag">
+            <span class="pulse-dot"></span> AI Motoru Hazır
+        </div>
+    </div>
+
+    <!-- Step 1 — Upload images & Presets -->
+    <section>
+        <div class="section-title">
+            <span class="step-badge">1</span>
+            <span>Mekân ve Seramik Seçimi</span>
         </div>
 
         <div class="upload-grid">
-            <!-- Hall / Room upload -->
+            <!-- Room column -->
             <div class="upload-col">
                 <div class="room-presets-bar">
-                    <span class="presets-label">Örnek Oda Seç:</span>
+                    <span class="presets-label">Örnek Oda:</span>
                     <div class="presets-buttons">
-                        <button type="button" class="preset-pill" data-preset="/hero/easy_bathroom.jpg">🚿 Modern Banyo</button>
-                        <button type="button" class="preset-pill" data-preset="/hero/easy_kitchen.jpg">🍳 Ada Mutfak</button>
-                        <button type="button" class="preset-pill" data-preset="/hero/modern_living.png">🛋️ Ferah Salon</button>
+                        <button type="button" class="preset-pill" data-preset="/hero/easy_bathroom.jpg">🚿 Banyo</button>
+                        <button type="button" class="preset-pill" data-preset="/hero/easy_kitchen.jpg">🍳 Mutfak</button>
+                        <button type="button" class="preset-pill" data-preset="/hero/modern_living.png">🛋️ Salon</button>
                     </div>
                 </div>
 
                 <div class="upload-zone card" id="hall-upload-zone">
                     <input type="file" id="hall-input" accept="image/*" />
                     <button class="upload-zone__remove" id="hall-remove" title="Kaldır">&times;</button>
-                    <svg class="upload-zone__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-                    <span class="upload-zone__label">Mekân Fotoğrafı Yükle</span>
-                    <span class="upload-zone__hint">Odanızın fotoğrafını sürükleyin veya tıklayın (JPG, PNG)</span>
+                    <svg class="upload-zone__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28" style="width:28px;height:28px;flex-shrink:0;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                    <span class="upload-zone__label">Mekân Fotoğrafı</span>
+                    <span class="upload-zone__hint">Odanızın fotoğrafını yükleyin</span>
                 </div>
             </div>
 
-            <!-- Tile / Marble upload -->
+            <!-- Tile column -->
             <div class="upload-col">
                 <div class="room-presets-bar">
                     <span class="presets-label">Seramik Dokusu:</span>
@@ -76,39 +843,41 @@
                 <div class="upload-zone card" id="tile-upload-zone">
                     <input type="file" id="tile-input" accept="image/*" />
                     <button class="upload-zone__remove" id="tile-remove" title="Kaldır">&times;</button>
-                    <svg class="upload-zone__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="1"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-                    <span class="upload-zone__label">Seramik / Mermer Dokusu</span>
-                    <span class="upload-zone__hint">Ürün dokusu otomatik seçilir veya özel desen yükleyebilirsiniz</span>
+                    <svg class="upload-zone__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28" style="width:28px;height:28px;flex-shrink:0;"><rect x="2" y="2" width="20" height="20" rx="1"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                    <span class="upload-zone__label">Seramik Dokusu</span>
+                    <span class="upload-zone__hint">Ürün dokusu seçili</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-         Step 2 — Options & detect
-         ============================================================ -->
-    <section class="fade-in-up" style="animation-delay:.2s">
-        <h2 class="section-title"><span class="step-badge">2</span> Alan ve Dizilim Ayarları</h2>
+    <!-- Step 2 — Configure & Detect -->
+    <section>
+        <div class="section-title">
+            <span class="step-badge">2</span>
+            <span>Alan ve Desen Ayarı</span>
+        </div>
+
         <div class="options-bar card">
             <div class="option-group">
-                <label>Uygulama Alanı (Yüzey)</label>
+                <label>Uygulama Alanı</label>
                 <div class="surface-toggle-group" id="surface-toggle-group">
                     <button type="button" class="surface-btn active" data-surface="floor">🏠 Zemin</button>
                     <button type="button" class="surface-btn" data-surface="wall">🧱 Duvar</button>
-                    <button type="button" class="surface-btn" data-surface="both">🔲 Zemin + Duvar</button>
+                    <button type="button" class="surface-btn" data-surface="both">🔲 İkisi</button>
                 </div>
             </div>
 
             <div class="option-group">
                 <label for="pattern-select">Döşeme Deseni</label>
                 <select id="pattern-select">
-                    <option value="grid">Düz Izgara (Standard Grid)</option>
-                    <option value="brick">Tuğla / Şaşırtmalı (Brick Offset)</option>
+                    <option value="grid">Düz Izgara (Grid)</option>
+                    <option value="brick">Tuğla / Şaşırtmalı</option>
                 </select>
             </div>
 
             <div class="option-group">
-                <label>Seramik Ölçeği (Ebat)</label>
+                <label>Ebat Ölçeği</label>
                 <div class="scale-row">
                     <input type="range" id="scale-slider" min="0.3" max="3" step="0.1" value="1.0" />
                     <span class="scale-value" id="scale-value">1.0×</span>
@@ -117,86 +886,84 @@
 
             <div class="action-row" style="margin-left:auto">
                 <button class="btn btn-primary" id="detect-btn" disabled>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <span id="detect-btn-text">Yüzeyi Algıla (AI)</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="width:16px;height:16px;flex-shrink:0;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span id="detect-btn-text">Zemini Algıla (AI)</span>
                 </button>
             </div>
         </div>
     </section>
 
-    <!-- ============================================================
-         Step 3 — Mask editor
-         ============================================================ -->
+    <!-- Step 3 — Mask editor -->
     <section class="editor-section" id="editor-section">
-        <h2 class="section-title fade-in-up"><span class="step-badge">3</span> Yüzey Maskesi İnce Ayarı</h2>
-        <p style="color:var(--text-secondary);font-size:.88rem;margin-bottom:1rem" class="fade-in-up">
-            Yapay zekâ tarafından tespit edilen yüzey <strong style="color:var(--accent-1)">mor</strong> renkle vurgulanmıştır.
-            Gerekirse fırça ile yeni alanlar ekleyebilir veya fazlalıkları silebilirsiniz.
-        </p>
+        <div class="section-title">
+            <span class="step-badge">3</span>
+            <span>Yüzey Maskesi İnce Ayarı</span>
+        </div>
 
-        <div class="editor-toolbar card fade-in-up">
-            <button class="tool-btn active" id="tool-paint" data-mode="paint">🖌️ Boya (Ekle)</button>
-            <button class="tool-btn" id="tool-erase" data-mode="erase">🧹 Silgi (Çıkar)</button>
-            <button class="tool-btn" id="tool-reset">↺ İlk Maskeye Sıfırla</button>
+        <div class="editor-toolbar card">
+            <button class="tool-btn active" id="tool-paint" data-mode="paint">🖌️ Boya</button>
+            <button class="tool-btn" id="tool-erase" data-mode="erase">🧹 Silgi</button>
+            <button class="tool-btn" id="tool-reset">↺ Sıfırla</button>
 
             <div class="brush-group">
-                <label for="brush-slider">Fırça Boyutu</label>
+                <label for="brush-slider">Fırça:</label>
                 <input type="range" id="brush-slider" min="5" max="80" value="25" />
                 <span class="scale-value" id="brush-value">25</span>
             </div>
         </div>
 
-        <div class="card fade-in-up" style="padding:0;overflow:hidden">
+        <div class="card" style="padding:0;overflow:hidden">
             <div class="editor-canvas-wrap" id="editor-canvas-wrap">
                 <canvas id="editor-canvas"></canvas>
             </div>
         </div>
 
-        <div class="editor-actions fade-in-up">
+        <div class="editor-actions">
             <button class="btn btn-success" id="apply-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                Seramiği Mekâna Uygula &amp; Render Al
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="width:16px;height:16px;flex-shrink:0;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                Seramiği Odaya Uygula &amp; Render Al
             </button>
         </div>
     </section>
 
-    <!-- ============================================================
-         Step 4 — Result / Comparison
-         ============================================================ -->
+    <!-- Step 4 — Result / Comparison -->
     <section class="result-section" id="result-section">
-        <h2 class="section-title fade-in-up"><span class="step-badge">4</span> Canlı Görselleştirme Sonucu</h2>
+        <div class="section-title">
+            <span class="step-badge">4</span>
+            <span>Öncesi / Sonrası Karşılaştırma</span>
+        </div>
 
-        <div class="comparison-container card fade-in-up" id="comparison-container">
+        <div class="comparison-container card" id="comparison-container">
             <div class="comparison-labels">
-                <span class="comparison-label">ÖNCESİ (ORİJİNAL)</span>
-                <span class="comparison-label">SONRASI (YENİ SERAMİK)</span>
+                <span class="comparison-label">ÖNCESİ</span>
+                <span class="comparison-label">YENİ SERAMİK</span>
             </div>
 
-            <!-- After (full width, behind) -->
+            <!-- After (result) -->
             <img id="result-img" src="" alt="Result" />
 
-            <!-- Before (clipped, on top) -->
+            <!-- Before (original) -->
             <div class="comparison-before" id="comparison-before">
                 <img id="original-img" src="" alt="Original" />
             </div>
 
-            <!-- Draggable handle -->
+            <!-- Handle -->
             <div class="comparison-handle" id="comparison-handle">
                 <div class="comparison-handle__grip">
-                    <svg viewBox="0 0 24 24"><path d="M8 5l-5 7 5 7M16 5l5 7-5 7"/></svg>
+                    <svg viewBox="0 0 24 24" width="16" height="16" style="width:16px;height:16px;"><path d="M8 5l-5 7 5 7M16 5l5 7-5 7"/></svg>
                 </div>
             </div>
         </div>
 
-        <div class="download-row fade-in-up">
+        <div class="download-row">
             <button class="btn btn-primary" id="download-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="width:16px;height:16px;flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Sonucu İndir (HD PNG)
             </button>
         </div>
     </section>
 
-</div><!-- /.app-container -->
+</div>
 
 <!-- Loading overlay -->
 <div class="loading-overlay" id="loading-overlay">
@@ -207,6 +974,596 @@
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<script src="script.js"></script>
+<script>
+/**
+ * Inlined Complete Logic — SeramikBak Floor Tile Visualizer
+ */
+const $ = (sel) => document.querySelector(sel);
+
+const hallZone      = $("#hall-upload-zone");
+const tileZone      = $("#tile-upload-zone");
+const hallInput     = $("#hall-input");
+const tileInput     = $("#tile-input");
+const hallRemove    = $("#hall-remove");
+const tileRemove    = $("#tile-remove");
+
+const patternSelect = $("#pattern-select");
+const scaleSlider   = $("#scale-slider");
+const scaleValue    = $("#scale-value");
+
+const detectBtn     = $("#detect-btn");
+const detectBtnText = $("#detect-btn-text");
+const applyBtn      = $("#apply-btn");
+const downloadBtn   = $("#download-btn");
+const surfaceBtns   = document.querySelectorAll(".surface-btn");
+let selectedSurface = "floor";
+
+const productBanner = $("#product-banner");
+const productNameEl = $("#product-name");
+const tileStatusHint = $("#tile-status-hint");
+
+function updateSurfaceText() {
+    if (!detectBtnText) return;
+    if (selectedSurface === "wall") {
+        detectBtnText.textContent = "Duvarı Algıla (AI)";
+    } else if (selectedSurface === "both") {
+        detectBtnText.textContent = "Zemin & Duvarı Algıla (AI)";
+    } else {
+        detectBtnText.textContent = "Zemini Algıla (AI)";
+    }
+}
+
+surfaceBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+        surfaceBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedSurface = btn.dataset.surface;
+        updateSurfaceText();
+    });
+});
+
+const editorSection = $("#editor-section");
+const editorCanvas  = $("#editor-canvas");
+const toolPaint     = $("#tool-paint");
+const toolErase     = $("#tool-erase");
+const toolReset     = $("#tool-reset");
+const brushSlider   = $("#brush-slider");
+const brushValue    = $("#brush-value");
+
+const resultSection = $("#result-section");
+const resultImg     = $("#result-img");
+const originalImg   = $("#original-img");
+const compBefore    = $("#comparison-before");
+const compHandle    = $("#comparison-handle");
+const compContainer = $("#comparison-container");
+
+const loadingOverlay = $("#loading-overlay");
+const loadingText    = $("#loading-text");
+const toastEl        = $("#toast");
+
+let hallFile  = null;
+let tileFile  = null;
+let hallUrl   = null;
+let tileUrl   = null;
+
+let maskB64Original = null;
+let maskImage       = null;
+
+const ctx = editorCanvas.getContext("2d");
+let maskCanvas, maskCtx;
+let colorCanvas, colorCtx;
+let hallImageEl = null;
+let brushMode  = "paint";
+let isDrawing  = false;
+let lastPos    = null;
+
+let resultBlobUrl = null;
+
+function showLoading(msg = "Yapay zekâ işlemi sürüyor…") {
+    loadingText.textContent = msg;
+    loadingOverlay.classList.add("active");
+}
+function hideLoading() { loadingOverlay.classList.remove("active"); }
+
+function showToast(msg, type = "error", duration = 4000) {
+    toastEl.textContent = msg;
+    toastEl.className = "toast " + type + " visible";
+    clearTimeout(toastEl._timer);
+    toastEl._timer = setTimeout(() => toastEl.classList.remove("visible"), duration);
+}
+
+function updateDetectBtn() {
+    detectBtn.disabled = !(hallFile && tileFile);
+}
+
+async function urlToFile(url, filename = "image.jpg") {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Görsel indirilemedi: " + url);
+    const blob = await res.blob();
+    const mime = blob.type || "image/jpeg";
+    return new File([blob], filename, { type: mime });
+}
+
+function setupZone(zone, input, removeBtn, setFile) {
+    zone.addEventListener("click", (e) => {
+        if (e.target === removeBtn || removeBtn.contains(e.target)) return;
+        input.click();
+    });
+
+    zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("dragover"); });
+    zone.addEventListener("dragleave", ()  => { zone.classList.remove("dragover"); });
+    zone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        zone.classList.remove("dragover");
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith("image/")) setFile(file);
+    });
+
+    input.addEventListener("change", () => {
+        if (input.files[0]) setFile(input.files[0]);
+    });
+
+    removeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        clearZone(zone);
+        if (zone === hallZone)  { hallFile = null; if (hallUrl) URL.revokeObjectURL(hallUrl); hallUrl = null; }
+        if (zone === tileZone)  { tileFile = null; if (tileUrl) URL.revokeObjectURL(tileUrl); tileUrl = null; }
+        updateDetectBtn();
+    });
+}
+
+function showPreview(zone, file) {
+    const url = URL.createObjectURL(file);
+    zone.querySelectorAll(".upload-zone__icon, .upload-zone__label, .upload-zone__hint")
+        .forEach((el) => (el.style.display = "none"));
+
+    let img = zone.querySelector(".upload-zone__preview");
+    if (!img) {
+        img = document.createElement("img");
+        img.className = "upload-zone__preview";
+        zone.appendChild(img);
+    }
+    img.src = url;
+    zone.classList.add("has-file");
+    return url;
+}
+
+function clearZone(zone) {
+    zone.classList.remove("has-file");
+    const img = zone.querySelector(".upload-zone__preview");
+    if (img) img.remove();
+    zone.querySelectorAll(".upload-zone__icon, .upload-zone__label, .upload-zone__hint")
+        .forEach((el) => (el.style.display = ""));
+}
+
+setupZone(hallZone, hallInput, hallRemove, (file) => {
+    hallFile = file;
+    if (hallUrl) URL.revokeObjectURL(hallUrl);
+    hallUrl = showPreview(hallZone, file);
+    updateDetectBtn();
+});
+
+setupZone(tileZone, tileInput, tileRemove, (file) => {
+    tileFile = file;
+    if (tileUrl) URL.revokeObjectURL(tileUrl);
+    tileUrl = showPreview(tileZone, file);
+    updateDetectBtn();
+});
+
+async function loadTileFromUrl(url, productName = null) {
+    try {
+        if (tileStatusHint) tileStatusHint.textContent = "Yükleniyor...";
+        const file = await urlToFile(url, "tile_texture.jpg");
+        tileFile = file;
+        if (tileUrl) URL.revokeObjectURL(tileUrl);
+        tileUrl = showPreview(tileZone, file);
+        if (productName && productNameEl) {
+            productNameEl.textContent = productName;
+            if (productBanner) productBanner.style.display = "flex";
+        }
+        if (tileStatusHint) tileStatusHint.textContent = "Hazır ✓";
+        updateDetectBtn();
+    } catch (err) {
+        console.warn("Could not preload tile texture:", err);
+        if (tileStatusHint) tileStatusHint.textContent = "Manuel yükleyin";
+    }
+}
+
+async function loadRoomFromPreset(url, pillBtn = null) {
+    try {
+        showLoading("Örnek oda yükleniyor...");
+        const file = await urlToFile(url, "preset_room.jpg");
+        hallFile = file;
+        if (hallUrl) URL.revokeObjectURL(hallUrl);
+        hallUrl = showPreview(hallZone, file);
+
+        document.querySelectorAll(".preset-pill").forEach(p => p.classList.remove("active"));
+        if (pillBtn) pillBtn.classList.add("active");
+
+        updateDetectBtn();
+        showToast("Örnek oda seçildi. 'Zemini Algıla' butonuna tıklayabilirsiniz.", "success", 2500);
+    } catch (err) {
+        showToast("Örnek oda yüklenemedi: " + err.message);
+    } finally {
+        hideLoading();
+    }
+}
+
+document.querySelectorAll(".preset-pill").forEach((btn) => {
+    btn.addEventListener("click", () => {
+        const presetUrl = btn.dataset.preset;
+        if (presetUrl) loadRoomFromPreset(presetUrl, btn);
+    });
+});
+
+scaleSlider.addEventListener("input", () => {
+    scaleValue.textContent = parseFloat(scaleSlider.value).toFixed(1) + "×";
+});
+
+brushSlider.addEventListener("input", () => {
+    brushValue.textContent = brushSlider.value;
+});
+
+detectBtn.addEventListener("click", async () => {
+    if (!hallFile) return;
+
+    const surfaceLabel = selectedSurface === "wall" ? "duvar" : selectedSurface === "both" ? "zemin ve duvar" : "zemin";
+    showLoading("SegFormer AI " + surfaceLabel + " yüzeyini analiz ediyor…");
+
+    try {
+        const fd = new FormData();
+        fd.append("hall_image", hallFile);
+        fd.append("surface", selectedSurface);
+
+        const res = await fetch("/api/segment", { method: "POST", body: fd });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || "Sunucu hatası: " + res.status);
+        }
+
+        const data = await res.json();
+        maskB64Original = data.mask;
+
+        await initEditor(data.width, data.height);
+
+        editorSection.classList.add("visible");
+        editorSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        showToast("Yüzey başarıyla tespit edildi! Şimdi 'Seramiği Odaya Uygula' butonuna tıklayın.", "success");
+    } catch (err) {
+        showToast(err.message);
+    } finally {
+        hideLoading();
+    }
+});
+
+async function initEditor(imgW, imgH) {
+    hallImageEl = await loadImage(hallUrl);
+    const w = hallImageEl.naturalWidth;
+    const h = hallImageEl.naturalHeight;
+
+    editorCanvas.width  = w;
+    editorCanvas.height = h;
+
+    if (!maskCanvas) {
+        maskCanvas = document.createElement("canvas");
+        maskCtx    = maskCanvas.getContext("2d");
+    }
+    maskCanvas.width  = w;
+    maskCanvas.height = h;
+
+    if (!colorCanvas) {
+        colorCanvas = document.createElement("canvas");
+        colorCtx    = colorCanvas.getContext("2d");
+    }
+    colorCanvas.width  = w;
+    colorCanvas.height = h;
+
+    maskImage = await loadImage("data:image/png;base64," + maskB64Original);
+    maskCtx.clearRect(0, 0, w, h);
+    maskCtx.drawImage(maskImage, 0, 0, w, h);
+
+    renderComposite();
+}
+
+function loadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload  = () => resolve(img);
+        img.onerror = () => reject(new Error("Görsel yüklenemedi"));
+        img.src = src;
+    });
+}
+
+function renderComposite() {
+    const w = editorCanvas.width;
+    const h = editorCanvas.height;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(hallImageEl, 0, 0, w, h);
+
+    colorCtx.clearRect(0, 0, w, h);
+    colorCtx.drawImage(maskCanvas, 0, 0);
+    colorCtx.globalCompositeOperation = "source-in";
+    colorCtx.fillStyle = "rgba(99, 102, 241, 1)";
+    colorCtx.fillRect(0, 0, w, h);
+    colorCtx.globalCompositeOperation = "source-over";
+
+    ctx.globalAlpha = 0.38;
+    ctx.drawImage(colorCanvas, 0, 0);
+    ctx.globalAlpha = 1.0;
+}
+
+function canvasCoords(e) {
+    const rect = editorCanvas.getBoundingClientRect();
+    const scaleX = editorCanvas.width  / rect.width;
+    const scaleY = editorCanvas.height / rect.height;
+
+    let cx, cy;
+    if (e.touches && e.touches[0]) {
+        cx = (e.touches[0].clientX - rect.left) * scaleX;
+        cy = (e.touches[0].clientY - rect.top)  * scaleY;
+    } else {
+        cx = (e.clientX - rect.left) * scaleX;
+        cy = (e.clientY - rect.top)  * scaleY;
+    }
+    return { x: cx, y: cy };
+}
+
+function drawBrush(x, y) {
+    const r = parseInt(brushSlider.value, 10) *
+              (editorCanvas.width / editorCanvas.getBoundingClientRect().width);
+
+    maskCtx.beginPath();
+    maskCtx.arc(x, y, r, 0, Math.PI * 2);
+    if (brushMode === "paint") {
+        maskCtx.fillStyle = "#fff";
+        maskCtx.fill();
+    } else {
+        maskCtx.save();
+        maskCtx.globalCompositeOperation = "destination-out";
+        maskCtx.fillStyle = "#fff";
+        maskCtx.fill();
+        maskCtx.restore();
+    }
+}
+
+function drawLine(from, to) {
+    const dist = Math.hypot(to.x - from.x, to.y - from.y);
+    const steps = Math.max(1, Math.ceil(dist / 4));
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        drawBrush(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t);
+    }
+}
+
+function onPointerDown(e) {
+    e.preventDefault();
+    isDrawing = true;
+    const pos = canvasCoords(e);
+    drawBrush(pos.x, pos.y);
+    lastPos = pos;
+    renderComposite();
+}
+
+function onPointerMove(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const pos = canvasCoords(e);
+    drawLine(lastPos, pos);
+    lastPos = pos;
+    renderComposite();
+}
+
+function onPointerUp() {
+    isDrawing = false;
+    lastPos = null;
+}
+
+editorCanvas.addEventListener("mousedown",  onPointerDown);
+editorCanvas.addEventListener("mousemove",  onPointerMove);
+editorCanvas.addEventListener("mouseup",    onPointerUp);
+editorCanvas.addEventListener("mouseleave", onPointerUp);
+
+editorCanvas.addEventListener("touchstart", onPointerDown, { passive: false });
+editorCanvas.addEventListener("touchmove",  onPointerMove, { passive: false });
+editorCanvas.addEventListener("touchend",   onPointerUp);
+
+toolPaint.addEventListener("click", () => { brushMode = "paint"; toolPaint.classList.add("active"); toolErase.classList.remove("active"); });
+toolErase.addEventListener("click", () => { brushMode = "erase"; toolErase.classList.add("active"); toolPaint.classList.remove("active"); });
+
+toolReset.addEventListener("click", () => {
+    if (!maskImage) return;
+    maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+    maskCtx.drawImage(maskImage, 0, 0, maskCanvas.width, maskCanvas.height);
+    renderComposite();
+});
+
+function getMaskBase64() {
+    const w = maskCanvas.width;
+    const h = maskCanvas.height;
+    const data = maskCtx.getImageData(0, 0, w, h);
+    const px = data.data;
+
+    const binCanvas = document.createElement("canvas");
+    binCanvas.width  = w;
+    binCanvas.height = h;
+    const binCtx = binCanvas.getContext("2d");
+    const binData = binCtx.createImageData(w, h);
+    const out = binData.data;
+
+    for (let i = 0; i < px.length; i += 4) {
+        const bright = (px[i] + px[i + 1] + px[i + 2]) / 3;
+        const val = (px[i + 3] > 50 && bright > 50) ? 255 : 0;
+        out[i]     = val;
+        out[i + 1] = val;
+        out[i + 2] = val;
+        out[i + 3] = 255;
+    }
+
+    binCtx.putImageData(binData, 0, 0);
+    return binCanvas.toDataURL("image/png").split(",")[1];
+}
+
+applyBtn.addEventListener("click", async () => {
+    if (!hallFile || !tileFile) return;
+
+    showLoading("Perspektif dönüşümü ve gerçekçi ışık haritalaması uygulanıyor…");
+
+    try {
+        const fd = new FormData();
+        fd.append("hall_image",  hallFile);
+        fd.append("tile_image",  tileFile);
+        fd.append("mask",        getMaskBase64());
+        fd.append("pattern",     patternSelect.value);
+        fd.append("tile_scale",  scaleSlider.value);
+        fd.append("surface",     selectedSurface);
+
+        const res = await fetch("/api/apply", { method: "POST", body: fd });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail || "Sunucu hatası: " + res.status);
+        }
+
+        const blob = await res.blob();
+        if (resultBlobUrl) URL.revokeObjectURL(resultBlobUrl);
+        resultBlobUrl = URL.createObjectURL(blob);
+
+        resultImg.src   = resultBlobUrl;
+        originalImg.src = hallUrl;
+
+        resultSection.classList.add("visible");
+        initComparison();
+        resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        showToast("Seramik başarıyla uygulandı! Kaydırıcı ile karşılaştırabilirsiniz.", "success");
+    } catch (err) {
+        showToast(err.message);
+    } finally {
+        hideLoading();
+    }
+});
+
+function initComparison() {
+    const ready = () => { setSliderPos(50); };
+    let loaded = 0;
+    const check = () => { loaded++; if (loaded >= 2) ready(); };
+    if (resultImg.complete)   check(); else resultImg.onload   = check;
+    if (originalImg.complete) check(); else originalImg.onload  = check;
+}
+
+function setSliderPos(pct) {
+    pct = Math.max(0, Math.min(100, pct));
+    compBefore.style.width = pct + "%";
+    compHandle.style.left  = pct + "%";
+
+    const containerWidth = compContainer.offsetWidth;
+    originalImg.style.width = containerWidth + "px";
+}
+
+let isDragging = false;
+
+function startDrag(e) {
+    isDragging = true;
+    e.preventDefault();
+    moveDrag(e);
+}
+
+function moveDrag(e) {
+    if (!isDragging) return;
+    const rect = compContainer.getBoundingClientRect();
+    let clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX);
+    if (clientX == null) return;
+    const pct = ((clientX - rect.left) / rect.width) * 100;
+    setSliderPos(pct);
+}
+
+function endDrag() { isDragging = false; }
+
+compHandle.addEventListener("mousedown",  startDrag);
+compContainer.addEventListener("mousemove", moveDrag);
+document.addEventListener("mouseup",       endDrag);
+
+compHandle.addEventListener("touchstart", startDrag, { passive: false });
+compContainer.addEventListener("touchmove", moveDrag, { passive: false });
+document.addEventListener("touchend",      endDrag);
+
+compContainer.addEventListener("click", (e) => {
+    const rect = compContainer.getBoundingClientRect();
+    const pct = ((e.clientX - rect.left) / rect.width) * 100;
+    setSliderPos(pct);
+});
+
+window.addEventListener("resize", () => {
+    if (resultSection.classList.contains("visible")) {
+        const pct = parseFloat(compBefore.style.width) || 50;
+        setSliderPos(pct);
+    }
+});
+
+downloadBtn.addEventListener("click", () => {
+    if (!resultBlobUrl) return;
+    const a = document.createElement("a");
+    a.href = resultBlobUrl;
+    a.download = "seramikbak_mekan_sonuc.png";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+});
+
+async function initFromParams() {
+    const params = new URLSearchParams(window.location.search);
+    const tileParam = params.get("tile");
+    const productParam = params.get("product");
+    const roomParam = params.get("room");
+    const surfaceParam = params.get("surface");
+    const scaleParam = params.get("scale");
+    const isEmbed = params.get("embed") === "1" || window !== window.parent;
+
+    if (isEmbed) {
+        document.body.classList.add("embedded");
+    }
+
+    if (surfaceParam && ["floor", "wall", "both"].includes(surfaceParam)) {
+        surfaceBtns.forEach((b) => {
+            if (b.dataset.surface === surfaceParam) b.click();
+        });
+    }
+
+    if (scaleParam) {
+        const s = parseFloat(scaleParam);
+        if (!isNaN(s) && s >= 0.3 && s <= 3.0) {
+            scaleSlider.value = s;
+            scaleValue.textContent = s.toFixed(1) + "×";
+        }
+    }
+
+    if (tileParam) {
+        await loadTileFromUrl(tileParam, productParam);
+    }
+
+    if (roomParam) {
+        await loadRoomFromPreset(roomParam);
+    } else {
+        const firstPreset = document.querySelector(".preset-pill");
+        if (firstPreset) firstPreset.click();
+    }
+}
+
+window.addEventListener("message", async (e) => {
+    if (!e.data) return;
+    if (e.data.type === "LOAD_PRODUCT") {
+        if (e.data.tile) await loadTileFromUrl(e.data.tile, e.data.product);
+        if (e.data.surface) {
+            const btn = document.querySelector('.surface-btn[data-surface="' + e.data.surface + '"]');
+            if (btn) btn.click();
+        }
+    }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    initFromParams();
+    updateSurfaceText();
+});
+</script>
 </body>
 </html>

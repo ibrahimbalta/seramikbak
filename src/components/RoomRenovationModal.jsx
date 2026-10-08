@@ -34,8 +34,8 @@ export default function RoomRenovationModal({
   const rawTexture = currentProduct.textureUrl || currentProduct.imageUrl || '/textures/calacatta_gold.jpg';
   const textureUrl = resolveSafeTextureUrl(rawTexture);
 
-  // Visualizer URL with params
-  const visualizerUrl = `/floor-tile-visualizer/?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}&scale=1.0&surface=floor&embed=1`;
+  // Visualizer URL with params (explicit index.html ensures direct static serving without router rewrite issues)
+  const visualizerUrl = `/floor-tile-visualizer/index.html?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}&scale=1.0&surface=floor&embed=1`;
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -112,7 +112,7 @@ export default function RoomRenovationModal({
           {/* Right: Actions */}
           <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
             <a
-              href={`/floor-tile-visualizer/?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}`}
+              href={`/floor-tile-visualizer/index.html?tile=${encodeURIComponent(textureUrl)}&product=${encodeURIComponent(productName)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors"

@@ -76,6 +76,20 @@ const nextConfig = {
     ];
   },
 
+  // Rewrites for static visualizer directory
+  async rewrites() {
+    return [
+      {
+        source: '/floor-tile-visualizer',
+        destination: '/floor-tile-visualizer/index.html',
+      },
+      {
+        source: '/floor-tile-visualizer/',
+        destination: '/floor-tile-visualizer/index.html',
+      },
+    ];
+  },
+
   // SEO & Security Headers
   async headers() {
     return [
