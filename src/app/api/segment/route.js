@@ -27,10 +27,10 @@ export async function POST(req) {
     const data = await pyRes.json();
     return NextResponse.json(data);
   } catch (err) {
-    console.error('[API /api/segment] Error:', err);
+    console.warn('[API /api/segment] Python server offline or unreachable:', err.message);
     return NextResponse.json(
-      { detail: err.message || 'Zemin segmentasyonu servisine bağlanılamadı.' },
-      { status: 502 }
+      { success: false, offline: true, detail: 'Python AI mikroservisi çevrimdışı. İstemci motoru devrede.' },
+      { status: 503 }
     );
   }
 }

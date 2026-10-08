@@ -32,10 +32,10 @@ export async function POST(req) {
       },
     });
   } catch (err) {
-    console.error('[API /api/apply] Error:', err);
+    console.warn('[API /api/apply] Python server offline or unreachable:', err.message);
     return NextResponse.json(
-      { detail: err.message || 'Seramik dokulandırma servisine bağlanılamadı.' },
-      { status: 502 }
+      { success: false, offline: true, detail: 'Python AI mikroservisi çevrimdışı. İstemci motoru devrede.' },
+      { status: 503 }
     );
   }
 }
