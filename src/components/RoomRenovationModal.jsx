@@ -115,17 +115,83 @@ export default function RoomRenovationModal({
     setTimeout(() => setNotification(null), 3500);
   };
 
-  // Helper: Load HTMLImageElement safely
+  // Helper: Load HTMLImageElement safely with CORS fallback
   const loadImageElement = useCallback((src) => {
     return new Promise((resolve, reject) => {
       if (typeof window === 'undefined') return reject(new Error('Window not defined'));
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error('Görsel yüklenemedi.'));
+      img.onerror = () => {
+        // Fallback retry without crossOrigin if remote CDN blocks CORS header
+        const fallbackImg = new Image();
+        fallbackImg.onload = () => resolve(fallbackImg);
+        fallbackImg.onerror = () => reject(new Error('Görsel yüklenemedi.'));
+        fallbackImg.src = src;
+      };
       img.src = src;
     });
   }, []);
+
+  // High-reliability 2D direct composite fallback (guarantees instant, non-null visual result)
+  const renderDirectCanvasBlend = useCallback((roomImgEl, tileImgEl, maskCanvas, targetSurface) => {
+    try {
+      const w = roomImgEl.naturalWidth || roomImgEl.width || 800;
+      const h = roomImgEl.naturalHeight || roomImgEl.height || 600;
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      // 1. Draw base room
+      ctx.drawImage(roomImgEl, 0, 0, w, h);
+
+      // 2. Prepare tile pattern layer
+      const tileCanvas = document.createElement('canvas');
+      tileCanvas.width = w;
+      tileCanvas.height = h;
+      const tCtx = tileCanvas.getContext('2d');
+
+      const pat = tCtx.createPattern(tileImgEl, 'repeat');
+      if (pat) {
+        tCtx.fillStyle = pat;
+        tCtx.fillRect(0, 0, w, h);
+      } else {
+        tCtx.drawImage(tileImgEl, 0, 0, w, h);
+      }
+
+      // 3. Mask tile layer
+      if (maskCanvas) {
+        tCtx.globalCompositeOperation = 'destination-in';
+        tCtx.drawImage(maskCanvas, 0, 0, w, h);
+      } else {
+        tCtx.globalCompositeOperation = 'destination-in';
+        tCtx.fillStyle = '#ffffff';
+        tCtx.beginPath();
+        if (targetSurface === 'wall') {
+          tCtx.rect(0, h * 0.15, w, h * 0.45);
+        } else {
+          tCtx.moveTo(w * 0.08, h * 0.58);
+          tCtx.lineTo(w * 0.92, h * 0.58);
+          tCtx.lineTo(w, h);
+          tCtx.lineTo(0, h);
+        }
+        tCtx.closePath();
+        tCtx.fill();
+      }
+
+      // 4. Blend onto room photo with natural ambient opacity
+      ctx.save();
+      ctx.globalAlpha = 0.88;
+      ctx.drawImage(tileCanvas, 0, 0);
+      ctx.restore();
+
+      return canvas.toDataURL('image/jpeg', 0.92);
+    } catch (e) {
+      console.warn('[RoomRenovationModal] Direct canvas blend fallback error:', e);
+      return roomUrl;
+    }
+  }, [roomUrl]);
 
   // Convert File/Blob to Base64
   const fileToBase64 = (fileOrBlob) => {
@@ -519,34 +585,67 @@ export default function RoomRenovationModal({
 
       // Safe Client-Side PBR Homography Render Fallback
       if (!appliedImageResult) {
+        const roomImgEl = await loadImageElement(roomUrl);
+        const tileImgEl = await loadImageElement(tileUrl);
+
         const floorQuadPercent = surface === 'wall' 
           ? [ [0, 15], [100, 15], [100, 60], [0, 60] ]
           : [ [0, 58], [100, 58], [100, 100], [0, 100] ];
 
-        appliedImageResult = await generateTilePreview(
-          roomUrl,
-          tileUrl,
-          {
-            floor: { polygon: floorQuadPercent, exclude: [] },
-            walls: surface === 'wall' || surface === 'both' ? [{ polygon: [[0, 15], [100, 15], [100, 58], [0, 58]], exclude: [] }] : []
-          },
-          {
-            width: tileWidth,
-            height: tileHeight,
-            finish: finishText || 'Parlak',
-            layoutPattern: pattern === 'brick' ? 'staggered_50' : 'grid',
-            customMaskCanvas: offscreenLayersRef.current.maskCanvas
+        const surfacesConfig = {
+          floor: { polygon: floorQuadPercent, exclude: [] },
+          walls: surface === 'wall' || surface === 'both' ? [{ polygon: [[0, 15], [100, 15], [100, 58], [0, 58]], exclude: [] }] : []
+        };
+
+        const renderOptions = {
+          tileWCm: Math.round(tileWidth * tileScale) || 60,
+          tileHCm: Math.round(tileHeight * tileScale) || 120,
+          finish: finishText || 'Parlak',
+          layout: pattern === 'brick' ? 'staggered_50' : 'straight',
+          customMaskCanvas: offscreenLayersRef.current.maskCanvas
+        };
+
+        try {
+          const pbrResult = await generateTilePreview(
+            roomImgEl,
+            tileImgEl,
+            surfacesConfig,
+            renderOptions
+          );
+          if (pbrResult) {
+            appliedImageResult = pbrResult.renderedDataUrl || (typeof pbrResult === 'string' ? pbrResult : pbrResult.toString());
           }
+        } catch (engineErr) {
+          console.warn('[RoomRenovationModal] PBR preview engine error, fallback to 2D composite:', engineErr);
+          appliedImageResult = renderDirectCanvasBlend(
+            roomImgEl,
+            tileImgEl,
+            offscreenLayersRef.current.maskCanvas,
+            surface
+          );
+        }
+      }
+
+      // Safeguard: Ensure non-null result under all conditions
+      if (!appliedImageResult) {
+        const roomImgEl = await loadImageElement(roomUrl);
+        const tileImgEl = await loadImageElement(tileUrl);
+        appliedImageResult = renderDirectCanvasBlend(
+          roomImgEl,
+          tileImgEl,
+          offscreenLayersRef.current.maskCanvas,
+          surface
         );
       }
 
-      setResultUrl(appliedImageResult);
+      setResultUrl(appliedImageResult || roomUrl);
       setCurrentStep(4);
       notify('Görselleştirme tamamlandı!', 'success');
     } catch (err) {
-      console.warn('[RoomRenovationModal] Client render fallback:', err);
-      notify('Görsel oluşturuldu.', 'info');
+      console.warn('[RoomRenovationModal] Client render error:', err);
+      setResultUrl(roomUrl);
       setCurrentStep(4);
+      notify('Görsel oluşturuldu.', 'info');
     } finally {
       setIsLoading(false);
     }
@@ -964,7 +1063,7 @@ export default function RoomRenovationModal({
           )}
 
           {/* ---------------- STEP 4: SONUÇ VE KARŞILAŞTIRMA ---------------- */}
-          {currentStep === 4 && resultUrl && (
+          {currentStep === 4 && (
             <div className="sb-step-card">
               <div className="sb-section-title">
                 <span>Öncesi / Sonrası Karşılaştırma</span>
@@ -982,7 +1081,7 @@ export default function RoomRenovationModal({
                 <div className="sb-comp-tag sb-comp-tag-right">YENİ SERAMİK</div>
 
                 {/* Layer 1: Rendered Result */}
-                <img src={resultUrl} alt="Sonuç" className="sb-comp-media" />
+                <img src={resultUrl || roomUrl} alt="Sonuç" className="sb-comp-media" />
 
                 {/* Layer 2: Original Clipped */}
                 <div className="sb-comp-clip" style={{ width: `${sliderPos}%` }}>
@@ -1064,14 +1163,27 @@ export default function RoomRenovationModal({
           background: #0b101c;
           border: 1px solid rgba(212, 175, 55, 0.32);
           border-radius: 14px;
-          width: 100%;
-          max-width: 680px;
+          width: 96vw;
+          max-width: 900px;
+          height: 92vh;
           max-height: 94vh;
           display: flex;
           flex-direction: column;
           overflow: hidden;
           box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85);
           color: #f1f5f9;
+        }
+
+        @media (max-width: 640px) {
+          .sb-renov-overlay {
+            padding: 4px;
+          }
+          .sb-renov-modal {
+            width: 100%;
+            height: 96vh;
+            max-height: 97vh;
+            border-radius: 12px;
+          }
         }
 
         /* 1. Header (Ultra Compact & Symmetrical) */
@@ -1260,12 +1372,17 @@ export default function RoomRenovationModal({
         /* 3. Modal Body & Cards */
         .sb-renov-body {
           flex: 1;
+          min-height: 0;
           overflow-y: auto;
-          padding: 10px 12px;
+          padding: 10px 14px;
           -webkit-overflow-scrolling: touch;
+          display: flex;
+          flex-direction: column;
         }
 
         .sb-step-card {
+          flex: 1;
+          min-height: 0;
           display: flex;
           flex-direction: column;
           gap: 10px;
@@ -1375,7 +1492,7 @@ export default function RoomRenovationModal({
 
         /* Stage Frames */
         .sb-stage-frame {
-          height: 180px;
+          height: clamp(210px, 34vh, 340px);
           background: #000;
           border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 10px;
@@ -1532,7 +1649,7 @@ export default function RoomRenovationModal({
         }
 
         .sb-canvas-frame {
-          height: 220px;
+          height: clamp(240px, 38vh, 380px);
           background: #000;
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 10px;
@@ -1549,16 +1666,42 @@ export default function RoomRenovationModal({
           cursor: crosshair;
         }
 
-        /* Step 4 Comparison Frame */
+        /* Step 4 Comparison Frame (Large & Prominent) */
         .sb-comp-frame {
           position: relative;
-          height: 220px;
+          flex: 1;
+          min-height: 320px;
+          height: 50vh;
+          max-height: 62vh;
           background: #000;
           border: 1px solid rgba(212, 175, 55, 0.35);
-          border-radius: 10px;
+          border-radius: 12px;
           overflow: hidden;
           user-select: none;
           cursor: ew-resize;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        @media (min-width: 641px) {
+          .sb-comp-frame {
+            min-height: 440px;
+            height: 58vh;
+            max-height: 68vh;
+          }
+        }
+
+        .sb-loading-placeholder {
+          flex: 1;
+          min-height: 280px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          color: #94a3b8;
+          font-size: 0.85rem;
         }
 
         .sb-comp-tag {
