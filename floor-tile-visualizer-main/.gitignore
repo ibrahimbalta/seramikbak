@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+
+.env
+.venv
+env/
+venv/
+
+full_codebase_walkthrough floor tire.md
+
+.DS_Store
+Thumbs.db
