@@ -52,8 +52,6 @@ export default function RoomRenovationModal({
   relatedProducts = [], 
   onOpenQuote 
 }) {
-  if (!isOpen) return null;
-
   // Active product details
   const [currentProduct, setCurrentProduct] = useState(product);
 
@@ -155,7 +153,10 @@ export default function RoomRenovationModal({
   // Helper: Load HTMLImageElement
   const loadImageElement = useCallback((src) => {
     return new Promise((resolve, reject) => {
-      const img = new window.Image();
+      if (typeof window === 'undefined') {
+        return reject(new Error('Window not available'));
+      }
+      const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => resolve(img);
       img.onerror = () => reject(new Error('Görsel yüklenemedi.'));
@@ -589,6 +590,8 @@ export default function RoomRenovationModal({
       onOpenQuote(currentProduct, resultUrl);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="sb-modal-backdrop" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>

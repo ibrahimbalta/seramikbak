@@ -1,5 +1,24 @@
 import prisma from '@/lib/prisma';
-import VisualizerStudio from '@/components/VisualizerStudio';
+import dynamic from 'next/dynamic';
+
+const VisualizerStudio = dynamic(() => import('@/components/VisualizerStudio'), {
+  ssr: false,
+  loading: () => (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#080c16',
+      color: '#d4af37',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      fontSize: '1rem',
+      fontWeight: '600'
+    }}>
+      Yapay Zekâ Mekân Stüdyosu Yükleniyor...
+    </div>
+  )
+});
 
 export const metadata = {
   title: 'Mekânında Gör & Dene — AI Seramik Görselleştirme Stüdyosu | SeramikBak',
@@ -8,12 +27,14 @@ export const metadata = {
 };
 
 export default async function MekanimdaGorPage({ searchParams }) {
-  const { slug } = (await searchParams) || {};
   let product = null;
 
-  if (slug) {
-    try {
-      const targetSlug = slug.toLowerCase().trim();
+  try {
+    const params = await searchParams;
+    const slug = params?.slug;
+
+    if (slug) {
+      const targetSlug = String(slug).toLowerCase().trim();
       product = await prisma.product.findUnique({
         where: { slug: targetSlug },
         include: { brand: true }
@@ -23,7 +44,7 @@ export default async function MekanimdaGorPage({ searchParams }) {
         product = await prisma.product.findFirst({
           where: {
             OR: [
-              { code: { equals: slug, mode: 'insensitive' } },
+              { code: { equals: String(slug), mode: 'insensitive' } },
               { slug: { equals: targetSlug, mode: 'insensitive' } }
             ]
           },
@@ -45,9 +66,9 @@ export default async function MekanimdaGorPage({ searchParams }) {
           finish: product.surface || 'Parlak Rektifiye'
         };
       }
-    } catch (e) {
-      console.warn('[MekanimdaGorPage] Could not query product by slug:', e.message);
     }
+  } catch (e) {
+    console.warn('[MekanimdaGorPage] Could not query product by slug:', e.message);
   }
 
   return (

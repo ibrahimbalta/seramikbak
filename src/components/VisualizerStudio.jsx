@@ -108,7 +108,7 @@ export default function VisualizerStudio({ initialProduct = null }) {
   useEffect(() => {
     if (!roomUrl) {
       setRoomUrl(QUICK_ROOM_PRESETS[0].url);
-      const img = new window.Image();
+      const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => setRoomImageEl(img);
       img.src = QUICK_ROOM_PRESETS[0].url;
@@ -143,7 +143,7 @@ export default function VisualizerStudio({ initialProduct = null }) {
     setMaskB64Original(null);
     setResultUrl(null);
 
-    const img = new window.Image();
+    const img = new Image();
     img.onload = () => setRoomImageEl(img);
     img.src = objectUrl;
     e.target.value = '';
@@ -155,7 +155,7 @@ export default function VisualizerStudio({ initialProduct = null }) {
     setMaskB64Original(null);
     setResultUrl(null);
 
-    const img = new window.Image();
+    const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => setRoomImageEl(img);
     img.src = preset.url;
@@ -247,7 +247,7 @@ export default function VisualizerStudio({ initialProduct = null }) {
     colorCanvas.height = h;
 
     // Load AI mask image
-    const maskImg = new window.Image();
+    const maskImg = new Image();
     maskImg.onload = () => {
       setMaskImgEl(maskImg);
       maskCtx.clearRect(0, 0, w, h);
