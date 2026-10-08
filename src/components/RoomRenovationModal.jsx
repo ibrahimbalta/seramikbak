@@ -37,20 +37,22 @@ import { analyzeRoomSurfaces } from '../services/RoomAnalysisService';
 // Preset rooms for quick trial without uploading
 const QUICK_ROOM_PRESETS = [
   {
-    id: 'luxury_bath',
-    name: 'Lüks Ebeveyn Banyosu',
-    url: '/hero/luxury_bathroom.png',
-    fgUrl: '/hero/luxury_bathroom_fg.png',
-    floorQuad: [ [15, 68], [85, 68], [100, 100], [0, 100] ],
-    wallQuad: [ [0, 18], [100, 18], [100, 68], [0, 68] ]
+    id: 'easy_bathroom',
+    name: 'Modern Ferah Banyo',
+    url: '/hero/easy_bathroom.jpg',
+    floorQuad: [ [0, 71], [100, 71], [100, 100], [0, 100] ],
+    wallQuad: [ [32, 19], [69, 19], [69, 71], [32, 71] ],
+    obstacles: [
+      { type: 'vanity', polygon: [[30, 54], [70, 54], [70, 69], [30, 69]] },
+      { type: 'mirror', polygon: [[40, 24], [60, 24], [60, 51], [40, 51]] }
+    ]
   },
   {
-    id: 'scandi_kitchen',
-    name: 'İskandinav Mutfak',
-    url: '/hero/scandinavian_kitchen.png',
-    fgUrl: '/hero/scandinavian_kitchen_fg.png',
-    floorQuad: [ [0, 68], [100, 68], [100, 100], [0, 100] ],
-    wallQuad: [ [35, 25], [100, 25], [100, 68], [35, 68] ]
+    id: 'easy_kitchen',
+    name: 'Modern Ada Mutfak',
+    url: '/hero/easy_kitchen.jpg',
+    floorQuad: [ [0, 62], [100, 62], [100, 100], [0, 100] ],
+    wallQuad: [ [31, 31], [69, 31], [69, 50], [31, 50] ]
   },
   {
     id: 'modern_living',
@@ -159,6 +161,7 @@ export default function RoomRenovationModal({
       const tileImg = await loadImage(textureUrl);
 
       // 2. Prepare surface quads based on active selection with multi-surface and obstacle awareness
+      const activePreset = !isCustomUpload ? QUICK_ROOM_PRESETS.find((p) => p.url === roomPhotoUrl) : null;
       const surfaces = {
         floor: (activeSurface === 'floor' || activeSurface === 'both') ? {
           polygon: floorQuad,
@@ -169,19 +172,18 @@ export default function RoomRenovationModal({
             ? detectedWalls 
             : [{ polygon: wallQuad, exclude: [] }]
         ) : [],
-        obstacles: detectedObstacles
+        obstacles: detectedObstacles.length > 0 
+          ? detectedObstacles 
+          : (activePreset?.obstacles || [])
       };
 
       // Resolve preset foreground fixture layer (bathtubs, vanity, mirrors)
       let foregroundImg = null;
-      if (!isCustomUpload) {
-        const activePreset = QUICK_ROOM_PRESETS.find((p) => p.url === roomPhotoUrl);
-        if (activePreset?.fgUrl) {
-          try {
-            foregroundImg = await loadImage(activePreset.fgUrl);
-          } catch {
-            foregroundImg = null;
-          }
+      if (!isCustomUpload && activePreset?.fgUrl) {
+        try {
+          foregroundImg = await loadImage(activePreset.fgUrl);
+        } catch {
+          foregroundImg = null;
         }
       }
 
@@ -306,13 +308,17 @@ export default function RoomRenovationModal({
 
   // Reset Pins to default
   const handleResetPins = () => {
+    const activePreset = !isCustomUpload ? QUICK_ROOM_PRESETS.find((p) => p.url === roomPhotoUrl) : null;
+    const defaultFloor = activePreset ? activePreset.floorQuad : [ [15, 65], [85, 65], [100, 100], [0, 100] ];
+    const defaultWall = activePreset ? activePreset.wallQuad : [ [10, 15], [90, 15], [90, 65], [10, 65] ];
+
     if (pinEditingMode === 'floor' || activeSurface === 'floor') {
-      setFloorQuad([ [15, 65], [85, 65], [100, 100], [0, 100] ]);
+      setFloorQuad(defaultFloor);
     } else if (pinEditingMode === 'walls' || activeSurface === 'walls') {
-      setWallQuad([ [10, 15], [90, 15], [90, 65], [10, 65] ]);
+      setWallQuad(defaultWall);
     } else {
-      setFloorQuad([ [15, 65], [85, 65], [100, 100], [0, 100] ]);
-      setWallQuad([ [10, 15], [90, 15], [90, 65], [10, 65] ]);
+      setFloorQuad(defaultFloor);
+      setWallQuad(defaultWall);
     }
   };
 
