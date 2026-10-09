@@ -9,11 +9,39 @@ import { cropWhiteBorders } from '../utils/imageTextureUtils';
 // ----------------------------------------------------------------------
 export default function TileVisualPreview({ style, color, finish, width, height, imageUrl, productName, brandName, altText }) {
   const [imageError, setImageError] = useState(false);
+  const [useFallbackTexture, setUseFallbackTexture] = useState(false);
+
   const isDark = (color || '').toLowerCase().includes('antrasit') || (color || '').toLowerCase().includes('siyah') || (color || '').toLowerCase().includes('füme');
   const isBeige = (color || '').toLowerCase().includes('bej') || (color || '').toLowerCase().includes('krem');
   const isBrown = (color || '').toLowerCase().includes('kahve') || (color || '').toLowerCase().includes('ahşap');
   
   const seoAltString = altText || `${brandName ? brandName + ' ' : ''}${productName ? productName + ' - ' : ''}${color || ''} ${style || ''} ${finish || ''} Seramik Fayans Karo (${width}x${height} cm) | Ceramic Porcelain Tile Fliesen سيراميك`;
+
+  // Determine intelligent realistic fallback texture
+  const getMatchingFallbackTexture = () => {
+    const s = (style || '').toLowerCase();
+    const c = (color || '').toLowerCase();
+    const n = (productName || '').toLowerCase();
+
+    if (s.includes('ahşap') || s.includes('wood') || n.includes('wood') || n.includes('oak')) {
+      return (c.includes('koyu') || n.includes('dark')) ? '/textures/teak_ahsap.jpg' : '/textures/natural_oak.jpg';
+    }
+    if (s.includes('mermer') || s.includes('marble') || n.includes('calacatta') || n.includes('mermer')) {
+      return (isDark || c.includes('antrasit')) ? '/textures/borneo_antrasit.jpg' : '/textures/calacatta_gold.jpg';
+    }
+    if (s.includes('taş') || s.includes('stone') || isBeige) {
+      return '/textures/travertino_classico.jpg';
+    }
+    if (isDark) {
+      return '/textures/albatros_antrasit.jpg';
+    }
+    if (isBrown) {
+      return '/textures/vista_bej.jpg';
+    }
+    return '/textures/concrete_light_grey.jpg';
+  };
+
+  const fallbackTexture = getMatchingFallbackTexture();
 
   // Base background color determination
   let bgColor = '#e5e7eb'; // Default light grey
@@ -28,7 +56,7 @@ export default function TileVisualPreview({ style, color, finish, width, height,
   const [cleanedSrc, setCleanedSrc] = useState(null);
 
   useEffect(() => {
-    if (!imageUrl || imageError) return;
+    if (!imageUrl || imageError || useFallbackTexture) return;
     const rawSrc = (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))
       ? `/api/proxy?url=${encodeURIComponent(imageUrl)}`
       : imageUrl;
@@ -55,22 +83,34 @@ export default function TileVisualPreview({ style, color, finish, width, height,
     img.src = rawSrc;
 
     return () => { active = false; };
-  }, [imageUrl, imageError]);
+  }, [imageUrl, imageError, useFallbackTexture]);
 
-  // If a real image path exists and has loaded successfully, render it!
-  if (imageUrl && !imageError) {
-    const displaySrc = (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))
-      ? `/api/proxy?url=${encodeURIComponent(imageUrl)}`
-      : imageUrl;
+  const handleImageError = () => {
+    if (!useFallbackTexture && fallbackTexture) {
+      setUseFallbackTexture(true);
+    } else {
+      setImageError(true);
+    }
+  };
+
+  // If a real image path exists or fallback texture is active, render it!
+  const effectiveUrl = useFallbackTexture ? fallbackTexture : (imageUrl || fallbackTexture);
+
+  if (effectiveUrl && !imageError) {
+    const rawDisplaySrc = (effectiveUrl.startsWith('http://') || effectiveUrl.startsWith('https://'))
+      ? `/api/proxy?url=${encodeURIComponent(effectiveUrl)}`
+      : effectiveUrl;
+
+    const displaySrc = (!useFallbackTexture && cleanedSrc) ? cleanedSrc : rawDisplaySrc;
 
     return (
       <div className="tile-preview-container" style={{ backgroundColor: bgColor }} title={seoAltString} aria-label={seoAltString}>
         <img 
-          src={cleanedSrc || displaySrc} 
+          src={displaySrc} 
           alt={seoAltString}
           title={seoAltString}
           referrerPolicy="no-referrer"
-          onError={() => setImageError(true)} 
+          onError={handleImageError} 
           loading="lazy"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
