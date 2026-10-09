@@ -141,12 +141,26 @@ class FloorSegmentor:
         for cls_idx in target_classes:
             mask[pred == cls_idx] = 255
 
-        # Strictly exclude fixtures, obstacles, doors, windows, ceilings, appliances
-        for cls_idx in self.EXCLUDE_CLASSES:
-            mask[pred == cls_idx] = 0
+        # Helper to zero out non-target areas
+        def enforce_exclusions(m):
+            for cls_idx in self.EXCLUDE_CLASSES:
+                m[pred == cls_idx] = 0
+            if surface == "floor":
+                m[pred == self.WALL_CLASS] = 0
+                m[pred == 5] = 0  # ceiling
+            elif surface == "wall":
+                m[pred == self.FLOOR_CLASS] = 0
+                m[pred == self.RUG_CLASS] = 0
+                m[pred == 5] = 0  # ceiling
+            return m
 
-        # Clean up
+        mask = enforce_exclusions(mask)
+
+        # Morphological cleanup
         mask = self._cleanup_mask(mask)
+
+        # Re-enforce strictly after cleanup so closing never bleeds onto fixtures/cabinets
+        mask = enforce_exclusions(mask)
         return mask
 
     def segment_floor(

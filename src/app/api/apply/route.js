@@ -9,6 +9,7 @@ export async function POST(req) {
     const formData = await req.formData();
     const pythonUrl = await getHealthyPythonUrl();
 
+    // Proxy multipart form to Python FastAPI /api/apply
     const pyRes = await fetch(`${pythonUrl}/api/apply`, {
       method: 'POST',
       body: formData,
@@ -16,7 +17,7 @@ export async function POST(req) {
         'bypass-tunnel-reminder': '1',
         'Bypass-Tunnel-Reminder': 'true',
       },
-      signal: AbortSignal.timeout(65000),
+      signal: AbortSignal.timeout(55000),
     });
 
     if (!pyRes.ok) {
@@ -28,8 +29,8 @@ export async function POST(req) {
       );
     }
 
-    const arrayBuffer = await pyRes.arrayBuffer();
-    return new Response(arrayBuffer, {
+    const imageBlob = await pyRes.blob();
+    return new NextResponse(imageBlob, {
       status: 200,
       headers: {
         'Content-Type': 'image/png',

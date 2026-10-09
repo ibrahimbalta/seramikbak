@@ -124,20 +124,19 @@ def preserve_shadows(
 # Mask feathering
 # ======================================================================
 
-def feather_mask(mask: np.ndarray, radius: int = 7) -> np.ndarray:
-    """Return a soft-edged float mask (0.0–1.0).
+def feather_mask(mask: np.ndarray, radius: int = 5) -> np.ndarray:
+    """Return a soft-edged float mask (0.0–1.0) strictly clamped within the mask.
 
-    The interior is kept at 1.0; only the border region is feathered.
+    The outer boundary (mask == 0) is GUARANTEED to remain 0.0.
+    Feathering only happens inwards to avoid bleeding into adjacent furniture or walls.
     """
-    ksize = radius * 4 + 1
-    erode_k = cv2.getStructuringElement(
-        cv2.MORPH_ELLIPSE, (radius * 2 + 1, radius * 2 + 1)
-    )
-    eroded = cv2.erode(mask, erode_k)
+    if radius <= 0:
+        return (mask > 127).astype(np.float32)
 
-    feathered = cv2.GaussianBlur(mask.astype(np.float32), (ksize, ksize), 0)
-    feathered /= 255.0
-    feathered[eroded > 127] = 1.0
+    binary = (mask > 127).astype(np.uint8)
+    dist = cv2.distanceTransform(binary, cv2.DIST_L2, 5)
+    feathered = np.clip(dist / float(max(1, radius)), 0.0, 1.0)
+    feathered[mask == 0] = 0.0
     return feathered
 
 
@@ -156,30 +155,34 @@ def blend(
       1. ``transfer_lighting``  — luminance / colour matching.
       2. ``preserve_shadows``   — bake original shadows.
       3. Poisson cloning (``MIXED_CLONE``) for gradient-domain smoothing.
-      4. Feathered alpha compositing for clean edges.
-
-    Falls back to pure alpha compositing if Poisson cloning fails
-    (e.g. concave mask geometry).
+      4. Inward-feathered alpha compositing for clean edges without bleeding.
+      5. Strict mask clamping: pixels outside *mask* remain 100% original.
     """
+    binary_mask = (mask > 127).astype(np.uint8) * 255
+    if not np.any(binary_mask):
+        return hall_img.copy()
+
     # ---- Steps 1 & 2 ------------------------------------------------
-    lit = transfer_lighting(hall_img, textured_floor, mask)
-    shadowed = preserve_shadows(hall_img, lit, mask)
+    lit = transfer_lighting(hall_img, textured_floor, binary_mask)
+    shadowed = preserve_shadows(hall_img, lit, binary_mask)
 
     # ---- Step 3: Poisson / seamless cloning --------------------------
-    feathered = feather_mask(mask, radius=7)
+    feathered = feather_mask(binary_mask, radius=4)
     mask3 = np.stack([feathered] * 3, axis=-1)
 
+    result = None
     try:
-        pts = np.where(mask > 127)
+        pts = np.where(binary_mask > 0)
         if len(pts[0]) > 100:
             cy = int(np.mean(pts[0]))
             cx = int(np.mean(pts[1]))
 
-            dilate_k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-            dilated = cv2.dilate(mask, dilate_k)
+            # Erode slightly so seamlessClone doesn't pull background colors
+            erode_k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+            clone_mask = cv2.erode(binary_mask, erode_k)
 
             cloned = cv2.seamlessClone(
-                shadowed, hall_img, dilated, (cx, cy), cv2.MIXED_CLONE
+                shadowed, hall_img, clone_mask, (cx, cy), cv2.MIXED_CLONE
             )
 
             # Mix: 55 % Poisson + 45 % direct (keeps texture sharpness)
@@ -189,17 +192,23 @@ def blend(
             )
             np.clip(floor_blend, 0, 255, out=floor_blend)
 
-            result = (
+            blended = (
                 floor_blend * mask3
-                + hall_img.astype(np.float64) * (1 - mask3)
+                + hall_img.astype(np.float64) * (1.0 - mask3)
             )
-            return np.clip(result, 0, 255).astype(np.uint8)
+            result = np.clip(blended, 0, 255).astype(np.uint8)
     except cv2.error:
         pass  # fall through to alpha compositing
 
-    # ---- Fallback: feathered alpha blend -----------------------------
-    result = (
-        shadowed.astype(np.float64) * mask3
-        + hall_img.astype(np.float64) * (1 - mask3)
-    )
-    return np.clip(result, 0, 255).astype(np.uint8)
+    if result is None:
+        # ---- Fallback: feathered alpha blend -----------------------------
+        blended = (
+            shadowed.astype(np.float64) * mask3
+            + hall_img.astype(np.float64) * (1.0 - mask3)
+        )
+        result = np.clip(blended, 0, 255).astype(np.uint8)
+
+    # ABSOLUTE SAFETY CLAMP: 100% original pixels outside the binary mask
+    # sonuc = orijinal * (1 - maske) + seramik_uygulanmis * maske
+    final = np.where(binary_mask[:, :, None] > 0, result, hall_img)
+    return final

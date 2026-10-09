@@ -1470,11 +1470,12 @@ function getMaskBase64() {
 
     for (let i = 0; i < px.length; i += 4) {
         const bright = (px[i] + px[i + 1] + px[i + 2]) / 3;
-        const val = (px[i + 3] > 50 && bright > 50) ? 255 : 0;
+        const isMasked = (px[i + 3] > 50 && bright > 50);
+        const val = isMasked ? 255 : 0;
         out[i]     = val;
         out[i + 1] = val;
         out[i + 2] = val;
-        out[i + 3] = 255;
+        out[i + 3] = val; // Strictly transparent outside mask, opaque white inside
     }
 
     binCtx.putImageData(binData, 0, 0);
@@ -1482,7 +1483,8 @@ function getMaskBase64() {
 }
 
 /**
- * Intelligent Client-Side Texture Mapper with Realistic Lighting & Shadow Preservation
+ * Intelligent Client-Side Texture Mapper with Realistic Perspective & Zero-Leak Masking
+ * Formula: sonuc = orijinal * (1 - maske) + seramik_uygulanmis * maske
  */
 async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, tileScale, surface) {
     const w = hallImg.naturalWidth;
@@ -1493,10 +1495,31 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
     resultCanvas.height = h;
     const rCtx = resultCanvas.getContext("2d");
 
-    // 1. Draw base photo
+    // 1. Draw 100% original base photo (untouched reference)
     rCtx.drawImage(hallImg, 0, 0, w, h);
 
-    // 2. Tile layer
+    // 2. Load mask image (binary alpha mask)
+    const maskImgEl = await loadImage("data:image/png;base64," + maskB64);
+    const mCanvas = document.createElement("canvas");
+    mCanvas.width = w;
+    mCanvas.height = h;
+    const mCtx = mCanvas.getContext("2d");
+    mCtx.drawImage(maskImgEl, 0, 0, w, h);
+
+    // Analyze mask bounds for floor perspective scanline detection
+    const mData = mCtx.getImageData(0, 0, w, h).data;
+    let topRow = -1, botRow = -1;
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            if (mData[(y * w + x) * 4 + 3] > 100) {
+                if (topRow === -1) topRow = y;
+                botRow = y;
+                break;
+            }
+        }
+    }
+
+    // 3. Isolated tile rendering layer
     const tileLayer = document.createElement("canvas");
     tileLayer.width = w;
     tileLayer.height = h;
@@ -1505,57 +1528,77 @@ async function renderClientPerspectiveTile(hallImg, tileImg, maskB64, pattern, t
     const baseTileW = Math.max(35, Math.round((w / 7) * tileScale));
     const baseTileH = Math.max(35, Math.round(baseTileW * (tileImg.naturalHeight / (tileImg.naturalWidth || 1))));
 
+    // Pattern swatch with architectural grout line
     const patCanvas = document.createElement("canvas");
     patCanvas.width = baseTileW;
     patCanvas.height = baseTileH;
     const pCtx = patCanvas.getContext("2d");
     pCtx.drawImage(tileImg, 0, 0, baseTileW, baseTileH);
-
-    // Subtle grout line
     pCtx.strokeStyle = "rgba(0, 0, 0, 0.22)";
     pCtx.lineWidth = Math.max(1, Math.round(baseTileW * 0.02));
     pCtx.strokeRect(0, 0, baseTileW, baseTileH);
 
-    const patternObj = tCtx.createPattern(patCanvas, "repeat");
-    tCtx.fillStyle = patternObj;
-    tCtx.fillRect(0, 0, w, h);
+    if (surface === "floor" && topRow !== -1 && (botRow - topRow) > 30) {
+        // Multi-slice depth perspective warping (reproduces optical horizon convergence)
+        const slices = 45;
+        const totalHeight = botRow - topRow;
+        const sliceH = Math.ceil(totalHeight / slices) + 1;
 
-    // 3. Mask layer
-    const maskImgEl = await loadImage("data:image/png;base64," + maskB64);
-    const mCanvas = document.createElement("canvas");
-    mCanvas.width = w;
-    mCanvas.height = h;
-    const mCtx = mCanvas.getContext("2d");
-    mCtx.drawImage(maskImgEl, 0, 0, w, h);
+        const repCanvas = document.createElement("canvas");
+        repCanvas.width = w * 2;
+        repCanvas.height = h * 2;
+        const repCtx = repCanvas.getContext("2d");
+        const patternObj = repCtx.createPattern(patCanvas, "repeat");
+        repCtx.fillStyle = patternObj;
+        repCtx.fillRect(0, 0, repCanvas.width, repCanvas.height);
 
-    // Clip tile layer with user mask
+        for (let s = 0; s < slices; s++) {
+            const t = s / (slices - 1); // 0 = far/top, 1 = near/bottom
+            const currentY = topRow + Math.round(t * (totalHeight - sliceH));
+            // Realistic ground plane perspective scaling
+            const depthScale = 0.40 + 0.60 * Math.pow(t, 1.35);
+
+            const srcW = Math.round(w / depthScale);
+            const srcX = Math.round((repCanvas.width - srcW) / 2);
+            const srcY = Math.round((currentY % (baseTileH * 3)));
+
+            tCtx.drawImage(
+                repCanvas,
+                srcX, srcY, srcW, sliceH,
+                0, currentY, w, sliceH
+            );
+        }
+    } else {
+        // Planar repeat for walls or uniform surfaces
+        const patternObj = tCtx.createPattern(patCanvas, "repeat");
+        tCtx.fillStyle = patternObj;
+        tCtx.fillRect(0, 0, w, h);
+    }
+
+    // 4. Photorealistic lighting & shadow blending (strictly within tileLayer)
+    tCtx.save();
+    // Neutral ambient shadow preservation
+    tCtx.globalCompositeOperation = "multiply";
+    tCtx.globalAlpha = 0.58;
+    tCtx.drawImage(hallImg, 0, 0, w, h);
+
+    // Natural sheen & specular reflection
+    tCtx.globalCompositeOperation = "soft-light";
+    tCtx.globalAlpha = 0.45;
+    tCtx.drawImage(hallImg, 0, 0, w, h);
+    tCtx.restore();
+
+    // 5. STRICT MASK CLIPPING:
+    // Destination-in keeps tileLayer ONLY where mask alpha > 0.
+    // Every pixel outside mask is made 100% transparent (alpha = 0).
     tCtx.globalCompositeOperation = "destination-in";
-    tCtx.drawImage(mCanvas, 0, 0);
+    tCtx.drawImage(mCanvas, 0, 0, w, h);
     tCtx.globalCompositeOperation = "source-over";
 
-    // 4. Lighting & shadow extraction from original room
-    const lightCanvas = document.createElement("canvas");
-    lightCanvas.width = w;
-    lightCanvas.height = h;
-    const lCtx = lightCanvas.getContext("2d");
-    lCtx.drawImage(hallImg, 0, 0, w, h);
-    lCtx.globalCompositeOperation = "destination-in";
-    lCtx.drawImage(mCanvas, 0, 0);
-
-    // Composite onto result
-    rCtx.save();
+    // 6. Final composite:
+    // Result = original (rCtx) + clipped tileLayer (only on mask)
+    // sonuc = orijinal * (1 - maske) + seramik * maske
     rCtx.drawImage(tileLayer, 0, 0);
-
-    // Preserve room shadows & ambient lighting
-    rCtx.globalCompositeOperation = "multiply";
-    rCtx.globalAlpha = 0.52;
-    rCtx.drawImage(lightCanvas, 0, 0);
-
-    // Soft specular highlight reflection
-    rCtx.globalCompositeOperation = "soft-light";
-    rCtx.globalAlpha = 0.68;
-    rCtx.drawImage(lightCanvas, 0, 0);
-    rCtx.restore();
 
     return new Promise((resolve) => {
         resultCanvas.toBlob((blob) => resolve(blob), "image/png");
