@@ -58,6 +58,11 @@ async function saveBase64Image(base64Data, filename) {
 // GET: List products with search, pagination, and filters
 export async function GET(request) {
   try {
+    const auth = await verifyAuth(request, 'admin');
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
     const brandId = searchParams.get('brandId') || '';

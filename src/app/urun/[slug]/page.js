@@ -172,7 +172,7 @@ export default async function ProductDetailPage({ params }) {
   }
 
   const brandName = product.brand?.name || 'Seramik';
-  const productSlug = slugify(`${brandName} ${product.name}`);
+  const productSlug = product.slug || slugify(`${brandName} ${product.name}`);
   const canonicalUrl = `https://www.seramikbak.com/urun/${productSlug}`;
 
   // Fetch related products from same brand

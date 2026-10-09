@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { verifyAuth } from '@/lib/auth-check';
 
 export async function GET(request) {
   try {
+    const auth = await verifyAuth(request);
+    if (!auth) {
+      return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const brandId = searchParams.get('brandId');
 
@@ -10,6 +16,13 @@ export async function GET(request) {
       return NextResponse.json(
         { error: 'Missing brandId query parameter' },
         { status: 400 }
+      );
+    }
+
+    if (auth.role !== 'admin' && (auth.role !== 'brand' || auth.id !== brandId)) {
+      return NextResponse.json(
+        { error: 'Bu markanın verilerine erişim yetkiniz yok.' },
+        { status: 403 }
       );
     }
 

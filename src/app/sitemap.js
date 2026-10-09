@@ -92,7 +92,7 @@ export default async function sitemap() {
       supportedLangs.forEach(lang => {
         const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
         productRoutes.push({
-          url: `${baseUrl}/urun/${slug}${langParam ? `?lang=${lang}` : ''}`,
+          url: `${baseUrl}/urun/${slug}${langParam}`,
           lastModified: p.updatedAt || new Date(),
           changeFrequency: 'daily',
           priority: 0.95
@@ -106,7 +106,7 @@ export default async function sitemap() {
       supportedLangs.forEach(lang => {
         const langParam = lang === 'tr' ? '' : `?lang=${lang}`;
         productRoutes.push({
-          url: `${baseUrl}/marka/${brandSlug}${langParam ? `?lang=${lang}` : ''}`,
+          url: `${baseUrl}/marka/${brandSlug}${langParam}`,
           lastModified: new Date(),
           changeFrequency: 'daily',
           priority: 0.9

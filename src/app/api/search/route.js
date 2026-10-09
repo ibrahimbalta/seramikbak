@@ -23,12 +23,7 @@ async function flushAnalyticsLogs() {
   }
 }
 
-// Flush logs every 5 seconds
-if (!global.analyticsFlushInterval) {
-  global.analyticsFlushInterval = setInterval(() => {
-    flushAnalyticsLogs().catch(err => console.error('Interval flush error:', err.message));
-  }, 5000);
-}
+// Flush analytics logs asynchronously via Next.js after() lifecycle
 
 export async function GET(request) {
   try {
@@ -222,14 +217,14 @@ export async function GET(request) {
         city: searchParams.get('city') || 'İstanbul'
       });
 
-      // Flush asynchronously if the buffer reaches 50 items
-      if (logBuffer.length >= 50) {
-        try {
-          after(() => {
-            flushAnalyticsLogs().catch(err => console.error(err));
-          });
-        } catch (e) {
-          // Fallback if after() is not supported in this runtime
+      // Flush asynchronously via Next.js after()
+      try {
+        after(() => {
+          flushAnalyticsLogs().catch(err => console.error(err));
+        });
+      } catch (e) {
+        // Fallback if after() is not supported in this runtime
+        if (logBuffer.length >= 20) {
           flushAnalyticsLogs().catch(err => console.error(err));
         }
       }
