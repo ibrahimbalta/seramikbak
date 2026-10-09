@@ -70,6 +70,11 @@ import {
 import dynamic from 'next/dynamic';
 import BimSpecDownloadModal from '@/components/BimSpecDownloadModal';
 
+// Dynamically import Room Renovation (Mekânımda Gör & Dene) modal
+const RoomRenovationModal = dynamic(() => import('@/components/RoomRenovationModal'), { 
+  ssr: false 
+});
+
 // Dynamically import client-only components to prevent Next.js SSR hydration mismatches
 const StudioCanvas = dynamic(() => import('@/components/StudioCanvas'), { 
   ssr: false,
@@ -747,6 +752,8 @@ export default function Home() {
   const [weeklyProducts, setWeeklyProducts] = useState([]);
   const [activeProduct, setActiveProduct] = useState(null);
   const [vitrinCampaigns, setVitrinCampaigns] = useState([]);
+  const [showRenovationModal, setShowRenovationModal] = useState(false);
+  const [renovationProduct, setRenovationProduct] = useState(null);
 
   // New visual and search states
   const [heroSlideIndex, setHeroSlideIndex] = useState(0);
@@ -4619,20 +4626,33 @@ export default function Home() {
             <section className="persona-gateway-section" aria-label="Kullanıcı Odaklı Hızlı Yönlendirme">
               <div className="persona-gateway-grid">
                 
-                {/* 1. Evini Yenileyenler */}
+                {/* 1. Evini Yenileyenler - Mekânımda Gör & Dene */}
                 <div 
-                  onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => {
+                    const targetProduct = activeProduct || weeklyProducts?.[0] || products?.[0] || {
+                      name: 'White Silver 60×120 Full Lappato',
+                      brand: 'Güral Seramik',
+                      width: 60,
+                      height: 120,
+                      imageUrl: '/textures/calacatta_gold.jpg',
+                      textureUrl: '/textures/calacatta_gold.jpg',
+                      slug: 'gural-seramik-white-silver-60120-full-lappato'
+                    };
+                    setRenovationProduct(targetProduct);
+                    setShowRenovationModal(true);
+                  }}
                   className="persona-banner-card card-studio"
                   style={{ textDecoration: 'none', cursor: 'pointer' }}
                   role="button"
                   tabIndex={0}
+                  title="Mekânımda Gör & Dene ile seramikleri odanızda canlı deneyin"
                 >
                   <div className="promo-text-column">
                     <div className="promo-top-badge gold">
                       <Sparkles size={11} className="promo-sparkle-icon" />
                       <span>AI 3D MEKAN</span>
                     </div>
-                    <h5 className="persona-card-title">3D Sanal Stüdyo</h5>
+                    <h5 className="persona-card-title">Mekânımda Gör & Dene</h5>
                     <p className="persona-card-desc">Seramiklerinizi odanızda canlı görün</p>
                     <div className="promo-action-btn-gold">
                       <span>Hemen Deneyin</span>
@@ -4640,7 +4660,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="promo-image-column">
-                    <img src="/hero/luxury_bathroom.png" alt="3D Sanal Stüdyo" />
+                    <img src="/hero/luxury_bathroom.png" alt="Mekânımda Gör & Dene" />
                     <div className="promo-image-badge">3D</div>
                   </div>
                 </div>
@@ -7080,7 +7100,8 @@ export default function Home() {
                   <button 
                     onClick={() => {
                       setShowDetailModal(false);
-                      navigateTo3DStudio(detailProduct);
+                      setRenovationProduct(detailProduct);
+                      setShowRenovationModal(true);
                     }}
                     className="detail-action-btn btn-action-studio"
                   >
@@ -7088,11 +7109,11 @@ export default function Home() {
                       <Sparkles size={18} />
                     </div>
                     <div className="btn-text-group">
-                      <span className="btn-title">3D Sanal Stüdyoda Dene</span>
-                      <span className="btn-subtext">360° Mimari Mekân Simülasyonu</span>
+                      <span className="btn-title">Mekânımda Gör & Dene</span>
+                      <span className="btn-subtext">SegFormer-B3 AI Mekân Simülasyonu</span>
                     </div>
                     <div className="btn-hero-tag">
-                      <span>3D TASARIM</span>
+                      <span>AI DENEYİM</span>
                       <ChevronRight size={13} />
                     </div>
                   </button>
@@ -19790,6 +19811,15 @@ export default function Home() {
         onClose={() => setIsBimModalOpen(false)}
         product={bimModalProduct}
       />
+
+      {/* ROOM RENOVATION MODAL (MEKÂNIMDA GÖR & DENE) */}
+      {showRenovationModal && (
+        <RoomRenovationModal
+          isOpen={showRenovationModal}
+          onClose={() => setShowRenovationModal(false)}
+          product={renovationProduct || activeProduct}
+        />
+      )}
     </main>
   );
 }
