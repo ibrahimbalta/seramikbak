@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { slugify } from '@/lib/slugify';
 import ProductDetailClient from './ProductDetailClient';
+import './product-detail.css';
 import { generateProductSchema, generateBreadcrumbSchema, generateFaqSchema, generateImageObjectSchema } from '@/lib/seo/schemaGenerator';
 import { generateImageAltText } from '@/lib/seo/imageSeo';
 
@@ -222,7 +223,7 @@ export default async function ProductDetailPage({ params }) {
   });
 
   return (
-    <>
+    <div className="sb-dark-page min-h-screen">
       {productSchema && (
         <script
           type="application/ld+json"
@@ -246,6 +247,6 @@ export default async function ProductDetailPage({ params }) {
         relatedProducts={relatedProducts}
         authorizedDealers={authorizedDealers}
       />
-    </>
+    </div>
   );
 }
