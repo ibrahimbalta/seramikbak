@@ -2265,58 +2265,31 @@ export default function StudioCanvas({
   };
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+    <div 
+      className="studio-canvas-root" 
+      style={{ 
+        position: 'relative', 
+        width: '100%', 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        overflow: 'hidden',
+        background: backgroundColor || '#090d16'
+      }}
+    >
+      {/* 3D Viewport Top Symmetrical Bar (Tasarımın Üstünü Asla Kapatmaz!) */}
       <div 
-        ref={containerRef} 
-        style={{ width: '100%', height: '100%', cursor: walkthroughMode ? 'crosshair' : 'grab' }} 
-      />
-
-      {/* 3D Split-Screen Comparison Slider Line */}
-      {comparisonMode && (
-        <div 
-          style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            left: `${comparisonSplit}%`,
-            width: '3px',
-            background: 'var(--accent-gold)',
-            boxShadow: '0 0 12px rgba(212, 175, 55, 0.8)',
-            zIndex: 10,
-            pointerEvents: 'none'
-          }}
-        >
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            background: 'var(--accent-gold)',
-            color: '#0f172a',
-            padding: '6px 12px',
-            borderRadius: '20px',
-            fontSize: '0.7rem',
-            fontWeight: '800',
-            whiteSpace: 'nowrap',
-            boxShadow: '0 4px 14px rgba(0,0,0,0.4)'
-          }}>
-            ◀ Kıyasla ▶
-          </div>
-        </div>
-      )}
-
-      {/* 3D Viewport Overlays (Top & Bottom Symmetrical Edges) */}
-      <div 
-        className="canvas-overlay-top"
+        className={`canvas-header-bar ${topOffset !== null && topOffset !== undefined ? 'floating-offset-mode' : ''}`}
         style={topOffset !== null && topOffset !== undefined ? { 
           '--canvas-top-offset': typeof topOffset === 'number' ? `${topOffset}px` : topOffset, 
           top: typeof topOffset === 'number' ? `${topOffset}px` : topOffset 
         } : undefined}
       >
-        <div className="overlay-top-left-badges">
+        {/* SOL: Mekân Bilgi Rozetleri & Aktif Yüzey Seçimi */}
+        <div className="header-bar-left">
           <div className="desktop-badges-group">
-            <div className="overlay-badge">
-              <span>Oda Türü: </span>
+            <div className="overlay-badge" title="Mekân Türü">
+              <span className="badge-lbl">Oda Türü:</span>
               <strong style={{ textTransform: 'capitalize', color: 'var(--accent-gold)' }}>
                 {roomType === 'bathroom' ? 'Lüks Banyo' : 
                  roomType === 'livingroom' ? 'Modern Salon' : 
@@ -2325,29 +2298,24 @@ export default function StudioCanvas({
                  roomType === 'bedroom' ? 'Yatak Odası' : 'Açık Teras'}
               </strong>
             </div>
-            <div className="overlay-badge">
-              <span>Kaplama: </span>
+
+            <div className="overlay-badge" title="Yüzey Kaplama Kapsamı">
+              <span className="badge-lbl">Kaplama:</span>
               <strong style={{ textTransform: 'capitalize', color: '#38bdf8' }}>
-                {applyAccent ? 'Zemin, Duvar & Vurgu' : applyFloor && applyWalls ? 'Zemin & Duvar' : applyFloor ? 'Sadece Zemin' : 'Döşenmemiş'}
+                {applyAccent ? 'Zemin & Duvar & Vurgu' : applyFloor && applyWalls ? 'Zemin & Duvar' : applyFloor ? 'Zemin' : 'Döşenmemiş'}
               </strong>
             </div>
-            <div className="overlay-badge">
-              <span>Doku: </span>
+
+            <div className="overlay-badge" title="Yüksek Çözünürlüklü Doku Durumu">
+              <span className="badge-lbl">Doku:</span>
               <strong style={{ color: textureStatus.includes('Real') ? 'var(--accent-green)' : 'var(--accent-gold)' }}>
                 {textureStatus}
               </strong>
             </div>
-            {layPattern !== 'flat' && (
-              <div className="overlay-badge" style={{ borderColor: 'var(--accent-gold)' }}>
-                <span>Desen: </span>
-                <strong style={{ textTransform: 'uppercase', color: 'var(--accent-gold)' }}>
-                  {layPattern}
-                </strong>
-              </div>
-            )}
+
             {roomType === 'bathroom' && (
-              <div className="overlay-badge" style={{ borderColor: 'rgba(56, 189, 248, 0.4)' }}>
-                <span>Cam: </span>
+              <div className="overlay-badge" style={{ borderColor: 'rgba(56, 189, 248, 0.4)' }} title="Duşakabin Cam Kaplama">
+                <span className="badge-lbl">Cam:</span>
                 <strong style={{ color: '#38bdf8' }}>
                   {activeGlass === 'clear' ? 'Şeffaf Kristal' :
                    activeGlass === 'smoke' ? 'Füme Duman' :
@@ -2356,47 +2324,59 @@ export default function StudioCanvas({
                 </strong>
               </div>
             )}
+
+            {layPattern !== 'flat' && (
+              <div className="overlay-badge" style={{ borderColor: 'var(--accent-gold)' }} title="Döşeme Deseni">
+                <span className="badge-lbl">Desen:</span>
+                <strong style={{ textTransform: 'uppercase', color: 'var(--accent-gold)' }}>
+                  {layPattern}
+                </strong>
+              </div>
+            )}
           </div>
           {extraTopLeft}
         </div>
         
-        {/* Camera Quick Presets Center Bar */}
-        <div className="overlay-camera-presets">
-          <button 
-            onClick={() => setCameraPreset('perspective')}
-            className={`preset-btn ${activeCameraPreset === 'perspective' ? 'active' : ''}`}
-            title="Genel Perspektif Açısı"
-            type="button"
-          >
-            👁️ <span className="btn-label">Perspektif</span>
-          </button>
-          <button 
-            onClick={() => setCameraPreset('vanity')}
-            className={`preset-btn ${activeCameraPreset === 'vanity' ? 'active' : ''}`}
-            title="Lavabo ve Ayna Odaklı Görünüm"
-            type="button"
-          >
-            🪞 <span className="btn-label">Lavabo</span>
-          </button>
-          <button 
-            onClick={() => setCameraPreset('shower')}
-            className={`preset-btn ${activeCameraPreset === 'shower' ? 'active' : ''}`}
-            title="Duş ve Zemin Odaklı Görünüm"
-            type="button"
-          >
-            🚿 <span className="btn-label">Duş & Zemin</span>
-          </button>
-          <button 
-            onClick={() => setCameraPreset('topdown')}
-            className={`preset-btn ${activeCameraPreset === 'topdown' ? 'active' : ''}`}
-            title="Plan / Kuşbakışı Görünüm"
-            type="button"
-          >
-            📐 <span className="btn-label">Kuşbakışı</span>
-          </button>
+        {/* ORTA: Symmetrical Camera Quick Presets Center Bar */}
+        <div className="header-bar-center">
+          <div className="overlay-camera-presets">
+            <button 
+              onClick={() => setCameraPreset('perspective')}
+              className={`preset-btn ${activeCameraPreset === 'perspective' ? 'active' : ''}`}
+              title="Genel Perspektif Açısı"
+              type="button"
+            >
+              👁️ <span className="btn-label">Perspektif</span>
+            </button>
+            <button 
+              onClick={() => setCameraPreset('vanity')}
+              className={`preset-btn ${activeCameraPreset === 'vanity' ? 'active' : ''}`}
+              title="Lavabo ve Ayna Odaklı Görünüm"
+              type="button"
+            >
+              🪞 <span className="btn-label">Lavabo</span>
+            </button>
+            <button 
+              onClick={() => setCameraPreset('shower')}
+              className={`preset-btn ${activeCameraPreset === 'shower' ? 'active' : ''}`}
+              title="Duş ve Zemin Odaklı Görünüm"
+              type="button"
+            >
+              🚿 <span className="btn-label">Duş & Zemin</span>
+            </button>
+            <button 
+              onClick={() => setCameraPreset('topdown')}
+              className={`preset-btn ${activeCameraPreset === 'topdown' ? 'active' : ''}`}
+              title="Plan / Kuşbakışı Görünüm"
+              type="button"
+            >
+              📐 <span className="btn-label">Kuşbakışı</span>
+            </button>
+          </div>
         </div>
 
-        <div className="overlay-top-right-actions">
+        {/* SAĞ: Aksiyonlar (HD Fotoğraf, Menü, Tam Ekran) */}
+        <div className="header-bar-right">
           {showSnapshot && (
             <button onClick={downloadSnapshot} className="overlay-action-btn" title="Yüksek Çözünürlüklü Görüntüyü İndir" type="button">
               <span className="snapshot-icon">📷</span>
@@ -2408,141 +2388,240 @@ export default function StudioCanvas({
         </div>
       </div>
 
-      <div className="canvas-overlay-bottom">
-        <div className="overlay-bottom-left">
-          <div className="overlay-instructions">
-            <span className="instruction-desktop">{walkthroughMode ? '🚶 360° Oda İçinde Gezintidesiniz' : '👆 Zemine/Duvara Tıklayarak Kapla'}</span>
-            <span className="instruction-mobile">{walkthroughMode ? '🚶 360° Gezinti' : '👆 Tıklayarak Kapla'}</span>
+      {/* 3D WebGL Sahnesi (Header Bar'ın Altında Tertemiz Yerleşir, Tasarımın Üstüne Binmez!) */}
+      <div 
+        className="canvas-viewport-stage" 
+        style={{ 
+          position: 'relative', 
+          flex: 1, 
+          minHeight: 0, 
+          width: '100%', 
+          overflow: 'hidden' 
+        }}
+      >
+        <div 
+          ref={containerRef} 
+          style={{ width: '100%', height: '100%', cursor: walkthroughMode ? 'crosshair' : 'grab' }} 
+        />
+
+        {/* 3D Split-Screen Comparison Slider Line */}
+        {comparisonMode && (
+          <div 
+            style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: `${comparisonSplit}%`,
+              width: '3px',
+              background: 'var(--accent-gold)',
+              boxShadow: '0 0 12px rgba(212, 175, 55, 0.8)',
+              zIndex: 10,
+              pointerEvents: 'none'
+            }}
+          >
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: 'var(--accent-gold)',
+              color: '#0f172a',
+              padding: '6px 12px',
+              borderRadius: '20px',
+              fontSize: '0.7rem',
+              fontWeight: '800',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.4)'
+            }}>
+              ◀ Kıyasla ▶
+            </div>
           </div>
-        </div>
-        <div className="overlay-bottom-right">
-          <div className="overlay-gesture-hint">
-            <span className="gesture-hint-desktop">🔄 360° döndürmek için sürükleyin</span>
-            <span className="gesture-hint-mobile">👆 Sürükle • Yakınlaştır</span>
+        )}
+
+        <div className="canvas-overlay-bottom">
+          <div className="overlay-bottom-left">
+            <div className="overlay-instructions">
+              <span className="instruction-desktop">{walkthroughMode ? '🚶 360° Oda İçinde Gezintidesiniz' : '👆 Zemine/Duvara Tıklayarak Kapla'}</span>
+              <span className="instruction-mobile">{walkthroughMode ? '🚶 360° Gezinti' : '👆 Tıklayarak Kapla'}</span>
+            </div>
+          </div>
+          <div className="overlay-bottom-right">
+            <div className="overlay-gesture-hint">
+              <span className="gesture-hint-desktop">🔄 360° döndürmek için sürükleyin</span>
+              <span className="gesture-hint-mobile">👆 Sürükle • Yakınlaştır</span>
+            </div>
           </div>
         </div>
       </div>
 
       <style jsx>{`
-        /* Top Overlay (Badges at Left, Download Button at Right) */
-        .canvas-overlay-top {
+        /* Dedicated Symmetrical Studio Top Bar */
+        .canvas-header-bar {
+          position: relative;
+          width: 100%;
+          min-height: 48px;
+          height: 48px;
+          background: rgba(9, 13, 22, 0.96);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          align-items: center;
+          padding: 0 14px;
+          gap: 12px;
+          z-index: 25;
+          box-sizing: border-box;
+          user-select: none;
+          flex-shrink: 0;
+        }
+
+        .canvas-header-bar.floating-offset-mode {
           position: absolute;
           top: var(--canvas-top-offset, 14px);
           left: 14px;
           right: 14px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+          width: auto;
+          background: transparent;
+          border-bottom: none;
           pointer-events: none;
-          gap: 12px;
-          z-index: 25;
         }
-        .overlay-top-left-badges {
+
+        .header-bar-left {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
+          min-width: 0;
+          overflow-x: auto;
+          scrollbar-width: none;
+          justify-self: start;
           pointer-events: auto;
         }
+        .header-bar-left::-webkit-scrollbar {
+          display: none;
+        }
+
         .desktop-badges-group {
           display: flex;
           align-items: center;
           gap: 6px;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
+          white-space: nowrap;
         }
-        .overlay-top-right-actions {
+
+        .header-bar-center {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          justify-self: center;
+          flex-shrink: 0;
+          pointer-events: auto;
+        }
+
+        .header-bar-right {
           display: flex;
           align-items: center;
           gap: 8px;
-          pointer-events: auto;
+          justify-self: end;
           flex-shrink: 0;
+          pointer-events: auto;
         }
+
         .overlay-badge {
-          background: rgba(15, 23, 42, 0.88);
+          background: rgba(15, 23, 42, 0.90);
           border: 1px solid rgba(255, 255, 255, 0.12);
           color: #fff;
-          padding: 6px 12px;
-          border-radius: 8px;
-          font-size: 0.72rem;
+          height: 28px;
+          padding: 0 9px;
+          border-radius: 7px;
+          font-size: 0.70rem;
           font-family: var(--font-body);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.25);
           white-space: nowrap;
           display: inline-flex;
           align-items: center;
           gap: 4px;
+          flex-shrink: 0;
         }
-        .overlay-action-btn {
-          background: linear-gradient(135deg, var(--accent-gold) 0%, #d4af37 100%);
-          color: #0f172a;
-          border: none;
-          padding: 8px 16px;
-          border-radius: 8px;
-          font-size: 0.72rem;
-          font-family: var(--font-title);
-          font-weight: 800;
-          cursor: pointer;
-          pointer-events: auto;
-          box-shadow: 0 4px 12px rgba(179, 142, 71, 0.35);
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-          white-space: nowrap;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-        }
-        .snapshot-label-mob {
-          display: none;
-        }
-        .snapshot-label {
-          display: inline;
-        }
-        .overlay-action-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(179, 142, 71, 0.45);
+
+        .badge-lbl {
+          color: #94a3b8;
+          font-weight: 600;
         }
 
         /* Camera Quick Presets Toolbar */
         .overlay-camera-presets {
           display: flex;
           align-items: center;
-          gap: 5px;
-          background: rgba(15, 23, 42, 0.88);
+          gap: 3px;
+          background: rgba(15, 23, 42, 0.92);
           border: 1px solid rgba(255, 255, 255, 0.14);
-          padding: 4px;
-          border-radius: 10px;
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
+          padding: 3px;
+          border-radius: 9px;
           box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-          pointer-events: auto;
         }
+
         .preset-btn {
-          background: transparent;
-          border: none;
-          color: rgba(255, 255, 255, 0.8);
-          padding: 6px 12px;
+          height: 30px;
+          padding: 0 11px;
           border-radius: 7px;
-          font-size: 0.70rem;
+          font-size: 0.72rem;
           font-family: var(--font-body);
-          font-weight: 600;
+          font-weight: 700;
+          color: #cbd5e1;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
           cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          border: none;
+          background: transparent;
+          white-space: nowrap;
+        }
+
+        .preset-btn:hover {
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.10);
+        }
+
+        .preset-btn.active {
+          background: linear-gradient(135deg, var(--accent-gold) 0%, #b4823c 100%);
+          color: #0f172a;
+          font-weight: 850;
+          box-shadow: 0 2px 10px rgba(180, 130, 60, 0.4);
+        }
+
+        .overlay-action-btn {
+          background: linear-gradient(135deg, var(--accent-gold) 0%, #d4af37 100%);
+          color: #0f172a;
+          border: none;
+          height: 32px;
+          padding: 0 13px;
+          border-radius: 8px;
+          font-size: 0.72rem;
+          font-family: var(--font-title);
+          font-weight: 800;
+          cursor: pointer;
+          pointer-events: auto;
+          box-shadow: 0 3px 10px rgba(179, 142, 71, 0.35);
           transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
           white-space: nowrap;
           display: inline-flex;
           align-items: center;
-          gap: 5px;
-        }
-        .preset-btn:hover {
-          color: #ffffff;
-          background: rgba(255, 255, 255, 0.1);
-        }
-        .preset-btn.active {
-          background: linear-gradient(135deg, var(--accent-gold) 0%, #d4af37 100%);
-          color: #0f172a;
-          font-weight: 700;
-          box-shadow: 0 2px 8px rgba(179, 142, 71, 0.4);
+          gap: 6px;
         }
 
-        /* Bottom Overlay (Click Guide at Left, Gesture Hint at Right) */
+        .snapshot-label-mob {
+          display: none;
+        }
+        .snapshot-label {
+          display: inline;
+        }
+
+        .overlay-action-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(179, 142, 71, 0.45);
+        }
+
+        /* Bottom Overlay */
         .canvas-overlay-bottom {
           position: absolute;
           bottom: 14px;
@@ -2553,7 +2632,7 @@ export default function StudioCanvas({
           align-items: flex-end;
           pointer-events: none;
           gap: 12px;
-          z-index: 25;
+          z-index: 20;
         }
         .overlay-bottom-left,
         .overlay-bottom-right {
@@ -2598,77 +2677,34 @@ export default function StudioCanvas({
           display: inline;
         }
 
-        @media (max-width: 768px) {
-          /* Top Overlay Mobile */
-          .canvas-overlay-top {
-            top: var(--canvas-top-offset, 6px);
-            left: 6px;
-            right: 6px;
-            gap: 4px;
-            align-items: center;
+        @media (max-width: 900px) {
+          .canvas-header-bar {
+            display: flex;
             justify-content: space-between;
-            pointer-events: none;
-            z-index: 25;
+            height: auto;
+            min-height: 46px;
+            padding: 6px 10px;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
           }
-          /* Hide repetitive debug badges on mobile completely so 3D room is pristine */
+          .canvas-header-bar::-webkit-scrollbar {
+            display: none;
+          }
+          .header-bar-left, .header-bar-center, .header-bar-right {
+            flex-shrink: 0;
+          }
+        }
+
+        @media (max-width: 640px) {
           .desktop-badges-group {
             display: none !important;
-          }
-          .overlay-top-left-badges {
-            display: flex !important;
-            align-items: center;
-            gap: 4px;
-            pointer-events: auto;
-            flex-shrink: 0;
-            max-width: 38%;
-          }
-          .overlay-camera-presets {
-            order: 0;
-            width: auto;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            padding: 2px 3px;
-            border-radius: 7px;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(8px);
-            pointer-events: auto;
-            flex-shrink: 0;
-          }
-          .preset-btn {
-            font-size: 0.68rem;
-            padding: 3px 5px;
-            height: 28px;
-            min-height: 28px;
-            gap: 2px;
-            border-radius: 5px;
           }
           .preset-btn .btn-label {
             display: none !important;
           }
-          .overlay-top-right-actions {
-            pointer-events: auto;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-shrink: 0;
-          }
-          .overlay-action-btn {
-            padding: 0 7px;
-            height: 28px;
-            font-size: 0.62rem;
-            font-weight: 800;
-            border-radius: 6px;
-            white-space: nowrap;
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: #0f172a;
-            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
-            cursor: pointer;
-            pointer-events: auto;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
+          .preset-btn {
+            padding: 0 8px;
           }
           .snapshot-label {
             display: none !important;
@@ -2676,18 +2712,8 @@ export default function StudioCanvas({
           .snapshot-label-mob {
             display: inline !important;
           }
-
-          /* Bottom Overlay Mobile: Hide text prompts so they don't collide with surfaces bar */
           .canvas-overlay-bottom {
             display: none !important;
-          }
-          .instruction-desktop,
-          .gesture-hint-desktop {
-            display: none !important;
-          }
-          .instruction-mobile,
-          .gesture-hint-mobile {
-            display: inline !important;
           }
         }
       `}</style>

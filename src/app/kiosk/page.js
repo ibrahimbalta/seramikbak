@@ -3467,15 +3467,15 @@ export default function ShowroomKioskPage() {
           align-items: center;
           gap: 6px;
           background: rgba(15, 23, 42, 0.90);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          border: 1px solid rgba(245, 158, 11, 0.35);
-          padding: 4px 10px;
-          border-radius: 8px;
-          font-size: 0.72rem;
+          border: 1px solid rgba(245, 158, 11, 0.45);
+          height: 28px;
+          padding: 0 9px;
+          border-radius: 7px;
+          font-size: 0.70rem;
           color: #f8fafc;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
           white-space: nowrap;
+          flex-shrink: 0;
         }
 
         .pill-target-name {
@@ -3509,17 +3509,17 @@ export default function ShowroomKioskPage() {
           align-items: center;
           gap: 5px;
           background: rgba(15, 23, 42, 0.90);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
           border: 1px solid rgba(56, 189, 248, 0.4);
           color: #38bdf8;
-          padding: 5px 11px;
+          height: 32px;
+          padding: 0 12px;
           border-radius: 8px;
           font-size: 0.72rem;
           font-weight: 800;
           cursor: pointer;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
           transition: all 0.2s ease;
+          white-space: nowrap;
         }
 
         .canvas-focus-toggle-btn:hover {
@@ -3536,8 +3536,6 @@ export default function ShowroomKioskPage() {
 
         .canvas-expand-touch-btn {
           background: rgba(15, 23, 42, 0.90);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
           border: 1px solid rgba(255, 255, 255, 0.15);
           color: #94a3b8;
           width: 32px;
