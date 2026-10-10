@@ -511,24 +511,76 @@ export default function HowItWorksModal({
               </div>
             </div>
 
-            {/* Bottom Primary Actions Bar */}
-            <div className="hiw-modal-action-footer">
-              <Link
-                href="/tasarim"
-                onClick={onClose}
-                className="hiw-primary-btn"
-              >
-                <Camera size={18} />
-                <span>Hemen Mekânında Gör & Dene</span>
-              </Link>
-              <button
-                type="button"
-                onClick={onClose}
-                className="hiw-secondary-btn"
-              >
-                <span>Koleksiyonları İncele</span>
-                <ArrowRight size={16} />
-              </button>
+            {/* Bottom Executive CTA Banner for Customers */}
+            <div className="hiw-executive-cta-card customer-theme">
+              <div className="hiw-cta-card-left">
+                <div className="hiw-cta-icon-badge gold">
+                  <Sparkles size={22} />
+                </div>
+                <div className="hiw-cta-text-group">
+                  <div className="hiw-cta-status-tag gold">YAPAY ZEKÂ İLE ANINDA DENEYİN</div>
+                  <h4 className="hiw-cta-title">Hayalinizdeki Banyo & Zemin Seramiğini Mekânınızda Görün</h4>
+                  <p className="hiw-cta-desc">
+                    Fotoğrafınızı yükleyin veya hazır örnek odayı seçin; seramikleri canlı perspektifle döşeyip en yakın yetkili bayiden doğrudan fiyat teklifi alın.
+                  </p>
+                </div>
+              </div>
+
+              <div className="hiw-cta-card-right">
+                <Link
+                  href="/tasarim"
+                  onClick={onClose}
+                  className="hiw-btn-action-primary gold"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    height: '48px',
+                    padding: '0 22px',
+                    borderRadius: '13px',
+                    background: 'linear-gradient(135deg, #b4823c 0%, #92641f 100%)',
+                    color: '#ffffff',
+                    fontWeight: 800,
+                    fontSize: '0.90rem',
+                    textDecoration: 'none',
+                    boxShadow: '0 4px 18px rgba(180, 130, 60, 0.38)',
+                    cursor: 'pointer',
+                    border: 'none',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <Camera size={18} />
+                  <span>Mekânımda Gör & Dene</span>
+                  <ArrowRight size={16} />
+                </Link>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="hiw-btn-action-secondary"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    height: '48px',
+                    padding: '0 20px',
+                    borderRadius: '13px',
+                    background: '#ffffff',
+                    border: '1.5px solid #cbd5e1',
+                    color: '#1e293b',
+                    fontWeight: 700,
+                    fontSize: '0.86rem',
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <Compass size={17} />
+                  <span>Koleksiyonları Keşfet</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -786,24 +838,76 @@ export default function HowItWorksModal({
               </div>
             </div>
 
-            {/* Bottom Actions for Dealers */}
-            <div className="hiw-modal-action-footer">
-              <Link
-                href="/bayi"
-                onClick={onClose}
-                className="hiw-primary-btn amber"
-              >
-                <Building2 size={18} />
-                <span>Hemen Bayi Başvurusu Yap / Giriş Yap</span>
-              </Link>
-              <Link
-                href="/kiosk"
-                onClick={onClose}
-                className="hiw-secondary-btn"
-              >
-                <span>Showroom Kiosk Deneyimini Gör</span>
-                <ArrowRight size={16} />
-              </Link>
+            {/* Bottom Executive CTA Banner for Dealers */}
+            <div className="hiw-executive-cta-card dealer-theme">
+              <div className="hiw-cta-card-left">
+                <div className="hiw-cta-icon-badge amber">
+                  <Building2 size={22} />
+                </div>
+                <div className="hiw-cta-text-group">
+                  <div className="hiw-cta-status-tag amber">YETKİLİ BAYİ & SHOWROOM SAAS AĞI</div>
+                  <h4 className="hiw-cta-title">Bölgenizdeki Seramik Alıcılarını Mağazanıza Çekin</h4>
+                  <p className="hiw-cta-desc">
+                    Şehrinizde seramik arayan müşterilerin doğrudan mağazanızı bulmasını sağlayın; 3D tablet kiosk ile showroom satış kapatma oranınızı artırın.
+                  </p>
+                </div>
+              </div>
+
+              <div className="hiw-cta-card-right">
+                <Link
+                  href="/bayi"
+                  onClick={onClose}
+                  className="hiw-btn-action-primary amber"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    height: '48px',
+                    padding: '0 22px',
+                    borderRadius: '13px',
+                    background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
+                    color: '#ffffff',
+                    fontWeight: 800,
+                    fontSize: '0.90rem',
+                    textDecoration: 'none',
+                    boxShadow: '0 4px 18px rgba(217, 119, 6, 0.38)',
+                    cursor: 'pointer',
+                    border: 'none',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <Store size={18} />
+                  <span>Bayi Başvurusu / Giriş</span>
+                  <ArrowRight size={16} />
+                </Link>
+                <Link
+                  href="/kiosk"
+                  onClick={onClose}
+                  className="hiw-btn-action-secondary"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    height: '48px',
+                    padding: '0 20px',
+                    borderRadius: '13px',
+                    background: '#ffffff',
+                    border: '1.5px solid #cbd5e1',
+                    color: '#1e293b',
+                    fontWeight: 700,
+                    fontSize: '0.86rem',
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <Smartphone size={17} />
+                  <span>Showroom Kiosk Lisansı</span>
+                </Link>
+              </div>
             </div>
           </div>
         )}
@@ -1045,31 +1149,83 @@ export default function HowItWorksModal({
               </div>
             </div>
 
-            {/* Bottom Actions for Brands */}
-            <div className="hiw-modal-action-footer">
-              <Link
-                href="/marka"
-                onClick={onClose}
-                className="hiw-primary-btn blue"
-              >
-                <Globe size={18} />
-                <span>Marka & Üretici Portalına Gir</span>
-              </Link>
-              <Link
-                href="/global-tanitim"
-                onClick={onClose}
-                className="hiw-secondary-btn"
-              >
-                <span>Global İhracat Ağını Keşfet</span>
-                <ArrowRight size={16} />
-              </Link>
+            {/* Bottom Executive CTA Banner for Brands */}
+            <div className="hiw-executive-cta-card brand-theme">
+              <div className="hiw-cta-card-left">
+                <div className="hiw-cta-icon-badge blue">
+                  <Globe size={22} />
+                </div>
+                <div className="hiw-cta-text-group">
+                  <div className="hiw-cta-status-tag blue">ÜRETİCİ & MARKA KURUMSAL ENTEGRASYONU</div>
+                  <h4 className="hiw-cta-title">Tüm Koleksiyonlarınızı 3D Dijital İkizlerle Küresel Pazara Açın</h4>
+                  <p className="hiw-cta-desc">
+                    Ürün portföyünüzü Web-3D ve AR altyapısıyla Türkiye geneli bayi ağınıza sunun, 16+ dilde uluslararası distribütör ve ihracat alıcılarına doğrudan ulaştırın.
+                  </p>
+                </div>
+              </div>
+
+              <div className="hiw-cta-card-right">
+                <Link
+                  href="/marka"
+                  onClick={onClose}
+                  className="hiw-btn-action-primary blue"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    height: '48px',
+                    padding: '0 22px',
+                    borderRadius: '13px',
+                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                    color: '#ffffff',
+                    fontWeight: 800,
+                    fontSize: '0.90rem',
+                    textDecoration: 'none',
+                    boxShadow: '0 4px 18px rgba(2, 132, 199, 0.38)',
+                    cursor: 'pointer',
+                    border: 'none',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <Building2 size={18} />
+                  <span>Marka & Üretici Portalına Katıl</span>
+                  <ArrowRight size={16} />
+                </Link>
+                <Link
+                  href="/global-tanitim"
+                  onClick={onClose}
+                  className="hiw-btn-action-secondary"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    height: '48px',
+                    padding: '0 20px',
+                    borderRadius: '13px',
+                    background: '#ffffff',
+                    border: '1.5px solid #cbd5e1',
+                    color: '#1e293b',
+                    fontWeight: 700,
+                    fontSize: '0.86rem',
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <Globe size={17} />
+                  <span>Global İhracat Hub Detayları</span>
+                </Link>
+              </div>
             </div>
           </div>
         )}
       </div>
 
       {/* Styled JSX (Clean Modern Light Luxury Theme Matching Image 2) */}
-      <style jsx>{`
+      <style jsx global>{`
         .hiw-overlay {
           background: rgba(15, 23, 42, 0.65);
           backdrop-filter: blur(14px);
@@ -2219,66 +2375,203 @@ export default function HowItWorksModal({
           line-height: 1.3;
         }
 
-        /* Action Footer */
-        .hiw-modal-action-footer {
+        /* ==============================================================
+           EXECUTIVE BOTTOM CTA ACTION CARDS (PROFESSIONAL FOOTER BANNERS)
+           ============================================================== */
+        .hiw-executive-cta-card {
+          margin-top: 24px;
+          padding: 22px 26px;
+          border-radius: 20px;
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding-top: 4px;
+          justify-content: space-between;
+          gap: 24px;
+          box-sizing: border-box;
+          position: relative;
+          overflow: hidden;
         }
 
-        .hiw-primary-btn {
+        .hiw-executive-cta-card.customer-theme {
+          background: linear-gradient(135deg, #ffffff 0%, #fdfbf7 50%, #fef8ee 100%);
+          border: 1.5px solid rgba(212, 175, 55, 0.38);
+          box-shadow: 0 12px 32px -6px rgba(180, 130, 60, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .hiw-executive-cta-card.dealer-theme {
+          background: linear-gradient(135deg, #ffffff 0%, #fffbeb 50%, #fef3c7 100%);
+          border: 1.5px solid rgba(217, 119, 6, 0.38);
+          box-shadow: 0 12px 32px -6px rgba(217, 119, 6, 0.16), 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .hiw-executive-cta-card.brand-theme {
+          background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%);
+          border: 1.5px solid rgba(2, 132, 199, 0.38);
+          box-shadow: 0 12px 32px -6px rgba(2, 132, 199, 0.16), 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .hiw-cta-card-left {
+          display: flex;
+          align-items: center;
+          gap: 16px;
           flex: 1;
-          height: 48px;
+          min-width: 0;
+        }
+
+        .hiw-cta-icon-badge {
+          width: 50px;
+          height: 50px;
           border-radius: 14px;
-          background: linear-gradient(135deg, #b4823c 0%, #92641f 100%);
-          color: #ffffff;
-          font-size: 0.92rem;
-          font-weight: 850;
-          text-decoration: none;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
-          box-shadow: 0 4px 18px rgba(180, 130, 60, 0.3);
-          transition: all 0.2s ease;
+          flex-shrink: 0;
         }
 
-        .hiw-primary-btn.amber {
-          background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-          box-shadow: 0 4px 18px rgba(217, 119, 6, 0.3);
+        .hiw-cta-icon-badge.gold {
+          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+          color: #b45309;
+          border: 1px solid rgba(212, 175, 55, 0.4);
+          box-shadow: 0 4px 12px rgba(180, 130, 60, 0.18);
         }
 
-        .hiw-primary-btn.blue {
-          background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-          box-shadow: 0 4px 18px rgba(2, 132, 199, 0.3);
+        .hiw-cta-icon-badge.amber {
+          background: linear-gradient(135deg, #fef3c7 0%, #fde047 100%);
+          color: #92400e;
+          border: 1px solid rgba(217, 119, 6, 0.4);
+          box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
         }
 
-        .hiw-primary-btn:hover {
-          transform: translateY(-1px);
+        .hiw-cta-icon-badge.blue {
+          background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+          color: #0369a1;
+          border: 1px solid rgba(2, 132, 199, 0.4);
+          box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
         }
 
-        .hiw-secondary-btn {
+        .hiw-cta-text-group {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          min-width: 0;
+        }
+
+        .hiw-cta-status-tag {
+          display: inline-flex;
+          align-items: center;
+          width: fit-content;
+          font-size: 0.68rem;
+          font-weight: 800;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          padding: 2px 8px;
+          border-radius: 6px;
+        }
+
+        .hiw-cta-status-tag.gold {
+          background: #fef3c7;
+          color: #92400e;
+          border: 1px solid #fde68a;
+        }
+
+        .hiw-cta-status-tag.amber {
+          background: #fef3c7;
+          color: #78350f;
+          border: 1px solid #fde047;
+        }
+
+        .hiw-cta-status-tag.blue {
+          background: #e0f2fe;
+          color: #075985;
+          border: 1px solid #bae6fd;
+        }
+
+        .hiw-cta-title {
+          font-size: 1.04rem;
+          font-weight: 850;
+          color: #0f172a;
+          margin: 0;
+          line-height: 1.35;
+        }
+
+        .hiw-cta-desc {
+          font-size: 0.84rem;
+          color: #475569;
+          margin: 0;
+          line-height: 1.45;
+        }
+
+        .hiw-cta-card-right {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-shrink: 0;
+        }
+
+        .hiw-btn-action-primary {
           height: 48px;
-          padding: 0 24px;
-          border-radius: 14px;
-          background: #f8fafc;
-          border: 1px solid #cbd5e1;
-          color: #334155;
+          padding: 0 22px;
+          border-radius: 13px;
+          color: #ffffff !important;
+          font-size: 0.90rem;
+          font-weight: 850;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          cursor: pointer;
+          transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+          border: none;
+          white-space: nowrap;
+        }
+
+        .hiw-btn-action-primary.gold {
+          background: linear-gradient(135deg, #b4823c 0%, #92641f 100%);
+          box-shadow: 0 4px 18px rgba(180, 130, 60, 0.38);
+        }
+
+        .hiw-btn-action-primary.amber {
+          background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+          box-shadow: 0 4px 18px rgba(217, 119, 6, 0.38);
+        }
+
+        .hiw-btn-action-primary.blue {
+          background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+          box-shadow: 0 4px 18px rgba(2, 132, 199, 0.38);
+        }
+
+        .hiw-btn-action-primary:hover {
+          transform: translateY(-2px);
+          filter: brightness(1.06);
+          box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+        }
+
+        .hiw-btn-action-secondary {
+          height: 48px;
+          padding: 0 20px;
+          border-radius: 13px;
+          background: #ffffff;
+          border: 1.5px solid #cbd5e1;
+          color: #1e293b !important;
           font-size: 0.86rem;
           font-weight: 750;
           text-decoration: none;
           cursor: pointer;
-          display: flex;
+          display: inline-flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
-          transition: all 0.2s ease;
+          transition: all 0.22s ease;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+          white-space: nowrap;
         }
 
-        .hiw-secondary-btn:hover {
-          background: #f1f5f9;
-          color: #0f172a;
+        .hiw-btn-action-secondary:hover {
+          background: #f8fafc;
+          border-color: #94a3b8;
+          color: #0f172a !important;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         /* Responsive Breakpoints */
@@ -2291,6 +2584,24 @@ export default function HowItWorksModal({
           }
           .hiw-trust-bar {
             grid-template-columns: repeat(2, 1fr);
+          }
+          .hiw-executive-cta-card {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 18px 18px;
+            gap: 16px;
+          }
+          .hiw-cta-card-left {
+            gap: 12px;
+          }
+          .hiw-cta-card-right {
+            flex-direction: column;
+            width: 100%;
+            gap: 10px;
+          }
+          .hiw-btn-action-primary, .hiw-btn-action-secondary {
+            width: 100%;
+            justify-content: center;
           }
         }
 
@@ -2328,12 +2639,6 @@ export default function HowItWorksModal({
           }
           .hiw-trust-bar {
             grid-template-columns: 1fr;
-          }
-          .hiw-modal-action-footer {
-            flex-direction: column;
-          }
-          .hiw-primary-btn, .hiw-secondary-btn {
-            width: 100%;
           }
         }
       `}</style>
