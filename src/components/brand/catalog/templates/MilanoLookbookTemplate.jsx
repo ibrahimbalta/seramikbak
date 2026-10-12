@@ -318,10 +318,10 @@ export default function MilanoLookbookTemplate({
       return (
         <section
           key={p.id || index}
-          className="catalog-page relative bg-[#fdfbf7] text-neutral-900 p-8 sm:p-12 md:p-14 flex flex-col justify-between overflow-hidden"
+          className="catalog-page relative bg-[#fdfbf7] text-neutral-900 p-5 sm:p-10 md:p-14 flex flex-col justify-between overflow-hidden"
         >
           {/* Top Running Header */}
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-300/80 mb-6">
+          <div className="flex items-center justify-between pb-3 border-b border-neutral-300/80 mb-4 sm:mb-6">
             <span className="text-[10px] font-mono font-bold tracking-[0.25em] text-neutral-500 uppercase">
               | {p.style ? `${p.style.toUpperCase()} KOLEKSİYONU` : 'MERMER KOLEKSİYONU'}
             </span>
@@ -331,11 +331,11 @@ export default function MilanoLookbookTemplate({
           </div>
 
           {/* Main 2-Column Product Layout */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center my-auto">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 items-center my-auto">
             {/* Left Column: Product Typography, Narrative & 6 Specs */}
             <div className="md:col-span-6 flex flex-col justify-between h-full py-2">
               <div>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-light text-neutral-950 tracking-tight mb-3">
+                <h2 className="text-2xl sm:text-4xl md:text-5xl font-serif font-light text-neutral-950 tracking-tight mb-3">
                   {p.name}
                 </h2>
 
@@ -455,7 +455,7 @@ export default function MilanoLookbookTemplate({
             {/* Right Column: Full-Height Slab Showcase + 3 Face Variations */}
             <div className="md:col-span-6 flex flex-col items-center">
               {/* Grand Vertical Slab Showcase */}
-              <div className="relative w-full max-w-[340px] aspect-[9/16] rounded-xl overflow-hidden shadow-2xl border border-neutral-200 bg-white group">
+              <div className="relative w-full max-w-[260px] sm:max-w-[340px] aspect-[9/16] rounded-xl overflow-hidden shadow-2xl border border-neutral-200 bg-white group">
                 <img
                   src={pImage}
                   alt={p.name}

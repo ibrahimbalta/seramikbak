@@ -138,11 +138,32 @@ export default function CatalogTemplateRenderer({
           border-radius: 12px;
           overflow: hidden;
           position: relative;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
           background: #faf8f5;
           transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        /* Mobile Responsiveness for Phone Viewports */
+        @media (max-width: 640px) {
+          .mode-interactive {
+            border-radius: 12px;
+            background: #090e17;
+          }
+          .catalog-page {
+            max-width: 100% !important;
+            aspect-ratio: auto !important;
+            min-height: 480px !important;
+            padding: 1.25rem 1rem !important;
+            border-radius: 8px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+          }
+          .catalog-page h1 {
+            font-size: 1.75rem !important;
+            line-height: 1.2 !important;
+          }
+          .catalog-page h2 {
+            font-size: 1.5rem !important;
+            line-height: 1.25 !important;
+          }
         }
 
         /* High-DPI Print Output Rules */
@@ -277,7 +298,7 @@ export default function CatalogTemplateRenderer({
       )}
 
       {/* -------------------- MAIN DISPLAY AREA -------------------- */}
-      <div className="p-4 sm:p-8 flex items-center justify-center min-h-[500px]">
+      <div className="p-2 sm:p-8 flex items-center justify-center min-h-[400px]">
         <div
           className="w-full flex flex-col items-center justify-center transition-transform duration-200"
           style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top center' }}
