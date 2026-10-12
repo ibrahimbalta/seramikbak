@@ -15,6 +15,7 @@ import MilanoLookbookTemplate from './MilanoLookbookTemplate';
 import ArchitecturalSpecSheetTemplate from './ArchitecturalSpecSheetTemplate';
 import ShowroomCollectionTemplate from './ShowroomCollectionTemplate';
 import GlobalExportTemplate from './GlobalExportTemplate';
+import LidyaTechnicTemplate from './LidyaTechnicTemplate';
 
 export default function CatalogTemplateRenderer({
   catalog,
@@ -42,6 +43,12 @@ export default function CatalogTemplateRenderer({
     if (catalog.showSpecs !== false) extraPages += 1; // Technical standards page
     extraPages += 1; // Application areas page
     if (catalog.showQrCodes !== false) extraPages += 1; // Digital 3D studio page
+  } else if (template === 'lidya') {
+    extraPages += 1; // System & 4 domains page
+    extraPages += 1; // Colour engineering page
+    if (catalog.showSpecs !== false) extraPages += 1; // Technical standards page
+    if (catalog.showQrCodes !== false) extraPages += 1; // Digital BIM & 3D
+    productPagesCount = products.length > 0 ? products.length : 2;
   } else if (template === 'showroom') {
     productPagesCount = Math.max(1, Math.ceil(productPagesCount / 2));
   }
@@ -94,6 +101,8 @@ export default function CatalogTemplateRenderer({
         return <ShowroomCollectionTemplate {...props} />;
       case 'global-export':
         return <GlobalExportTemplate {...props} />;
+      case 'lidya':
+        return <LidyaTechnicTemplate {...props} />;
       case 'milano':
       default:
         return <MilanoLookbookTemplate {...props} />;

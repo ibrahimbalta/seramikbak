@@ -59,6 +59,16 @@ const TEMPLATES = [
     mockupImg: '/renders/modern_living_natural_oak.jpg'
   },
   {
+    id: 'lidya',
+    name: 'Lidya Pro Technic',
+    badge: 'Mimari Modüler & Şartname',
+    desc: 'Mimari şartname ve teknik matris standardında modüler seramik kataloğu: Renk mühendisliği (Colour engineering), RAL renk paletleri, tel kafes modüler formlar, R9-R12 kaymazlık matrisleri ve çift dilli (TR/EN) teknik föy düzeni.',
+    accent: '#059669',
+    icon: Palette,
+    tag: 'Mimari Projeler & Şartname',
+    mockupImg: '/renders/luxury_bathroom_albatros_antrasit.jpg'
+  },
+  {
     id: 'spec-sheet',
     name: 'Mimari Teknik Föy & Şartname',
     badge: 'TS EN 14411 & BIM',
