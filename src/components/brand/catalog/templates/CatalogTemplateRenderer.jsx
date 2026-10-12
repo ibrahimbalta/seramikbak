@@ -114,10 +114,10 @@ export default function CatalogTemplateRenderer({
 
         /* Interactive Reader Backdrop */
         .mode-interactive {
-          background: #090d16;
-          border-radius: 16px;
+          background: radial-gradient(circle at 50% 15%, #151d2f 0%, #090e17 60%, #04070c 100%);
+          border-radius: 20px;
           overflow: hidden;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+          box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.1);
         }
 
         /* Fixed Page Aspect Ratio & Presentation Scaler */
@@ -126,14 +126,14 @@ export default function CatalogTemplateRenderer({
           max-width: ${isLandscape ? '1100px' : '820px'};
           aspect-ratio: ${isLandscape ? '297 / 210' : '210 / 297'};
           margin: 0 auto;
-          box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
-          border-radius: 8px;
+          box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.65), 0 0 50px rgba(180, 130, 60, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.12);
+          border-radius: 12px;
           overflow: hidden;
           position: relative;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          background: #ffffff;
+          background: #faf8f5;
           transition: transform 0.2s ease, opacity 0.2s ease;
         }
 

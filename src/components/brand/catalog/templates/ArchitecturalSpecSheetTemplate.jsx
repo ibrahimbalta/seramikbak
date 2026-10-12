@@ -1,7 +1,19 @@
 'use client';
 
-import React from 'react';
-import { Layers, QrCode, ExternalLink, ShieldCheck, Ruler, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  Layers,
+  QrCode,
+  ExternalLink,
+  ShieldCheck,
+  Ruler,
+  CheckCircle2,
+  Compass,
+  FileText,
+  Download,
+  Box,
+  Cpu
+} from 'lucide-react';
 
 export default function ArchitecturalSpecSheetTemplate({
   catalog,
@@ -12,6 +24,11 @@ export default function ArchitecturalSpecSheetTemplate({
 }) {
   const brand = catalog.brand || {};
   const logo = catalog.customLogoUrl || brand.logoUrl;
+  const [imgErrors, setImgErrors] = useState({});
+
+  const handleImgError = (id) => {
+    setImgErrors((prev) => ({ ...prev, [id]: true }));
+  };
 
   const pages = [];
   if (catalog.showCover) pages.push({ type: 'cover' });
@@ -22,102 +39,166 @@ export default function ArchitecturalSpecSheetTemplate({
   const renderSinglePage = (pageObj, pageIndex) => {
     if (!pageObj) return null;
 
+    // -------------------------------------------------------------------------
+    // COVER — EXECUTIVE BIM & CAD BLUEPRINT SPECIFICATION COVER
+    // -------------------------------------------------------------------------
     if (pageObj.type === 'cover') {
       return (
         <section
           key="cover"
-          className="catalog-page p-8 sm:p-12 text-slate-100 flex flex-col justify-between"
-          style={{ backgroundColor: '#0f172a' }}
+          className="catalog-page relative p-8 sm:p-12 text-slate-100 flex flex-col justify-between overflow-hidden"
+          style={{
+            background:
+              'radial-gradient(circle at 80% 20%, rgba(37, 99, 235, 0.15) 0%, transparent 50%), linear-gradient(135deg, #090e17 0%, #0f172a 60%, #1e293b 100%)',
+            backgroundColor: '#090e17'
+          }}
         >
-          <div className="border border-slate-700/80 p-6 sm:p-10 h-full flex flex-col justify-between relative bg-slate-900/90 rounded-lg">
-            <div className="absolute top-3 left-3 text-[10px] font-mono text-slate-500">+ 0,0 REF</div>
-            <div className="absolute top-3 right-3 text-[10px] font-mono text-slate-500">TS EN 14411 +</div>
+          {/* Drafting CAD Grid Overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-20"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(56, 189, 248, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.2) 1px, transparent 1px)',
+              backgroundSize: '32px 32px'
+            }}
+          />
 
-            <div className="border-b border-slate-700 pb-5 flex items-center justify-between">
+          <div className="relative z-10 border-2 border-slate-700/80 p-6 sm:p-10 h-full flex flex-col justify-between rounded-xl bg-slate-900/85 backdrop-blur-md">
+            <div className="absolute top-3 left-4 text-[10px] font-mono text-cyan-400/80 flex items-center gap-1.5">
+              <Compass size={12} />
+              <span>BIM/REVIT & CAD SPECIFICATION DOSSIER &bull; ISO 128</span>
+            </div>
+            <div className="absolute top-3 right-4 text-[10px] font-mono text-slate-400">
+              REV: 2026.01-FINAL
+            </div>
+
+            {/* Antet / Title Block Header */}
+            <div className="border-b border-slate-700 pb-5 pt-3 flex items-center justify-between">
               <div>
-                <span className="text-2xl font-mono font-bold tracking-wider uppercase text-white">
+                <span className="text-2xl sm:text-3xl font-mono font-bold tracking-wider uppercase text-white">
                   {brand.name || 'SERAMİK'}
                 </span>
-                <p className="text-xs text-blue-400 font-mono mt-0.5">
-                  MİMARİ TEKNİK FÖY & ŞARTNAME DOSYASI
+                <p className="text-xs text-cyan-400 font-mono mt-0.5 tracking-wide">
+                  MİMARİ TEKNİK ŞARTNAME & POZ DOSYASI
                 </p>
               </div>
-              <div className="text-right text-xs font-mono text-slate-400">
-                <span className="px-2.5 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded text-[11px] font-bold">
-                  BIM & CAD SPEC
+              <div className="text-right font-mono">
+                <span className="px-3 py-1 bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 rounded text-xs font-bold inline-block shadow-sm">
+                  TS EN 14411 EK-G BIA
                 </span>
               </div>
             </div>
 
-            <div className="my-auto py-8 max-w-2xl">
-              <span className="text-[11px] font-mono font-bold px-3 py-1 bg-blue-600/20 text-blue-300 rounded border border-blue-500/30 uppercase tracking-wider inline-block mb-4">
-                STANDART: TS EN 14411 (ISO 13006) GRUP BIA
+            {/* Center Architectural Spec Title */}
+            <div className="my-auto py-8 max-w-2xl font-mono">
+              <span className="text-[11px] font-bold px-3 py-1 bg-blue-600/20 text-blue-300 rounded border border-blue-500/30 uppercase tracking-wider inline-block mb-4">
+                STANDART: TS EN 14411 (ISO 13006) PORSELEN KARO
               </span>
-              <h1 className="text-3xl sm:text-5xl font-mono font-bold text-white tracking-tight leading-tight mb-4">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white tracking-tight leading-tight mb-4 font-sans">
                 {catalog.coverTitle || catalog.title}
               </h1>
               {catalog.coverSubtitle && (
-                <p className="text-base text-slate-300 font-sans leading-relaxed mb-4">
+                <p className="text-base sm:text-lg text-slate-300 font-sans leading-relaxed mb-4">
                   {catalog.coverSubtitle}
                 </p>
               )}
               {catalog.introText && (
-                <div className="p-4 bg-slate-800/80 border border-slate-700 rounded-lg text-xs font-mono text-slate-300 leading-relaxed">
+                <div className="p-4 bg-slate-800/90 border border-slate-700 rounded-lg text-xs font-mono text-slate-300 leading-relaxed">
                   {catalog.introText}
                 </div>
               )}
             </div>
 
+            {/* Antet Technical Metadata Table */}
             <div className="border-t border-slate-700 pt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono text-slate-400">
-              <div><p className="text-[10px] text-slate-500">ÜRETİCİ</p><p className="text-white font-bold">{brand.name}</p></div>
-              <div><p className="text-[10px] text-slate-500">FORMAT</p><p className="text-white font-bold">A4 Şartname</p></div>
-              <div><p className="text-[10px] text-slate-500">ÜRÜN ADEDİ</p><p className="text-white font-bold">{products.length} Poz</p></div>
-              <div><p className="text-[10px] text-slate-500">TARİH</p><p className="text-white font-bold">{new Date().getFullYear()}</p></div>
+              <div className="p-2 rounded bg-slate-800/50 border border-slate-700/50">
+                <p className="text-[9px] text-slate-500 uppercase">ÜRETİCİ / MARKA</p>
+                <p className="text-white font-bold truncate">{brand.name}</p>
+              </div>
+              <div className="p-2 rounded bg-slate-800/50 border border-slate-700/50">
+                <p className="text-[9px] text-slate-500 uppercase">PROJE FORMATI</p>
+                <p className="text-white font-bold">A4 Şartname Föyü</p>
+              </div>
+              <div className="p-2 rounded bg-slate-800/50 border border-slate-700/50">
+                <p className="text-[9px] text-slate-500 uppercase">POZ SAYISI</p>
+                <p className="text-white font-bold">{products.length} Kalem</p>
+              </div>
+              <div className="p-2 rounded bg-slate-800/50 border border-slate-700/50">
+                <p className="text-[9px] text-slate-500 uppercase">DÜZENLEME TARİHİ</p>
+                <p className="text-cyan-300 font-bold">{new Date().getFullYear()}</p>
+              </div>
             </div>
           </div>
         </section>
       );
     }
 
+    // -------------------------------------------------------------------------
+    // TOC — TECHNICAL POZ SPECIFICATION MATRIX
+    // -------------------------------------------------------------------------
     if (pageObj.type === 'toc') {
       return (
-        <section key="toc" className="catalog-page p-8 sm:p-10 bg-white text-slate-900 flex flex-col justify-between">
+        <section
+          key="toc"
+          className="catalog-page relative p-8 sm:p-10 bg-slate-50 text-slate-900 flex flex-col justify-between font-mono"
+          style={{
+            backgroundImage:
+              'radial-gradient(#94a3b8 0.75px, transparent 0.75px)',
+            backgroundSize: '16px 16px'
+          }}
+        >
           <div>
-            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3 mb-6">
+            <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3 mb-6 bg-white/80 p-3 rounded-lg border border-slate-200">
               <div>
-                <h2 className="text-xl font-bold font-mono tracking-tight text-slate-900">
-                  TEKNİK ÖZELLİKLER & POZ LİSTESİ
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+                  TEKNİK ŞARTNAME & POZ MATRİSİ
                 </h2>
-                <p className="text-xs text-slate-500 font-sans">{brand.name} Mimari Şartname Matrisi</p>
+                <p className="text-xs text-slate-600 font-sans">
+                  {brand.name} Proje & Mimari İhale Teknik Listesi
+                </p>
               </div>
-              <span className="text-xs font-mono bg-slate-100 text-slate-800 px-3 py-1 rounded border border-slate-200">
+              <span className="text-xs font-mono bg-blue-100 text-blue-900 px-3 py-1 rounded border border-blue-200 font-bold">
                 TS EN 14411 Ek-G
               </span>
             </div>
 
-            <div className="overflow-x-auto border border-slate-300 rounded-lg">
-              <table className="w-full text-xs text-left border-collapse font-mono">
+            <div className="overflow-x-auto border-2 border-slate-300 rounded-xl bg-white shadow-sm">
+              <table className="w-full text-xs text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-100 text-slate-700 text-[11px] uppercase border-b border-slate-300">
-                    <th className="p-2 border-r border-slate-300">#</th>
-                    <th className="p-2 border-r border-slate-300">Poz Kodu</th>
-                    <th className="p-2 border-r border-slate-300">Ürün Adı</th>
-                    <th className="p-2 border-r border-slate-300">Ebat (cm)</th>
-                    <th className="p-2 border-r border-slate-300">Yüzey</th>
-                    <th className="p-2 border-r border-slate-300">Kaymazlık</th>
-                    <th className="p-2">Aşınma</th>
+                  <tr className="bg-slate-100 text-slate-800 text-[11px] uppercase border-b-2 border-slate-300">
+                    <th className="p-2.5 border-r border-slate-300">#</th>
+                    <th className="p-2.5 border-r border-slate-300">Poz Kodu</th>
+                    <th className="p-2.5 border-r border-slate-300">Ürün Adı</th>
+                    <th className="p-2.5 border-r border-slate-300">Ebat (cm)</th>
+                    <th className="p-2.5 border-r border-slate-300">Yüzey</th>
+                    <th className="p-2.5 border-r border-slate-300">Kaymazlık</th>
+                    <th className="p-2.5">Aşınma</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {products.map((p, idx) => (
-                    <tr key={p.id || idx} className="hover:bg-slate-50">
-                      <td className="p-2 border-r border-slate-200 font-bold">{(idx + 1).toString().padStart(2, '0')}</td>
-                      <td className="p-2 border-r border-slate-200 text-blue-700 font-bold">{p.code || `SB-${idx + 101}`}</td>
-                      <td className="p-2 border-r border-slate-200 font-sans font-medium">{p.name}</td>
-                      <td className="p-2 border-r border-slate-200">{p.width}x{p.height}</td>
-                      <td className="p-2 border-r border-slate-200 font-sans">{p.finish || 'Mat'}</td>
-                      <td className="p-2 border-r border-slate-200">{p.slipResistance || 'R10'}</td>
-                      <td className="p-2 font-bold">{p.peiRating ? `PEI ${p.peiRating}` : 'PEI 4'}</td>
+                    <tr key={p.id || idx} className="hover:bg-blue-50/50 transition">
+                      <td className="p-2.5 border-r border-slate-200 font-bold text-slate-500">
+                        {(idx + 1).toString().padStart(2, '0')}
+                      </td>
+                      <td className="p-2.5 border-r border-slate-200 text-blue-700 font-bold">
+                        {p.code || `SB-${idx + 101}`}
+                      </td>
+                      <td className="p-2.5 border-r border-slate-200 font-sans font-semibold text-slate-900">
+                        {p.name}
+                      </td>
+                      <td className="p-2.5 border-r border-slate-200">
+                        {p.width || 60}x{p.height || 120}
+                      </td>
+                      <td className="p-2.5 border-r border-slate-200 font-sans">
+                        {p.finish || 'Mat'}
+                      </td>
+                      <td className="p-2.5 border-r border-slate-200 font-bold text-slate-700">
+                        {p.slipResistance || 'R10'}
+                      </td>
+                      <td className="p-2.5 font-bold text-slate-800">
+                        {p.peiRating ? `PEI ${p.peiRating}` : 'PEI IV'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -125,117 +206,278 @@ export default function ArchitecturalSpecSheetTemplate({
             </div>
           </div>
 
-          <div className="border-t border-slate-200 pt-3 flex justify-between text-xs text-slate-500 font-mono">
-            <span>{brand.name} Teknik Şartname Dosyası</span>
+          <div className="border-t border-slate-300 pt-3 flex justify-between text-xs text-slate-500 font-mono">
+            <span>{brand.name} Teknik Şartname Dosyası &bull; Standart: TS EN 14411</span>
             <span>Sayfa 02</span>
           </div>
         </section>
       );
     }
 
+    // -------------------------------------------------------------------------
+    // PRODUCT PAGE — TECHNICAL CAD SUBMITTAL & BIM ISOMETRIC SPREAD
+    // -------------------------------------------------------------------------
     if (pageObj.type === 'product') {
       const p = pageObj.product;
       const index = pageObj.index;
       const pImage = p.imageUrl || p.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg';
-      const dimensions = p.width && p.height ? `${p.width} × ${p.height} cm` : 'Standart';
+      const dimensions = p.width && p.height ? `${p.width} × ${p.height} cm` : '60 × 120 cm';
+      const pageNum = pageIndex + 1;
 
       return (
-        <section key={p.id || index} className="catalog-page p-6 sm:p-10 bg-white text-slate-900 flex flex-col justify-between">
-          <div className="border-b-2 border-slate-900 pb-3 flex items-center justify-between">
+        <section
+          key={p.id || index}
+          className="catalog-page relative p-6 sm:p-10 bg-slate-50 text-slate-900 flex flex-col justify-between overflow-hidden"
+          style={{
+            backgroundImage:
+              'radial-gradient(#94a3b8 0.75px, transparent 0.75px)',
+            backgroundSize: '16px 16px'
+          }}
+        >
+          {/* CAD Antet Top Bar */}
+          <div className="border-2 border-slate-900 bg-white p-3 rounded-xl flex items-center justify-between shadow-xs mb-3">
             <div className="flex items-center gap-3">
-              <span className="font-bold font-mono text-sm tracking-wide">{brand.name}</span>
+              <span className="font-bold font-mono text-sm tracking-wider uppercase text-slate-900">
+                {brand.name}
+              </span>
               <span className="text-slate-300">|</span>
-              <span className="text-xs font-mono text-slate-600 uppercase">MİMARİ TEKNİK FÖY</span>
+              <span className="text-xs font-mono text-blue-700 font-bold uppercase">
+                MİMARİ TEKNİK FÖY (CAD/BIM)
+              </span>
             </div>
-            <div className="text-xs font-mono text-blue-700 font-bold bg-blue-50 px-2.5 py-0.5 rounded border border-blue-200">
-              POZ: {p.code || `SB-${index + 101}`}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">
+                LEED v4 UYUMLU
+              </span>
+              <div className="text-xs font-mono text-blue-800 font-bold bg-blue-50 px-2.5 py-0.5 rounded border border-blue-300">
+                POZ: {p.code || `SB-${index + 101}`}
+              </div>
             </div>
           </div>
 
-          <div className="my-auto py-4 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-            <div className="md:col-span-6 space-y-3">
-              <div className="border border-slate-300 rounded-xl overflow-hidden aspect-[4/3] bg-slate-50 relative flex items-center justify-center shadow-sm">
-                <img src={pImage} alt={p.name} className="w-full h-full object-cover" />
-                <div className="absolute top-2.5 left-2.5 bg-slate-900/90 text-white font-mono text-xs px-2.5 py-1 rounded">
-                  ÖLÇÜ: {dimensions}
+          {/* Main CAD Grid (Left Visual + Isometric, Right Full Submittal Table) */}
+          <div className="flex-1 flex flex-col justify-between gap-3 my-auto">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
+              
+              {/* Left Column: Visual Staging & Isometric Drawing */}
+              <div className="md:col-span-6 flex flex-col justify-between gap-3">
+                <div className="border-2 border-slate-300 rounded-xl overflow-hidden aspect-[16/11] bg-white relative flex items-center justify-center shadow-md">
+                  <img
+                    src={pImage}
+                    alt={p.name}
+                    onError={() => handleImgError(`prod-${p.id}`)}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2.5 left-2.5 bg-slate-900/90 text-white font-mono text-xs px-3 py-1 rounded shadow">
+                    EBAT: {dimensions}
+                  </div>
+                  <div className="absolute bottom-2.5 right-2.5 bg-blue-600 text-white font-mono text-[10px] px-2.5 py-0.5 rounded font-bold shadow">
+                    GRUP BIA
+                  </div>
                 </div>
+
+                {/* Isometric Dimension Drawing Card */}
+                <div className="p-3 bg-white border-2 border-slate-300 rounded-xl shadow-xs font-mono">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-800 mb-1.5">
+                    <span className="flex items-center gap-1.5">
+                      <Box size={14} className="text-blue-600" />
+                      <span>Geometrik & Boyutsal Toleranslar</span>
+                    </span>
+                    <span className="text-[10px] text-slate-500">EN ISO 10545-2</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-[10px] text-slate-600 border-t border-slate-200 pt-1.5">
+                    <div>
+                      <p className="text-slate-400">Kalınlık</p>
+                      <p className="font-bold text-slate-900">{p.thickness || '9.5'} mm ± %5</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-400">Kenar Doğruluğu</p>
+                      <p className="font-bold text-slate-900">± %0.2 mm</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-400">Yüzey Düzgünlüğü</p>
+                      <p className="font-bold text-slate-900">± %0.3 mm</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 1:1 Digital Texture & BIM Sample */}
+                {p.textureUrl && (
+                  <div className="flex items-center gap-3 p-2.5 bg-white border border-slate-300 rounded-xl shadow-xs">
+                    <img
+                      src={p.textureUrl}
+                      alt="Texture"
+                      className="w-12 h-12 rounded-lg object-cover border border-slate-300 flex-shrink-0"
+                    />
+                    <div className="text-xs font-mono">
+                      <p className="font-bold text-slate-900">1:1 BIM & CAD Dijital Doku</p>
+                      <p className="text-slate-500 text-[10px]">
+                        Revit / ArchiCAD materyal kaplamasına hazır dijital yüzey
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {p.textureUrl && (
-                <div className="flex items-center gap-3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
-                  <img src={p.textureUrl} alt="Texture" className="w-12 h-12 rounded object-cover border border-slate-300" />
-                  <div className="text-xs font-mono">
-                    <p className="font-bold text-slate-800">1:1 Yüzey Dokusu</p>
-                    <p className="text-slate-500 text-[11px]">BIM ve 3D Render uyumlu dijital doku</p>
+              {/* Right Column: Full Technical Submittal Matrix */}
+              <div className="md:col-span-6 flex flex-col justify-between h-full bg-white border-2 border-slate-300 rounded-xl p-4 shadow-md font-mono">
+                <div>
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-2">
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-sans">
+                        {p.name}
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Poz No: {p.code || `SB-${index + 101}`} &bull; {p.style || 'Mimari Porselen'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Standard Submittal Table */}
+                  <div className="border border-slate-200 rounded-lg overflow-hidden text-xs divide-y divide-slate-100 mb-3">
+                    <div className="bg-slate-100 px-3 py-1.5 font-bold text-slate-800 text-[10px] uppercase flex justify-between">
+                      <span>Test Standardı (TS EN 14411)</span>
+                      <span>Beyan Edilen Değer</span>
+                    </div>
+
+                    <div className="flex justify-between px-3 py-1.5">
+                      <span className="text-slate-500">Su Emme (EN ISO 10545-3)</span>
+                      <span className="font-bold text-slate-800">E ≤ 0.1% (Grup BIA)</span>
+                    </div>
+
+                    <div className="flex justify-between px-3 py-1.5">
+                      <span className="text-slate-500">Kırılma Dayanımı (10545-4)</span>
+                      <span className="font-bold text-slate-800">≥ 2000 N</span>
+                    </div>
+
+                    <div className="flex justify-between px-3 py-1.5">
+                      <span className="text-slate-500">Eğilme Dayanımı (10545-4)</span>
+                      <span className="font-bold text-slate-800">≥ 45 N/mm²</span>
+                    </div>
+
+                    <div className="flex justify-between px-3 py-1.5">
+                      <span className="text-slate-500">Yüzey Aşınması (PEI - 10545-7)</span>
+                      <span className="font-bold text-blue-700">PEI {p.peiRating || 'IV'}</span>
+                    </div>
+
+                    <div className="flex justify-between px-3 py-1.5">
+                      <span className="text-slate-500">Kayma Direnci (DIN 51130)</span>
+                      <span className="font-bold text-blue-700">{p.slipResistance || 'R10 - A+B'}</span>
+                    </div>
+
+                    <div className="flex justify-between px-3 py-1.5">
+                      <span className="text-slate-500">Dona Dayanıklılık (10545-12)</span>
+                      <span className="font-bold text-emerald-700 flex items-center gap-1">
+                        <CheckCircle2 size={12} /> Dayanıklı (Frost-proof)
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between px-3 py-1.5">
+                      <span className="text-slate-500">Leke Dayanımı (10545-14)</span>
+                      <span className="font-bold text-slate-800">Sınıf 5 (En Yüksek)</span>
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
 
-            <div className="md:col-span-6 flex flex-col justify-between h-full">
-              <div>
-                <h3 className="text-2xl font-bold font-mono text-slate-900 mb-1">{p.name}</h3>
-                <p className="text-xs font-mono text-slate-500 mb-4">
-                  Kategori: {p.style || 'Mimari Porselen'} &bull; Renk: {p.color || 'Doğal'}
-                </p>
-
-                <div className="border border-slate-300 rounded-lg overflow-hidden text-xs font-mono mb-4">
-                  <div className="bg-slate-100 px-3 py-1.5 font-bold text-slate-800 border-b border-slate-300 flex justify-between">
-                    <span>PARAMETRELER</span>
-                    <span className="text-[10px] text-slate-500">TS EN 14411</span>
+                {/* 3D AR & BIM QR Action Bar */}
+                {catalog.showQrCodes && (
+                  <div className="p-2.5 rounded-xl bg-slate-900 text-white flex items-center gap-3">
+                    {p.qrCodeUrl ? (
+                      <img
+                        src={p.qrCodeUrl}
+                        alt="QR Code"
+                        className="w-13 h-13 rounded bg-white p-1 flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-13 h-13 rounded bg-white p-2 flex items-center justify-center flex-shrink-0 text-slate-900">
+                        <QrCode size={28} />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-cyan-300">
+                        3D / AR Canlı İnceleme & BIM Modeli
+                      </p>
+                      <p className="text-[10px] text-slate-300 leading-tight mt-0.5">
+                        Kameranızla okutun veya tıklayın; 3D simülatörde projeye uygulayın.
+                      </p>
+                      <a
+                        href={p.tryInRoomUrl || p.productUrl || '#'}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] font-bold text-cyan-400 hover:underline flex items-center gap-1 mt-0.5"
+                      >
+                        <span>3D Görüntüle</span>
+                        <ExternalLink size={10} />
+                      </a>
+                    </div>
                   </div>
-                  <div className="divide-y divide-slate-200">
-                    <div className="flex justify-between p-2"><span>Ebat:</span><span className="font-bold">{dimensions}</span></div>
-                    <div className="flex justify-between p-2 bg-slate-50/50"><span>Kalınlık:</span><span className="font-bold">{p.thickness ? `${p.thickness} mm` : '9 mm'}</span></div>
-                    <div className="flex justify-between p-2"><span>Yüzey:</span><span className="font-bold font-sans">{p.finish || 'Mat R10'}</span></div>
-                    <div className="flex justify-between p-2 bg-slate-50/50"><span>Kaymazlık:</span><span className="font-bold">{p.slipResistance || 'R10 Sınıfı'}</span></div>
-                    <div className="flex justify-between p-2"><span>Aşınma:</span><span className="font-bold">PEI {p.peiRating || '4'}</span></div>
-                    <div className="flex justify-between p-2 bg-slate-50/50"><span>Su Emme:</span><span className="font-bold text-blue-700">&le; 0.1% (Grup BIa)</span></div>
-                  </div>
-                </div>
+                )}
               </div>
-
-              {catalog.showQrCodes && (
-                <div className="p-3 border border-slate-300 rounded-lg bg-slate-50 flex items-center gap-3">
-                  <img src={p.qrCodeUrl || '/favicon.ico'} alt="QR" className="w-14 h-14 bg-white p-1 border border-slate-300 rounded" />
-                  <div className="text-xs font-mono flex-1">
-                    <p className="font-bold text-slate-900">3D Mekânda Test Et</p>
-                    <p className="text-slate-600 text-[11px] font-sans">Kameranızla okutun, SeramikBak 3D Studio ile test edin.</p>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
-          <div className="border-t border-slate-300 pt-3 flex justify-between items-center text-xs font-mono text-slate-500">
-            <span>{brand.name} &bull; Poz: {p.code || `SB-${index + 101}`}</span>
-            <span>Sayfa {(pageIndex + 1).toString().padStart(2, '0')}</span>
+          {/* Running Footer */}
+          <div className="border-t-2 border-slate-900 pt-2.5 flex justify-between items-center text-xs text-slate-600 font-mono">
+            <span>
+              {brand.name} Mimari Teknik Şartname &bull; Poz: {p.code || `SB-${index + 101}`}
+            </span>
+            <span>Sayfa {pageNum.toString().padStart(2, '0')}</span>
           </div>
         </section>
       );
     }
 
+    // -------------------------------------------------------------------------
+    // CONTACT — TECHNICAL SUBMITTAL CLOSING
+    // -------------------------------------------------------------------------
     if (pageObj.type === 'contact') {
       return (
-        <section key="contact" className="catalog-page p-8 sm:p-12 text-white flex flex-col justify-between font-mono" style={{ backgroundColor: '#0f172a' }}>
-          <div className="border-b border-slate-700 pb-4 flex justify-between">
-            <span className="text-lg font-bold">{brand.name} TEKNİK ŞARTNAME & PROJE</span>
-            <span className="text-xs text-slate-400">ARCH-SPEC V2.0</span>
+        <section
+          key="contact"
+          className="catalog-page relative p-8 sm:p-14 bg-slate-900 text-white flex flex-col justify-between font-mono overflow-hidden"
+        >
+          <div className="border-b border-slate-700 pb-4 flex justify-between items-center">
+            <span className="text-xl font-bold tracking-wider">{brand.name}</span>
+            <span className="text-xs text-cyan-400">MİMARİ TEKNİK OFİS</span>
           </div>
+
           <div className="my-auto py-8 max-w-xl">
-            <h4 className="text-2xl font-bold mb-3">Teknik Destek & Numune Sevkiyatı</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-sans mb-6">
-              Yukarıda yer alan ürünlerin mimari pafta CAD/BIM doku kütüphaneleri, test raporları ve yerinde numune sunumu için proje ofisimizle irtibat kurabilirsiniz.
+            <h3 className="text-3xl font-bold text-white mb-3 font-sans">
+              Şartname & Proje Departmanı
+            </h3>
+            <p className="text-xs text-slate-300 leading-relaxed mb-6">
+              Teknik şartname hazırlığı, akustik/statik hesaplamalar ve numune kutusu talepleri için proje masamızla doğrudan iletişime geçebilirsiniz.
             </p>
-            <div className="space-y-2 text-xs bg-slate-800 p-4 rounded-lg border border-slate-700 text-slate-300">
-              <div><strong className="text-white">Santral:</strong> {catalog.contactPhone || '+90 (212) 000 00 00'}</div>
-              <div><strong className="text-white">E-Posta:</strong> {catalog.contactEmail || 'proje@seramikbak.com'}</div>
-              <div><strong className="text-white">Web:</strong> {catalog.websiteUrl || 'www.seramikbak.com'}</div>
+
+            <div className="p-5 rounded-xl bg-slate-800 border border-slate-700 space-y-3 text-xs">
+              {catalog.contactAddress && (
+                <div className="flex gap-4">
+                  <span className="w-20 text-slate-400">Adres:</span>
+                  <span className="text-white">{catalog.contactAddress}</span>
+                </div>
+              )}
+              {catalog.contactPhone && (
+                <div className="flex gap-4">
+                  <span className="w-20 text-slate-400">Telefon:</span>
+                  <a href={`tel:${catalog.contactPhone}`} className="text-cyan-400 font-bold">
+                    {catalog.contactPhone}
+                  </a>
+                </div>
+              )}
+              {catalog.contactEmail && (
+                <div className="flex gap-4">
+                  <span className="w-20 text-slate-400">E-Posta:</span>
+                  <a href={`mailto:${catalog.contactEmail}`} className="text-cyan-400 font-bold">
+                    {catalog.contactEmail}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
-          <div className="border-t border-slate-700 pt-4 text-xs text-slate-500 flex justify-between">
-            <span>&copy; {new Date().getFullYear()} {brand.name}. TS EN 14411 Teknik Şartname Dosyası.</span>
-            <span>SeramikBak Mimari Sistemler</span>
+
+          <div className="border-t border-slate-700 pt-4 flex justify-between text-xs text-slate-400">
+            <span>&copy; {new Date().getFullYear()} {brand.name} Mimari Teknik Grubu</span>
+            <span>SeramikBak Mimari Çözümler</span>
           </div>
         </section>
       );
@@ -245,8 +487,16 @@ export default function ArchitecturalSpecSheetTemplate({
   };
 
   if (viewFormat === 'single') {
-    return <div className="w-full flex justify-center">{renderSinglePage(pages[activePageIndex] || pages[0], activePageIndex)}</div>;
+    return (
+      <div className="w-full flex justify-center">
+        {renderSinglePage(pages[activePageIndex] || pages[0], activePageIndex)}
+      </div>
+    );
   }
 
-  return <div className="w-full flex flex-col gap-8 items-center">{pages.map((p, idx) => renderSinglePage(p, idx))}</div>;
+  return (
+    <div className="w-full flex flex-col gap-10 items-center">
+      {pages.map((p, idx) => renderSinglePage(p, idx))}
+    </div>
+  );
 }
