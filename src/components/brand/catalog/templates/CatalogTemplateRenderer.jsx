@@ -38,11 +38,19 @@ export default function CatalogTemplateRenderer({
   const template = catalog.template || 'milano';
   const isLandscape = catalog.orientation === 'landscape';
 
-  // Calculate total pages
+  // Calculate total pages dynamically based on active template
+  let extraPages = 0;
+  if (template === 'milano') {
+    if (catalog.showSpecs) extraPages += 1; // Technical standards page
+    extraPages += 1; // Application areas page
+    if (catalog.showQrCodes) extraPages += 1; // Digital 3D studio page
+  }
+
   const totalPages =
     (catalog.showCover ? 1 : 0) +
-    (catalog.showTOC && products.length > 1 ? 1 : 0) +
-    products.length +
+    (catalog.showTOC ? 1 : 0) +
+    (template === 'showroom' ? Math.max(1, Math.ceil(products.length / 2)) : products.length) +
+    extraPages +
     (catalog.showContactPage ? 1 : 0);
 
   // Keyboard navigation
