@@ -1,330 +1,453 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Sparkles, QrCode, ExternalLink, ShieldCheck, Layers, Maximize2 } from 'lucide-react';
 
-export default function MilanoLookbookTemplate({ catalog, products = [], mode = 'preview' }) {
+export default function MilanoLookbookTemplate({
+  catalog,
+  products = [],
+  mode = 'preview',
+  activePageIndex = 0,
+  viewFormat = 'single'
+}) {
   const brand = catalog.brand || {};
   const logo = catalog.customLogoUrl || brand.logoUrl;
   const primaryColor = catalog.primaryColor || '#b4823c';
   const isLandscape = catalog.orientation === 'landscape';
 
-  const isTR = catalog.language !== 'en';
-  const t = {
-    collection: isTR ? 'ÖZEL KOLEKSİYON' : 'EXCLUSIVE COLLECTION',
-    lookbook: isTR ? 'MİMARİ LOOKBOOK' : 'ARCHITECTURAL LOOKBOOK',
-    specifications: isTR ? 'Teknik Özellikler' : 'Specifications',
-    dimensions: isTR ? 'Ebat' : 'Dimensions',
-    finish: isTR ? 'Yüzey' : 'Finish',
-    color: isTR ? 'Renk' : 'Color',
-    thickness: isTR ? 'Kalınlık' : 'Thickness',
-    rectified: isTR ? 'Rektifiye' : 'Rectified',
-    yes: isTR ? 'Evet (Lazer Kesim)' : 'Yes (Laser Cut)',
-    no: isTR ? 'Hayır' : 'No',
-    tryInRoom: isTR ? 'Mekânımda Gör & Dene' : 'Try in 3D Room',
-    scanToTry: isTR ? 'Kameranızla tarayarak seramiği kendi banyo veya salonunuzda 3D görün.' : 'Scan with camera to preview this tile in your room with 3D Studio.',
-    tableOfContents: isTR ? 'İçindekiler & Koleksiyon Fihristi' : 'Table of Contents',
-    contact: isTR ? 'İletişim & Proje Destek' : 'Contact & Project Inquiries',
-    page: isTR ? 'Sayfa' : 'Page',
+  const [imgErrors, setImgErrors] = useState({});
+
+  const handleImgError = (id) => {
+    setImgErrors((prev) => ({ ...prev, [id]: true }));
   };
 
-  return (
-    <div className={`catalog-milano ${isLandscape ? 'orientation-landscape' : 'orientation-portrait'}`}>
-      {/* -------------------- COVER PAGE -------------------- */}
-      {catalog.showCover && (
-        <section className="catalog-page cover-page flex flex-col justify-between p-12 bg-neutral-950 text-white relative overflow-hidden">
-          <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
-          
-          {/* Header / Brand Logo */}
-          <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-6">
-            <div className="flex items-center gap-4">
-              {logo ? (
-                <img src={logo} alt={brand.name || 'Brand Logo'} className="h-10 max-w-[180px] object-contain filter brightness-0 invert" />
-              ) : (
-                <span className="text-2xl font-bold tracking-widest uppercase">{brand.name || 'SERAMİKBAK'}</span>
-              )}
-            </div>
-            <span className="text-xs uppercase tracking-[0.3em] text-neutral-400 font-medium">
-              {t.lookbook} &bull; {new Date().getFullYear()}
-            </span>
+  // Compile all pages array
+  const pages = [];
+
+  // Page 1: Cover
+  if (catalog.showCover) {
+    pages.push({ type: 'cover' });
+  }
+
+  // Page 2: Table of Contents
+  if (catalog.showTOC && products.length > 1) {
+    pages.push({ type: 'toc' });
+  }
+
+  // Product Pages
+  products.forEach((p, idx) => {
+    pages.push({ type: 'product', product: p, index: idx });
+  });
+
+  // Back Cover Page
+  if (catalog.showContactPage) {
+    pages.push({ type: 'contact' });
+  }
+
+  const renderSinglePage = (pageObj, pageIndex) => {
+    if (!pageObj) return null;
+
+    // ----------------------------------------------------
+    // COVER PAGE
+    // ----------------------------------------------------
+    if (pageObj.type === 'cover') {
+      const coverHero =
+        products[0]?.imageUrl ||
+        products[0]?.textureUrl ||
+        '/renders/luxury_bathroom_calacatta_gold.jpg';
+
+      return (
+        <section
+          key="cover"
+          className="catalog-page relative text-white overflow-hidden p-8 sm:p-14 flex flex-col justify-between"
+          style={{
+            background: `linear-gradient(135deg, rgba(9, 13, 22, 0.92) 0%, rgba(17, 24, 39, 0.85) 60%, rgba(30, 27, 75, 0.9) 100%), url(${coverHero}) center/cover no-repeat`,
+            backgroundColor: '#090d16'
+          }}
+        >
+          {/* Subtle gold architectural framing lines */}
+          <div className="absolute inset-4 sm:inset-6 border border-white/15 pointer-events-none rounded" />
+          <div className="absolute top-8 right-8 text-[10px] font-mono tracking-[0.3em] text-amber-300/80 uppercase">
+            MILANO LOOKBOOK &bull; {new Date().getFullYear()}
           </div>
 
-          {/* Hero Title */}
-          <div className="relative z-10 my-auto py-12 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs tracking-wider uppercase mb-6" style={{ color: primaryColor }}>
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: primaryColor }} />
-              {t.collection}
+          {/* Top Brand Header */}
+          <div className="relative z-10 pt-2 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {logo && !imgErrors['logo-cover'] ? (
+                <img
+                  src={logo}
+                  alt={brand.name || 'Brand'}
+                  onError={() => handleImgError('logo-cover')}
+                  className="h-10 max-w-[160px] object-contain filter brightness-0 invert"
+                />
+              ) : (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500 text-neutral-950 font-serif font-bold text-lg flex items-center justify-center shadow">
+                    {(brand.name || 'S').charAt(0)}
+                  </div>
+                  <span className="text-xl font-serif font-bold tracking-widest text-white uppercase">
+                    {brand.name || 'SERAMİK'}
+                  </span>
+                </div>
+              )}
             </div>
-            <h1 className="text-5xl md:text-6xl font-light tracking-tight leading-tight mb-6 font-serif">
+
+            <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-[10px] font-medium tracking-widest uppercase text-amber-300">
+              EXCLUSIVE COLLECTION
+            </div>
+          </div>
+
+          {/* Center Title Block */}
+          <div className="relative z-10 my-auto py-8 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-semibold tracking-wider uppercase mb-6">
+              <Sparkles size={13} className="text-amber-400" />
+              <span>İtalyan Mimari Seramik Koleksiyonu</span>
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-light text-white tracking-tight leading-tight mb-4">
               {catalog.coverTitle || catalog.title}
             </h1>
+
             {catalog.coverSubtitle && (
-              <p className="text-xl text-neutral-300 font-light leading-relaxed max-w-xl">
+              <p className="text-lg sm:text-xl text-neutral-200 font-light leading-relaxed mb-6">
                 {catalog.coverSubtitle}
               </p>
             )}
+
             {catalog.introText && (
-              <p className="text-sm text-neutral-400 font-light leading-relaxed max-w-lg mt-6 pt-6 border-t border-white/10">
+              <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed max-w-xl border-l-2 border-amber-500 pl-4 py-1">
                 {catalog.introText}
               </p>
             )}
           </div>
 
-          {/* Footer info */}
-          <div className="relative z-10 flex items-end justify-between border-t border-white/10 pt-6 text-xs text-neutral-400">
+          {/* Bottom Footer Info */}
+          <div className="relative z-10 pt-6 border-t border-white/15 flex items-end justify-between text-xs text-neutral-300">
             <div>
-              <p className="font-medium text-white">{brand.name}</p>
-              <p>{catalog.websiteUrl || 'www.seramikbak.com'}</p>
+              <p className="font-bold text-white tracking-wide">{brand.name}</p>
+              <p className="text-neutral-400 text-[11px]">{catalog.websiteUrl || 'www.seramikbak.com'}</p>
             </div>
             <div className="text-right">
-              <p className="tracking-widest uppercase text-[10px] text-neutral-500">DIGITAL CATALOG STUDIO</p>
-              <p className="text-neutral-300">Curated with SeramikBak Architecture</p>
+              <span className="text-[10px] text-amber-400/80 font-mono tracking-widest uppercase block">
+                CURATED ARCHITECTURE
+              </span>
+              <span className="text-neutral-400 text-[11px]">SeramikBak Catalog Studio</span>
             </div>
           </div>
         </section>
-      )}
+      );
+    }
 
-      {/* -------------------- TABLE OF CONTENTS -------------------- */}
-      {catalog.showTOC && products.length > 2 && (
-        <section className="catalog-page toc-page p-12 bg-white text-neutral-900 flex flex-col justify-between">
+    // ----------------------------------------------------
+    // TABLE OF CONTENTS (FİHRİST)
+    // ----------------------------------------------------
+    if (pageObj.type === 'toc') {
+      return (
+        <section
+          key="toc"
+          className="catalog-page p-8 sm:p-12 bg-white text-neutral-900 flex flex-col justify-between"
+        >
           <div>
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-4 mb-8">
-              <h2 className="text-2xl font-serif font-light tracking-wide text-neutral-900">{t.tableOfContents}</h2>
-              <span className="text-xs uppercase tracking-widest text-neutral-400">{brand.name}</span>
+            <div className="flex items-center justify-between border-b-2 border-neutral-900 pb-4 mb-8">
+              <div>
+                <span className="text-xs font-mono font-bold text-amber-700 uppercase tracking-widest">
+                  KOLEKSİYON DİZİNİ
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-serif font-light text-neutral-900 tracking-tight mt-0.5">
+                  İçindekiler & Koleksiyon Fihristi
+                </h2>
+              </div>
+              <span className="text-xs font-bold text-neutral-400 uppercase tracking-widest">{brand.name}</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4">
               {products.map((p, idx) => (
-                <div key={p.id || idx} className="flex items-center justify-between py-2 border-b border-neutral-100 text-sm group">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono text-neutral-400 w-6">{(idx + 1).toString().padStart(2, '0')}</span>
-                    <div>
-                      <span className="font-medium text-neutral-800">{p.name}</span>
-                      {catalog.showCodes && p.code && (
-                        <span className="ml-2 text-xs text-neutral-400">({p.code})</span>
-                      )}
+                <div
+                  key={p.id || idx}
+                  className="flex items-center justify-between py-2.5 border-b border-neutral-100 group"
+                >
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <span className="text-xs font-mono font-bold text-amber-600 w-6">
+                      {(idx + 1).toString().padStart(2, '0')}
+                    </span>
+                    <div className="overflow-hidden">
+                      <p className="text-xs font-bold text-neutral-800 truncate group-hover:text-amber-700 transition">
+                        {p.name}
+                      </p>
+                      <p className="text-[10px] text-neutral-400 font-mono">
+                        {p.code ? `Ref: ${p.code}` : ''} {p.width && p.height ? `• ${p.width}x${p.height} cm` : ''}
+                      </p>
                     </div>
                   </div>
-                  <span className="text-xs text-neutral-400 font-mono">
-                    {p.width && p.height ? `${p.width}x${p.height} cm` : ''}
+                  <span className="text-xs font-mono text-neutral-400 group-hover:text-neutral-900 font-bold">
+                    P. {(idx + (catalog.showCover ? 2 : 1) + 1).toString().padStart(2, '0')}
                   </span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="border-t border-neutral-200 pt-4 flex justify-between items-center text-xs text-neutral-400">
+          <div className="border-t border-neutral-200 pt-3 flex justify-between items-center text-[11px] text-neutral-400 font-medium">
             <span>{brand.name} &bull; {catalog.title}</span>
-            {catalog.showPageNumbers && <span>{t.page} 02</span>}
+            {catalog.showPageNumbers && <span>Sayfa 02</span>}
           </div>
         </section>
-      )}
+      );
+    }
 
-      {/* -------------------- PRODUCT PAGES -------------------- */}
-      {products.map((p, index) => {
-        const pageNum = (catalog.showCover ? 1 : 0) + (catalog.showTOC && products.length > 2 ? 1 : 0) + index + 1;
-        const mainImage = p.imageUrl || p.textureUrl || '/placeholder.png';
-        const hasDimensions = p.width && p.height;
-        const dimensionsText = hasDimensions ? `${p.width} × ${p.height} cm` : null;
+    // ----------------------------------------------------
+    // PRODUCT PAGES (EDITORIAL MILANO DESIGN)
+    // ----------------------------------------------------
+    if (pageObj.type === 'product') {
+      const p = pageObj.product;
+      const index = pageObj.index;
+      const pImage = p.imageUrl || p.textureUrl || '/renders/luxury_bathroom_calacatta_gold.jpg';
+      const dimensions = p.width && p.height ? `${p.width} × ${p.height} cm` : null;
+      const pageNum = pageIndex + 1;
 
-        return (
-          <section key={p.id || index} className="catalog-page product-page p-12 bg-white text-neutral-900 flex flex-col justify-between">
-            {/* Top Brand Header */}
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-4 mb-6">
-              <div className="flex items-center gap-3">
-                {logo ? (
-                  <img src={logo} alt={brand.name} className="h-6 max-w-[120px] object-contain" />
-                ) : (
-                  <span className="text-sm font-semibold tracking-wider text-neutral-800">{brand.name}</span>
-                )}
-                <span className="text-xs text-neutral-300">|</span>
-                <span className="text-xs text-neutral-500 uppercase tracking-wider">{catalog.title}</span>
-              </div>
-              <span className="text-xs font-mono text-neutral-400">#{(index + 1).toString().padStart(2, '0')}</span>
+      return (
+        <section
+          key={p.id || index}
+          className="catalog-page p-6 sm:p-10 bg-white text-neutral-900 flex flex-col justify-between"
+        >
+          {/* Top Brand Header Bar */}
+          <div className="flex items-center justify-between border-b border-neutral-200 pb-3 mb-4">
+            <div className="flex items-center gap-3">
+              <span className="font-serif font-bold text-sm tracking-wider uppercase text-neutral-900">
+                {brand.name}
+              </span>
+              <span className="text-neutral-300">|</span>
+              <span className="text-xs text-neutral-500 font-light truncate max-w-xs">{catalog.title}</span>
             </div>
-
-            {/* Main Content Layout */}
-            <div className={`grid ${isLandscape ? 'grid-cols-12 gap-8' : 'grid-cols-1 md:grid-cols-12 gap-8'} items-center flex-1 my-auto`}>
-              {/* Product Visual */}
-              <div className={`${isLandscape ? 'col-span-7' : 'col-span-12 md:col-span-7'} flex flex-col items-center justify-center`}>
-                <div className="w-full relative rounded-2xl overflow-hidden bg-neutral-100 shadow-md border border-neutral-200/60 aspect-[4/3] flex items-center justify-center">
-                  <img
-                    src={mainImage}
-                    alt={p.name}
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                    loading="lazy"
-                  />
-                  {dimensionsText && (
-                    <div className="absolute bottom-3 left-3 bg-neutral-900/80 backdrop-blur-sm text-white px-3 py-1 rounded-md text-xs font-medium">
-                      {dimensionsText}
-                    </div>
-                  )}
-                </div>
-
-                {/* Secondary texture swatch if exists */}
-                {p.textureUrl && p.textureUrl !== p.imageUrl && (
-                  <div className="mt-4 flex items-center gap-3 w-full p-2.5 rounded-xl bg-neutral-50 border border-neutral-200">
-                    <img src={p.textureUrl} alt="Texture Swatch" className="w-12 h-12 rounded-lg object-cover border border-neutral-300" />
-                    <div className="text-xs">
-                      <p className="font-semibold text-neutral-800">Orijinal Doku Detayı (1:1)</p>
-                      <p className="text-neutral-500">Yüksek çözünürlüklü dijital seramik yüzey taraması</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Product Info & Specifications */}
-              <div className={`${isLandscape ? 'col-span-5' : 'col-span-12 md:col-span-5'} flex flex-col justify-between h-full`}>
-                <div>
-                  <div className="inline-block px-2.5 py-1 rounded bg-neutral-100 text-xs font-mono font-medium text-neutral-600 mb-2">
-                    {p.code || `SB-${(index + 101).toString()}`}
-                  </div>
-                  <h2 className="text-2xl md:text-3xl font-serif font-light text-neutral-900 tracking-tight mb-3">
-                    {p.name}
-                  </h2>
-                  {catalog.showDescriptions && (p.description || p.customNote) && (
-                    <p className="text-xs text-neutral-600 leading-relaxed mb-6 font-light">
-                      {p.customNote || p.description}
-                    </p>
-                  )}
-
-                  {/* Technical Specs Table */}
-                  {catalog.showSpecs && (
-                    <div className="border border-neutral-200 rounded-xl overflow-hidden mb-6 bg-neutral-50/50">
-                      <div className="bg-neutral-100 px-3 py-1.5 border-b border-neutral-200 text-[11px] font-semibold text-neutral-700 uppercase tracking-wider">
-                        {t.specifications}
-                      </div>
-                      <div className="divide-y divide-neutral-200 text-xs">
-                        {dimensionsText && (
-                          <div className="flex justify-between px-3 py-2">
-                            <span className="text-neutral-500">{t.dimensions}</span>
-                            <span className="font-medium text-neutral-800">{dimensionsText}</span>
-                          </div>
-                        )}
-                        {p.finish && (
-                          <div className="flex justify-between px-3 py-2">
-                            <span className="text-neutral-500">{t.finish}</span>
-                            <span className="font-medium text-neutral-800">{p.finish}</span>
-                          </div>
-                        )}
-                        {p.color && (
-                          <div className="flex justify-between px-3 py-2">
-                            <span className="text-neutral-500">{t.color}</span>
-                            <span className="font-medium text-neutral-800">{p.color}</span>
-                          </div>
-                        )}
-                        {p.thickness && (
-                          <div className="flex justify-between px-3 py-2">
-                            <span className="text-neutral-500">{t.thickness}</span>
-                            <span className="font-medium text-neutral-800">{p.thickness} mm</span>
-                          </div>
-                        )}
-                        {p.rectified !== undefined && (
-                          <div className="flex justify-between px-3 py-2">
-                            <span className="text-neutral-500">{t.rectified}</span>
-                            <span className="font-medium text-neutral-800">{p.rectified ? t.yes : t.no}</span>
-                          </div>
-                        )}
-                        {p.slipResistance && (
-                          <div className="flex justify-between px-3 py-2">
-                            <span className="text-neutral-500">Kaymazlık (R)</span>
-                            <span className="font-medium text-neutral-800">{p.slipResistance}</span>
-                          </div>
-                        )}
-                        {p.peiRating && (
-                          <div className="flex justify-between px-3 py-2">
-                            <span className="text-neutral-500">Aşınma (PEI)</span>
-                            <span className="font-medium text-neutral-800">PEI {p.peiRating}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Price if enabled */}
-                  {catalog.showPrices && p.trendyolPrice && (
-                    <div className="mb-6 p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between">
-                      <span className="text-xs text-amber-800 font-medium">Tavsiye Edilen Fiyat (m²):</span>
-                      <span className="text-lg font-bold text-amber-900">{p.trendyolPrice} TL</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* 3D Visualizer & QR Box */}
-                {catalog.showQrCodes && p.qrCodeUrl && (
-                  <div className="mt-4 p-3.5 rounded-xl border border-neutral-200 bg-neutral-50 flex items-center gap-3">
-                    <img src={p.qrCodeUrl} alt="QR Code" className="w-16 h-16 rounded-lg bg-white p-1 border border-neutral-300" />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-neutral-900">
-                        <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: primaryColor }} />
-                        {t.tryInRoom}
-                      </div>
-                      <p className="text-[11px] text-neutral-500 leading-tight mt-0.5">
-                        {t.scanToTry}
-                      </p>
-                      <a
-                        href={p.tryInRoomUrl || p.productUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block mt-1 text-[11px] font-medium text-blue-600 hover:underline"
-                      >
-                        seramikbak.com/urun/{p.slug} &rarr;
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
+            <div className="text-xs font-mono font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded border border-amber-200">
+              #{(index + 1).toString().padStart(2, '0')}
             </div>
-
-            {/* Bottom Footer */}
-            <div className="border-t border-neutral-200 pt-4 flex justify-between items-center text-xs text-neutral-400">
-              <span>{brand.name} &bull; {p.name}</span>
-              {catalog.showPageNumbers && <span>{t.page} {pageNum.toString().padStart(2, '0')}</span>}
-            </div>
-          </section>
-        );
-      })}
-
-      {/* -------------------- CONTACT & BACK COVER -------------------- */}
-      {catalog.showContactPage && (
-        <section className="catalog-page back-cover-page p-12 bg-neutral-900 text-white flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b border-white/10 pb-6">
-            {logo ? (
-              <img src={logo} alt={brand.name} className="h-8 max-w-[150px] object-contain filter brightness-0 invert" />
-            ) : (
-              <span className="text-xl font-bold tracking-widest">{brand.name}</span>
-            )}
-            <span className="text-xs uppercase tracking-widest text-neutral-400">{t.contact}</span>
           </div>
 
-          <div className="max-w-xl my-auto py-12">
-            <h3 className="text-3xl font-serif font-light mb-6 text-white">{brand.name} Mimari & B2B Çözümleri</h3>
-            <p className="text-neutral-400 text-sm leading-relaxed mb-8">
-              Projeleriniz, mimari numune talepleriniz ve toptan siparişleriniz için yetkili satış ve proje ekibimizle doğrudan iletişime geçebilirsiniz.
+          {/* Main Editorial Layout (Split 2-Columns) */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center my-auto py-2">
+            {/* Left: Product Visual Presentation */}
+            <div className="md:col-span-7 flex flex-col items-center">
+              <div className="w-full relative rounded-2xl overflow-hidden bg-neutral-100 shadow-lg border border-neutral-200/80 aspect-[4/3] flex items-center justify-center group">
+                <img
+                  src={pImage}
+                  alt={p.name}
+                  onError={() => handleImgError(`prod-${p.id}`)}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+
+                {dimensions && (
+                  <div className="absolute top-3 left-3 bg-neutral-950/80 backdrop-blur-md text-white px-3 py-1 rounded-md text-xs font-mono font-semibold shadow">
+                    {dimensions}
+                  </div>
+                )}
+
+                {p.finish && (
+                  <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-md text-neutral-900 px-2.5 py-0.5 rounded text-[11px] font-bold shadow">
+                    Yüzey: {p.finish}
+                  </div>
+                )}
+              </div>
+
+              {/* 1:1 Surface Texture Macro Swatch if available */}
+              {p.textureUrl && p.textureUrl !== p.imageUrl && (
+                <div className="mt-3 w-full p-2.5 rounded-xl bg-neutral-50 border border-neutral-200/90 flex items-center gap-3">
+                  <img
+                    src={p.textureUrl}
+                    alt="Texture"
+                    className="w-12 h-12 rounded-lg object-cover border border-neutral-300 shadow-xs flex-shrink-0"
+                  />
+                  <div className="text-xs">
+                    <p className="font-bold text-neutral-800">1:1 Yüzey Dokusu & Rölyef</p>
+                    <p className="text-neutral-500 text-[11px]">Gerçekçi ışık ve sırlama detayları</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right: Architectural Typography & Specs */}
+            <div className="md:col-span-5 flex flex-col justify-between h-full">
+              <div>
+                <div className="inline-block px-2.5 py-1 rounded bg-neutral-100 text-neutral-700 text-[11px] font-mono font-bold mb-2">
+                  {p.code ? `KOD: ${p.code}` : `SERİ NO: SB-${index + 101}`}
+                </div>
+
+                <h2 className="text-2xl sm:text-3xl font-serif font-light text-neutral-950 tracking-tight mb-2">
+                  {p.name}
+                </h2>
+
+                {(p.customNote || p.description) && catalog.showDescriptions && (
+                  <p className="text-xs text-neutral-600 font-light leading-relaxed mb-4">
+                    {p.customNote || p.description}
+                  </p>
+                )}
+
+                {/* Specs Table */}
+                {catalog.showSpecs && (
+                  <div className="border border-neutral-200 rounded-xl overflow-hidden mb-4 bg-neutral-50/50">
+                    <div className="bg-neutral-100 px-3 py-1.5 border-b border-neutral-200 text-[10px] font-bold text-neutral-700 uppercase tracking-wider">
+                      TEKNİK ÖZELLİKLER &bull; TS EN 14411
+                    </div>
+                    <div className="divide-y divide-neutral-200/80 text-xs">
+                      {dimensions && (
+                        <div className="flex justify-between px-3 py-1.5">
+                          <span className="text-neutral-500">Anma Ebatı</span>
+                          <span className="font-bold text-neutral-800">{dimensions}</span>
+                        </div>
+                      )}
+                      {p.finish && (
+                        <div className="flex justify-between px-3 py-1.5">
+                          <span className="text-neutral-500">Yüzey Tipi</span>
+                          <span className="font-bold text-neutral-800">{p.finish}</span>
+                        </div>
+                      )}
+                      {p.color && (
+                        <div className="flex justify-between px-3 py-1.5">
+                          <span className="text-neutral-500">Renk</span>
+                          <span className="font-bold text-neutral-800">{p.color}</span>
+                        </div>
+                      )}
+                      {p.thickness && (
+                        <div className="flex justify-between px-3 py-1.5">
+                          <span className="text-neutral-500">Kalınlık</span>
+                          <span className="font-bold text-neutral-800">{p.thickness} mm</span>
+                        </div>
+                      )}
+                      {p.rectified !== undefined && (
+                        <div className="flex justify-between px-3 py-1.5">
+                          <span className="text-neutral-500">Rektifiye</span>
+                          <span className="font-bold text-neutral-800">{p.rectified ? 'Evet (Lazer Kesim)' : 'Standart'}</span>
+                        </div>
+                      )}
+                      {p.slipResistance && (
+                        <div className="flex justify-between px-3 py-1.5">
+                          <span className="text-neutral-500">Kaymazlık</span>
+                          <span className="font-bold text-neutral-800">{p.slipResistance}</span>
+                        </div>
+                      )}
+                      {p.peiRating && (
+                        <div className="flex justify-between px-3 py-1.5">
+                          <span className="text-neutral-500">Aşınma (PEI)</span>
+                          <span className="font-bold text-neutral-800">PEI {p.peiRating}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Price if enabled */}
+                {catalog.showPrices && p.trendyolPrice && (
+                  <div className="mb-4 p-2.5 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between">
+                    <span className="text-xs text-amber-800 font-medium">Tavsiye Edilen Liste Fiyatı:</span>
+                    <span className="text-base font-bold text-amber-950">{p.trendyolPrice} TL / m²</span>
+                  </div>
+                )}
+              </div>
+
+              {/* 3D Visualizer QR Code Action Box */}
+              {catalog.showQrCodes && (
+                <div className="p-3 rounded-xl border border-amber-200 bg-gradient-to-r from-amber-50/50 to-orange-50/30 flex items-center gap-3 shadow-xs">
+                  {p.qrCodeUrl ? (
+                    <img
+                      src={p.qrCodeUrl}
+                      alt="QR Code"
+                      className="w-16 h-16 rounded-lg bg-white p-1 border border-amber-300 shadow-xs flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-lg bg-white p-2 border border-neutral-300 flex items-center justify-center flex-shrink-0">
+                      <QrCode size={32} className="text-neutral-800" />
+                    </div>
+                  )}
+                  <div className="flex-1 overflow-hidden">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-900">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                      <span>Mekânımda Gör & Dene</span>
+                    </div>
+                    <p className="text-[11px] text-neutral-600 leading-tight mt-0.5">
+                      Kameranızla okutun, SeramikBak 3D Studio ile bu karoyu kendi odanızda görün.
+                    </p>
+                    <a
+                      href={p.tryInRoomUrl || p.productUrl || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 hover:text-amber-950 hover:underline mt-1"
+                    >
+                      <span>3D Stüdyoda Aç</span>
+                      <ExternalLink size={11} />
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Footer Bar */}
+          <div className="border-t border-neutral-200 pt-3 flex justify-between items-center text-[11px] text-neutral-400 font-medium">
+            <span>{brand.name} &bull; {p.name}</span>
+            {catalog.showPageNumbers && <span>Sayfa {pageNum.toString().padStart(2, '0')}</span>}
+          </div>
+        </section>
+      );
+    }
+
+    // ----------------------------------------------------
+    // CONTACT & BACK COVER
+    // ----------------------------------------------------
+    if (pageObj.type === 'contact') {
+      return (
+        <section
+          key="contact"
+          className="catalog-page p-8 sm:p-14 bg-neutral-950 text-white flex flex-col justify-between"
+          style={{ backgroundColor: '#090d16' }}
+        >
+          <div className="flex items-center justify-between border-b border-white/15 pb-6">
+            <span className="text-xl font-serif font-bold tracking-widest uppercase">{brand.name}</span>
+            <span className="text-xs uppercase tracking-widest text-neutral-400 font-mono">
+              PROJE & İLETİŞİM
+            </span>
+          </div>
+
+          <div className="my-auto py-8 max-w-xl">
+            <h3 className="text-3xl sm:text-4xl font-serif font-light text-white mb-4">
+              Mimari & B2B Çözüm Ortaklığı
+            </h3>
+            <p className="text-sm text-neutral-400 leading-relaxed mb-8">
+              Koleksiyon numuneleri, CAD/BIM dosyaları ve toplu proje teklifleri için satış ve mimari destek ekibimizle irtibata geçebilirsiniz.
             </p>
 
-            <div className="space-y-4 text-sm text-neutral-300">
+            <div className="space-y-4 text-xs sm:text-sm text-neutral-300 bg-white/5 p-6 rounded-2xl border border-white/10">
               {catalog.contactAddress && (
-                <div className="flex items-start gap-3">
-                  <span className="text-neutral-500 font-mono text-xs w-20">Adres:</span>
+                <div className="flex gap-4">
+                  <span className="w-20 text-neutral-400 font-mono">Adres:</span>
                   <span>{catalog.contactAddress}</span>
                 </div>
               )}
               {catalog.contactPhone && (
-                <div className="flex items-start gap-3">
-                  <span className="text-neutral-500 font-mono text-xs w-20">Telefon:</span>
-                  <a href={`tel:${catalog.contactPhone}`} className="hover:text-white">{catalog.contactPhone}</a>
+                <div className="flex gap-4">
+                  <span className="w-20 text-neutral-400 font-mono">Telefon:</span>
+                  <a href={`tel:${catalog.contactPhone}`} className="text-amber-300 hover:underline">
+                    {catalog.contactPhone}
+                  </a>
                 </div>
               )}
               {catalog.contactEmail && (
-                <div className="flex items-start gap-3">
-                  <span className="text-neutral-500 font-mono text-xs w-20">E-Posta:</span>
-                  <a href={`mailto:${catalog.contactEmail}`} className="hover:text-white">{catalog.contactEmail}</a>
+                <div className="flex gap-4">
+                  <span className="w-20 text-neutral-400 font-mono">E-Posta:</span>
+                  <a href={`mailto:${catalog.contactEmail}`} className="text-amber-300 hover:underline">
+                    {catalog.contactEmail}
+                  </a>
                 </div>
               )}
               {catalog.websiteUrl && (
-                <div className="flex items-start gap-3">
-                  <span className="text-neutral-500 font-mono text-xs w-20">Web:</span>
-                  <a href={catalog.websiteUrl.startsWith('http') ? catalog.websiteUrl : `https://${catalog.websiteUrl}`} target="_blank" rel="noreferrer" className="hover:text-white underline">
+                <div className="flex gap-4">
+                  <span className="w-20 text-neutral-400 font-mono">Web:</span>
+                  <a
+                    href={catalog.websiteUrl.startsWith('http') ? catalog.websiteUrl : `https://${catalog.websiteUrl}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-amber-300 underline"
+                  >
                     {catalog.websiteUrl}
                   </a>
                 </div>
@@ -332,12 +455,29 @@ export default function MilanoLookbookTemplate({ catalog, products = [], mode = 
             </div>
           </div>
 
-          <div className="border-t border-white/10 pt-6 flex justify-between items-center text-xs text-neutral-500">
+          <div className="border-t border-white/15 pt-6 flex justify-between items-center text-xs text-neutral-400">
             <span>&copy; {new Date().getFullYear()} {brand.name}. Tüm hakları saklıdır.</span>
-            <span>Hazırlayan: SeramikBak Dijital Katalog Stüdyosu</span>
+            <span>SeramikBak Dijital Katalog Stüdyosu</span>
           </div>
         </section>
-      )}
+      );
+    }
+
+    return null;
+  };
+
+  if (viewFormat === 'single') {
+    return (
+      <div className="w-full flex justify-center">
+        {renderSinglePage(pages[activePageIndex] || pages[0], activePageIndex)}
+      </div>
+    );
+  }
+
+  // View format: all (continuous scroll)
+  return (
+    <div className="w-full flex flex-col gap-8 items-center">
+      {pages.map((p, idx) => renderSinglePage(p, idx))}
     </div>
   );
 }

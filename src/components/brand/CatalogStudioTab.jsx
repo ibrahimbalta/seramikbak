@@ -42,7 +42,8 @@ import {
   Mail,
   MapPin,
   DollarSign,
-  Tag
+  Tag,
+  Maximize2
 } from 'lucide-react';
 import CatalogTemplateRenderer from './catalog/templates/CatalogTemplateRenderer';
 
@@ -55,6 +56,7 @@ const TEMPLATES = [
     accent: '#b4823c',
     icon: Sparkles,
     tag: 'Mimarlar & Tasarımcılar',
+    mockupImg: '/renders/luxury_bathroom_calacatta_gold.jpg'
   },
   {
     id: 'spec-sheet',
@@ -63,25 +65,28 @@ const TEMPLATES = [
     desc: 'Mimarlar, mühendisler ve kamu ihale dosyaları için CAD/BIM standartlarında teknik matris. TS EN 14411 uygunluğu, PEI aşınma, R kaymazlık, kutu/palet metrajı.',
     accent: '#0284c7',
     icon: Layers,
-    tag: 'İhale & Proje',
+    tag: 'İhale & Şartname',
+    mockupImg: '/renders/luxury_bathroom_loft_beton.jpg'
   },
   {
     id: 'showroom',
     name: 'Showroom & Koleksiyon Rehberi',
     badge: 'Perakende & Bayi Satış',
-    desc: 'Bayi teşhirleri ve mağaza satış ekipleri için yan yana ürün kartları, önerilen mekan etiketleri (Banyo, Mutfak, Salon), derz eşleştirmeleri ve tavsiye edilen m² fiyat etiketleri.',
+    desc: 'Bayi teşhirleri ve mağaza satış ekipleri için yan yana ürün kartları, önerilen mekan etiketleri (Banyo, Mutfak, Salon), derz eşleştirmeleri ve perakende liste etiketleri.',
     accent: '#d97706',
     icon: Building,
     tag: 'Mağaza & Müşteri',
+    mockupImg: '/renders/luxury_bathroom_albatros_antrasit.jpg'
   },
   {
     id: 'global-export',
     name: 'Global İhracat & B2B Matrisi',
     badge: 'Konteyner & Lojistik',
-    desc: 'Yurtdışı distribütörler ve ihracat fuarları için çok dilli (EN) format. 20ft/40ft konteyner yükleme kapasiteleri, GTİP / HS Kodu (6907), CE / ISO sertifikaları ve FOB/EXW ihracat terimleri.',
+    desc: 'Yurtdışı distribütörler ve ihracat fuarları için çok dilli (EN) format. 20ft/40ft konteyner yükleme kapasiteleri, GTİP / HS Kodu (6907), CE / ISO sertifikaları ve FOB/EXW terimleri.',
     accent: '#2563eb',
     icon: Globe,
-    tag: 'Uluslararası İhracat',
+    tag: 'Global İhracat',
+    mockupImg: '/renders/luxury_bathroom_natural_oak.jpg'
   },
 ];
 
@@ -95,8 +100,7 @@ const COLOR_PRESETS = [
 ];
 
 export default function CatalogStudioTab({ brandInfo }) {
-  // Navigation: 'list' | 'editor' | 'preview-modal'
-  const [viewMode, setViewMode] = useState('list');
+  const [viewMode, setViewMode] = useState('list'); // 'list' | 'editor' | 'preview-modal'
   const [catalogs, setCatalogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
@@ -144,7 +148,7 @@ export default function CatalogStudioTab({ brandInfo }) {
     showTOC: true,
     showContactPage: true,
     showPageNumbers: true,
-    selectedItems: [], // array of { productId, customNote, usageArea }
+    selectedItems: [],
     isPublished: false,
     isDraft: true,
     publicSlug: '',
@@ -157,7 +161,6 @@ export default function CatalogStudioTab({ brandInfo }) {
 
   const brandId = brandInfo?.id;
 
-  // Load catalogs on mount
   useEffect(() => {
     if (brandId) {
       loadCatalogs();
@@ -198,7 +201,6 @@ export default function CatalogStudioTab({ brandInfo }) {
     }
   };
 
-  // Start new catalog creation
   const handleStartNew = () => {
     setActiveCatalogId(null);
     setFormData({
@@ -227,7 +229,7 @@ export default function CatalogStudioTab({ brandInfo }) {
       showTOC: true,
       showContactPage: true,
       showPageNumbers: true,
-      selectedItems: [],
+      selectedItems: availableProducts.slice(0, 6).map(p => ({ productId: p.id, customNote: '', usageArea: p.style || 'İç Mekân' })),
       isPublished: false,
       isDraft: true,
       publicSlug: '',
@@ -236,7 +238,6 @@ export default function CatalogStudioTab({ brandInfo }) {
     setViewMode('editor');
   };
 
-  // Edit existing catalog
   const handleEdit = async (cat) => {
     setLoading(true);
     try {
@@ -295,7 +296,6 @@ export default function CatalogStudioTab({ brandInfo }) {
     }
   };
 
-  // Open Full Preview Modal
   const handleOpenPreview = async (cat) => {
     setPreviewLoading(true);
     setPreviewCatalog(null);
@@ -316,7 +316,6 @@ export default function CatalogStudioTab({ brandInfo }) {
     }
   };
 
-  // Duplicate Catalog
   const handleDuplicate = async (cat) => {
     if (!confirm(`"${cat.title}" kataloğunun bir kopyasını oluşturmak istiyor musunuz?`)) return;
     try {
@@ -333,7 +332,6 @@ export default function CatalogStudioTab({ brandInfo }) {
     }
   };
 
-  // Delete Catalog
   const handleDelete = async (cat) => {
     if (!confirm(`"${cat.title}" kataloğunu kalıcı olarak silmek istediğinizden emin misiniz?`)) return;
     try {
@@ -350,7 +348,6 @@ export default function CatalogStudioTab({ brandInfo }) {
     }
   };
 
-  // Toggle Product Selection in Wizard Step 2
   const handleToggleProduct = (product) => {
     const exists = formData.selectedItems.some(i => i.productId === product.id);
     if (exists) {
@@ -389,7 +386,6 @@ export default function CatalogStudioTab({ brandInfo }) {
     setFormData(prev => ({ ...prev, selectedItems: items }));
   };
 
-  // Save or Publish
   const handleSaveCatalog = async (publish = false) => {
     if (!formData.title.trim()) {
       alert('Lütfen bir katalog başlığı girin.');
@@ -436,19 +432,12 @@ export default function CatalogStudioTab({ brandInfo }) {
     }
   };
 
-  // Copy Public Link
   const handleCopyLink = (slug) => {
     const url = `${window.location.origin}/katalog/${slug}`;
     navigator.clipboard.writeText(url);
     alert('Katalog web bağlantısı panoya kopyalandı:\n' + url);
   };
 
-  // Trigger Print to PDF
-  const handlePrint = () => {
-    window.print();
-  };
-
-  // Filtered Catalogs
   const filteredCatalogs = catalogs.filter(cat => {
     if (filterTab === 'published' && !cat.isPublished) return false;
     if (filterTab === 'draft' && cat.isPublished) return false;
@@ -462,7 +451,6 @@ export default function CatalogStudioTab({ brandInfo }) {
     return true;
   });
 
-  // Unique product categories for filter
   const productCategories = ['all', ...new Set(availableProducts.map(p => p.style).filter(Boolean))];
 
   const filteredAvailableProducts = availableProducts.filter(p => {
@@ -479,22 +467,22 @@ export default function CatalogStudioTab({ brandInfo }) {
   });
 
   const STEPS = [
-    { num: 1, label: 'Katalog Bilgileri', desc: 'Başlık, kapak ve ebat' },
-    { num: 2, label: `Ürün Seçimi (${formData.selectedItems.length})`, desc: 'Portföyden ürün seç ve sırala' },
-    { num: 3, label: 'Şablon Seçimi', desc: '4 lüks seramik şablonu' },
-    { num: 4, label: 'Kurumsal Kimlik', desc: 'Logo, renk ve iletişim' },
-    { num: 5, label: 'Görünürlük', desc: 'Fiyat, QR ve sayfalar' },
-    { num: 6, label: 'Önizleme & Yayın', desc: 'Canlı A4 test ve yayın' },
+    { num: 1, label: 'Katalog Bilgileri', desc: 'Başlık, kapak & dil' },
+    { num: 2, label: `Ürün Seçimi (${formData.selectedItems.length})`, desc: 'Koleksiyon karoları' },
+    { num: 3, label: 'Şablon Seçimi', desc: '4 lüks preset' },
+    { num: 4, label: 'Kurumsal Kimlik', desc: 'Logo & renkler' },
+    { num: 5, label: 'Görünürlük', desc: 'Fiyat, QR & sayfalar' },
+    { num: 6, label: 'Canlı Flipbook & Yayın', desc: 'İnteraktif test' },
   ];
 
   return (
     <div className="w-full flex flex-col gap-6 font-sans">
-      {/* Notifications */}
+      {/* Toast Notifications */}
       {successMsg && (
         <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm flex items-center justify-between shadow-sm animate-in fade-in">
           <div className="flex items-center gap-2.5">
             <CheckCircle2 size={18} className="text-emerald-600 flex-shrink-0" />
-            <span className="font-medium">{successMsg}</span>
+            <span className="font-bold">{successMsg}</span>
           </div>
           <button onClick={() => setSuccessMsg('')} className="text-emerald-600 hover:text-emerald-800 p-1">
             <X size={16} />
@@ -506,7 +494,7 @@ export default function CatalogStudioTab({ brandInfo }) {
         <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-sm flex items-center justify-between shadow-sm animate-in fade-in">
           <div className="flex items-center gap-2.5">
             <AlertCircle size={18} className="text-rose-600 flex-shrink-0" />
-            <span className="font-medium">{errorMsg}</span>
+            <span className="font-bold">{errorMsg}</span>
           </div>
           <button onClick={() => setErrorMsg('')} className="text-rose-600 hover:text-rose-800 p-1">
             <X size={16} />
@@ -515,34 +503,34 @@ export default function CatalogStudioTab({ brandInfo }) {
       )}
 
       {/* ========================================================================= */}
-      {/* VIEW MODE 1: CATALOG LIST */}
+      {/* VIEW MODE 1: CATALOG STUDIO HUB & 3D HARDCOVER BOOK SHOWCASE */}
       {/* ========================================================================= */}
       {viewMode === 'list' && (
         <div className="space-y-6">
-          {/* Executive Hero Banner */}
-          <div className="relative rounded-2xl overflow-hidden shadow-xl border border-amber-500/20 bg-gradient-to-r from-neutral-950 via-neutral-900 to-stone-900 text-white p-6 md:p-8">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-amber-500/10 via-transparent to-transparent pointer-events-none" />
+          {/* Executive Studio Header */}
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-amber-500/20 bg-gradient-to-r from-neutral-950 via-neutral-900 to-stone-900 text-white p-6 sm:p-8">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-amber-500/15 via-transparent to-transparent pointer-events-none" />
 
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2 max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold tracking-wide uppercase">
-                  <Sparkles size={12} className="text-amber-400" />
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-widest uppercase">
+                  <Sparkles size={13} className="text-amber-400" />
                   <span>Catalog Studio &bull; Dijital Yayıncılık</span>
                 </div>
-                <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
-                  Dijital Katalog & Lookbook Oluşturucu
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                  Dijital Katalog & Lookbook Stüdyosu
                 </h1>
-                <p className="text-xs md:text-sm text-neutral-300 leading-relaxed">
-                  Portföyünüzdeki seramikleri İtalyan mimari dergi, teknik şartname veya showroom şablonlarına dönüştürün. Canlı QR kodları ile doğrudan SeramikBak 3D Studio'ya bağlayın.
+                <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed font-light">
+                  Seramik koleksiyonlarınızı İtalyan mimarlık dergisi, teknik şartname veya interaktif showroom e-kataloğuna dönüştürün. Canlı QR kodları ile müşterileriniz ve mimarlar karoları doğrudan 3D Studio'da deneyebilir.
                 </p>
               </div>
 
               <div className="flex-shrink-0">
                 <button
                   onClick={handleStartNew}
-                  className="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-neutral-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all transform hover:-translate-y-0.5"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:opacity-95 text-neutral-950 font-extrabold text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-amber-500/25 transition-all transform hover:-translate-y-0.5"
                 >
-                  <Plus size={18} />
+                  <Plus size={19} />
                   <span>Yeni Katalog Oluştur</span>
                 </button>
               </div>
@@ -551,38 +539,38 @@ export default function CatalogStudioTab({ brandInfo }) {
 
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-white p-4 rounded-xl border border-neutral-200/80 shadow-sm flex flex-col justify-between">
-              <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Toplam Katalog</span>
-              <p className="text-2xl font-bold text-neutral-900 mt-1">{catalogs.length}</p>
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-neutral-200/90 shadow-sm flex flex-col justify-between">
+              <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">Toplam Katalog</span>
+              <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1">{catalogs.length}</p>
             </div>
-            <div className="bg-white p-4 rounded-xl border border-emerald-200/80 shadow-sm flex flex-col justify-between">
-              <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider">Yayında Olanlar</span>
-              <p className="text-2xl font-bold text-emerald-600 mt-1">
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-emerald-200/90 shadow-sm flex flex-col justify-between">
+              <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Yayında Olanlar</span>
+              <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1">
                 {catalogs.filter(c => c.isPublished).length}
               </p>
             </div>
-            <div className="bg-white p-4 rounded-xl border border-neutral-200/80 shadow-sm flex flex-col justify-between">
-              <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Web Görüntülenme</span>
-              <p className="text-2xl font-bold text-neutral-900 mt-1">
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-neutral-200/90 shadow-sm flex flex-col justify-between">
+              <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">Web Okunma</span>
+              <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1">
                 {catalogs.reduce((acc, c) => acc + (c.viewCount || 0), 0)}
               </p>
             </div>
-            <div className="bg-white p-4 rounded-xl border border-blue-200/80 shadow-sm flex flex-col justify-between">
-              <span className="text-[11px] font-semibold text-blue-700 uppercase tracking-wider">PDF İndirilme</span>
-              <p className="text-2xl font-bold text-blue-600 mt-1">
+            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-blue-200/90 shadow-sm flex flex-col justify-between">
+              <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider">PDF İndirilme</span>
+              <p className="text-2xl sm:text-3xl font-extrabold text-blue-600 mt-1">
                 {catalogs.reduce((acc, c) => acc + (c.downloadCount || 0), 0)}
               </p>
             </div>
           </div>
 
-          {/* Filtering & Search Bar */}
-          <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-neutral-200/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+          {/* Filter Bar */}
+          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-neutral-200/90 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
               <button
                 onClick={() => setFilterTab('all')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
                   filterTab === 'all'
-                    ? 'bg-neutral-900 text-white shadow-sm'
+                    ? 'bg-neutral-900 text-white shadow'
                     : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                 }`}
               >
@@ -590,9 +578,9 @@ export default function CatalogStudioTab({ brandInfo }) {
               </button>
               <button
                 onClick={() => setFilterTab('published')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
                   filterTab === 'published'
-                    ? 'bg-emerald-600 text-white shadow-sm'
+                    ? 'bg-emerald-600 text-white shadow'
                     : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                 }`}
               >
@@ -600,9 +588,9 @@ export default function CatalogStudioTab({ brandInfo }) {
               </button>
               <button
                 onClick={() => setFilterTab('draft')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
                   filterTab === 'draft'
-                    ? 'bg-amber-600 text-white shadow-sm'
+                    ? 'bg-amber-600 text-white shadow'
                     : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                 }`}
               >
@@ -611,146 +599,156 @@ export default function CatalogStudioTab({ brandInfo }) {
             </div>
 
             <div className="relative w-full sm:w-72">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Katalog adı veya açıklama ara..."
-                className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                placeholder="Katalog adı ara..."
+                className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
               />
             </div>
           </div>
 
-          {/* Catalog Cards Grid */}
+          {/* Hardcover Lookbook Cards Grid */}
           {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center text-neutral-500">
-              <Loader2 size={32} className="animate-spin text-amber-500 mb-2" />
-              <p className="text-sm font-medium">Kataloglar yükleniyor...</p>
+            <div className="py-24 flex flex-col items-center justify-center text-neutral-500">
+              <Loader2 size={36} className="animate-spin text-amber-500 mb-2" />
+              <p className="text-sm font-bold">Kataloglar yükleniyor...</p>
             </div>
           ) : filteredCatalogs.length === 0 ? (
-            <div className="bg-white rounded-2xl border-2 border-dashed border-neutral-300 p-8 sm:p-12 text-center">
-              <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 shadow-sm">
-                <BookOpen size={28} />
+            <div className="bg-white rounded-3xl border-2 border-dashed border-neutral-300 p-10 sm:p-16 text-center">
+              <div className="w-18 h-18 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 shadow-sm">
+                <BookOpen size={32} />
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-neutral-900 mb-1">
+              <h3 className="text-lg font-extrabold text-neutral-900 mb-1">
                 Henüz Dijital Katalog Oluşturulmadı
               </h3>
               <p className="text-xs sm:text-sm text-neutral-500 max-w-md mx-auto mb-6">
-                Ürün portföyünüzden dilediğiniz seramikleri seçerek mimari şartname, lookbook veya bayi satış kataloğu oluşturabilirsiniz.
+                Ürün portföyünüzden seramikleri seçerek İtalyan mimari dergi, şartname veya showroom lookbook'u oluşturun.
               </p>
               <button
                 onClick={handleStartNew}
-                className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-sm inline-flex items-center gap-2 shadow-md transition"
+                className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-sm inline-flex items-center gap-2 shadow-lg transition"
               >
                 <Plus size={18} />
                 <span>İlk Kataloğunuzu Oluşturun</span>
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCatalogs.map(cat => {
                 const tplInfo = TEMPLATES.find(t => t.id === cat.template) || TEMPLATES[0];
-                const TplIcon = tplInfo.icon;
 
                 return (
                   <div
                     key={cat.id}
-                    className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group"
+                    className="bg-white rounded-2xl border border-neutral-200/90 shadow-md hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group"
                   >
-                    {/* Top banner / template indicator */}
-                    <div className="p-4 border-b border-neutral-100 flex items-start justify-between bg-neutral-50/60">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm flex-shrink-0"
-                          style={{ backgroundColor: tplInfo.accent }}
+                    {/* 3D Realistic Hardcover Book Spine Mockup */}
+                    <div
+                      onClick={() => handleOpenPreview(cat)}
+                      className="relative h-56 w-full cursor-pointer overflow-hidden p-6 flex flex-col justify-between text-white"
+                      style={{
+                        background: `linear-gradient(135deg, rgba(9, 13, 22, 0.95) 0%, rgba(17, 24, 39, 0.85) 60%, rgba(30, 27, 75, 0.9) 100%), url(${tplInfo.mockupImg}) center/cover no-repeat`,
+                        backgroundColor: '#0f172a'
+                      }}
+                    >
+                      {/* Book Spine Shadow Left */}
+                      <div className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+                      <div className="absolute inset-y-0 left-3 w-px bg-white/20" />
+
+                      {/* Top Badges */}
+                      <div className="relative z-10 flex items-center justify-between">
+                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-300 font-mono bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/10">
+                          {tplInfo.name}
+                        </span>
+                        <span
+                          className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+                            cat.isPublished ? 'bg-emerald-500 text-neutral-950 font-extrabold' : 'bg-amber-500 text-neutral-950 font-extrabold'
+                          }`}
                         >
-                          <TplIcon size={18} />
-                        </div>
-                        <div>
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 block">
-                            {tplInfo.name}
-                          </span>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[11px] text-neutral-500 font-medium">
-                              {cat.orientation === 'landscape' ? 'Yatay (A4)' : 'Dikey (A4)'}
-                            </span>
-                            <span className="text-neutral-300">&bull;</span>
-                            <span className="text-[11px] text-amber-700 font-semibold">
-                              {cat.itemCount || 0} Ürün
-                            </span>
-                          </div>
-                        </div>
+                          {cat.isPublished ? 'YAYINDA' : 'TASLAK'}
+                        </span>
                       </div>
 
-                      {/* Status badge */}
-                      <span
-                        className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                          cat.isPublished
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-amber-50 text-amber-700 border border-amber-200'
-                        }`}
-                      >
-                        {cat.isPublished ? 'Yayında' : 'Taslak'}
-                      </span>
-                    </div>
-
-                    {/* Middle Info */}
-                    <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
-                      <div>
-                        <h3 className="text-sm sm:text-base font-bold text-neutral-900 group-hover:text-amber-600 transition mb-1 line-clamp-1">
+                      {/* Middle Book Title */}
+                      <div className="relative z-10 my-auto">
+                        <span className="text-[11px] font-serif text-amber-200/90 uppercase tracking-widest block mb-1">
+                          {brandInfo?.name || 'SERAMİK'}
+                        </span>
+                        <h3 className="text-xl font-serif font-light text-white leading-snug line-clamp-2">
                           {cat.title}
                         </h3>
-                        {cat.description && (
-                          <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed mb-4">
-                            {cat.description}
-                          </p>
-                        )}
                       </div>
 
-                      {/* Stats */}
-                      <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500 font-medium">
-                        <span>Görüntülenme: <strong className="text-neutral-800">{cat.viewCount || 0}</strong></span>
+                      {/* Bottom Book Metadata */}
+                      <div className="relative z-10 flex items-center justify-between text-[11px] text-neutral-300 font-mono border-t border-white/15 pt-2">
+                        <span>{cat.itemCount || 0} Seramik Karo</span>
+                        <span>{cat.orientation === 'landscape' ? 'Yatay A4' : 'Dikey A4'}</span>
+                      </div>
+
+                      {/* Hover Overlay with "Lookbook Olarak Aç" button */}
+                      <div className="absolute inset-0 bg-neutral-950/70 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenPreview(cat);
+                          }}
+                          className="px-4 py-2 rounded-xl bg-amber-500 text-neutral-950 font-extrabold text-xs flex items-center gap-1.5 shadow-lg transform scale-95 group-hover:scale-100 transition"
+                        >
+                          <Eye size={14} />
+                          <span>Lookbook Aç</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Bottom Card Controls */}
+                    <div className="p-4 bg-white flex flex-col justify-between flex-1">
+                      {cat.description && (
+                        <p className="text-xs text-neutral-500 line-clamp-2 mb-3 leading-relaxed">
+                          {cat.description}
+                        </p>
+                      )}
+
+                      <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500 font-medium">
+                        <span>Okunma: <strong className="text-neutral-800">{cat.viewCount || 0}</strong></span>
                         <span>İndirilme: <strong className="text-neutral-800">{cat.downloadCount || 0}</strong></span>
                       </div>
                     </div>
 
                     {/* Action Bar */}
-                    <div className="p-2.5 bg-neutral-50 border-t border-neutral-100 grid grid-cols-4 gap-1.5 text-xs">
+                    <div className="p-2.5 bg-neutral-50 border-t border-neutral-100 grid grid-cols-4 gap-1.5 text-xs font-bold">
                       <button
                         onClick={() => handleOpenPreview(cat)}
-                        title="Canlı Önizle & PDF"
-                        className="py-2 px-1 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
+                        className="py-2 px-1 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
                       >
-                        <Eye size={14} className="text-neutral-600" />
-                        <span className="text-[10px] font-semibold">Önizle</span>
+                        <Eye size={14} className="text-amber-600" />
+                        <span className="text-[10px]">Önizle</span>
                       </button>
 
                       <button
                         onClick={() => handleEdit(cat)}
-                        title="Düzenle"
-                        className="py-2 px-1 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
+                        className="py-2 px-1 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
                       >
-                        <Edit size={14} className="text-neutral-600" />
-                        <span className="text-[10px] font-semibold">Düzenle</span>
+                        <Edit size={14} className="text-blue-600" />
+                        <span className="text-[10px]">Düzenle</span>
                       </button>
 
                       <button
                         onClick={() => handleCopyLink(cat.publicSlug)}
-                        title="Web Linkini Paylaş"
-                        className="py-2 px-1 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
+                        className="py-2 px-1 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
                       >
-                        <Share2 size={14} className="text-neutral-600" />
-                        <span className="text-[10px] font-semibold">Paylaş</span>
+                        <Share2 size={14} className="text-emerald-600" />
+                        <span className="text-[10px]">Paylaş</span>
                       </button>
 
                       <button
                         onClick={() => handleDuplicate(cat)}
-                        title="Kopyasını Çoğalt"
-                        className="py-2 px-1 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
+                        className="py-2 px-1 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
                       >
                         <Copy size={14} className="text-neutral-600" />
-                        <span className="text-[10px] font-semibold">Kopya</span>
+                        <span className="text-[10px]">Kopya</span>
                       </button>
                     </div>
                   </div>
@@ -762,28 +760,24 @@ export default function CatalogStudioTab({ brandInfo }) {
       )}
 
       {/* ========================================================================= */}
-      {/* VIEW MODE 2: WIZARD EDITOR (EXECUTIVE REDESIGN & FULL MOBILE COMPLIANT) */}
+      {/* VIEW MODE 2: WIZARD EDITOR (EXECUTIVE LUXURY FORM + LIVE PREVIEW) */}
       {/* ========================================================================= */}
       {viewMode === 'editor' && (
         <div className="space-y-4">
-          {/* Editor Header Bar (Replaces giant brown banner in editor mode) */}
+          {/* Editor Header Bar */}
           <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setViewMode('list')}
-                className="p-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition flex items-center justify-center"
+                className="p-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition"
                 title="Katalog Listesine Dön"
               >
                 <ArrowLeft size={18} />
               </button>
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 uppercase tracking-wide">
-                    {activeCatalogId ? 'Katalog Düzenleme' : 'Yeni Katalog Sihirbazı'}
-                  </span>
-                  <span className="text-xs text-neutral-400">&bull;</span>
-                  <span className="text-xs text-neutral-500 font-medium">Adım {activeStep} / 6</span>
-                </div>
+                <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded border border-amber-200 uppercase tracking-wide">
+                  {activeCatalogId ? 'Katalog Düzenleme' : 'Yeni Katalog Stüdyosu'}
+                </span>
                 <h2 className="text-base sm:text-lg font-bold text-neutral-900 mt-0.5 truncate max-w-xs sm:max-w-md">
                   {formData.title || 'Başlıksız Katalog'}
                 </h2>
@@ -795,7 +789,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                 type="button"
                 onClick={() => handleSaveCatalog(false)}
                 disabled={saving}
-                className="px-3.5 py-2 rounded-xl border border-neutral-300 hover:bg-neutral-50 text-neutral-700 text-xs font-bold transition flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl border border-neutral-300 hover:bg-neutral-50 text-neutral-700 text-xs font-bold transition flex items-center gap-1.5"
               >
                 {saving ? <Loader2 size={13} className="animate-spin" /> : null}
                 <span>Taslak Kaydet</span>
@@ -804,17 +798,16 @@ export default function CatalogStudioTab({ brandInfo }) {
                 type="button"
                 onClick={() => handleSaveCatalog(true)}
                 disabled={saving}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition flex items-center gap-1.5"
+                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5"
               >
-                <Sparkles size={13} />
+                <Sparkles size={14} />
                 <span>Kataloğu Yayınla</span>
               </button>
             </div>
           </div>
 
-          {/* Stepper Navigation (Responsive Horizontal Pills on Desktop, Progress Bar on Mobile) */}
+          {/* Stepper Navigation */}
           <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-3 sm:p-4">
-            {/* Desktop Stepper */}
             <div className="hidden lg:grid grid-cols-6 gap-2">
               {STEPS.map(step => {
                 const isActive = activeStep === step.num;
@@ -828,14 +821,14 @@ export default function CatalogStudioTab({ brandInfo }) {
                       isActive
                         ? 'border-amber-500 bg-amber-50/60 shadow-sm ring-2 ring-amber-500/20'
                         : isPassed
-                        ? 'border-emerald-200 bg-emerald-50/40 hover:bg-emerald-50/80 text-emerald-900'
-                        : 'border-neutral-200 bg-neutral-50/50 hover:bg-neutral-100/80 text-neutral-500'
+                        ? 'border-emerald-200 bg-emerald-50/40 text-emerald-900'
+                        : 'border-neutral-200 bg-neutral-50/40 text-neutral-500 hover:bg-neutral-100'
                     }`}
                   >
                     <span
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                         isActive
-                          ? 'bg-amber-500 text-neutral-950'
+                          ? 'bg-amber-500 text-neutral-950 font-bold'
                           : isPassed
                           ? 'bg-emerald-600 text-white'
                           : 'bg-neutral-200 text-neutral-600'
@@ -854,10 +847,10 @@ export default function CatalogStudioTab({ brandInfo }) {
               })}
             </div>
 
-            {/* Mobile / Tablet Stepper (Progress Bar & Current Step) */}
+            {/* Mobile Stepper */}
             <div className="lg:hidden space-y-2">
               <div className="flex items-center justify-between text-xs font-bold">
-                <span className="text-amber-700">Adım {activeStep} / 6: {STEPS[activeStep - 1].label}</span>
+                <span className="text-amber-800">Adım {activeStep} / 6: {STEPS[activeStep - 1].label}</span>
                 <span className="text-neutral-400 font-mono">%{Math.round((activeStep / 6) * 100)}</span>
               </div>
               <div className="w-full h-2 rounded-full bg-neutral-100 overflow-hidden">
@@ -866,8 +859,6 @@ export default function CatalogStudioTab({ brandInfo }) {
                   style={{ width: `${(activeStep / 6) * 100}%` }}
                 />
               </div>
-
-              {/* Mobile Quick Step Selector Pills */}
               <div className="flex items-center gap-1.5 overflow-x-auto pt-1 pb-1">
                 {STEPS.map(step => (
                   <button
@@ -890,7 +881,7 @@ export default function CatalogStudioTab({ brandInfo }) {
 
           {/* Form Content Card */}
           <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm p-5 sm:p-8">
-            {/* -------------------- STEP 1: KATALOG BİLGİLERİ -------------------- */}
+            {/* STEP 1: KATALOG BİLGİLERİ */}
             {activeStep === 1 && (
               <div className="space-y-6 max-w-3xl">
                 <div className="border-b border-neutral-100 pb-4">
@@ -905,16 +896,13 @@ export default function CatalogStudioTab({ brandInfo }) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-1.5 md:col-span-2">
-                    <label className="text-xs font-bold text-neutral-800 flex items-center justify-between">
-                      <span>Katalog Resmi Adı *</span>
-                      <span className="text-[10px] text-neutral-400">Yönetim ve fihrist başlığı</span>
-                    </label>
+                    <label className="text-xs font-bold text-neutral-800">Katalog Resmi Adı *</label>
                     <input
                       type="text"
                       value={formData.title}
                       onChange={e => setFormData({ ...formData, title: e.target.value })}
                       placeholder="Örn: Bien Seramik 2026 Koleksiyon Kataloğu"
-                      className="w-full px-4 py-2.5 bg-neutral-50/50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                      className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                     />
                   </div>
 
@@ -925,7 +913,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                       value={formData.coverTitle}
                       onChange={e => setFormData({ ...formData, coverTitle: e.target.value })}
                       placeholder="Kapakta büyük puntoyla yer alacak başlık"
-                      className="w-full px-4 py-2.5 bg-neutral-50/50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                      className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                     />
                   </div>
 
@@ -936,24 +924,24 @@ export default function CatalogStudioTab({ brandInfo }) {
                       value={formData.coverSubtitle}
                       onChange={e => setFormData({ ...formData, coverSubtitle: e.target.value })}
                       placeholder="Örn: Lüks Porselen & Seramik Seçkisi"
-                      className="w-full px-4 py-2.5 bg-neutral-50/50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                      className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                     />
                   </div>
 
                   <div className="space-y-1.5 md:col-span-2">
-                    <label className="text-xs font-bold text-neutral-800">Giriş / Önsöz Manifestosu</label>
+                    <label className="text-xs font-bold text-neutral-800">Giriş / Önsöz Metni</label>
                     <textarea
                       rows={3}
                       value={formData.introText}
                       onChange={e => setFormData({ ...formData, introText: e.target.value })}
-                      placeholder="Katalog kapağının altında veya iç kapağında yer alacak koleksiyon felsefesi..."
-                      className="w-full px-4 py-2.5 bg-neutral-50/50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                      placeholder="Koleksiyon önsözü veya mimari marka manifestosu..."
+                      className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                     />
                   </div>
 
                   {/* Orientation Cards */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-neutral-800">Sayfa Yönlendirmesi (A4 Formatı)</label>
+                    <label className="text-xs font-bold text-neutral-800">Sayfa Yönlendirmesi</label>
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         type="button"
@@ -961,7 +949,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                         className={`p-3 rounded-xl border-2 text-left transition flex items-center gap-3 ${
                           formData.orientation === 'portrait'
                             ? 'border-amber-500 bg-amber-50/50 text-amber-950 font-bold'
-                            : 'border-neutral-200 bg-neutral-50/40 text-neutral-600 hover:bg-neutral-100'
+                            : 'border-neutral-200 bg-neutral-50 text-neutral-600'
                         }`}
                       >
                         <div className="w-6 h-8 rounded border-2 border-current flex items-center justify-center flex-shrink-0">
@@ -979,7 +967,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                         className={`p-3 rounded-xl border-2 text-left transition flex items-center gap-3 ${
                           formData.orientation === 'landscape'
                             ? 'border-amber-500 bg-amber-50/50 text-amber-950 font-bold'
-                            : 'border-neutral-200 bg-neutral-50/40 text-neutral-600 hover:bg-neutral-100'
+                            : 'border-neutral-200 bg-neutral-50 text-neutral-600'
                         }`}
                       >
                         <div className="w-8 h-6 rounded border-2 border-current flex items-center justify-center flex-shrink-0">
@@ -987,7 +975,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                         </div>
                         <div>
                           <p className="text-xs font-bold">Yatay (Landscape)</p>
-                          <p className="text-[10px] text-neutral-400">Geniş mimari pafta</p>
+                          <p className="text-[10px] text-neutral-400">Geniş pafta</p>
                         </div>
                       </button>
                     </div>
@@ -1003,7 +991,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                         className={`p-3 rounded-xl border-2 text-left transition flex items-center gap-2.5 ${
                           formData.language === 'tr'
                             ? 'border-amber-500 bg-amber-50/50 text-amber-950 font-bold'
-                            : 'border-neutral-200 bg-neutral-50/40 text-neutral-600 hover:bg-neutral-100'
+                            : 'border-neutral-200 bg-neutral-50 text-neutral-600'
                         }`}
                       >
                         <span className="text-base">🇹🇷</span>
@@ -1019,13 +1007,13 @@ export default function CatalogStudioTab({ brandInfo }) {
                         className={`p-3 rounded-xl border-2 text-left transition flex items-center gap-2.5 ${
                           formData.language === 'en'
                             ? 'border-amber-500 bg-amber-50/50 text-amber-950 font-bold'
-                            : 'border-neutral-200 bg-neutral-50/40 text-neutral-600 hover:bg-neutral-100'
+                            : 'border-neutral-200 bg-neutral-50 text-neutral-600'
                         }`}
                       >
                         <span className="text-base">🇬🇧</span>
                         <div>
                           <p className="text-xs font-bold">English</p>
-                          <p className="text-[10px] text-neutral-400">Global Export / B2B</p>
+                          <p className="text-[10px] text-neutral-400">Export & B2B</p>
                         </div>
                       </button>
                     </div>
@@ -1034,7 +1022,7 @@ export default function CatalogStudioTab({ brandInfo }) {
               </div>
             )}
 
-            {/* -------------------- STEP 2: ÜRÜN SEÇİMİ & SIRALAMA -------------------- */}
+            {/* STEP 2: ÜRÜN SEÇİMİ & SIRALAMA */}
             {activeStep === 2 && (
               <div className="space-y-6">
                 <div className="border-b border-neutral-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -1044,7 +1032,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                       <span>2. Ürün Portföyünden Seçim Yapın</span>
                     </h3>
                     <p className="text-xs text-neutral-500 mt-1">
-                      Kataloğa dahil etmek istediğiniz seramikleri tıklayarak seçin. Seçilen seramiklerin sayfa sırasını aşağıdan düzenleyebilirsiniz.
+                      Kataloğa dahil etmek istediğiniz seramikleri tıklayarak seçin.
                     </p>
                   </div>
                   <span className="text-xs font-bold px-3.5 py-1.5 bg-amber-100 text-amber-900 rounded-full border border-amber-200 self-start sm:self-center">
@@ -1061,14 +1049,14 @@ export default function CatalogStudioTab({ brandInfo }) {
                       value={productSearch}
                       onChange={e => setProductSearch(e.target.value)}
                       placeholder="Seramik adı, kodu veya rengi ile filtrele..."
-                      className="w-full pl-9 pr-4 py-2.5 bg-neutral-50/50 border border-neutral-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                      className="w-full pl-9 pr-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                     />
                   </div>
 
                   <select
                     value={productCategoryFilter}
                     onChange={e => setProductCategoryFilter(e.target.value)}
-                    className="px-4 py-2.5 bg-neutral-50/50 border border-neutral-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                    className="px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                   >
                     <option value="all">Tüm Kategoriler ({availableProducts.length})</option>
                     {productCategories.filter(c => c !== 'all').map(cat => (
@@ -1078,11 +1066,11 @@ export default function CatalogStudioTab({ brandInfo }) {
                 </div>
 
                 {/* Product Selection Grid */}
-                <div className="border border-neutral-200 rounded-2xl p-4 bg-neutral-50/40 max-h-80 overflow-y-auto">
+                <div className="border border-neutral-200 rounded-2xl p-4 bg-neutral-50 max-h-80 overflow-y-auto">
                   {productsLoading ? (
                     <div className="py-12 text-center text-neutral-500">
                       <Loader2 size={24} className="animate-spin text-amber-500 mx-auto mb-2" />
-                      <p className="text-xs font-medium">Ürünler taranıyor...</p>
+                      <p className="text-xs font-bold">Ürünler taranıyor...</p>
                     </div>
                   ) : filteredAvailableProducts.length === 0 ? (
                     <div className="py-12 text-center text-neutral-500 text-xs">
@@ -1098,7 +1086,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                             onClick={() => handleToggleProduct(p)}
                             className={`p-2.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between ${
                               isSelected
-                                ? 'border-amber-500 bg-amber-50/90 shadow-sm ring-2 ring-amber-500/20'
+                                ? 'border-amber-500 bg-amber-50 shadow-sm ring-2 ring-amber-500/20'
                                 : 'border-neutral-200 bg-white hover:border-neutral-300'
                             }`}
                           >
@@ -1125,25 +1113,19 @@ export default function CatalogStudioTab({ brandInfo }) {
                   )}
                 </div>
 
-                {/* Selected Products Order & Custom Notes */}
+                {/* Selected Products Order */}
                 {formData.selectedItems.length > 0 && (
                   <div className="space-y-3 pt-2">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
-                        Katalog Sayfa Sıralaması ve Özel Açıklamalar
-                      </h4>
-                      <span className="text-[11px] text-neutral-500">
-                        {formData.selectedItems.length} sayfa / ürün
-                      </span>
-                    </div>
-
+                    <h4 className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
+                      Katalog Sayfa Sıralaması
+                    </h4>
                     <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                       {formData.selectedItems.map((item, idx) => {
                         const p = availableProducts.find(prod => prod.id === item.productId) || {};
                         return (
                           <div
                             key={item.productId}
-                            className="p-3 bg-white border border-neutral-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
+                            className="p-3 bg-white border border-neutral-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                           >
                             <div className="flex items-center gap-3">
                               <span className="w-6 text-xs font-mono font-bold text-neutral-400">
@@ -1177,7 +1159,6 @@ export default function CatalogStudioTab({ brandInfo }) {
                                   disabled={idx === 0}
                                   onClick={() => handleMoveProduct(idx, -1)}
                                   className="p-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-100 disabled:opacity-30 text-neutral-600"
-                                  title="Yukarı Taşı"
                                 >
                                   <MoveUp size={14} />
                                 </button>
@@ -1186,7 +1167,6 @@ export default function CatalogStudioTab({ brandInfo }) {
                                   disabled={idx === formData.selectedItems.length - 1}
                                   onClick={() => handleMoveProduct(idx, 1)}
                                   className="p-1.5 rounded-lg border border-neutral-200 hover:bg-neutral-100 disabled:opacity-30 text-neutral-600"
-                                  title="Aşağı Taşı"
                                 >
                                   <MoveDown size={14} />
                                 </button>
@@ -1194,7 +1174,6 @@ export default function CatalogStudioTab({ brandInfo }) {
                                   type="button"
                                   onClick={() => handleToggleProduct(p)}
                                   className="p-1.5 rounded-lg border border-rose-200 hover:bg-rose-50 text-rose-600"
-                                  title="Katalogdan Çıkar"
                                 >
                                   <Trash2 size={14} />
                                 </button>
@@ -1209,7 +1188,7 @@ export default function CatalogStudioTab({ brandInfo }) {
               </div>
             )}
 
-            {/* -------------------- STEP 3: ŞABLON SEÇİMİ -------------------- */}
+            {/* STEP 3: ŞABLON SEÇİMİ */}
             {activeStep === 3 && (
               <div className="space-y-6 max-w-4xl">
                 <div className="border-b border-neutral-100 pb-4">
@@ -1218,7 +1197,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                     <span>3. Profesyonel Tasarım Şablonu</span>
                   </h3>
                   <p className="text-xs text-neutral-500 mt-1">
-                    Seramik sektörünün farklı kullanım senaryolarına (iç mimarlık, teknik ihaleler, mağazalar veya ihracat) göre hazırlanmış 4 ana şablondan birini seçin.
+                    Seramik sektörünün 4 ana hedef kitlesi için hazırlanmış prestijli şablonlardan birini seçin.
                   </p>
                 </div>
 
@@ -1231,41 +1210,43 @@ export default function CatalogStudioTab({ brandInfo }) {
                       <div
                         key={tpl.id}
                         onClick={() => setFormData({ ...formData, template: tpl.id })}
-                        className={`p-5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col justify-between ${
+                        className={`rounded-2xl border-2 cursor-pointer transition-all overflow-hidden flex flex-col justify-between ${
                           isSelected
-                            ? 'border-amber-500 bg-amber-50/30 shadow-md ring-2 ring-amber-500/20'
+                            ? 'border-amber-500 bg-amber-50/40 shadow-xl ring-2 ring-amber-500/20'
                             : 'border-neutral-200 hover:border-neutral-300 bg-white'
                         }`}
                       >
-                        <div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div
-                              className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm"
-                              style={{ backgroundColor: tpl.accent }}
-                            >
-                              <Icon size={20} />
-                            </div>
-                            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-700">
+                        {/* Mini mockup banner */}
+                        <div
+                          className="h-28 w-full p-4 flex flex-col justify-between text-white relative"
+                          style={{
+                            background: `linear-gradient(135deg, rgba(9, 13, 22, 0.9) 0%, rgba(17, 24, 39, 0.75) 100%), url(${tpl.mockupImg}) center/cover no-repeat`,
+                            backgroundColor: '#0f172a'
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-black/50 backdrop-blur-md uppercase text-amber-300">
                               {tpl.tag}
                             </span>
+                            {isSelected && (
+                              <span className="w-5 h-5 rounded-full bg-amber-500 text-neutral-950 flex items-center justify-center font-bold text-xs shadow">
+                                <Check size={12} />
+                              </span>
+                            )}
                           </div>
-
-                          <h4 className="text-base font-bold text-neutral-900 mb-1">
-                            {tpl.name}
-                          </h4>
-                          <span className="text-[11px] font-semibold text-neutral-400 block mb-2 uppercase tracking-wide">
-                            {tpl.badge}
-                          </span>
-                          <p className="text-xs text-neutral-600 leading-relaxed">
-                            {tpl.desc}
-                          </p>
+                          <p className="text-sm font-serif font-light text-white">{tpl.name}</p>
                         </div>
 
-                        <div className="mt-5 pt-3.5 border-t border-neutral-100 flex items-center justify-between text-xs font-bold">
-                          <span style={{ color: tpl.accent }}>
-                            {isSelected ? '✓ Seçili Şablon' : 'Bu Şablonu Seç'}
-                          </span>
-                          <span className="text-neutral-400 font-normal">A4 &bull; Yüksek Baskı Çözünürlüğü</span>
+                        <div className="p-4 flex-1 flex flex-col justify-between">
+                          <p className="text-xs text-neutral-600 leading-relaxed mb-3">
+                            {tpl.desc}
+                          </p>
+                          <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs font-bold">
+                            <span style={{ color: tpl.accent }}>
+                              {isSelected ? '✓ Seçili Şablon' : 'Bu Şablonu Uygula'}
+                            </span>
+                            <span className="text-neutral-400 font-normal">A4 Ultra HD</span>
+                          </div>
                         </div>
                       </div>
                     );
@@ -1274,7 +1255,7 @@ export default function CatalogStudioTab({ brandInfo }) {
               </div>
             )}
 
-            {/* -------------------- STEP 4: KURUMSAL KİMLİK & İLETİŞİM -------------------- */}
+            {/* STEP 4: KURUMSAL KİMLİK */}
             {activeStep === 4 && (
               <div className="space-y-6 max-w-3xl">
                 <div className="border-b border-neutral-100 pb-4">
@@ -1283,7 +1264,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                     <span>4. Kurumsal Kimlik & İletişim Bilgileri</span>
                   </h3>
                   <p className="text-xs text-neutral-500 mt-1">
-                    Katalog kapağı, iç sayfalar ve arka kapakta yer alacak logo, kurumsal renk ve resmi irtibat bilgilerini girin.
+                    Katalog kapağı ve arka sayfada yer alacak logo, kurumsal renk ve resmi irtibat bilgilerini girin.
                   </p>
                 </div>
 
@@ -1295,11 +1276,10 @@ export default function CatalogStudioTab({ brandInfo }) {
                       value={formData.customLogoUrl}
                       onChange={e => setFormData({ ...formData, customLogoUrl: e.target.value })}
                       placeholder="https://... logo.png (Boş bırakılırsa profil logonuz kullanılır)"
-                      className="w-full px-4 py-2.5 bg-neutral-50/50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                      className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                     />
                   </div>
 
-                  {/* Primary Color Picker & Presets */}
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-xs font-bold text-neutral-800">Katalog Ana Vurgu Rengi</label>
                     <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -1331,7 +1311,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                         type="text"
                         value={formData.primaryColor}
                         onChange={e => setFormData({ ...formData, primaryColor: e.target.value })}
-                        className="w-40 px-3 py-2 bg-neutral-50/50 border border-neutral-300 rounded-xl text-xs font-mono font-bold"
+                        className="w-40 px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-xl text-xs font-mono font-bold"
                       />
                     </div>
                   </div>
@@ -1343,7 +1323,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                       value={formData.websiteUrl}
                       onChange={e => setFormData({ ...formData, websiteUrl: e.target.value })}
                       placeholder="www.markaniz.com"
-                      className="w-full px-4 py-2.5 bg-neutral-50/50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                      className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none"
                     />
                   </div>
 
@@ -1354,7 +1334,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                       value={formData.contactPhone}
                       onChange={e => setFormData({ ...formData, contactPhone: e.target.value })}
                       placeholder="+90 (212) 000 00 00"
-                      className="w-full px-4 py-2.5 bg-neutral-50/50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                      className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none"
                     />
                   </div>
 
@@ -1365,7 +1345,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                       value={formData.contactEmail}
                       onChange={e => setFormData({ ...formData, contactEmail: e.target.value })}
                       placeholder="proje@markaniz.com"
-                      className="w-full px-4 py-2.5 bg-neutral-50/50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                      className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none"
                     />
                   </div>
 
@@ -1376,14 +1356,14 @@ export default function CatalogStudioTab({ brandInfo }) {
                       value={formData.contactAddress}
                       onChange={e => setFormData({ ...formData, contactAddress: e.target.value })}
                       placeholder="Organize Sanayi Bölgesi, Seramik Cad. No:1, Türkiye"
-                      className="w-full px-4 py-2.5 bg-neutral-50/50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                      className="w-full px-4 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm font-medium focus:bg-white focus:outline-none"
                     />
                   </div>
                 </div>
               </div>
             )}
 
-            {/* -------------------- STEP 5: GÖRÜNÜRLÜK & ALAN AYARLARI -------------------- */}
+            {/* STEP 5: GÖRÜNÜRLÜK */}
             {activeStep === 5 && (
               <div className="space-y-6 max-w-3xl">
                 <div className="border-b border-neutral-100 pb-4">
@@ -1392,7 +1372,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                     <span>5. Görünürlük & İçerik Ayarları</span>
                   </h3>
                   <p className="text-xs text-neutral-500 mt-1">
-                    Kataloğunuzda hangi bilgilerin (fiyatlar, teknik tablolar, 3D QR kodları, kapak vb.) yer alacağını belirleyin.
+                    Kataloğunuzda hangi bilgilerin yer alacağını belirleyin.
                   </p>
                 </div>
 
@@ -1412,7 +1392,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                       key={toggle.key}
                       className={`p-4 rounded-xl border-2 cursor-pointer flex items-start gap-3.5 transition ${
                         Boolean(formData[toggle.key])
-                          ? 'border-amber-500/50 bg-amber-50/20'
+                          ? 'border-amber-500 bg-amber-50/30'
                           : 'border-neutral-200 bg-white hover:border-neutral-300'
                       }`}
                     >
@@ -1432,17 +1412,17 @@ export default function CatalogStudioTab({ brandInfo }) {
               </div>
             )}
 
-            {/* -------------------- STEP 6: CANLI ÖNİZLEME & YAYINLAMA -------------------- */}
+            {/* STEP 6: CANLI İNTERAKTİF FLIPBOOK TESTİ & YAYINLAMA */}
             {activeStep === 6 && (
               <div className="space-y-6">
                 <div className="border-b border-neutral-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-extrabold text-neutral-900 flex items-center gap-2">
                       <Sparkles size={20} className="text-amber-600" />
-                      <span>6. Canlı Önizleme, Test & Yayın</span>
+                      <span>6. Canlı E-Katalog & Flipbook Önizleme</span>
                     </h3>
                     <p className="text-xs text-neutral-500 mt-1">
-                      Kataloğunuzun birebir A4 ölçeğindeki son hâlini inceleyin, taslak kaydedin veya yayına alarak paylaşın.
+                      Kataloğunuzu birebir sayfa sayfa çevirerek test edin; dilerseniz taslak kaydedin veya yayına alarak paylaşın.
                     </p>
                   </div>
 
@@ -1466,8 +1446,8 @@ export default function CatalogStudioTab({ brandInfo }) {
                   </div>
                 </div>
 
-                {/* Inline Preview Container */}
-                <div className="border border-neutral-300 rounded-2xl p-4 sm:p-6 bg-neutral-100 max-h-[650px] overflow-y-auto">
+                {/* Flipbook Container */}
+                <div className="w-full">
                   <CatalogTemplateRenderer
                     catalog={{
                       ...formData,
@@ -1526,14 +1506,16 @@ export default function CatalogStudioTab({ brandInfo }) {
       )}
 
       {/* ========================================================================= */}
-      {/* VIEW MODE 3: FULLSCREEN PREVIEW & PDF PRINT MODAL */}
+      {/* VIEW MODE 3: FULLSCREEN PRESENTATION MODAL */}
       {/* ========================================================================= */}
       {viewMode === 'preview-modal' && previewCatalog && (
-        <div className="fixed inset-0 z-50 bg-neutral-900/95 backdrop-blur-sm flex flex-col">
+        <div className="fixed inset-0 z-50 bg-neutral-950 flex flex-col">
           {/* Top Floating Control Bar */}
-          <div className="bg-neutral-900 border-b border-neutral-800 px-4 sm:px-6 py-3 flex items-center justify-between text-white no-print">
+          <div className="bg-neutral-950 border-b border-white/10 px-4 sm:px-6 py-3 flex items-center justify-between text-white no-print">
             <div className="flex items-center gap-3 overflow-hidden">
-              <span className="font-bold text-sm tracking-wide truncate max-w-xs">{previewCatalog.title}</span>
+              <span className="font-serif font-bold text-base tracking-wide text-amber-300 truncate max-w-xs">
+                {previewCatalog.title}
+              </span>
               <span className="text-xs text-neutral-400 font-mono hidden sm:inline">
                 ({previewProducts.length} Ürün &bull; {previewCatalog.template.toUpperCase()})
               </span>
@@ -1541,32 +1523,24 @@ export default function CatalogStudioTab({ brandInfo }) {
 
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <button
-                onClick={handlePrint}
-                className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs flex items-center gap-1.5 shadow transition"
-              >
-                <Printer size={14} />
-                <span>Yazdır / PDF İndir</span>
-              </button>
-
-              <button
                 onClick={() => handleCopyLink(previewCatalog.publicSlug)}
-                className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium flex items-center gap-1.5 transition"
+                className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition"
               >
                 <Share2 size={14} />
-                <span className="hidden sm:inline">Paylaş</span>
+                <span>Paylaş</span>
               </button>
 
               <button
                 onClick={() => setViewMode('list')}
-                className="p-1.5 rounded-lg hover:bg-white/10 text-neutral-400 hover:text-white transition"
+                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-neutral-300 hover:text-white transition"
               >
                 <X size={20} />
               </button>
             </div>
           </div>
 
-          {/* Scrollable Document Container */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-neutral-800">
+          {/* Interactive Flipbook Container */}
+          <div className="flex-1 overflow-y-auto p-4 sm:p-8 bg-neutral-900 flex items-center justify-center">
             <CatalogTemplateRenderer
               catalog={previewCatalog}
               products={previewProducts}
