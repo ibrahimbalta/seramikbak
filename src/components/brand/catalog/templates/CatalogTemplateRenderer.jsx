@@ -7,14 +7,9 @@ import {
   Maximize2,
   Minimize2,
   Printer,
-  Share2,
-  ZoomIn,
-  ZoomOut,
-  Layers,
   BookOpen,
   LayoutGrid,
-  Sparkles,
-  Download
+  FileText
 } from 'lucide-react';
 import MilanoLookbookTemplate from './MilanoLookbookTemplate';
 import ArchitecturalSpecSheetTemplate from './ArchitecturalSpecSheetTemplate';
@@ -28,9 +23,8 @@ export default function CatalogTemplateRenderer({
   initialPage = 0
 }) {
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [viewFormat, setViewFormat] = useState('single'); // 'single' | 'all'
+  const [viewFormat, setViewFormat] = useState('single'); // 'single' | 'spread' | 'all'
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
   const containerRef = useRef(null);
 
   if (!catalog) return null;
@@ -40,32 +34,38 @@ export default function CatalogTemplateRenderer({
 
   // Calculate total pages dynamically based on active template
   let extraPages = 0;
+  let productPagesCount = products.length > 0 ? products.length : 2;
+
   if (template === 'milano') {
-    if (catalog.showSpecs) extraPages += 1; // Technical standards page
+    extraPages += 1; // Manifesto & Innovation page
+    productPagesCount = productPagesCount * 2; // 2 pages per product (Sol: Mekan & Teknik / Sağ: Dikey Plaka)
+    if (catalog.showSpecs !== false) extraPages += 1; // Technical standards page
     extraPages += 1; // Application areas page
-    if (catalog.showQrCodes) extraPages += 1; // Digital 3D studio page
+    if (catalog.showQrCodes !== false) extraPages += 1; // Digital 3D studio page
+  } else if (template === 'showroom') {
+    productPagesCount = Math.max(1, Math.ceil(productPagesCount / 2));
   }
 
   const totalPages =
-    (catalog.showCover ? 1 : 0) +
-    (catalog.showTOC ? 1 : 0) +
-    (template === 'showroom' ? Math.max(1, Math.ceil(products.length / 2)) : products.length) +
+    (catalog.showCover !== false ? 1 : 0) +
+    (catalog.showTOC !== false ? 1 : 0) +
+    productPagesCount +
     extraPages +
-    (catalog.showContactPage ? 1 : 0);
+    (catalog.showContactPage !== false ? 1 : 0);
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (mode === 'print') return;
       if (e.key === 'ArrowRight' || e.key === 'PageDown') {
-        setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1));
+        setCurrentPage((prev) => Math.min(totalPages - 1, prev + (viewFormat === 'spread' && prev > 0 ? 2 : 1)));
       } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
-        setCurrentPage((prev) => Math.max(0, prev - 1));
+        setCurrentPage((prev) => Math.max(0, prev - (viewFormat === 'spread' && prev > 1 ? 2 : 1)));
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [totalPages, mode]);
+  }, [totalPages, mode, viewFormat]);
 
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
@@ -122,8 +122,8 @@ export default function CatalogTemplateRenderer({
 
         /* Interactive Reader Backdrop */
         .mode-interactive {
-          background: radial-gradient(circle at 50% 15%, #151d2f 0%, #090e17 60%, #04070c 100%);
-          border-radius: 20px;
+          background: radial-gradient(circle at 50% 15%, #181d26 0%, #0d1117 60%, #06080c 100%);
+          border-radius: 16px;
           overflow: hidden;
           box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.1);
         }
@@ -134,35 +134,26 @@ export default function CatalogTemplateRenderer({
           max-width: ${isLandscape ? '1100px' : '820px'};
           aspect-ratio: ${isLandscape ? '297 / 210' : '210 / 297'};
           margin: 0 auto;
-          box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.65), 0 0 50px rgba(180, 130, 60, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.12);
-          border-radius: 12px;
+          box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 0, 0, 0.08);
+          border-radius: 0px;
           overflow: hidden;
           position: relative;
-          background: #faf8f5;
+          background: #ffffff;
           transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
-        /* Mobile Responsiveness for Phone Viewports */
+        /* Mobile Ergonomics & Symmetrical Adaptability */
         @media (max-width: 640px) {
           .mode-interactive {
             border-radius: 12px;
-            background: #090e17;
+            background: #0d1117;
           }
           .catalog-page {
             max-width: 100% !important;
             aspect-ratio: auto !important;
-            min-height: 480px !important;
+            min-height: 520px !important;
             padding: 1.25rem 1rem !important;
-            border-radius: 8px !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
-          }
-          .catalog-page h1 {
-            font-size: 1.75rem !important;
-            line-height: 1.2 !important;
-          }
-          .catalog-page h2 {
-            font-size: 1.5rem !important;
-            line-height: 1.25 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
           }
         }
 
@@ -204,7 +195,7 @@ export default function CatalogTemplateRenderer({
             height: 100vh !important;
             aspect-ratio: auto !important;
             margin: 0 !important;
-            padding: 12mm !important;
+            padding: 10mm !important;
             box-shadow: none !important;
             border-radius: 0 !important;
             page-break-after: always !important;
@@ -215,75 +206,89 @@ export default function CatalogTemplateRenderer({
         }
       `}</style>
 
-      {/* -------------------- INTERACTIVE READER TOOLBAR (Top) -------------------- */}
+      {/* -------------------- TOP READER TOOLBAR -------------------- */}
       {mode !== 'print' && (
-        <div className="no-print bg-neutral-950/95 border-b border-white/10 px-4 py-3 flex items-center justify-between text-white select-none">
-          {/* Left: Title & Mode Switcher */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-              <span className="text-xs font-bold tracking-wide uppercase text-amber-300">
-                {template.toUpperCase()} LOOKBOOK
-              </span>
-            </div>
-            <div className="h-4 w-px bg-white/20 hidden sm:block" />
-            <div className="hidden sm:flex items-center gap-1 bg-white/10 p-1 rounded-lg text-[11px]">
+        <div className="no-print bg-neutral-950/95 border-b border-white/10 px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between text-white select-none">
+          {/* Left: Template badge & View Mode Switcher */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span className="text-[11px] sm:text-xs font-bold tracking-wide uppercase text-amber-300 truncate max-w-[120px] sm:max-w-none">
+              {template.toUpperCase()} LOOKBOOK
+            </span>
+
+            <div className="h-4 w-px bg-white/20 hidden md:block" />
+
+            {/* View Format Selector (Desktop / Tablet) */}
+            <div className="hidden md:flex items-center gap-1 bg-white/10 p-0.5 rounded-lg text-[11px]">
               <button
                 onClick={() => setViewFormat('single')}
-                className={`px-2.5 py-1 rounded-md font-semibold transition ${
+                className={`px-2.5 py-1 rounded-md font-semibold transition flex items-center gap-1 ${
                   viewFormat === 'single' ? 'bg-amber-500 text-neutral-950 shadow' : 'text-neutral-300 hover:text-white'
                 }`}
               >
-                Sayfa Sayfa (Flipbook)
+                <FileText size={12} />
+                <span>Tek Sayfa</span>
               </button>
+
+              <button
+                onClick={() => setViewFormat('spread')}
+                className={`px-2.5 py-1 rounded-md font-semibold transition flex items-center gap-1 ${
+                  viewFormat === 'spread' ? 'bg-amber-500 text-neutral-950 shadow' : 'text-neutral-300 hover:text-white'
+                }`}
+              >
+                <BookOpen size={12} />
+                <span>Çift Sayfa (Dergilik)</span>
+              </button>
+
               <button
                 onClick={() => setViewFormat('all')}
-                className={`px-2.5 py-1 rounded-md font-semibold transition ${
+                className={`px-2.5 py-1 rounded-md font-semibold transition flex items-center gap-1 ${
                   viewFormat === 'all' ? 'bg-amber-500 text-neutral-950 shadow' : 'text-neutral-300 hover:text-white'
                 }`}
               >
-                Tüm Sayfalar
+                <LayoutGrid size={12} />
+                <span>Tüm Sayfalar</span>
               </button>
             </div>
           </div>
 
-          {/* Center: Page Navigation (When in single page mode) */}
-          {viewFormat === 'single' && (
-            <div className="flex items-center gap-2">
+          {/* Center: Pagination Controls (Single / Spread) */}
+          {viewFormat !== 'all' && (
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 disabled={currentPage === 0}
-                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:hover:bg-white/10 transition text-neutral-200"
-                title="Önceki Sayfa (Sol Ok)"
+                onClick={() => setCurrentPage((p) => Math.max(0, p - (viewFormat === 'spread' && p > 1 ? 2 : 1)))}
+                className="p-1 sm:p-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 transition text-neutral-200"
+                title="Önceki Sayfa"
               >
                 <ChevronLeft size={16} />
               </button>
 
-              <div className="px-3 py-1 rounded-lg bg-white/10 text-xs font-mono font-bold">
+              <div className="px-2.5 sm:px-3 py-1 rounded-lg bg-white/10 text-[11px] sm:text-xs font-mono font-bold">
                 <span className="text-amber-400">{currentPage + 1}</span>
                 <span className="text-neutral-400"> / {totalPages}</span>
               </div>
 
               <button
                 disabled={currentPage >= totalPages - 1}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
-                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:hover:bg-white/10 transition text-neutral-200"
-                title="Sonraki Sayfa (Sağ Ok)"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + (viewFormat === 'spread' && p > 0 ? 2 : 1)))}
+                className="p-1 sm:p-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 transition text-neutral-200"
+                title="Sonraki Sayfa"
               >
                 <ChevronRight size={16} />
               </button>
             </div>
           )}
 
-          {/* Right: Zoom, Fullscreen & Print */}
-          <div className="flex items-center gap-2">
+          {/* Right: Print & Fullscreen */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
               onClick={() => window.print()}
-              className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-bold flex items-center gap-1.5 shadow transition"
+              className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-neutral-950 text-xs font-bold flex items-center gap-1.5 shadow transition"
               title="Yazdır / PDF Olarak Kaydet"
             >
               <Printer size={14} />
-              <span className="hidden md:inline">Yazdır / PDF</span>
+              <span className="hidden sm:inline">PDF İndir</span>
             </button>
 
             <button
@@ -297,39 +302,29 @@ export default function CatalogTemplateRenderer({
         </div>
       )}
 
-      {/* -------------------- MAIN DISPLAY AREA -------------------- */}
-      <div className="p-2 sm:p-8 flex items-center justify-center min-h-[400px]">
-        <div
-          className="w-full flex flex-col items-center justify-center transition-transform duration-200"
-          style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'top center' }}
-        >
+      {/* -------------------- MAIN DISPLAY ARENA -------------------- */}
+      <div className="p-2 sm:p-6 md:p-10 flex items-center justify-center min-h-[460px]">
+        <div className="w-full flex flex-col items-center justify-center">
           {renderTemplateComponent()}
         </div>
       </div>
 
-      {/* -------------------- BOTTOM THUMBNAIL FILMSTRIP -------------------- */}
-      {mode !== 'print' && viewFormat === 'single' && (
-        <div className="no-print bg-neutral-950/90 border-t border-white/10 p-3 flex items-center justify-center gap-2 overflow-x-auto">
+      {/* -------------------- BOTTOM FILMSTRIP NAVIGATION -------------------- */}
+      {mode !== 'print' && viewFormat !== 'all' && (
+        <div className="no-print bg-neutral-950/95 border-t border-white/10 p-2.5 sm:p-3 flex items-center justify-center gap-1.5 sm:gap-2 overflow-x-auto">
           {Array.from({ length: totalPages }).map((_, idx) => {
-            const isCover = idx === 0 && catalog.showCover;
-            const isTOC = idx === 1 && catalog.showCover && catalog.showTOC;
-            const isBack = idx === totalPages - 1 && catalog.showContactPage;
             const isSelected = currentPage === idx;
-
             return (
               <button
                 key={idx}
                 onClick={() => setCurrentPage(idx)}
-                className={`relative px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold transition flex items-center gap-1.5 ${
+                className={`px-2 sm:px-2.5 py-1 rounded-md text-[11px] font-mono font-bold transition whitespace-nowrap ${
                   isSelected
-                    ? 'bg-amber-500 text-neutral-950 shadow-md ring-2 ring-amber-400/50'
+                    ? 'bg-amber-500 text-neutral-950 shadow-md ring-1 ring-amber-400'
                     : 'bg-white/10 text-neutral-400 hover:bg-white/20 hover:text-white'
                 }`}
               >
-                <span>#{idx + 1}</span>
-                <span className="text-[10px] font-sans font-normal opacity-80 hidden md:inline">
-                  {isCover ? 'Kapak' : isTOC ? 'Fihrist' : isBack ? 'İletişim' : 'Ürün'}
-                </span>
+                #{idx + 1}
               </button>
             );
           })}

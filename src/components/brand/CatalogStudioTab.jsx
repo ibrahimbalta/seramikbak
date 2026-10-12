@@ -50,13 +50,13 @@ import CatalogTemplateRenderer from './catalog/templates/CatalogTemplateRenderer
 const TEMPLATES = [
   {
     id: 'milano',
-    name: 'Minimalist Milano Lookbook',
-    badge: 'Editorial & Lüks Mimari',
-    desc: 'İtalyan Cersaie dergi estetiği. Geniş negatif alanlar, yüksek çözünürlüklü mekan ve doku görselleri, zarif tipografi ve 3D simülasyon QR kodları.',
+    name: 'NG Kütahya & Milano Monograf',
+    badge: '120×280 & Dev Ebat Matbaa Baskısı',
+    desc: 'NG Kütahya Seramik ve Cersaie matbaa standardında 2 sayfalı mimari monograf mizanpajı: Sol sayfada yaşam alanı uygulaması, tel kafes ebat şemaları ve teknik şartname matrisi; sağ sayfada tam boy dikey plaka, renk varyasyonları ve marjinal dikey tipografi.',
     accent: '#b4823c',
     icon: Sparkles,
     tag: 'Mimarlar & Tasarımcılar',
-    mockupImg: '/renders/luxury_bathroom_calacatta_gold.jpg'
+    mockupImg: '/renders/modern_living_natural_oak.jpg'
   },
   {
     id: 'spec-sheet',
