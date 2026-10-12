@@ -50,9 +50,9 @@ import CatalogTemplateRenderer from './catalog/templates/CatalogTemplateRenderer
 const TEMPLATES = [
   {
     id: 'milano',
-    name: 'NG Kütahya & Milano Monograf',
+    name: 'Milano Lookbook',
     badge: '120×280 & Dev Ebat Matbaa Baskısı',
-    desc: 'NG Kütahya Seramik ve Cersaie matbaa standardında 2 sayfalı mimari monograf mizanpajı: Sol sayfada yaşam alanı uygulaması, tel kafes ebat şemaları ve teknik şartname matrisi; sağ sayfada tam boy dikey plaka, renk varyasyonları ve marjinal dikey tipografi.',
+    desc: 'İtalyan Cersaie ve Milano matbaa standardında 2 sayfalı mimari monograf mizanpajı: Sol sayfada yaşam alanı uygulaması, tel kafes ebat şemaları ve teknik şartname matrisi; sağ sayfada tam boy dikey plaka, renk varyasyonları ve marjinal dikey tipografi.',
     accent: '#b4823c',
     icon: Sparkles,
     tag: 'Mimarlar & Tasarımcılar',

@@ -92,7 +92,7 @@ export default function MilanoLookbookTemplate({
   // =========================================================================
   const pages = [];
 
-  // Page 1: Minimalist Dark Cover (NG Kütahya 120x280 Page 1)
+  // Page 1: Minimalist Dark Cover (Milano 120x280)
   if (catalog?.showCover !== false) {
     pages.push({ type: 'cover' });
   }
@@ -138,7 +138,7 @@ export default function MilanoLookbookTemplate({
     const collectionTag = catalog?.collectionTag || '120×280 KOLEKSİYONLARI';
 
     // -----------------------------------------------------------------------
-    // 1. COVER PAGE — Minimalist Dark Slate Monograph (NG Kütahya Page 1)
+    // 1. COVER PAGE — Minimalist Dark Slate Monograph
     // -----------------------------------------------------------------------
     if (pageObj.type === 'cover') {
       return (
@@ -183,7 +183,7 @@ export default function MilanoLookbookTemplate({
             </p>
           </div>
 
-          {/* Bottom Bold Monograph Category (NG Kütahya Benchmark) */}
+          {/* Bottom Bold Monograph Category */}
           <div className="p-8 sm:p-14 md:p-16 text-center border-t border-white/10">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-sans font-bold tracking-[0.18em] uppercase text-white">
               {catalog?.coverTitle || collectionTag}
@@ -215,7 +215,7 @@ export default function MilanoLookbookTemplate({
               İçindekiler
             </h2>
 
-            {/* Strict Two-Column Directory (Matching NG Kütahya Page 3) */}
+            {/* Strict Two-Column Directory */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 sm:gap-x-16 gap-y-3 sm:gap-y-4 max-w-2xl text-xs sm:text-sm">
               {/* Product Collections with Spaced Page Numbers */}
               {safeProducts.map((p, idx) => {
@@ -276,7 +276,7 @@ export default function MilanoLookbookTemplate({
     }
 
     // -----------------------------------------------------------------------
-    // 3. CORPORATE MANIFESTO & INNOVATION (NG Kütahya Page 4)
+    // 3. CORPORATE MANIFESTO & INNOVATION
     // -----------------------------------------------------------------------
     if (pageObj.type === 'manifesto') {
       return (
@@ -337,7 +337,7 @@ export default function MilanoLookbookTemplate({
           className="catalog-page relative bg-white text-neutral-900 p-6 sm:p-12 md:p-14 flex flex-col justify-between overflow-hidden"
         >
           <div>
-            {/* Top Collection Title in Bold Uppercase (NG Kütahya Benchmark) */}
+            {/* Top Collection Title in Bold Uppercase */}
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-sans font-bold uppercase tracking-wider text-neutral-950 mb-5 sm:mb-6">
               {p.name}
             </h2>
@@ -400,7 +400,7 @@ export default function MilanoLookbookTemplate({
               </div>
             </div>
 
-            {/* Bottom Section: Strict NG Kütahya-style Technical Matrix Table */}
+            {/* Bottom Section: Strict Technical Matrix Table */}
             <div className="w-full overflow-x-auto">
               <table className="w-full text-left border-collapse border border-neutral-300 text-xs">
                 <thead>
@@ -538,7 +538,7 @@ export default function MilanoLookbookTemplate({
             </div>
           </div>
 
-          {/* Bottom Accent Bar & Running Footer (NG Kütahya Benchmark) */}
+          {/* Bottom Accent Bar & Running Footer */}
           <div className="pt-4 flex justify-between items-end">
             <span className="text-[10px] font-mono text-neutral-400">
               {brand.name || 'SeramikBak'} &bull; {collectionTag}
@@ -771,7 +771,7 @@ export default function MilanoLookbookTemplate({
     }
 
     // -----------------------------------------------------------------------
-    // 9. BACK COVER / CONTACT PAGE (NG Kütahya Closing Style)
+    // 9. BACK COVER / CONTACT PAGE
     // -----------------------------------------------------------------------
     if (pageObj.type === 'contact') {
       return (
