@@ -16,6 +16,7 @@ import ArchitecturalSpecSheetTemplate from './ArchitecturalSpecSheetTemplate';
 import ShowroomCollectionTemplate from './ShowroomCollectionTemplate';
 import GlobalExportTemplate from './GlobalExportTemplate';
 import LidyaTechnicTemplate from './LidyaTechnicTemplate';
+import DecoExclusiveTemplate from './DecoExclusiveTemplate';
 
 export default function CatalogTemplateRenderer({
   catalog,
@@ -49,6 +50,9 @@ export default function CatalogTemplateRenderer({
     if (catalog.showSpecs !== false) extraPages += 1; // Technical standards page
     if (catalog.showQrCodes !== false) extraPages += 1; // Digital BIM & 3D
     productPagesCount = products.length > 0 ? products.length : 2;
+  } else if (template === 'deco') {
+    productPagesCount = productPagesCount * 2; // 2 pages per product spread (Left: Mekan Fotoğrafı / Right: Ebat & Dekofon Detayı)
+    if (catalog.showSpecs !== false) extraPages += 1; // Technical standards & packing page
   } else if (template === 'showroom') {
     productPagesCount = Math.max(1, Math.ceil(productPagesCount / 2));
   }
@@ -103,6 +107,8 @@ export default function CatalogTemplateRenderer({
         return <GlobalExportTemplate {...props} />;
       case 'lidya':
         return <LidyaTechnicTemplate {...props} />;
+      case 'deco':
+        return <DecoExclusiveTemplate {...props} />;
       case 'milano':
       default:
         return <MilanoLookbookTemplate {...props} />;
@@ -151,13 +157,28 @@ export default function CatalogTemplateRenderer({
           transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
+        /* Deco Exclusive 1:1 Square Editorial Format (Bien Standard) */
+        .deco-square-page {
+          width: 100%;
+          max-width: 820px;
+          aspect-ratio: 1 / 1;
+          margin: 0 auto;
+          box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 0, 0, 0.08);
+          border-radius: 0px;
+          overflow: hidden;
+          position: relative;
+          background: #ffffff;
+          transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
         /* Mobile Ergonomics & Symmetrical Adaptability */
         @media (max-width: 640px) {
           .mode-interactive {
             border-radius: 12px;
             background: #0d1117;
           }
-          .catalog-page {
+          .catalog-page,
+          .deco-square-page {
             max-width: 100% !important;
             aspect-ratio: auto !important;
             min-height: 520px !important;
@@ -198,7 +219,8 @@ export default function CatalogTemplateRenderer({
             width: 100% !important;
           }
 
-          .catalog-page {
+          .catalog-page,
+          .deco-square-page {
             width: 100% !important;
             max-width: 100% !important;
             height: 100vh !important;

@@ -59,6 +59,16 @@ const TEMPLATES = [
     mockupImg: '/renders/modern_living_natural_oak.jpg'
   },
   {
+    id: 'deco',
+    name: 'Deco Exclusive',
+    badge: 'Bien Kare Monograf & Dekofon',
+    desc: 'Bien Seramik Exclusive dergi standardında kare (1:1) editoryal katalog: Sol sayfada tam boy mekan fotoğrafı, sağ sayfada geniş harf aralıklı koleksiyon başlığı, kare REC/M yüzey rozetleri, rölyefli dekofon karolar ve sade ebat tablosu.',
+    accent: '#0f172a',
+    icon: LayoutTemplate,
+    tag: 'Exclusive & Lüks Konsept',
+    mockupImg: '/renders/luxury_bathroom_calacatta_gold.jpg'
+  },
+  {
     id: 'lidya',
     name: 'Lidya Pro Technic',
     badge: 'Mimari Modüler & Şartname',
