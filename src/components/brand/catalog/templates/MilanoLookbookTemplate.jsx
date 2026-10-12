@@ -435,7 +435,7 @@ export default function MilanoLookbookTemplate({
                       </div>
                     )}
                     <span className="text-[11px] text-neutral-600 font-medium leading-tight">
-                      Bu ürünü 3D'de deneyin
+                      Bu ürünü 3D&apos;de deneyin
                     </span>
                   </div>
                 )}
