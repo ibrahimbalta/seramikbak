@@ -45,12 +45,14 @@ import {
   FileText,
   Box,
   Send,
-  Award
+  Award,
+  BookOpen
 } from 'lucide-react';
 import Link from 'next/link';
 import EmbedStudioTab from '@/components/brand/EmbedStudioTab';
 import BrandHealthTab from '@/components/brand/BrandHealthTab';
 import MarketIntelligenceTab from '@/components/brand/MarketIntelligenceTab';
+import CatalogStudioTab from '@/components/brand/CatalogStudioTab';
 
 const TURKEY_CITIES = [
   "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Aksaray", "Amasya", "Ankara", "Antalya", "Ardahan", "Artvin",
@@ -1737,6 +1739,7 @@ export default function BrandPortalPage() {
             {[
               { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={17} /> },
               { id: 'products', label: 'Ürün Kataloğumuz', icon: <Layers size={17} /> },
+              { id: 'catalogs', label: 'Dijital Kataloglar (Studio)', icon: <BookOpen size={17} /> },
               { id: 'embed-studio', label: '3D Kiosk & Embed SDK', icon: <Box size={17} /> },
               { id: 'market-intel', label: 'Pazar Trend Radarı', icon: <BarChart3 size={17} /> },
               { id: 'brand-health', label: 'Marka Sağlığı & SEO', icon: <Award size={17} /> },
@@ -1871,6 +1874,7 @@ export default function BrandPortalPage() {
                     <span style={{ fontSize: '0.62rem', color: '#d4af37', fontWeight: '700' }}>
                       {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
                       {activePortalTab === 'products' && 'Ürün Kataloğu'}
+                      {activePortalTab === 'catalogs' && 'Dijital Kataloglar'}
                       {activePortalTab === 'embed-studio' && '3D Kiosk & Embed SDK'}
                       {activePortalTab === 'market-intel' && 'Pazar Trend Radarı'}
                       {activePortalTab === 'brand-health' && 'Marka Sağlığı & SEO'}
@@ -1961,6 +1965,7 @@ export default function BrandPortalPage() {
                 <h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: '#0f172a', fontFamily: 'var(--font-title, "Outfit", sans-serif)' }}>
                   {activePortalTab === 'dashboard' && 'Gösterge Paneli'}
                   {activePortalTab === 'products' && 'Ürün Kataloğumuz'}
+                  {activePortalTab === 'catalogs' && '📖 Dijital Kataloglar & Lookbook Oluşturucu'}
                   {activePortalTab === 'embed-studio' && '🎮 White-Label 3D Visualizer & Mağaza Kiosk SDK'}
                   {activePortalTab === 'market-intel' && '📊 Canlı Pazar İstihbaratı & Trend Radarı'}
                   {activePortalTab === 'brand-health' && '🏆 Dijital Marka Sağlığı & Google SERP Görünürlüğü'}
@@ -5855,6 +5860,11 @@ export default function BrandPortalPage() {
                 </div>
               )}
 
+              {/* -------------------- TAB: DIGITAL CATALOG STUDIO & LOOKBOOK -------------------- */}
+              {activePortalTab === 'catalogs' && (
+                <CatalogStudioTab brandInfo={brandInfo} />
+              )}
+
               {/* -------------------- TAB: WHITE-LABEL 3D EMBED STUDIO & KIOSK SDK -------------------- */}
               {activePortalTab === 'embed-studio' && (
                 <EmbedStudioTab brandInfo={brandInfo} />
@@ -6844,6 +6854,7 @@ export default function BrandPortalPage() {
               {[
                 { id: 'dashboard', label: 'Gösterge Paneli', icon: <Activity size={18} /> },
                 { id: 'products', label: 'Ürün Kataloğu', icon: <Layers size={18} /> },
+                { id: 'catalogs', label: 'Dijital Kataloglar', icon: <BookOpen size={18} /> },
                 { id: 'embed-studio', label: '3D Kiosk & Embed SDK', icon: <Box size={18} /> },
                 { id: 'market-intel', label: 'Pazar Trend Radarı', icon: <BarChart3 size={18} /> },
                 { id: 'brand-health', label: 'Marka Sağlığı & SEO', icon: <Award size={18} /> },
