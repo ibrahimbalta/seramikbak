@@ -503,110 +503,257 @@ export default function CatalogStudioTab({ brandInfo }) {
       )}
 
       {/* ========================================================================= */}
-      {/* VIEW MODE 1: CATALOG STUDIO HUB & 3D HARDCOVER BOOK SHOWCASE */}
+      {/* VIEW MODE 1: CATALOG STUDIO COMMAND CENTER & 3D LOOKBOOK SHOWCASE */}
       {/* ========================================================================= */}
       {viewMode === 'list' && (
-        <div className="space-y-6">
-          {/* Executive Studio Header */}
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-amber-500/20 bg-gradient-to-r from-neutral-950 via-neutral-900 to-stone-900 text-white p-6 sm:p-8">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-amber-500/15 via-transparent to-transparent pointer-events-none" />
+        <div className="space-y-8">
+          {/* Executive Studio Hero Command Center */}
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-amber-500/30 bg-gradient-to-r from-neutral-950 via-[#10141e] to-neutral-900 text-white p-7 sm:p-10">
+            {/* Ambient luxury lighting */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-bl from-amber-500/20 via-amber-500/5 to-transparent pointer-events-none rounded-full blur-2xl" />
+            <div className="absolute -bottom-10 left-10 w-72 h-72 bg-blue-500/10 pointer-events-none rounded-full blur-3xl" />
 
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="space-y-2 max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold tracking-widest uppercase">
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+              <div className="space-y-3 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 text-xs font-bold tracking-widest uppercase backdrop-blur-md">
                   <Sparkles size={13} className="text-amber-400" />
-                  <span>Catalog Studio &bull; Dijital Yayıncılık</span>
+                  <span>SERAMİKBAK CATALOG STUDIO &bull; B2B & B2C DİJİTAL YAYINCILIK</span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-light text-white tracking-tight leading-[1.15]">
                   Dijital Katalog & Lookbook Stüdyosu
                 </h1>
+
                 <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed font-light">
-                  Seramik koleksiyonlarınızı İtalyan mimarlık dergisi, teknik şartname veya interaktif showroom e-kataloğuna dönüştürün. Canlı QR kodları ile müşterileriniz ve mimarlar karoları doğrudan 3D Studio'da deneyebilir.
+                  Markanızın seramik ve porselen koleksiyonlarını; İtalyan Cersaie mimarlık dergisi kalitesinde lookbook&apos;lara, kamu ihale teknik şartnamelerine ve bayi showroom kataloglarına dönüştürün. Otomatik 3D & AR karekodlarıyla müşterileriniz ve mimarlar karoları anında kendi odalarında canlı denesin.
                 </p>
+
+                <div className="flex flex-wrap items-center gap-3 pt-2 text-[11px] font-mono text-neutral-400">
+                  <span className="flex items-center gap-1.5 text-neutral-200">
+                    <CheckCircle2 size={13} className="text-emerald-400" />
+                    <span>A4 Vektörel PDF</span>
+                  </span>
+                  <span>&bull;</span>
+                  <span className="flex items-center gap-1.5 text-neutral-200">
+                    <CheckCircle2 size={13} className="text-amber-400" />
+                    <span>Canlı 3D & AR Karekod</span>
+                  </span>
+                  <span>&bull;</span>
+                  <span className="flex items-center gap-1.5 text-neutral-200">
+                    <CheckCircle2 size={13} className="text-sky-400" />
+                    <span>İnteraktif Web Linki</span>
+                  </span>
+                  <span>&bull;</span>
+                  <span className="flex items-center gap-1.5 text-neutral-200">
+                    <CheckCircle2 size={13} className="text-purple-400" />
+                    <span>İndirme Analitiği</span>
+                  </span>
+                </div>
               </div>
 
-              <div className="flex-shrink-0">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0">
                 <button
                   onClick={handleStartNew}
-                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:opacity-95 text-neutral-950 font-extrabold text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-amber-500/25 transition-all transform hover:-translate-y-0.5"
+                  className="px-6 py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:opacity-95 text-neutral-950 font-black text-sm flex items-center justify-center gap-2.5 shadow-xl shadow-amber-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
                 >
-                  <Plus size={19} />
+                  <Plus size={20} className="stroke-[3]" />
                   <span>Yeni Katalog Oluştur</span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-neutral-200/90 shadow-sm flex flex-col justify-between">
-              <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">Toplam Katalog</span>
-              <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1">{catalogs.length}</p>
+          {/* Quick Metrics Bar with Modern Glassmorphism */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white p-5 rounded-2xl border border-neutral-200/90 shadow-sm flex flex-col justify-between hover:border-amber-400 transition group">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider font-mono">
+                  Toplam Katalog
+                </span>
+                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
+                  <BookOpen size={16} />
+                </div>
+              </div>
+              <div className="mt-3">
+                <p className="text-3xl font-extrabold text-neutral-900">{catalogs.length}</p>
+                <p className="text-[11px] text-neutral-400 mt-0.5">Yayınlanan & Taslak Yayınlar</p>
+              </div>
             </div>
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-emerald-200/90 shadow-sm flex flex-col justify-between">
-              <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Yayında Olanlar</span>
-              <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1">
-                {catalogs.filter(c => c.isPublished).length}
-              </p>
+
+            <div className="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm flex flex-col justify-between hover:border-emerald-400 transition group">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider font-mono">
+                  Yayında Olanlar
+                </span>
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <Globe size={16} />
+                </div>
+              </div>
+              <div className="mt-3">
+                <div className="flex items-center gap-2">
+                  <p className="text-3xl font-extrabold text-emerald-600">
+                    {catalogs.filter(c => c.isPublished).length}
+                  </p>
+                  <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+                <p className="text-[11px] text-neutral-400 mt-0.5">Web & Mobil Erişime Açık</p>
+              </div>
             </div>
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-neutral-200/90 shadow-sm flex flex-col justify-between">
-              <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">Web Okunma</span>
-              <p className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1">
-                {catalogs.reduce((acc, c) => acc + (c.viewCount || 0), 0)}
-              </p>
+
+            <div className="bg-white p-5 rounded-2xl border border-blue-200 shadow-sm flex flex-col justify-between hover:border-blue-400 transition group">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider font-mono">
+                  Web Okunma
+                </span>
+                <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <Eye size={16} />
+                </div>
+              </div>
+              <div className="mt-3">
+                <p className="text-3xl font-extrabold text-neutral-900">
+                  {catalogs.reduce((acc, c) => acc + (c.viewCount || 0), 0)}
+                </p>
+                <p className="text-[11px] text-neutral-400 mt-0.5">Mimar & Müşteri Görüntülemesi</p>
+              </div>
             </div>
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-blue-200/90 shadow-sm flex flex-col justify-between">
-              <span className="text-[11px] font-bold text-blue-700 uppercase tracking-wider">PDF İndirilme</span>
-              <p className="text-2xl sm:text-3xl font-extrabold text-blue-600 mt-1">
-                {catalogs.reduce((acc, c) => acc + (c.downloadCount || 0), 0)}
-              </p>
+
+            <div className="bg-white p-5 rounded-2xl border border-purple-200 shadow-sm flex flex-col justify-between hover:border-purple-400 transition group">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider font-mono">
+                  PDF İndirilme
+                </span>
+                <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                  <Download size={16} />
+                </div>
+              </div>
+              <div className="mt-3">
+                <p className="text-3xl font-extrabold text-purple-600">
+                  {catalogs.reduce((acc, c) => acc + (c.downloadCount || 0), 0)}
+                </p>
+                <p className="text-[11px] text-neutral-400 mt-0.5">B2B Şartname & Föy İndirmeleri</p>
+              </div>
             </div>
           </div>
 
-          {/* Filter Bar */}
-          <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-neutral-200/90 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-              <button
-                onClick={() => setFilterTab('all')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
-                  filterTab === 'all'
-                    ? 'bg-neutral-900 text-white shadow'
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                }`}
-              >
-                Tümü ({catalogs.length})
-              </button>
-              <button
-                onClick={() => setFilterTab('published')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
-                  filterTab === 'published'
-                    ? 'bg-emerald-600 text-white shadow'
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                }`}
-              >
-                Yayındakiler ({catalogs.filter(c => c.isPublished).length})
-              </button>
-              <button
-                onClick={() => setFilterTab('draft')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
-                  filterTab === 'draft'
-                    ? 'bg-amber-600 text-white shadow'
-                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                }`}
-              >
-                Taslaklar ({catalogs.filter(c => !c.isPublished).length})
-              </button>
+          {/* Quick-Start Architectural Templates Showcase */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-extrabold text-neutral-900 flex items-center gap-2">
+                  <Layers size={18} className="text-amber-600" />
+                  <span>4 Profesyonel Şablon ile Hemen Başlayın</span>
+                </h3>
+                <p className="text-xs text-neutral-500">
+                  İhtiyacınıza uygun mimari formatı seçin; ürünleriniz otomatik olarak profesyonel mizanpaja dizilsin.
+                </p>
+              </div>
             </div>
 
-            <div className="relative w-full sm:w-72">
-              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Katalog adı ara..."
-                className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {TEMPLATES.map((tpl) => {
+                const IconComponent = tpl.icon;
+
+                return (
+                  <div
+                    key={tpl.id}
+                    className="bg-white rounded-2xl border border-neutral-200/90 shadow-sm hover:shadow-lg transition-all p-4 flex flex-col justify-between group hover:border-amber-400"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm"
+                          style={{ backgroundColor: tpl.accent }}
+                        >
+                          <IconComponent size={18} />
+                        </div>
+                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700">
+                          {tpl.tag}
+                        </span>
+                      </div>
+
+                      <h4 className="text-sm font-extrabold text-neutral-900 mb-1 group-hover:text-amber-800 transition">
+                        {tpl.name}
+                      </h4>
+                      <p className="text-[11px] text-neutral-500 leading-relaxed line-clamp-3 mb-4">
+                        {tpl.desc}
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleStartNew();
+                        setFormData((prev) => ({ ...prev, template: tpl.id }));
+                      }}
+                      className="w-full py-2 px-3 rounded-xl bg-neutral-100 group-hover:bg-amber-500 text-neutral-800 group-hover:text-neutral-950 font-bold text-xs flex items-center justify-center gap-1.5 transition"
+                    >
+                      <span>Bu Şablonla Başla</span>
+                      <ArrowRight size={13} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Catalog Listing Header & Search / Filter Controls */}
+          <div className="space-y-4 pt-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-extrabold text-neutral-900 flex items-center gap-2">
+                  <BookOpen size={19} className="text-amber-600" />
+                  <span>Kataloglarım & Yayınlanan E-Lookbook&apos;lar</span>
+                </h3>
+                <p className="text-xs text-neutral-500">
+                  Oluşturduğunuz katalogları görüntüleyin, canlı web bağlantısını paylaşın veya düzenleyin.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-neutral-200/90 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+                <button
+                  onClick={() => setFilterTab('all')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
+                    filterTab === 'all'
+                      ? 'bg-neutral-900 text-white shadow'
+                      : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                  }`}
+                >
+                  Tümü ({catalogs.length})
+                </button>
+                <button
+                  onClick={() => setFilterTab('published')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
+                    filterTab === 'published'
+                      ? 'bg-emerald-600 text-white shadow'
+                      : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                  }`}
+                >
+                  Yayındakiler ({catalogs.filter(c => c.isPublished).length})
+                </button>
+                <button
+                  onClick={() => setFilterTab('draft')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition ${
+                    filterTab === 'draft'
+                      ? 'bg-amber-600 text-white shadow'
+                      : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                  }`}
+                >
+                  Taslaklar ({catalogs.filter(c => !c.isPublished).length})
+                </button>
+              </div>
+
+              <div className="relative w-full sm:w-72">
+                <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Katalog adı veya seri ara..."
+                  className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+                />
+              </div>
             </div>
           </div>
 
@@ -625,7 +772,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                 Henüz Dijital Katalog Oluşturulmadı
               </h3>
               <p className="text-xs sm:text-sm text-neutral-500 max-w-md mx-auto mb-6">
-                Ürün portföyünüzden seramikleri seçerek İtalyan mimari dergi, şartname veya showroom lookbook'u oluşturun.
+                Ürün portföyünüzden seramikleri seçerek İtalyan mimari dergi, şartname veya showroom lookbook&apos;u oluşturun.
               </p>
               <button
                 onClick={handleStartNew}
@@ -643,29 +790,29 @@ export default function CatalogStudioTab({ brandInfo }) {
                 return (
                   <div
                     key={cat.id}
-                    className="bg-white rounded-2xl border border-neutral-200/90 shadow-md hover:shadow-xl transition-all overflow-hidden flex flex-col justify-between group"
+                    className="bg-white rounded-2xl border border-neutral-200/90 shadow-md hover:shadow-2xl transition-all overflow-hidden flex flex-col justify-between group"
                   >
                     {/* 3D Realistic Hardcover Book Spine Mockup */}
                     <div
                       onClick={() => handleOpenPreview(cat)}
-                      className="relative h-56 w-full cursor-pointer overflow-hidden p-6 flex flex-col justify-between text-white"
+                      className="relative h-60 w-full cursor-pointer overflow-hidden p-6 flex flex-col justify-between text-white"
                       style={{
                         background: `linear-gradient(135deg, rgba(9, 13, 22, 0.95) 0%, rgba(17, 24, 39, 0.85) 60%, rgba(30, 27, 75, 0.9) 100%), url(${tplInfo.mockupImg}) center/cover no-repeat`,
                         backgroundColor: '#0f172a'
                       }}
                     >
                       {/* Book Spine Shadow Left */}
-                      <div className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
-                      <div className="absolute inset-y-0 left-3 w-px bg-white/20" />
+                      <div className="absolute inset-y-0 left-0 w-3.5 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
+                      <div className="absolute inset-y-0 left-3.5 w-px bg-white/20" />
 
                       {/* Top Badges */}
                       <div className="relative z-10 flex items-center justify-between">
-                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-300 font-mono bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/10">
+                        <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-300 font-mono bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/10 shadow-sm">
                           {tplInfo.name}
                         </span>
                         <span
                           className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
-                            cat.isPublished ? 'bg-emerald-500 text-neutral-950 font-extrabold' : 'bg-amber-500 text-neutral-950 font-extrabold'
+                            cat.isPublished ? 'bg-emerald-500 text-neutral-950 font-extrabold shadow-sm' : 'bg-amber-500 text-neutral-950 font-extrabold'
                           }`}
                         >
                           {cat.isPublished ? 'YAYINDA' : 'TASLAK'}
@@ -677,7 +824,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                         <span className="text-[11px] font-serif text-amber-200/90 uppercase tracking-widest block mb-1">
                           {brandInfo?.name || 'SERAMİK'}
                         </span>
-                        <h3 className="text-xl font-serif font-light text-white leading-snug line-clamp-2">
+                        <h3 className="text-xl sm:text-2xl font-serif font-light text-white leading-snug line-clamp-2 drop-shadow-md">
                           {cat.title}
                         </h3>
                       </div>
@@ -689,16 +836,16 @@ export default function CatalogStudioTab({ brandInfo }) {
                       </div>
 
                       {/* Hover Overlay with "Lookbook Olarak Aç" button */}
-                      <div className="absolute inset-0 bg-neutral-950/70 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                      <div className="absolute inset-0 bg-neutral-950/75 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleOpenPreview(cat);
                           }}
-                          className="px-4 py-2 rounded-xl bg-amber-500 text-neutral-950 font-extrabold text-xs flex items-center gap-1.5 shadow-lg transform scale-95 group-hover:scale-100 transition"
+                          className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black text-xs flex items-center gap-2 shadow-xl transform scale-95 group-hover:scale-100 transition"
                         >
-                          <Eye size={14} />
-                          <span>Lookbook Aç</span>
+                          <Eye size={15} />
+                          <span>Lookbook Olarak Oku</span>
                         </button>
                       </div>
                     </div>
@@ -714,48 +861,105 @@ export default function CatalogStudioTab({ brandInfo }) {
                       <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500 font-medium">
                         <span>Okunma: <strong className="text-neutral-800">{cat.viewCount || 0}</strong></span>
                         <span>İndirilme: <strong className="text-neutral-800">{cat.downloadCount || 0}</strong></span>
+                        <span className="font-mono text-[10px] text-neutral-400">
+                          {new Date(cat.updatedAt || Date.now()).toLocaleDateString('tr-TR')}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Action Bar */}
-                    <div className="p-2.5 bg-neutral-50 border-t border-neutral-100 grid grid-cols-4 gap-1.5 text-xs font-bold">
+                    {/* Modern Action Bar */}
+                    <div className="p-3 bg-neutral-50 border-t border-neutral-200/80 flex items-center justify-between gap-2">
                       <button
                         onClick={() => handleOpenPreview(cat)}
-                        className="py-2 px-1 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
+                        className="flex-1 py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition"
                       >
-                        <Eye size={14} className="text-amber-600" />
-                        <span className="text-[10px]">Önizle</span>
+                        <Eye size={14} />
+                        <span>Lookbook Aç</span>
                       </button>
 
-                      <button
-                        onClick={() => handleEdit(cat)}
-                        className="py-2 px-1 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
-                      >
-                        <Edit size={14} className="text-blue-600" />
-                        <span className="text-[10px]">Düzenle</span>
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleEdit(cat)}
+                          className="p-2 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-100 text-blue-700 transition"
+                          title="Kataloğu Düzenle"
+                        >
+                          <Edit size={15} />
+                        </button>
 
-                      <button
-                        onClick={() => handleCopyLink(cat.publicSlug)}
-                        className="py-2 px-1 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
-                      >
-                        <Share2 size={14} className="text-emerald-600" />
-                        <span className="text-[10px]">Paylaş</span>
-                      </button>
+                        <button
+                          onClick={() => handleCopyLink(cat.publicSlug)}
+                          className="p-2 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-100 text-emerald-700 transition"
+                          title="Web Bağlantısını Kopyala"
+                        >
+                          <Share2 size={15} />
+                        </button>
 
-                      <button
-                        onClick={() => handleDuplicate(cat)}
-                        className="py-2 px-1 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 flex flex-col items-center justify-center gap-1 transition"
-                      >
-                        <Copy size={14} className="text-neutral-600" />
-                        <span className="text-[10px]">Kopya</span>
-                      </button>
+                        <button
+                          onClick={() => handleDuplicate(cat)}
+                          className="p-2 rounded-xl bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 transition"
+                          title="Kopyasını Çoğalt"
+                        >
+                          <Copy size={15} />
+                        </button>
+
+                        <button
+                          onClick={() => handleDelete(cat.id)}
+                          className="p-2 rounded-xl bg-white border border-neutral-200 hover:bg-rose-50 text-rose-600 transition"
+                          title="Kataloğu Sil"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
               })}
             </div>
           )}
+
+          {/* Features & Architectural Value Guide (Bottom Highlights) */}
+          <div className="pt-4 border-t border-neutral-200">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 mb-3">
+              Catalog Studio &bull; Dijital Yayıncılık Özellikleri
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 rounded-2xl bg-white border border-neutral-200 shadow-xs flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <QrCode size={18} />
+                </div>
+                <div>
+                  <h5 className="text-xs font-extrabold text-neutral-900">Otomatik 3D & AR Karekod</h5>
+                  <p className="text-[11px] text-neutral-500 mt-0.5 leading-relaxed">
+                    Her ürün sayfası için dinamik 3D mekan simülasyon karekodu basılır. Müşterileriniz telefonla okutarak karoları kendi odalarında canlı deneyimler.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white border border-neutral-200 shadow-xs flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Printer size={18} />
+                </div>
+                <div>
+                  <h5 className="text-xs font-extrabold text-neutral-900">Vektörel A4 Baskı & PDF</h5>
+                  <p className="text-[11px] text-neutral-500 mt-0.5 leading-relaxed">
+                    Sayfa kenar boşlukları ve yüksek çözünürlüklü görsellerle matbaa baskısına ve e-posta paylaşımlarına hazır profesyonel PDF dosyası üretin.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white border border-neutral-200 shadow-xs flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Globe size={18} />
+                </div>
+                <div>
+                  <h5 className="text-xs font-extrabold text-neutral-900">İnteraktif Web Lookbook&apos;u</h5>
+                  <p className="text-[11px] text-neutral-500 mt-0.5 leading-relaxed">
+                    Web sitenize gömebileceğiniz veya mimarlarla tek tıkla paylaşabileceğiniz, sayfa çevirme animasyonlu interaktif dijital yayın bağlantısı.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
