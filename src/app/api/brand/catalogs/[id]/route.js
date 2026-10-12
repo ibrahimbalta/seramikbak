@@ -274,7 +274,7 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'Katalog bulunamadı.' }, { status: 404 });
     }
 
-    if (auth.role !== 'admin' && (auth.role !== 'brand' || auth.id !== existing.brandId)) {
+    if (auth.role !== 'admin' && String(auth.id) !== String(existing.brandId)) {
       return NextResponse.json({ error: 'Bu kataloğu silme yetkiniz yok.' }, { status: 403 });
     }
 

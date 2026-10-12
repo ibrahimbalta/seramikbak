@@ -332,14 +332,27 @@ export default function CatalogStudioTab({ brandInfo }) {
     }
   };
 
-  const handleDelete = async (cat) => {
-    if (!confirm(`"${cat.title}" kataloğunu kalıcı olarak silmek istediğinizden emin misiniz?`)) return;
+  const handleDelete = async (target) => {
+    const cat = typeof target === 'object' && target !== null
+      ? target
+      : catalogs.find(c => c.id === target) || { id: target, title: 'Katalog' };
+
+    const catId = cat.id || (typeof target === 'string' ? target : null);
+    if (!catId) return;
+
+    const catalogTitle = cat.title || 'Bu kataloğu';
+    if (!confirm(`"${catalogTitle}" kalıcı olarak silmek istediğinizden emin misiniz?`)) return;
+
     try {
-      const res = await fetch(`/api/brand/catalogs/${cat.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/brand/catalogs/${catId}`, { method: 'DELETE' });
       const data = await res.json();
       if (res.ok && data.success) {
         setSuccessMsg('Katalog başarıyla silindi.');
-        loadCatalogs();
+        // Optimistic UI update immediately
+        setCatalogs(prev => prev.filter(c => c.id !== catId));
+        setTimeout(() => {
+          loadCatalogs();
+        }, 200);
       } else {
         alert(data.error || 'Silme işlemi başarısız.');
       }
@@ -848,7 +861,7 @@ export default function CatalogStudioTab({ brandInfo }) {
                         </button>
 
                         <button
-                          onClick={() => handleDelete(cat.id)}
+                          onClick={() => handleDelete(cat)}
                           className="p-2 rounded-xl bg-white border border-neutral-200 hover:bg-rose-50 text-neutral-500 hover:text-rose-600 transition"
                           title="Kataloğu Sil"
                         >
