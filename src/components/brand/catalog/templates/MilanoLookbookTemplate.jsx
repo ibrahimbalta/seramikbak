@@ -337,10 +337,24 @@ export default function MilanoLookbookTemplate({
           className="catalog-page relative bg-white text-neutral-900 p-6 sm:p-12 md:p-14 flex flex-col justify-between overflow-hidden"
         >
           <div>
-            {/* Top Collection Title in Bold Uppercase */}
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-sans font-bold uppercase tracking-wider text-neutral-950 mb-5 sm:mb-6">
-              {p.name}
-            </h2>
+            {/* Top Collection Title in Bold Uppercase + Custom Badge / Price */}
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-5 sm:mb-6">
+              <div className="flex items-center gap-3">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-sans font-bold uppercase tracking-wider text-neutral-950">
+                  {p.name}
+                </h2>
+                {p.badge && (
+                  <span className="px-2.5 py-1 rounded bg-neutral-900 text-amber-400 text-[10px] font-mono font-bold uppercase tracking-widest">
+                    {p.badge}
+                  </span>
+                )}
+              </div>
+              {catalog?.showPrices && (p.customPrice || p.price) && (
+                <span className="px-3 py-1 rounded-lg bg-amber-50 border border-amber-200 text-xs font-extrabold text-amber-900">
+                  {p.customPrice || p.price} {catalog?.sectionSettings?.prices?.currency || '₺'} / m²
+                </span>
+              )}
+            </div>
 
             {/* Ambient Interior Scene (16:9 Architectural Aspect Ratio) */}
             <div className="w-full aspect-[16/9] overflow-hidden bg-neutral-100 border border-neutral-200 mb-6 sm:mb-8">

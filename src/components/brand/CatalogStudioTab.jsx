@@ -46,6 +46,7 @@ import {
 } from 'lucide-react';
 import CatalogTemplateRenderer from './catalog/templates/CatalogTemplateRenderer';
 import CatalogVisualCanvasEditor from './catalog/CatalogVisualCanvasEditor';
+import CatalogVisibilityGraphicEditor from './catalog/CatalogVisibilityGraphicEditor';
 
 const TEMPLATES = [
   {
@@ -188,6 +189,8 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
     showTOC: true,
     showContactPage: true,
     showPageNumbers: true,
+    collectionTag: '',
+    sectionSettings: {},
     selectedItems: [],
     customCanvasPages: [],
     versions: [],
@@ -271,8 +274,12 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
     try {
       const parsed = JSON.parse(rawProductItems || '[]');
       if (Array.isArray(parsed)) {
+        const items = parsed.map((i) => (typeof i === 'string' ? { productId: i } : i));
+        const firstMeta = items.find((i) => i && i._metaSectionSettings);
         return {
-          items: parsed.map((i) => (typeof i === 'string' ? { productId: i } : i)),
+          items,
+          sectionSettings: firstMeta?._metaSectionSettings || {},
+          collectionTag: firstMeta?._metaCollectionTag || '',
           customCanvasPages: [],
           versions: [],
           dataMode: 'live',
@@ -280,8 +287,12 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
         };
       }
       if (parsed && typeof parsed === 'object') {
+        const items = (parsed.items || []).map((i) => (typeof i === 'string' ? { productId: i } : i));
+        const firstMeta = items.find((i) => i && i._metaSectionSettings);
         return {
-          items: (parsed.items || []).map((i) => (typeof i === 'string' ? { productId: i } : i)),
+          items,
+          sectionSettings: parsed.sectionSettings || firstMeta?._metaSectionSettings || {},
+          collectionTag: parsed.collectionTag || firstMeta?._metaCollectionTag || '',
           customCanvasPages: parsed.customCanvasPages || [],
           versions: parsed.versions || [],
           dataMode: parsed.dataMode || 'live',
@@ -291,7 +302,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
     } catch (e) {
       // ignore
     }
-    return { items: [], customCanvasPages: [], versions: [], dataMode: 'live', isArchived: false };
+    return { items: [], sectionSettings: {}, collectionTag: '', customCanvasPages: [], versions: [], dataMode: 'live', isArchived: false };
   };
 
   // Detect product changes between snapshot stored in catalog and live DB product
@@ -359,10 +370,13 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       showTOC: true,
       showContactPage: true,
       showPageNumbers: true,
+      collectionTag: '120×280 KOLEKSİYONLARI',
+      sectionSettings: {},
       selectedItems: availableProducts.slice(0, 6).map((p) => ({
         productId: p.id,
         customNote: '',
         usageArea: p.style || 'İç Mekân',
+        overrides: {},
         snapshot: {
           name: p.name,
           width: p.width,
@@ -421,6 +435,8 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
           showTOC: catalog.showTOC,
           showContactPage: catalog.showContactPage,
           showPageNumbers: catalog.showPageNumbers,
+          collectionTag: meta.collectionTag || '120×280 KOLEKSİYONLARI',
+          sectionSettings: catalog.sectionSettings || meta.sectionSettings || {},
           selectedItems: meta.items,
           customCanvasPages: meta.customCanvasPages,
           versions: meta.versions,
@@ -570,6 +586,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
             productId: product.id,
             customNote: '',
             usageArea: product.style || 'İç Mekân & Zemin',
+            overrides: {},
             snapshot: {
               name: product.name,
               width: product.width,
@@ -621,8 +638,14 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
         language: formData.language
       };
 
-      const enrichedSelectedItems = formData.selectedItems.map((item) => ({
+      const enrichedSelectedItems = formData.selectedItems.map((item, idx) => ({
         ...item,
+        ...(idx === 0
+          ? {
+              _metaSectionSettings: formData.sectionSettings || {},
+              _metaCollectionTag: formData.collectionTag || ''
+            }
+          : {}),
         _metaVersions: [...(formData.versions || []), newVersionEntry].slice(-10)
       }));
 
@@ -2273,52 +2296,15 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                   </div>
                 )}
 
-                {/* STEP 5: GÖRÜNÜRLÜK AYARLARI */}
+                {/* STEP 5: GÖRÜNÜRLÜK, ALAN & GRAFİK MÜDAHALE STÜDYOSU */}
                 {activeStep === 5 && (
-                  <div className="space-y-6 max-w-3xl">
-                    <div className="border-b border-neutral-100 pb-4">
-                      <h3 className="text-lg font-extrabold text-neutral-900 flex items-center gap-2">
-                        <Sliders size={20} className="text-[#b4823c]" />
-                        <span>5. Sayfa Tipleri ve Görünürlük Ayarları</span>
-                      </h3>
-                      <p className="text-xs text-neutral-500 mt-1">
-                        Kataloğunuzda yer alacak bölümleri ve teknik detay görünürlüğünü seçin.
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {[
-                        { key: 'showCover', label: 'Kapak Sayfası', desc: 'Marka logolu ve görselli ana katalog kapağı' },
-                        { key: 'showTOC', label: 'İçindekiler & Konsept Dizini', desc: 'Koleksiyon fihristi ve sayfa numaraları' },
-                        { key: 'showSpecs', label: 'Teknik Özellikler Tablosu', desc: 'Veritabanında mevcut olan ebat, yüzey ve kalınlık verileri' },
-                        { key: 'showCodes', label: 'Ürün ve Stok Kodları', desc: 'Her seramiğin resmi ürün kodunu göster' },
-                        { key: 'showDescriptions', label: 'Koleksiyon Açıklamaları', desc: 'Ürün hikayesi ve kullanım alanı notları' },
-                        { key: 'showQrCodes', label: 'QR Kod & Mekânımda Gör Bağlantısı', desc: 'Gerçek ürün sayfasına yönlenen dinamik QR kodlar' },
-                        { key: 'showPrices', label: 'Liste Fiyatlarını Göster', desc: 'Tavsiye edilen m² perakende fiyatlarını dahil et' },
-                        { key: 'showContactPage', label: 'İletişim & Arka Kapak', desc: 'Genel merkez, telefon, web ve QR arka kapak sayfası' }
-                      ].map((toggle) => (
-                        <label
-                          key={toggle.key}
-                          className={`p-4 rounded-xl border-2 cursor-pointer flex items-start gap-3.5 transition ${
-                            Boolean(formData[toggle.key])
-                              ? 'border-[#b4823c] bg-amber-50/30'
-                              : 'border-neutral-200 bg-white'
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={Boolean(formData[toggle.key])}
-                            onChange={(e) => setFormData({ ...formData, [toggle.key]: e.target.checked })}
-                            className="mt-0.5 w-4 h-4 accent-[#b4823c] rounded"
-                          />
-                          <div>
-                            <p className="text-xs font-bold text-neutral-800">{toggle.label}</p>
-                            <p className="text-[11px] text-neutral-500 mt-0.5 leading-relaxed">{toggle.desc}</p>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
+                  <CatalogVisibilityGraphicEditor
+                    formData={formData}
+                    setFormData={setFormData}
+                    availableProducts={availableProducts}
+                    brandInfo={brandInfo}
+                    onOpenCanvasStudio={() => setStudioMode('advanced')}
+                  />
                 )}
 
                 {/* STEP 6: CANLI ÖNİZLEME & YAYINLAMA */}
@@ -2338,8 +2324,16 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
+                          onClick={() => setActiveStep(5)}
+                          className="px-3.5 py-2 rounded-xl border border-[#b4823c] bg-amber-50 hover:bg-amber-100 text-xs font-bold text-[#b4823c] flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Sliders size={14} />
+                          <span>Alanları & Verileri Düzenle</span>
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => window.print()}
-                          className="px-4 py-2 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-xs font-bold text-neutral-800 flex items-center gap-1.5"
+                          className="px-4 py-2 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 text-xs font-bold text-neutral-800 flex items-center gap-1.5 cursor-pointer"
                         >
                           <Printer size={14} />
                           <span>PDF İndir / Yazdır</span>
@@ -2356,12 +2350,27 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                         .map((item, idx) => {
                           const found = availableProducts.find((p) => p.id === item.productId);
                           if (!found) return null;
+                          const ov = item.overrides || {};
                           return {
                             ...found,
+                            ...(ov.name ? { name: ov.name } : {}),
+                            ...(ov.sku ? { sku: ov.sku } : {}),
+                            ...(ov.width ? { width: Number(ov.width) || ov.width } : {}),
+                            ...(ov.height ? { height: Number(ov.height) || ov.height } : {}),
+                            ...(ov.thickness ? { thickness: ov.thickness } : {}),
+                            ...(ov.finish ? { finish: ov.finish } : {}),
+                            ...(ov.color ? { color: ov.color } : {}),
+                            ...(ov.slipResistance ? { slipResistance: ov.slipResistance } : {}),
+                            ...(ov.peiRating ? { peiRating: ov.peiRating } : {}),
+                            ...(ov.description ? { description: ov.description } : {}),
+                            ...(ov.imageUrl ? { imageUrl: ov.imageUrl } : {}),
+                            ...(ov.badge ? { badge: ov.badge } : {}),
+                            ...(ov.price ? { customPrice: ov.price } : {}),
                             catalogItemIndex: idx + 1,
-                            customNote: item.customNote,
-                            customUsageArea: item.usageArea,
-                            productUrl: `https://www.seramikbak.com/urun/${found.slug}`
+                            customNote: ov.description || item.customNote,
+                            customUsageArea: ov.usageArea || item.usageArea,
+                            productUrl: ov.customUrl || `https://www.seramikbak.com/urun/${found.slug}`,
+                            overrides: ov
                           };
                         })
                         .filter(Boolean)}

@@ -111,23 +111,41 @@ export async function GET(request, { params }) {
             }
           }
 
+          const ov = typeof item === 'object' && item.overrides ? item.overrides : {};
           return {
             ...dbProduct,
+            ...(ov.name ? { name: ov.name } : {}),
+            ...(ov.sku ? { sku: ov.sku } : {}),
+            ...(ov.width ? { width: Number(ov.width) || ov.width } : {}),
+            ...(ov.height ? { height: Number(ov.height) || ov.height } : {}),
+            ...(ov.thickness ? { thickness: ov.thickness } : {}),
+            ...(ov.finish ? { finish: ov.finish } : {}),
+            ...(ov.color ? { color: ov.color } : {}),
+            ...(ov.slipResistance ? { slipResistance: ov.slipResistance } : {}),
+            ...(ov.peiRating ? { peiRating: ov.peiRating } : {}),
+            ...(ov.description ? { description: ov.description } : {}),
+            ...(ov.imageUrl ? { imageUrl: ov.imageUrl } : {}),
+            ...(ov.badge ? { badge: ov.badge } : {}),
+            ...(ov.price ? { customPrice: ov.price } : {}),
             catalogItemIndex: index + 1,
-            customNote: typeof item === 'object' ? item.customNote : null,
-            customUsageArea: typeof item === 'object' ? item.usageArea : null,
-            productUrl,
+            customNote: typeof item === 'object' ? ov.description || item.customNote : null,
+            customUsageArea: typeof item === 'object' ? ov.usageArea || item.usageArea : null,
+            productUrl: ov.customUrl || productUrl,
             tryInRoomUrl,
             qrCodeUrl,
+            overrides: ov,
           };
         })
       );
     }
 
+    const firstItemMeta = items.find((i) => typeof i === 'object' && i._metaSectionSettings);
+
     return NextResponse.json({
       success: true,
       catalog: {
         ...catalog,
+        sectionSettings: firstItemMeta?._metaSectionSettings || null,
         products: enrichedProducts.filter(Boolean),
       }
     });
