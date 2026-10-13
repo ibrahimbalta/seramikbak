@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { QrCode, Sparkles } from 'lucide-react';
+import { sanitizeUrlString } from '@/lib/catalogSanitizer';
 
 /**
  * CustomCanvasPageRenderer
@@ -11,22 +12,13 @@ import { QrCode, Sparkles } from 'lucide-react';
  * - Turkish typography, exact background colors & eager image loading.
  */
 
-function sanitizeUrl(url) {
-  if (!url || typeof url !== 'string') return '#';
-  const trimmed = url.trim();
-  if (trimmed.startsWith('/') || trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
-    return trimmed;
-  }
-  return '#';
-}
-
 export function getCanvasDimensions(format) {
   if (format === 'landscape') return { width: 842, height: 595 };
   if (format === 'square') return { width: 700, height: 700 };
   return { width: 595, height: 842 }; // portrait (A4 ratio)
 }
 
-function SingleCanvasPage({ page, scale = 1, isPrint = false, isLast = false }) {
+const SingleCanvasPage = memo(function SingleCanvasPage({ page, scale = 1, isPrint = false, isLast = false }) {
   if (!page) return null;
   const { width: pageW, height: pageH } = getCanvasDimensions(page.format);
   const elements = Array.isArray(page.elements) ? page.elements.filter(Boolean) : [];
@@ -156,7 +148,7 @@ function SingleCanvasPage({ page, scale = 1, isPrint = false, isLast = false }) 
               {/* Type: QR CODE */}
               {el.type === 'qr' && (
                 <a
-                  href={sanitizeUrl(el.qrUrl)}
+                  href={sanitizeUrlString(el.qrUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full h-full p-2 bg-white flex flex-col items-center justify-center border border-neutral-300 hover:border-amber-500 hover:shadow-md transition group/qr"
@@ -181,7 +173,7 @@ function SingleCanvasPage({ page, scale = 1, isPrint = false, isLast = false }) 
       </div>
     </div>
   );
-}
+});
 
 export default function CustomCanvasPageRenderer({
   catalog,

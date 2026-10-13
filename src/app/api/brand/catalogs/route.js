@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { verifyAuth } from '@/lib/auth-check';
 import { slugify } from '@/lib/slugify';
 import crypto from 'crypto';
+import { validateAndSanitizeCanvasPages } from '@/lib/catalogSanitizer';
 
 export async function GET(request) {
   try {
@@ -142,12 +143,13 @@ export async function POST(request) {
       if (customCanvasPages.length > 50) {
         return NextResponse.json({ error: 'Maksimum sayfa sayısı (50) aşıldı.' }, { status: 400 });
       }
+      const safeCanvasPages = validateAndSanitizeCanvasPages(customCanvasPages, orientation);
       if (rawItems.length === 0) {
-        rawItems = [{ _isMetaOnly: true, _metaCustomCanvasPages: customCanvasPages }];
+        rawItems = [{ _isMetaOnly: true, _metaCustomCanvasPages: safeCanvasPages }];
       } else {
         rawItems[0] = {
           ...rawItems[0],
-          _metaCustomCanvasPages: customCanvasPages
+          _metaCustomCanvasPages: safeCanvasPages
         };
       }
     }

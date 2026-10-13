@@ -1224,6 +1224,18 @@ export default function CatalogVisualCanvasEditor({
     setAutoSaveStatus('Otomatik kaydedildi');
   }, [pages]);
 
+  // Prevent accidental tab closure when unsaved edits exist in history
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (history.length > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [history.length]);
+
   const pushHistory = (newPages) => {
     setHistory((prev) => [...prev.slice(-19), pages]);
     setFuture([]);
@@ -3177,7 +3189,8 @@ export default function CatalogVisualCanvasEditor({
                       transform: el.rotation ? `rotate(${el.rotation}deg)` : 'none',
                       transformOrigin: 'center center',
                       cursor: el.locked ? 'not-allowed' : 'move',
-                      opacity: (el.opacity || 100) / 100
+                      opacity: (el.opacity || 100) / 100,
+                      touchAction: 'none'
                     }}
                     className={`group ${
                       isSelected

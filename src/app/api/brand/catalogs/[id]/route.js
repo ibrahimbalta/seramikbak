@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyAuth } from '@/lib/auth-check';
 import QRCode from 'qrcode';
+import { validateAndSanitizeCanvasPages } from '@/lib/catalogSanitizer';
 
 // Helper to enrich productItems with actual product details from database & QR code
 async function enrichCatalogProducts(catalog) {
@@ -248,12 +249,13 @@ export async function PUT(request, { params }) {
         if (customCanvasPages.length > 50) {
           return NextResponse.json({ error: 'Maksimum sayfa sayısı (50) aşıldı.' }, { status: 400 });
         }
+        const safeCanvasPages = validateAndSanitizeCanvasPages(customCanvasPages, orientation || existing.orientation || 'portrait');
         if (rawItems.length === 0) {
-          rawItems = [{ _isMetaOnly: true, _metaCustomCanvasPages: customCanvasPages }];
+          rawItems = [{ _isMetaOnly: true, _metaCustomCanvasPages: safeCanvasPages }];
         } else {
           rawItems[0] = {
             ...rawItems[0],
-            _metaCustomCanvasPages: customCanvasPages
+            _metaCustomCanvasPages: safeCanvasPages
           };
         }
       }
