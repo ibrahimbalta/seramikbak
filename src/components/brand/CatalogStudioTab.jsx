@@ -1630,8 +1630,9 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
       {viewMode === 'editor' && (
         <div className="space-y-4 pb-16">
           {/* Editor Top Header with Mode Switcher (Kolay Mod / Gelişmiş Studio) */}
-          <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+          <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-2xs p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Left: Back + Title & Badge */}
+            <div className="flex items-center gap-3.5 min-w-0">
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
@@ -1646,7 +1647,7 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
                     {activeCatalogId ? 'Katalog Düzenleme' : 'Yeni Katalog Stüdyosu'}
                   </span>
                   <span className="text-[10px] font-mono text-neutral-400">
-                    {formData.dataMode === 'live' ? '• Canlı Ürün Verisi' : '• Sabit Sürüm (Snapshot)'}
+                    {formData.dataMode === 'live' ? '• Canlı Ürün Verisi' : '• Sabit Sürüm'}
                   </span>
                 </div>
                 <h2 className="text-base sm:text-lg font-extrabold text-neutral-900 mt-0.5 truncate">
@@ -1656,44 +1657,44 @@ export default function CatalogStudioTab({ brandInfo, externalSubSection, onNavi
             </div>
 
             {/* Center: Mode Switcher (Kolay Mod vs Gelişmiş Studio) */}
-            <div className="flex items-center bg-neutral-100 p-1 rounded-xl border border-neutral-200 self-start lg:self-center">
+            <div className="flex items-center bg-neutral-100 p-1.5 rounded-2xl border border-neutral-200 flex-shrink-0 self-start md:self-center">
               <button
                 type="button"
                 onClick={() => setStudioMode('easy')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition cursor-pointer ${
                   studioMode === 'easy'
-                    ? 'bg-white text-neutral-900 shadow-2xs'
-                    : 'text-neutral-600 hover:text-neutral-900'
+                    ? 'bg-white text-neutral-900 shadow-xs'
+                    : 'text-neutral-500 hover:text-neutral-900'
                 }`}
               >
-                <Sparkles size={13} className="text-[#b4823c]" />
+                <Sparkles size={14} className="text-[#b4823c]" />
                 <span>Kolay Mod (Adım Adım)</span>
               </button>
               <button
                 type="button"
                 onClick={() => setStudioMode('advanced')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition cursor-pointer ${
                   studioMode === 'advanced'
-                    ? 'bg-neutral-900 text-white shadow-2xs'
-                    : 'text-neutral-600 hover:text-neutral-900'
+                    ? 'bg-neutral-900 text-white shadow-xs'
+                    : 'text-neutral-500 hover:text-neutral-900'
                 }`}
               >
-                <Wand2 size={13} className="text-amber-400" />
-                <span>Gelişmiş Studio (Sürükle-Bırak)</span>
+                <Wand2 size={14} className="text-amber-400" />
+                <span>Gelişmiş Studio (Tuval)</span>
               </button>
             </div>
 
-            {/* Right: Delete, Save Draft & Publish Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
+            {/* Right: Actions */}
+            <div className="flex items-center gap-2 flex-shrink-0">
               {activeCatalogId && (
                 <button
                   type="button"
                   onClick={(e) => handleDelete({ id: activeCatalogId, title: formData.title }, e)}
-                  className="px-3.5 py-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-2.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
                   title="Kataloğu Sil"
                 >
                   <Trash2 size={14} />
-                  <span>Kataloğu Sil</span>
+                  <span className="hidden sm:inline">Sil</span>
                 </button>
               )}
               <button
